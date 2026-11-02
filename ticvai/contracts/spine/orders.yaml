@@ -2868,6 +2868,11 @@ paths:
         Marked as a proof on the artefact itself — **a proof that can be mistaken for a ticket is a ticket**,
         and one left on a counter will be presented at a gate.
 
+
+        **It renders the model that prints** (ADAM CR-447, Chinmay, 1 November 2026; CHG-CR447-001): the template''s
+        `TicketLayout` (the one `layoutRef` names), filled with the sample''s values, so the proof previews exactly what
+        the device host prints from the same layout (contracts/devices/ticket-printer.yaml).
+
         '
       tags:
       - orders
@@ -7923,6 +7928,29 @@ paths:
       - query: catalogue#productRecords
         route: in-process
         for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'each added line''s inventoryHoldId, which must be an active hold (409 hold-not-active), as createOrder checks
+          it (CHG-R13ORD-001)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'the added lines'' prices at the order''s venue and channel, CR-439''s rule (addedValue; CHG-R13ORD-001)'
+      x-ticvai-writes:
+      - table: orders.order_event
+        for: 'one row per state change (decided 29 September, writers pass)'
+      - table: orders.order_line
+        for: 'the added lines, as createOrder writes them (CHG-R13ORD-001)'
+      - table: orders.sales_order
+        for: 'the order''s totals and balance due'
+      - table: platform.outbox
+        for: 'order.exchanged, kind modification (CHG-R13ORD-001)'
+      x-ticvai-reads:
+      - table: orders.order_line
+        for: 'the removed lines, of the path''s order, and what they paid (removedValue; CHG-R13ORD-001)'
+      - table: orders.refund_line
+        for: 'what earlier refunds took from each removed line, CR-208''s refundableAmount (removedValue; CHG-R13ORD-001)'
+      - table: orders.sales_order
+        for: 'the order, its venue, channel and status (409 order-voided)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -7937,6 +7965,33 @@ paths:
         **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
         change it makes, with the previous and new state, the actor and the correlation id (decided 29
         September, writers pass).
+
+
+        **Settled as an exchange is** (the lead, 2 November 2026, "Yes to both", applying CR-480''s posted decision
+        to modifyOrder and rescheduleOrder; CHG-R13ORD-001). **The checks, refusing before anything is written:**
+        `400 validation` when a `removeLineIds` entry is not a line of the path''s order, the body has neither
+        `addLines` nor `removeLineIds`, or its `id` differs from the `Idempotency-Key`; `409 order-voided` for a voided
+        order; `409 line-redeemed` (`lineRedeemed`, `lineIds`) when `access#entitlementRecords` shows a removed line''s
+        entitlement redeemed; `409 hold-not-active` (`holdNotActive`, `lineIds`) when an added line''s `inventoryHoldId`
+        is not an active hold (`catalogue#inventoryReservationRecords`), as `createOrder` refuses it: the client holds
+        the new capacity with `acquireInventoryHold` before calling. One problem type per reason.
+
+
+        **The quote.** `removedValue` is what the removed lines paid minus what earlier refunds took from them (their
+        `orders.refund_line` rows, CR-208''s `refundableAmount`); `addedValue` prices the added lines with
+        `catalogue#variantPriceRecords` at the order''s venue and channel (CR-439''s rule), quantity times the selected
+        amount; `balanceDue` = `addedValue` - `removedValue`, in the venue''s currency, with no fee (fees stay zero while
+        the exchange-fee question is with the client). **Until the write half is in**, the operation answers `200` with
+        these values, `refundId` null and the entitlement lists empty, and writes nothing.
+
+
+        **The write**, after `createOrder` (#30977) and `createRefund` (#31924) are built, reusing their steps rather
+        than copies, in one transaction: insert the added lines as `createOrder` writes lines (converting each
+        `inventoryHoldId` as `createOrder` does), refund the removed lines through `createRefund` (with `refund_line`
+        rows), append `orders.order_event` rows, and write `order.exchanged` (`kind` `modification`) to
+        `platform.outbox`. A positive `balanceDue` is left due on the order and collected by `createPayment`; a negative
+        one is the refund `createRefund` makes (`refundId`). Entitlements and capacity move through `order.exchanged`''s
+        consumers (#37212), never written by Orders.
 
         '
       tags:
@@ -7958,15 +8013,25 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Modified, with the balance to settle
+          description: 'Modified, with the balance to settle; until the write half is in, the quote alone, with
+            nothing written (CHG-R13ORD-001)'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderModificationResult'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: 'A `removeLineIds` entry is not a line of this order, the body adds and removes nothing, or its
+            `id` is not the `Idempotency-Key` (CHG-R13ORD-001)'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          x-ticvai-problem-types: [line-redeemed, order-voided]
+          x-ticvai-problem-types: [line-redeemed, order-voided, hold-not-active]
           description: 'A targeted line''s entitlement has been redeemed (`lineRedeemed`, naming it in
-            `lineIds`), or the order is voided (`orderVoided`).
+            `lineIds`), the order is voided (`orderVoided`), or an added line''s inventory hold is not active
+            (`holdNotActive`, naming it in `lineIds`; CHG-R13ORD-001).
 
             '
           content:
@@ -8166,6 +8231,8 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: orders.sales_order
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.refund_line
+        for: 'what earlier refunds took from each outgoing line, for outgoingValue (CR-208''s refundableAmount; ADAM CR-480)'
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -8173,6 +8240,18 @@ paths:
       - query: catalogue#productRecords
         route: in-process
         for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: access#entitlementRecords
+        route: service
+        for: 'whether an outgoing line''s entitlement is redeemed (409 line-redeemed), as modifyOrder asks it (ADAM CR-480)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'each outgoing line''s performance start, for the exchange window (409 outside-exchange-window; ADAM CR-480)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'each incoming line''s inventoryHoldId, which must be an active hold (409 replacement-unavailable; ADAM CR-480)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'the incoming lines'' prices at the order''s venue and channel, CR-439''s rule (incomingValue; ADAM CR-480)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -8192,6 +8271,38 @@ paths:
         **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state
         change it makes, with the previous and new state, the actor and the correlation id (decided 29
         September, writers pass).
+
+
+        **The checks, in this order, refusing before anything is written** (ADAM CR-480, Chinmay, 2 November 2026:
+        option A for the write, and option B built first; CHG-CR480-001). `400 validation` when an `outgoingLineIds`
+        entry is not a line of the path''s order, `incomingLines` is empty, or the body''s `id` differs from the
+        `Idempotency-Key`. `409 line-redeemed` (`refusedReason` `lineRedeemed`, `lineIds`) when
+        `access#entitlementRecords` (route service, as `modifyOrder` asks it) shows an outgoing line''s entitlement
+        redeemed. `409 outside-exchange-window` (`outsideExchangeWindow`, `lineIds`) when now is later than an outgoing
+        line''s performance start (`catalogue#performanceRecords`, in process) minus `exchangeCutoffHours`
+        (`tenancy#venueSettingsRecords`; 24 when unset). `409 replacement-unavailable` (`replacementUnavailable`,
+        `lineIds`) when an incoming line''s `inventoryHoldId` is not an active hold
+        (`catalogue#inventoryReservationRecords`): the client holds the replacement with `acquireInventoryHold` before
+        calling, as POS-004 does before `createOrder`, which is how the replacement is held before the original is
+        released. One problem type per reason, as CR-345 and CR-481 decided.
+
+
+        **The quote.** `outgoingValue` is what the outgoing lines paid minus what earlier refunds took from them (their
+        `orders.refund_line` rows, CR-208''s `refundableAmount`). `incomingValue` prices the incoming lines with
+        `catalogue#variantPriceRecords` at the order''s venue and channel (CR-439''s rule), quantity times the selected
+        amount. `exchangeFee` is zero until the client sets a fee rule (`waiveFee` changes nothing meanwhile).
+        `difference` = `incomingValue` + `exchangeFee` - `outgoingValue`, in the venue''s currency. **Until the write half
+        is in**, the operation answers `200 OrderExchangeResult` with these four values, `newLineIds`,
+        `revokedEntitlementIds` and `issuedEntitlementIds` empty, and writes nothing: not an `order_event`, not a line.
+
+
+        **The write**, after `createOrder` (#30977) and `createRefund` (#31924) are built, reusing their steps rather
+        than copies. In one transaction: insert the incoming lines as `createOrder` writes lines (converting each
+        `inventoryHoldId` as `createOrder` does), mark the outgoing lines exchanged, append `orders.order_event` rows,
+        and write `order.exchanged` to `platform.outbox`. A positive `difference` is left as the balance due on the
+        order and collected by `createPayment`; a negative one is refunded by `createRefund` over the outgoing lines,
+        with `refund_line` rows. Entitlements and capacity move through `order.exchanged`''s consumers, not through
+        calls from Orders.
 
         '
       tags:
@@ -8213,15 +8324,24 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Exchanged
+          description: 'Exchanged; until the write half is in, the quote alone, with nothing written (ADAM CR-480)'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderExchangeResult'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: 'An `outgoingLineIds` entry is not a line of this order, `incomingLines` is empty, or the body''s
+            `id` is not the `Idempotency-Key` (ADAM CR-480)'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [line-redeemed, outside-exchange-window, replacement-unavailable]
           description: 'Replacement unavailable (`replacementUnavailable`), outside the exchange window
             (`outsideExchangeWindow`), or the original is redeemed (`lineRedeemed`). `lineIds` names the
-            lines concerned.
+            lines concerned. One problem type per reason (ADAM CR-480).
 
             '
           content:
@@ -8257,6 +8377,10 @@ paths:
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: orders.sales_order
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.order_line
+        for: 'the moved lines, pointed at the target performance (CHG-R13ORD-001)'
+      - table: platform.outbox
+        for: 'order.exchanged, kind reschedule (CHG-R13ORD-001)'
       x-ticvai-reads:
       - table: orders.order_line
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -8266,13 +8390,23 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: orders.sales_order
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.refund_line
+        for: 'what earlier refunds took from each moved line, CR-208''s refundableAmount (outgoingValue; CHG-R13ORD-001)'
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
         route: in-process
-        for: 'the target performance (409 target-unavailable) (CHG-MOD-003)'
+        for: 'the target performance (409 target-unavailable), and each moved line''s performance start, for the
+          reschedule window (409 outside-reschedule-window) (CHG-MOD-003; CHG-R13ORD-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: access#entitlementRecords
+        route: service
+        for: 'whether a moved line''s entitlement is redeemed (409 line-redeemed), as modifyOrder asks it (CHG-R13ORD-001)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'the moved lines'' prices at the target performance, the order''s venue and channel, CR-439''s rule
+          (incomingValue; CHG-R13ORD-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -8282,7 +8416,8 @@ paths:
         centre agent does forty times a day. Same product, different date or time.
 
         Where the new performance is priced differently, the balance settles as for an exchange. Where
-        the venue charges a rescheduling fee, it appears as a line.
+        the venue charges a rescheduling fee, it appears as a line, once the client sets a fee rule; until then
+        the fee is zero (CHG-R13ORD-001).
 
         **A transport trip moves to another departure of the same route** (decided 29 September, rev 3
         REV3-21): the prototype''s "Change your trip free up to two hours before departure" is the
@@ -8298,6 +8433,32 @@ paths:
         `eventType` `rescheduled`, `relatedEntityType` `performance`, `relatedEntityId` the target performance, in the
         same transaction, even when the order''s status does not change. `getOrderCalendarEvent` counts these rows
         as the calendar event''s SEQUENCE.
+
+
+        **Settled as an exchange is** (the lead, 2 November 2026, "Yes to both", applying CR-480''s posted decision
+        to modifyOrder and rescheduleOrder; CHG-R13ORD-001). **The checks, refusing before anything is written:**
+        `400 validation` when a `lineIds` entry is not a line of the path''s order; `409 line-redeemed` (`lineRedeemed`,
+        `lineIds`) when `access#entitlementRecords` shows a moved line''s entitlement redeemed; `409
+        outside-reschedule-window` when now is later than a moved line''s performance start minus
+        `rescheduleCutoffHours`; `409 target-unavailable` when the target performance cannot take the moved lines
+        (`catalogue#performanceRecords`). One problem type per reason.
+
+
+        **The quote** (`OrderExchangeResult`). `outgoingValue` is what the moved lines paid minus what earlier refunds
+        took from them (`orders.refund_line`, CR-208''s `refundableAmount`); `incomingValue` prices the same variants at
+        the target performance with `catalogue#variantPriceRecords` at the order''s venue and channel (CR-439''s rule);
+        `exchangeFee` is zero, and no rescheduling fee line is added, while the fee question is with the client
+        (`waiveFee` changes nothing meanwhile); `difference` = `incomingValue` + `exchangeFee` - `outgoingValue`.
+        **Until the write half is in**, the operation answers `200` with these values, the id lists empty, and writes
+        nothing: not an `order_event`, not a line.
+
+
+        **The write**, after `createOrder` (#30977) and `createRefund` (#31924) are built, reusing their steps, in one
+        transaction: point the moved lines at the target performance, append the `orders.order_event` rows (the
+        `rescheduled` row among them), and write `order.exchanged` (`kind` `reschedule`) to `platform.outbox`. A
+        positive `difference` is left due on the order and collected by `createPayment`; a negative one is refunded by
+        `createRefund` over the moved lines, with `refund_line` rows. Entitlements and capacity (the old performance''s
+        released, the new one''s taken) move through `order.exchanged`''s consumers (#37212), never written by Orders.
 
         '
       tags:
@@ -8341,13 +8502,20 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Rescheduled
+          description: 'Rescheduled; until the write half is in, the quote alone, with nothing written (CHG-R13ORD-001)'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderExchangeResult'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: 'A `lineIds` entry is not a line of this order (CHG-R13ORD-001)'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          x-ticvai-problem-types: [target-unavailable, outside-reschedule-window]
+          x-ticvai-problem-types: [target-unavailable, outside-reschedule-window, line-redeemed]
           description: Target performance is unavailable (`targetUnavailable`) or outside the
             reschedule window (`outsideRescheduleWindow`). The window is the venue setting
             `rescheduleCutoffHours`, with a tenant default; a reschedule is refused once the original
@@ -22529,7 +22697,9 @@ components:
           type: integer
         layoutRef:
           type: string
-          description: The artwork, as a media-asset reference.
+          description: 'Names the stored `TicketLayout` this template prints (ADAM CR-447, Chinmay, 1 November 2026;
+            CHG-CR447-001): the layout the ticket designer screen saves. Until r13 it was the artwork as a media-asset
+            reference, which carried no element model a printer could render.'
         localeVariants:
           type: object
           additionalProperties:
@@ -22613,12 +22783,89 @@ components:
             '
         layoutRef:
           type: string
+          description: Names the stored `TicketLayout` this template prints (ADAM CR-447).
         localeVariants:
           type: object
           additionalProperties:
             type: string
         isActive:
           type: boolean
+    TicketLayout:
+      x-ticvai-persistence: none — the ticket designer's layout document; `TicketTemplate.layoutRef` names the stored one
+      type: object
+      description: '**What a ticket or wristband prints, element by element** (ADAM CR-447, Chinmay, 1 November 2026, as
+        recommended (A); the names as the Windows device host built them, ADAM CR-463, Chinmay, 2 November 2026;
+        CHG-CR447-001). The ticket designer screen saves it and `TicketTemplate.layoutRef` names it. Filled (each `field`
+        content replaced by its value for the ticket), it is what the device host''s `POST /ticket-printer/print-jobs`
+        takes (contracts/devices/ticket-printer.yaml): the BOCA driver translates a filled layout into its print job, and
+        `printTicketProof` renders the same model, so the proof previews exactly what prints. Every printer prints this
+        one model.'
+      required: [stock, elements]
+      properties:
+        stock:
+          type: object
+          required: [kind, widthMm, heightMm, dpi]
+          description: The stock it prints on.
+          properties:
+            kind:
+              type: string
+              enum: [ticket, wristband]
+            widthMm:
+              type: number
+              exclusiveMinimum: 0
+            heightMm:
+              type: number
+              exclusiveMinimum: 0
+            dpi:
+              type: integer
+              minimum: 1
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketLayoutElement'
+    TicketLayoutElement:
+      x-ticvai-persistence: none — part of TicketLayout
+      type: object
+      description: 'One element of a `TicketLayout` (ADAM CR-447, CR-463): where it sits (`xMm`, `yMm`, in mm from the
+        stock''s origin), its `rotation`, and what fills it. A `text` element has a `font` and `fontSize`; a `code128` or
+        `qr` element a `moduleSizeMm`; an `image` element an asset reference as its content.'
+      required: [kind, xMm, yMm, rotation, content]
+      properties:
+        kind:
+          type: string
+          enum: [text, code128, qr, image]
+        xMm:
+          type: number
+        yMm:
+          type: number
+        rotation:
+          type: integer
+          enum: [0, 90, 180, 270]
+        font:
+          type: string
+          nullable: true
+          description: For `text`.
+        fontSize:
+          type: number
+          nullable: true
+          description: For `text`.
+        moduleSizeMm:
+          type: number
+          nullable: true
+          description: For `code128` and `qr`.
+        content:
+          type: object
+          description: 'Exactly one of `field` (a bound field, filled per ticket), `text` (fixed text) or `assetRef` (an
+            image asset). A filled layout carries each bound field''s value as `text`.'
+          properties:
+            field:
+              type: string
+              enum: [mediaCode, performanceStartsAt, performanceName, seatLabel, guestName, venueName, priceAmount]
+            text:
+              type: string
+            assetRef:
+              type: string
+              description: An image asset, as a media-asset reference.
     Chargeback:
       type: object
       x-ticvai-persistence: orders.chargeback + orders.chargeback_evidence + orders.chargeback_investigation_log
@@ -23367,12 +23614,16 @@ components:
         incomingValue:
           $ref: ../shared/common.yaml#/components/schemas/Money
         exchangeFee:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: 'Zero until the client sets a fee rule (ADAM CR-480); `waiveFee` changes nothing meanwhile.'
         difference:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           description: 'Only the difference settles. The replacement is held before the original is released,
-            never the other way round.
+            never the other way round. `incomingValue` + `exchangeFee` - `outgoingValue`, in the venue''s currency:
+            positive is the balance due on the order, collected by `createPayment`; negative is refunded by
+            `createRefund` over the outgoing lines (ADAM CR-480).
 
             '
         newLineIds:

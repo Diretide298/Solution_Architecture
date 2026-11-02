@@ -1,0 +1,52 @@
+id: CHG-CR483-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: identity.end_principal_sessions (tools/derive-ddl.py END_PRINCIPAL_SESSIONS_SQL) takes the tenant root from the
+  caller's own tenant path under the root grant, else the first label of the principal's home scope path read in the same
+  statement as the caller check, switches to it, confirms it is the tenant node and raises P0001 when no root is found;
+  same signature, owner and SECURITY DEFINER, no policy or grant change. updatePrincipal says so.
+decision:
+  what: 'Posted on #30744 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" (2 November 2026):
+    "option A, with option C''s guard. Build now: a forward migration (new ticket below) replaces identity.end_principal_sessions
+    ... with CREATE OR REPLACE FUNCTION, same signature, owner and SECURITY DEFINER, no policy or grant change: (1) Keep
+    the caller check as it is. (2) Take the root from what the check proved visible ... (3) Switch ticvai.scope_paths to
+    that path, then confirm it ... RAISE EXCEPTION with ERRCODE P0001 ... (4) Then the two UPDATEs as now ... Add one test
+    to the migration"'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-483 (Sanket Keluskar, #30744, blocking): the function read the tenant row of platform.scope, which forced
+  row security hides from a venue grant, so a venue manager''s deactivation ended nothing and answered 200 (CHG-R10ID-006,
+  CR-180, CR-377).'
+keys_touched:
+  operations:
+  - updatePrincipal
+  - resetPrincipalCredential
+  tables:
+  - identity.session
+  - identity.refresh_token
+  - platform.scope
+  files:
+  - tools/derive-ddl.py
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: a definer function that derives its widened scope from a row the caller cannot see, and proceeds on empty
+tickets:
+  started:
+  - '30744 (updatePrincipal, Sanket): no code change; keep the two venue-manager tests, which pass once the migration is
+    applied.'
+  - '31238 (resetPrincipalCredential, Hrushikant, Ready for QA): no code change.'
+  unstarted:
+  - '37214 (the session function fix, made by hand): write the forward migration from the generator''s function (derive-ddl
+    lists it in handoff/migration-review.md as a changed function for a person) and the decision''s test.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-483
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::END_PRINCIPAL_SESSIONS_SQL (held by tools/check-business-rules.py::BR-END-SESSIONS-ROOT)
+status: open
+notes: 'derive-ddl does not write a changed function into a forward migration (ddl_forward lists it for a person), so the
+  migration is #37214''s by hand. Beyond the posted words: the caller check is the same condition, written as the statement
+  that also reads the home root.'

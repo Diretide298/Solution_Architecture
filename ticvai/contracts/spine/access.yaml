@@ -9111,7 +9111,7 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s biometrics settings, consentFormId for the fallback and templatesHeldByTicvai for the view: platform.venue_settings, Tenancy''s data, asked in process through Tenancy''s own query class under the caller''s row security (ADAM CR-390; XDR-032)'
+        for: 'the venue''s biometrics settings, consentFormId for the fallback and templatesHeldByTicvai for the view: platform.venue_settings, Tenancy''s data, asked in process through Tenancy''s own query class under the caller''s row security (ADAM CR-390; XDR-032); then the tenant default (the settings row with venue_id null), read under the routed tenant''s root grant, when the venue''s row names no consent form (ADAM CR-445)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out; pack ''Access Control Module'' p.61 (BO-188); MoM 2 Sep 2026
@@ -9151,8 +9151,16 @@ paths:
         the profile: each capture records the version the guest accepted on its own enrolment record (CHG-CSP-018).
         The venue''s biometrics settings (`consentFormId` for the
         fallback, `templatesHeldByTicvai` for the view) are read through `tenancy#venueSettingsRecords`, in process,
-        through Tenancy''s own query class and under the caller''s row security (XDR-032). No `consentFormId` on the
-        profile and none on the venue is `422 consent-form-required`.
+        through Tenancy''s own query class and under the caller''s row security (XDR-032).
+
+
+        **The consent form in force** (ADAM CR-445, Chinmay, 1 November 2026; CHG-CR445-001): the profile''s
+        `consentFormId`, else the venue''s biometrics settings (`VenueSettings.biometrics.consentFormId`), else the
+        tenant default (the settings row with `venue_id` null, as `VenueSettings` promises a null field inherits it),
+        the last read through the same query under the routed tenant''s root grant (ITenantRootGrant), for that one
+        statement only. Only when all three are empty is it `422 consent-form-required`. The view''s `consentFormId`
+        is the stored value: null means the venue''s (or the tenant''s) form applies, so a client that PUTs the view
+        back keeps following the venue.
 
         '
       tags:
@@ -9201,8 +9209,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
           description: '`retention-threshold-required`: `deletionTrigger` is `operationalRetentionThreshold` and no
-            `retentionThresholdHours` is sent. `consent-form-required`: no `consentFormId` on the profile and none
-            on the venue (CHG-CSP-018; ADAM CR-390).'
+            `retentionThresholdHours` is sent. `consent-form-required`: no `consentFormId` on the profile, none in
+            the venue''s biometrics settings and none in the tenant default (CHG-CSP-018; ADAM CR-390, CR-445).'
           x-ticvai-problem-types:
           - retention-threshold-required
           - consent-form-required
@@ -22900,7 +22908,8 @@ components:
           format: uuid
           nullable: true
           description: 'faceTagEnrolment rows. The venue''s consent form this profile''s captures are taken on (DEC-128;
-            ADAM CR-390, 31 October 2026); null falls back to the venue''s biometric consent form. No foreign key: the
+            ADAM CR-390, 31 October 2026); null falls back to the venue''s biometric consent form, else the tenant
+            default (ADAM CR-445). No foreign key: the
             form lives outside Access. The form''s version is not kept here: each capture records the version the
             guest accepted on its own enrolment record (CHG-CSP-018).'
         accessContext:
@@ -25034,9 +25043,10 @@ components:
           nullable: true
           description: '**The venue''s own consent form a Face Tag is captured on** (decided 2 October 2026, Chinmay,
             batch 4, BO-188: "consent first, using a consent form from the venue"; DEC-128, DEC-549; CHG-CSP-018).
-            Null uses the venue''s biometric consent form (`tenancy.VenueSettings.biometrics.consentFormId`); either
-            way the form comes from the one consent-form builder in Venue Management. With neither, the profile is
-            refused `422 consent-form-required`. Stored as `access.biometric_profile.consent_form_id`; the form''s
+            Null uses the venue''s biometric consent form (`tenancy.VenueSettings.biometrics.consentFormId`), else the
+            tenant default, the settings row with `venue_id` null, read under the routed tenant''s root grant (ADAM
+            CR-445); either way the form comes from the one consent-form builder in Venue Management. With none of the
+            three, the profile is refused `422 consent-form-required`. Stored as `access.biometric_profile.consent_form_id`; the form''s
             version is not kept on the profile, each capture records the one the guest accepted (ADAM CR-390).'
           x-ticvai-stored-as: access.biometric_profile.consent_form_id
         consentCapture:
@@ -35109,7 +35119,9 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: The venue's consent form this profile captures on (DEC-128; CHG-CSP-018).
+          description: 'The consent form stored on this profile (DEC-128; CHG-CSP-018), never the form in effect
+            (ADAM CR-445, Chinmay, 1 November 2026; CHG-CR445-001): null means the venue''s form applies, or the
+            tenant''s where the venue names none, so a client that PUTs the view back keeps following the venue.'
         enrollmentChannels:
           type: array
           items:

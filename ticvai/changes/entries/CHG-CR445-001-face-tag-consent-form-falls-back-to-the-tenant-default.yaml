@@ -1,0 +1,47 @@
+id: CHG-CR445-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: setFaceTagTemporaryEnrollment's consent form is the profile's consentFormId, else the venue's biometrics settings,
+  else the tenant default (the settings row with venue_id null) read under the routed tenant's root grant; only when all
+  three are empty is it 422 consent-form-required. The view's consentFormId is the stored value (null follows the venue).
+decision:
+  what: 'Posted on #30956 (Chinmay, 1 November 2026), under the lead''s "Approve all" (1 November 2026): "as you recommended:
+    fallback B, view A. The consent form is the profile''s consentFormId, else the venue''s biometrics settings, else the
+    tenant default (the settings row with venue_id null), the last read under the routed tenant''s root grant; only when
+    all three are empty is it 422 consent-form-required. The view''s consentFormId shows the stored value: null means the
+    venue''s (or tenant''s) form applies, so a client that PUTs the view back keeps following the venue."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-445 (Hrushikant Patkar, #30956): CR-390 refused a profile with no form on it or on the venue, though VenueSettings
+  promises a null field inherits the tenant default, which a venue grant cannot read.'
+keys_touched:
+  operations:
+  - setFaceTagTemporaryEnrollment
+  schemas:
+  - FaceTagTemporaryEnrollmentView
+  - FaceTagTemporaryEnrollmentInput
+  - AccessBiometricProfile
+  tables:
+  - platform.venue_settings
+  - access.biometric_profile
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/tenancy.yaml
+  - tools/check-business-rules.py
+root_class: a fallback the settings model promises, read where the caller's row security cannot reach
+tickets:
+  started:
+  - '30956 (setFaceTagTemporaryEnrollment, Hrushikant): add the tenant-default read under the root grant; keep the view''s
+    stored value as built.'
+  unstarted:
+  - '32382 (BO-188 connect to API): no visible change.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-445
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FACE-TAG-CONSENT-FALLBACK
+status: open
+notes: 'No migration. Beyond the posted words: none.'

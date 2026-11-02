@@ -125,6 +125,11 @@ x-ticvai-queries:
       reads (searchCatalogue, listProducts, getProduct), a read the lead granted across deployables
       (docs/active/cross-deployable-writes.yaml XDR-005; ADAM CR-221, CHG-R10CAT-015); and asked from another
       deployable through VenueOps' service route (serviceAuth).
+      **The tenant's library, for White Label's kiosk checks only** (ADAM CR-443, Chinmay, 1 November 2026;
+      CHG-CR443-001): for white-label getKioskConfigValidation and publishKioskConfigs (mediaDoesNotFit) the read
+      takes the rows whose venue_id is the kiosk's venue or null (a null venue_id is the tenant's library), in
+      process, for that check only, so a library asset is found; every other asker reads as the caller's scope lets
+      it see them.
     served: [in-process, service]
   # **A guest's identity uploads, as Identity's projection** (r11 gate, 29 October 2026; CHG-R11FXV-001; the lead's
   # r10 ruling on the ADR-0028 tiers, CHG-R10ID-018): Identity is Foundation, so submitGuestIdentityDocument checks the

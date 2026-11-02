@@ -1999,6 +1999,7 @@ def main() -> int:
              f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
     access_rules_r12(need, op)
     pricing_rules_r13(need, op)
+    lane_q_rules_r13(need, op)
 
     # ---------------------------------------------------------------- r12 CR lane F (31 October 2026; the lead: "for
     # each one actually check if they hold and if not then find out the best way keeping in mind what client needs").
@@ -2818,7 +2819,7 @@ def main() -> int:
              "BR-VARIANT-PRICE", "BR-ELASTICITY-LABELS", "BR-CHANGE-IMPACT", "BR-PRODUCT-WORKFLOW", "BR-FEE-INSTANTS",
              "BR-SEAT-RULE-OVERLAP", "BR-TAX-PROFILE-LIST",
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
-             "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE"]
+             "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE"] + LANE_Q_R13_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -3042,6 +3043,212 @@ def pricing_rules_r13(need, op):
     need("BR-TAX-PROFILE-LIST", "in-process" in (((fin.get("x-ticvai-queries") or {}).get("legalEntityRecords") or {})
                                                  .get("served") or []),
          "finance#legalEntityRecords is not served in process, so Catalogue cannot ask it within commerce (CR-468)")
+
+
+LANE_Q_R13_RULES = ["BR-CATALOGUE-ANCESTORS", "BR-GUIDED-CHOICE-UPDATE", "BR-FACE-TAG-CONSENT-FALLBACK", "BR-TICKET-LAYOUT",
+                    "BR-DEVICE-HOST", "BR-DEVICE-KEY", "BR-SIGNAGE-BOARD", "BR-TEMPERATURE-CHECKPOINT",
+                    "BR-SIGNAGE-CALLS-LEFT", "BR-WALLET-TOPUP-GUEST", "BR-DELEGATION-AUTHORITY", "BR-EXCHANGE-QUOTE",
+                    "BR-MATRIX-REFUSAL-TYPES", "BR-END-SESSIONS-ROOT", "BR-ORDER-SETTLEMENT"]
+
+
+def lane_q_rules_r13(need, op):
+    """r13 CR lane q (ADAM CR-443 to CR-483, decided 1 and 2 November 2026; CHG-CR443-001 to CHG-CR483-001,
+    CHG-R13ORD-001). Each rule fails on the r12 package (e3e4082c) and passes once the posted decision is in."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route")))
+                for v in o_.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def tables(o_, key):
+        return {str((t or {}).get("table")) for t in o_.get(key) or [] if isinstance(t, dict)}
+
+    def query(contract, name):
+        return ((load(contract).get("x-ticvai-queries") or {}).get(name)) or {}
+
+    def schemas(contract):
+        return (load(contract).get("components") or {}).get("schemas") or {}
+
+    xdr = {str((r or {}).get("id")): r for r in load("docs/active/cross-deployable-writes.yaml").get("reads") or []
+           if isinstance(r, dict)}
+
+    # BR-CATALOGUE-ANCESTORS (ADAM CR-443): the guided choice and kiosk checks read rows at the venue and its ancestors
+    for oid in ("createGuidedChoice", "proposeGuidedChoice", "updateGuidedChoice", "publishGuidedChoice",
+                "getKioskConfigValidation"):
+        need("BR-CATALOGUE-ANCESTORS", "at its ancestors" in words(op(oid)[3].get("description"))
+             and "for this check only" in words(op(oid)[3].get("description")),
+             f"{oid} does not say its check reads the rows at the venue and at its ancestors, for this check only (CR-443)")
+    need("BR-CATALOGUE-ANCESTORS", "root grant" in words(op("getKioskConfigValidation")[3].get("description")),
+         "getKioskConfigValidation does not read module enablement under the routed tenant's root grant (CR-443)")
+    for contract, name in (("contracts/spine/catalogue.yaml", "productCategoryRecords"),
+                           ("contracts/satellite/payments.yaml", "paymentMethodRecords"),
+                           ("contracts/satellite/assets.yaml", "mediaAssetRecords")):
+        need("BR-CATALOGUE-ANCESTORS", "CR-443" in words(query(contract, name).get("rule")),
+             f"{name}'s rule does not state the read above the venue for White Label's checks (CR-443)")
+
+    # BR-GUIDED-CHOICE-UPDATE (ADAM CR-444)
+    ugc = op("updateGuidedChoice")[3]
+    need("BR-GUIDED-CHOICE-UPDATE", "target-not-in-venue" in ptypes(ugc, "400"),
+         "updateGuidedChoice's 400 does not answer target-not-in-venue (CR-444)")
+    for q in ("catalogue#productRecords", "catalogue#productCategoryRecords", "catalogue#eventRecords"):
+        need("BR-GUIDED-CHOICE-UPDATE", (q, "in-process") in vias(ugc),
+             f"updateGuidedChoice does not ask {q} in process (CR-444)")
+    need("BR-GUIDED-CHOICE-UPDATE", "updateGuidedChoice" in ((xdr.get("XDR-033") or {}).get("operations") or []),
+         "XDR-033 does not grant updateGuidedChoice's Catalogue reads (CR-444)")
+
+    # BR-FACE-TAG-CONSENT-FALLBACK (ADAM CR-445)
+    sft = words(op("setFaceTagTemporaryEnrollment")[3].get("description"))
+    need("BR-FACE-TAG-CONSENT-FALLBACK", "else the tenant default" in sft and "root grant" in sft,
+         "setFaceTagTemporaryEnrollment does not fall back to the tenant default under the root grant (CR-445)")
+    view = (schemas("contracts/spine/access.yaml").get("FaceTagTemporaryEnrollmentView") or {}).get("properties") or {}
+    need("BR-FACE-TAG-CONSENT-FALLBACK", "never the form in effect" in words((view.get("consentFormId") or {}).get("description")),
+         "FaceTagTemporaryEnrollmentView.consentFormId does not say it is the stored value (CR-445)")
+
+    # BR-TICKET-LAYOUT (ADAM CR-447, CR-463): the layout model the BOCA driver and the proof share
+    osch = schemas("contracts/spine/orders.yaml")
+    tl, tle = osch.get("TicketLayout") or {}, osch.get("TicketLayoutElement") or {}
+    stock = ((tl.get("properties") or {}).get("stock") or {}).get("properties") or {}
+    need("BR-TICKET-LAYOUT", {"widthMm", "heightMm", "dpi"} <= set(stock),
+         "orders TicketLayout.stock has no widthMm, heightMm and dpi (CR-447, CR-463)")
+    eprops = tle.get("properties") or {}
+    need("BR-TICKET-LAYOUT", {"kind", "xMm", "yMm", "rotation", "font", "fontSize", "moduleSizeMm", "content"} <= set(eprops)
+         and {"field", "text", "assetRef"} <= set(((eprops.get("content") or {}).get("properties") or {})),
+         "orders TicketLayoutElement lacks the names the device host built (CR-463)")
+    need("BR-TICKET-LAYOUT", "TicketLayout" in words(((osch.get("TicketTemplateRequest") or {}).get("properties") or {})
+                                                     .get("layoutRef", {}).get("description")),
+         "TicketTemplateRequest.layoutRef does not name a stored TicketLayout (CR-447)")
+    need("BR-TICKET-LAYOUT", "TicketLayout" in words(op("printTicketProof")[3].get("description")),
+         "printTicketProof does not say it renders the TicketLayout that prints (CR-447)")
+    tp = load("contracts/devices/ticket-printer.yaml") if (ROOT / "contracts/devices/ticket-printer.yaml").exists() else {}
+    paths = tp.get("paths") or {}
+    need("BR-TICKET-LAYOUT", "/ticket-printer/status" in paths and "/ticket-printer/print-jobs" in paths,
+         "contracts/devices/ticket-printer.yaml does not carry the device host's two paths (CR-463)")
+    pj = (paths.get("/ticket-printer/print-jobs") or {}).get("post") or {}
+    need("BR-TICKET-LAYOUT", any((p or {}).get("name") == "Idempotency-Key" and (p or {}).get("required")
+                                 for p in pj.get("parameters") or []),
+         "the device host's print job does not require an Idempotency-Key (CR-463)")
+    need("BR-TICKET-LAYOUT", {"502", "503", "504", "409", "400", "403"} <= {str(k) for k in (pj.get("responses") or {})},
+         "the device host's print job does not answer 400, 403, 409, 502, 503 and 504 (CR-463)")
+    td = words((tp.get("info") or {}).get("description"))
+    need("BR-TICKET-LAYOUT", "127.0.0.1 only" in td and "refuses any other origin with 403" in td
+         and "never prints again" in td and "keeps no secret" in td,
+         "contracts/devices/ticket-printer.yaml does not state loopback, the origin allowlist, the idempotent retry "
+         "and no secret (CR-463 (2))")
+
+    # BR-DEVICE-HOST (ADAM CR-448)
+    adr = (ROOT / "docs/adr/0015-standards-first-device-drivers.md").read_text(encoding="utf-8")
+    need("BR-DEVICE-HOST", "CR-448" in adr and "device host" in adr,
+         "ADR-0015 does not record where the BOCA driver runs (the Windows device host, CR-448)")
+
+    # BR-DEVICE-KEY (ADAM CR-451)
+    dc = (schemas("contracts/spine/tenancy.yaml").get("DeviceCredential") or {}).get("properties") or {}
+    need("BR-DEVICE-KEY", "apiKey" in ((dc.get("kind") or {}).get("enum") or []) and "key" in dc,
+         "tenancy DeviceCredential has no kind apiKey, or no key shown once at issue (CR-451)")
+    for oid in ("getSignageQueueBoard", "getSignageQueueCalls"):
+        rs = {str(k) for k in (op(oid)[3].get("responses") or {})}
+        need("BR-DEVICE-KEY", {"401", "403"} <= rs and "CR-451" in words(op(oid)[3].get("description")),
+             f"{oid} does not sign the display in by its key, with 401 and 403 (CR-451)")
+    need("BR-DEVICE-KEY", "CR-451" in words(op("submitQueueReading")[3].get("description")),
+         "submitQueueReading does not use the device-key sign-in (CR-451)")
+
+    # BR-SIGNAGE-BOARD (ADAM CR-452)
+    gsb = op("getSignageQueueBoard")[3]
+    gd = words(gsb.get("description"))
+    need("BR-SIGNAGE-BOARD", "queue.feed" in tables(gsb, "x-ticvai-reads"),
+         "getSignageQueueBoard does not read queue.feed for isStale (CR-452)")
+    for frag in ("`green` up to 15 minutes, `amber` from 16 to 45, `red` above 45", "English as the fallback",
+                 "'Min {n} cm'", "older than twice its feed's", "`refreshSeconds` is 30", "ordered by name"):
+        need("BR-SIGNAGE-BOARD", frag in gd, f"getSignageQueueBoard does not say {frag!r} (CR-452)")
+
+    # BR-TEMPERATURE-CHECKPOINT (ADAM CR-453)
+    stc = op("setTemperatureCheckpoint")[3]
+    need("BR-TEMPERATURE-CHECKPOINT", ("tenancy#outletRecords", "in-process") in vias(stc) and "400" in (stc.get("responses") or {})
+         and "setTemperatureCheckpoint" in ((xdr.get("XDR-004") or {}).get("operations") or []),
+         "setTemperatureCheckpoint does not check outletId against the venue's outlets in process with a 400 (CR-453)")
+    need("BR-TEMPERATURE-CHECKPOINT", "`minCelsius` greater than `maxCelsius` is `400`" in words(stc.get("description"))
+         and "0 or less is `400`" in words(stc.get("description")),
+         "setTemperatureCheckpoint does not refuse min above max, or a frequency of 0 or less (CR-453)")
+
+    # BR-SIGNAGE-CALLS-LEFT (ADAM CR-453)
+    calls = (((((op("getSignageQueueCalls")[3].get("responses") or {}).get("200") or {}).get("content") or {})
+              .get("application/json") or {}).get("schema") or {}).get("properties") or {}
+    need("BR-SIGNAGE-CALLS-LEFT", "leftCalled" in calls,
+         "getSignageQueueCalls does not list the parties that left the called state since the cursor (CR-453)")
+
+    # BR-WALLET-TOPUP-GUEST (ADAM CR-471)
+    tuw = op("topUpWallet")[3]
+    need("BR-WALLET-TOPUP-GUEST", tuw.get("x-ticvai-self-scoped") == "subject" and "404" in (tuw.get("responses") or {}),
+         "topUpWallet does not hold a guest to its own wallet (self-scoped subject, the shared 404) (CR-471)")
+    need("BR-WALLET-TOPUP-GUEST", {"wallet.balance", "wallet.credit_lot", "wallet.wallet_transaction", "wallet.wallet",
+                                   "platform.outbox"} <= tables(tuw, "x-ticvai-writes"),
+         "topUpWallet's x-ticvai-writes does not list its five tables (CR-471)")
+    twd = words(tuw.get("description"))
+    need("BR-WALLET-TOPUP-GUEST", "ITenantRootGrant" in twd and "Nothing else runs under the root grant" in twd
+         and "`orders.order_line.venue_id`" in twd,
+         "topUpWallet does not confine a guest's writes to the root grant, or state the lot's scope (CR-471)")
+
+    # BR-DELEGATION-AUTHORITY (ADAM CR-479)
+    for oid in ("createApprovalDelegation", "approveRoleAuthorityDelegation"):
+        v = vias(op(oid)[3])
+        need("BR-DELEGATION-AUTHORITY", ("identity#principalHoldsRoleAtVenue", "in-process") in v
+             and ("identity#principalHoldsPermissionAtVenue", "in-process") in v,
+             f"{oid} does not ask the two yes/no rule questions in process (CR-479)")
+    php = query("contracts/spine/identity.yaml", "principalHoldsPermissionAtVenue")
+    need("BR-DELEGATION-AUTHORITY", "ITenantRootGrant" in words(php.get("rule")) and php.get("served") == ["in-process"],
+         "identity#principalHoldsPermissionAtVenue is not a yes/no under ITenantRootGrant, served in process (CR-479)")
+    cad = words(op("createApprovalDelegation")[3].get("description"))
+    need("BR-DELEGATION-AUTHORITY", "makes the limit unlimited" in cad and "is not compared with the matrix" in cad
+         and "The `400`s (`invalidWindow`, `delegateIsDelegator`) are checked first" in cad,
+         "createApprovalDelegation does not state the limit rule, maxPercentage and the order of refusals (CR-479)")
+    need("BR-DELEGATION-AUTHORITY", "which never exceeds what the delegator may approve under the matrix, its own"
+         not in words(op("approveRoleAuthorityDelegation")[3].get("description")),
+         "approveRoleAuthorityDelegation still compares maxPercentage with the matrix (CR-479)")
+
+    # BR-EXCHANGE-QUOTE (ADAM CR-480)
+    eol = op("exchangeOrderLines")[3]
+    need("BR-EXCHANGE-QUOTE", ptypes(eol, "409") == {"line-redeemed", "outside-exchange-window", "replacement-unavailable"},
+         "exchangeOrderLines' 409 does not name one problem type per reason (CR-480)")
+    for q, r in (("access#entitlementRecords", "service"), ("catalogue#performanceRecords", "in-process"),
+                 ("catalogue#inventoryReservationRecords", "in-process"), ("catalogue#variantPriceRecords", "in-process")):
+        need("BR-EXCHANGE-QUOTE", (q, r) in vias(eol), f"exchangeOrderLines does not ask {q} ({r}) (CR-480)")
+    ed = words(eol.get("description"))
+    need("BR-EXCHANGE-QUOTE", "`exchangeFee` is zero until the client sets a fee rule" in ed and "writes nothing" in ed,
+         "exchangeOrderLines does not state the quote, the zero fee and the write-nothing interim (CR-480)")
+    ev = load("events/order-exchanged.yaml")
+    need("BR-EXCHANGE-QUOTE", {"catalogue", "seating", "access"} <= {(c or {}).get("context") for c in ev.get("consumers") or []},
+         "events/order-exchanged.yaml names no catalogue, seating and access consumers (CR-480)")
+
+    # BR-MATRIX-REFUSAL-TYPES (ADAM CR-481)
+    sam = op("setApprovalMatrix")[3]
+    need("BR-MATRIX-REFUSAL-TYPES", {"loosens-parent-rule", "unreachable-rule", "matrix-id-mismatch"} <= ptypes(sam, "409"),
+         "setApprovalMatrix's 409 does not declare loosens-parent-rule and unreachable-rule (CR-481)")
+    for oid in ("setApprovalMatrix", "approveMatrixMultiLevel"):
+        sch = (((((op(oid)[3].get("responses") or {}).get("422") or {}).get("content") or {})
+                .get("application/problem+json") or {}).get("schema") or {}).get("$ref")
+        need("BR-MATRIX-REFUSAL-TYPES", str(sch).endswith("ApprovalConditionInvalidProblem"),
+             f"{oid}'s 422 condition-invalid is not ApprovalConditionInvalidProblem (ruleOrder, clause; CR-481)")
+
+    # BR-END-SESSIONS-ROOT (ADAM CR-483)
+    ddl = (ROOT / "tools/derive-ddl.py").read_text(encoding="utf-8")
+    need("BR-END-SESSIONS-ROOT", "FROM platform.scope s WHERE s.level = 'tenant' LIMIT 1" not in ddl
+         and "subpath(hs.path, 0, 1)" in ddl and "no tenant root for principal" in ddl and "'P0001'" in ddl,
+         "identity.end_principal_sessions still takes the root from platform.scope's tenant row, or does not raise "
+         "when it finds none (CR-483)")
+
+    # BR-ORDER-SETTLEMENT (the lead, 2 November 2026, "Yes to both": CR-480's rule for modifyOrder and rescheduleOrder)
+    for oid in ("modifyOrder", "rescheduleOrder"):
+        o_ = op(oid)[3]
+        d = words(o_.get("description"))
+        need("BR-ORDER-SETTLEMENT", "line-redeemed" in ptypes(o_, "409") and "never written by Orders" in d
+             and "writes nothing" in d and ("catalogue#variantPriceRecords", "in-process") in vias(o_),
+             f"{oid} does not settle as an exchange does: refusals first, quote first, entitlements through the "
+             "order event's consumers (CHG-R13ORD-001)")
+    need("BR-ORDER-SETTLEMENT", "modifyOrder" in str(ev.get("emittedWhen")) and "rescheduleOrder" in str(ev.get("emittedWhen")),
+         "events/order-exchanged.yaml is not emitted by modifyOrder and rescheduleOrder (CHG-R13ORD-001)")
 
 
 if __name__ == "__main__":

@@ -1844,12 +1844,20 @@ def seed_rows_sql(db: str, cols: dict) -> str:
 # ends every live session and revokes every live refresh token of that principal. No grant or policy is widened: the
 # function lifts the connection to the tenant root for its own two statements only and puts the caller's scope back
 # before it returns. updatePrincipal (deactivation, validTo, primaryRoleId) and forceLogout call it.
+# **The root comes from what the caller check proved visible** (ADAM CR-483, Chinmay, 2 November 2026, option A with
+# option C's guard; CHG-CR483-001). It used to read the tenant row of platform.scope, whose forced row security hides
+# that row from a venue grant, so for a venue manager root_path was NULL, scope_paths became '' and both UPDATEs ended
+# nothing while updatePrincipal answered 200. Now: the caller's own tenant path when platform.tenant_root_in_scope(),
+# else the first label of the principal's home scope path, read in the same statement as the check; the path is
+# switched to, then confirmed as the tenant node, and a missing root raises P0001 so nothing is written.
 END_PRINCIPAL_SESSIONS_SQL = """
 -- **identity.end_principal_sessions** (ADAM CR-180, option A; CHG-R10ID-006): ends every live session and revokes every
 -- live refresh token of one principal, at every venue, once the caller is shown to be allowed to update that principal
 -- (identity.principal's write rule, home-scope-write). Returns the number of sessions ended. Whatever its owner, it
 -- reads and writes the two tables at the tenant root for these statements only, and restores the caller's
--- ticvai.scope_paths before returning.
+-- ticvai.scope_paths before returning. The root is taken from what the caller check proved visible (ADAM CR-483;
+-- CHG-CR483-001): the caller's own tenant path under the tenant root, else the first label of the principal's home
+-- scope path; it is confirmed as the tenant node once granted, and a missing root raises, so nothing is written.
 CREATE OR REPLACE FUNCTION identity.end_principal_sessions(target_principal_id uuid, ended_by uuid, reason text)
     RETURNS integer
     LANGUAGE plpgsql
@@ -1859,17 +1867,33 @@ CREATE OR REPLACE FUNCTION identity.end_principal_sessions(target_principal_id u
 AS $$
 DECLARE
     caller_paths text := current_setting('ticvai.scope_paths', true);
+    root_in_scope boolean := platform.tenant_root_in_scope();
     root_path text;
+    home_root text;
     ended integer := 0;
 BEGIN
-    IF NOT (platform.tenant_root_in_scope() OR EXISTS (
-            SELECT 1 FROM identity.principal hp JOIN platform.scope hs ON hs.id = hp.home_scope_id
-             WHERE hp.id = target_principal_id AND platform.in_scope(hs.path))) THEN
+    SELECT subpath(hs.path, 0, 1)::text INTO home_root
+      FROM identity.principal hp JOIN platform.scope hs ON hs.id = hp.home_scope_id
+     WHERE hp.id = target_principal_id AND (root_in_scope OR platform.in_scope(hs.path));
+    IF NOT (root_in_scope OR home_root IS NOT NULL) THEN
         RAISE EXCEPTION 'identity.end_principal_sessions: the caller may not update principal %', target_principal_id
             USING ERRCODE = '42501';
     END IF;
-    SELECT s.path::text INTO root_path FROM platform.scope s WHERE s.level = 'tenant' LIMIT 1;
-    PERFORM set_config('ticvai.scope_paths', COALESCE(root_path, ''), true);
+    IF root_in_scope THEN
+        SELECT s.path::text INTO root_path FROM platform.scope s
+         WHERE s.level = 'tenant' AND s.path = ANY (platform.current_scope_paths()) LIMIT 1;
+    ELSE
+        root_path := home_root;
+    END IF;
+    IF root_path IS NULL THEN
+        RAISE EXCEPTION 'identity.end_principal_sessions: no tenant root for principal %', target_principal_id
+            USING ERRCODE = 'P0001';
+    END IF;
+    PERFORM set_config('ticvai.scope_paths', root_path, true);
+    IF (SELECT count(*) FROM platform.scope s WHERE s.level = 'tenant' AND s.path = root_path::ltree) <> 1 THEN
+        RAISE EXCEPTION 'identity.end_principal_sessions: no tenant root for principal %', target_principal_id
+            USING ERRCODE = 'P0001';
+    END IF;
     UPDATE identity.session
        SET status = 'terminated', ended_at = now(), ended_by_principal_id = ended_by, end_reason = left(reason, 500)
      WHERE principal_id = target_principal_id AND status = 'active';

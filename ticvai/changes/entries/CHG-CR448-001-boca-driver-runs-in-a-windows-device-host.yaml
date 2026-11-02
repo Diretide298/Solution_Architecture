@@ -1,0 +1,39 @@
+id: CHG-CR448-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'On Windows kiosks and tills a small .NET device host runs beside the BOCA printer, composing #35592''s driver
+  (ticketPrinter port, FGL encoder, raw TCP 9100, status mapper); the kiosk and POS apps call it on localhost. Android waits
+  on the client''s answer on how the printer connects. Recorded as an ADR-0015 amendment and in the integration register.'
+decision:
+  what: 'Posted on #35592 (Chinmay, 1 November 2026), under the lead''s "Approve all" (1 November 2026): "as you recommended.
+    On Windows kiosks and tills a small .NET device host runs beside the printer, composing the existing driver (ticketPrinter
+    port, FGL encoder, raw TCP 9100, status mapper); the kiosk and POS apps call it on localhost. Android is decided once
+    the client answers how the printer connects (TCP, USB or serial) ... until then build and test the Windows host. #35592
+    comes off hold for the Windows path."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-448 (Hrushikant Patkar, #35592, blocking): ''in the device app'' named no process, and the kiosk and POS apps
+  are TypeScript and cannot load the .NET driver; ADR-0015.'
+keys_touched:
+  files:
+  - docs/adr/0015-standards-first-device-drivers.md
+  - handoff/integration-register.md
+  - tools/check-business-rules.py
+  other:
+  - ADR-0015 amendment of 1 November 2026
+root_class: a device driver with no named host process between the apps and the printer
+tickets:
+  started:
+  - '35592 (DEVICE-BOCA-FGL, Hrushikant): build and test the Windows device host; off hold for the Windows path.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-448
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DEVICE-HOST
+status: open
+notes: 'The plan task text (DEVICE-BOCA-FGL ''in the device app'', block-a-extra-tasks.json) is a plan file and is not touched;
+  the plan lane may reword it. Beyond the posted words: none.'

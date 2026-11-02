@@ -4443,14 +4443,6 @@
    "reason": "the map's own seat state; the orders side comes through the orders service operation, not a table read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "getSignageQueueBoard": {
-   "reads": [
-    "queue.queue",
-    "queue.reading"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "getSignageQueueCalls": {
    "reads": [
     "queue.entry"
@@ -15997,10 +15989,6 @@
   "topUpWallet": {
    "reads": [
     "wallet.balance"
-   ],
-   "writes": [
-    "wallet.balance",
-    "wallet.wallet_transaction"
    ],
    "reason": "4 October 2026 (CHG-FXC-004): the one balance writer (SD-027) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true

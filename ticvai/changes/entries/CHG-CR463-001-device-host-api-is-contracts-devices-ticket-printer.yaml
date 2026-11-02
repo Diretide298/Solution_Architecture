@@ -1,0 +1,58 @@
+id: CHG-CR463-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'The Windows device host''s localhost API is contracts/devices/ticket-printer.yaml: GET /ticket-printer/status
+  and POST /ticket-printer/print-jobs (Idempotency-Key required) printing a filled TicketLayout, errors in the shared Problem
+  (paper out, jam, offline, busy, fault 503; printer-rejected-ticket 502; print-not-confirmed 504; stock-not-configured
+  and two RFID codes 409; validation 400), loopback only, an origin allowlist (403 otherwise), a retried POST never prints
+  twice (keys kept 24 hours), no secret. The lineage tools skip a device-tier contract.'
+decision:
+  what: 'Posted on #35592 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" (2 November 2026):
+    "A, as you recommended: the device host''s API as built is the contract, written down once, and the Android path implements
+    the same one later ... The package adds it as contracts/devices/ticket-printer.yaml, with TicketLayout in the orders
+    contract, under the same names, so the host does not change. (2) ... the host listens on 127.0.0.1 only ... refuses
+    any other origin with 403. A POST retried with the same Idempotency-Key answers the first job''s outcome and never prints
+    again; keep keys locally for at least 24 hours ... The host keeps no secret. (3) The front ends (new ticket) ... (4)
+    The mock API (SETUP-MOCK-API) serves this file"'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-463 (Hrushikant Patkar, #35592): CR-448''s host was built with an API no contract held, so the kiosk and POS
+  builders had nothing to build against; ADR-0015.'
+keys_touched:
+  operations:
+  - getTicketPrinterStatus
+  - submitTicketPrintJob
+  schemas:
+  - TicketLayout
+  - TicketLayoutElement
+  files:
+  - contracts/devices/ticket-printer.yaml
+  - contracts/spine/orders.yaml
+  - docs/adr/0015-standards-first-device-drivers.md
+  - tools/derive-lineage.py
+  - tools/check-lineage.py
+  - tools/check-business-rules.py
+root_class: a built API between our own processes held in no contract
+tickets:
+  started:
+  - '35592 (DEVICE-BOCA-FGL, Hrushikant): commit the host''s OpenAPI file to its repository and attach it; check it against
+    contracts/devices/ticket-printer.yaml (see notes).'
+  unstarted:
+  - '37207 and 37208 (kiosk and POS printing, the child tickets made by hand): status check and print job from KSK-009,
+    502/503/504 to KSK-010 and POS-026''s reprint; no visible change.'
+  - 'SETUP-MOCK-API: serve this file.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-463
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TICKET-LAYOUT
+status: open
+notes: 'Written from the posted names; the as-built OpenAPI is not in this repository. To check against the host''s file:
+  the operationIds (getTicketPrinterStatus, submitTicketPrintJob are this package''s), the status body (here only ready),
+  the print-job body (here {layout}) and result (here {printed}), the 503 slugs (here printer-paper-out, printer-jam, printer-offline,
+  printer-busy, printer-fault), the names of the two RFID 409 codes (not listed here), the 403''s type (here forbidden),
+  the stock kind''s field name, and the port (none stated). Device-tier contracts (info.x-ticvai-tier device) have no lineage:
+  tools/derive-lineage.py and tools/check-lineage.py skip them.'

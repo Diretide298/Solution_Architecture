@@ -1,0 +1,48 @@
+id: CHG-CR480-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: exchangeOrderLines states its checks in order (400 validation; 409 line-redeemed, outside-exchange-window, replacement-unavailable,
+  one problem type each), the quote (outgoingValue net of refunds, incomingValue by catalogue#variantPriceRecords, exchangeFee
+  zero, difference) answered with nothing written until the write half, and the write reusing createOrder's and createRefund's
+  steps. It declares the four reads; order.exchanged gains catalogue, seating and access consumers.
+decision:
+  what: 'Posted on #30685 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" (2 November 2026):
+    "option A for the write, and option B built first in this ticket ... (1) The checks, in this order ... One problem type
+    per reason ... (2) The quote ... exchangeFee is zero until the client sets a fee rule ... write nothing ... (3) The
+    write, after createOrder (#30977) and createRefund (#31924) are built ... Entitlements and capacity move through order.exchanged''s
+    consumers (new ticket below) ... Declare access#entitlementRecords, catalogue#performanceRecords, catalogue#inventoryReservationRecords
+    and catalogue#variantPriceRecords on the operation, and its 409 problem types"'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-480 (Pranay Shinde, #30685, blocking): the exchange needed the sale and refund pipelines, which are not built,
+  and reads and consumers it did not declare; CR-439 (the price rule), CR-208 (refundableAmount).'
+keys_touched:
+  operations:
+  - exchangeOrderLines
+  schemas:
+  - OrderExchangeResult
+  tables:
+  - orders.refund_line
+  files:
+  - contracts/spine/orders.yaml
+  - events/order-exchanged.yaml
+  - tools/check-business-rules.py
+root_class: an operation that needs pipelines and cross-module reads it neither has nor declares
+tickets:
+  started: []
+  unstarted:
+  - '30685 (exchangeOrderLines, Pranay): the checks and the quote now; the write after #30977 and #31924.'
+  - '37212 (order.exchanged consumers, made by hand): Catalogue cancels the outgoing entitlements and returns capacity,
+    Seating returns seats, Access issues the incoming entitlements.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-480
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-EXCHANGE-QUOTE
+status: open
+notes: 'catalogue#variantPriceRecords is CR-439''s query, added by lane n (CHG-CR439-001); until the lanes meet, check-cross-module-reads
+  XR-QUERY reports it as undeclared here. Beyond the posted words: the 400 lists only validation; the consumers'' idempotency
+  key is orderId + eventId.'
