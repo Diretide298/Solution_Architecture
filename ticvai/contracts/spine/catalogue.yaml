@@ -18565,10 +18565,13 @@ paths:
         was a schema change — `can_share_media`, `can_claim_shop_and_drop`, `included_value`. Its 15
         operations and 34 screens read 34 columns to get three.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
+      # A guest calls it without a permission and reads published data (ADAM CR-482, 2 November 2026: WEB-022's
+      # What you get list calls it for each plan on the page).
+      x-ticvai-guest-callable: true
       x-ticvai-audience:
       - staff
       - guest
@@ -18664,6 +18667,9 @@ paths:
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
+      # A guest calls it without a permission and reads published data (ADAM CR-482, 2 November 2026: WEB-022's
+      # What you get list calls it for each plan on the page).
+      x-ticvai-guest-callable: true
       x-ticvai-audience:
       - staff
       - guest

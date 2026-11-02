@@ -65,4 +65,9 @@ notes: '**Design change: WEB-022 is the plan step of the membership booking flow
   getMyMemberships) become the basket, and those two reads now drive the card selection and the held-plan mark.
   docs/active/approved-ui-changes.yaml records the changed fields against the client-verified frame and CR-482. The
   frame (wireframes/frames/web-022.html, the rev 3 capture) is unchanged. The page info (design-r1) is generated from
-  screens/ and follows at the next design batch rebuild.'
+  screens/ and follows at the next design batch rebuild. **Named beyond the posted words**, so the page passes the
+  gate as a guest page: getPlanBenefits and listMembershipBenefits, already public (security {}) with a guest
+  audience, are marked x-ticvai-guest-callable (check-audience-match AM-GUEST-PERMISSION); listMembershipBenefits states
+  its order, by name then id, the r10 default ruling written by tools/fix-order-and-refusals.py (check-list-order
+  LO-UNORDERED); WEB-022 reads getCart in the background with the session the device already holds, as WEB-006 does
+  (check-preauth-session PS-UNDECLARED-SIGNIN).'

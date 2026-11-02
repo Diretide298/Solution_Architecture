@@ -6246,8 +6246,9 @@ screens:
   - operationId: getCart
     contract: orders
     purpose: 'The basket in the right panel: membership lines, subtotal, VAT (taxTotal) and total (ADAM
-      CR-482)'
-    trigger: onLoad
+      CR-482), with the guest session the device already holds: signed in, or the anonymous cart session a
+      visitor gets with the first line (ADR-0045); a visitor with no cart reads none and sees the empty basket'
+    trigger: background
   - operationId: getPublishedBookingFlow
     contract: white-label
     purpose: 'The venue''s membership booking flow, for Continue: the step after the plan (ADAM CR-482)'
