@@ -134,7 +134,7 @@ x-ticvai-jobs:
     writes: [transport.departure, transport.network_import]
     for: Transport's nightly departure release, departure timers and network import job.
     source:
-    - contracts/satellite/transport.yaml:947
+    - contracts/satellite/transport.yaml
     - states/transport-departure.yaml:21
     - states/transport-network-import.yaml:22
 paths:

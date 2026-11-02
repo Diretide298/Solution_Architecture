@@ -218,10 +218,10 @@ x-ticvai-jobs:
     for: 'Forecast-bound operational views: F&B prep and par, Inventory replenishment, Workforce rota (critical: shows the
       requirement a manager applies), Resources demand, refreshed on a published forecast or an issued operational requirement.'
     source:
-    - events/ai-forecastPublished.yaml:45
-    - events/ai-forecastPublished.yaml:50
-    - events/ai-forecastPublished.yaml:55
-    - events/ai-forecastPublished.yaml:60
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
   kitchenTicketPush:
     module: fnb
     host: workers
@@ -234,10 +234,10 @@ x-ticvai-jobs:
       is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
       wallet.credited and re-enables a repair'
     source:
-    - events/access-validated.yaml:45
-    - events/approval-granted.yaml:41
-    - events/entitlement-issued.yaml:53
-    - events/fnb-kitchenTicketCreated.yaml:29
+    - events/access-validated.yaml
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/fnb-kitchenTicketCreated.yaml
   timers:
     module: fnb
     host: workers

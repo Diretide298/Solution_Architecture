@@ -165,10 +165,10 @@ x-ticvai-jobs:
       is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
       wallet.credited and re-enables a repair'
     source:
-    - events/access-validated.yaml:45
-    - events/approval-granted.yaml:41
-    - events/entitlement-issued.yaml:53
-    - events/fnb-kitchenTicketCreated.yaml:29
+    - events/access-validated.yaml
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/fnb-kitchenTicketCreated.yaml
   timers:
     module: queue
     host: workers
@@ -180,7 +180,7 @@ x-ticvai-jobs:
     reads: [maintenance.work_order, queue.entry, queue.queue]
     writes: [maintenance.work_order, queue.entry, queue.queue]
     for: 'Queue timers: call windows and the sensor-fed cycle.'
-    source: ['contracts/satellite/queue.yaml:893', 'states/queue-entry.yaml:43']
+    source: ['contracts/satellite/queue.yaml', 'states/queue-entry.yaml:43']
 paths:
   # ---------------------------------------------------------------- queues
   /queues:

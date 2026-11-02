@@ -262,10 +262,10 @@ x-ticvai-jobs:
     for: 'Forecast-bound operational views: F&B prep and par, Inventory replenishment, Workforce rota (critical: shows the
       requirement a manager applies), Resources demand, refreshed on a published forecast or an issued operational requirement.'
     source:
-    - events/ai-forecastPublished.yaml:45
-    - events/ai-forecastPublished.yaml:50
-    - events/ai-forecastPublished.yaml:55
-    - events/ai-forecastPublished.yaml:60
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
   serialisedItemMoves:
     module: inventory
     host: workers
@@ -308,9 +308,9 @@ x-ticvai-jobs:
     for: 'Inventory''s consumers: deplete stock for physical lines on a paid order (critical), return stock on a refund, consume
       the parts recorded on a completed work order.'
     source:
-    - events/maintenance-workOrderCompleted.yaml:30
-    - events/order-paid.yaml:66
-    - events/order-refunded.yaml:44
+    - events/maintenance-workOrderCompleted.yaml
+    - events/order-paid.yaml
+    - events/order-refunded.yaml
 paths:
   /suppliers/{supplierId}:
     parameters:

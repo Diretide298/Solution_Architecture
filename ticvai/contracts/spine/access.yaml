@@ -312,10 +312,10 @@ x-ticvai-jobs:
       transfer, invitation, performance cancellation, an approved whitelist entry) and refresh the offline validation bundle
       so a gate admits or refuses without a network.'
     source:
-    - events/approval-granted.yaml:130
-    - events/entitlement-issued.yaml:48
-    - events/entitlement-reissued.yaml:40
-    - events/entitlement-shareChanged.yaml:33
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/entitlement-reissued.yaml
+    - events/entitlement-shareChanged.yaml
   entitlementsLater:
     module: access
     host: workers
@@ -330,10 +330,10 @@ x-ticvai-jobs:
     for: 'Access''s later entitlement and accreditation consumers: frozen or suspended entitlements, voided entitlements,
       and accreditation credentials and holder status in the validation bundle.'
     source:
-    - events/accreditation-credentialIssued.yaml:48
-    - events/accreditation-holderStatusChanged.yaml:55
-    - events/entitlement-statusChanged.yaml:51
-    - events/entitlement-voided.yaml:33
+    - events/accreditation-credentialIssued.yaml
+    - events/accreditation-holderStatusChanged.yaml
+    - events/entitlement-statusChanged.yaml
+    - events/entitlement-voided.yaml
   expiryNotice:
     module: access
     host: workers
@@ -344,7 +344,7 @@ x-ticvai-jobs:
     reliesOn: [issueOrderEntitlements]
     for: 'The daily expiry-notice run: an entitlement whose validTo is within its template''s expiryNoticeDays gets entitlement.expiringSoon,
       once per entitlement per validTo.'
-    source: ['events/entitlement-expiringSoon.yaml:1']
+    source: ['events/entitlement-expiringSoon.yaml']
   fraudDetection:
     module: access
     host: undecided
@@ -356,7 +356,7 @@ x-ticvai-jobs:
       AI-ENGINE-FRAUD-RISK-RULES is Block D). Awaiting the lead.'
     for: 'Access''s detection jobs: fraud rules, sharing detection and biometric anomaly; they raise access security alerts,
       write sharing-detection bindings and cases, and set temporary identity locks.'
-    source: ['contracts/spine/access.yaml:17159', 'contracts/spine/access.yaml:23434']
+    source: ['contracts/spine/access.yaml', 'contracts/spine/access.yaml']
   offlinePackageBuild:
     module: access
     host: workers
@@ -365,7 +365,7 @@ x-ticvai-jobs:
     writes: [access.edge_package]
     reliesOn: [getOfflinePackage]
     for: Access offline package build job.
-    source: ['contracts/spine/access.yaml:22264']
+    source: ['contracts/spine/access.yaml']
   parking:
     module: access
     host: workers
@@ -412,10 +412,21 @@ x-ticvai-jobs:
     for: 'Access scheduled changes and expiry timers: gate modes, configuration versions, media templates, dynamic policies,
       identity locks.'
     source:
-    - contracts/spine/access.yaml:2531
+    - contracts/spine/access.yaml
     - states/access-configuration-version.yaml:82
     - states/access-dynamic-policy.yaml:78
     - states/access-gate-mode-change.yaml:29
+  orderExchanged:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.exchanged]
+    reads: []
+    writes: [access.entitlement]
+    builtBy: CR480-ORDER-EXCHANGED-CONSUMERS
+    for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
+      as on the order-paid saga.'
+    source: ['events/order-exchanged.yaml']
 paths:
   /access/validate:
     post:

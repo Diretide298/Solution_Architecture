@@ -179,10 +179,10 @@ x-ticvai-jobs:
     for: 'Forecast-bound operational views: F&B prep and par, Inventory replenishment, Workforce rota (critical: shows the
       requirement a manager applies), Resources demand, refreshed on a published forecast or an issued operational requirement.'
     source:
-    - events/ai-forecastPublished.yaml:45
-    - events/ai-forecastPublished.yaml:50
-    - events/ai-forecastPublished.yaml:55
-    - events/ai-forecastPublished.yaml:60
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
   rota:
     module: workforce
     host: workers

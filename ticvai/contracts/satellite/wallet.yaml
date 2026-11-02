@@ -201,7 +201,7 @@ x-ticvai-jobs:
     reads: [wallet.gift_card]
     writes: [wallet.gift_card]
     for: Wallet hold sweeper and card expiry timers.
-    source: ['contracts/satellite/wallet.yaml:3519', 'states/game-card.yaml:31', 'states/gift-card.yaml:58']
+    source: ['contracts/satellite/wallet.yaml', 'states/game-card.yaml:31', 'states/gift-card.yaml:58']
 paths:
   /wallet-types:
     get:

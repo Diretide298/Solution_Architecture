@@ -270,10 +270,21 @@ x-ticvai-jobs:
       capacity on an abandoned cart and on a cancelled performance (and close its waitlist), cancel or reduce entitlements
       on a refund, stop publishing and sales for a suspen'
     source:
-    - events/approval-expired.yaml:45
-    - events/approval-granted.yaml:144
-    - events/approval-rejected.yaml:86
-    - events/approval-withdrawn.yaml:52
+    - events/approval-expired.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
+  orderExchanged:
+    module: seating
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.exchanged]
+    reads: []
+    writes: [seating.seat]
+    builtBy: CR480-ORDER-EXCHANGED-CONSUMERS
+    for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
+      as on the order-paid saga.'
+    source: ['events/order-exchanged.yaml']
 paths:
   /performances/{performanceId}/assign-seats:
     parameters:

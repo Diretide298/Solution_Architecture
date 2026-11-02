@@ -452,10 +452,10 @@ x-ticvai-jobs:
       when a payment method is stored as marketing.consent_record rows Marketing owns; open the privacy request in the queue;
       apply an approval decision to the privacy-notice governance record.'
     source:
-    - events/approval-granted.yaml:102
-    - events/approval-rejected.yaml:34
-    - events/biometric-enrolmentChanged.yaml:71
-    - events/identity-guestRegistered.yaml:27
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/biometric-enrolmentChanged.yaml
+    - events/identity-guestRegistered.yaml
   eventRegistration:
     module: marketing-crm
     host: workers
@@ -464,7 +464,7 @@ x-ticvai-jobs:
     writes: [marketing.business_event]
     reliesOn: [setBusinessEventMapping]
     for: Marketing's event-catalogue registration job.
-    source: ['contracts/satellite/marketing-crm.yaml:39190']
+    source: ['contracts/satellite/marketing-crm.yaml']
   journeys:
     module: marketing-crm
     host: workers
@@ -489,10 +489,10 @@ x-ticvai-jobs:
       abandoned-cart and abandoned-payment journeys, post-visit campaigns, low-balance journeys, pre-expiry alerts, low-stock
       alerts, fraud-analyst alerts and the accreditation notices.'
     source:
-    - events/access-validated.yaml:40
-    - events/accreditation-applicationDecided.yaml:57
-    - events/accreditation-credentialIssued.yaml:58
-    - events/accreditation-holderStatusChanged.yaml:65
+    - events/access-validated.yaml
+    - events/accreditation-applicationDecided.yaml
+    - events/accreditation-credentialIssued.yaml
+    - events/accreditation-holderStatusChanged.yaml
   messageSender:
     module: marketing-crm
     host: workers
@@ -510,7 +510,7 @@ x-ticvai-jobs:
     - {model: message-dispatch, from: sent, to: failed}
     reads: [marketing.guest_device, marketing.message_dispatch]
     writes: [marketing.guest_device, marketing.message_dispatch]
-    builtBy: '#37203'
+    builtBy: CR442-MESSAGE-SENDER
     for: Marketing message sender (CR-442).
     source: ['states/guest-device.yaml:24', 'states/message-dispatch.yaml:22']
   notifications:
@@ -536,10 +536,10 @@ x-ticvai-jobs:
       AI capability pause, ceiling, incident, insight, plan result or operational requirement, and warn the tenant admin 30
       days before the Apple pass certificate expires.'
     source:
-    - events/ai-capabilityPaused.yaml:37
-    - events/ai-ceilingApproaching.yaml:38
-    - events/ai-incidentOpened.yaml:29
-    - events/ai-insightRaised.yaml:31
+    - events/ai-capabilityPaused.yaml
+    - events/ai-ceilingApproaching.yaml
+    - events/ai-incidentOpened.yaml
+    - events/ai-insightRaised.yaml
   profileAndLoyalty:
     module: marketing-crm
     host: workers
@@ -550,9 +550,9 @@ x-ticvai-jobs:
     for: 'Marketing''s guest-profile and loyalty consumers: record purchase behaviour and accrue loyalty on a paid order,
       adjust loyalty and lifetime value on a refund, attach an issued entitlement to the guest profile.'
     source:
-    - events/entitlement-issued.yaml:58
-    - events/order-paid.yaml:71
-    - events/order-refunded.yaml:49
+    - events/entitlement-issued.yaml
+    - events/order-paid.yaml
+    - events/order-refunded.yaml
   timers:
     module: marketing-crm
     host: workers

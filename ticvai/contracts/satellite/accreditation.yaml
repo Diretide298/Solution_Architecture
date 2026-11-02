@@ -162,7 +162,7 @@ x-ticvai-jobs:
     reliesOn: [decideAccreditationApplication, renewAccreditation]
     for: 'The daily renewal run: an active holder whose validTo is renewalWindowDays away gets accreditation.renewalDue, once
       per holder per validity period.'
-    source: ['events/accreditation-renewalDue.yaml:1']
+    source: ['events/accreditation-renewalDue.yaml']
 paths:
   /accreditation-programmes:
     get:

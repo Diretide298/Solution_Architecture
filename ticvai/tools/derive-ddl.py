@@ -1927,9 +1927,24 @@ CHANGE_VERSION_MARK = "x-ticvai-change-version"
 # sets it to that value on every row already in the table, in the same guarded block (tools/ddl_forward.py
 # backfill_block); rows written later take the column's default. `MerchandiseItem.isPublished` defaults to false for a
 # new item and is true on every item that was there before it, so no item a guest sees today disappears. A scalar
-# only (boolean, number, string), typed as the column is; BACKFILL: table -> {column: SQL literal}, filled by main.
+# (boolean, number, string), typed as the column is, or `{column, where}`: another column of the same row, on the rows
+# a boolean column marks (backfill_from_column, CHG-R13JOB-004); BACKFILL: table -> {column: SQL}, filled by main.
 BACKFILL_MARK = "x-ticvai-backfill"
 BACKFILL: dict = {}
+
+
+def backfill_from_column(v: dict) -> str | None:
+    """**A backfill copied from another column of the same row** (r13, 2 November 2026; CHG-R13JOB-004, the lead's
+    decision for whitelabel.config_version.activated_at): `x-ticvai-backfill: {column: <snake column>, where: <snake
+    boolean column>}` sets the new column to that column on the rows where the boolean is true (each tenant's current
+    version takes its published_at), and leaves the others null. Two identifiers, nothing else, so it stays one
+    guarded UPDATE."""
+    col, where = v.get("column"), v.get("where")
+    ident = re.compile(r"^[a-z][a-z0-9_]*$")
+    if set(v) - {"column", "where"} or not (isinstance(col, str) and ident.match(col)) or (
+            where is not None and not (isinstance(where, str) and ident.match(where))):
+        return None
+    return col + (f" WHERE {where}" if where else "")
 
 
 def backfill_literal(typ: str, v) -> str | None:
@@ -3123,7 +3138,7 @@ def main() -> int:
                 # `x-ticvai-backfill` (CHG-R10OPN-002): the value a forward migration gives the rows already there.
                 bf = (column_spec(c, contract_props) or {}).get(BACKFILL_MARK)
                 if bf is not None:
-                    lit = backfill_literal(typ, bf)
+                    lit = backfill_literal(typ, bf) if not isinstance(bf, dict) else backfill_from_column(bf)
                     if lit is None:
                         print(f"  ! {t}.{col}: x-ticvai-backfill {bf!r} does not fit a {typ} column; nothing backfilled")
                     else:

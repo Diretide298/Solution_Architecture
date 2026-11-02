@@ -1,0 +1,51 @@
+id: CHG-R13JOB-004
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'whitelabel.config_version gains activated_at (ConfigVersion.activatedAt, timestamptz, null), set whenever a
+  version becomes current (an immediate publishTenantConfig, the approval consumer, or the scheduled-publish job); each
+  tenant''s current version takes its published_at (x-ticvai-backfill, which derive-ddl now also takes as a copy of
+  another column on the rows a boolean marks). The scheduled-publish job (white-label#scheduledPublish) supersedes a
+  scheduled version published before the current one became current: not made current, activation_failed_at now,
+  activation_failure ''superseded: version N was published after this one was scheduled'', never retried; otherwise as
+  IDENTITY-C63.'
+decision:
+  what: 'The lead''s decision posted to Narayan Gaonkar on 2 November 2026 for #27779 (CR-154, IDENTITY-C63):
+    "whitelabel.config_version gains activated_at timestamptz NULL (ConfigVersion.activatedAt), set whenever a version
+    becomes current (an immediate publishTenantConfig or the job); backfill each tenant''s current version with its
+    published_at. The job, every minute, takes versions with scheduled_for passed, activated_at null,
+    activation_failed_at null, and approved if under review. If the tenant''s current version''s activated_at is later
+    than this version''s published_at, it is superseded: not made current; activation_failed_at = now,
+    activation_failure ''superseded: version N was published after this one was scheduled''; never retried. Otherwise as
+    IDENTITY-C63: validate again, make it current, set activated_at, emit contentPublished; a validation failure is
+    recorded and not retried."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-154 and R8 blocker IDENTITY-C63 (#27779, publishTenantConfig): without a time the version became current,
+  the job could not tell a scheduled version from one a later publish had overtaken, and made the older one current.'
+keys_touched:
+  operations: [publishTenantConfig]
+  schemas: [ConfigVersion]
+  tables: [whitelabel.config_version]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/derive-ddl.py
+root_class: a scheduled change applied without knowing whether a newer one had already been applied
+tickets:
+  started:
+  - '27779 (publishTenantConfig and the scheduled-publish job, Narayan Gaonkar): builds to the posted decision; the
+    package now says the same. Set activated_at on an immediate publish too.'
+  unstarted:
+  - 'The [DB] task for the column and the backfill (Hrushikant Patkar, the migration owner): a plan task the plan lane
+    files.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-154
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::backfill_from_column
+status: open
+notes: 'The forward migration derive-ddl wrote for it (deleted, the integration writes the release''s once) held one
+  guarded block: ALTER TABLE whitelabel.config_version ADD COLUMN IF NOT EXISTS activated_at timestamptz; UPDATE
+  whitelabel.config_version SET activated_at = published_at WHERE is_current.'

@@ -104,7 +104,7 @@ x-ticvai-jobs:
     writes: [reporting.alert]
     reliesOn: [setAlertRule, acknowledgeAlert]
     for: Reporting alert evaluation and alert expiry.
-    source: ['contracts/satellite/reporting.yaml:4137', 'states/alert.yaml:31']
+    source: ['contracts/satellite/reporting.yaml', 'states/alert.yaml:31']
   alertRaising:
     module: reporting
     host: workers
@@ -114,7 +114,7 @@ x-ticvai-jobs:
     writes: [reporting.alert]
     for: 'Reporting''s alert consumers: raise an API anomaly to the tenant''s and TICVAI''s API administrators (ADM-015, DEV-006)
       and a device tamper alert to the venue''s security roles.'
-    source: ['events/apiClient-anomalyDetected.yaml:40', 'events/device-tamperDetected.yaml:28']
+    source: ['events/apiClient-anomalyDetected.yaml', 'events/device-tamperDetected.yaml']
   execution:
     module: reporting
     host: workers
@@ -131,7 +131,7 @@ x-ticvai-jobs:
     writes: [reporting.execution, reporting.export]
     for: Reporting execution worker and export generation.
     source:
-    - contracts/spine/tenancy.yaml:7041
+    - contracts/spine/tenancy.yaml
     - states/report-execution.yaml:20
     - states/report-export.yaml:24
   syncRejectionAlert:
@@ -143,7 +143,7 @@ x-ticvai-jobs:
     reads: []
     writes: [reporting.alert]
     for: 'Platform''s sync-rejection alert: raise an operator alert (BO-133 Offline Alerts) for each refused offline entry.'
-    source: ['events/sync-rejectionRaised.yaml:27']
+    source: ['events/sync-rejectionRaised.yaml']
 paths:
   /reports/seeded:
     get:

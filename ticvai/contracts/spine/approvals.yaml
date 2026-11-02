@@ -205,8 +205,8 @@ x-ticvai-jobs:
     emits: [approval.escalated, approval.expired]
     for: 'Approvals SLA job: escalate and expire approval requests.'
     source:
-    - contracts/spine/approvals.yaml:6335
-    - contracts/spine/approvals.yaml:807
+    - contracts/spine/approvals.yaml
+    - contracts/spine/approvals.yaml
     - states/approval-request.yaml:39
   workflowEngine:
     module: approvals

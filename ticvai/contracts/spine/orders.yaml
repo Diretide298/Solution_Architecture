@@ -542,10 +542,10 @@ x-ticvai-jobs:
       every holder of a cancelled performance (F09, ''the critical consumer''), mark cart lines whose hold expired, and refuse
       new orders for a suspended tenant.'
     source:
-    - events/approval-granted.yaml:36
-    - events/approval-rejected.yaml:29
-    - events/approval-withdrawn.yaml:28
-    - events/inventoryHold-expired.yaml:25
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
+    - events/inventoryHold-expired.yaml
   entitlementCompletion:
     module: orders
     host: workers
@@ -556,7 +556,7 @@ x-ticvai-jobs:
     emits: [order.completed]
     builtBy: PLATFORM-SAGA-PAID
     for: 'Orders'' consumer of entitlement.issued: record the ids on the line and complete the order (paid to completed).'
-    source: ['events/entitlement-issued.yaml:1', 'events/order-completed.yaml:1']
+    source: ['events/entitlement-issued.yaml', 'events/order-completed.yaml']
   guestExpiry:
     module: orders
     host: workers
@@ -594,7 +594,7 @@ x-ticvai-jobs:
     for: 'Orders'' guest-facing expiry timers: transfers, payment links, wallet passes, resale listings, entitlements, group
       names.'
     source:
-    - contracts/spine/orders.yaml:1254
+    - contracts/spine/orders.yaml
     - states/entitlement-status.yaml:54
     - states/group-booking.yaml:25
     - states/payment-link.yaml:42
@@ -622,12 +622,13 @@ x-ticvai-jobs:
     - {model: payment, from: authorised, to: pendingConfirmation}
     reads: [orders.sales_order]
     writes: [orders.sales_order]
+    builtBy: PAYMENTS-NI-ADAPTER
     for: Orders' background payment reconciler (Network International poll, CR-165).
     source:
-    - contracts/satellite/payments.yaml:801
-    - contracts/spine/orders.yaml:7280
-    - contracts/spine/orders.yaml:7304
-    - contracts/spine/orders.yaml:7311
+    - contracts/satellite/payments.yaml
+    - contracts/spine/orders.yaml
+    - contracts/spine/orders.yaml
+    - contracts/spine/orders.yaml
   refundGatewayConfirmation:
     module: orders
     host: workers
@@ -661,7 +662,7 @@ x-ticvai-jobs:
     emits: [order.chargebackRecorded]
     for: Orders' resale settlement payout job and late timers (chargeback evidence, group quotes).
     source:
-    - contracts/spine/orders.yaml:16381
+    - contracts/spine/orders.yaml
     - states/chargeback.yaml:53
     - states/group-quote.yaml:55
     - states/resale-settlement.yaml:20
@@ -676,10 +677,10 @@ x-ticvai-jobs:
       attribution, candidate availability, renewal moments, risk velocity and chargebacks, browsing signals, account-takeover
       resets, staff leakage, device-health anomalies, and the risk-case outcome for Identity and Orders.'
     source:
-    - events/ai-riskCaseClosed.yaml:30
-    - events/ai-riskCaseClosed.yaml:35
-    - events/cart-abandoned.yaml:51
-    - events/device-statusChanged.yaml:48
+    - events/ai-riskCaseClosed.yaml
+    - events/ai-riskCaseClosed.yaml
+    - events/cart-abandoned.yaml
+    - events/device-statusChanged.yaml
 paths:
   /carts:
     post:

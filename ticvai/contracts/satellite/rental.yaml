@@ -74,7 +74,7 @@ x-ticvai-jobs:
     writes: [rental.quote]
     reliesOn: [quoteRentalPrice]
     for: Rental nightly quote purge.
-    source: ['contracts/satellite/rental.yaml:3383']
+    source: ['contracts/satellite/rental.yaml']
 paths:
   /rental-products:
     get:

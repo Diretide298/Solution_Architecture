@@ -287,10 +287,10 @@ x-ticvai-jobs:
       and to a pending suspension (which raises tenant.suspended), trigger tenant billing on period close, flag the period
       for review when AI spend nears its ceiling.'
     source:
-    - events/ai-ceilingApproaching.yaml:44
-    - events/approval-granted.yaml:68
-    - events/approval-rejected.yaml:49
-    - events/ledger-periodClosed.yaml:31
+    - events/ai-ceilingApproaching.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/ledger-periodClosed.yaml
   billingTimers:
     module: subscription
     host: workers
@@ -321,7 +321,7 @@ x-ticvai-jobs:
     reads: [control.cell, control.cell_job]
     writes: [control.cell, control.cell_job]
     for: 'Control Plane cell job runner: provisioning, migration and tier-change jobs.'
-    source: ['contracts/satellite/subscription.yaml:2571', 'states/cell-job.yaml:20', 'states/cell.yaml:18']
+    source: ['contracts/satellite/subscription.yaml', 'states/cell-job.yaml:20', 'states/cell.yaml:18']
   membershipAndOnboardingTimers:
     module: subscription
     host: workers
@@ -345,7 +345,7 @@ x-ticvai-jobs:
     - subscription.membership_product_history
     for: Subscription membership-product and onboarding timers.
     source:
-    - contracts/satellite/subscription.yaml:5023
+    - contracts/satellite/subscription.yaml
     - states/membership-product.yaml:44
     - states/onboarding-application.yaml:47
   partnerProgramme:
@@ -387,10 +387,10 @@ x-ticvai-jobs:
     reliesOn: [setPartnerSecurity]
     for: 'Partner programme jobs: commission calculation, reconciliation, settlement, cases, agreement and security expiry.'
     source:
-    - contracts/satellite/subscription.yaml:10734
-    - contracts/satellite/subscription.yaml:16910
-    - contracts/satellite/subscription.yaml:17014
-    - contracts/satellite/subscription.yaml:17148
+    - contracts/satellite/subscription.yaml
+    - contracts/satellite/subscription.yaml
+    - contracts/satellite/subscription.yaml
+    - contracts/satellite/subscription.yaml
   tenantLifecycle:
     module: subscription
     host: workers
@@ -403,8 +403,8 @@ x-ticvai-jobs:
     emits: [tenant.suspended, tenant.terminated]
     for: 'Control Plane tenant lifecycle job: apply a pending suspension, end a termination.'
     source:
-    - contracts/satellite/subscription.yaml:1523
-    - contracts/satellite/subscription.yaml:1555
+    - contracts/satellite/subscription.yaml
+    - contracts/satellite/subscription.yaml
     - states/tenant.yaml:35
   tenantMigration:
     module: subscription
@@ -436,7 +436,7 @@ x-ticvai-jobs:
       provisioning job (createTenant's, or the verified onboarding application's) and that no operation emits it, while
       states/tenant.yaml gives that move to updateTenant, an operation. Awaiting the lead."
     for: The provisioning job that makes a new tenant active and writes tenant.provisioned to control.outbox.
-    source: ['events/tenant-provisioned.yaml:1', 'states/tenant.yaml:16']
+    source: ['events/tenant-provisioned.yaml', 'states/tenant.yaml:16']
 paths:
   /onboarding-applications:
     post:

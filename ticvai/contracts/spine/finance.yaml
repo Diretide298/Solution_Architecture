@@ -328,10 +328,10 @@ x-ticvai-jobs:
       on wallet top-up, capture and expiry (breakage), the goods-receipt accrual and price variance, and cost of sales on
       a stock count.'
     source:
-    - events/inventory-purchaseOrderReceived.yaml:30
-    - events/order-refunded.yaml:39
-    - events/shift-closed.yaml:50
-    - events/stock-depleted.yaml:33
+    - events/inventory-purchaseOrderReceived.yaml
+    - events/order-refunded.yaml
+    - events/shift-closed.yaml
+    - events/stock-depleted.yaml
   revenueRecognition:
     module: finance
     host: workers
@@ -340,7 +340,7 @@ x-ticvai-jobs:
     writes: [ledger.journal_entry, ledger.journal_line]
     reliesOn: [createRecognitionSchedule]
     for: Ledger revenue recognition schedule job.
-    source: ['contracts/spine/finance.yaml:7024']
+    source: ['contracts/spine/finance.yaml']
   settlementIngest:
     module: finance
     host: workers
@@ -356,8 +356,8 @@ x-ticvai-jobs:
     writes: [ledger.settlement]
     for: Ledger settlement file ingestion and matching job, and the nightly reconciliation.
     source:
-    - contracts/satellite/payments.yaml:4505
-    - contracts/spine/finance.yaml:7908
+    - contracts/satellite/payments.yaml
+    - contracts/spine/finance.yaml
     - states/settlement.yaml:19
 paths:
   /internal/order-postings:

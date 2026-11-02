@@ -181,7 +181,7 @@ x-ticvai-jobs:
     writes: [assets.media_fingerprint, assets.tag]
     reliesOn: [analyseMediaAsset]
     for: 'Assets'' analysis job: recompute hash and embedding under the current model.'
-    source: ['contracts/satellite/assets.yaml:1072']
+    source: ['contracts/satellite/assets.yaml']
   guestUploadRetention:
     module: assets
     host: workers
@@ -190,7 +190,7 @@ x-ticvai-jobs:
     writes: [assets.guest_upload]
     reliesOn: [createGuestUpload, completeGuestUpload]
     for: Assets' guest-upload retention job.
-    source: ['contracts/satellite/assets.yaml:153', 'contracts/satellite/assets.yaml:2580']
+    source: ['contracts/satellite/assets.yaml', 'contracts/satellite/assets.yaml']
   mediaProcessing:
     module: assets
     host: workers
@@ -204,9 +204,9 @@ x-ticvai-jobs:
     emits: [assets.documentIndexed]
     for: 'Assets'' media processing job: derivatives, virus scan, fingerprint, text extraction.'
     source:
-    - contracts/satellite/assets.yaml:631
-    - contracts/satellite/assets.yaml:635
-    - contracts/satellite/assets.yaml:640
+    - contracts/satellite/assets.yaml
+    - contracts/satellite/assets.yaml
+    - contracts/satellite/assets.yaml
     - states/media.yaml:17
 paths:
   /media:

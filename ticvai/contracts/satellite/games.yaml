@@ -93,7 +93,7 @@ x-ticvai-jobs:
     reads: [games.card]
     writes: [games.card]
     for: Wallet hold sweeper and card expiry timers.
-    source: ['contracts/satellite/wallet.yaml:3519', 'states/game-card.yaml:31', 'states/gift-card.yaml:58']
+    source: ['contracts/satellite/wallet.yaml', 'states/game-card.yaml:31', 'states/gift-card.yaml:58']
   creditAndAssetEvents:
     module: games
     host: workers
@@ -106,10 +106,10 @@ x-ticvai-jobs:
       is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
       wallet.credited and re-enables a repair'
     source:
-    - events/access-validated.yaml:45
-    - events/approval-granted.yaml:41
-    - events/entitlement-issued.yaml:53
-    - events/fnb-kitchenTicketCreated.yaml:29
+    - events/access-validated.yaml
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/fnb-kitchenTicketCreated.yaml
 paths:
   /game-cards:
     post:

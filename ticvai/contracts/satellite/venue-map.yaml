@@ -248,7 +248,7 @@ x-ticvai-jobs:
     reads: [venuemap.point]
     writes: [venuemap.point]
     for: 'Venue-map import job: parse the source, OCR, preview, expire abandoned imports.'
-    source: ['contracts/satellite/venue-map.yaml:409', 'states/venue-map-import.yaml:25']
+    source: ['contracts/satellite/venue-map.yaml', 'states/venue-map-import.yaml:25']
 paths:
   /venue-maps:
     get:

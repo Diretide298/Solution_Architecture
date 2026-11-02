@@ -460,7 +460,7 @@ x-ticvai-jobs:
     - identity.session
     for: 'Identity''s access-review timers: campaign due date and recurrence.'
     source:
-    - contracts/spine/identity.yaml:8015
+    - contracts/spine/identity.yaml
     - states/access-review-campaign.yaml:27
     - states/access-review-item.yaml:32
   delegationExpiry:
@@ -471,7 +471,7 @@ x-ticvai-jobs:
     writes: [identity.delegated_access]
     reliesOn: [createDelegatedAccess, grantDelegation]
     for: Identity delegated-access expiry sweep.
-    source: ['contracts/spine/identity.yaml:12608']
+    source: ['contracts/spine/identity.yaml']
   guestErasure:
     module: identity
     host: workers
@@ -481,9 +481,9 @@ x-ticvai-jobs:
     reliesOn: [deleteGuestAccount, eraseSubject]
     for: Identity's guest erasure job and its daily sweep.
     source:
-    - contracts/satellite/ai.yaml:3518
-    - contracts/spine/identity.yaml:4469
-    - contracts/spine/identity.yaml:4484
+    - contracts/satellite/ai.yaml
+    - contracts/spine/identity.yaml
+    - contracts/spine/identity.yaml
   privacyApprovals:
     module: identity
     host: workers
@@ -494,10 +494,10 @@ x-ticvai-jobs:
     for: 'Identity''s privacy-request approval consumers (ADAM CR-101, CHG-R10ID-016): an approved subjectDataExport starts
       the export job, a rejected, expired or withdrawn one closes identity.subject_data_export.'
     source:
-    - events/approval-expired.yaml:36
-    - events/approval-granted.yaml:119
-    - events/approval-rejected.yaml:77
-    - events/approval-withdrawn.yaml:43
+    - events/approval-expired.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
   riskCaseOutcome:
     module: identity
     host: workers
@@ -509,10 +509,10 @@ x-ticvai-jobs:
       attribution, candidate availability, renewal moments, risk velocity and chargebacks, browsing signals, account-takeover
       resets, staff leakage, device-health anomalies, and the risk-case outcome for Identity and Orders.'
     source:
-    - events/ai-riskCaseClosed.yaml:30
-    - events/ai-riskCaseClosed.yaml:35
-    - events/cart-abandoned.yaml:51
-    - events/device-statusChanged.yaml:48
+    - events/ai-riskCaseClosed.yaml
+    - events/ai-riskCaseClosed.yaml
+    - events/cart-abandoned.yaml
+    - events/device-statusChanged.yaml
   sessionTimeout:
     module: identity
     host: workers
@@ -548,10 +548,10 @@ x-ticvai-jobs:
     for: 'Identity''s sign-in projections: the open-shift marker ActiveSession.hasOpenShift reads, the redirect hosts guestUaePassLogin
       checks, and the biometric enrolment on pii.subject.'
     source:
-    - events/biometric-enrolmentChanged.yaml:61
-    - events/shift-closed.yaml:66
-    - events/shift-opened.yaml:27
-    - events/whitelabel-customDomainChanged.yaml:37
+    - events/biometric-enrolmentChanged.yaml
+    - events/shift-closed.yaml
+    - events/shift-opened.yaml
+    - events/whitelabel-customDomainChanged.yaml
   subjectExport:
     module: identity
     host: workers
@@ -561,9 +561,9 @@ x-ticvai-jobs:
     reliesOn: [exportSubjectData, recordSubjectDataExportPart, writeSubjectDataExportPart]
     for: 'Identity''s subject-data export job: assemble the parts, write the file, delete it after 7 days.'
     source:
-    - contracts/spine/identity.yaml:1556
-    - contracts/spine/identity.yaml:1565
-    - contracts/spine/identity.yaml:1709
+    - contracts/spine/identity.yaml
+    - contracts/spine/identity.yaml
+    - contracts/spine/identity.yaml
   subjectHolding:
     module: identity
     host: workers
@@ -588,10 +588,10 @@ x-ticvai-jobs:
       order and entitlement a guest holds, so deleteGuestAccount knows what still blocks a deletion and linkGuestCheckout
       can match guest-checkout orders.'
     source:
-    - events/entitlement-issued.yaml:69
-    - events/entitlement-reissued.yaml:48
-    - events/entitlement-statusChanged.yaml:42
-    - events/entitlement-transferred.yaml:51
+    - events/entitlement-issued.yaml
+    - events/entitlement-reissued.yaml
+    - events/entitlement-statusChanged.yaml
+    - events/entitlement-transferred.yaml
 paths:
   /internal/step-up/verify:
     post:

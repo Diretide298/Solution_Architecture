@@ -234,10 +234,10 @@ x-ticvai-jobs:
       is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
       wallet.credited and re-enables a repair'
     source:
-    - events/access-validated.yaml:45
-    - events/approval-granted.yaml:41
-    - events/entitlement-issued.yaml:53
-    - events/fnb-kitchenTicketCreated.yaml:29
+    - events/access-validated.yaml
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/fnb-kitchenTicketCreated.yaml
   inactivity:
     module: shift
     host: workers
@@ -251,7 +251,7 @@ x-ticvai-jobs:
     writes: [orders.pos_shift]
     emits: [shift.closed]
     for: 'Shift inactivity job: auto-close abandoned shifts.'
-    source: ['contracts/spine/shift.yaml:2455', 'states/shift.yaml:45']
+    source: ['contracts/spine/shift.yaml', 'states/shift.yaml:45']
 paths:
   /shifts:
     get:

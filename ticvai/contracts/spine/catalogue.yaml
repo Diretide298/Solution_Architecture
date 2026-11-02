@@ -663,8 +663,8 @@ x-ticvai-jobs:
     writes: [catalogue.ai_finding, catalogue.audit_entry]
     for: Catalogue's AI monitoring and pricing governance jobs.
     source:
-    - contracts/spine/catalogue.yaml:42682
-    - contracts/spine/catalogue.yaml:43260
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
     - states/catalogue-ai-finding.yaml:55
   allocationRelease:
     module: catalogue
@@ -674,7 +674,7 @@ x-ticvai-jobs:
     writes: [catalogue.channel_envelope, catalogue.audit_entry]
     reliesOn: [relinquishChannelAllocation]
     for: 'Catalogue''s allocation release job: return unsold channel allocation before the performance.'
-    source: ['contracts/spine/catalogue.yaml:4249']
+    source: ['contracts/spine/catalogue.yaml']
   approvalsAndCapacity:
     module: catalogue
     host: workers
@@ -697,10 +697,10 @@ x-ticvai-jobs:
       capacity on an abandoned cart and on a cancelled performance (and close its waitlist), cancel or reduce entitlements
       on a refund, stop publishing and sales for a suspen'
     source:
-    - events/approval-expired.yaml:45
-    - events/approval-granted.yaml:144
-    - events/approval-rejected.yaml:86
-    - events/approval-withdrawn.yaml:52
+    - events/approval-expired.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
   channelActivation:
     module: catalogue
     host: workers
@@ -710,17 +710,18 @@ x-ticvai-jobs:
     reads: [catalogue.audit_entry, catalogue.sales_channel]
     writes: [catalogue.audit_entry, catalogue.sales_channel]
     for: Catalogue's sales-channel activation job (CR-211).
-    source: ['contracts/spine/catalogue.yaml:8908', 'states/sales-channel.yaml:44']
+    source: ['contracts/spine/catalogue.yaml', 'states/sales-channel.yaml:44']
   channelRetry:
     module: catalogue
     host: workers
-    trigger: {kind: queue}
+    trigger: {kind: event}
+    consumes: [catalogue.channelIncidentRetryRequested]
     reads: [catalogue.channel_incident]
     writes: [catalogue.channel_incident, catalogue.audit_entry]
     reliesOn: [retryChannelIncident]
-    builtBy: '#37206'
+    builtBy: CR457-CHANNEL-RETRY-JOB
     for: 'CR-457 channel retry job: a failed sales-channel call queued again with the same idempotency reference (retryChannelIncident).'
-    source: ['contracts/spine/catalogue.yaml:19076']
+    source: ['contracts/spine/catalogue.yaml']
   channelSync:
     module: catalogue
     host: workers
@@ -735,8 +736,8 @@ x-ticvai-jobs:
     reliesOn: [setChannelSyncSetting]
     for: 'Catalogue''s channel sync job: counts, full comparison and channel incidents.'
     source:
-    - contracts/spine/catalogue.yaml:19408
-    - contracts/spine/catalogue.yaml:43778
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
     - states/channel-incident.yaml:34
   eventLifecycle:
     module: catalogue
@@ -749,8 +750,8 @@ x-ticvai-jobs:
     writes: [catalogue.performance]
     for: Catalogue's event lifecycle job and performance completion timer.
     source:
-    - contracts/spine/catalogue.yaml:17607
-    - contracts/spine/catalogue.yaml:17658
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
     - states/performance.yaml:73
   import:
     module: catalogue
@@ -763,8 +764,8 @@ x-ticvai-jobs:
     writes: [catalogue.import_job]
     for: 'Catalogue import job: parse the file, build the preview, expire abandoned previews.'
     source:
-    - contracts/spine/catalogue.yaml:23721
-    - contracts/spine/catalogue.yaml:876
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
     - states/catalogue-import-job.yaml:25
   leaseSweeper:
     module: catalogue
@@ -778,8 +779,8 @@ x-ticvai-jobs:
     reliesOn: [acquireInventoryHold]
     for: Catalogue's lease expiry sweeper (deferred by ADR-0037).
     source:
-    - contracts/spine/catalogue.yaml:27015
-    - contracts/spine/catalogue.yaml:4761
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
     - states/lease.yaml:26
   priceExecutionDeployment:
     module: catalogue
@@ -809,7 +810,7 @@ x-ticvai-jobs:
       is Block D, phase 2). Awaiting the lead.'
     for: 'Catalogue''s demand forecasting and price recommendation jobs: the forecasting job writes catalogue.demand_forecast
       and the engine its recommendations.'
-    source: ['contracts/spine/catalogue.yaml:15353', 'contracts/spine/catalogue.yaml:46813']
+    source: ['contracts/spine/catalogue.yaml', 'contracts/spine/catalogue.yaml']
   pricingPublication:
     module: catalogue
     host: workers
@@ -860,8 +861,8 @@ x-ticvai-jobs:
     writes: [catalogue.demand_forecast, catalogue.pricing_recommendation]
     for: Catalogue's demand forecasting and price recommendation engine jobs, and recommendation expiry.
     source:
-    - contracts/spine/catalogue.yaml:46551
-    - contracts/spine/catalogue.yaml:46737
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
     - states/pricing-recommendation.yaml:78
   pricingSignals:
     module: catalogue
@@ -872,9 +873,9 @@ x-ticvai-jobs:
     reliesOn: [setDemandSignalConfiguration]
     for: Catalogue's demand-signal ingestion and data-quality / model-monitoring jobs.
     source:
-    - contracts/spine/catalogue.yaml:20445
-    - contracts/spine/catalogue.yaml:20521
-    - contracts/spine/catalogue.yaml:46129
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
   scheduledActions:
     module: catalogue
     host: workers
@@ -919,6 +920,17 @@ x-ticvai-jobs:
     - states/catalogue-rollback-action.yaml:39
     - states/dynamic-pricing-strategy.yaml:44
     - states/guest-membership-status.yaml:38
+  orderExchanged:
+    module: catalogue
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.exchanged]
+    reads: []
+    writes: [catalogue.channel_capacity, catalogue.inventory_reservation]
+    builtBy: CR480-ORDER-EXCHANGED-CONSUMERS
+    for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
+      as on the order-paid saga.'
+    source: ['events/order-exchanged.yaml']
 paths:
   /product-categories:
     get:

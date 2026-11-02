@@ -286,7 +286,7 @@ x-ticvai-jobs:
     reliesOn: [configureAnomalyDetector]
     builtBy: AI-ENGINE-ANOMALY-DETECTION
     for: 'The anomaly detectors configureAnomalyDetector sets: each crossing raises an AiInsight with ai.insightRaised.'
-    source: ['contracts/satellite/ai.yaml:6228']
+    source: ['contracts/satellite/ai.yaml']
   answerCache:
     module: ai
     host: ticvai-ai
@@ -311,10 +311,10 @@ x-ticvai-jobs:
     for: 'The AI answer-cache invalidation consumers (ADR-0034): drop cached answers under the affected scope when the content,
       configuration, prices or an AI capability they came from change.'
     source:
-    - events/ai-capabilityPaused.yaml:32
-    - events/ai-planExecuted.yaml:41
-    - events/approval-granted.yaml:61
-    - events/assets-documentIndexed.yaml:37
+    - events/ai-capabilityPaused.yaml
+    - events/ai-planExecuted.yaml
+    - events/approval-granted.yaml
+    - events/assets-documentIndexed.yaml
   evaluationRunner:
     module: ai
     host: ticvai-ai
@@ -355,7 +355,7 @@ x-ticvai-jobs:
     writes: [ai.decision_record, ai.message, ai.operational_requirement, ai.policy_exception]
     for: 'AI expiry timers: proposed actions, policy exceptions, operational requirements.'
     source:
-    - contracts/satellite/ai.yaml:18981
+    - contracts/satellite/ai.yaml
     - states/ai-operational-requirement.yaml:54
     - states/ai-policy-exception.yaml:23
     - states/ai-proposed-action.yaml:42
@@ -369,10 +369,10 @@ x-ticvai-jobs:
     for: 'AI''s forecast-actuals consumers: attendance, delivered demand and net sales actuals from orders, refunds and scans,
       and the accuracy window closed at period close.'
     source:
-    - events/access-validated.yaml:51
-    - events/ledger-periodClosed.yaml:36
-    - events/order-completed.yaml:38
-    - events/order-paid.yaml:81
+    - events/access-validated.yaml
+    - events/ledger-periodClosed.yaml
+    - events/order-completed.yaml
+    - events/order-paid.yaml
   forecastRun:
     module: ai
     host: ticvai-ai
@@ -390,7 +390,7 @@ x-ticvai-jobs:
     emits: [ai.forecastPublished]
     for: 'AI nightly forecast run: snapshot, produce, reconcile, score, auto-publish.'
     source:
-    - contracts/satellite/ai.yaml:6491
+    - contracts/satellite/ai.yaml
     - states/ai-forecast-scenario.yaml:22
     - states/ai-forecast-version.yaml:24
   fraudRiskSignals:
@@ -408,7 +408,7 @@ x-ticvai-jobs:
     emits: [ai.riskAlertRaised]
     builtBy: AI-ENGINE-FRAUD-RISK-RULES
     for: The five owner events the fraud and risk scoring reads, and the risk alert a crossing raises.
-    source: ['events/ai-riskAlertRaised.yaml:1']
+    source: ['events/ai-riskAlertRaised.yaml']
   governanceAndPlans:
     module: ai
     host: ticvai-ai
@@ -430,10 +430,10 @@ x-ticvai-jobs:
       question (critical, 8.3.55-57); learn from handover reasons; index a saved report definition; refresh the Redis strategy
       cache Help me choose ranks with.'
     source:
-    - events/approval-expired.yaml:26
-    - events/approval-granted.yaml:51
-    - events/approval-rejected.yaml:44
-    - events/approval-withdrawn.yaml:38
+    - events/approval-expired.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
   guidedChoiceSuggestion:
     module: ai
     host: ticvai-ai
@@ -456,7 +456,7 @@ x-ticvai-jobs:
     writes: [ai.history_import, ai.history_observation]
     reliesOn: [importVenueHistory]
     for: AI venue-history import job.
-    source: ['contracts/satellite/ai.yaml:11399']
+    source: ['contracts/satellite/ai.yaml']
   indexJob:
     module: ai
     host: ticvai-ai
@@ -504,10 +504,10 @@ x-ticvai-jobs:
     for: 'AI''s knowledge-index consumers: re-embed or remove indexed text when a document, product, menu, procedure, case
       resolution, merchandise or web content is published or withdrawn.'
     source:
-    - events/assets-documentIndexed.yaml:31
-    - events/catalogue-productPublished.yaml:35
-    - events/catalogue-productWithdrawn.yaml:23
-    - events/fnb-menuPublished.yaml:27
+    - events/assets-documentIndexed.yaml
+    - events/catalogue-productPublished.yaml
+    - events/catalogue-productWithdrawn.yaml
+    - events/fnb-menuPublished.yaml
   layoutDraft:
     module: ai
     host: ticvai-ai
@@ -530,9 +530,9 @@ x-ticvai-jobs:
     writes: [ai.anomaly_detector, ai.insight]
     for: 'AI nightly jobs: insight impact measurement, marketing recommendations, suggestion outcomes, governance controls.'
     source:
-    - contracts/satellite/ai.yaml:15997
-    - contracts/satellite/ai.yaml:17970
-    - contracts/satellite/ai.yaml:6152
+    - contracts/satellite/ai.yaml
+    - contracts/satellite/ai.yaml
+    - contracts/satellite/ai.yaml
     - states/ai-insight.yaml:42
   orderExchanged:
     module: ai
@@ -541,7 +541,6 @@ x-ticvai-jobs:
     consumes: [order.exchanged]
     reads: []
     writes: []
-    builtBy: '#37212'
     for: CR-480 order.exchanged consumers (AI's staff-leakage, forecast and attribution consumer).
     source: []
   providerHealth:
@@ -552,7 +551,7 @@ x-ticvai-jobs:
     writes: [ai.provider, ai.activity]
     reliesOn: [testAiProvider]
     for: 'AI scheduled provider test: re-run testAiProvider after activation.'
-    source: ['contracts/satellite/ai.yaml:1613']
+    source: ['contracts/satellite/ai.yaml']
   qdrantTenant:
     module: ai
     host: ticvai-ai
@@ -563,7 +562,7 @@ x-ticvai-jobs:
     builtBy: AI-ENGINE-QDRANT
     for: 'AI''s Qdrant tenant-lifecycle consumers: create the tenant''s collection, alias and first token on tenant.provisioned,
       delete them and revoke the token on tenant.terminated.'
-    source: ['events/tenant-provisioned.yaml:22', 'events/tenant-terminated.yaml:18']
+    source: ['events/tenant-provisioned.yaml', 'events/tenant-terminated.yaml']
   recommendationAndRiskSignals:
     module: ai
     host: ticvai-ai
@@ -588,10 +587,10 @@ x-ticvai-jobs:
       attribution, candidate availability, renewal moments, risk velocity and chargebacks, browsing signals, account-takeover
       resets, staff leakage, device-health anomalies, and the risk-case outcome for Identity and Orders.'
     source:
-    - events/ai-riskCaseClosed.yaml:30
-    - events/ai-riskCaseClosed.yaml:35
-    - events/cart-abandoned.yaml:51
-    - events/device-statusChanged.yaml:48
+    - events/ai-riskCaseClosed.yaml
+    - events/ai-riskCaseClosed.yaml
+    - events/cart-abandoned.yaml
+    - events/device-statusChanged.yaml
 paths:
   /ai/translate:
     post:

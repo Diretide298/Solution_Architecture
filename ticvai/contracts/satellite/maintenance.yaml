@@ -138,7 +138,7 @@ x-ticvai-jobs:
     writes: [maintenance.work_order]
     reliesOn: [createMaintenancePlan, updateMaintenancePlan]
     for: 'Maintenance plan generator: create preventive work orders ahead of time.'
-    source: ['contracts/satellite/maintenance.yaml:3321']
+    source: ['contracts/satellite/maintenance.yaml']
 paths:
   # ---------------------------------------------------------------- assets
   /assets:

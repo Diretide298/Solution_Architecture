@@ -125,7 +125,7 @@ x-ticvai-jobs:
     reliesOn: [setApiAnomalyRule]
     for: 'The anomaly monitor: records an ApiAnomaly (control.api_anomaly) for a rule set with setApiAnomalyRule and publishes
       apiClient.anomalyDetected.'
-    source: ['events/apiClient-anomalyDetected.yaml:1']
+    source: ['events/apiClient-anomalyDetected.yaml']
   lifecycleTimers:
     module: public-api
     host: workers
@@ -156,8 +156,8 @@ x-ticvai-jobs:
     reliesOn: [replayEvents, republishOutbox]
     for: Public API webhook replay dispatcher (CR-140, CR-201).
     source:
-    - contracts/satellite/public-api.yaml:1015
-    - contracts/satellite/public-api.yaml:2997
+    - contracts/satellite/public-api.yaml
+    - contracts/satellite/public-api.yaml
     - states/webhook-replay.yaml:20
   sandbox:
     module: public-api
@@ -211,10 +211,10 @@ x-ticvai-jobs:
       and records control.webhook_delivery, with exponential-backoff retries and endpoint health (merged with the jobs scan''s
       JOB-PUBLICAPI-WEBHOOK-RETRY).'
     source:
-    - events/accreditation-applicationDecided.yaml:62
-    - events/accreditation-credentialIssued.yaml:53
-    - events/accreditation-holderStatusChanged.yaml:60
-    - events/accreditation-renewalDue.yaml:42
+    - events/accreditation-applicationDecided.yaml
+    - events/accreditation-credentialIssued.yaml
+    - events/accreditation-holderStatusChanged.yaml
+    - events/accreditation-renewalDue.yaml
 paths:
   /developers:
     post:

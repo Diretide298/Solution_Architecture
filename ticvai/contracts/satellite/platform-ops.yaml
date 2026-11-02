@@ -148,9 +148,9 @@ x-ticvai-jobs:
       the edge resolves hosts from it; it also emits tenantDomain.rejected), and alert TICVAI operations about an expiring
       Apple pass certificate; link an AI incident to the operational incident.'
     source:
-    - events/ai-incidentOpened.yaml:34
-    - events/tenantDomain-mapped.yaml:52
-    - events/whitelabel-passCertificateExpiring.yaml:34
+    - events/ai-incidentOpened.yaml
+    - events/tenantDomain-mapped.yaml
+    - events/whitelabel-passCertificateExpiring.yaml
   migrationRun:
     module: platform-ops
     host: workers

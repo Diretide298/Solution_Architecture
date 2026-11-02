@@ -225,7 +225,7 @@ x-ticvai-jobs:
     writes: [promotions.partner_bundle_product]
     reliesOn: [setBundlePartnerProductMappings, listBundlePartnerProductMappings]
     for: Promotions' partner sync job for bundle partner products.
-    source: ['contracts/satellite/promotions.yaml:8929']
+    source: ['contracts/satellite/promotions.yaml']
   scheduleAndChannelSync:
     module: promotions
     host: workers
@@ -259,8 +259,8 @@ x-ticvai-jobs:
     emits: [promotions.recommendationStrategyPublished]
     for: Promotions' schedule timers, channel sync, conflict detection and monitoring jobs.
     source:
-    - contracts/satellite/promotions.yaml:10538
-    - contracts/satellite/promotions.yaml:1137
+    - contracts/satellite/promotions.yaml
+    - contracts/satellite/promotions.yaml
     - states/coupon.yaml:34
     - states/promotion-channel-publication.yaml:24
 paths:

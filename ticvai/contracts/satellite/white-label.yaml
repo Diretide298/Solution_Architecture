@@ -374,7 +374,7 @@ x-ticvai-jobs:
     writes: [whitelabel.app_build]
     reliesOn: [requestAppBuild]
     for: 'White-label app build job: build and publish the branded apps.'
-    source: ['contracts/satellite/white-label.yaml:7508', 'contracts/satellite/white-label.yaml:9574']
+    source: ['contracts/satellite/white-label.yaml', 'contracts/satellite/white-label.yaml']
   appIconRenditions:
     module: white-label
     host: workers
@@ -384,29 +384,31 @@ x-ticvai-jobs:
     reliesOn: [setAppIcons]
     for: The white-label jobs component asks Assets for each derived icon size (requestMediaRendition) and fills each assetRef
       when Assets has made it (ADAM CR-106).
-    source: ['contracts/satellite/white-label.yaml:2224']
+    source: ['contracts/satellite/white-label.yaml']
   approvalsAndCatalogue:
     module: white-label
     host: workers
     trigger: {kind: event}
     consumes:
+    - approval.expired
     - approval.granted
     - approval.rejected
+    - approval.withdrawn
     - catalogue.productPublished
     - catalogue.productWithdrawn
     - tenant.suspended
     - tenantDomain.rejected
     reads: []
-    writes: [whitelabel.config_version]
+    writes: [whitelabel.config_version, whitelabel.content_block]
     for: 'White-label''s consumers: make an approved white-label version current or mark it rejected, and publish or reject
       a content block sent for review (R19 1.27782.1: the declared consumer writes only config_version, so an approved block
       is never published); rebuild the guest catalogue bundle on a published product; flag guided choices pointing at a withdrawn
       product; show the branded suspension notice;'
     source:
-    - events/approval-granted.yaml:110
-    - events/approval-rejected.yaml:69
-    - events/catalogue-productPublished.yaml:30
-    - events/catalogue-productWithdrawn.yaml:29
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/catalogue-productPublished.yaml
+    - events/catalogue-productWithdrawn.yaml
   contentSchedule:
     module: white-label
     host: workers
@@ -421,9 +423,9 @@ x-ticvai-jobs:
     emits: [whitelabel.contentPublished]
     for: 'White-label content schedule timer: banners, content blocks and schedules go live and expire in the tenant''s timezone.'
     source:
-    - contracts/satellite/white-label.yaml:11999
-    - contracts/satellite/white-label.yaml:1676
-    - contracts/satellite/white-label.yaml:3142
+    - contracts/satellite/white-label.yaml
+    - contracts/satellite/white-label.yaml
+    - contracts/satellite/white-label.yaml
     - states/content-block.yaml:22
   domain:
     module: white-label
@@ -439,9 +441,9 @@ x-ticvai-jobs:
     writes: [whitelabel.custom_domain]
     for: 'White-label domain job: certificate issue, renewal, revalidation and expiry (every five minutes).'
     source:
-    - contracts/satellite/white-label.yaml:545
-    - contracts/satellite/white-label.yaml:9798
-    - contracts/spine/tenancy.yaml:545
+    - contracts/satellite/white-label.yaml
+    - contracts/satellite/white-label.yaml
+    - contracts/spine/tenancy.yaml
     - states/custom-domain.yaml:67
   passCertificateExpiry:
     module: white-label
@@ -452,7 +454,7 @@ x-ticvai-jobs:
     emits: [whitelabel.passCertificateExpiring]
     reliesOn: [setStoreAccounts]
     for: 'White-label daily job: warn 30 days before a wallet-pass certificate expires.'
-    source: ['contracts/satellite/white-label.yaml:9368']
+    source: ['contracts/satellite/white-label.yaml']
   previewRenderer:
     module: white-label
     host: workers
@@ -461,9 +463,9 @@ x-ticvai-jobs:
     reads: [whitelabel.config_version]
     writes: []
     reliesOn: [createPreview]
-    builtBy: '#37209'
+    builtBy: CR476-PREVIEW-RENDERER
     for: White-label preview renderer (CR-476).
-    source: ['contracts/satellite/white-label.yaml:4386']
+    source: ['contracts/satellite/white-label.yaml']
   receivedReleaseCopy:
     module: white-label
     host: workers
@@ -473,16 +475,22 @@ x-ticvai-jobs:
     reliesOn: [getTenantAppStatus]
     for: 'Written by the workers host when the cell takes a release: one whitelabel.received_release row when the release''s
       rollout completes on the tenant''s database (ADAM CR-338).'
-    source: ['contracts/satellite/white-label.yaml:10703']
+    source: ['contracts/satellite/white-label.yaml']
   scheduledPublish:
     module: white-label
     host: workers
     trigger: {kind: timer, every: PT1M}
     reads: [whitelabel.config_version]
     writes: [whitelabel.config_version]
+    emits: [whitelabel.contentPublished]
     reliesOn: [publishTenantConfig]
-    for: White-label scheduled-publish job (publishTenantConfig at a future time).
-    source: ['contracts/satellite/white-label.yaml:4728']
+    for: 'The scheduled-publish job (R8 blocker IDENTITY-C63; ADAM CR-154; the lead, 2 November 2026): every minute it takes
+      the versions whose scheduledFor has passed with activated_at and activation_failed_at null (approved, where under review).
+      One published before the tenant''s current version became current (the current activated_at later than its published_at)
+      is superseded: not made current, activation_failed_at now, activation_failure ''superseded: version N was published
+      after this one was scheduled'', never retried. Otherwise it is validated again and made current, activated_at set and
+      whitelabel.contentPublished emitted; a validation failure is recorded and not retried.'
+    source: ['contracts/satellite/white-label.yaml']
   sitePackage:
     module: white-label
     host: workers
@@ -492,7 +500,7 @@ x-ticvai-jobs:
     writes: [whitelabel.site_package]
     reliesOn: [exportSitePackage, getSitePackage]
     for: 'White-label site package job: build the self-hosted package from a published version.'
-    source: ['contracts/satellite/white-label.yaml:1151', 'contracts/satellite/white-label.yaml:1162']
+    source: ['contracts/satellite/white-label.yaml', 'contracts/satellite/white-label.yaml']
 paths:
   /tenant-domains:
     get:
@@ -4861,6 +4869,11 @@ paths:
         listed, warnings too, and only errors block. A `scheduledFor` that is not in the future is 400 `validation` on
         `scheduledFor`, and nothing is snapshotted.
 
+        **When a version becomes current, `activatedAt` is set** (the lead, 2 November 2026, CR-154, IDENTITY-C63): at
+        once on an immediate publish (in this transaction), when the approval consumer makes a reviewed version current,
+        and when the scheduled-publish job does; the job compares it with a scheduled version''s `publishedAt`, so a
+        version published later wins over an earlier scheduled one.
+
         '
       tags:
       - publishing
@@ -4892,12 +4905,18 @@ paths:
                     snapshotted now, recorded with `isCurrent` false, and the job makes it current at
                     `scheduledFor`. It is validated again then; a failure leaves the current version
                     live and is reported on the version (`activationFailedAt`, `activationFailure`).
-                    **The job** (R8 blocker IDENTITY-C63) runs in the workers host every minute: it takes the
-                    versions whose `scheduledFor` has passed and that are not current and not failed,
-                    validates each again and makes it current, which is when `contentPublished` is emitted
-                    (CR-154); a version that fails validation keeps `isCurrent` false and records the
-                    failure. A time that is not in the future is refused 400 `validation` on `scheduledFor`
-                    (ADAM CR-324, A3).
+                    **The job** (R8 blocker IDENTITY-C63; `x-ticvai-jobs.scheduledPublish`) runs in the
+                    workers host every minute. It takes the versions whose `scheduledFor` has passed, whose
+                    `activatedAt` and `activationFailedAt` are null, and, where the version was under review,
+                    whose `reviewStatus` is `approved`. **A newer publish wins** (the lead, 2 November 2026,
+                    CR-154): if the tenant's current version's `activatedAt` is later than this version's
+                    `publishedAt`, this version is superseded: it is not made current, `activationFailedAt`
+                    is set to now and `activationFailure` to `superseded: version N was published after this
+                    one was scheduled` (N the current version), and it is never retried. Otherwise it is
+                    validated again and made current, its `activatedAt` set, which is when
+                    `contentPublished` is emitted (CR-154); a version that fails validation keeps
+                    `isCurrent` false, records the failure and is not retried. A time that is not in the
+                    future is refused 400 `validation` on `scheduledFor` (ADAM CR-324, A3).
       responses:
         '201':
           headers:
@@ -13398,6 +13417,17 @@ components:
           type: string
           format: date-time
           nullable: true
+        activatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          x-ticvai-backfill: {column: published_at, where: is_current}   # each tenant's current version (the lead, 2 November 2026)
+          description: '**When this version became current** (the lead, 2 November 2026, posted for CR-154 and
+            IDENTITY-C63; CHG-R13JOB-004): set whenever a version becomes current, by an immediate publishTenantConfig,
+            by the approval consumer or by the scheduled-publish job; null while it has never been current. The rows
+            already there take it from `publishedAt` on each tenant''s current version (`x-ticvai-backfill`). The job
+            reads it to supersede a scheduled version published before the current one became current.'
         activationFailedAt:
           type: string
           format: date-time
@@ -13410,7 +13440,9 @@ components:
           maxLength: 2000
           nullable: true
           readOnly: true
-          description: Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63).
+          description: 'Why the scheduled activation failed, in the validation''s words (R8 blocker IDENTITY-C63), or
+            `superseded: version N was published after this one was scheduled` where a newer version became current
+            first (the lead, 2 November 2026, CR-154). Never retried.'
         contentHash:
           type: string
           description: The lowercase hex SHA-256 of the `snapshot` JSON as stored, the same rule as the kiosk
