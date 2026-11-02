@@ -1,0 +1,48 @@
+id: CHG-R13PL-017
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'CR-470: #37159 (seating.section) gains the plain index section_seat_map_id_idx and keeps its NOT NULL; #37162
+  (pricing.dynamic_price_rule) has sales_channel unchecked and is_dynamic_pricing_enabled nullable, as the statements.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. docs/active/block-a-extra-tasks.json:
+    CR402-DB-SECTION-SEAT-MAP''s text adds CREATE INDEX section_seat_map_id_idx (V0122 line 215) between the key and the
+    unique index and keeps SET NOT NULL; CR410-DB-CONTEXTUAL-PRICE-RULE''s text has sales_channel plain nullable text (400
+    in setDynamicPriceRule) and is_dynamic_pricing_enabled boolean DEFAULT true, nullable. Plan change waived from the cooling-off
+    by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-470, the lead''s decision of 2 November 2026 posted on #27645: "The tickets'' texts are corrected to this
+  at the next release".'
+keys_touched:
+  tickets:
+  - CR402-DB-SECTION-SEAT-MAP (37159)
+  - CR410-DB-CONTEXTUAL-PRICE-RULE (37162)
+  tables:
+  - seating.section
+  - pricing.dynamic_price_rule
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: hand-written [DB] task texts written from a decision before the package's statements were derived
+tickets:
+  started: []
+  unstarted:
+  - '#37159, #37162 (Hrushikant Patkar): New in ADAM''s status cache of 1 November; text corrected at r13'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-470
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: A New ticket's text is the plan's at the release apply (its pointer), so the correction reaches the developer at
+  r13; a ticket started since ADAM's status cache of 1 November keeps its text and gets r13's as a comment (op-release.rb,
+  in progress only).

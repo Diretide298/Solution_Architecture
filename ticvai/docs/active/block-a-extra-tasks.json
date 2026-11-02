@@ -495,7 +495,8 @@
    "points": 8,
    "assignee": "Pradnya Yeram",
    "depends": [
-    "SETUP-CLIENTS"
+    "SETUP-CLIENTS",
+    "CR241-SYNC-REJECTION-ROUTES"
    ],
    "subject": "Offline journal in packages/offline-core: record, replay and the conflict policies",
    "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns. Spec (4 October, CHG-FXP-005): the conflict policies are the `x-ticvai-conflict-policy` of each operation the journal records (linked here): `append` for createOrder, createPayment, createCashMovement and validateAccess (nothing is overwritten, so a replayed entry is a new fact, deduplicated by its idempotency key); `lastWriterWins` only where an operation declares it (holdOrder); `serverWins` for everything else (the server's version stands and the till re-reads). Replay goes through `orders#syncOrders` and `access#syncScans` in journal order, each entry with the idempotency key it was taken with. ADR-0013: the catalogue is read locally on every transaction, online or not, and contended inventory sells only from a lease; ADR-0022: the four policies and why the set is closed. **A cash movement** (r8, FOUNDATION-AI-C13): it replays through shift.createCashMovement with its Idempotency-Key and recordedAt; a 409 shift-not-open or lift-exceeds-float on replay is quarantined through recordSyncRejection with kind cashMovement, as a refused sale is.",
@@ -536,7 +537,8 @@
    "points": 5,
    "pool": "backend",
    "depends": [
-    "OFFLINE-BUNDLE"
+    "OFFLINE-BUNDLE",
+    "CR241-SYNC-REJECTION-ROUTES"
    ],
    "subject": "syncOrders: a result per entry, and a bad entry quarantined instead of blocking the till",
    "detail": "Per-entry outcomes, a quarantine a supervisor resolves, and the till carrying on with the rest (SD-028). Done when: one malformed sale in a batch of twenty is quarantined and the other nineteen are accepted.",
@@ -1498,7 +1500,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "identity.guest_verification_policy stores the top-up limit's currency (CR-363)",
-   "detail": "Spec: ADAM CR-363, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30716 (setGuestVerificationPolicy), carried by this task. One forward migration in the tenant database: ALTER TABLE identity.guest_verification_policy ADD COLUMN currency_code text, with CHECK ((wallet_top_up_limit IS NULL) = (currency_code IS NULL)) and a check that currency_code is three capital letters (^[A-Z]{3}$). No backfill: the build never wrote wallet_top_up_limit. setGuestVerificationPolicy writes it from walletTopUpLimit.currency and getGuestVerificationPolicy answers the Money from it. Source DDL after r1: the statements on identity.guest_verification_policy in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-363, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30716 (setGuestVerificationPolicy), carried by this task. One forward migration in the tenant database: ALTER TABLE identity.guest_verification_policy ADD COLUMN currency_code text, with the length check only (V0120 line 13). Corrected to the package's statements (ADAM CR-461, the lead's decision of 2 November 2026, posted on #27645): the statements at the release tag are what is built; setGuestVerificationPolicy keeps currency_code and wallet_top_up_limit null together and writes only a three-capital-letter code, as CR-363 decided; the table has no check for either. No backfill: the build never wrote wallet_top_up_limit. setGuestVerificationPolicy writes it from walletTopUpLimit.currency and getGuestVerificationPolicy answers the Money from it. Source DDL after r1: the statements on identity.guest_verification_policy in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table identity.guest_verification_policy"
    ]
@@ -1601,7 +1603,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "platform.tenant_field_key and platform.blind_index_rehash: where field-encryption keys and re-hash progress are kept (CR-339)",
-   "detail": "Spec: ADAM CR-339, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27665 (MIG-PLATFORM): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration, additive, in every tenant database: two new tables only the kernel reads and writes (KERNEL-FIELD-ENC). (1) platform.tenant_field_key: id uuid primary key, purpose text CHECK in (dataKey, blindIndexKey), key_version integer NOT NULL, wrapped_key bytea NOT NULL, wrapping_key_id text NOT NULL (the Key Vault key and its version), state text CHECK in (active, decryptOnly, retired), created_at timestamptz NOT NULL, rotated_at timestamptz; UNIQUE tenant_field_key_purpose_version_uniq (purpose, key_version); UNIQUE INDEX tenant_field_key_active_uniq (purpose) WHERE state = 'active'. (2) platform.blind_index_rehash: id uuid primary key, column_name text NOT NULL (schema.table.column), from_version integer NOT NULL, to_version integer NOT NULL, last_id uuid, started_at timestamptz NOT NULL, finished_at timestamptz; UNIQUE (column_name, to_version). Row security on both as the contract gives it: any grant of the tenant may read, insert and update, and no one deletes (no DELETE policy). Grants: SELECT, INSERT and UPDATE to the commerce, access, operations and workers roles (DB-ROLES), no DELETE. Infrastructure, already on KERNEL-FIELD-ENC: Key Vault soft-delete and purge protection on. Source DDL after r1: the statements on the two tables in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-339, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27665 (MIG-PLATFORM): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration, additive, in every tenant database: two new tables only the kernel reads and writes (KERNEL-FIELD-ENC). (1) platform.tenant_field_key: id uuid primary key, purpose text CHECK in (dataKey, blindIndexKey), key_version integer NOT NULL, wrapped_key bytea NOT NULL, wrapping_key_id text NOT NULL (the Key Vault key and its version), state text CHECK in (active, decryptOnly, retired), created_at timestamptz NOT NULL, rotated_at timestamptz; the unique indexes tenant_field_key_purpose_key_version_uniq on (purpose, key_version) and tenant_field_key_purpose_uniq on (purpose) WHERE state = 'active' (V0120 lines 110 and 114); code that recognises a clash by constraint name uses these names (ADAM CR-461, 2 November 2026). (2) platform.blind_index_rehash: id uuid primary key, column_name text NOT NULL (schema.table.column), from_version integer NOT NULL, to_version integer NOT NULL, last_id uuid, started_at timestamptz NOT NULL, finished_at timestamptz; UNIQUE (column_name, to_version). Row security on both as the contract gives it: any grant of the tenant may read, insert and update, and no one deletes (no DELETE policy). Grants: SELECT, INSERT and UPDATE to the commerce, access, operations and workers roles (DB-ROLES), no DELETE. Infrastructure, already on KERNEL-FIELD-ENC: Key Vault soft-delete and purge protection on. Source DDL after r1: the statements on the two tables in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table platform.tenant_field_key",
     "table platform.blind_index_rehash",
@@ -1672,7 +1674,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "platform.audit_record keeps the reason an operation was given (CR-376)",
-   "detail": "Spec: ADAM CR-376, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27665 (MIG-PLATFORM, whose migration creates platform.audit_record): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive: ALTER TABLE platform.audit_record ADD COLUMN IF NOT EXISTS reason text, with CHECK (reason IS NULL OR char_length(reason) BETWEEN 3 AND 500). The table is partitioned by month (backend/tenant/930-partitioning.sql, MIG-PARTITIONS), so the column and the check are added on the parent and reach every partition; nothing is added to a partition by hand. No backfill: older rows keep null. The audit interceptor writes it from the request's audit context in the same row as the other audit fields (resetPrincipalCredential, #31238, with the body's reason). Source DDL after r1: the statements on platform.audit_record in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a row written with a reason of 3 and of 500 characters is kept, one of 2 or 501 is refused, and a row with no reason is kept null, in the current month's partition and in next month's. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-376, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27665 (MIG-PLATFORM, whose migration creates platform.audit_record): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive: ALTER TABLE platform.audit_record ADD COLUMN IF NOT EXISTS reason text, with CHECK (char_length(reason) <= 500) on the parent table (V0122 line 87). The table is partitioned by month (backend/tenant/930-partitioning.sql, MIG-PARTITIONS), so the column and the check are added on the parent and reach every partition; nothing is added to a partition by hand. No backfill: older rows keep null. The audit interceptor writes it from the request's audit context in the same row as the other audit fields (resetPrincipalCredential, #31238, with the body's reason). Source DDL after r1: the statements on platform.audit_record in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: at the database, a reason of 500 characters is kept, one of 501 is refused and a row with no reason is kept null, in this month's partition and in next month's; at the API, a reason of 2 characters is refused 400. Corrected to the package's statements (ADAM CR-461, the lead's decision of 2 November 2026, posted on #27645): the statements at the release tag are what is built; the 3-character minimum is the request's validation (AuditRecord.reason minLength 3; resetPrincipalCredential answers 400 on a shorter reason), not a table check. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table platform.audit_record"
    ]
@@ -1688,7 +1690,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "workforce.guest_broadcast: the record of a broadcast sent to the guests at a venue (CR-379)",
-   "detail": "Spec: ADAM CR-379, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #37101 (broadcastToGuests), carried by this task. One forward migration, additive, in the tenant database: the new table workforce.guest_broadcast, which broadcastToGuests writes in the transaction that puts workforce.guestBroadcastAccepted v1 in the outbox. Columns: id uuid primary key (the broadcastId); venue_id uuid NOT NULL; kind text NOT NULL with a CHECK on evacuation, weather, rideClosure, lostChild, operational and allClear (the six kinds of the request); message text NOT NULL; message_localised jsonb; assembly_point_ids uuid[]; sent_by_principal_id uuid NOT NULL; second_principal_id uuid (the supervisor who signed an evacuation in place); recipient_count integer NOT NULL; accepted_at timestamptz NOT NULL; scope_path ltree NOT NULL with its gist index. The principal references are unenforced, as the other workforce tables keep them. Row security: the venue policy (platform.apply_venue_rls). Grants as the other workforce tables have them (DB-ROLES). This task is the table's migration (a -DB key: no other migration creates it). Source DDL after r1: the statements on workforce.guest_broadcast in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a row under one venue's scope is not visible under another venue's; a kind outside the six is refused. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-379, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #37101 (broadcastToGuests), carried by this task. One forward migration, additive, in the tenant database: the new table workforce.guest_broadcast, which broadcastToGuests writes in the transaction that puts workforce.guestBroadcastAccepted v1 in the outbox. Columns: id uuid primary key (the broadcastId); venue_id uuid NOT NULL; kind text NOT NULL with a CHECK on evacuation, weather, rideClosure, lostChild, operational and allClear (the six kinds of the request); message text NOT NULL, at most 300 characters; message_localised jsonb; assembly_point_ids text[] holding uuid strings; sent_by_principal_id uuid NOT NULL; second_principal_id uuid (the supervisor who signed an evacuation in place); recipient_count integer NOT NULL; accepted_at timestamptz NOT NULL; scope_path ltree NOT NULL with its gist index. The principal references are unenforced, as the other workforce tables keep them. Row security: the scope policy (platform.apply_scope_rls on scope_path, V0122 line 263), not the venue policy; broadcastToGuests writes the venue's path into scope_path. Grants as the other workforce tables have them (DB-ROLES). This task is the table's migration (a -DB key: no other migration creates it). Corrected to the package's statements (ADAM CR-461, the lead's decision of 2 November 2026, posted on #27645): the statements at the release tag are what is built; assembly_point_ids, the message length and the scope policy are as above. Source DDL after r1: the statements on workforce.guest_broadcast in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a row under one venue's scope is not visible under another venue's; a kind outside the six is refused. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table workforce.guest_broadcast"
    ]
@@ -1822,7 +1824,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "whitelabel.policy: one row per kind and version (CR-392)",
-   "detail": "Spec: ADAM CR-392, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30271 ([DB] whitelabel.policy, under MIG-WHITELABEL, #27663): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database: first list any duplicate (kind, version) and stop with an error naming them if there is one (none is expected); then CREATE UNIQUE INDEX IF NOT EXISTS on whitelabel.policy (kind, version). setPolicy maps a clash on it to 409 concurrency-conflict. Rollback: drop the index. Source DDL after r1: the statements on whitelabel.policy in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-392, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30271 ([DB] whitelabel.policy, under MIG-WHITELABEL, #27663): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database: first list any duplicate (kind, version) and stop with an error naming them if there is one (none is expected); then CREATE UNIQUE INDEX IF NOT EXISTS policy_kind_version_uniq ON whitelabel.policy (lower(kind), lower(version)) (V0122 line 243). Corrected to the package's statements (ADAM CR-461, the lead's decision of 2 November 2026, posted on #27645): the statements at the release tag are what is built; kind is one of five fixed values and version is digits, so it refuses exactly the duplicates the decision meant; the duplicate pre-check may stay. setPolicy maps a clash on it to 409 concurrency-conflict. Rollback: drop the index. Source DDL after r1: the statements on whitelabel.policy in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table whitelabel.policy"
    ]
@@ -1854,7 +1856,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "access.gate_mode_change keeps the turnstile mode a scheduled change applies (CR-396)",
-   "detail": "Spec: ADAM CR-396, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30506 ([DB] access.gate_mode_change, under MIG-ACCESS, #27676): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive and nullable: ALTER TABLE access.gate_mode_change ADD COLUMN IF NOT EXISTS target_turnstile_mode text CONSTRAINT gate_mode_change_target_turnstile_mode_chk CHECK (target_turnstile_mode IN ('freeRotation', 'closed')). The timer sets both operating_mode and mode from it. who_can_activate stays text[] (it holds role ids as uuid strings), so it needs no change. Source DDL after r1: the statements on access.gate_mode_change in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-396, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30506 ([DB] access.gate_mode_change, under MIG-ACCESS, #27676): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive and nullable: ALTER TABLE access.gate_mode_change ADD COLUMN IF NOT EXISTS target_turnstile_mode text, plain and nullable with no check, as target_mode has none (V0122 line 21). Corrected to the package's statements (ADAM CR-461, the lead's decision of 2 November 2026, posted on #27645): the statements at the release tag are what is built; setTurnstileMode refuses a value outside TurnstileMode with 400. The timer sets both operating_mode and mode from it. who_can_activate stays text[] (it holds role ids as uuid strings), so it needs no change. Source DDL after r1: the statements on access.gate_mode_change in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table access.gate_mode_change"
    ]
@@ -1870,7 +1872,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "seating.section belongs to one seat map, and its code is unique on that map (CR-402)",
-   "detail": "Spec: ADAM CR-402, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #35653 ([DB] seating.section, under MIG-SEATING, #27668): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, in this order, each statement guarded so a second run changes nothing: (1) check that seating.section holds no rows (no build has written a section with a map, so a row there is test data with no map to name): if it holds any, stop with an error that says how many, and tell the lead; (2) ALTER TABLE seating.section ADD COLUMN IF NOT EXISTS seat_map_id uuid, then SET NOT NULL; (3) ADD CONSTRAINT section_seat_map_id_fkey FOREIGN KEY (seat_map_id) REFERENCES seating.seat_map(id); (4) CREATE UNIQUE INDEX IF NOT EXISTS section_seat_map_id_code_uniq ON seating.section (seat_map_id, code), the code matched exactly as seats and sectionCode match it. Row security on the table is unchanged (its scope_path). Source DDL after r1: the statements on seating.section in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-402, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #35653 ([DB] seating.section, under MIG-SEATING, #27668): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, in this order, each statement guarded so a second run changes nothing: (1) check that seating.section holds no rows (no build has written a section with a map, so a row there is test data with no map to name): if it holds any, stop with an error that says how many, and tell the lead; (2) ALTER TABLE seating.section ADD COLUMN IF NOT EXISTS seat_map_id uuid, then SET NOT NULL; (3) ADD CONSTRAINT section_seat_map_id_fkey FOREIGN KEY (seat_map_id) REFERENCES seating.seat_map(id); (4) CREATE INDEX IF NOT EXISTS section_seat_map_id_idx ON seating.section (seat_map_id) (V0122 line 215); (5) CREATE UNIQUE INDEX IF NOT EXISTS section_seat_map_id_code_uniq ON seating.section (seat_map_id, code) (V0122 line 239), the code matched exactly as seats and sectionCode match it. Corrected to the package's statements (ADAM CR-470, the lead's decision of 2 November 2026, posted on #27645): the plain index (4) is added; the NOT NULL stays (CR-402, the contract and handoff/migration-review.md all say NOT NULL; the derived file leaves the column nullable only because a derived file never adds one), and every writer of a section sets seat_map_id. A database check that reports seat_map_id NOT NULL against the nullable statement is the difference migration-review.md lists, not a fault. Row security on the table is unchanged (its scope_path). Source DDL after r1: the statements on seating.section in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table seating.section"
    ]
@@ -1886,7 +1888,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "seating.seat_map_template carries the copied structure of its source map from its first creation (CR-403)",
-   "detail": "Spec: ADAM CR-403, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of MIG-SEATING-8 (V1203__seating.sql, Block C, not ticketed yet), the migration that creates seating.seat_map_template, carried by this task. seating.seat_map_template is not in the live database yet: no migration that has run creates it, so this is not an ALTER of a live table. Its first creation carries the new columns: structure jsonb NOT NULL (the sections with their rows and seats, copied from the source map when the template is saved), view_box jsonb, stage_position jsonb, source_seat_map_id uuid (REFERENCES seating.seat_map(id) ON DELETE SET NULL, lineage only), and scope_path ltree NOT NULL with its gist index; and its row security is read-beneath (platform.apply_read_beneath_rls('seating.seat_map_template')) in place of the parent policy on region_id, so the venues under the region read it. MIG-SEATING-8 is written from the package's DDL at the release tag, which carries all of this; this task checks that it does, and if MIG-SEATING-8 has run by then without them, writes the difference as a guarded forward migration. Source DDL: backend/tenant/010-seating.sql, 900, 910 and 920 at the release tag. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-403, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of MIG-SEATING-8 (V1203__seating.sql, Block C, not ticketed yet), the migration that creates seating.seat_map_template, carried by this task. seating.seat_map_template is not in the live database yet: no migration that has run creates it, so this is not an ALTER of a live table. Its first creation carries the new columns: structure jsonb NOT NULL (the sections with their rows and seats, copied from the source map when the template is saved), view_box jsonb, stage_position jsonb, source_seat_map_id uuid (REFERENCES seating.seat_map(id) with no ON DELETE action, as V0122 line 171 writes it: no operation deletes a seat map; lineage only), and scope_path ltree NOT NULL with its gist index; and its row security is read-beneath (platform.apply_read_beneath_rls('seating.seat_map_template')) in place of the parent policy on region_id, so the venues under the region read it. MIG-SEATING-8 is written from the package's DDL at the release tag, which carries all of this; this task checks that it does, and if MIG-SEATING-8 has run by then without them, writes the difference as a guarded forward migration. Corrected to the package's statements (ADAM CR-461, the lead's decision of 2 November 2026, posted on #27645): the statements at the release tag are what is built; structure and scope_path are NOT NULL (the exception the decision makes: the contract requires both and handoff/migration-review.md lists the NOT NULL for a person to write, since a derived forward file never adds one); the migration that first creates the table creates both NOT NULL. If it has already run without them, the guarded forward migration fills scope_path from region_id first, as migration-review.md gives, and stops with the row count if any row has no structure. Row security is read-beneath (V0122 lines 266-268). A database check that reports these two columns NOT NULL against a nullable statement is the difference migration-review.md lists, not a fault. Source DDL: backend/tenant/010-seating.sql, 900, 910 and 920 at the release tag. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table seating.seat_map_template"
    ]
@@ -1918,7 +1920,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "catalogue.competitor_price_observation: one competitor price seen on a date (CR-409)",
-   "detail": "Spec: ADAM CR-409, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #35327 (listCompetitorPricingMarket), carried by this task. One forward migration, additive, in the tenant database: the new table catalogue.competitor_price_observation, one row per competitor price observed, under a competitorPrice catalogue.demand_signal row (the registry, created by MIG-CATALOGUE-10). Columns: id uuid primary key (UUIDv7); scope_path ltree NOT NULL; demand_signal_id uuid NOT NULL REFERENCES catalogue.demand_signal(id); price_date date NOT NULL; timeslot text (at most 40 characters) null; published_price, promotional_price, weekend_price, peak_price, resident_price and member_price numeric(18,4) null; currency_code text NOT NULL CHECK (currency_code ~ '^[A-Z]{3}$'); availability text NOT NULL DEFAULT 'unknown' CHECK in available, limited, soldOut, unknown; observed_at timestamptz NOT NULL; created_at timestamptz NOT NULL. Index (demand_signal_id, price_date, timeslot, observed_at DESC) and a gist index on scope_path; row security platform.apply_scope_rls. Grants as the other catalogue tables have them (DB-ROLES). This task is the table's migration (a -DB key: no other migration creates it). Nothing writes observations yet (the writer is on the left-out list), so the table starts empty. Source DDL after r1: the statements on catalogue.competitor_price_observation in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a row outside the caller's scope is not visible; a currency code that is not three capital letters is refused. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-409, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #35327 (listCompetitorPricingMarket), carried by this task. One forward migration, additive, in the tenant database: the new table catalogue.competitor_price_observation, one row per competitor price observed, under a competitorPrice catalogue.demand_signal row (the registry, created by MIG-CATALOGUE-10). Columns: id uuid primary key (UUIDv7); scope_path ltree NOT NULL; demand_signal_id uuid NOT NULL REFERENCES catalogue.demand_signal(id); price_date date NOT NULL; timeslot text (at most 40 characters) null; published_amount, promotional_amount, weekend_amount, peak_amount, resident_amount and member_amount numeric(18,4) null; currency_code text NOT NULL with the package's length check (char_length(currency_code) <= 3); availability text NOT NULL DEFAULT 'unknown' CHECK in available, limited, soldOut, unknown; observed_at timestamptz NOT NULL; created_at timestamptz NOT NULL. Index (demand_signal_id, price_date, timeslot, observed_at), as V0122 line 195 writes it, and a gist index on scope_path; row security platform.apply_scope_rls. Grants as the other catalogue tables have them (DB-ROLES). This task is the table's migration (a -DB key: no other migration creates it). Nothing writes observations yet (the writer is on the left-out list), so the table starts empty. Source DDL after r1: the statements on catalogue.competitor_price_observation in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a row outside the caller's scope is not visible. Corrected to the package's statements (ADAM CR-461, the lead's decision of 2 November 2026, posted on #27645): the statements at the release tag are what is built; the six prices are the *_amount columns, the currency code carries the length check only, and the three-capital-letters rule belongs to the writer, which is on the left-out list, so there is no database test for it. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table catalogue.competitor_price_observation"
    ]
@@ -1935,7 +1937,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "pricing.dynamic_price_rule carries a contextual rule's dimension and fields (CR-410)",
-   "detail": "Spec: ADAM CR-410, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #31607 ([DB] pricing.dynamic_price_rule, under MIG-PRICING-2, #28091): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive: pricing.dynamic_price_rule gains dimension text CHECK in channel, customerSegment, location (null); sales_channel text CHECK in the SalesChannel values (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, b2b, ota) (null); customer_segment text CHECK in standardCustomer, member, loyaltyTier, resident, vip, corporate, group, b2b, customSegment (null); segment_ref text (at most 100 characters) null; location_level text CHECK in country, market, venue, attraction, zone, eventLocation (null); location_id text (at most 100 characters) null; is_dynamic_pricing_enabled boolean NOT NULL DEFAULT true. channel_id is declared as a key to catalogue.sales_channel (one configured channel profile; null means every channel), added NOT VALID where it is enforced, with an index on it. Source DDL after r1: the statements on pricing.dynamic_price_rule in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-410, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #31607 ([DB] pricing.dynamic_price_rule, under MIG-PRICING-2, #28091): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive: pricing.dynamic_price_rule gains dimension text CHECK in channel, customerSegment, location (null); sales_channel text, plain and nullable with no check (V0122 line 99; setDynamicPriceRule refuses a value outside SalesChannel with 400 validation on salesChannel); customer_segment text CHECK in standardCustomer, member, loyaltyTier, resident, vip, corporate, group, b2b, customSegment (null); segment_ref text (at most 100 characters) null; location_level text CHECK in country, market, venue, attraction, zone, eventLocation (null); location_id text (at most 100 characters) null; is_dynamic_pricing_enabled boolean DEFAULT true, nullable (V0122 line 119): setDynamicPriceRule always writes true or false, true when the body leaves it out, and a reader takes a null as true. Corrected to the package's statements (ADAM CR-470, the lead's decision of 2 November 2026, posted on #27645): sales_channel and is_dynamic_pricing_enabled are as above. channel_id is declared as a key to catalogue.sales_channel (one configured channel profile; null means every channel), added NOT VALID where it is enforced, with an index on it. Source DDL after r1: the statements on pricing.dynamic_price_rule in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table pricing.dynamic_price_rule"
    ]
@@ -1951,7 +1953,7 @@
    ],
    "notBefore": "2026-11-02",
    "subject": "catalogue.channel_envelope keeps a percentage allocation and the units released and returned (CR-412)",
-   "detail": "Spec: ADAM CR-412, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #35659 ([DB] catalogue.channel_envelope, under MIG-CATALOGUE, #27671): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive: catalogue.channel_envelope gains allocation_percent numeric(5,2) null CHECK (allocation_percent BETWEEN 0 AND 100), released_units integer NOT NULL DEFAULT 0 and returned_units integer NOT NULL DEFAULT 0. Existing rows start at 0. Source DDL after r1: the statements on catalogue.channel_envelope in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "detail": "Spec: ADAM CR-412, the lead's decision of 31 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #35659 ([DB] catalogue.channel_envelope, under MIG-CATALOGUE, #27671): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive: catalogue.channel_envelope gains envelope_percent numeric(18,4), released_units integer DEFAULT 0 and returned_units integer DEFAULT 0, all three nullable and with no range check (V0122 lines 24-34). Corrected to the package's statements (ADAM CR-461, the lead's decision of 2 November 2026, posted on #27645): the statements at the release tag are what is built; the 0 to 100 rule is setChannelAllocations' 400 validation, from the contract's minimum and maximum; the release job and relinquishChannelAllocation add to the counts, and a reader takes a null count as 0. Source DDL after r1: the statements on catalogue.channel_envelope in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table catalogue.channel_envelope"
    ]
@@ -2036,6 +2038,1252 @@
    "builds": [
     "table catalogue.price_execution",
     "table catalogue.audit_entry"
+   ]
+  },
+  {
+   "key": "CR442-MESSAGE-SENDER",
+   "epic": "PLATFORM",
+   "points": 5,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "PLATFORM-OUTBOX",
+    "MIG-MARKETING",
+    "CR379-DB-DISPATCH-SOURCE-AND-ENTITLEMENT-READ",
+    "CR442-DB-DISPATCH-BODY"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Marketing's message sender: the dispatch worker and the email, SMS and push providers (CR-442)",
+   "detail": "broadcastToGuests is built to CR-379: it records the broadcast, enqueues workforce.guestBroadcastAccepted and answers 202. Marketing's consumer, sendGuestBroadcast, works out every subject and channel, but cannot write what CR-379 asks. marketing.message_dispatch has no column for the broadcast it belongs to or for the text to send, and being partitioned by queued_at it cannot carry a unique key on broadcastId + subjectId + channel. Nothing in the repository sends push, SMS or email either: no dispatch worker, no provider adapter, and sendTransactionalMessage is not built. So today an evacuation is accepted with 202 and reaches no guest. The consumer dead-letters every delivery rather than pretend it sent anything, and #37101 cannot go to QA until this is settled.\n\n**What was seen**\n\nCR-379 (decided 31 Oct): \"writes one transactional message_dispatch per subject and channel with sourceRef = broadcastId. It is idempotent on broadcastId + subjectId + channel.\" and \"Drop the x-ticvai-write-via to sendTransactionalMessage.\"\nCR-379's own problem text: \"message_dispatch has no column for the body, kind or broadcast id\" (not addressed by the decision).\ndb/tenant/038-marketing.sql, marketing.message_dispatch: columns id, subject_id, campaign_id, channel, template_id, message_trigger_id, campaign_variant_id, planned_send_at, status, failure_reason, provider_reference, queued_at, delivered_at, is_test, opened_at, clicked_at, complained_at, unsubscribed_at; \"CONSTRAINT message_dispatch_pkey PRIMARY KEY (id, queued_at)) PARTITION BY RANGE (queued_at)\". No source_ref, no body. CR-138 kept the partitioning.\nA unique index on a partitioned table must include the partition key, so (broadcast, subject, channel) cannot be unique without queued_at.\nsrc/: no push, SMS or email sender or dispatch worker exists; marketing-crm#sendTransactionalMessage is not built.\n\n**Options considered**\n\n- A: add source_ref uuid and body text (the resolved message) to marketing.message_dispatch, with a non-unique index on (source_ref, subject_id, channel). Idempotency comes from the consumer's inbox: every dispatch of one delivery is written in the inbox's transaction, plus a check before insert. A separate ticket builds the dispatch worker and the push, SMS and email providers.\n- B: a Marketing-owned table guest_broadcast_dispatch (broadcast_id, subject_id, channel, body, status, provider_reference, queued_at, sent_at) with a unique key on (broadcast_id, subject_id, channel); the dispatch worker and providers as in A.\n- C: un-partition marketing.message_dispatch so the unique key can exist (reverses CR-138).\n\n**Recommended**\n\nA. It keeps every guest message in one table, as CR-379 intends, and stays within ADR-0056's partitioning. The inbox already de-duplicates deliveries at least once. Whichever option is chosen, the dispatch worker and the three channel providers need their own ticket: until they exist, a 202 evacuation reaches nobody. Until then broadcastToGuests stays as built and #37101 stays On hold.\n\n**Intake**\n\n- Source: developer — #37101\n- Triage: defect, now\n- Contract impact: none\n- Artefacts: tenancy#broadcastToGuests, marketing-crm#sendTransactionalMessage, workforce.guest_broadcast\n- Raised against release r11\n\n**Decision (CR-442 · accepted)**\n\nDecided (Chinmay, 1 November 2026): A. marketing.message_dispatch keeps source_ref (r12 already adds it: the [DB] ticket for CR-379) and gains body text, nullable: the resolved message as sent. Add a non-unique index on (source_ref, subject_id, channel). Idempotency comes from the consumer's inbox: every dispatch row of one delivery is written in the inbox's transaction, after a check that no row for that source_ref, subject_id and channel exists. The partitioning stays (ADR-0056). The sending itself is a new ticket, filed as a child of this one: Marketing's message sender, the dispatch worker that sends queued dispatch rows through the provider each channel has configured (setChannelProvider: email, SMS and push, ranked by role and priority with fallback) and records delivered or failed with the provider's reference. Guest one-time codes (CR-370) send through the same worker. Until it exists broadcastToGuests stays as built, the consumer dead-letters rather than pretending to send, and #37101 stays On hold. Build to it now; the package is updated to match at the next release.\n\n---\n\nRaised in ADAM as CR-442 (Backend).\n\n**Done when (plan):** a queued marketing.message_dispatch row is sent through the provider its channel has configured (setChannelProvider: by role and priority, falling back on failure) and marked delivered or failed with the provider's reference; a guest one-time code (CR-370) goes through the same worker; a channel with no provider fails the row and never reports it delivered.",
+   "builds": [
+    "table marketing.message_dispatch"
+   ],
+   "made": {
+    "id": 37203,
+    "parent": "SVC-TENANCY-WORKFORCE-3#broadcastToGuests",
+    "parentId": 37101,
+    "assignee": "Hrushikant Patkar",
+    "accountable": "Pranay Shinde",
+    "sprint": 3,
+    "subject": "[CR-442] [BE] Marketing's message sender: the dispatch worker and the email, SMS and push providers",
+    "on": "2026-11-01"
+   }
+  },
+  {
+   "key": "CR451-DEVICE-KEY-SIGN-IN",
+   "epic": "PLATFORM",
+   "points": 5,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "KERNEL-DEVICE-AUTH",
+    "VM-MIG-TENANCY"
+   ],
+   "notBefore": "2026-11-16",
+   "subject": "Device-key sign-in for apiKeyAuth operations (signage displays, queue readings) (CR-451)",
+   "detail": "getSignageQueueBoard and getSignageQueueCalls are device calls from a signage display: security apiKeyAuth, no permission, audience device, scope level venue. Nothing in the package or the repository defines a display key: tenancy.device_credential.kind allows only clientCertificate, deviceToken and mutualTls; platform.device has no key column; the request kernel has no device session and nothing reads X-Api-Key. So neither endpoint can sign a display in, check that the venueId or queueId it asks for is its own, or answer 401. The read behind getSignageQueueCalls is built (unexposed); both endpoints wait on this. submitQueueReading has the same gap.\n\n**What was seen**\n\nqueue.yaml (around L1376, L1413): \"security: - apiKeyAuth: []\", \"x-ticvai-permission: null # a registered device, authenticated by its enrolment rather than a person\", \"x-ticvai-audience: [device]\", \"x-ticvai-scope-level: venue\". The board's description: \"Unauthenticated by display key\". Scheme: \"apiKeyAuth: {type: apiKey, in: header, name: X-Api-Key}\".\ntenancy.device_credential.kind check: clientCertificate, deviceToken, mutualTls.\nsubmitQueueReading (around L1258) uses the same scheme.\n\n**Options considered**\n\n- A: define a display key: a device_credential of kind apiKey holding only a hash, bound to a signageDisplay device and its venue. The key opens a session scoped to that venue; venueId and queueId must be inside it; a missing or wrong key is 401. A ticket builds the device-key sign-in for every apiKeyAuth operation.\n- B: use the existing deviceToken credential as a bearer token, and change these operations' security from apiKeyAuth to it.\n- C: make the signage reads public by venueId (guest or public audience, like getWaitTimes), with no key.\n\n**Recommended**\n\nA: a display holds no person's session, the key can be revoked per device, and venue scope stays enforced. It needs a ticket for the device-key sign-in, which submitQueueReading also needs.\n\n**Intake**\n\n- Source: developer — #33061\n- Triage: scope, now\n- Contract impact: additive\n- Artefacts: queue#getSignageQueueCalls, queue#submitQueueReading, tenancy.device_credential, platform.device\n- Raised against release r11\n\n**Decision (CR-451 · accepted)**\n\nDecided (Chinmay, 1 November 2026): as you recommended (A). A display key is a tenancy.device_credential of a new kind apiKey, holding only a hash of the key, bound to one signage display device and its venue; the key is shown once when issued and can be revoked per device. A request with X-Api-Key opens a device session scoped to that venue; a venueId or queueId outside it is 403, a missing, wrong or revoked key is 401. The sign-in is a new ticket, filed as a child of this one: device-key sign-in for every apiKeyAuth operation (issue, hash and store, verify, revoke; the kind check gains apiKey), which getSignageQueueBoard, getSignageQueueCalls and submitQueueReading all use. #33061 stays On hold until it is built. Build to it now; the package is updated to match at the next release.\n\n---\n\nRaised in ADAM as CR-451 (Backend).\n\n**Done when (plan):** a signage display with a valid key (a tenancy.device_credential of kind apiKey, stored only as a hash, shown once when issued) reads its venue's board and calls; a venueId or queueId outside its venue is 403; a missing, wrong or revoked key is 401; submitQueueReading signs in the same way.",
+   "builds": [
+    "table tenancy.device_credential",
+    "adr ADR-0067"
+   ],
+   "made": {
+    "id": 37205,
+    "parent": "SVC-VENUEOPS-SIGNAGE-1#getSignageQueueBoard",
+    "parentId": 33061,
+    "assignee": "Hrushikant Patkar",
+    "accountable": "Narayan Gaonkar",
+    "sprint": 4,
+    "subject": "[CR-451] [BE] Device-key sign-in for apiKeyAuth operations (signage displays, queue readings)",
+    "on": "2026-11-01"
+   }
+  },
+  {
+   "key": "CR457-CHANNEL-RETRY-JOB",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "PLATFORM-OUTBOX",
+    "MIG-CATALOGUE",
+    "SVC-CATALOGUE-CATALOGUE-14"
+   ],
+   "notBefore": "2026-11-16",
+   "subject": "Catalogue's channel retry job: carry out a queued incident retry and move the incident on (CR-457)",
+   "detail": "**[CR-457] [BE] Catalogue's channel retry job: carry out a queued incident retry and move the incident on**\n\nFrom ADAM CR-457 (#35231), decided by Chinmay on 2 November 2026. The work: [BE] Catalogue's channel retry job: carry out a queued incident retry (catalogue.channelIncidentRetryRequested) and move the incident to resolved or investigating\n\n**The decision (also the ADAM CR-457 comment on #35231):**\n\nDecided (Chinmay, 2 November 2026): A, as you recommended: the retry is a fact written to the outbox and carried out by a job. Build now: (1) retryChannelIncident, in one transaction: an incident that is resolved or closed answers 409 not-retryable and nothing changes. Otherwise move the catalogue.channel_incident to retrying, add 1 to retry_count and set updated_at. If api_request_reference is null, set it to the incident id as text, so this retry and every later one share one reference. Write one catalogue.audit_entry (domain channel, action retry, entity_type channelIncident, entity_id the incident). Write one platform.outbox row for catalogue.channelIncidentRetryRequested v1 (aggregate channelIncident, aggregateId the incident id). Answer 202 with the incident, and declare x-ticvai-emits catalogue.channelIncidentRetryRequested on the operation. (2) The event, for events/catalogue-channelIncidentRetryRequested.yaml when the package catches up: publisher catalogue; emittedWhen 'retryChannelIncident moves an incident from open or investigating to retrying'; emittedBy retryChannelIncident. Payload: incidentId (uuid), salesChannelId (uuid), channelConnectionId (uuid, optional), errorType (string), apiRequestReference (string, the partner's idempotency reference, reused unchanged), correlationId (string, optional, the original call's trace id, used only to find the trace and never sent to the partner as the idempotency reference), retryCount (integer), requestedByPrincipalId (uuid). Consumer: Catalogue's channel retry job in the workers host; idempotency key incidentId + retryCount; onFailure retryThenDeadLetter; isCritical false. Retention 30 days after publication. (3) The job (its own ticket): if the incident is no longer retrying, or its retry_count is not the event's, do nothing. Otherwise find the failed call's trace in catalogue.audit_entry (domain channel, reference equal to the incident's original apiRequestReference, or by correlationId when it had none), and send that call again through the channel connector for channelConnectionId, with apiRequestReference as the partner's idempotency reference. Product, price and availability calls send today's values, not the stale ones; order and cancellation calls send the same request. On the partner's success, set status resolved, resolved_at now and resolution_note 'Retry <retry_count> succeeded'. On failure, set status investigating, and take error_code and response_excerpt from the answer (truncated and scrubbed of personal data). Until a connector exists for the connection's type, the attempt fails with error_code connectorNotAvailable; an incident is never marked resolved without a partner's success. If the event is dead-lettered, move the incident to investigating with error_code retryNotDelivered, so nothing stays retrying. Each move writes the incident and one catalogue.audit_entry (domain channel, result success or failure, source sync, actor_system channelRetryJob) in one transaction. Build to it now; the package is updated to match at the next release.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** a catalogue.channelIncidentRetryRequested event moves the incident to resolved only on the partner's success, otherwise to investigating with error_code and response_excerpt (connectorNotAvailable until a connector exists); an event whose incident is no longer retrying or whose retry_count moved on does nothing; a dead-lettered event leaves the incident investigating with retryNotDelivered; every move writes its catalogue.audit_entry in the same transaction.",
+   "builds": [
+    "table catalogue.channel_incident",
+    "table catalogue.audit_entry"
+   ],
+   "made": {
+    "id": 37206,
+    "parent": "SVC-CATALOGUE-CATALOGUE-14#retryChannelIncident",
+    "parentId": 35231,
+    "assignee": "Hrushikant Patkar",
+    "accountable": "Pranay Shinde",
+    "sprint": 4,
+    "subject": "[CR-457] [BE] Catalogue's channel retry job: carry out a queued incident retry and move the incident on",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR463-KIOSK-PRINT",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 3,
+   "area": "P05",
+   "assignee": "Pradnya Yeram",
+   "block": "A2",
+   "appModule": "AM-DEVICES-BOCA",
+   "depends": [
+    "DEVICE-BOCA-FGL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Kiosk prints through the Windows device host: status, print job, printer errors on KSK-010 (CR-463)",
+   "detail": "**[CR-463] [FE] Kiosk prints through the Windows device host: status, print job, printer errors on KSK-010**\n\nFrom ADAM CR-463 (#35592), decided by Chinmay on 2 November 2026. The work: [FE] Kiosk and POS print through the Windows device host: status check, print job with the filled layout, and the printer errors routed to KSK-010 and POS-026 (one child per app: kiosk and POS)\n\n**The decision (also the ADAM CR-463 comment on #35592):**\n\nDecided (Chinmay, 2 November 2026): A, as you recommended: the device host's API as built is the contract, written down once, and the Android path implements the same one later. Build now: (1) The host's OpenAPI 3 file, as built on feature/35592-boca-windows-device-host, is the spec. It covers GET /ticket-printer/status and POST /ticket-printer/print-jobs (Idempotency-Key required), with errors as application/problem+json in the shared Problem shape and the problem types as built: paper out, jam, offline, busy and fault are 503; printer-rejected-ticket is 502; print-not-confirmed is 504; stock-not-configured and the two RFID codes are 409; validation is 400. The TicketLayout names are as built (stock with widthMm, heightMm and dpi; elements with kind, xMm, yMm, rotation, font, fontSize and moduleSizeMm; content as field, text or assetRef). Commit the file to the host's repository and attach it to #35592. The package adds it as contracts/devices/ticket-printer.yaml, with TicketLayout in the orders contract, under the same names, so the host does not change. (2) Part of the contract: the host listens on 127.0.0.1 only. It answers only the kiosk and POS app origins named in its local settings (CORS and the private-network preflight) and refuses any other origin with 403. A POST retried with the same Idempotency-Key answers the first job's outcome and never prints again; keep keys locally for at least 24 hours, which matters most after a 504 print-not-confirmed. The host keeps no secret. (3) The front ends (new ticket): the kiosk checks status and posts the filled layout when KSK-009 issues the tickets. Any 502, 503 or 504 takes the guest to KSK-010, which stays as it is ('Send to my phone', reprintOrder with reason printerFault). The POS does the same and offers POS-026's reprint. Neither screen changes visibly. (4) The mock API (SETUP-MOCK-API) serves this file, so the front-end builders work without a printer; the host's emulator stays for the module test (TEST-AM-DEVICES-BOCA). Build to it now; the package is updated to match at the next release.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** KSK-009 checks the device host's status and posts the filled layout; a 502, 503 or 504 takes the guest to KSK-010; a print retried with the same Idempotency-Key never prints twice; tested against the mock API serving the host's contract.",
+   "builds": [
+    "adr ADR-0015"
+   ],
+   "linksNothingBecause": "the kiosk app's calls to the Windows device host on localhost (CR-448, CR-463): no operation, table or screen of the package; KSK-009 and KSK-010 do not change visibly",
+   "made": {
+    "id": 37207,
+    "parent": "AM-DEVICES-BOCA",
+    "parentId": 35591,
+    "assignee": "Pradnya Yeram",
+    "accountable": "Pradnya Yeram",
+    "sprint": null,
+    "subject": "[CR-463] [FE] Kiosk prints through the Windows device host: status, print job, printer errors on KSK-010",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR463-POS-PRINT",
+   "epic": "FRONTEND-FOUNDATION",
+   "points": 3,
+   "area": "POS",
+   "assignee": "Pradnya Yeram",
+   "block": "A2",
+   "appModule": "AM-DEVICES-BOCA",
+   "depends": [
+    "DEVICE-BOCA-FGL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "POS prints through the Windows device host: status, print job, printer errors on POS-026 (CR-463)",
+   "detail": "**[CR-463] [FE] POS prints through the Windows device host: status, print job, printer errors on POS-026**\n\nFrom ADAM CR-463 (#35592), decided by Chinmay on 2 November 2026. The work: [FE] Kiosk and POS print through the Windows device host: status check, print job with the filled layout, and the printer errors routed to KSK-010 and POS-026 (one child per app: kiosk and POS)\n\n**The decision (also the ADAM CR-463 comment on #35592):**\n\nDecided (Chinmay, 2 November 2026): A, as you recommended: the device host's API as built is the contract, written down once, and the Android path implements the same one later. Build now: (1) The host's OpenAPI 3 file, as built on feature/35592-boca-windows-device-host, is the spec. It covers GET /ticket-printer/status and POST /ticket-printer/print-jobs (Idempotency-Key required), with errors as application/problem+json in the shared Problem shape and the problem types as built: paper out, jam, offline, busy and fault are 503; printer-rejected-ticket is 502; print-not-confirmed is 504; stock-not-configured and the two RFID codes are 409; validation is 400. The TicketLayout names are as built (stock with widthMm, heightMm and dpi; elements with kind, xMm, yMm, rotation, font, fontSize and moduleSizeMm; content as field, text or assetRef). Commit the file to the host's repository and attach it to #35592. The package adds it as contracts/devices/ticket-printer.yaml, with TicketLayout in the orders contract, under the same names, so the host does not change. (2) Part of the contract: the host listens on 127.0.0.1 only. It answers only the kiosk and POS app origins named in its local settings (CORS and the private-network preflight) and refuses any other origin with 403. A POST retried with the same Idempotency-Key answers the first job's outcome and never prints again; keep keys locally for at least 24 hours, which matters most after a 504 print-not-confirmed. The host keeps no secret. (3) The front ends (new ticket): the kiosk checks status and posts the filled layout when KSK-009 issues the tickets. Any 502, 503 or 504 takes the guest to KSK-010, which stays as it is ('Send to my phone', reprintOrder with reason printerFault). The POS does the same and offers POS-026's reprint. Neither screen changes visibly. (4) The mock API (SETUP-MOCK-API) serves this file, so the front-end builders work without a printer; the host's emulator stays for the module test (TEST-AM-DEVICES-BOCA). Build to it now; the package is updated to match at the next release.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** the POS checks the device host's status and posts the filled layout; a 502, 503 or 504 offers POS-026's reprint; a print retried with the same Idempotency-Key never prints twice; tested against the mock API serving the host's contract.",
+   "builds": [
+    "adr ADR-0015"
+   ],
+   "linksNothingBecause": "the POS app's calls to the Windows device host on localhost (CR-448, CR-463): no operation, table or screen of the package; POS-026 does not change visibly",
+   "made": {
+    "id": 37208,
+    "parent": "AM-DEVICES-BOCA",
+    "parentId": 35591,
+    "assignee": "Pradnya Yeram",
+    "accountable": "Pradnya Yeram",
+    "sprint": null,
+    "subject": "[CR-463] [FE] POS prints through the Windows device host: status, print job, printer errors on POS-026",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR476-PREVIEW-RENDERER",
+   "epic": "PLATFORM",
+   "points": 5,
+   "assignee": "Chinmay Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "PLATFORM-OUTBOX",
+    "SVC-WHITELABEL-PUBLISHING-1"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "White-label jobs (workers host): render a preview from preview.requested into its cache entry (CR-476)",
+   "detail": "**[CR-476] [BE] White-label jobs (workers host): render a preview from preview.requested into its cache entry**\n\nFrom ADAM CR-476 (#30767), decided by Chinmay on 2 November 2026. The work: [BE] White-label jobs component, workers host: render a preview from preview.requested (the draft app, PDF ticket and Wallet passes) into its cache entry, reading catalogue#productRecords and orders#ticketTemplateRecords in process (Orders' ticketTemplateRecords as an in-process query class)\n\n**The decision (also the ADAM CR-476 comment on #30767):**\n\nDecided (Chinmay, 2 November 2026): Build now: createPreview reads nothing from Catalogue or Orders and calls no service route. Do not add a grant on orders.ticket_template for the operations role. It validates the body and writes cache:preview:{tenantId}:{previewId} with expiresAt. In the same transaction it writes preview.requested to the outbox (previewId, platform, language, outputs, productId as sent, expiresAt), then answers 201 with the Preview (CR-106). getPreview reads the cache entry back. Rendering the app, the PDF ticket and the Wallet passes is the white-label jobs component's work in the workers host, triggered by preview.requested. Like every consumer in the workers host, it asks catalogue#productRecords (ids [productId]) and orders#ticketTemplateRecords in process, and Orders implements ticketTemplateRecords as an in-process query class. That renderer is a new ticket, not this one.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** a preview.requested event renders the requested outputs into cache:preview:{tenantId}:{previewId} before its expiresAt, reading catalogue#productRecords and orders#ticketTemplateRecords in process; getPreview reads it back; a second delivery of the same event renders nothing again.",
+   "builds": [
+    "table orders.ticket_template",
+    "table catalogue.product",
+    "adr ADR-0055"
+   ],
+   "made": {
+    "id": 37209,
+    "parent": "AM-WHITE-LABEL-P13",
+    "parentId": 27874,
+    "assignee": "Chinmay Patkar",
+    "accountable": "Chinmay Patkar",
+    "sprint": null,
+    "subject": "[CR-476] [BE] White-label jobs (workers host): render a preview from preview.requested into its cache entry",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR477-DB-OPERATIONS-READS-ORDER-LINE",
+   "epic": "PLATFORM",
+   "points": 1,
+   "area": "database",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-ORDERS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Grant the operations role USAGE on orders and SELECT on orders.order_line (guarded) (CR-477)",
+   "detail": "**[CR-477] [DB] Grant the operations role USAGE on orders and SELECT on orders.order_line (guarded)**\n\nFrom ADAM CR-477 (#30870), decided by Chinmay on 2 November 2026. The work: [DB] Grant the operations role USAGE on schema orders and SELECT on orders.order_line, guarded as V0118/V0122 write theirs (createShopAndDrop asks orders#orderLineRecords in process; a granted read in docs/active/cross-deployable-writes.yaml)\n\n**The decision (also the ADAM CR-477 comment on #30870):**\n\nDecided (Chinmay, 2 November 2026): Build now: on the orderId path, createShopAndDrop asks orders#orderLineRecords with where {orderId} in process from the operations host. Use Orders' query class, already composed there (CR-385), under the caller's row-level security; call no service route. An orderId with no visible line is 422 unknown-order, and a lineIds entry that is not one of those lines is 422 unknown-line. The saleId path reads Retail's own tables, and fnb#deliveryLocationRecords stays in process. Database: Hrushikant adds a guarded grant of USAGE on schema orders and SELECT on orders.order_line to the operations role, written the way V0118 and V0122 write theirs. It is read only, and row security still decides the rows. Do not apply it yourself. PostgreSQL refuses the read until the grant is on the database, so test against a database that has it.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** the operations role reads orders.order_line under the caller's row security and cannot write it; a second run of the migration changes nothing.",
+   "builds": [
+    "table orders.order_line"
+   ],
+   "made": {
+    "id": 37210,
+    "parent": "MIG-ORDERS",
+    "parentId": 27675,
+    "assignee": "Hrushikant Patkar",
+    "accountable": "Pranay Shinde",
+    "sprint": 1,
+    "subject": "[CR-477] [DB] Grant the operations role USAGE on orders and SELECT on orders.order_line (guarded)",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR478-DB-OPERATIONS-READS-PROMOTIONS",
+   "epic": "PLATFORM",
+   "points": 1,
+   "area": "database",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-PROMOTIONS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Grant the operations role USAGE on promotions and SELECT on promotion and promotion_rule (CR-478)",
+   "detail": "**[CR-478] [DB] Grant the operations role USAGE on promotions and SELECT on promotion and promotion_rule**\n\nFrom ADAM CR-478 (#30871), decided by Chinmay on 2 November 2026. The work: [DB] Grant the operations role USAGE on schema promotions and SELECT on promotions.promotion and promotions.promotion_rule, guarded as V0118/V0122 write theirs (lookupMerchandise asks promotions#liveEffectivePrice in process; a granted read in docs/active/cross-deployable-writes.yaml)\n\n**The decision (also the ADAM CR-478 comment on #30871):**\n\nDecided (Chinmay, 2 November 2026): Build now: (1) lookupMerchandise asks tenancy#workstationRecords in process from the operations host, through Tenancy's query class as assignKiosk does (CR-384), for the caller's workstation and its outlet. Answer 400 outlet-required and 404 as the operation states. No grant is needed (V0118). (2) promotions#liveEffectivePrice is asked in process too. Implement it as an in-process query class of Catalogue's Promotions module, registered in the operations host with Catalogue's other query classes. It runs the same evaluation code evaluatePromotions uses (#31714) for stacking, precedence and the zero floor, never a copy, so this part depends on #31714. Its inputs are venueId, the caller's channel, and one item per merchandise (itemRef = the merchandise id, unitPrice = its list price). Its result gives PriceCheck.effectivePrice, under the caller's row-level security. Database: Hrushikant adds a guarded grant of USAGE on schema promotions and SELECT on promotions.promotion and promotions.promotion_rule to the operations role, written the way V0118 and V0122 write theirs. It is read only. Do not apply it yourself. tenancy#venueSettingsRecords stays in process, and retail.merchandise is Retail's own table.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** the operations role reads promotions.promotion and promotions.promotion_rule under the caller's row security and cannot write them; a second run of the migration changes nothing.",
+   "builds": [
+    "table promotions.promotion",
+    "table promotions.promotion_rule"
+   ],
+   "made": {
+    "id": 37211,
+    "parent": "MIG-PROMOTIONS",
+    "parentId": 27674,
+    "assignee": "Hrushikant Patkar",
+    "accountable": "Hrushikant Patkar",
+    "sprint": 1,
+    "subject": "[CR-478] [DB] Grant the operations role USAGE on promotions and SELECT on promotion and promotion_rule",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR480-ORDER-EXCHANGED-CONSUMERS",
+   "epic": "PLATFORM",
+   "points": 5,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "PLATFORM-OUTBOX",
+    "SVC-ORDER-ORDER-2"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Consumers of order.exchanged: entitlements, capacity and seats move as on a refund (CR-480)",
+   "detail": "**[CR-480] [BE] Consumers of order.exchanged: entitlements, capacity and seats move as on a refund**\n\nFrom ADAM CR-480 (#30685), decided by Chinmay on 2 November 2026. The work: Consumers of order.exchanged: Catalogue cancels the outgoing lines' entitlements and returns their capacity, Seating returns their seats, Access issues the incoming lines' entitlements, as order.refunded and the order-paid saga do\n\n**The decision (also the ADAM CR-480 comment on #30685):**\n\nDecided (Chinmay, 2 November 2026): option A for the write, and option B built first in this ticket. Build now on #30685: (1) The checks, in this order, refusing before anything is written: 400 validation when outgoingLineIds are not lines of the path's order or incomingLines is empty, or the body id differs from Idempotency-Key. 409 line-redeemed (refusedReason lineRedeemed, lineIds) when access#entitlementRecords (route service, as modifyOrder asks it) shows an outgoing line's entitlement redeemed. 409 outside-exchange-window (outsideExchangeWindow, lineIds) when now is later than an outgoing line's performance start (catalogue#performanceRecords, in-process) minus exchangeCutoffHours (tenancy#venueSettingsRecords; 24 when unset). 409 replacement-unavailable (replacementUnavailable, lineIds) when an incoming line's inventoryHoldId is not an active hold (catalogue#inventoryReservationRecords): the client holds the replacement with acquireInventoryHold before calling, as POS-004 does before createOrder, which is how the replacement is held before the original is released. One problem type per reason, as CR-345 and CR-481 decided. (2) The quote: outgoingValue is what the outgoing lines paid minus what earlier refunds took from them (their orders.refund_line rows, CR-208's refundableAmount); incomingValue prices the incoming lines with catalogue#variantPriceRecords at the order's venue and channel (CR-439's rule, built in #35288), quantity times the selected amount; exchangeFee is zero until the client sets a fee rule (waiveFee changes nothing meanwhile); difference = incomingValue + exchangeFee - outgoingValue, in the venue's currency. Until the write half is in, answer 200 OrderExchangeResult with these four values, newLineIds, revokedEntitlementIds and issuedEntitlementIds empty, and write nothing - not an order_event, not a line. (3) The write, after createOrder (#30977) and createRefund (#31924) are built, reusing their steps rather than copies: in one transaction, insert the incoming lines as createOrder writes lines (converting each inventoryHoldId as createOrder does), mark the outgoing lines exchanged, append orders.order_event rows, and write order.exchanged to platform.outbox; a positive difference is left as the balance due on the order and collected by createPayment; a negative one is refunded by createRefund over the outgoing lines with refund_line rows. Entitlements and capacity move through order.exchanged's consumers (new ticket below), not through calls from Orders. Declare access#entitlementRecords, catalogue#performanceRecords, catalogue#inventoryReservationRecords and catalogue#variantPriceRecords on the operation, and its 409 problem types, when the package is next updated.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** an order.exchanged event cancels the outgoing lines' entitlements and returns their capacity (Catalogue), returns their seats (Seating) and issues the incoming lines' entitlements (Access), each consumer idempotent on the event, as order.refunded and the order-paid saga do.",
+   "builds": [
+    "table access.entitlement",
+    "table catalogue.inventory_reservation",
+    "table seating.seat"
+   ],
+   "made": {
+    "id": 37212,
+    "parent": "SVC-ORDER-ORDER-2#exchangeOrderLines",
+    "parentId": 30685,
+    "assignee": "Pranay Shinde",
+    "accountable": "Pranay Shinde",
+    "sprint": 1,
+    "subject": "[CR-480] [BE] Consumers of order.exchanged: entitlements, capacity and seats move as on a refund",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR482-PRODUCT-FEATURED-COMPARE-AT",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "MIG-CATALOGUE",
+    "CR482-DB-PRODUCT-FEATURED-COMPARE-AT"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Product gains isFeatured and compareAtPrice (the membership card's badge and saving) (CR-482)",
+   "detail": "**[CR-482] [BE] Product gains isFeatured and compareAtPrice (the membership card's badge and saving)**\n\nFrom ADAM CR-482 (#31742), decided by Chinmay on 2 November 2026. The work: [BE] Product gains isFeatured and compareAtPrice (catalogue.product is_featured, compare_at_amount): the membership plan card's 'Most popular' badge and its saving (CR-482)\n\n**The decision (also the ADAM CR-482 comment on #31742):**\n\nDecided (Chinmay, 2 November 2026): not as recommended. The page keeps the client-verified frame, basket included, because the package does not change approved UI and every part of the frame except two already has an operation. Build now on #31742. Cards: Product.name, description, primary photo and Product.fromPrice from listProducts (CR-358). The term line and the price's period ('Weekdays only · 12 months', 'per year') come from the product's displayTags: the venue's calendar and other tags, or the validity derived when it wrote none. With no tag, no line. What you get: call getPlanBenefits with the product's entitlementTemplateId for each plan on the page, and take the names from listMembershipBenefits. Show a tick for each of this plan's active benefits, in priority order, and a dash for each benefit another plan on the page grants and this one does not. Choose <plan>: listProductVariants gives the plan's variant. Call createCart when the guest has no cart, then addCartLine with that variantId and quantity 1. Choosing a plan already in the basket raises its quantity with updateCartLine; removeCartLine takes it out. The right panel 'Your membership' is the basket: getCart's membership lines, subtotal, taxTotal shown as VAT, and total. Continue goes to the step after the plan in the venue's membership booking flow (getPublishedBookingFlow: plan, then each member's details, consent, review, payment), so WEB-011 is a new exit. While the basket has no membership line, Continue stays off and the panel reads 'Add at least one membership to continue'. Arriving with productId selects that plan's card (getProduct). For a signed-in guest, getMyMemberships marks a plan they already hold on its card. The 'Most popular' badge and the 'Saves ... vs paying per visit' line have no field yet. They come from a new ticket: Product gains isFeatured (boolean, default false) and compareAtPrice (Money, nullable: what the same visits cost bought singly), stored on catalogue.product as is_featured and compare_at_amount, set by createProduct and updateProduct, and returned by listProducts and getProduct. The badge shows on a featured plan, and the saving shows compareAtPrice minus fromPrice when compareAtPrice is the greater. Until that ticket is built, the cards show neither, never a made-up value. WEB-022's screen record, its approved-UI entry and its page info are brought in line with the frame at the next release.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** createProduct and updateProduct write isFeatured and compareAtPrice (catalogue.product is_featured, compare_at_amount), and listProducts and getProduct return them, false and null by default.",
+   "builds": [
+    "table catalogue.product"
+   ],
+   "made": {
+    "id": 37213,
+    "parent": "APP-WEB-WEB-022#build",
+    "parentId": 31742,
+    "assignee": "Sanket Keluskar",
+    "accountable": "Pranay Shinde",
+    "sprint": 1,
+    "subject": "[CR-482] [BE] Product gains isFeatured and compareAtPrice (the membership card's badge and saving)",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR483-DB-END-PRINCIPAL-SESSIONS",
+   "epic": "PLATFORM",
+   "points": 2,
+   "area": "database",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-IDENTITY"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "identity.end_principal_sessions takes the tenant root from the proved scope, raises on none (CR-483)",
+   "detail": "**[CR-483] [DB] identity.end_principal_sessions takes the tenant root from the proved scope, raises on none**\n\nFrom ADAM CR-483 (#30744), decided by Chinmay on 2 November 2026. The work: [DB] Forward migration: identity.end_principal_sessions takes the tenant root from the scope its caller check proved visible and raises when it finds none, so a venue manager's deactivation and credential reset end the person's sessions\n\n**The decision (also the ADAM CR-483 comment on #30744):**\n\nDecided (Chinmay, 2 November 2026): option A, with option C's guard. Build now: a forward migration (new ticket below) replaces identity.end_principal_sessions(target_principal_id uuid, ended_by uuid, reason text) with CREATE OR REPLACE FUNCTION, same signature, owner and SECURITY DEFINER, no policy or grant change: (1) Keep the caller check as it is. (2) Take the root from what the check proved visible, not from platform.scope's tenant row: when platform.tenant_root_in_scope() is true, the caller's own tenant path; otherwise the first label of the principal's home scope path, subpath(hs.path, 0, 1), read in the same statement as the check (identity.principal joined to platform.scope on home_scope_id). (3) Switch ticvai.scope_paths to that path, then confirm it: SELECT path FROM platform.scope WHERE level = 'tenant' AND path = root_path must now return exactly one row (it is visible once the path is granted). If root_path is null or the row is not found, RAISE EXCEPTION with ERRCODE 'P0001' and message 'identity.end_principal_sessions: no tenant root for principal %', so the caller's transaction fails and nothing is written. (4) Then the two UPDATEs as now (identity.session terminated with ended_at, ended_by_principal_id, end_reason; identity.refresh_token revoked_at and revocation_reason), put the caller's scope_paths back, return the count. updatePrincipal (#30744) and resetPrincipalCredential (#31238) keep calling the function as CR-180 and CR-377 decided, with no code change; a raised error is a 500 for the call and nothing it wrote stays. Keep #30744's two venue-manager integration tests as written: they pass once the migration is applied. Add one test to the migration: a venue grant ending a principal homed at its venue ends every session (with and without a venue) and revokes every refresh token; a grant that cannot see the principal still gets 42501.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** in the migration's test a venue grant ending a principal homed at its venue ends every session (with and without a venue) and revokes every refresh token, a grant that cannot see the principal still gets 42501, and no tenant root raises P0001; a second run of the migration changes nothing.",
+   "builds": [
+    "table identity.session",
+    "table identity.refresh_token"
+   ],
+   "made": {
+    "id": 37214,
+    "parent": "SVC-IDENTITY-ADMINISTRATION-2#updatePrincipal",
+    "parentId": 30744,
+    "assignee": "Hrushikant Patkar",
+    "accountable": "Hrushikant Patkar",
+    "sprint": 1,
+    "subject": "[CR-483] [DB] identity.end_principal_sessions takes the tenant root from the proved scope, raises on none",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR455-DB-VARIANT-PRICE-CATEGORY",
+   "epic": "PLATFORM",
+   "points": 1,
+   "area": "database",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-CATALOGUE"
+   ],
+   "notBefore": "2026-11-16",
+   "subject": "catalogue.variant gains price_category_id, nullable, with its index (CR-455)",
+   "detail": "**[CR-455] [DB] catalogue.variant gains price_category_id, nullable, with its index**\n\nFrom ADAM CR-455 (#35288), decided by Chinmay on 2 November 2026. The work: [DB] catalogue.variant gains price_category_id, nullable, with its index (CR-455)\n\n**The decision (also the ADAM CR-455 comment on #35288):**\n\nDecided (Chinmay, 2 November 2026): A1, A2 and A3, with corrections. Build now: (1) Price category: add catalogue.variant.price_category_id uuid NULL, with index variant_price_category_id_idx and a conventional reference to catalogue.price_category, in a forward migration. ProductVariant gains an optional nullable priceCategoryId. updateProductVariant writes it and listProductVariants answers it; no screen changes. In variantPriceRecords (CR-439), once the winning candidate is chosen, the category amount applies when the variant has a price_category_id and the winning assignment's category_rates has an entry whose rateId names a catalogue.rate that is in the winning price list, has status active and has price_category_id equal to the variant's. That rate's amount then replaces price.amount. A rate with a null amount takes its base_rate_id rate's amount adjusted by adjustment_type and adjustment_value: percentage multiplies by (1 + value/100), fixedAmount adds value. The entry's priceCategory string is not matched; the rate's own price_category_id is. A variant with no category, or with no matching entry, keeps price.amount. (2) When no price resolves, simulatePriceBreakdownCalculation answers 422 no-selected-rate, as the contract states. CR-439's no-price-for-variant is not used, and searchCatalogue and getVariantListing answer a null price. (3) Member adjustment, at the contextualRateSelection step. A candidate is a pricing.dynamic_price_rule row with is_active true and valid_from <= at < valid_to (a null bound is open), where at is the instant variantPriceRecords is asked at. Its product_id is null or productId; its price_list_id is null or the winning list; its channel_id is null or the venue's catalogue.sales_channel id for the channel; its sales_channel is null or the channel. It also has a membershipProgramme condition (CR-439) whose value_json lists membershipId. With condition_logic all, every other condition must hold, and a condition the simulation has no input for does not hold. The lowest priority number wins, then the latest valid_from, then id, and only one rule applies. Its pricing.dynamic_price_action works by type: percentAdjustment multiplies the rate by (1 + value/100); fixedAmountAdjustment adds value; returnToBase leaves the selected rate unchanged. moveToBand is not applied, because the action keeps no band; the component's reason says so. The result is clamped to the action's min_price and max_price where they are set. With no membershipId, or no matching rule, there is no memberAdjustment component. (4) Dynamic adjustment. The step is skipped when the winning candidate came through a catalogue.price_assignment with is_dynamic_pricing_allowed false. Otherwise take the catalogue.price_execution with status deployed or partiallyDeployed, product_id = productId, event_id null or eventId, and performance_id null or timeslotId (a timeslotId is a catalogue.performance id; there is no timeslot table). It must also have a channel_deployments entry for the simulated channel, mapped as in CR-422 (web is b2c, mobile is mobileApp, callCentre is callCenter, the rest by the same name). Prefer the most specific (performance, then event, then product only), then the newest created_at, then id. Its price is that channel entry's price, else new_price. (5) Fees. A candidate is a catalogue.fee_rule with rule_kind applicability, status active and in effect at at, set at the venue's scope or above, whose catalogue.fee is active and in effect. Every condition key it sets must match: productId; productCategoryId (the product's category_id); salesChannel; venueId; eventId; membership (membershipId); paymentMethod; deliveryMethod; marketCode (the product's market_code); quantityMin and quantityMax (quantity); orderValueMin and orderValueMax (the subtotal after the price steps). customerType, transactionType, countryCode, serviceAction, hoursBeforeEventMax and deliveryDestinationZones have no simulation input, so a rule that sets one does not match. Evaluate in priority order, lower number first, then id. A matching rule is skipped when a rule of its mutual_exclusion_group has already applied, or when its fee was excluded by a rule that applied. combination stack (or null) adds the fee. replace removes the applied fees named in excluded_fee_ids, then adds this one. exclude adds this one and keeps the named fees out for the rest of the run. on_match stopProcessing ends the run. The amount: fixedAmount is amount; percentage is that percentage of the subtotal; tiered takes the tiers entry with the largest fromOrderValue at or below the subtotal, and charges its amount or its percentage of the subtotal. The fee is charged once when application is applyOnce or charge_basis is perOrder, perTransaction or perDay; otherwise it is charged per item, times quantity. The component type is surcharge for fee_type surcharge and fee for every other type. An exception rule applies only when all of these hold: eligibility_basis is membershipBenefit; eligibility_ref_id is null or membershipId; a membershipId is sent; and is_approval_required and is_evidence_required are both false. Then feeWaiver zeroes the fees in target_fee_ids, feeReduction takes reduction_percent or reduction_amount off them, and taxExemption and zeroRatedTax zero the taxes of target_tax_profile_ids, each shown as a waiver component. No other exception rule is applied. (6) Taxes. A candidate is a catalogue.tax_rule with status active and in effect at at, at the venue's scope or above. Each condition it sets must equal the simulation's value: product_id, product_category_id, venue_id, legal_entity_id (the winning price list's) and sales_channel. A rule that sets country_code, transaction_type or customer_type does not match. The most specific wins: the most conditions set, then product before category before venue, then the latest effective_from, then id. Its treatment applies, so the rule wins over ledger.tax_code.is_inclusive. With no matching rule, the winning price's catalogue.price.tax_code_id applies, inclusive when that code's is_inclusive is true. With none at all, no tax is charged, and a zero tax component says so. The rule's taxes entries apply in their sequence. For each entry, read its catalogue.tax_profile, then the rate of the profile's tax_code_id through finance#taxCodeRecords, and apply that rate to the profile's tax_base. onPreviousTaxes adds the earlier taxes to the base. taxInclusive takes the tax out of the amount; taxExclusive adds it on top; taxExempt, zeroRated and outOfScope give a zero tax component carrying that treatment. A fee is taxed by the tax rule its tax_treatment names, and a fee with an empty tax_treatment is not taxed. Build the percentage, compound, sequential and multipleConcurrent methods now. fixedTax and tiered answer 422 unsupported-tax-method, which is added to the operation's 422 problem types; both methods go on the left-out list. (7) finance#taxCodeRecords: build it yourself in #35288, inside the Ledger module behind its query interface: one read of ledger.tax_code by ids under the caller's row security. No other ticket builds it, and #31818 calls it. (8) Put the price, fee and tax steps in one Catalogue calculation component rather than inside the endpoint, so that checkout can call the same code later. The promotion rule of CR-439 stays as it is. Build to it now; the package is updated to match at the next release.\n\nNo release carries it: build to this text now; the package catches up later.\n\n**Done when (plan):** catalogue.variant has price_category_id, nullable, with variant_price_category_id_idx and its reference to catalogue.price_category; a second run of the migration changes nothing.",
+   "builds": [
+    "table catalogue.variant"
+   ],
+   "made": {
+    "id": 37215,
+    "parent": "SVC-CATALOGUE-DRAFTED-6#simulatePriceBreakdownCalculation",
+    "parentId": 35288,
+    "assignee": "Hrushikant Patkar",
+    "accountable": "Hrushikant Patkar",
+    "sprint": 4,
+    "subject": "[CR-455] [DB] catalogue.variant gains price_category_id, nullable, with its index",
+    "on": "2026-11-02"
+   }
+  },
+  {
+   "key": "CR441-DB-OPEN-SHIFT-REQUIRED",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-WORKFORCE"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "workforce.open_shift's venue, position and times become required, once its rows are checked (CR-441)",
+   "detail": "Spec: ADAM CR-441, the lead's decision of 1 November 2026 (posted on #37102, claimOpenShift), in the contracts at the release tag in ADAM. The [DB] work of #37189 ([DB] workforce.open_shift, a sub-task of MIG-WORKFORCE, #27670, which has started): the plan has no task under a sub-task, so this task carries the database part of the decision. One guarded forward migration in the tenant database, later than the one that created the table, in this order: (1) list every workforce.open_shift row whose venue_id, position_code, valid_from or valid_to is null (OpenShift's venueId, positionCode, from and to) and, if there is any, stop with an error giving the count and the ids, and tell the lead: a missing value is reported, never guessed; (2) ALTER COLUMN ... SET NOT NULL on the four. From this release OpenShift's create and update require the four (400 validation, from before to; a breaking change listed in breaking-changes.yaml); until this lands claimOpenShift keeps its interim (a missing value is taken from the released assignment, otherwise 409 open-shift-incomplete). Test: a row missing any of the four stops the migration with its count; with none, an insert without one is refused. Source DDL after r1: the statements on workforce.open_shift in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table workforce.open_shift"
+   ]
+  },
+  {
+   "key": "CR454-DB-REFUND-POLICY-SCOPE-PATH",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-ORDERS-6"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "orders.refund_calculation_policy.scope_path is filled from the tenant root and becomes required (CR-454)",
+   "detail": "Spec: ADAM CR-454, the lead's decision of 1 November 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #37037 ([DB] orders.refund_calculation_policy, under MIG-ORDERS-6, #28276): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One guarded forward migration in the tenant database, as db/tenant/089 did for orders.invitation and orders.ticket_template: (1) UPDATE orders.refund_calculation_policy SET scope_path = the tenant root's path (platform.scope, level tenant) WHERE scope_path IS NULL; (2) ALTER COLUMN scope_path SET NOT NULL. The table record keeps scope_path required. Source DDL after r1: the statements on orders.refund_calculation_policy in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a row written with no scope_path before the migration has the tenant root's path after it, and an insert without one is refused. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table orders.refund_calculation_policy"
+   ]
+  },
+  {
+   "key": "CR442-DB-DISPATCH-BODY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-MARKETING",
+    "CR379-DB-DISPATCH-SOURCE-AND-ENTITLEMENT-READ"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "marketing.message_dispatch keeps the message as sent, with a lookup on its source, subject and channel (CR-442)",
+   "detail": "Spec: ADAM CR-442, the lead's decision of 1 November 2026 (posted on #37101, broadcastToGuests), in the contracts at the release tag in ADAM. The [DB] work of #37101 (an operation's sub-task, On hold) on marketing.message_dispatch, created by MIG-MARKETING (#27677, started, not rewritten); source_ref is CR379-DB-DISPATCH-SOURCE-AND-ENTITLEMENT-READ's (#37169). One forward migration in the tenant database, additive: (1) ALTER TABLE marketing.message_dispatch ADD COLUMN IF NOT EXISTS body text, nullable: the resolved message as sent; (2) a non-unique index on (source_ref, subject_id, channel). The table stays partitioned by queued_at (ADR-0056), so the index is created on the parent and reaches every partition; idempotency is the consumer's inbox, with a check that no row for that source_ref, subject_id and channel exists before the insert. The sending is CR442-MESSAGE-SENDER's (#37203). Source DDL after r1: the statements on marketing.message_dispatch in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table marketing.message_dispatch"
+   ]
+  },
+  {
+   "key": "CR482-DB-PRODUCT-FEATURED-COMPARE-AT",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-CATALOGUE"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "catalogue.product keeps whether it is featured and what it would cost bought singly (CR-482)",
+   "detail": "Spec: ADAM CR-482, the lead's decision of 2 November 2026 (posted on #31742, WEB-022), in the contracts at the release tag in ADAM. The [DB] work of #37213 (CR482-PRODUCT-FEATURED-COMPARE-AT, the back end of Product's isFeatured and compareAtPrice): a developer does not write a migration, so this task carries the database part of the decision on catalogue.product, created by MIG-CATALOGUE (#27671, started, not rewritten). One forward migration in the tenant database, additive: is_featured boolean NOT NULL DEFAULT false, and compare_at_amount numeric(18,4), nullable (what the same visits cost bought singly, in the product's currency as fromPrice is). No backfill: every product starts not featured with no compare-at amount, so the cards show neither until a venue sets them. Source DDL after r1: the statements on catalogue.product in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table catalogue.product"
+   ]
+  },
+  {
+   "key": "PLATFORM-AUTH",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "SETUP-ENV"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Platform sign-in: the Control Plane signs a platform operator in and issues the platform token, and every cell host verifies it and builds the platform caller (ADR-0072)",
+   "detail": "The platform-auth ticket ADR-0072 section 6 asks for (ADAM CR-175, option A, accepted 21 October 2026; CHG-R10ID-007), scheduled before listOwnPlatformStaffGrants (#30739) and openPlatformStaffGrant (#30742). (1) The Control Plane issues the platform token: a signed JWT, issuer https://<control-plane-host>/, signed with a Control Plane key held in Key Vault (ADR-0063); its public keys are published as a JWKS that every cell host trusts, configured per environment and never fetched from a URL the token names; audience the cell the call goes to (control.cell.id), so a token for one cell opens nothing in another; lifetime at most 15 minutes, refreshed by the Platform Console from its platform session. Key rotation: publish the new key before signing with it and keep the old one until the longest token has expired. (2) Claims: sub is the operator (control.platform_operator.id, a Control Plane principal, never a tenant identity.principal); ticvai_platform_permissions is the operator's PLATFORM_* set and nothing else; sid is the platform session (control.platform_session.id); amr includes mfa once the operator has passed the second factor in that session; ticvai_step_up is {action, at}, the last MFA step-up. (3) The Control Plane sign-in writes control.platform_operator (the operator and its PLATFORM_* set), control.platform_session (one sign-in to the Console, with its step-up) and control.platform_operator_mfa (its second factors; a totp secret and an emailOtp destination stored encrypted under the Control Plane's field key, since the control database has no tenant key); the three tables are the control database's (backend/control/V0116). An operator never has a credential, a principal or a session in a tenant database (R098). (4) The step-up is recorded on the platform session (step_up_action, step_up_at) and carried in ticvai_step_up; a cell operation that declares x-ticvai-step-up: mfa for a platform caller accepts it when ticvai_step_up.action names the operation, ticvai_step_up.at is within 5 minutes and amr includes mfa, and never looks for an identity.mfa_challenge row. (5) In every cell host (commerce, access, operations, workers; ADR-0055) the verification of the token and the platform caller built from it: the operator id, the PLATFORM_* set and the step-up, with no tenant scope until a platform-staff grant is open; a PLATFORM_* permission is honoured only on the operations that name it (R203); while a grant is open the operator's tenant permissions are the grant's, at the tenant root, and every action is audited with the grant's id. Until this lands, #30739 and #30742 are built against the platform caller with a test double; they follow this task only for the connection to the real token. The Control Plane's own operations (licensing, subscription, createTenant) and replayEvents do not wait on it: they check PLATFORM_* or DEVELOPER_MANAGE through the Control Plane's current principal. Done when: an operator signs in with its second factor and gets a token for one cell that a host of that cell accepts and a host of another cell refuses; a token past 15 minutes, signed by an unknown key or with the wrong audience is refused 401; openPlatformStaffGrant accepts a step-up of under 5 minutes for itself and refuses an older one or one for another action; a PLATFORM_* permission opens nothing on an operation that does not name it.",
+   "builds": [
+    "adr ADR-0072",
+    "table control.platform_operator",
+    "table control.platform_session",
+    "table control.platform_operator_mfa"
+   ]
+  },
+  {
+   "key": "CR241-SYNC-REJECTION-ROUTES",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Deep Khanvilkar",
+   "depends": [
+    "KERNEL-SERVICE-AUTH",
+    "SVC-CROSSREGION-CROSS-REGION-3"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "CrossRegion: POST /sync-rejections and the resolution route over serviceAuth, with their 401s (CR-241)",
+   "detail": "Spec: ADAM CR-241, option B (the lead, 26 October 2026; CHG-R10CRF-001, CHG-R10CRF-013), in the contracts at the release tag in ADAM (contracts/spine/cross-region.yaml recordSyncRejection and recordSyncRejectionResolution). The follow-up of #35700 (SVC-CROSSREGION-CROSS-REGION-3): its tickets #35807 and #35808 built the writes as CrossRegion's in-process API (validation, the RLS-scoped insert and update of sync.rejection, the resolved-once rule, durable idempotency on the rejection id); this task exposes their HTTP routes, POST /sync-rejections and the resolution route, to the other deployables over serviceAuth, answering 401 to any caller that is not a fellow deployable (x-ticvai-auth-note), and calls the same in-process write. It needs service sign-in between deployables (KERNEL-SERVICE-AUTH, #37051), which it follows; until it lands the operation answers as the contract states today. OFFLINE-SYNC and OFFLINE-JOURNAL, which post rejections from the devices' sync, follow it. Done when: a fellow deployable's POST /sync-rejections writes the row exactly as the in-process call does and a second POST with the same rejection id writes nothing; the resolution route resolves it once; a caller with no service token gets 401.",
+   "builds": [
+    "operation recordSyncRejection",
+    "operation recordSyncRejectionResolution",
+    "table sync.rejection"
+   ]
+  },
+  {
+   "key": "CR174-GUEST-DEVICE-SIGN-OUT-CALL",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "KERNEL-SERVICE-AUTH",
+    "SVC-MARKETING-GUEST-2",
+    "SVC-IDENTITY-IDENTITY-12"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Marketing: revokeGuestDevice ends the device's guest sessions through identity#endGuestDeviceSessions over serviceAuth (CR-174)",
+   "detail": "Spec: ADAM CR-174, option B (the lead, 21 October 2026: \"the sign-out lands with the ticket that can actually make the call\"), in the contracts at the release tag in ADAM. The follow-up of #30710 (revokeGuestDevice, under SVC-MARKETING-GUEST-2, #27745): revoking a device also ends its guest sessions by calling Identity's endGuestDeviceSessions (#35803, SVC-IDENTITY-IDENTITY-12) across the deployables, as the operation's x-ticvai-calls declares. It needs service sign-in between deployables (KERNEL-SERVICE-AUTH, #37051), which it follows; until it lands the operation answers as the contract states today. Done when: revoking a device ends every guest session bound to it (the next call on that session is 401); a failed call leaves the device revoked and is retried, never reported done.",
+   "builds": [
+    "operation revokeGuestDevice",
+    "operation endGuestDeviceSessions"
+   ]
+  },
+  {
+   "key": "CR275-PROFILE-NAME-AND-LANGUAGE-TO-IDENTITY",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "KERNEL-SERVICE-AUTH",
+    "SVC-MARKETING-MARKETING-7",
+    "SVC-IDENTITY-IDENTITY-12"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Marketing: updateMyProfile sends displayName and preferredLanguage to identity#updateGuestSubjectDetails over serviceAuth (CR-275)",
+   "detail": "Spec: ADAM CR-275, option B (the lead, 28 October 2026; CHG-R11GST-004), in the contracts at the release tag in ADAM: \"Until a follow-up ticket wires the call to Identity's updateGuestSubjectDetails (after that operation and service sign-in between the apps exist), sending displayName or preferredLanguage is 400 validation naming the field.\" The follow-up of #31167 (updateMyProfile, under SVC-MARKETING-MARKETING-7, #27924): a displayName or preferredLanguage is written through Identity's updateGuestSubjectDetails (#35805), as the operation's x-ticvai-calls and write-via declare; Marketing still does not write guest_profile.display_name or preferred_language. It needs service sign-in between deployables (KERNEL-SERVICE-AUTH, #37051), which it follows; until it lands the operation answers as the contract states today. Done when: a guest's updateMyProfile with displayName or preferredLanguage is written through Identity and answered 200 with the stored values; the 400 for those fields is gone.",
+   "builds": [
+    "operation updateMyProfile",
+    "operation updateGuestSubjectDetails"
+   ]
+  },
+  {
+   "key": "CR277-FNB-ORDER-ENTITLEMENT-LINES",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Narayan Gaonkar",
+   "depends": [
+    "KERNEL-SERVICE-AUTH",
+    "SVC-FNB-ORDER-1"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "F&B: createFnbOrder redeems a line's entitlement (redeemEntitlementId) through Access over serviceAuth (CR-277)",
+   "detail": "Spec: ADAM CR-277 (5) (the lead, 28 October 2026; CHG-R11TEN-002), in the contracts at the release tag in ADAM (contracts/satellite/fnb.yaml createFnbOrder): \"Lines with redeemEntitlementId wait for the follow-up after service sign-in between the apps; until then such a line is 400 validation.\" The follow-up of #31972 (createFnbOrder, under SVC-FNB-ORDER-1): a line carrying redeemEntitlementId is redeemed by calling Access's validateAccess on the access host, at the order's outlet, and the 400 for such lines goes. It needs service sign-in between deployables (KERNEL-SERVICE-AUTH, #37051), which it follows; until it lands the operation answers as the contract states today. Done when: an order with a redeemEntitlementId line redeems that entitlement once and writes the line at no charge; an entitlement Access refuses fails the order with Access's problem and writes nothing.",
+   "builds": [
+    "operation createFnbOrder"
+   ]
+  },
+  {
+   "key": "KERNEL-SECRET-STORE",
+   "epic": "PLATFORM",
+   "points": 5,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "SETUP-ENV"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Secret store in the kernel: ISecretStore with the Azure Key Vault adapter; a secret column keeps only the reference (CR-243, CR-304)",
+   "detail": "Spec: ADAM CR-243, option A (the lead, 26 October 2026: \"a new ticket builds the Key Vault secret store\"; CHG-R10CRF-003) and CR-304 (29 October 2026: \"the secret store needs its ticket: CR-243 decided one and it does not exist\"; CHG-CR304-001), with ADR-0063 (keys; Key Vault). One Application abstraction in the kernel, ISecretStore: put a secret under a name and get the reference back, read a secret by its reference for the current tenant, and remove one; the Azure Key Vault adapter (the cell's Key Vault, the hosts' managed identity, Hrushikant Patkar for the vault access), and a test double for the builds and tests until it lands. Names follow CR-459's vault-reference rule (t-<tenantId>-...), checked by its kernel validator; a value never enters an answer, a log or an audit entry, and every *_secret_ref column keeps only the reference. Used by setApprovalExternalProvider (#31184: outboundCredential and signingSecret), changeOwnCredential and forceLogout (#30719, #30721: the PIN pepper), setStoreAccounts (#31029, CR-304) and testChannelConnection's authentication test (CR-458), which follow it for the connection to the real store. Done when: a secret put through ISecretStore is read back by its reference for the same tenant only, never for another; the row holds the reference; nothing logs or answers the value; the Key Vault adapter passes the same tests as the double.",
+   "builds": [
+    "adr ADR-0063",
+    "operation setApprovalExternalProvider",
+    "operation setStoreAccounts"
+   ]
+  },
+  {
+   "key": "KERNEL-CURRENCY-MINOR-UNITS",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Kernel: the ISO 4217 minor-units list beside Money (TICVAI.Domain), the scale of any currency (CR-192)",
+   "detail": "Spec: ADAM CR-192, option A (the lead, 21 October 2026: \"r10 adds the ISO 4217 list to the kernel\"; CHG-R10ORD-018), in the contracts at the release tag in ADAM (common.yaml Money.scale): the scale of a currency other than the venue's or region's trading currency is its ISO 4217 minor units, one fixed list in the kernel (TICVAI.Domain, next to Money), no table, no query and no migration; the venue and region settings keep their own currency_scale for the trading currency. Then getOrder (#30687) writes tenderAmount and chargeTotal in any currency, not only the trading one. Done when: every ISO 4217 code resolves to its minor units (JPY 0, AED 2, KWD 3) and an unknown code is refused; Money in another currency is rounded to its scale.",
+   "builds": [
+    "operation getOrder"
+   ]
+  },
+  {
+   "key": "CR330-PLATFORM-APPROVAL-RULE-DB",
+   "epic": "PLATFORM",
+   "points": 1,
+   "depends": [
+    "MIG-CONTROL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "control.platform_approval_rule, created and seeded with its one rule (CR-330)",
+   "detail": "Spec: ADAM CR-330, option A (the lead, 29 October 2026; CHG-CR330-001), in the contracts at the release tag in ADAM (platform-ops.yaml PlatformApprovalRule, x-ticvai-seed-rows). One forward migration in the control database: the new table control.platform_approval_rule (kind, subject_type, approver_permission, minimum_approvals, is_active; keyed (kind, subject_type)), and its seed row configurationChange / tenant / PLATFORM_TENANT_MANAGE / 2 / active, INSERT ... ON CONFLICT DO NOTHING. This task is the table's migration (a -DB key). createApprovalRequest (#30848) reads it through platform-ops#platformApprovalRuleFor and follows it. Source DDL after r1: the statements on control.platform_approval_rule in backend/control/V0118__after_r1_20261029.sql; write the migration yourself, copied from those statements, each guarded so it applies twice. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table control.platform_approval_rule"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "CR379-LIVE-ENTITLEMENT-SUBJECTS",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "MIG-ACCESS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Access: the in-process query access#liveEntitlementSubjects, the guests holding a live entitlement at a venue (CR-379)",
+   "detail": "Spec: ADAM CR-379 (the lead, 31 October 2026, posted on #37101; CHG-CR379-001), in the contracts at the release tag in ADAM: \"recipientCount comes from a new query access#liveEntitlementSubjects(venueId, at): distinct subjectId of access.entitlement rows at that venue with a subject, status issued or partiallyConsumed, and validFrom and validTo (where set) around now. It is served in process\". Access's query class, registered in the commerce host (broadcastToGuests, #37101, XDR-001) and the operations host (sendGuestBroadcast, #37183, under the grant of CR379-DB-DISPATCH-SOURCE-AND-ENTITLEMENT-READ), under the caller's row security. A query class gets no task from the operation formula; both readers follow this one. Done when: the query answers the distinct live subjects at a venue at an instant and nothing outside the caller's scope.",
+   "builds": [
+    "table access.entitlement"
+   ]
+  },
+  {
+   "key": "CR327-DB-SSO-PROVIDER-AUDIENCE",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-IDENTITY"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "identity.sso_provider says whether a row is for staff or guests, and which guest provider (CR-327)",
+   "detail": "Spec: ADAM CR-327, part (1) (the lead, 29 October 2026: \"Kind column on sso_provider\"; CHG-CR327-001), in the contracts at the release tag in ADAM (identity.yaml SsoProviderConfig). The [DB] work of #35778 (MIG-IDENTITY#identity.sso_provider, Ready for QA, not rewritten). One forward migration in the tenant database, additive: identity.sso_provider gains audience text NOT NULL DEFAULT 'staff' CHECK in (staff, guest), and guest_provider text CHECK in (apple, google, uaePass), null for staff rows. guestSocialLogin and guestUaePassLogin (#30670) pick their row by audience guest and guest_provider; setSsoConfig (#31276) and completeSsoAuthorization (#30729) serve staff rows only, and follow it. The uaePass authorizationUrl column is open with the lead and not here. Source DDL after r1: the statements on identity.sso_provider in the forward migration the release derives for it; write the migration yourself, copied from those statements, each guarded so it applies twice. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table identity.sso_provider"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-CATALOGUE-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-CATALOGUE"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "the catalogue changes of r10 written into the repository's migrations (CR-104 to CR-256)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-CATALOGUE (#27671, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-214 catalogue.product_version's snapshot column; CR-204 catalogue.product created_at and updated_at, the backfill, then created_at SET NOT NULL; CR-109 catalogue.event's three scheduled-move columns; CR-110 catalogue.published_bundle's note column and its unique index; CR-111 the unique indexes on catalogue.alternative_code, catalogue.group_package and catalogue.product_eligibility_rule; CR-256 catalogue.event's parent key; CR-167 catalogue.product.valid_to. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table catalogue.product_version",
+    "table catalogue.product",
+    "table catalogue.event",
+    "table catalogue.published_bundle",
+    "table catalogue.alternative_code",
+    "table catalogue.group_package",
+    "table catalogue.product_eligibility_rule"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-PROMOTIONS-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-PROMOTIONS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "promotions.promotion's four jsonb columns of r10 written into the repository's migrations (CR-225, CR-231)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-PROMOTIONS (#27674, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-225 and CR-231 promotions.promotion's four jsonb columns. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table promotions.promotion"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-SEATING-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-SEATING"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "seating.accessible and seating.recommendation_rule's unique indexes of r10 written into the repository's migrations (CR-112)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-SEATING (#27668, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-112 the unique indexes on seating.accessible and seating.recommendation_rule. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table seating.accessible",
+    "table seating.recommendation_rule"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-IDENTITY-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-IDENTITY"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "the identity changes of r10 written into the repository's migrations (CR-100, CR-180, CR-209, CR-242)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-IDENTITY (#27657, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-242 identity.session ended_at, ended_by_principal_id and end_reason; CR-209 identity.delegated_access's CHECK value and two columns; CR-180 the function identity.end_principal_sessions (as V0116 wrote it; CR-483's replacement is CR483-DB-END-PRINCIPAL-SESSIONS, #37214); CR-100 identity.refresh_token.subject_id, principal_id nullable and the CHECK. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table identity.session",
+    "table identity.delegated_access",
+    "table identity.refresh_token"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-PLATFORM-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-PLATFORM"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "the platform grants of r10 written into the repository's migrations (CR-247, CR-255, CR-260)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-PLATFORM (#27665, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-247 the access role's grants and schema USAGE; CR-255 and CR-260 the operations role's grant on platform.outlet. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table platform.outlet"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-ORDERS-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-ORDERS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "the orders changes of r10 written into the repository's migrations (CR-254, CR-257)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-ORDERS (#27675, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-254 orders.stored_value_authorisation.wallet_hold_id; CR-257 orders.group_booking.version. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table orders.stored_value_authorisation",
+    "table orders.group_booking"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-CONTROL-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-CONTROL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "the control price tables' currency of r10 written into the repository's migrations (CR-202)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-CONTROL (#27647, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/control/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-202 currency_code on control.plan, control.contract, control.licence_add_on, control.capacity_pack, control.module_listing and control.licensing_model, and control.credit_note's copy of the invoice's currency_code. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table control.plan",
+    "table control.contract"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-RETAIL-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-RETAIL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "retail.merchandise.is_published and its backfill of r10 written into the repository's migrations (CR-104)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-RETAIL (#27682, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-104 retail.merchandise.is_published and its backfill. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table retail.merchandise"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-ACCESS-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-ACCESS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "the access.entitlement changes of r10 written into the repository's migrations (CR-226, CR-239)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-ACCESS (#27676, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-239 access.entitlement's change-version trigger; CR-226 access.entitlement kind, added_at and transfer. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table access.entitlement"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R10-DB-AI-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-AI"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "ai.proposed_action's columns of r10 written into the repository's migrations (CR-207)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-AI (#27664, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-207 ai.proposed_action's columns (the ai schema: the AI engineers, CHG-R12PL-034). Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table ai.proposed_action"
+   ]
+  },
+  {
+   "key": "R10-DB-VENUEMAP-INTO-REPOSITORY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "depends": [
+    "MIG-VENUEMAP"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "venuemap.import_job's columns of r10 written into the repository's migrations (CR-207)",
+   "detail": "Spec: the decisions of r10 (25 to 29 October 2026) that settled their migration work as \"a child task of the affected MIG ticket\"; none was made. V0116 and V0117 applied these changes to the live databases on 27 October, but MIG-VENUEMAP (#27681, Ready for QA, not rewritten) does not carry them, so a database built from the repository's db/ folder lacks them. One guarded forward migration in the repository's db/ folder, copied from the statements on these tables in backend/tenant/V0116__after_r1_20261026.sql and V0117 (each guarded so it applies twice, and a no-op on a database that already has them, as live does): CR-207 venuemap.import_job's columns. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table venuemap.import_job"
+   ],
+   "assignee": "Hrushikant Patkar"
+  },
+  {
+   "key": "R13-DB-SHARED",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [],
+   "notBefore": "2026-11-02",
+   "subject": "Apply V0118 and every later forward migration to the shared tenant and control databases",
+   "detail": "Why: the r10 decision (CR-242, CHG-R10GFC-006) asked for a child task under R8-DB-SHARED (#36196, Closed) to apply every forward migration after r8 to the shared database; none was made. V0116 and V0117 reached the live databases directly on 27 October; on 30 October live had nothing after them, so V0118 onwards (r11 and r12) has neither a ticket nor the apply. The files, in name order (each records itself in platform.schema_version and runs twice cleanly; apply those the database does not list yet, and skip none): backend/tenant/V0118__after_r1_20261029.sql, backend/tenant/V0119__names_after_r1_20261029.sql, backend/tenant/V0120__after_r1_20261031.sql, backend/tenant/V0121__names_after_r1_20261031.sql, backend/tenant/V0122__after_r1_20261101.sql, backend/tenant/V0123__names_after_r1_20261101.sql, backend/control/V0118__after_r1_20261029.sql, backend/control/V0120__after_r1_20261031.sql, and every later forward migration the release adds (this task gains them at each plan build, CHG-R10GFC-006). How: as R8-DB-SHARED did, after the repository's Migrator, with a pg_dump -Fc backup of both databases first, then psql file by file with ON_ERROR_STOP. Done when: both shared databases list every one of these files in platform.schema_version, and a schema dump of each matches the package's derived DDL at the release tag.",
+   "builds": [
+    "file backend/tenant/V0118__after_r1_20261029.sql",
+    "file backend/tenant/V0119__names_after_r1_20261029.sql",
+    "file backend/tenant/V0120__after_r1_20261031.sql",
+    "file backend/tenant/V0121__names_after_r1_20261031.sql",
+    "file backend/tenant/V0122__after_r1_20261101.sql",
+    "file backend/tenant/V0123__names_after_r1_20261101.sql",
+    "file backend/control/V0118__after_r1_20261029.sql",
+    "file backend/control/V0120__after_r1_20261031.sql"
+   ]
+  },
+  {
+   "key": "EINV-ADAPTER",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "E-invoicing provider port and mock provider, with the PINT AE mapping behind it (ADR-0062)",
+   "detail": "ADR-0062's Block A ticket EINV-ADAPTER (\"interface and mock provider\", 3 points), never planned. The e-invoicing provider port LedgerService calls (transmit a tax document, read its status), the PINT AE mapping behind it (the contract: \"The mapping lives in the provider adapter (ADR-0062), so the regulator's final list changes the adapter, not this contract\", finance.yaml transmitEInvoices) and a mock provider the builds and tests use until the client's accredited provider is chosen (CF-133). transmitEInvoices (#28482), recordEInvoiceTransmissionStatus (#28410) and setEInvoicingProvider and issueTaxInvoice (#28255) build against it. Done when: a tax invoice maps to the PINT AE payload the mapping states, the mock accepts, rejects and times out on demand, and the operations' contract tests pass against the mock.",
+   "builds": [
+    "adr ADR-0062",
+    "operation transmitEInvoices",
+    "operation recordEInvoiceTransmissionStatus"
+   ]
+  },
+  {
+   "key": "EINV-CALLBACK",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "EINV-ADAPTER"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "E-invoicing provider callback: the verified inbound endpoint that records each transmission's status (ADR-0062)",
+   "detail": "ADR-0062's Block A ticket EINV-CALLBACK (\"authenticated inbound endpoint\", 3 points; item 4: \"the inbound callback operation per provider\"), never planned. recordEInvoiceTransmissionStatus is a service operation \"relayed by the integration that receives its callbacks\" (finance.yaml), and nothing receives the provider's call: this task is that endpoint, per provider, verifying the provider's signature or secret (as the payment webhook verifies Network International's), relaying the status, and answering the provider as it expects. Done when: a signed callback records its status once (a repeat records nothing), an unsigned or wrongly signed one is refused and records nothing.",
+   "builds": [
+    "adr ADR-0062",
+    "operation recordEInvoiceTransmissionStatus"
+   ]
+  },
+  {
+   "key": "BIO-ADAPTER",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Facial-reader vendor port and mock adapter: enrol, and delete with a receipt (ADR-0063)",
+   "detail": "ADR-0063's ticket BIO-ADAPTER (\"vendor adapter interface and mock; enrol and delete with receipt\", 3 points, before POS-005 is built), never planned. The port Access calls to enrol a face template with the facial-reader vendor the client has contracted (access.yaml enrolFacePass) and to delete it with the vendor's receipt (the erasure path, ADR-0063 item 4), and a mock adapter until the vendor is named. enrolFacePass (#28331) and setFacePassEnrollment (#28418) build against it. Done when: an enrolment returns the mock vendor's template reference, a delete returns its receipt, and no template value is stored or logged by us.",
+   "builds": [
+    "adr ADR-0063",
+    "operation enrolFacePass"
+   ]
+  },
+  {
+   "key": "WALLET-PASS-ADAPTER",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "KERNEL-SECRET-STORE"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Wallet pass adapter: Apple PassKit web service and push, pkpass signing, Google Wallet objects",
+   "detail": "orders.yaml issueWalletPass (\"A wallet pass is a live object, not a download\") and pushWalletPassUpdate (\"Every registered device, not just the one that asked\"): the adapter behind them, never planned: pkpass signing with the tenant's Pass Type ID certificate (a vault reference, KERNEL-SECRET-STORE), Apple's PassKit web service (the endpoints Apple calls to register and unregister a device and to fetch an updated pass, authenticated by the pass's authentication_token), the APNs pass push, and the Google Wallet objects API. The device registrations it keeps are what pushWalletPassUpdate pushes to; the contract has no operation for the PassKit callbacks yet, so their shape is Apple's and the lead is told when the package needs one. issueWalletPass (#28045) and pushWalletPassUpdate (#28293) build against it. Done when: an issued pass opens in Apple Wallet and Google Wallet, a device that adds it registers, and an update reaches every registered device.",
+   "builds": [
+    "operation issueWalletPass",
+    "operation pushWalletPassUpdate",
+    "table orders.wallet_pass"
+   ]
+  },
+  {
+   "key": "CHANNEL-CONNECTOR-PORT",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Sales-channel connector port and mock adapter: what a channel test, a retry and a price deployment call",
+   "detail": "catalogue.yaml testChannelConnection (\"calls the channel with the connection's settings\"), setChannelConnectionConfiguration (\"An existing OTA adapter is enabled for a venue by naming its adapterId\") and the price deployment job (CR422-PRICE-EXECUTION-DEPLOYMENT-JOB, #37179) need a connector, and none exists (CR-457 and CR-458: until one exists a retry fails with connectorNotAvailable and the partner tests answer notSupported). This task is the port (product sync, availability, pricing, order creation, cancellation, by adapterId) and a mock adapter for the tests; each real partner's adapter is its own task once the lead names the partners. Done when: a connection naming the mock's adapterId passes testChannelConnection's partner tests, a retry and a price deployment go through the port, and a connection with no adapter keeps answering notSupported and connectorNotAvailable.",
+   "builds": [
+    "operation testChannelConnection",
+    "operation setChannelConnectionConfiguration"
+   ]
+  },
+  {
+   "key": "DEVICE-ACCESS-CONTROLLER",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Access-control device port on OSDP's shape and a turnstile controller mock (ADR-0015)",
+   "detail": "ADR-0015 puts the reader-to-controller link in Tier A (OSDP) and the turnstile controller in Tier C (our own interface plus a mock); no task builds either, so the gate modes, free spin and direction set in Block A (setTurnstileMode, setAccessPointDirection, listLiveGateMode) reach no controller. This task is the port the access host calls (open, set mode, set direction, read state) on OSDP's shape, and the turnstile controller mock adapter. Done when: setting a gate mode or direction reaches the mock controller and its state reads back; a controller that does not answer is reported, never assumed set.",
+   "builds": [
+    "adr ADR-0015",
+    "operation setTurnstileMode",
+    "operation setAccessPointDirection"
+   ]
+  },
+  {
+   "key": "ORDERS-TICKET-PDF-RENDERER",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Ticket document renderer: a ticket template filled with a product's or an order's data, rendered to the PDF ticket",
+   "detail": "orders.yaml previewProductTickets (BO-008, Block A: \"renders a proof of each ticket template it issues through\"), printTicketProof and reprintOrder's email delivery need the PDF ticket rendered from a TicketTemplate (CR-447's TicketLayout) and an order's or a product's data; no task renders it (printing is CR-463's, the white-label preview CR-476's). This task is that renderer, used by previewProductTickets (#27862), printTicketProof (#28119) and reprintOrder (#27734): proofs marked as proofs, the same layout model the BOCA driver prints. Done when: a product's proof and an order's ticket render from the same template, a proof is marked as one, and the PDF matches what the printer prints.",
+   "builds": [
+    "operation previewProductTickets",
+    "operation printTicketProof",
+    "table orders.ticket_template"
+   ]
+  },
+  {
+   "key": "PAYMENTS-NI-ADAPTER",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-PAYMENTS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Network International (N-Genius) payment adapter beside Stripe, with its secret-header webhook",
+   "detail": "orders.yaml setPaymentProvider (CF-131: \"Network International and Stripe for Phase 1, two gateways\") and createPayment (\"the provider adapter (authorise, capture, refund, void, inquire, parseWebhook; Stripe and Network International)\"); PLATFORM-PAYMENTS (#27699) names one provider adapter. This task is the Network International adapter behind the same port: authorise, capture, refund, void, inquire, and parseWebhook verifying its secret header in constant time (CR-165), with the scheduled inquirePaymentStatus poll. Done when: the payment contract tests pass against N-Genius's sandbox as they do against Stripe's test mode.",
+   "builds": [
+    "operation createPayment",
+    "operation capturePayment",
+    "operation inquirePaymentStatus"
+   ]
+  },
+  {
+   "key": "DEVICE-POS-PERIPHERALS",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "DEVICE-BOCA-FGL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "POS peripheral abstraction and the ADR-0015 Tier A drivers: cash drawer, customer display, barcode scanner, card stripe reader, mobile printer",
+   "detail": "ADR-0015 Tier A (\"Build to the standard. Not rework.\"): the POS peripheral abstraction on UnifiedPOS's shape and the drivers no task builds (check-device-tiers D-TIER-A-UNPLANNED): cash drawer (ESC/POS kick), customer or line display, barcode scanner (HID or serial), magnetic stripe reader and mobile printer (Zebra ZPL/CPCL), each behind the abstraction with a mock for the tests. Receipt and ticket printing are CR-463's and DEVICE-BOCA-FGL's. Done when: each class works against its mock through the abstraction, and the POS app reaches them through the same device host CR-463 uses.",
+   "builds": [
+    "adr ADR-0015"
+   ],
+   "linksNothingBecause": "device drivers behind the POS peripheral abstraction: no operation, table or screen of the package; the spec is ADR-0015"
+  },
+  {
+   "key": "CAT-AVAIL-CACHE",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "KERNEL-REDIS",
+    "SVC-CATALOGUE-CAPACITY-1"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "getAvailability from a one-second cache with single-flight and jitter (ADR-0065)",
+   "detail": "ADR-0065's ticket CAT-AVAIL-CACHE (\"the cached read with single-flight and jitter\", 3 points, Sprint 2, before the first on-sale; accepted 1 October), never planned (flows/F01: \"Availability is read from a one-second cache\"). getAvailability (#28151) reads through a one-second Redis cache (KERNEL-REDIS) keyed by tenant and the query, one fill at a time per key (single-flight) with jitter on expiry, and answers asOf; writes never wait on it. Done when: a burst of reads fills the cache once per second per key, an answer is never older than the cache's second plus its jitter, and Redis down falls back to the primary read.",
+   "builds": [
+    "adr ADR-0065",
+    "operation getAvailability"
+   ]
+  },
+  {
+   "key": "OBS-SLO",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-OBSERVE"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Synthetic purchase probe and SLO dashboards per tier (ADR-0060)",
+   "detail": "ADR-0060's ticket OBS-SLO (\"synthetic purchase and SLO dashboards per tier\", 2 points), never planned: a synthetic purchase run on a schedule against each cell's sale path, and the SLO dashboards per availability tier on the SETUP-OBS stack beside PLATFORM-OBSERVE's. Done when: the probe completes a purchase every interval and its failure alerts, and each tier's SLO shows its target and its burn.",
+   "builds": [
+    "adr ADR-0060"
+   ],
+   "linksNothingBecause": "a probe and dashboards on the observability stack"
+  },
+  {
+   "key": "OBS-ALERT-SIGNALS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-OBSERVE",
+    "KERNEL-TENANT-LIMITS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "The signals the platform alerts need that nothing produces: edge-node heartbeat, oldest unsynced age, pgbouncer and the per-tenant 429 metric",
+   "detail": "docs/architecture/observability.md's alert table and OBS-TENANT-POOL assume four signals nothing produces: an edge-node heartbeat (access.yaml has only the edge node's configuration), the age of the oldest unsynced row (a device heartbeat reports only a count), pgbouncer.enabled on the Flexible Server with a monitoring role on the admin console (Terraform), and a 429 metric per tenant and audience from KERNEL-TENANT-LIMITS. Done when: each signal reaches the observability stack and the alert that reads it fires on a test.",
+   "builds": [
+    "adr ADR-0060"
+   ],
+   "linksNothingBecause": "metrics and infrastructure settings, named in docs/architecture/observability.md"
+  },
+  {
+   "key": "SETUP-OPS-BACKUP",
+   "epic": "PLATFORM",
+   "points": 3,
+   "area": "devops",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-DB",
+    "SETUP-ENV"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Nightly logical dump per tenant database, its retention and the restore script (ADR-0060 OPS-BACKUP)",
+   "detail": "In **ticvai-infra** (the cell module and its CronJob). ADR-0060's ticket OPS-BACKUP (\"nightly logical dump per tenant database, retention, restore script\", 3 points), never planned: a scheduled job in the cell (ticvai-infra, a CronJob) dumps each tenant database and the control database nightly, keeps them for the retention ADR-0060 gives, and a restore script brings one tenant back. Done when: a night's dumps exist for every database, the oldest beyond the retention is gone, and the script restores one tenant to a scratch server.",
+   "builds": [
+    "adr ADR-0060"
+   ],
+   "linksNothingBecause": "infrastructure in ticvai-infra"
+  },
+  {
+   "key": "SETUP-OPS-RESTORE-DRILL",
+   "epic": "PLATFORM",
+   "points": 2,
+   "area": "devops",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-OPS-BACKUP",
+    "SETUP-QDRANT"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "The first single-tenant restore drill and its runbook, database and Qdrant collection (ADR-0060 OPS-RESTORE-DRILL)",
+   "detail": "In **ticvai-infra**, with the runbook in **ticvai-docs**. ADR-0060's ticket OPS-RESTORE-DRILL (\"first drill in Block A; runbook for single-tenant restore, including a Qdrant collection\", 2 points), never planned. Done when: one tenant's database and its Qdrant collection are restored from the nightly dump and snapshot to a scratch environment by following the runbook in ticvai-docs, and the time it took is recorded.",
+   "builds": [
+    "adr ADR-0060"
+   ],
+   "linksNothingBecause": "a drill and its runbook"
+  },
+  {
+   "key": "SETUP-FRONT-DOOR",
+   "epic": "PLATFORM",
+   "points": 3,
+   "area": "devops",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-ENV"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Azure Front Door per cell: the platform wildcard certificate and DNS, routes to the hosts, and the custom-domain calls the domain job makes",
+   "detail": "In **ticvai-infra** (the cell module). white-label.yaml verifyCustomDomain (\"a verified domain is added to the cell's Azure Front Door profile as a custom domain with a Front Door managed certificate\") and tenancy.yaml resolveTenantHost (\"<venue>.<cell>.ticvai.app, one wildcard certificate per cell\"): the Front Door profile per cell, the platform wildcard certificate and DNS zone, the routes to the hosts, and the access the domain job uses to add a custom domain and read its validation and deployment state. Done when: <venue>.<cell>.ticvai.app reaches the right host over TLS, and a test custom domain is added, validated and served.",
+   "builds": [
+    "operation verifyCustomDomain",
+    "operation resolveTenantHost"
+   ]
+  },
+  {
+   "key": "SETUP-OBJECT-STORAGE",
+   "epic": "PLATFORM",
+   "points": 5,
+   "area": "devops",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-ENV",
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Object storage per cell and tenant: the media store with signed uploads and a CDN origin, private per-tenant storage with short signed links, and the kernel's object-store interface",
+   "detail": "In **ticvai-infra** (the storage accounts and CDN) and **ticvai-backend** (the kernel's object-store interface). assets.yaml createUpload (\"Uploads go direct to object storage, not through this API\"), identity.yaml getSubjectDataExport (\"a signed link to the file in the tenant's private storage, valid for five minutes\") and marketing-crm.yaml writeSubjectDataExportPart (\"never a public or CDN path; encrypted at rest under the tenant's keys\"): the Azure Blob storage per cell (public media behind the CDN, private per-tenant containers), signed direct-upload URLs and five-minute signed links, and the kernel's object-store interface the modules call. Done when: a direct upload lands in the media store and is served from the CDN; a private file is reachable only by a signed link that expires in five minutes; no module calls Blob storage except through the interface.",
+   "builds": [
+    "operation createUpload",
+    "operation getSubjectDataExport"
+   ]
+  },
+  {
+   "key": "SETUP-CELL-NETWORK",
+   "epic": "PLATFORM",
+   "points": 5,
+   "area": "devops",
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-ENV"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Cell module: overlay networking, a subnet per pool (AI, data), NAT egress, Gateway API ingress, Managed Redis, one production HA mode",
+   "detail": "In **ticvai-infra** (the cell module). docs/active/infra-answers-30-september.md (\"This is infrastructure code in repos/ticvai-infra, so it needs its own ticket\"): the cell module's CNI overlay and pod range, one subnet per node pool (the AI and data pools), NAT egress, Gateway API ingress, azurerm_managed_redis instead of azurerm_redis_cache (the Managed Redis KERNEL-REDIS uses), and one production HA mode. Done when: a cell applied from the module has these and the hosts, Redis and Qdrant run in it.",
+   "builds": [
+    "adr ADR-0060"
+   ],
+   "linksNothingBecause": "infrastructure in ticvai-infra"
+  },
+  {
+   "key": "SETUP-AI-GPU",
+   "epic": "PLATFORM",
+   "points": 3,
+   "depends": [
+    "SETUP-ENV",
+    "SETUP-QDRANT"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "The AI GPU node pool in the cell and the model serving on it: BGE-M3 embeddings, the reranker, Presidio and the Arabic named-entity model (no LLM)",
+   "detail": "In **ticvai-infra** (the GPU node pool) and **ticvai-ai** (the model servers). AI-ENGINE-CONCIERGE (\"embeddings from our own BGE-M3 on the AI GPU node pool in the cell\", Chinmay, 4 October, CHG-R11-001), AI-ENGINE-SCRUB-GUARD and ADR-0049 item 7 assume a GPU node pool that no task provisions. This task is the GPU pool in the cell (UAE North quota has a lead time) and the servers for BGE-M3, the reranker, Presidio and the Arabic named-entity model; no LLM is hosted. Done when: the four serve from the pool inside the cell, reachable only from the AI server.",
+   "builds": [
+    "adr ADR-0049"
+   ],
+   "linksNothingBecause": "infrastructure and model serving in the cell"
+  },
+  {
+   "key": "SEAT-PRICING-STEP",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "SVC-CATALOGUE-DRAFTED-5",
+    "SVC-CATALOGUE-DRAFTED-6"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Catalogue: the seat pricing step: a seat's price follows the active seat pricing rule that covers it (CR-467)",
+   "detail": "Spec: ADAM CR-467, the lead's decision of 2 November 2026 (posted on #31819, setSeatPricingRule, under SVC-CATALOGUE-DRAFTED-5), in the contracts at the release tag in ADAM: \"The pricing step that applies seat rules uses this same definition of covered seats.\" No task builds that step. A rule covers the seats of its seat map that match every selector it sets (seat_section_codes; rows, within those sections when sections are set; seat_ids; seat_category); a rule that sets none covers the whole map; it applies to its performance, or to every performance when performance_id is null; inactive rules never apply. The seat's price is the selected rate (catalogue#variantPriceRecords, CR-439, built in #35288) moved by the rule's strategy within floorPrice and ceilingPrice, by stepPrice when it is set. Done when: a seat inside a rule's coverage is priced within its bounds, a seat outside every rule keeps the selected rate, and two rules at one priority never both apply (setSeatPricingRule refuses the overlap).",
+   "builds": [
+    "table catalogue.seat_pricing_rule",
+    "operation setSeatPricingRule"
+   ]
+  },
+  {
+   "key": "R13-DB-IN-PROCESS-READ-GRANTS",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 2,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-ACCESS",
+    "VM-MIG-ACCREDITATION",
+    "MIG-APPROVALS",
+    "MIG-CATALOGUE",
+    "MIG-CATALOGUE-5",
+    "MIG-ORDERS",
+    "MIG-PAYMENTS",
+    "MIG-PAYMENTS-4",
+    "MIG-PLATFORM",
+    "MIG-PROMOTIONS",
+    "MIG-SEATING",
+    "MIG-TENANCY-3",
+    "VM-MIG-WORKFORCE"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "The read grants of the in-process queries r13 moves off the service route (XDR-073 to XDR-078)",
+   "detail": "Spec: the r13 decisions on the in-process reads (ADAM CR-438, CR-472 to CR-478 and the rest of their class; docs/active/cross-deployable-writes.yaml XDR-073 to XDR-078), in the contracts at the release tag in ADAM. Named under MIG-ORDERS (#27675) and MIG-PROMOTIONS (#27674), as CR-477's and CR-478's grants (#37210, #37211, XDR-071 and XDR-072) are, which this task does not repeat (orders.order_line, promotions.promotion and promotions.promotion_rule to operations, and USAGE on orders and promotions to operations, are theirs). One forward migration in the tenant database: GRANT SELECT, read only, to operations: accreditation.application, accreditation.credential, accreditation.holder, accreditation.validity, approvals.request, catalogue.channel_capacity, catalogue.product_eligibility_rule, catalogue.tax_profile, orders.cart, orders.cart_line, orders.deposit, orders.deposit_policy, orders.group_booking, orders.invitation, orders.order_fee, orders.order_line_discount, orders.payment, orders.refund, orders.refund_policy, orders.reservation, orders.sales_order, payments.instalment_policy, payments.provider, payments.provider_connection, platform.device, promotions.bundle, seating.seat, tenancy.data_retention_setting, workforce.shift; to access: approvals.request, approvals.rule, catalogue.product, catalogue.product_media, platform.region_settings, tenancy.data_retention_setting; to commerce: access.access_point; and USAGE on each of those schemas where the role does not hold it (accreditation, approvals, seating, tenancy and workforce to operations; approvals and tenancy to access). Each grant is guarded as derive-ddl writes the other cross-module grants (V0118, V0122): granted only where the role and the table exist and the grant is not already held. Row security still decides the rows. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. Test: each role reads each of its tables under the caller's row security and cannot write it. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table access.access_point",
+    "table accreditation.application",
+    "table accreditation.credential",
+    "table accreditation.holder",
+    "table accreditation.validity",
+    "table approvals.request",
+    "table approvals.rule",
+    "table catalogue.channel_capacity",
+    "table catalogue.product",
+    "table catalogue.product_eligibility_rule",
+    "table catalogue.product_media",
+    "table catalogue.tax_profile",
+    "table orders.cart",
+    "table orders.cart_line",
+    "table orders.deposit",
+    "table orders.deposit_policy",
+    "table orders.group_booking",
+    "table orders.invitation",
+    "table orders.order_fee",
+    "table orders.order_line_discount",
+    "table orders.payment",
+    "table orders.refund",
+    "table orders.refund_policy",
+    "table orders.reservation",
+    "table orders.sales_order",
+    "table payments.instalment_policy",
+    "table payments.provider",
+    "table payments.provider_connection",
+    "table platform.device",
+    "table platform.region_settings",
+    "table promotions.bundle",
+    "table seating.seat",
+    "table tenancy.data_retention_setting",
+    "table workforce.shift"
+   ]
+  },
+  {
+   "key": "R13-QUERIES-TENANCY",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "VM-MIG-ACCREDITATION",
+    "MIG-APPROVALS",
+    "MIG-TENANCY-3",
+    "VM-MIG-WORKFORCE",
+    "R13-DB-IN-PROCESS-READ-GRANTS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Tenancy's query classes served in process for the r13 in-process reads: accreditation#applicationRecords, accreditation#credentialRecords, accreditation#holderRecords, accreditation#validityRecords, approvals#ruleRecords, tenancy#dataRetentionSettingRecords, workforce#shiftRecords",
+   "detail": "Spec: the r13 in-process reads class (ADAM CR-438, the served-query rule; build lane r, CHG-R13INP-001), in the contracts at the release tag in ADAM; the lead, 2 November 2026: \"One task per owner\". Each query above is now served [in-process] as well as [service]: Tenancy builds it once as an in-process query class behind its query interface (the same rows and rule as the served route, CR-438), registered in every host that asks it in process, and running under the caller's row security in the caller's transaction (the read grants are R13-DB-IN-PROCESS-READ-GRANTS', XDR-073 to XDR-078). The operations that ask them in process follow this task: askReportingQuestion, getKpiValues, listAgentWorkloadAvailability, publishTopologyValidation, runSemanticQuery, setDataRetentionPolicy, suggestWorkOrderAssignee. Done when: each query answers in process exactly what its served route answers for the same inputs, a row outside the caller's scope is never returned, and every reader's contract tests pass with the in-process call.",
+   "builds": [
+    "table accreditation.application",
+    "table accreditation.credential",
+    "table accreditation.holder",
+    "table accreditation.validity",
+    "table approvals.rule",
+    "table tenancy.data_retention_setting",
+    "table workforce.shift"
+   ]
+  },
+  {
+   "key": "R13-QUERIES-CATALOGUE",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Narayan Gaonkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "MIG-CATALOGUE",
+    "MIG-PROMOTIONS",
+    "R13-DB-IN-PROCESS-READ-GRANTS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Catalogue's query classes served in process for the r13 in-process reads: catalogue#productEligibilityRuleRecords, promotions#bundleRecords",
+   "detail": "Spec: the r13 in-process reads class (ADAM CR-438, the served-query rule; build lane r, CHG-R13INP-001), in the contracts at the release tag in ADAM; the lead, 2 November 2026: \"One task per owner\". Each query above is now served [in-process] as well as [service]: Catalogue builds it once as an in-process query class behind its query interface (the same rows and rule as the served route, CR-438), registered in every host that asks it in process, and running under the caller's row security in the caller's transaction (the read grants are R13-DB-IN-PROCESS-READ-GRANTS', XDR-073 to XDR-078). The operations that ask them in process follow this task: bookVisitPlan, generateVisitPlan, getVisitPlannerOptions, listVisitPlanAlternatives, previewGuidedChoice, setVenuePoint, updateVisitPlan. Done when: each query answers in process exactly what its served route answers for the same inputs, a row outside the caller's scope is never returned, and every reader's contract tests pass with the in-process call.",
+   "builds": [
+    "table catalogue.product_eligibility_rule",
+    "table promotions.bundle"
+   ]
+  },
+  {
+   "key": "R13-QUERIES-ORDERS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "MIG-ORDERS",
+    "MIG-PAYMENTS-4",
+    "R13-DB-IN-PROCESS-READ-GRANTS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Orders's query classes served in process for the r13 in-process reads: orders#cartLineRecords, orders#groupBookingRecords, orders#invitationRecords, orders#orderFeeRecords, orders#reservationRecords, payments#instalmentPolicyRecords",
+   "detail": "Spec: the r13 in-process reads class (ADAM CR-438, the served-query rule; build lane r, CHG-R13INP-001), in the contracts at the release tag in ADAM; the lead, 2 November 2026: \"One task per owner\". Each query above is now served [in-process] as well as [service]: Orders builds it once as an in-process query class behind its query interface (the same rows and rule as the served route, CR-438), registered in every host that asks it in process, and running under the caller's row security in the caller's transaction (the read grants are R13-DB-IN-PROCESS-READ-GRANTS', XDR-073 to XDR-078). The operations that ask them in process follow this task: actOnWaiverRequirements, bookVisitPlan, listCustomerServiceProfile, listMinorGuardianGroup, listMissingExpiredInvalid, listParticipantWaiverStatus, listWaiver, respondToInvitation, setMembershipCommercialConfig, setRefundCompensationService. Done when: each query answers in process exactly what its served route answers for the same inputs, a row outside the caller's scope is never returned, and every reader's contract tests pass with the in-process call.",
+   "builds": [
+    "table orders.cart_line",
+    "table orders.group_booking",
+    "table orders.invitation",
+    "table orders.order_fee",
+    "table orders.reservation",
+    "table payments.instalment_policy"
+   ]
+  },
+  {
+   "key": "R13-QUERIES-ACCESS",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Narayan Gaonkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "MIG-ACCESS",
+    "R13-DB-IN-PROCESS-READ-GRANTS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Access's query classes served in process for the r13 in-process reads: access#accessPointRecords",
+   "detail": "Spec: the r13 in-process reads class (ADAM CR-438, the served-query rule; build lane r, CHG-R13INP-001), in the contracts at the release tag in ADAM; the lead, 2 November 2026: \"One task per owner\". Each query above is now served [in-process] as well as [service]: Access builds it once as an in-process query class behind its query interface (the same rows and rule as the served route, CR-438), registered in every host that asks it in process, and running under the caller's row security in the caller's transaction (the read grants are R13-DB-IN-PROCESS-READ-GRANTS', XDR-073 to XDR-078). The operations that ask them in process follow this task: recordAttendance, setVenueSettings. Done when: each query answers in process exactly what its served route answers for the same inputs, a row outside the caller's scope is never returned, and every reader's contract tests pass with the in-process call.",
+   "builds": [
+    "table access.access_point"
    ]
   }
  ],
@@ -2376,7 +3624,7 @@
  "readViaBuiltWith": {
   "wallet#periodCloseChecks": ["getWalletPreCloseChecks", "getWalletMovementSummary"]
  },
- "operationWaitsNote": "operation -> the hand-written plan tasks its task waits for: an operation whose ticket needs work that no screen, operation or query of the plan implies (a kernel scheme or client it runs on). tools/build-service-docs.py makes the task that builds the operation wait on each task named, so the release links the two tasks; a key must be a task of this file (a generated key, such as a migration's, is only settled at the key reconcile, and the build stops on one). Added 29 October 2026 (CHG-R11PLN-001; ADAM CR-271, CR-281 to CR-284): the lead made the four kernel tickets that day and linked each of these operations' tickets to the kernel tickets it waits for by hand in OpenProject; this is the plan's record of those waits. 31 October 2026 (CHG-R12PL-012; ADAM CR-343): setAnalyticsProvider and setMaintenanceMode no longer wait on KERNEL-SERVICE-AUTH: the only read they needed the service route for, tenancy#activeVenues, is asked in process from the operations host. 31 October 2026 (CHG-R12PL-033; ADAM CR-418): listLearningModelPerformance (#35225) waits on AI-ENGINE-PRICE-OUTCOME-MEASURE, the AI engineers' specification of how an executed price's actual outcome is measured, which its scorecards are assembled from (the lead, 31 October 2026: \"the AI engineers specify the price outcome measure now; ADM-117 stays in Block A\").",
+ "operationWaitsNote": "operation -> the hand-written plan tasks its task waits for: an operation whose ticket needs work that no screen, operation or query of the plan implies (a kernel scheme or client it runs on). tools/build-service-docs.py makes the task that builds the operation wait on each task named, so the release links the two tasks; a key must be a task of this file (a generated key, such as a migration's, is only settled at the key reconcile, and the build stops on one). Added 29 October 2026 (CHG-R11PLN-001; ADAM CR-271, CR-281 to CR-284): the lead made the four kernel tickets that day and linked each of these operations' tickets to the kernel tickets it waits for by hand in OpenProject; this is the plan's record of those waits. 31 October 2026 (CHG-R12PL-012; ADAM CR-343): setAnalyticsProvider and setMaintenanceMode no longer wait on KERNEL-SERVICE-AUTH: the only read they needed the service route for, tenancy#activeVenues, is asked in process from the operations host. 31 October 2026 (CHG-R12PL-033; ADAM CR-418): listLearningModelPerformance (#35225) waits on AI-ENGINE-PRICE-OUTCOME-MEASURE, the AI engineers' specification of how an executed price's actual outcome is measured, which its scorecards are assembled from (the lead, 31 October 2026: \"the AI engineers specify the price outcome measure now; ADM-117 stays in Block A\"). 2 November 2026 (CHG-R13PL-018; ADAM CR-175, ADR-0072 section 6): listOwnPlatformStaffGrants (#30739) and openPlatformStaffGrant (#30742) wait on PLATFORM-AUTH, for the connection to the real platform token only; they are built against the platform caller with a test double meanwhile, and the Control Plane's own operations and replayEvents do not wait on it. 2 November 2026 (CHG-R13PL-019 to CHG-R13PL-027; the lead: \"Can you check for all the missing tickets as well\"): setApprovalExternalProvider, changeOwnCredential and forceLogout wait on KERNEL-SECRET-STORE (CR-243); createApprovalRequest on CR330-PLATFORM-APPROVAL-RULE-DB (CR-330); broadcastToGuests and sendGuestBroadcast on CR379-LIVE-ENTITLEMENT-SUBJECTS (CR-379); setSsoConfig and completeSsoAuthorization on CR327-DB-SSO-PROVIDER-AUDIENCE (CR-327). And (CHG-R13PL-030 to CHG-R13PL-041, the second scan): transmitEInvoices and recordEInvoiceTransmissionStatus on EINV-ADAPTER (the second on EINV-CALLBACK too), enrolFacePass on BIO-ADAPTER, issueWalletPass and pushWalletPassUpdate on WALLET-PASS-ADAPTER, testChannelConnection on CHANNEL-CONNECTOR-PORT, previewProductTickets and printTicketProof on ORDERS-TICKET-PDF-RENDERER, getSubjectDataExport on SETUP-OBJECT-STORAGE, verifyCustomDomain on SETUP-FRONT-DOOR; each builds against the port's mock or double meanwhile. A started task gains no wait (setStoreAccounts, getOrder, guestUaePassLogin, setTurnstileMode, createUpload). And (CHG-R13PL-046; the lead, 2 November 2026: \"One task per owner\"): the readers of the query classes r13 serves in process wait on their owner's task, R13-QUERIES-TENANCY, -CATALOGUE, -ORDERS or -ACCESS; none of them had started.",
  "operationWaits": {
   "registerGuestDevice": ["KERNEL-FIELD-ENC"],
   "enrolMfaMethod": ["KERNEL-FIELD-ENC"],
@@ -2391,7 +3639,52 @@
   "startSsoAuthorization": ["KERNEL-REDIS"],
   "completeSsoAuthorization": ["KERNEL-REDIS"],
   "recordDeviceHeartbeat": ["KERNEL-DEVICE-AUTH"],
-  "listLearningModelPerformance": ["AI-ENGINE-PRICE-OUTCOME-MEASURE"]
+  "listLearningModelPerformance": ["AI-ENGINE-PRICE-OUTCOME-MEASURE"],
+  "listOwnPlatformStaffGrants": ["PLATFORM-AUTH"],
+  "openPlatformStaffGrant": ["PLATFORM-AUTH"],
+  "setApprovalExternalProvider": ["KERNEL-SECRET-STORE"],
+  "changeOwnCredential": ["KERNEL-SECRET-STORE"],
+  "forceLogout": ["KERNEL-SECRET-STORE"],
+  "createApprovalRequest": ["CR330-PLATFORM-APPROVAL-RULE-DB"],
+  "broadcastToGuests": ["CR379-LIVE-ENTITLEMENT-SUBJECTS"],
+  "sendGuestBroadcast": ["CR379-LIVE-ENTITLEMENT-SUBJECTS"],
+  "setSsoConfig": ["CR327-DB-SSO-PROVIDER-AUDIENCE"],
+  "completeSsoAuthorization": ["CR327-DB-SSO-PROVIDER-AUDIENCE"],
+  "transmitEInvoices": ["EINV-ADAPTER"],
+  "recordEInvoiceTransmissionStatus": ["EINV-ADAPTER", "EINV-CALLBACK"],
+  "enrolFacePass": ["BIO-ADAPTER"],
+  "issueWalletPass": ["WALLET-PASS-ADAPTER"],
+  "pushWalletPassUpdate": ["WALLET-PASS-ADAPTER"],
+  "testChannelConnection": ["CHANNEL-CONNECTOR-PORT"],
+  "previewProductTickets": ["ORDERS-TICKET-PDF-RENDERER"],
+  "printTicketProof": ["ORDERS-TICKET-PDF-RENDERER"],
+  "getSubjectDataExport": ["SETUP-OBJECT-STORAGE"],
+  "verifyCustomDomain": ["SETUP-FRONT-DOOR"],
+  "actOnWaiverRequirements": ["R13-QUERIES-ORDERS"],
+  "askReportingQuestion": ["R13-QUERIES-TENANCY"],
+  "bookVisitPlan": ["R13-QUERIES-CATALOGUE", "R13-QUERIES-ORDERS"],
+  "generateVisitPlan": ["R13-QUERIES-CATALOGUE"],
+  "getKpiValues": ["R13-QUERIES-TENANCY"],
+  "getVisitPlannerOptions": ["R13-QUERIES-CATALOGUE"],
+  "listAgentWorkloadAvailability": ["R13-QUERIES-TENANCY"],
+  "listCustomerServiceProfile": ["R13-QUERIES-ORDERS"],
+  "listMinorGuardianGroup": ["R13-QUERIES-ORDERS"],
+  "listMissingExpiredInvalid": ["R13-QUERIES-ORDERS"],
+  "listParticipantWaiverStatus": ["R13-QUERIES-ORDERS"],
+  "listVisitPlanAlternatives": ["R13-QUERIES-CATALOGUE"],
+  "listWaiver": ["R13-QUERIES-ORDERS"],
+  "previewGuidedChoice": ["R13-QUERIES-CATALOGUE"],
+  "publishTopologyValidation": ["R13-QUERIES-TENANCY"],
+  "recordAttendance": ["R13-QUERIES-ACCESS"],
+  "respondToInvitation": ["R13-QUERIES-ORDERS"],
+  "runSemanticQuery": ["R13-QUERIES-TENANCY"],
+  "setDataRetentionPolicy": ["R13-QUERIES-TENANCY"],
+  "setMembershipCommercialConfig": ["R13-QUERIES-ORDERS"],
+  "setRefundCompensationService": ["R13-QUERIES-ORDERS"],
+  "setVenuePoint": ["R13-QUERIES-CATALOGUE"],
+  "setVenueSettings": ["R13-QUERIES-ACCESS"],
+  "suggestWorkOrderAssignee": ["R13-QUERIES-TENANCY"],
+  "updateVisitPlan": ["R13-QUERIES-CATALOGUE"]
  },
  "navHomes": {
   "BO-873": "a section home of Venue Management (staff): the lead, 29 October 2026 (\"Bring BO-873 in\", r11 gate; CHG-R11INT-005): BO-881 joined Block A1 when rota assignments began reading the venue's working-hour rules (ADAM CR-334), and BO-873 is its only way in from the back-office entry",
@@ -2656,8 +3949,14 @@
    "screens": [],
    "wiring": [],
    "tasks": [
-    "DEVICE-BOCA-FGL"
+    "DEVICE-BOCA-FGL",
+    "CR463-KIOSK-PRINT",
+    "CR463-POS-PRINT"
    ]
   }
- ]
+ ],
+ "decidedReadsNote": "operation -> the tables a posted decision says it reads before its contract declares the read (CHG-R13PL-001, 2 November 2026; ADAM CR-460). tools/build-service-docs.py adds them to the operation's reads for the plan alone, so its task waits on the migration that creates each table and that migration is pulled into the task's block; once the contract declares the read the entry is redundant (printed by build-service-docs.py and check-plan-closure) and is removed. check-plan-closure C-TABLE refuses a Block A task whose operation reads or writes a table created only in a later block.",
+ "decidedReads": {
+  "listProductApprovalWorkflows": {"tables": ["catalogue.approval_policy"], "why": "ADAM CR-460, the lead's decision of 2 November 2026 (posted on #31816): listProductApprovalWorkflows returns the catalogue.approval_policy rows with subject product; \"Declare its read of catalogue.approval_policy\". Its migration, #31608 under MIG-CATALOGUE-3 (#28092), lands before #31816 and #34699 start."}
+ }
 }

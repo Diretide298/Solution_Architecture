@@ -1,0 +1,64 @@
+id: CHG-R13PL-028
+date: '2026-11-02'
+source: plan
+kind: plan
+proposed: '2026-11-02'
+summary: 'The r10 decisions'' migration child tasks are plan tasks: one [DB] task per affected MIG ticket writes what V0116
+  and V0117 applied to live into the repository''s db/ migrations.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026: "Can you check for all the missing tickets as well". docs/active/block-a-extra-tasks.json: eleven change-only
+    [DB] tasks (`area: database`), one per affected MIG ticket, each following it: R10-DB-CATALOGUE-INTO-REPOSITORY (CR-214,
+    CR-204, CR-109, CR-110, CR-111, CR-256, CR-167), -PROMOTIONS (CR-225, CR-231), -SEATING (CR-112), -IDENTITY (CR-242,
+    CR-209, CR-180, CR-100), -PLATFORM (CR-247, CR-255, CR-260), -ORDERS (CR-254, CR-257), -CONTROL (CR-202), -RETAIL (CR-104),
+    -ACCESS (CR-239, CR-226) and -VENUEMAP (CR-207), Hrushikant Patkar; and R10-DB-AI-INTO-REPOSITORY (CR-207, the ai schema),
+    the AI engineers (docs/active/team.json aiServer.keys, CHG-R12PL-034). Plan change waived from the cooling-off by the
+    lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: The r10 decisions (25 to 29 October 2026; CHG-R10CAT-006, -007, -009 to -013, CHG-R10CRF-002, -007, -016, -017, -018,
+  -021, CHG-R10ID-004, -006, -009, -017, CHG-R10OPN-002, -003, CHG-R10ORD-011 to -013) each settled its migration work as
+  "a child task of the affected MIG ticket"; none was made, and V0116 and V0117 reached live directly on 27 October.
+keys_touched:
+  tickets:
+  - R10-DB-CATALOGUE-INTO-REPOSITORY (new)
+  - R10-DB-PROMOTIONS-INTO-REPOSITORY (new)
+  - R10-DB-SEATING-INTO-REPOSITORY (new)
+  - R10-DB-IDENTITY-INTO-REPOSITORY (new)
+  - R10-DB-PLATFORM-INTO-REPOSITORY (new)
+  - R10-DB-ORDERS-INTO-REPOSITORY (new)
+  - R10-DB-CONTROL-INTO-REPOSITORY (new)
+  - R10-DB-RETAIL-INTO-REPOSITORY (new)
+  - R10-DB-ACCESS-INTO-REPOSITORY (new)
+  - R10-DB-AI-INTO-REPOSITORY (new)
+  - R10-DB-VENUEMAP-INTO-REPOSITORY (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - docs/active/team.json
+root_class: migration work a decision settled as a child task of a started MIG ticket, with no plan task carrying it
+tickets:
+  started:
+  - '27671 MIG-CATALOGUE, 27674 MIG-PROMOTIONS, 27668 MIG-SEATING, 27657 MIG-IDENTITY, 27665 MIG-PLATFORM, 27675 MIG-ORDERS,
+    27647 MIG-CONTROL, 27682 MIG-RETAIL, 27676 MIG-ACCESS, 27664 MIG-AI, 27681 MIG-VENUEMAP (all Ready for QA, Hrushikant
+    Patkar): not rewritten; each new task follows its MIG ticket'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r10''s migration child tasks (CR-100 to CR-257)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'One task per affected MIG ticket, as the r10 decisions named the MIG ticket; the r12 plan lane''s one task per CR
+  was for work applied nowhere yet, while this work is on live already and only the repository''s db/ folder lacks it. The
+  plan has no task under a task or sub-task, so the ticket the work belongs to is named in the task''s text; its OpenProject
+  parent is the app-module the plan places it in, and it follows the migration that creates its tables. A change-only [DB]
+  task is `area: database` and its key does not end in -DB (a -DB task''s `table` builds count as created by it, CHG-R8MIG-016,
+  CHG-R12PL-008).'

@@ -1,0 +1,50 @@
+id: CHG-R13PL-015
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'A [DB] task for CR-454: orders.refund_calculation_policy.scope_path is backfilled from the tenant root, then NOT
+  NULL.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR454-DB-REFUND-POLICY-SCOPE-PATH (Hrushikant Patkar, migrations.owner in docs/active/team.json, `area:
+    database`, not before 2 November 2026): following MIG-ORDERS-6: fill a null scope_path from the tenant root''s path,
+    then SET NOT NULL, as db/tenant/089 did for invitation and ticket_template. Its text carries the decision''s statements
+    and names the release''s forward migration as its Source DDL after r1. Plan change waived from the cooling-off by the
+    lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: ADAM CR-454; the lead's decision of 1 November 2026, posted on its ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes.
+keys_touched:
+  tickets:
+  - CR454-DB-REFUND-POLICY-SCOPE-PATH (new)
+  tables:
+  - orders.refund_calculation_policy
+  operations: []
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '28276 (MIG-ORDERS-6, Ready for QA, Hrushikant Patkar): not rewritten'
+  - '37037 (MIG-ORDERS-6#orders.refund_calculation_policy, Ready for QA, Hrushikant Patkar): not rewritten'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-454
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the task''s text; its
+  OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its tables. A change-only
+  [DB] task is `area: database` and its key does not end in -DB (a -DB task''s `table` builds count as created by it, CHG-R8MIG-016,
+  CHG-R12PL-008).'

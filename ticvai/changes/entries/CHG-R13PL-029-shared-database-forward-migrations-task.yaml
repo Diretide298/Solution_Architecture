@@ -1,0 +1,44 @@
+id: CHG-R13PL-029
+date: '2026-11-02'
+source: plan
+kind: plan
+proposed: '2026-11-02'
+summary: 'R13-DB-SHARED: the shared tenant and control databases get V0118 and every later forward migration, as R8-DB-SHARED
+  gave them r8''s.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026: "Can you check for all the missing tickets as well". docs/active/block-a-extra-tasks.json: R13-DB-SHARED (Hrushikant
+    Patkar, 3 points), a database update task that builds the forward migration files V0118 to V0123 (tenant) and V0118
+    and V0120 (control) and gains every later one at each plan build (CHG-R10GFC-006). Plan change waived from the cooling-off
+    by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-242 (CHG-R10GFC-006): the shared database needs V0116 too, "a child task under it (CLAUDE.md rule 7), for
+  the lead to create" under R8-DB-SHARED (#36196, Closed); none was made, and on 30 October live had nothing after V0117.'
+keys_touched:
+  tickets:
+  - R13-DB-SHARED (new)
+  - R8-DB-SHARED (36196)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: forward migrations with no task that applies them to the shared databases
+tickets:
+  started: []
+  unstarted:
+  - '#36196 R8-DB-SHARED (Closed): unchanged'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-242
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'A database update task (check-ticket-builds B-DB-FILES): its files are the package''s, each recording itself in
+  platform.schema_version, as R8-DB-SHARED''s were.'

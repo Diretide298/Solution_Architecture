@@ -1,0 +1,46 @@
+id: CHG-R13PL-036
+date: '2026-11-02'
+source: plan
+kind: plan
+proposed: '2026-11-02'
+summary: The Network International (N-Genius) payment adapter beside Stripe is a plan task, following PLATFORM-PAYMENTS.
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026: "Can you check for all the missing tickets as well"; a read-only scan of the package for work it describes that
+    no task builds. docs/active/block-a-extra-tasks.json: PAYMENTS-NI-ADAPTER (`pool: backend`, follows PLATFORM-PAYMENTS).
+    Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: contracts/spine/orders.yaml setPaymentProvider (CF-131, two gateways for Phase 1) and createPayment; ADAM CR-165 (the
+  secret-header webhook).
+keys_touched:
+  operations:
+  - createPayment
+  - capturePayment
+  - inquirePaymentStatus
+  tickets:
+  - PAYMENTS-NI-ADAPTER (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: work the package or an ADR describes that no plan task builds
+tickets:
+  started:
+  - '27699 PLATFORM-PAYMENTS: unchanged'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-165
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Owner by the plan''s rules: a named owner where the work belongs to a person''s service or setup, else `pool: backend`
+  (the least-loaded back-end owner at the plan build). The waiting operations'' tasks follow it only where they are not
+  started; their builders work against the mock or double meanwhile.'

@@ -25,6 +25,11 @@ ticketed block must still be built in one, or carry its reason in `docs/active/b
                  built by no task of the caller's drop or an earlier one: revokeGuestDevice (A) called Identity's
                  endGuestDeviceSessions, built in Block B (CHG-GT1-009, r6 gate, 14 October 2026); the fix is a
                  `blockAOperations` entry naming the caller
+  C-TABLE        a Block A task builds an operation that reads or writes a table (the lineage, plus block-a-extra-tasks.json
+                 `decidedReads`) whose creating migration is built only in a later block: listProductApprovalWorkflows
+                 (#31816, A1) reads catalogue.approval_policy, created by MIG-CATALOGUE-3 (#31608), which the plan put in
+                 Block B (ADAM CR-460, CHG-R13PL-001). build-service-docs.py pulls such a migration into the block of the
+                 first task that waits on it; this holds the plan to it
   C-REACH        a Block A screen is reached from its app's entry (`navigation.isEntryPoint`) only through a screen
                  outside its drop or an earlier one (EMP-003, the staff home, was in no block; CHG-RONEP-006). The plan
                  pulls in app homes only (`navHomes`, lever A, CHG-RONEP-007); a screen behind a command centre gets a
@@ -66,6 +71,7 @@ RULES = {
     "C-BOUND": "a Block A screen binds an operation no Block A task builds (CHG-RONEP-001)",
     "C-FLOW": "an operation a step or branch of a Block A app's flow needs is built by no Block A task (CHG-RONEP-002)",
     "C-CALLS": "an operation a Block A operation calls or writes through is built by no Block A task (CHG-GT1-009)",
+    "C-TABLE": "a Block A task's operation reads or writes a table whose migration is built only in a later block (CR-460, CHG-R13PL-001)",
     "C-REACH": "a Block A screen is reached from its app's entry only through screens outside Block A (CHG-RONEP-006)",
     "C-NO-PATH": "a Block A screen no navigation from its app's entry reaches at all (CHG-RONEP-006)",
     "C-DECIDED": "a decided Block A operation, screen or AI engine operation is not built in Block A (CHG-RONEP-001)",
@@ -241,6 +247,43 @@ def main() -> int:
             guard.add("C-CALLS", f"{o}:{t}", f"{o} (Block {sp.block_label(first_block(where_o))}) calls {t}, which "
                       + (f"Block {first_block(where_t)} builds ({', '.join(where_t[first_block(where_t)][:2])})"
                          if where_t else "no task builds"))
+
+    # C-TABLE: the tables a Block A task's operations read or write are created by a migration of its drop or an earlier
+    # one (ADAM CR-460, CHG-R13PL-001). A migration is a Database task that creates its tables: a generated MIG- or VM-MIG-
+    # task, or a hand-written -DB task (ticket_done.hand_db_tables); a hand-written change task (`area: database`) creates
+    # none.
+    lineage = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
+    decided = {o: set((x or {}).get("tables") or []) for o, x in (extra.get("decidedReads") or {}).items()}
+    creators = defaultdict(set)
+    for r in rows:
+        if r.get("type") != "Task" or "#" in r.get("key", "") or r.get("track") != "Database":
+            continue
+        if not (r["key"].startswith(("MIG-", "VM-MIG-")) or r["key"].endswith("-DB")):
+            continue
+        for b in td.builds_of(r, "", {}):
+            if b.startswith("table "):
+                creators[b.split(" ", 1)[1]].add(r.get("block") or "A")
+    for r in rows:
+        if r.get("type") != "Task" or "#" in r.get("key", "") or r.get("track") != "Backend":
+            continue
+        b_task = r.get("block") or "A"
+        if b_task not in FAMILY:
+            continue
+        for b in td.builds_of(r, "", lineage):
+            if not b.startswith("operation "):
+                continue
+            o = b.split(" ", 1)[1].split("#")[-1]
+            x = lineage.get(o) or {}
+            for t in sorted(set(x.get("reads") or []) | set(x.get("writes") or []) | decided.get(o, set())):
+                if t not in creators:
+                    continue
+                first = first_block(creators[t])
+                if RANK.get(first, 9) > RANK[b_task]:
+                    guard.add("C-TABLE", f"{r['key']}:{o}:{t}", f"{r['key']} (Block {sp.block_label(b_task)}) builds {o}, "
+                              f"which reads or writes {t}; the migration that creates it is in Block {first}")
+    for o, ts in sorted(decided.items()):
+        for t in sorted(ts & set((lineage.get(o) or {}).get("reads") or [])):
+            guard.note(f"decidedReads {o}: {t} is in the contract's reads now; remove the entry")
 
     # C-REACH, C-NO-PATH: each Block A screen is reached from its app's entry through Block A screens
     plat = {s["id"]: stem.split("-")[0] for stem, s in g.screens()}

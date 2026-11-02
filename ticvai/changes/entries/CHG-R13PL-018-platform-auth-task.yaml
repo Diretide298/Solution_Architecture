@@ -1,0 +1,57 @@
+id: CHG-R13PL-018
+date: '2026-11-02'
+source: plan
+kind: plan
+proposed: '2026-11-02'
+summary: 'ADR-0072 section 6: PLATFORM-AUTH, the platform sign-in (Control Plane token, JWKS, the cells'' verification and
+  platform caller), is a Block A task, and #30739 and #30742 follow it for the real token only.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. docs/active/block-a-extra-tasks.json:
+    PLATFORM-AUTH (epic PLATFORM, 8 points, `pool: backend`, follows PLATFORM-KERNEL and SETUP-ENV, not before 2 November
+    2026), its text from ADR-0072 sections 1 to 6; `operationWaits` listOwnPlatformStaffGrants and openPlatformStaffGrant
+    wait on it. Its owner and sprint are the plan''s (the least-loaded back-end owner at the plan build). The Control Plane''s
+    own operations (licensing, subscription, createTenant) and replayEvents do not wait on it. Plan change waived from the
+    cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADR-0072 section 6 (ADAM CR-175, option A, accepted 21 October 2026; CHG-R10ID-007): "one platform-auth ticket, scheduled
+  before 30739 and 30742"; it was never added to the plan (the developer review''s root R06).'
+keys_touched:
+  tickets:
+  - PLATFORM-AUTH (new)
+  - SVC-IDENTITY-ADMINISTRATION-1 (27764)
+  - SVC-IDENTITY-ADMINISTRATION-2 (27765)
+  operations:
+  - listOwnPlatformStaffGrants
+  - openPlatformStaffGrant
+  tables:
+  - control.platform_operator
+  - control.platform_session
+  - control.platform_operator_mfa
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: an ADR that asks for a ticket, with no plan task carrying it
+tickets:
+  started:
+  - '30739 (listOwnPlatformStaffGrants, Ready for QA, Deep Khanvilkar): not rewritten; built against the platform caller
+    with a test double, connected to the real token once PLATFORM-AUTH lands'
+  unstarted:
+  - '#30742 (openPlatformStaffGrant, Sanket Keluskar, New): build against the platform caller with a test double; its task
+    SVC-IDENTITY-ADMINISTRATION-2 (#27765) follows PLATFORM-AUTH'
+  - 'SVC-IDENTITY-ADMINISTRATION-1 (#27764, New): follows PLATFORM-AUTH'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: ADR-0072 section 6 (CR-175)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: The waits run from the two operations' tasks (operationWaits applies to the task that builds the operation), so SVC-IDENTITY-ADMINISTRATION-1
+  and -2 follow PLATFORM-AUTH; the decision is that only the connection to the real token waits.
