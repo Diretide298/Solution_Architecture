@@ -1,0 +1,49 @@
+id: CHG-R13PL-052
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'XDR-055''s read grant (operations SELECT on catalogue.rate, for the category rate catalogue#variantListingFacts
+  reads, CR-439 and CR-455) is folded into R13-DB-IN-PROCESS-READ-GRANTS: the release''s forward migration grants it and
+  no task applied it.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. ADAM CR-439 and
+    CR-455 (posted on #35288; lane n, CHG-CR455-001, XDR-055). docs/active/block-a-extra-tasks.json:
+    R13-DB-IN-PROCESS-READ-GRANTS (not ticketed) gains SELECT on catalogue.rate to operations. CR-455''s made ticket
+    #37215 is the price-category column only, and its text as made is not rewritten. Plan change waived from the
+    cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding of the r13 integration gate: the forward migration derive-ddl writes for r13 (V0124) holds GRANT SELECT ON
+  catalogue.rate TO operations (XDR-055, ADAM CR-455), which neither R13-DB-IN-PROCESS-READ-GRANTS nor #37215 carried.'
+keys_touched:
+  tickets:
+  - R13-DB-IN-PROCESS-READ-GRANTS (not ticketed)
+  operations:
+  - addToWishlist
+  - getWishlist
+  tables:
+  - catalogue.rate
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a granted cross-deployable read with no [DB] task applying its grant
+tickets:
+  started: []
+  unstarted:
+  - '#37215 (CR455-DB-VARIANT-PRICE-CATEGORY, New as made): unchanged.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-455
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Every GRANT in V0124 is now carried by a task: XDR-055, XDR-067, XDR-068 and XDR-073 to XDR-078 by
+  R13-DB-IN-PROCESS-READ-GRANTS, XDR-071 and XDR-072 by #37210 and #37211.'
