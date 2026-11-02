@@ -8426,7 +8426,7 @@ paths:
         route: in-process
         for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       - query: access#entitlementRecords
-        route: in-process
+        route: service
         for: 'whether an outgoing line''s entitlement is redeemed (409 line-redeemed), as modifyOrder asks it (ADAM CR-480)'
       - query: catalogue#performanceRecords
         route: in-process

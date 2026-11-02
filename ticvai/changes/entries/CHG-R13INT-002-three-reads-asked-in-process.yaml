@@ -2,9 +2,10 @@ id: CHG-R13INT-002
 date: '2026-11-02'
 source: audit
 kind: contract
-summary: 'exchangeOrderLines and rescheduleOrder ask access#entitlementRecords in process (commerce), and publishContentBlock
-  asks approvals#requestRecords in process (operations), as every read a host already asks in process is asked: lane r''s
-  rule applied to the reads lanes q and p declared on the service route in parallel.'
+summary: 'rescheduleOrder asks access#entitlementRecords in process (commerce), as modifyOrder does and as every read the
+  lead granted to its host is asked (lane r''s rule, applied to a read lane q declared on the service route in parallel).
+  exchangeOrderLines (CR-480) and publishContentBlock''s approval consumer (CR-462) keep the service route their posted
+  decisions name: the class rule and those two decisions disagree, and that is the lead''s to settle.'
 decision:
   what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 2 November 2026): fix every new finding at its source,
     never by baselining, acknowledging or exempting. ADAM CR-438 and the in-process reads class (lane r, CHG-R13INP-001):
@@ -13,23 +14,21 @@ decision:
   by: Chinmay
   date: '2026-11-02'
 why: 'check-cross-module-reads on fix/r13-integration: 3 new XR-INPROCESS-HOST (exchangeOrderLines, rescheduleOrder, publishContentBlock),
-  each read declared route: service by a lane that branched before lane r''s class fix merged (CR-480''s and CHG-R13ORD-001''s
-  line-redeemed check; CR-462''s content-block approval consumer).'
+  each read declared route: service by a lane that branched before lane r''s class fix merged (CHG-R13ORD-001''s line-redeemed
+  check; ADAM CR-480; CR-462). Moving all three in process failed check-business-rules BR-EXCHANGE-QUOTE and BR-CONTENT-BLOCK-APPROVAL:
+  CR-480''s posted decision says "access#entitlementRecords (route service, as modifyOrder asks it)" and CR-462''s "over
+  the service route".'
 keys_touched:
   operations:
-  - exchangeOrderLines
   - rescheduleOrder
-  - publishContentBlock
   files:
   - contracts/spine/orders.yaml
-  - contracts/satellite/white-label.yaml
 root_class: a read declared on the service route where the host asks the owner in process (CHG-R13INP-001), written by a
   lane in parallel with the class fix
 tickets:
   started: []
   unstarted:
-  - '30685 (exchangeOrderLines, New), rescheduleOrder''s and publishContentBlock''s tickets: the read is in process, as
-    their other reads are.'
+  - 'rescheduleOrder''s ticket: the read is in process, as modifyOrder''s is.'
 release_tag: pending
 decision_owner: Chinmay
 adam_cr: CR-438
@@ -38,3 +37,5 @@ prevention:
   type: check
   ref: tools/check-cross-module-reads.py::XR-INPROCESS-HOST
 status: open
+notes: 'Left for the lead (the integration report): exchangeOrderLines (#30685) and publishContentBlock keep route service
+  as posted, so check-cross-module-reads still reports them (2 XR-INPROCESS-HOST).'

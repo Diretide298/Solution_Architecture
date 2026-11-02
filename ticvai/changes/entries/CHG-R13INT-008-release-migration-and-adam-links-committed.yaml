@@ -1,0 +1,41 @@
+id: CHG-R13INT-008
+date: '2026-11-02'
+source: audit
+kind: process
+summary: 'r13''s forward migration is written once, by the integration refresh (backend/tenant/V0124__after_r1_20261102.sql
+  and V0125__names_after_r1_20261102.sql, derive-ddl in frozen mode), and committed; ADAM''s ticket links are rebuilt on
+  the refreshed tree (tools/adam-links.py, no token: statuses carried from 1 November) so the twelve hand-made tickets
+  link what they build; handoff/cross-deployable-writes.md is rewritten by its check.'
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 2 November 2026): fix every new finding at its
+    source. docs/active/release-runbook.md section 4: "run python3 tools/adam-links.py ... after the full refresh and before
+    the release gate". The lane brief: "the integration refresh writes the release''s migration once for all lanes".'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding of the r13 integration gate (ADAM CR-442 to CR-483''s made tickets): check-ticket-links failed 10
+  TL-NOTHING-LINKED (#37203, #37205, #37206, #37209 to #37215: made after r12''s links were built), then, with the links
+  rebuilt, 24 TL-DEAD-LINK on V0124 and V0125 (written by the refresh, not yet tracked); check-cross-deployable-writes
+  X-DOC.'
+keys_touched:
+  files:
+  - backend/tenant/V0124__after_r1_20261102.sql
+  - backend/tenant/V0125__names_after_r1_20261102.sql
+  - handoff/service-docs/adam-links.json
+  - handoff/cross-deployable-writes.md
+root_class: release-time outputs the refresh does not write, judged by the gate before they are made
+tickets:
+  started: []
+  unstarted:
+  - 'R13-DB-SHARED and the R8-DB-LOCAL-* tasks: V0124 and V0125 join their files at this plan build.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 integration gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-links.py
+status: open
+notes: 'V0124 holds the r13 columns (catalogue.product is_featured and compare_at_amount, catalogue.variant
+  price_category_id, whitelabel.config_version activated_at with its backfill, among them), the device_credential kind
+  check gaining apiKey, and the guarded read grants of XDR-055, XDR-067, XDR-068 and XDR-071 to XDR-078. After the r13
+  apply, adam-links.py runs again with TICVAI_OP_TOKEN as the runbook says, for the new tickets'' ids and live statuses.'
