@@ -9,9 +9,9 @@ summary: ADAM's schema reader follows the row security and indexes an after-r1 f
   V0113-V0122 files apply (77 blocks on 70 tenant tables). A condition the reader cannot answer is listed as not
   modelled, never assumed. db-ticket-check --package now also fails a policy PostgreSQL has that the parsed shape lacks,
   and a row-security or forced flag that differs. The same rule gives a table the other statements the after-r1 files
-  guard: an index a block makes (so V0119's DROP INDEX by name finds its table), a block's trigger (V0116's
+  guard, such as an index a block makes (so V0119's DROP INDEX by name finds its table), a block's trigger (V0116's
   access.entitlement change_version, V0120's outbox and journal triggers), and a helper function V0120 defines in a
-  `DO $recorded$` block. The --package check provisions the two pii domains as backend/provision-tenant.sh does
+  DO $recorded$ block. The --package check provisions the two pii domains as backend/provision-tenant.sh does
   (CHG-R12DB-001), so the tenant package applies again.
 decision:
   what: 'The lead, 3 November 2026, on the review of all 1,582 Block A tickets at the r13 candidate: "why are these
