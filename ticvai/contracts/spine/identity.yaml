@@ -144,8 +144,40 @@ x-ticvai-queries:
       process by createRotaAssignment and updateRotaAssignment, which refuse 409 person-lacks-required-role when
       it is false, and by access setTurnstileMode from the access host (ADAM CR-396, decided 31 October 2026;
       CHG-CR396-001; XDR-035), once per role of the governing gate mode policy's whoCanActivate, which refuses
-      403 gate-mode-role-required when it is false for every one. Built inside the Identity module, behind its query interface, by the createRotaAssignment ticket
+      403 gate-mode-role-required when it is false for every one. It is asked in process by approvals
+      createApprovalDelegation and approveRoleAuthorityDelegation for the delegation-authority check: once per approver
+      role of the in-force matrix's rules for the delegator's limit, and for the delegate's requiredRoleId (ADAM CR-479,
+      Chinmay, 2 November 2026; CHG-CR479-001). Built inside the Identity module, behind its query interface, by the createRotaAssignment ticket
       (#32338, ADAM CR-344); no other ticket builds it.
+    served: [in-process]
+  # **Whether a person holds a permission at or above a venue, as a yes or no** (ADAM CR-479, decided 2 November 2026;
+  # CHG-CR479-001). The delegation-authority check needs the delegate's APPROVAL_DECIDE, which a grant above the caller's
+  # venue gives and the caller's row security hides.
+  principalHoldsPermissionAtVenue:
+    module: identity
+    table: identity.delegated_access
+    reads: [identity.delegated_access, identity.role_permission, identity.principal]
+    inputs:
+      principalId: {type: string, format: uuid, description: 'The person asked about: the delegate of approvals createApprovalDelegation or approveRoleAuthorityDelegation.'}
+      permission: {type: string, description: 'The permission key (contracts/shared/permissions.yaml), APPROVAL_DECIDE for the delegation-authority check.'}
+      venueScopePath: {type: string, description: 'The scope path of the delegation''s venue (its scopePath, the caller''s venue), which the asker holds.'}
+    returns:
+      type: object
+      required: [holds]
+      properties:
+        holds: {type: boolean, description: 'True when the person is active and holds the permission at the venue or at a scope above it, directly or through its role, and no live DENY of that permission or role at the venue or above it suppresses it. Which grant, where it was made and by whom are never returned.'}
+    rule: >-
+      A rule question (ADAM CR-479, Chinmay, 2 November 2026: "option A as you recommended for the rules, with the reads
+      asked as yes/no questions under the routed tenant's root grant, as CR-336 and CR-362 did"). True when the
+      principal is active and an identity.delegated_access row for it, effect `ALLOW`, revoked_at null, inside
+      valid_from and valid_to, with scope_path @> venueScopePath, grants the permission directly (its permission) or
+      through its role (an identity.role_permission row with is_active true for that role and permission), and no live
+      DENY of that permission or role at the venue or above it exists (deny wins, as principalHoldsRoleAtVenue).
+      Identity answers it with one statement under the routed tenant's root grant (ITenantRootGrant) and returns only
+      `holds`; the caller's grant is in force for every other statement of its transaction. It is asked in process by
+      approvals createApprovalDelegation and approveRoleAuthorityDelegation (403 delegate-lacks-permission when it is
+      false). Built inside the Identity module, behind its query interface, by the approveRoleAuthorityDelegation ticket
+      (#30847); no other ticket builds it.
     served: [in-process]
   # **Whether a guest is a minor, and its name, beyond the caller's own row** (ADAM CR-362, decided 30 October 2026;
   # CHG-CR362-001). grantDelegation and listDelegations read pii.subject under subject row security, which shows a
@@ -333,8 +365,9 @@ x-ticvai-queries:
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through Identity's service route (serviceAuth): `listSubjectBiometricRecords`,
-      GET /internal/subject-biometrics, which the access host's revokeFacePass asks for the enrolment it revokes
-      (ADAM CR-391, Chinmay, 31 October 2026). The access role has no grant on pii.subject_biometric; the route
+      POST /queries/subject-biometric-records with the declared inputs as the JSON body (ADAM CR-438, Chinmay, 1
+      November 2026, the rule for every served service query), which the access host's revokeFacePass asks for
+      the enrolment it revokes (ADAM CR-391, Chinmay, 31 October 2026). The access role has no grant on pii.subject_biometric; the route
       needs the kernel's service sign-in (#37051, ADAM CR-281).
     served: [service]
   subjectContactRecords:
@@ -618,8 +651,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /internal/subject-biometrics:
-    get:
+  /queries/subject-biometric-records:
+    post:
       operationId: listSubjectBiometricRecords
       security:
       - serviceAuth: []
@@ -638,6 +671,14 @@ paths:
         The route needs the kernel''s service sign-in (#37051, ADAM CR-281), and revokeFacePass connects to it when
         that is ready.
 
+
+        **Where a served query is asked from another deployable** (ADAM CR-438, Chinmay, 1 November 2026: the rule
+        for every served `service` query). A query served on the service route is POST /queries/<the query''s name
+        in kebab case> on the owning deployable, with the query''s declared inputs as the JSON body, answering `200`
+        with a JSON array of its rows in camelCase, `401` to any caller that is not a fellow deployable
+        (serviceAuth), and `400 validation` when neither `ids` nor `where` is given or `where` names a field the
+        row lacks. For this query that is POST /api/v1/queries/subject-biometric-records.
+
         '
       tags:
       - identity
@@ -645,32 +686,27 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      parameters:
-      - name: ids
-        in: query
-        required: false
-        description: The `pii.subject_biometric` rows asked for, by id. With `subjectId` or `kind`, the two narrow.
-        style: form
-        explode: false
-        schema:
-          type: array
-          maxItems: 50
-          items: { type: string, format: uuid }
-      - name: subjectId
-        in: query
-        required: false
-        description: Or the rows of this subject.
-        schema: { type: string, format: uuid }
-      - name: kind
-        in: query
-        required: false
-        description: Only `facePass` or only `faceTag` rows.
-        schema:
-          type: string
-          enum: [facePass, faceTag]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The query's declared inputs (identity#subjectBiometricRecords); at least one of the two.
+              properties:
+                ids:
+                  type: array
+                  maxItems: 50
+                  description: The `pii.subject_biometric` rows asked for, by id; with `where`, the two narrow.
+                  items: { type: string, format: uuid }
+                where:
+                  type: object
+                  additionalProperties: true
+                  description: Or the rows whose columns equal these values (a key the asker holds, such as
+                    `subjectId`, `entitlementId` or `kind`); a field the row lacks is `400 validation`.
       responses:
         '200':
-          description: The rows found; an id with no visible row is absent.
+          description: The rows found, in camelCase; an id with no visible row is absent.
           content:
             application/json:
               schema:
@@ -679,7 +715,14 @@ paths:
                 items:
                   $ref: ../spine/access.yaml#/components/schemas/FacePassEnrolment
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: Neither `ids` nor `where` is given, or `where` names a field the row lacks (`validation`;
+            ADAM CR-438).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '401':
           description: The calling workload's token is missing or invalid (`unauthenticated`).
           x-ticvai-problem-types:
@@ -3156,6 +3199,15 @@ paths:
         policy is widened. A refusal by the function fails the whole update. Any other operation that must end
         all of a principal''s sessions calls the same function (`forceLogout` ends one session, at the caller''s
         own venue, and does not need it).
+
+
+        **The tenant root comes from what the check proved visible** (ADAM CR-483, Chinmay, 2 November 2026; option A
+        with option C''s guard; CHG-CR483-001). The function takes the root it switches to from the caller''s own tenant
+        path (a tenant-root caller) or else the first label of the principal''s home scope path, read in the same
+        statement as the check, never from `platform.scope`''s tenant row, which a venue grant cannot see. It confirms
+        the root is the tenant node once granted and raises `P0001` when it finds none, so a venue manager''s
+        deactivation ends the person''s sessions, and a gap can no longer answer 200 with nothing ended: a raised error is
+        a 500 for the call and nothing it wrote stays. This operation and `resetPrincipalCredential` call it unchanged.
 
 
         **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15,
@@ -6886,7 +6938,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
-          description: '`forbidden` as the shared answer says; or the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          description: '`forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read from the caller''s Control Plane token, never from a tenant session or a tenant MFA challenge row. `step-up-token-missing` when the token''s `ticvai_step_up` is absent, its `action` does not name this operation, or `amr` does not include `mfa`; `step-up-token-expired` when `ticvai_step_up.at` is more than 5 minutes old. Nothing is written.'
           x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
@@ -8512,7 +8564,7 @@ paths:
       operationId: getSessionVenue
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'the names of the venues the session may act at, and that each is active: platform.scope, Tenancy''s data'
       x-ticvai-self-service: true
       x-ticvai-audience:
@@ -8573,7 +8625,7 @@ paths:
       x-ticvai-singleton-note: 'One per session, the caller''s own: a PUT replaces it. There is no key in the path.'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'the chosen venue must be an active venue the session''s grants reach: platform.scope, Tenancy''s data'
       x-ticvai-self-service: true
       x-ticvai-audience:

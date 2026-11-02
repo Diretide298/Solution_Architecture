@@ -1,0 +1,42 @@
+id: CHG-CR444-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: updateGuidedChoice applies createGuidedChoice's 400 target-not-in-venue rule to the questions it is sent, with
+  the same errors[] pointer (questions/i/answers/j/target), asking Catalogue's three queries in process (XDR-033 gains the
+  operation); publishGuidedChoice's checks stay as decided.
+decision:
+  what: 'Posted on #30932 (Chinmay, 1 November 2026), under the lead''s "Approve all" (1 November 2026): "as you recommended
+    (A). updateGuidedChoice applies the same 400 target-not-in-venue rule as createGuidedChoice and proposeGuidedChoice,
+    with the same pointer (questions/i/answers/j/target). publishGuidedChoice''s checks stay as decided."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-444 (Hrushikant Patkar, #30932): CR-394 gave the venue check to create and propose only, so an edit could
+  bring in another venue''s on-sale product that publish then let through.'
+keys_touched:
+  operations:
+  - updateGuidedChoice
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - XDR-033 operations gain updateGuidedChoice (no new grant)
+root_class: an update that takes the create's rule-bearing field without the create's refusal
+tickets:
+  started:
+  - '30938 (updateGuidedChoice, Deep Khanvilkar, Ready for QA): ask the three Catalogue queries in process and answer 400
+    target-not-in-venue with the pointer.'
+  unstarted:
+  - '31145 (CMS-101 connect to API): show the 400''s pointer on an edit as on a create.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-444
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUIDED-CHOICE-UPDATE
+status: open
+notes: 'Beyond the posted words: updateGuidedChoice''s 400 was the shared BadRequest; it is now an explicit 400 listing
+  validation and target-not-in-venue (the same body).'

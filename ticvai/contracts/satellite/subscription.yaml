@@ -2460,9 +2460,12 @@ paths:
       - white-label.getModuleEnablement
       x-ticvai-reads:
       - table: control.tenant
-        for: 'the tenant''s plan (plan_id), the base of the LicencePosition it answers'
+        for: 'the tenant''s plan (plan_id), the base of the limits of the LicencePosition it answers'
+      - table: control.contract
+        for: 'the tenant''s in-force contract, whose plan version licenses the modules, by LicencePosition''s rule
+          (ADAM CR-449; CHG-CR449-001)'
       - table: control.plan_module
-        for: 'the modules the plan licenses, half of LicencePosition'
+        for: 'the modules the in-force contract''s plan version licenses, half of LicencePosition (ADAM CR-449)'
       - table: control.plan_limit
         for: 'the limits the plan sets, half of LicencePosition'
       - table: control.licence_add_on
@@ -2479,8 +2482,9 @@ paths:
         CHG-R8RW-003): its `control.licence_add_on` row gets `validTo` today, `removedAt` now, `removedByPrincipalId`
         the caller and `removalReason` the body''s `reason`, so the row is the record of who removed it, when and
         why. Nothing else is written; the tenant''s contract row does not change. The answer is the
-        tenant''s `LicencePosition` after it: the plan''s modules and limits (control.tenant.plan_id ->
-        control.plan_module, control.plan_limit) and the add-ons still in force (control.licence_add_on rows with no
+        tenant''s `LicencePosition` after it: the modules of the in-force contract''s plan version, by the rule
+        `LicencePosition` states (ADAM CR-449), the plan''s limits (control.tenant.plan_id -> control.plan_limit) and
+        the add-ons still in force (control.licence_add_on rows with no
         `removedAt`, and their control.licence_add_on_limit rows).
 
 
@@ -4291,7 +4295,7 @@ paths:
       operationId: reconcileBurstEnvironment
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: orders.order_line
@@ -4494,10 +4498,10 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -4611,7 +4615,7 @@ paths:
         - "P08 BO-285 Membership Product & Tier Builder"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -4672,7 +4676,7 @@ paths:
         - "P08 BO-286 Membership Eligibility & Qualification Rule Builder"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -4728,7 +4732,7 @@ paths:
         - "P08 BO-287 Validity, Activation & Expiry Configuration"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -4783,10 +4787,10 @@ paths:
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-read-via:
       - query: catalogue#priceListRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -4842,7 +4846,7 @@ paths:
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -4907,7 +4911,7 @@ paths:
         - "P08 BO-290 Family, Household & Dependent Membership Configuration"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
         route: in-process
@@ -4968,13 +4972,13 @@ paths:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
       - query: catalogue#priceListRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -5052,7 +5056,7 @@ paths:
         - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -5110,10 +5114,10 @@ paths:
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: A membership product's validation, as the approver sees it
       description: |-
@@ -5161,10 +5165,10 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipCode` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -5263,10 +5267,10 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -5429,13 +5433,13 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-body-key: [membershipId]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `membershipId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -5495,13 +5499,13 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -5588,7 +5592,7 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -5687,7 +5691,7 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -5767,13 +5771,13 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -5856,13 +5860,13 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -6077,19 +6081,19 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       - query: orders#refundRecords
-        route: service
+        route: in-process
         for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -6203,16 +6207,16 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       - query: orders#refundRecords
-        route: service
+        route: in-process
         for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -7149,7 +7153,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalStatusLifecycleManagementView'
         '403':
-          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          description: 'A step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read from the caller''s Control Plane token, never from a tenant session or a tenant MFA challenge row. `step-up-token-missing` when the token''s `ticvai_step_up` is absent, its `action` does not name this operation, or `amr` does not include `mfa`; `step-up-token-expired` when `ticvai_step_up.at` is more than 5 minutes old. Nothing is written.'
           x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
@@ -8043,7 +8047,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingLimitsCommercialExceptionsApprovalView'
         '403':
-          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          description: 'A step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read from the caller''s Control Plane token, never from a tenant session or a tenant MFA challenge row. `step-up-token-missing` when the token''s `ticvai_step_up` is absent, its `action` does not name this operation, or `amr` does not include `mfa`; `step-up-token-expired` when `ticvai_step_up.at` is more than 5 minutes old. Nothing is written.'
           x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
@@ -10157,7 +10161,7 @@ paths:
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the membership product''s catalogue product (404, 409) (CHG-MOD-003)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -10242,16 +10246,16 @@ paths:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-read-via:
       - query: catalogue#priceListRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: payments#instalmentPolicyRecords
-        route: service
+        route: in-process
         for: 'whether payments supports instalments for the product (422 instalments-not-supported) (CHG-MOD-003)'
       - query: catalogue#taxProfileRecords
-        route: service
+        route: in-process
         for: 'that `taxProfile` names an active catalogue.tax_profile row (422 unknown-profile) (r8, GPS-C34)'
       x-ticvai-body-key: [membershipCode]
       x-ticvai-body-key-note: 'Keyed by the body''s `membershipCode`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per membership product within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -18274,10 +18278,18 @@ components:
           readOnly: true
           description: Why it was removed (`removeLicenceAddOn`'s `reason`); null while it is in force.
     LicencePosition:
-      x-ticvai-persistence: none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module,
-        control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit
-        by tenant_id)
+      x-ticvai-persistence: none — union of the modules of the plan version on the tenant's in-force control.contract
+        (control.contract.plan_id, plan_version -> control.plan_module; ADAM CR-449) and the add-ons in force
+        (control.licence_add_on by tenant_id), core always; the limits as before CR-449 (control.tenant.plan_id ->
+        control.plan_limit, and control.licence_add_on_limit by tenant_id)
       type: object
+      description: '**Which contract licenses what, stated once** (ADAM CR-449, Chinmay, 1 November 2026;
+        CHG-CR449-001). A `control.contract` row counts (is in force) when its status is not `expired`, `startsAt`
+        is on or before today, and `cancelledAt` is null or after today: `pastDue` keeps service, and a
+        cancellation takes effect on its date. The licensed modules are the in-force contract''s plan version''s
+        modules (`control.plan_module` by `plan_id` and `plan_version`) plus the add-ons in force, with `core`
+        always licensed; not `control.tenant.plan_id`. One rule (Application/Common/Licensing), used by
+        `createDashboard`, `listDashboards`, `validateTenantConfig` and `getModuleEnablement`.'
       required:
       - tenantId
       - licensedModules

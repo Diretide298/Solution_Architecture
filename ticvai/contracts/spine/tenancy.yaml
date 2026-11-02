@@ -294,6 +294,10 @@ x-ticvai-queries:
       It is asked in process by the access host for setFaceTagTemporaryEnrollment and listFaceTagTemporary, for the
       venue's biometrics settings (consentFormId for the fallback, templatesHeldByTicvai for the view), through
       Tenancy's own query class under the caller's row security (ADAM CR-390, Chinmay, 31 October 2026; XDR-032).
+      When the venue's row names no consent form, setFaceTagTemporaryEnrollment asks it once more for the tenant
+      default (the row with venue_id null), that one statement under the routed tenant's root grant
+      (ITenantRootGrant), since a venue grant cannot see the tenant's row (ADAM CR-445, Chinmay, 1 November 2026;
+      CHG-CR445-001).
       **A signed-in guest reads every venue's settings** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings tables; CHG-CR341-001): platform.venue_settings has a read branch for any
       session with a guest subject (`ticvai.subject_id` set), so a signed-in guest's read above venue level
       (listMyOrders pricing an order at a venue other than the request's) sees that venue's row and the tenant's
@@ -338,12 +342,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/TenantDataRetentionSetting'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its tenancy.data_retention_setting rows, as it stores them and as the
-      caller's scope lets it see them (the table's row-level security, under the caller's connection and
-      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
-      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
-      own. It is asked from another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      October). Tenancy answers with its tenancy.data_retention_setting rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process by the access and operations hosts, which compose Tenancy's query classes, through the C# query class
+      Tenancy implements, under the caller's row-level security (CHG-R13INP-001). It is asked from another
+      deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
   scopeRecords:
     module: tenancy
     table: platform.scope
@@ -1624,7 +1630,7 @@ paths:
         - "P08 BO-600 Venue, Calendar & Operational Setup"
       x-ticvai-read-via:
       - query: access#accessPointRecords
-        route: service
+        route: in-process
         for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
       - query: finance#fxRateRecords
         route: in-process
@@ -3572,6 +3578,12 @@ paths:
         **Rotation is routine rather than exceptional.** A credential that never expires is one nobody
         has practised replacing, and it will be replaced for the first time during an incident.
 
+
+        **A signage display gets a display key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001). For a
+        `signageDisplay` device the credential is of kind `apiKey`, bound to that device and its venue: the key is
+        answered once, in this 201 (`key`), and only a hash of it is stored. `revokeDeviceCredential` revokes it for
+        that device alone; a revoked key is `401` at once.
+
         '
       tags:
       - devices
@@ -4267,8 +4279,6 @@ components:
       required:
       - id
       - principalId
-      - readAt
-      - target
       properties:
         id:
           type: string
@@ -4288,13 +4298,17 @@ components:
         readAt:
           type: string
           format: date-time
-          description: When the read happened.
+          description: 'When the read happened. **Nullable in the table, as the package SQL adds it** (tenant V0108 `ADD
+            COLUMN read_at timestamptz`; ADAM CR-436, decided by Chinmay on 1 November 2026: "platform.audit_read.read_at
+            and target are nullable. No database change"): every writer sets it, and the table record follows the SQL.'
         target:
           type: string
           enum:
           - auditRecord
           - subject
-          description: What was read. `auditRecord` is a `listAuditRecords` call; `subject` is a guest''s PII.
+          description: 'What was read. `auditRecord` is a `listAuditRecords` call; `subject` is a guest''s PII.
+            **Nullable in the table, as the package SQL adds it** (tenant V0108, with its CHECK on the two values; ADAM
+            CR-436): every writer sets it.'
         filter:
           type: object
           nullable: true
@@ -5268,12 +5282,23 @@ components:
           - clientCertificate
           - deviceToken
           - mutualTls
+          - apiKey
+          description: '`apiKey` is a display key (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001): bound to one
+            `signageDisplay` device and its venue, sent as `X-Api-Key` (`apiKeyAuth`) by the device-key sign-in every
+            `apiKeyAuth` operation uses.'
         fingerprint:
           type: string
           description: '**The identifier, never the secret.** The credential material is returned once at
-            issue and is not readable afterwards.
+            issue and is not readable afterwards. For kind `apiKey`, a hash of the key: the only thing stored of it
+            (ADAM CR-451).
 
             '
+        key:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          description: 'The display key itself, for kind `apiKey` only, in the 201 of `issueDeviceCredential` and
+            never again: only its hash is stored (`fingerprint`), so it is shown once when issued (ADAM CR-451).'
         issuedAt:
           type: string
           format: date-time

@@ -1,0 +1,50 @@
+id: CHG-CR459-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'One format for vault references, checked in one place: the name of a secret in the cell''s Key Vault,
+  namespaced to the tenant, matching ^t-<tenantId>-[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$ (at most 119 characters).
+  ChannelConnection.credentialsReference states it for the kernel''s shared validator (tenant id and value), which every
+  typed vault reference uses and whose form the secret store names its secrets in; certificateReference follows it.
+  setChannelConnectionConfiguration refuses anything else 422 secret-not-reference (errors[] names the field, nothing
+  stored, the value never echoed, logged or audited), does not check the secret exists, and reads keep returning the
+  reference.'
+decision:
+  what: 'ADAM CR-459, posted on #35232: "Decided (Chinmay, 2 November 2026): A: one format for vault references, checked
+    in one place. Build now: (1) A vault reference is the name of a secret in the cell''s Key Vault (what ADR-0063 says
+    the row keeps), namespaced to the tenant ... ^t-<tenantId>-[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$ ... (2)
+    setChannelConnectionConfiguration checks credentialsReference and certificateReference ... 422 secret-not-reference
+    ... (3) Build the rule once, as a shared validator in the kernel ... Name secrets the store writes in the same form.
+    (4) The save does not check that the secret exists ... (5) Reads keep returning the reference." The lead''s "approve
+    all as a recommended", 2 November 2026.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-459 (Hrushikant Patkar, #35232 setChannelConnectionConfiguration, blocking): the 422 secretNotReference
+  had no rule, because the package defined no vault-reference format (ADR-0063 says the row keeps a Key Vault secret''s
+  name). Because the vault is per cell, a typed name with no tenant check could name another tenant''s secret, which
+  testChannelConnection would then use against an endpoint the caller chose; the tenant prefix stops that and refuses
+  a pasted key.'
+keys_touched:
+  operations: [setChannelConnectionConfiguration, testChannelConnection]
+  schemas: [ChannelConnection]
+  tables: [catalogue.channel_connection]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal promised by a rule the package never defined'
+tickets:
+  started:
+  - '35232 (setChannelConnectionConfiguration): the 422 with the shared kernel validator, never echoing the value.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-459
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-VAULT-REFERENCE
+status: open
+notes: 'No schema pattern is added: the format names the caller''s tenant, and a pattern failure would answer 400
+  validation where the decision says 422 secret-not-reference. The secret store''s naming rule is stated on
+  credentialsReference; the store has no contract or ticket of its own in the package yet (handoff/service-docs
+  TenancyService.md: built against the ISecretStore abstraction with a test double).'

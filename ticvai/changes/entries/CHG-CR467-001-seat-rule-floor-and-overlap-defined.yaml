@@ -1,0 +1,50 @@
+id: CHG-CR467-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'setSeatPricingRule: a floor above the ceiling is 422 invalid-range (equal is allowed); a rule covers the seats
+  matching every selector it sets (rows within its sections), none set covers the map; two active rules on one map at
+  one priority whose performances meet overlap unless they share no value on some selector both set; an overlap is 422
+  overlapping-rule-same-priority naming the other rule; checked on catalogue.seat_pricing_rule alone; the pricing step
+  uses the same covered seats.'
+decision:
+  what: 'ADAM CR-467, posted 2 November 2026 on #31819: "Decided (Chinmay, 2 November 2026): A for the floor fault; the
+    overlap differs from what you built. Build now: A floor_price above ceiling_price is 422 invalid-range, added to the
+    operation''s 422 problem types ... A floor equal to the ceiling is allowed. A rule covers the seats of its seat map
+    that match every selector it sets ... Two rules overlap when both are is_active, they share seat_map_id and priority,
+    their performances meet ..., and they are not apart ... An overlap is 422 overlapping-rule-same-priority, naming the
+    other rule''s id. The rule being replaced is not compared with itself. Inactive rules are never compared, and making
+    a rule active runs the check. The pricing step that applies seat rules uses this same definition of covered seats."
+    The lead, 2 November 2026: "approve all as a recommended".'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-467 (Hrushikant Patkar, #31819): the 422 named only the overlap though the floor fault answered it too,
+  and "covering the same seat" was undefined across sections, rows, seat ids and categories; the build compared rows by
+  label alone and missed a section rule against a seat list inside it.'
+keys_touched:
+  screens: [BO-1044]
+  operations: [setSeatPricingRule]
+  schemas: [SeatPricingRule]
+  tables: [catalogue.seat_pricing_rule]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal stated without its problem type, and an overlap rule over selectors with no definition of what
+  a rule covers'
+tickets:
+  started: []
+  unstarted:
+  - '31819 (setSeatPricingRule, New): invalid-range and the overlap rule at the next tag; the developer builds to the
+    posted comment now.'
+  - 'The seat-rule pricing step (the dynamic pricing job that moves seat prices): use the same covered-seat definition;
+    no ticket names that step yet (listed for the plan lane).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-467
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SEAT-RULE-OVERLAP
+status: open
+notes: 'A new problem type in a 422 is additive by check-contract-compat. The covered-seat definition is stated on
+  SeatPricingRule too, so the pricing step reads it there. No database change.'

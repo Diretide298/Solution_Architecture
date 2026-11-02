@@ -265,7 +265,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Create a queue
@@ -342,7 +342,7 @@ paths:
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Amend queue configuration
@@ -406,7 +406,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Open, pause or close a queue
@@ -530,7 +530,7 @@ paths:
         route: in-process
         for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1044,7 +1044,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: catalogue#productCategoryRecords
-        route: service
+        route: in-process
         for: 'what its text calls "ProductCategory": catalogue.product_category, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
@@ -1285,6 +1285,11 @@ paths:
         `disposition: discardedOutOfOrder`, so feed health can count it; it never moves an
         estimate. A duplicate is the same reading ID again, has no row of its own, and is
         counted only in this response's `duplicates`.
+
+        **Signed in by its device key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001). `X-Api-Key` is
+        checked by the device-key sign-in every `apiKeyAuth` operation uses: a device credential (Tenancy's) of kind
+        `apiKey`, of which only a hash is stored, bound to one device and its venue; it opens a device session
+        scoped to that venue. A missing, wrong or revoked key is `401`.
       tags: [feed]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
@@ -1413,11 +1418,35 @@ paths:
       operationId: getSignageQueueBoard
       x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
+      x-ticvai-reads:
+      - table: queue.queue
+        for: 'the venue''s queues: name, status, currentWaitMinutes, heightRequirementCm, zone and waitTimeAsOf (ADAM CR-452)'
+      - table: queue.reading
+        for: 'the readings behind the wait figure (#33061)'
+      - table: queue.feed
+        for: 'each queue''s feed, expectedIntervalSeconds, for isStale (ADAM CR-452)'
       summary: Wait-time board for a display
       description: >
-        Consumed by digital signage. Unauthenticated by display key, cached, and shaped for
+        Consumed by digital signage. Authenticated by display key, cached, and shaped for
         rendering rather than for an application — a signage panel should not need to
         interpret anything.
+
+
+        **Signed in by its display key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001). `X-Api-Key` is a
+        display key: a device credential (Tenancy's) of kind `apiKey`, of which only a hash is stored, bound to one
+        `signageDisplay` device and its venue. A request with it opens a device session scoped to that venue; a
+        `venueId` outside it is `403`, and a missing, wrong or revoked key is `401`.
+
+
+        **How each entry is shaped** (ADAM CR-452, Chinmay, 1 November 2026, option A with these values, proposed
+        defaults the client may correct; CHG-CR452-001). Listed: the venue's ride and attraction queues only,
+        filtered by `zone` where it is given, ordered by name. `statusColour` is `grey` when the queue is `closed` or
+        the entry `isStale`; otherwise `green` up to 15 minutes, `amber` from 16 to 45, `red` above 45.
+        `displayText` is the wait as '{n} min', or 'Closed', or 'Ride Now' when the wait is 0, from a string table
+        per language, with English as the fallback when the requested `language` has no string.
+        `heightRequirementText` is 'Min {n} cm' from the queue's minimum height (`heightRequirementCm`), absent when
+        there is none. `isStale` is true when the queue's `waitTimeAsOf` is older than twice its feed's
+        `expectedIntervalSeconds` (`queue.feed`). `refreshSeconds` is 30.
       tags: [signage]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
@@ -1442,6 +1471,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/SignageBoard' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1454,6 +1485,16 @@ paths:
       description: >
         The now-serving display at a ride entrance. Short-lived and polled frequently, so it
         returns only what changed since the supplied cursor.
+
+
+        **Signed in by its display key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001), as
+        `getSignageQueueBoard` says: the key opens a device session scoped to its display's venue; a `queueId`
+        outside it is `403`, and a missing, wrong or revoked key is `401`.
+
+
+        **What changed since the cursor** (ADAM CR-453, Chinmay, 1 November 2026; CHG-CR453-001): the parties called
+        since `since` (`nowServing`), and also the parties that left the `called` state since it (`leftCalled`), each
+        with its new state, so the display drops a redeemed or expired party at once rather than at `expiresAt`.
       tags: [signage]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
@@ -1486,7 +1527,19 @@ paths:
                         partyNumber: { type: integer }
                         calledAt: { type: string, format: date-time }
                         expiresAt: { type: string, format: date-time }
+                  leftCalled:
+                    type: array
+                    description: 'The parties that left the `called` state since the cursor, each with its new state
+                      (ADAM CR-453), so the display drops them at once.'
+                    items:
+                      type: object
+                      required: [partyNumber, status]
+                      properties:
+                        partyNumber: { type: integer }
+                        status: { $ref: '#/components/schemas/QueueEntryStatus' }
                   asOf: { type: string, format: date-time }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -2111,10 +2164,13 @@ components:
         zone: { type: string, nullable: true }
         language: { type: string }
         generatedAt: { type: string, format: date-time }
-        refreshSeconds: { type: integer }
+        refreshSeconds:
+          type: integer
+          description: 30 (ADAM CR-452, a proposed default the client may correct).
         entries:
           type: array
-          description: Shaped for rendering. A signage panel should not need to interpret anything.
+          description: 'Shaped for rendering. A signage panel should not need to interpret anything. The venue''s ride
+            and attraction queues only, filtered by `zone` where given, ordered by name (ADAM CR-452).'
           items:
             type: object
             required: [name, displayText, statusColour]
@@ -2122,13 +2178,23 @@ components:
               name: { type: string }
               displayText:
                 type: string
-                description: Already localised and formatted — "45 min", "Closed", "Ride Now".
+                description: 'Already localised and formatted — "45 min", "Closed", "Ride Now" (ADAM CR-452): the
+                  wait as ''{n} min'', ''Closed'' for a closed queue, or ''Ride Now'' when the wait is 0, from a string
+                  table per language, English when the requested language has no string.'
               waitMinutes: { type: integer, nullable: true }
               statusColour:
                 type: string
                 enum: [green, amber, red, grey]
-              heightRequirementText: { type: string, nullable: true }
-              isStale: { type: boolean }
+                description: '`grey` when the queue is closed or `isStale`; otherwise `green` up to 15 minutes,
+                  `amber` from 16 to 45, `red` above 45 (ADAM CR-452, proposed defaults the client may correct).'
+              heightRequirementText:
+                type: string
+                nullable: true
+                description: '''Min {n} cm'' from the queue''s `heightRequirementCm`; absent when it has none (ADAM CR-452).'
+              isStale:
+                type: boolean
+                description: 'True when the queue''s `waitTimeAsOf` is older than twice its feed''s
+                  `expectedIntervalSeconds` (ADAM CR-452).'
 
   securitySchemes:
     bearerAuth:
@@ -2147,3 +2213,6 @@ components:
       type: apiKey
       in: header
       name: X-Api-Key
+      description: 'A device''s key (ADAM CR-451, CHG-CR451-001): a device credential (Tenancy''s) of kind apiKey, only its
+        hash stored, bound to one device and its venue; it opens a device session scoped to that venue. A missing,
+        wrong or revoked key is 401 (common.yaml apiKeyAuth).'

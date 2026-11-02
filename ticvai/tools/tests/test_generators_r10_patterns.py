@@ -66,9 +66,11 @@ def test_a_money_asks_the_venue_or_region_settings_by_deployable():
     v = CS.money_read_via(True, "venue", "commerce")
     assert v[0]["query"] == "tenancy#venueSettingsRecords" and v[0]["route"] == "in-process"
     # ADAM CR-296 (CHG-R11RUL-001): the operations host reads Tenancy's settings in process (XDR-004); a deployable
-    # with no grant still asks them over the service route.
+    # with no grant still asks them over the service route. The access host composes Tenancy's query classes (XDR-003,
+    # XDR-032; XDR-076 since CHG-R13INP-001), so ticvai-ai, which composes none, is the deployable with no grant.
     assert CS.money_read_via(True, "outlet", "operations")[0]["route"] == "in-process"
-    assert CS.money_read_via(True, "venue", "access")[0]["route"] == "service"
+    assert CS.money_read_via(True, "venue", "access")[0]["route"] == "in-process"
+    assert CS.money_read_via(True, "venue", "ticvai-ai")[0]["route"] == "service"
     assert CS.read_route("operations", "commerce", "tenancy#scopeRecords") == "in-process"
     assert CS.read_route("operations", "commerce", "identity#principalRecords") == "service"
     assert CS.money_read_via(True, "region", "commerce")[0]["query"] == "tenancy#regionSettingsRecords"

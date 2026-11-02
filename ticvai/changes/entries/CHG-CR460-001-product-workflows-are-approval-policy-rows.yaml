@@ -1,0 +1,49 @@
+id: CHG-CR460-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'listProductApprovalWorkflows and approveWorkflow both use catalogue.approval_policy rows with subject product,
+  with the member-to-column mapping stated; the list declares its read, returns the rows the caller''s row security
+  shows ordered by name then id and paged; approveWorkflow upserts with subject product, the caller''s venue scope and
+  is_active true, writes an audit_entry with domain product, and keeps the columns the view does not carry on a
+  replace. Moving migration #31608 into Block A is the plan lane''s.'
+decision:
+  what: 'ADAM CR-460, posted 2 November 2026 on #31816: "Decided (Chinmay, 2 November 2026): As you recommended (A); the
+    package already says so for the write. Build now: listProductApprovalWorkflows and approveWorkflow both use
+    catalogue.approval_policy rows with subject product. The mapping: workflowId is id; workflowName is name;
+    applicableProductTypes is product_kinds (empty means all) ... The list returns the subject product rows the
+    caller''s row security shows, ordered by name then id, and paged. Declare its read of catalogue.approval_policy ...
+    approveWorkflow upserts the row whose id is workflowId, with subject product, scope_path the caller''s venue and
+    is_active true, and writes a catalogue.audit_entry with domain product. On a replace, the columns the view does not
+    carry ... keep their stored values ... Hrushikant lands #31608 before #31816 and #34699 start, even though it is
+    planned for Block B." The lead, 2 November 2026: "approve all as a recommended".'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-460 (Hrushikant Patkar, #31816, blocking): listProductApprovalWorkflows declared no table; the write
+  already named catalogue.approval_policy (CatalogueApprovalPolicy merges the product workflow and the pricing authority
+  matrix), but the read did not, and its table''s migration (#31608) is planned for Block B.'
+keys_touched:
+  screens: [BO-637, ADM-129, ADM-319]
+  operations: [listProductApprovalWorkflows, approveWorkflow]
+  tables: [catalogue.approval_policy, catalogue.audit_entry]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'a read with no declared table beside a write that names one'
+tickets:
+  started: []
+  unstarted:
+  - '31816 (listProductApprovalWorkflows, New) and 34699 (approveWorkflow, New): read and upsert subject product rows
+    by the mapping, after #31608 lands.'
+  - '31608 ([DB] catalogue.approval_policy, under MIG-CATALOGUE-3 #28092, Hrushikant Patkar): lands before 31816 and
+    34699 start; moving it into Block A is a plan change for the plan lane (not made here).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-460
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRODUCT-WORKFLOW
+status: open
+notes: 'No shape and no database change. The plan part of the decision (#31608 before #31816 and #34699) is the plan
+  lane''s and touches no plan file here.'

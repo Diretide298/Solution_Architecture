@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 238
+  x-ticvai-screen-count: 240
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -161,7 +161,8 @@ x-ticvai-queries:
             pattern: ^-?\d+(\.\d{1,4})?$
             nullable: true
             description: The amount only, numeric(18,4) as a decimal string (ADR-0018), of the price the guest listing
-              shows for this variant at the venue on the channel now; null when no price list prices it. The asker
+              shows for this variant at the venue on the channel now, by catalogue#variantPriceRecords (ADAM CR-439);
+              null when no price resolves (ADAM CR-455). The asker
               puts the venue's currency and scale on it (tenancy#venueSettingsRecords).
           performanceStartsAt: { type: string, format: date-time, nullable: true, description: The asked performance's start; null when none was asked. }
           isAvailable: { type: boolean, description: True when the variant is known and sellable at the venue on the channel. }
@@ -173,13 +174,13 @@ x-ticvai-queries:
               that is not the variant's product's (the asker's unknown-variant); every other value is
               variantsSellableAt's reason (the asker's variant-not-sellable).
     reads: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.price, catalogue.price_assignment,
-      catalogue.price_list, catalogue.performance]
+      catalogue.price_list, catalogue.rate, catalogue.performance]
     rule: >
       The lead's decision on ADAM CR-270, option A (28 October 2026), declaring CR-087's query as CR-270's
       specification gives it. For each asked variant, with the performance asked beside it: the product's name and
       primary media as the guest listing (searchCatalogue) shows them; listPrice, the amount only, is the price the
-      same listing shows for that variant at the venue on the asked channel at this moment (the same price-list
-      resolution as its fromPrice, for the one variant); performanceStartsAt is the asked performance's start.
+      same listing shows for that variant at the venue on the asked channel at this moment: variantPriceRecords for the one
+      variant, asked at now (ADAM CR-439), and null when it answers no amount (CR-455); performanceStartsAt is the asked performance's start.
       isAvailable is variantsSellableAt's sellable for the variant at venueId on the channel, and unavailableReason
       its reason. A variant Catalogue does not know, or a performance that is not the variant's product's, is
       unknownVariant: the asker answers it as the 404 unknown-variant, and any other reason as the 404
@@ -187,6 +188,75 @@ x-ticvai-queries:
       unavailable instead. Read-only, no side effects, under the caller's row-level security. It is asked in process
       by the operations host for Marketing's wishlist (XDR-007), and in process within commerce.
     served: [in-process, service]
+  # **The price a variant sells at** (ADAM CR-439, decided 1 November 2026, and CR-455, 2 November 2026, both on
+  # #35288; CHG-CR439-001, CHG-CR455-001). One rule, written once in Catalogue, for every price read: searchCatalogue's
+  # fromPrice, the variantListingFacts query's listPrice (the guest listing and the wishlist) and
+  # simulatePriceBreakdownCalculation's selected rate.
+  variantPriceRecords:
+    module: catalogue
+    decision_owner: Chinmay
+    notes: Declared by the lead's decisions on ADAM CR-439 (1 November 2026) and CR-455 (2 November 2026); built once in
+      Catalogue in #35288 and asked in process.
+    inputs:
+      variantId: { type: string, format: uuid }
+      venueId: { type: string, format: uuid }
+      channel:
+        $ref: '#/components/schemas/Channel'
+        description: Matched against the candidate price list's channels.
+      at: { type: string, format: date-time, description: The instant the price is taken at. }
+      customerSegment:
+        type: string
+        nullable: true
+        description: Optional; an assignment naming a segment counts only when it is this one.
+    returns:
+      type: object
+      required: [variantId]
+      properties:
+        variantId: { type: string, format: uuid }
+        amount:
+          type: string
+          pattern: ^-?\d+(\.\d{1,4})?$
+          nullable: true
+          description: The selected amount, numeric(18,4) as a decimal string (ADR-0018); null when no candidate
+            qualifies (ADAM CR-455). The asker puts the venue's currency and scale on it (tenancy#venueSettingsRecords).
+        priceId: { type: string, format: uuid, nullable: true, description: The winning catalogue.price row; null with no candidate. }
+        priceListId: { type: string, format: uuid, nullable: true, description: The winning candidate's price list. }
+        priceAssignmentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The catalogue.price_assignment the winning candidate counted through; null when its list has no
+            assignments.
+        rateId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The catalogue.rate whose amount replaced price.amount (the category rate); null when none did.
+    reads: [catalogue.variant, catalogue.product, catalogue.price, catalogue.price_list, catalogue.price_assignment,
+      catalogue.rate]
+    rule: >
+      The lead's decisions on ADAM CR-439 (1 November 2026) and CR-455 (2 November 2026). Candidates are the
+      catalogue.price rows for the variant whose price_list has status active, venue_id = venueId, the channel in
+      channels, and valid_from <= at < valid_to (a null bound is open). A price list that has catalogue.price_assignment
+      rows counts only through an assignment that covers the variant (assignment_scope productVariant with the variant
+      in object_ids, or productLevel with product_id = the variant's product), at the venue (venue_id = venueId, or
+      venue_id null with scope_path the venue's or an ancestor's), with sales_channel_id null or the channel's,
+      customer_segment null or the given segment, and effective_from <= at < effective_to. Rank the candidates:
+      assignment priority (highest first; a list with no assignments counts 0), then price_list.priority (highest
+      first), then the more specific (productVariant before productLevel, venue before ancestor, a named channel before
+      any, a named segment before any), then the latest valid_from. The first wins. This is highestPriorityWins;
+      price_resolution_policy's other methods are not applied yet (a list naming another method resolves the same way
+      and logs a warning). **The category amount** (CR-455): once the winning candidate is chosen, the category amount
+      applies when the variant has a price_category_id and the winning assignment's category_rates has an entry whose
+      rateId names a catalogue.rate that is in the winning price list, has status active and has price_category_id
+      equal to the variant's. That rate's amount then replaces price.amount. A rate with a null amount takes its
+      base_rate_id rate's amount adjusted by adjustment_type and adjustment_value: percentage multiplies by (1 +
+      value/100), fixedAmount adds value. The entry's priceCategory string is not matched; the rate's own
+      price_category_id is. A variant with no category, or with no matching entry, keeps price.amount. **No candidate**
+      answers a null amount (CR-455: CR-439's no-price-for-variant is not used): searchCatalogue and the
+      variantListingFacts query answer a null price, and simulatePriceBreakdownCalculation answers 422
+      no-selected-rate. Read-only, under the caller's row-level security, asked in process within commerce.
+    served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.
@@ -250,8 +320,9 @@ x-ticvai-queries:
       from another deployable through Catalogue's service route (serviceAuth).
       It is asked in process by the operations host for white-label createGuidedChoice, proposeGuidedChoice and
       publishGuidedChoice, whose event targets must be the choice's venue's and, at publish, on sale (ADAM CR-394,
-      Chinmay, 31 October 2026; docs/active/cross-deployable-writes.yaml XDR-033), through Catalogue's own query
-      class under the caller's row security.
+      Chinmay, 31 October 2026; docs/active/cross-deployable-writes.yaml XDR-033), and for updateGuidedChoice, which
+      applies the same check (ADAM CR-444, 1 November 2026), through Catalogue's own query class under the caller's
+      row security.
     served: [in-process, service]
   groupPackageRecords:
     module: catalogue
@@ -390,7 +461,8 @@ x-ticvai-queries:
       deployable through Catalogue's service route (serviceAuth).
       It is asked in process by the operations host for white-label createGuidedChoice, proposeGuidedChoice and
       publishGuidedChoice, whose product targets must be the choice's venue's and, at publish, on sale (ADAM
-      CR-394, Chinmay, 31 October 2026; XDR-033).
+      CR-394, Chinmay, 31 October 2026; XDR-033), and for updateGuidedChoice, which applies the same check (ADAM
+      CR-444, 1 November 2026).
       It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
       CR-167; ADR-0055, amended 25 October 2026). It is asked in process by the operations host for
       createFnbOrder's productCategory routing match (ADAM CR-277, option A, 28 October 2026; XDR-008), and for
@@ -473,9 +545,13 @@ x-ticvai-queries:
       description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
       items: {$ref: '#/components/schemas/ProductCategory'}
     rule: >-
-      Asked in process by the operations host for white-label createGuidedChoice, proposeGuidedChoice and
-      publishGuidedChoice too, whose category targets must be the choice's venue's (or an ancestor's) and, at
-      publish, active with a product on sale (ADAM CR-394, Chinmay, 31 October 2026; XDR-033).
+      Asked in process by the operations host for white-label createGuidedChoice, proposeGuidedChoice,
+      updateGuidedChoice (ADAM CR-444) and publishGuidedChoice, whose category targets must be the choice's venue's
+      (or an ancestor's) and, at publish, active with a product on sale (ADAM CR-394, Chinmay, 31 October 2026;
+      XDR-033). **Above the venue, for these checks only** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001):
+      for those four operations the read takes the rows at the choice's venue and at its ancestors (a scope_path that
+      is the venue's or an ancestor of it), in process, for that check only, so a brand-level category head office
+      set up is found; every other asker reads as the caller's scope lets it see them, below.
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
       October). Catalogue answers with its catalogue.product_category rows, as it stores them and as the
       caller's scope lets it see them (the table's row-level security, under the caller's connection and
@@ -501,10 +577,12 @@ x-ticvai-queries:
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
       October). Catalogue answers with its catalogue.product_eligibility_rule rows, as it stores them and as the
       caller's scope lets it see them (the table's row-level security, under the caller's connection and
-      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
-      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
-      own. It is asked from another deployable through Catalogue's service route (serviceAuth).
-    served: [service]
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its own
+      operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its own. It
+      is asked in process by the operations host, which composes Catalogue's query classes, through the C# query
+      class Catalogue implements, under the caller's row-level security (CHG-R13INP-001). It is asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
   taxProfileRecords:
     module: catalogue
     table: catalogue.tax_profile
@@ -1081,7 +1159,7 @@ paths:
         - "P02 GST-015 Memberships"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: marketing-crm#loyaltyPositionRecords
         route: service
@@ -1386,7 +1464,7 @@ paths:
         - "P08 BO-008 Product Detail & Variants"
       x-ticvai-read-via:
       - query: assets#mediaAssetRecords
-        route: service
+        route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1471,7 +1549,7 @@ paths:
         - "P08 BO-008 Product Detail & Variants"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: orders#cartRecords
         route: in-process
@@ -1803,7 +1881,7 @@ paths:
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
@@ -1881,7 +1959,7 @@ paths:
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
@@ -1993,7 +2071,7 @@ paths:
         - "P08 BO-008 Product Detail & Variants"
       x-ticvai-read-via:
       - query: assets#mediaAssetRecords
-        route: service
+        route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -2179,7 +2257,12 @@ paths:
                     summary:
                       type: string
                     fromPrice:
-                      $ref: ../shared/common.yaml#/components/schemas/Money
+                      allOf:
+                      - $ref: ../shared/common.yaml#/components/schemas/Money
+                      nullable: true
+                      description: 'The lowest price `catalogue#variantPriceRecords` gives the product''s sellable
+                        variants at the venue on the caller''s channel now (ADAM CR-439); null when no price resolves
+                        (ADAM CR-455).'
                     guestListing:
                       $ref: '#/components/schemas/GuestListing'
                     notBookableLabel:
@@ -2772,7 +2855,7 @@ paths:
         route: service
         for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
       - query: assets#mediaAssetRecords
-        route: service
+        route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -3282,7 +3365,7 @@ paths:
         route: service
         for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
       - query: assets#mediaAssetRecords
-        route: service
+        route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -3529,6 +3612,7 @@ paths:
       operationId: listProductVariants
       x-ticvai-consumed-by:
         - "P01 WEB-005 Ticket Type Selection"
+        - "P01 WEB-022 Membership Plans"
         - "P01 WEB-048 Book a Space by the Hour"
         - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-041 Checkout Entry"
@@ -3653,7 +3737,8 @@ paths:
         values (`axisValues`) and its `sku` come from `setProductAttributes` and are not edited here; this
         sets the `name`, the `description` a guest reads behind the (i) on a ticket-type row (decided 29
         September, 23SEP-6), the `barcode`, which variant is the default, and the `referencePrice` a length''s
-        saving is measured against (ADAM CR-253; the answer''s `savingPercent` is worked out from it).
+        saving is measured against (ADAM CR-253; the answer''s `savingPercent` is worked out from it), and the
+        variant''s `priceCategoryId` (ADAM CR-455; CHG-CR455-001), which `listProductVariants` answers.
 
         Setting `isDefault` true clears it on the product''s other variants. A retired variant is not
         edited: `409`.
@@ -3695,6 +3780,12 @@ paths:
                   nullable: true
                   description: The price the variant's saving is measured against (`ProductVariant.referencePrice`;
                     ADAM CR-253); null clears it. In the same currency as `listPrice`.
+                priceCategoryId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The variant's price category (`ProductVariant.priceCategoryId`; ADAM CR-455); null
+                    clears it.
       responses:
         '200':
           headers:
@@ -5593,10 +5684,10 @@ paths:
         - "P08 BO-014 Catalogue Publishing"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: assets#mediaAssetRecords
-        route: service
+        route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -6429,7 +6520,7 @@ paths:
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -6706,7 +6797,7 @@ paths:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
@@ -7143,7 +7234,7 @@ paths:
         - "P08 BO-601 Product, Pricing & Sales Channel Setup"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-body-key: [productId]
       x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `productId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -7640,6 +7731,9 @@ paths:
   /product-approval-workflows:
     get:
       operationId: listProductApprovalWorkflows
+      x-ticvai-reads:
+      - table: catalogue.approval_policy
+        for: 'the product approval workflows: the rows with subject product (ADAM CR-460; CHG-CR460-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-read-routing: replica
@@ -7651,6 +7745,16 @@ paths:
         `approveWorkflow` wrote them. Despite its name `approveWorkflow` designs a workflow; it keeps its r1 name. **Ordered
         by workflow name, `workflowId` as the tiebreak.** These are product and catalogue workflows; accreditation approval
         workflows are not here.
+
+
+        **The mapping** (ADAM CR-460, decided 2 November 2026; CHG-CR460-001). `listProductApprovalWorkflows` and
+        `approveWorkflow` both use `catalogue.approval_policy` rows with subject product: `workflowId` is `id`;
+        `workflowName` is `name`; `applicableProductTypes` is `product_kinds` (empty means all); `venue` is `venue_id`
+        (null means all venues); `department` is `department_id`; `changeTypes` is `change_types`; `approvalStages` is
+        `stages` (the array as sent); `rejectionBehavior` is `rejection_behavior` (default returnToDraft);
+        `resubmissionBehavior` is `resubmission_behavior` (default restartFromFirstStage). Rows with subject pricing
+        belong to `approvePricingWorkflowAuthority` and never appear here. The list returns the subject product rows the caller''s row security shows, ordered by
+        `name` then `id`, and paged.
 
         '
       tags:
@@ -7702,7 +7806,20 @@ paths:
         sequential/parallel, mandatory, SLA, escalation, delegation, reminders) folded into typed approvalStages;
         product types and change types are lists; rejection/resubmission are enums; workflowId added. Different
         change types route to different workflows (Conditional Approval); a change matching no workflow falls
-        to the venue''s default workflow.'
+        to the venue''s default workflow.
+
+
+        **The mapping** (ADAM CR-460, decided 2 November 2026; CHG-CR460-001). `listProductApprovalWorkflows` and
+        `approveWorkflow` both use `catalogue.approval_policy` rows with subject product: `workflowId` is `id`;
+        `workflowName` is `name`; `applicableProductTypes` is `product_kinds` (empty means all); `venue` is `venue_id`
+        (null means all venues); `department` is `department_id`; `changeTypes` is `change_types`; `approvalStages` is
+        `stages` (the array as sent); `rejectionBehavior` is `rejection_behavior` (default returnToDraft);
+        `resubmissionBehavior` is `resubmission_behavior` (default restartFromFirstStage). Rows with subject pricing
+        belong to `approvePricingWorkflowAuthority` and never appear here. `approveWorkflow` upserts the row whose `id` is `workflowId`, with subject product,
+        `scope_path` the caller''s venue and `is_active` true, and writes a `catalogue.audit_entry` with domain product.
+        On a replace, the columns the view does not carry (`is_default`, `market_code`, `legal_entity_id`, `tiers`,
+        `is_creator_barred_from_final_approval`, the hour settings and the roles) keep their stored values; on a create
+        they take their defaults.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -7737,7 +7854,7 @@ paths:
         - "P08 ADM-130 Approval Review & Decision Workspace"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: orders#cartRecords
         route: in-process
@@ -7884,7 +8001,7 @@ paths:
         - "P08 ADM-133 Change Impact Analysis"
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: orders#cartRecords
         route: in-process
@@ -9353,6 +9470,12 @@ paths:
         Product, Price, Availability, Order and Cancellation are buttons on ADM-269, results land in lastTests;
         secrets are never returned; enabling an existing adapter for a new tenant creates a connection that
         references it.
+
+
+        **The stored test results, in the view''s names** (ADAM CR-458, decided by Chinmay on 2 November 2026). Each
+        `lastTests` entry is the stored `catalogue.channel_connection.last_tests` entry with `productSync` answered as
+        `product`, `pricing` as `price` and `orderCreation` as `order`; a `webhook` entry is left out. Where the
+        view''s text says `failed`, the stored `offline` is answered. No screen changes visibly.
 
         **Order.** Sorted by `channel` ascending, then by `adapterId`.'
       tags:
@@ -11894,6 +12017,26 @@ paths:
       operationId: getTaxProfileJurisdiction
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
+      x-ticvai-reads:
+      - table: catalogue.tax_rule
+        for: 'consumingProductCount and consumingVenueCount: the active tax rules whose taxes list the profile (ADAM
+          CR-468; CHG-CR468-001)'
+      - table: catalogue.product
+        for: 'consumingProductCount: the products whose category_id is a counted rule''s product_category_id (ADAM
+          CR-468; CHG-CR468-001)'
+      x-ticvai-read-via:
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'ratePercent and country: ledger.tax_code.rate and country_code for the profile''s tax_code_id, Ledger''s
+          data (ADAM CR-468; CHG-CR468-001)'
+      - query: finance#legalEntityRecords
+        route: in-process
+        for: 'currency: ledger.legal_entity.currency of the profile''s legal_entity_id, Ledger''s data (ADAM CR-468;
+          CHG-CR468-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'currency when the profile has no legal entity: the trading currency of the venue its scope_path names
+          (ADAM CR-468; CHG-CR468-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The tax profile and jurisdiction configuration as saved
@@ -11901,6 +12044,11 @@ paths:
         **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
         ADM-069 saves it with `setTaxProfileJurisdiction`, which is PUT-only; the r1 gate found the screen
         shows a profile it cannot read. Returns what the write stores, in the write's own shape.
+
+        **The same shape as `listTaxProfiles`** (ADAM CR-468, decided 2 November 2026; CHG-CR468-001): each member is
+        answered by the rule `listTaxProfiles` states (`ratePercent` and `country` through `finance#taxCodeRecords`,
+        `currency` from the legal entity or else the venue, the ids as uuid text, the two counts from the tax rules
+        that list the profile, `status` as stored).
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -12057,7 +12205,12 @@ paths:
         by many charging rules (setFeeApplicabilityCharging); the amount, refundability and visibility are values
         the client enters per fee.
 
-        **Order.** Soonest first, by `effectiveFrom` ascending, then by `feeId`.'
+        **Order.** Soonest first, by `effectiveFrom` ascending with nulls last, then by `feeId`.
+
+        **Dates and status** (ADAM CR-464, decided 2 November 2026; CHG-CR464-001). `effectiveFrom` and `effectiveTo`
+        are the instants `catalogue.fee` stores, as the fee record already types them, and both are nullable: a null `effectiveFrom`
+        means in effect from when the record was saved, and a null `effectiveTo` means open-ended. The screen shows the
+        day in the venue''s time zone. The `status` filter takes `CatalogueConfigStatus` and matches the stored status exactly.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12092,13 +12245,8 @@ paths:
           in: query
           required: false
           schema:
-            type: string
-            enum:
-              - draft
-              - active
-              - inactive
-              - expired
-          description: Status
+            $ref: '#/components/schemas/CatalogueConfigStatus'
+          description: 'Status: matches the stored status exactly (`CatalogueConfigStatus`; ADAM CR-464)'
         - name: search
           in: query
           required: false
@@ -12154,7 +12302,12 @@ paths:
         each; the fee reference, event-window, destination-zone, rule identity, dates and status added; conditions
         typed (channel as SalesChannel, service action an enum). Conflict Detection flags two rules charging
         the same kind of fee on one transaction (Service Fee A and B on one B2C sale) through the validation
-        list (ADM-077).'
+        list (ADM-077).
+
+        **Dates and status** (ADAM CR-464, decided 2 November 2026; CHG-CR464-001). `effectiveFrom` and `effectiveTo`
+        are the instants `catalogue.fee_rule` stores, as the fee rule record already types them, and both are nullable: a null `effectiveFrom`
+        means in effect from when the record was saved, and a null `effectiveTo` means open-ended. The screen shows the
+        day in the venue''s time zone. It takes and answers `status` as `CatalogueConfigStatus`, as stored.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -12213,7 +12366,12 @@ paths:
         evidence (type, reference, document, validity, verification status) is kept on the finance TaxExemption
         record; every waiver or exemption is audited; Board 4 owns the wider approval framework.
 
-        **Order.** Soonest first, by `effectiveFrom` ascending, then by `eligibilityRefId`.'
+        **Order.** Soonest first, by `effectiveFrom` ascending with nulls last, then by `eligibilityRefId`.
+
+        **Dates and status** (ADAM CR-464, decided 2 November 2026; CHG-CR464-001). `effectiveFrom` and `effectiveTo`
+        are the instants `catalogue.fee_rule` stores, as the fee rule record already types them, and both are nullable: a null `effectiveFrom`
+        means in effect from when the record was saved, and a null `effectiveTo` means open-ended. The screen shows the
+        day in the venue''s time zone. The `status` filter takes `CatalogueConfigStatus` and matches the stored status exactly.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12258,13 +12416,8 @@ paths:
           in: query
           required: false
           schema:
-            type: string
-            enum:
-              - draft
-              - active
-              - inactive
-              - expired
-          description: Status
+            $ref: '#/components/schemas/CatalogueConfigStatus'
+          description: 'Status: matches the stored status exactly (`CatalogueConfigStatus`; ADAM CR-464)'
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -12307,7 +12460,12 @@ paths:
         legal rules differ; circular formulas are rejected; formulas are effective-dated so historical transactions
         stay reproducible.
 
-        **Order.** Soonest first, by `effectiveFrom` ascending, then by `calculationProfileId`.'
+        **Order.** Soonest first, by `effectiveFrom` ascending with nulls last, then by `calculationProfileId`.
+
+        **Dates and status** (ADAM CR-464, decided 2 November 2026; CHG-CR464-001). `effectiveFrom` and `effectiveTo`
+        are the instants `catalogue.calculation_profile` stores, as the calculation profile record already types them, and both are nullable: a null `effectiveFrom`
+        means in effect from when the record was saved, and a null `effectiveTo` means open-ended. The screen shows the
+        day in the venue''s time zone. `asOf` is an instant: the steps of the profiles in force at it (`effective_from` null or at or before `asOf`, and `effective_to` null or after it); an absent `asOf` means now.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12327,8 +12485,9 @@ paths:
           required: false
           schema:
             type: string
-            format: date
-          description: Steps in force on this date
+            format: date-time
+          description: 'Steps in force at this instant: the steps of profiles whose `effective_from` is null or at or
+            before it and whose `effective_to` is null or after it; absent means now (ADAM CR-464)'
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -12400,6 +12559,31 @@ paths:
           dynamic price (ADAM CR-419, CR-422; CHG-CR419-001)'
       - table: catalogue.membership_programme
         for: 'the member adjustment: the membership programme membershipId names (ADAM CR-419; CHG-CR419-001)'
+      - table: catalogue.price
+        for: 'the selected rate, by catalogue#variantPriceRecords, and the winning price''s tax_code_id (ADAM CR-439,
+          CR-455; CHG-CR455-001)'
+      - table: catalogue.price_assignment
+        for: 'the selected rate (catalogue#variantPriceRecords) and whether the winning assignment allows dynamic
+          pricing (ADAM CR-439, CR-455)'
+      - table: catalogue.rate
+        for: 'the category rate of the winning assignment (catalogue#variantPriceRecords; ADAM CR-455)'
+      - table: catalogue.sales_channel
+        for: 'the member adjustment: the venue''s sales_channel id for the simulated channel (ADAM CR-455)'
+      - table: pricing.dynamic_price_rule
+        for: 'the member adjustment: the membership rules (ADAM CR-439, CR-455; CHG-CR455-001)'
+      - table: pricing.dynamic_price_condition
+        for: 'the member adjustment: the membershipProgramme condition and the rule''s other conditions (ADAM CR-439,
+          CR-455)'
+      - table: pricing.dynamic_price_action
+        for: 'the member adjustment: the winning rule''s action (ADAM CR-455)'
+      - table: catalogue.fee_rule
+        for: 'the fee step: applicability and exception rules (ADAM CR-455)'
+      - table: catalogue.fee
+        for: 'the fee step: the fees the rules charge, waive or reduce (ADAM CR-455)'
+      - table: catalogue.tax_rule
+        for: 'the tax step: the most specific matching tax rule (ADAM CR-455)'
+      - table: catalogue.tax_profile
+        for: 'the tax step: each taxes entry''s profile, its tax_code_id and tax_base (ADAM CR-455)'
       x-ticvai-read-via:
       - query: finance#taxCodeRecords
         route: in-process
@@ -12432,22 +12616,91 @@ paths:
         **The rule from inputs to trace** (ADAM CR-419, decided 31 October 2026; CHG-CR419-001). A simulation stores
         nothing, so it is not a singleton; the Idempotency-Key stays. **Variant**: the optional `productVariantId` must be a
         variant of `productId`, and it is required when the product has more than one sellable variant; either
-        failure is `400 validation` on `productVariantId`. **Selected rate**: the price that searchCatalogue''s `fromPrice`
-        resolution gives the variant at `venueId` on `channel`, taken at `date` (and `timeslotId`) instead of now; no
-        such price is `422 no-selected-rate`. **Sequence**: the steps, in `sequence` order, of the venue''s active
+        failure is `400 validation` on `productVariantId`. **Selected rate**: `catalogue#variantPriceRecords` for the
+        variant at `venueId` on `channel`, taken at `date` (and `timeslotId`) instead of now, the rule searchCatalogue''s
+        `fromPrice` uses too (ADAM CR-439); no price is `422 no-selected-rate` (ADAM CR-455). **Sequence**: the steps, in `sequence` order, of the venue''s active
         `isDefault` calculation profile in force on `date`; no such profile is `422 no-calculation-profile`.
         `calculationVersion` is that profile''s `code` and `version`. **Member adjustment**: `membershipId` names the
-        `catalogue.membership_programme` the simulated customer holds; at the `contextualRateSelection` step the
-        membership pricing rules (`pricing.dynamic_price_rule` rows with membership conditions) choose the rate.
+        `catalogue.membership_programme` the simulated customer holds; at the `contextualRateSelection` step one
+        membership rule adjusts the rate, as below (ADAM CR-439, CR-455).
         `customerId` is not read: a simulation never looks up a real guest. **Dynamic adjustment**: at the
         `dynamicPricingAdjustment` step the live dynamic price for the target replaces the selected rate; that price
-        is the newest `deployed` or `partiallyDeployed` `catalogue.price_execution` (ADAM CR-422). **Promotion**:
-        `promotionCode` goes to Promotions'' `evaluatePromotions` in process, without `orderId`, so nothing is stored.
-        **Tax**: the tax profile''s `taxCodeId` is read through `finance#taxCodeRecords`, in process (it exists since
-        ADAM CR-110), with the tax base each `catalogue.tax_rule` sets. **Rounding** follows the currency''s rounding
+        is a `deployed` or `partiallyDeployed` `catalogue.price_execution` (ADAM CR-422), chosen as below (ADAM
+        CR-455). **Promotion** (ADAM CR-439): until Promotions'' `evaluatePromotions` is built, a request with
+        `promotionCode` answers `422 promotion-evaluation-unavailable` and computes nothing, so no total silently ignores
+        a code. **Tax**: the tax profile''s `taxCodeId` is read through `finance#taxCodeRecords`, in process (it exists
+        since ADAM CR-110), by the tax rule below. **Rounding** follows the currency''s rounding
         profile and stage, with a `rounding` component so the totals add up. `aiInsights` answers an empty list
         until an AI producer exists (LO-CR419-001). `channelComparison` runs the same rule for each channel asked in
-        `compareChannels`.'
+        `compareChannels`.
+
+        **The member, dynamic, fee and tax rules** (ADAM CR-439, decided 1 November 2026, and CR-455, 2 November
+        2026; CHG-CR439-001, CHG-CR455-001). The price, fee and tax steps are one Catalogue calculation component,
+        not code inside the endpoint, so that checkout can call the same code later. `at` below is the instant
+        `variantPriceRecords` is asked at.
+
+
+        **Member adjustment**, at the `contextualRateSelection` step. A membership rule is a `pricing.dynamic_price_rule`
+        with a `pricing.dynamic_price_condition` of type `membershipProgramme`, `rule_operator` `in`, and `value_json` a
+        JSON array of membership programme ids. A candidate is such a rule with `is_active` true and `valid_from` <= at
+        < `valid_to` (a null bound is open). Its `product_id` is null or `productId`; its `price_list_id` is null or the
+        winning list; its `channel_id` is null or the venue''s `catalogue.sales_channel` id for the channel; its
+        `sales_channel` is null or the channel; and its membershipProgramme condition''s `value_json` lists
+        `membershipId`. With `condition_logic` all, every other condition must hold, and a condition the simulation has
+        no input for does not hold. The lowest priority number wins, then the latest `valid_from`, then `id`, and only
+        one rule applies. Its `pricing.dynamic_price_action` works by type: `percentAdjustment` multiplies the rate by
+        (1 + value/100); `fixedAmountAdjustment` adds value; `returnToBase` leaves the selected rate unchanged.
+        `moveToBand` is not applied, because the action keeps no band; the component''s reason says so. The result is
+        clamped to the action''s `min_price` and `max_price` where they are set. With no `membershipId`, or no matching
+        rule, there is no memberAdjustment component.
+
+
+        **Dynamic adjustment.** The step is skipped when the winning candidate came through a
+        `catalogue.price_assignment` with `is_dynamic_pricing_allowed` false. Otherwise take the
+        `catalogue.price_execution` with status `deployed` or `partiallyDeployed`, `product_id` = `productId`, `event_id`
+        null or `eventId`, and `performance_id` null or `timeslotId` (a `timeslotId` is a performance id; there is no
+        timeslot table). It must also have a `channel_deployments` entry for the simulated channel, mapped as
+        in ADAM CR-422 (web is b2c, mobile is mobileApp, callCentre is callCenter, the rest by the same name). Prefer the
+        most specific (performance, then event, then product only), then the newest `created_at`, then `id`. Its price
+        is that channel entry''s price, else `new_price`.
+
+
+        **Fees.** A candidate is a `catalogue.fee_rule` with `rule_kind` applicability, status `active` and in effect at
+        at, set at the venue''s scope or above, whose `catalogue.fee` is active and in effect. Every condition key it sets
+        must match: productId; productCategoryId (the product''s `category_id`); salesChannel; venueId; eventId;
+        membership (`membershipId`); paymentMethod; deliveryMethod; marketCode (the product''s `market_code`);
+        quantityMin and quantityMax (quantity); orderValueMin and orderValueMax (the subtotal after the price steps).
+        customerType, transactionType, countryCode, serviceAction, hoursBeforeEventMax and deliveryDestinationZones have
+        no simulation input, so a rule that sets one does not match. Evaluate in priority order, lower number first,
+        then `id`. A matching rule is skipped when a rule of its `mutual_exclusion_group` has already applied, or when
+        its fee was excluded by a rule that applied. `combination` stack (or null) adds the fee; replace removes the
+        applied fees named in `excluded_fee_ids`, then adds this one; exclude adds this one and keeps the named fees out
+        for the rest of the run. `on_match` stopProcessing ends the run. The amount: fixedAmount is `amount`; percentage
+        is that percentage of the subtotal; tiered takes the `tiers` entry with the largest `fromOrderValue` at or below
+        the subtotal, and charges its amount or its percentage of the subtotal. The fee is charged once when
+        `application` is applyOnce or `charge_basis` is perOrder, perTransaction or perDay; otherwise it is charged per
+        item, times quantity. The component type is surcharge for `fee_type` surcharge and fee for every other type. An
+        exception rule applies only when all of these hold: `eligibility_basis` is membershipBenefit;
+        `eligibility_ref_id` is null or `membershipId`; a `membershipId` is sent; and `is_approval_required` and
+        `is_evidence_required` are both false. Then feeWaiver zeroes the fees in `target_fee_ids`, feeReduction takes
+        `reduction_percent` or `reduction_amount` off them, and taxExemption and zeroRatedTax zero the taxes of
+        `target_tax_profile_ids`, each shown as a waiver component. No other exception rule is applied.
+
+
+        **Taxes.** A candidate is a `catalogue.tax_rule` with status `active` and in effect at at, at the venue''s scope
+        or above. Each condition it sets must equal the simulation''s value: `product_id`, `product_category_id`,
+        `venue_id`, `legal_entity_id` (the winning price list''s) and `sales_channel`. A rule that sets `country_code`,
+        `transaction_type` or `customer_type` does not match. The most specific wins: the most conditions set, then
+        product before category before venue, then the latest `effective_from`, then `id`. Its treatment applies, so the
+        rule wins over `ledger.tax_code.is_inclusive`. With no matching rule, the winning price''s
+        `catalogue.price.tax_code_id` applies, inclusive when that code''s `is_inclusive` is true. With none at all, no
+        tax is charged, and a zero tax component says so. The rule''s `taxes` entries apply in their sequence. For each
+        entry, read its `catalogue.tax_profile`, then the rate of the profile''s `tax_code_id` through
+        `finance#taxCodeRecords`, and apply that rate to the profile''s `tax_base`. onPreviousTaxes adds the earlier
+        taxes to the base. taxInclusive takes the tax out of the amount; taxExclusive adds it on top; taxExempt,
+        zeroRated and outOfScope give a zero tax component carrying that treatment. A fee is taxed by the tax rule its
+        `tax_treatment` names, and a fee with an empty `tax_treatment` is not taxed. The percentage, compound, sequential
+        and multipleConcurrent methods are built; fixedTax and tiered answer `422 unsupported-tax-method` (LO-CR455-001).'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -12479,10 +12732,14 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [no-selected-rate, no-calculation-profile]
-          description: '`no-selected-rate`: no price resolves for the variant at the venue on the channel on the date.
-            `no-calculation-profile`: the venue has no active default calculation profile in force on the date (ADAM
-            CR-419). Nothing is stored.'
+          x-ticvai-problem-types: [no-selected-rate, no-calculation-profile, promotion-evaluation-unavailable,
+            unsupported-tax-method]
+          description: '`no-selected-rate`: no price resolves for the variant at the venue on the channel on the date
+            (catalogue#variantPriceRecords; ADAM CR-455). `no-calculation-profile`: the venue has no active default
+            calculation profile in force on the date (ADAM CR-419). `promotion-evaluation-unavailable`: the request
+            carries a `promotionCode` and Promotions'' evaluatePromotions is not built yet (ADAM CR-439).
+            `unsupported-tax-method`: the winning tax rule uses the fixedTax or tiered method (ADAM CR-455,
+            LO-CR455-001). Nothing is stored.'
           content:
             application/problem+json:
               schema:
@@ -12981,13 +13238,38 @@ paths:
       operationId: listPricingChangeImpact
       x-ticvai-consumed-by:
         - "P08 ADM-082 Pricing Change Impact Analysis"
+      x-ticvai-reads:
+      - table: catalogue.change_request
+        for: 'the row: one per pricing change request the caller can see (ADAM CR-456; CHG-CR456-001)'
+      - table: catalogue.change_request_line
+        for: 'the changed objects and the price changes (ADAM CR-456)'
+      - table: catalogue.rate
+        for: 'the price lists of rate lines, and derivedRates (ADAM CR-456)'
+      - table: catalogue.price
+        for: 'the affected variants of the affected price lists (ADAM CR-456)'
+      - table: catalogue.price_assignment
+        for: 'the variants the affected lists'' assignments cover (ADAM CR-456)'
+      - table: catalogue.performance
+        for: 'performances: the affected events'' performances after the effective date (ADAM CR-456)'
+      - table: catalogue.group_package
+        for: 'packages: the group packages of affected products (ADAM CR-456)'
+      - table: catalogue.dynamic_pricing_control
+        for: 'dynamicPricingGuardrails: the controls scoped to an affected product, event or venue (ADAM CR-456)'
       x-ticvai-read-via:
       - query: access#entitlementRecords
-        route: service
+        route: in-process
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
         route: in-process
-        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001): the status and created_at of the orders the
+          counted order lines belong to (ADAM CR-456)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'futureReservations, currentRevenue, projectedRevenue, customerExposure and transactionVolume: the order
+          lines on affected variants (ADAM CR-456; CHG-CR456-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s trading currency for currentRevenue, projectedRevenue and revenueImpact (ADAM CR-456)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.63-64 (Impact Dimensions,
@@ -13007,7 +13289,43 @@ paths:
         opens this for a change request; the analysis is recomputed when the change request is edited and is
         required before approval.
 
-        **Order.** Sorted by `changeRequestId` descending (a UUIDv7, so newest first).'
+        **Order.** Sorted by `changeRequestId` descending (a UUIDv7, so newest first).
+
+        **Each figure''s rule** (ADAM CR-456, decided 2 November 2026; CHG-CR456-001). Computed at read time, as the
+        view declares; no table holds an analysis. One row per `catalogue.change_request` with subject pricing that the
+        caller can see, filtered by `changeRequestId` and `riskLevel` and ordered by id descending. Each figure is
+        computed when the row is read, so `analysedAt` is the time of the read and the analysis always reflects the
+        request''s latest edits. The approval check that requires an analysis runs the same rule. `changeRequestId` is
+        `id`, `changeName` is `name`, and `riskLevel` is `risk_level` as stored (null when unset). The changed objects
+        are the request''s `catalogue.change_request_line` rows. Affected price lists are the request''s
+        `price_list_id`, the `object_id` of each priceList line, and the `price_list_id` of the `catalogue.rate` each
+        rate line names. Affected variants are the `catalogue.price` rows of those lists, the variants of the products
+        that product lines or the request''s `product_id` name, and the variants the lists'' `catalogue.price_assignment`
+        rows cover (`object_ids` for productVariant, `product_id` for productLevel). `products` = the distinct products
+        of those variants. `events` = the distinct non-null `product.event_id`. `performances` = the
+        `catalogue.performance` rows of those events with `starts_at` after the request''s `effective_date` (now when it
+        is null). `venues` = the distinct `product.venue_id`. `markets` = the distinct non-null `product.market_code`,
+        plus the request''s `market_code`. `channels` = the request''s `impacted_channels` when set, else the distinct
+        channels of the affected price lists. `memberships` = the affected products of kind membership. `packages` = the
+        `catalogue.group_package` rows whose `product_id` is an affected product. `existingReservations` is 0, and
+        `affectsExistingOrders` and `affectsExistingReservations` are false, because a change never reaches what is
+        already sold. `futureReservations` = the `orders.order_line` rows on affected variants for those performances,
+        read in process through `orders#orderLineRecords`, in orders whose status is not voided, failed or refunded.
+        `affectsFutureUnsoldInventory` = `products` > 0. Price changes are the lines that have both `current_amount`
+        and `proposed_amount`; each line''s change is (proposed - current) / current * 100. `averagePriceChange` is their
+        mean, and `maximumChange` and `minimumChange` are the extremes; all three are null when there are no such
+        lines. `currentRevenue` = the sum of quantity * `server_unit_price` over order lines on affected variants, in
+        orders with status paid, partiallyPaid, completed or partiallyRefunded, created in the 365 days before the
+        read. `projectedRevenue` = the same quantities priced at the proposed amount wherever a line names the
+        variant''s price or rate, and at the current price otherwise. `revenueImpact` = `projectedRevenue` -
+        `currentRevenue`. `customerExposure` is the summed quantity, and `transactionVolume` the number of distinct
+        orders, in the same window. Money is in the venue''s trading currency (`tenancy#venueSettingsRecords`).
+        `derivedRates` = the `catalogue.rate` rows whose `base_rate_id` is a rate a line names. `contractRates` = the
+        affected price lists with `price_list_type` b2b, reseller, ota or corporate; `membershipRates` = those of type
+        membership; `groupRates` = those of type group. `dynamicPricingGuardrails` = the
+        `catalogue.dynamic_pricing_control` rows whose scope is an affected product, event or venue. `b2bPartners`,
+        `apis`, `integrations`, `promotions` and `marginImpact` have no source: they are nullable, answered null, and
+        on the left-out list (LO-CR456-001). `aiInsights` is an empty list until an AI producer exists.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -13654,7 +13972,22 @@ paths:
 
         **PUT to the rule''s key: an idempotent upsert.** `ruleId` is a client-generated UUIDv7; a key with no rule creates
         it (`201`), a key with one replaces it whole (`200`). Two rules of equal priority covering the same seat are refused `422
-        overlapping-rule-same-priority`; a floor above the ceiling is `422`.
+        overlapping-rule-same-priority`; a floor above the ceiling is `422 invalid-range`.
+
+
+        **Covered seats and the overlap** (ADAM CR-467, decided 2 November 2026; CHG-CR467-001). A `floorPrice` above
+        the `ceilingPrice` is `422 invalid-range`; a floor equal to the ceiling is allowed. A rule covers the seats of its seat map that match every selector it sets: `seat_section_codes`, `rows` (row
+        labels, within those sections when sections are set), `seat_ids`, and `seat_category`. A rule that sets none
+        covers the whole map. The pricing step that applies seat rules uses this same definition of covered seats. The overlap
+        check reads only `catalogue.seat_pricing_rule`. Two rules overlap when both are `is_active`, they share
+        `seat_map_id` and `priority`, their performances meet (the same `performance_id`, or either one null), and they
+        are not apart. They are apart when, on some selector both of them set, they share no value: no common section
+        code, no common row label, no common seat id, or different seat categories. A selector only one of them sets
+        never makes them apart. So a section rule and a seat-list rule on the same map at the same priority are
+        refused, even when the listed seats lie in another section; the user clears it by changing a priority or by
+        adding the seat list''s section to that rule, which leaves its coverage the same. An overlap is `422
+        overlapping-rule-same-priority`, naming the other rule''s id. The rule being replaced is not compared with
+        itself. Inactive rules are never compared, and making a rule active runs the check.
 
         '
       tags:
@@ -13692,9 +14025,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/SeatPricingRule'
         '422':
-          description: The floor is above the ceiling, or another rule of the same priority covers a seat this one covers
-            (`overlapping-rule-same-priority`).
+          description: '`invalid-range`: the floor is above the ceiling (ADAM CR-467). `overlapping-rule-same-priority`:
+            another active rule on the seat map at the same priority overlaps this one, as the description defines it;
+            the problem names the other rule''s id (ADAM CR-467).'
           x-ticvai-problem-types:
+            - invalid-range
             - overlapping-rule-same-priority
           content:
             application/problem+json:
@@ -15150,7 +15485,9 @@ paths:
         listed but never counted. **positionVsMedian** is (the comparable product''s `fromPrice`, by CR-358''s rule on
         `guestWeb`, minus the median) / the median x 100, to one decimal, and is null when either is missing.
         **movementPercent** compares the published price with the previous observation of the same mapping,
-        `price_date` and `timeslot`, and is null when there is none or the currency differs. **historicalCorrelation**
+        `price_date` and `timeslot`, as a percent rounded to one decimal like `positionVsMedian` (ADAM CR-446;
+        CHG-CR446-001), and is null when there is none or the currency differs.
+        **historicalCorrelation**
         is `{demand, conversion, priceSensitivity}` from the registry row''s `reading.historicalCorrelation`, and is null
         until the AI layer writes it. **Filters**: `competitor` on `name`, `market` on `market_code`,
         `comparableTicvaiProduct` on `product_id`, and `dateFrom`/`dateTo` on `price_date`. Nothing writes observations
@@ -15515,7 +15852,9 @@ paths:
         `day_type`, `peakOffPeak` matches `peak_period`, `season` matches `season` exactly, and `eventProximity` =
         n matches rows whose from is null or at most n and whose to is null or at least n. `time` is the non-null
         parts joined by '', '' in that order, with the proximity written as ''{from}-{to} days'', and absent when all
-        are null. `elasticityConfidence`: `confidence` below 0.5 is `low`, 0.5 up to 0.8 is `medium`, 0.8 and above
+        are null. With one proximity bound (ADAM CR-446, decided 1 November 2026; CHG-CR446-001), the proximity is
+        written ''up to {to} days'' when from is null and ''{from}+ days'' when to is null; with both bounds null it is
+        left out. `elasticityConfidence`: `confidence` below 0.5 is `low`, 0.5 up to 0.8 is `medium`, 0.8 and above
         is `high`, absent when null. Only the latest run of each slice is listed (latest `generated_at`, then
         `id`), where a slice is the same venue, product, event, performance, price category, channel, customer
         segment and context, with nulls counted equal. `inRecommendedRevenueZone` is `revenue_zone_min` <= price
@@ -18489,6 +18828,8 @@ paths:
   /membership-benefits:
     get:
       operationId: listMembershipBenefits
+      x-ticvai-consumed-by:
+        - "P01 WEB-022 Membership Plans"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -18500,10 +18841,13 @@ paths:
         was a schema change — `can_share_media`, `can_claim_shop_and_drop`, `included_value`. Its 15
         operations and 34 screens read 34 columns to get three.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
+      # A guest calls it without a permission and reads published data (ADAM CR-482, 2 November 2026: WEB-022's
+      # What you get list calls it for each plan on the page).
+      x-ticvai-guest-callable: true
       x-ticvai-audience:
       - staff
       - guest
@@ -18582,6 +18926,8 @@ paths:
   /entitlement-templates/{templateId}/benefits:
     get:
       operationId: getPlanBenefits
+      x-ticvai-consumed-by:
+        - "P01 WEB-022 Membership Plans"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -18597,6 +18943,9 @@ paths:
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
+      # A guest calls it without a permission and reads published data (ADAM CR-482, 2 November 2026: WEB-022's
+      # What you get list calls it for each plan on the page).
+      x-ticvai-guest-callable: true
       x-ticvai-audience:
       - staff
       - guest
@@ -18761,6 +19110,13 @@ paths:
         plus `segmentRef` for `loyaltyTier` or `customSegment`; `location` needs `locationLevel` and `locationId`. A
         contextual rule has no conditions or actions. Otherwise the call answers `422 contextual-rule-incomplete` and
         writes nothing.
+
+
+        **What the table leaves to this call** (ADAM CR-470, decided by Chinmay on 2 November 2026: the package's
+        statements are what is built). `pricing.dynamic_price_rule.sales_channel` is plain nullable text with no check,
+        so this call refuses a value outside `SalesChannel` with `400 validation` on `salesChannel`.
+        `is_dynamic_pricing_enabled` is boolean DEFAULT true and nullable: this call always writes true or false, true
+        when the body leaves `dynamicPricingEnabled` out, and a reader takes a null as true.
       tags:
       - catalogue
       x-ticvai-permission: PRICE_CONFIGURE
@@ -19530,10 +19886,22 @@ paths:
       description: '**How TICVAI reaches one channel, per environment** (29 September, writers pass). Creates or
         updates a `catalogue.channel_connection`, keyed by `salesChannelId`, `connectorName` and `environment`.
         **Credentials are never sent or stored here**: `credentialsReference` and `certificateReference` name
-        secrets in the vault (`422` `secretNotReference` if a value looks like a secret). A new or changed
+        secrets in the vault (`422` `secretNotReference` if a value is not a vault reference). A new or changed
         connection is saved `notTested`; `testChannelConnection` moves it to `connected` or `degraded`/`offline`.
         `disabled` switches it off. An existing OTA adapter is enabled for a venue by naming its `adapterId`, with
         no rebuild (MoM 31 Aug 2026 §4.3). Written to `catalogue.audit_entry` (`domain: channel`).
+
+
+        **What a vault reference is** (ADAM CR-459, decided by Chinmay on 2 November 2026, option A: one format,
+        checked in one place). `credentialsReference` and `certificateReference`, when not null, are checked with the
+        kernel''s shared vault-reference validator, which takes the caller''s tenant id and the value: the value must be
+        the name of a secret in the cell''s Key Vault namespaced to the tenant, matching
+        `^t-<tenantId>-[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$`, `<tenantId>` the caller''s tenant id as a lowercase uuid
+        with dashes (at most 119 characters). Anything else is `422 secret-not-reference`: `errors[]` names the field,
+        nothing is stored, and the refused value is never echoed in the problem, logged or written to
+        `catalogue.audit_entry`, because it may be a secret. The save does not check that the secret exists, since it
+        may be put in the vault later; `testChannelConnection`''s authentication test checks that it resolves. Reads
+        keep returning the reference: it is a name, not a secret.
 
         '
       tags:
@@ -19582,7 +19950,9 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [secret-not-reference]
-          description: '`secretNotReference`.'
+          description: '`secretNotReference`: `credentialsReference` or `certificateReference` is not a vault reference
+            under the CR-459 rule (`errors[]` names the field); nothing is stored and the refused value is never echoed,
+            logged or audited (ADAM CR-459).'
           content:
             application/problem+json:
               schema:
@@ -19607,6 +19977,40 @@ paths:
         overall `connectionStatus` (`connected`, `degraded` or `offline`) on the `catalogue.channel_connection`.
         A test in `production` sends no order and no booking: order tests run only in `sandbox` or `uat`
         (`422` `orderTestInProduction`). A `disabled` connection is not tested (`409` `connectionDisabled`).
+
+
+        **What each test does, and the status it gives** (ADAM CR-458, decided by Chinmay on 2 November 2026, option
+        B, with the result values `ChannelConnectionIntegrationManagerView.lastTests` already lists).
+
+        - **Which tests apply.** `ticvaiNative` has none (no call is made, and the status is `connected`). `fileSftp`
+        gets `connectivity` and `authentication`. A connection whose `direction` is `inbound` gets `authentication`
+        only. Every other `connectionType` gets all eight. Leaving `tests` out means all that apply, minus
+        `orderCreation` and `cancellation` in `production`; naming either of those in `production` stays `422
+        order-test-in-production`, and a `disabled` connection stays `409 connection-disabled`.
+
+        - **connectivity.** The endpoint must be `https` (`sftp` for `fileSftp`). Its host is resolved, and the test
+        fails with detail ''endpoint address not allowed'' for a loopback, private, link-local or cloud metadata address,
+        so the probe can never reach inside our network. One request is made with no credentials and no redirects
+        followed (`HEAD`, or a TCP connect for `sftp`) within `timeoutMs`, or 10000 ms when that is null. Any HTTP
+        answer over a valid TLS handshake passes; a DNS, TLS, refused or timed-out call fails.
+
+        - **authentication.** Not run when `authenticationType` is `none`. Otherwise it passes when
+        `credentialsReference` (and `certificateReference` for `certificate`) is a valid vault reference under the
+        CR-459 rule (`setChannelConnectionConfiguration`), resolves in the secret store (`ISecretStore`, with a test
+        double until the store lands; the value never enters the answer, a log or an audit entry), and, for
+        `certificate`, `certificateExpiresAt` is in the future. Its detail reads ''Credential found; the partner''s
+        sign-in is checked once its connector exists''.
+
+        - **productSync, availability, pricing, orderCreation, cancellation and webhook** answer `notSupported` with
+        detail ''No connector for <connectionType> yet''.
+
+        - **connectionStatus**, from the latest entries: `offline` if `connectivity` or `authentication` failed;
+        otherwise `degraded` if any test failed; otherwise `connected`. `notSupported` counts as neither.
+
+        - **What is written.** Each test run replaces that test''s earlier `lastTests` entry; tests not run this time
+        keep their last entry. `last_tests`, `connection_status` and `updated_at`, plus one `catalogue.audit_entry`
+        (domain `channel`, action `test`, result `success` or `failure`), in one transaction; the answer is `200` with
+        the connection.
 
         '
       tags:
@@ -19748,6 +20152,22 @@ paths:
         `eligibilityEffect` (`422` `eligibilityIncomplete`); a product-level rule on a product that already
         has one for the same `ruleKind` and window needs `overridesProductRule` (`409` `ruleConflict`).
 
+
+        **When a save conflicts** (ADAM CR-466, decided by Chinmay on 2 November 2026: option A as built, with two
+        corrections from earlier decisions). Saving an active rule (`isActive` true) that has a `productId` and
+        `overridesProductRule` false is refused with `409 rule-conflict`, and nothing is stored, when another active
+        `catalogue.channel_sales_rule` (not the one being replaced) has the same `sales_channel_id`, `product_id` and
+        `rule_kind` and an overlapping effective window. `ruleLevel` plays no part: CR-411 already reads a
+        product-level rule as a row with a product. Windows are instants: a null `effective_from` means from when that
+        rule was saved (its `created_at`, or now for the rule being saved), not open to the past (CR-414); a null
+        `effective_to` is open-ended; two windows overlap when each starts before the other ends. A save with
+        `isActive` false never conflicts, so a rule can always be switched off, and `overridesProductRule` true lets
+        the save through. Before the check the save takes a transaction lock on the sales channel, product and rule
+        kind (`pg_advisory_xact_lock` on a hash of the three), so two saves at once cannot both pass. The problem''s
+        `detail` names the id of the rule it collides with. A rule with no `productId` never gets this 409;
+        `listChannelSaleSchedule`''s conflicts count (CR-411) still shows a channel-wide rule overlapping a product
+        rule.
+
         '
       tags:
       - catalogue
@@ -19783,7 +20203,9 @@ paths:
                 $ref: '#/components/schemas/ChannelSalesRule'
         '409':
           x-ticvai-problem-types: [rule-conflict]
-          description: '`ruleConflict`.'
+          description: '`ruleConflict`: another active rule on the same channel, product and rule kind has an
+            overlapping effective window, and `overridesProductRule` is false; `detail` names that rule''s id and
+            nothing is stored (ADAM CR-466).'
           content:
             application/problem+json:
               schema:
@@ -19904,12 +20326,28 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ChannelIncident.businessImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      x-ticvai-emits:
+      - catalogue.channelIncidentRetryRequested
       summary: Retry the failed channel call behind an incident
       description: '**Retry, as a call** (29 September, writers pass). Moves an `open` or `investigating`
         `catalogue.channel_incident` to `retrying`, increments `retryCount` and queues the failed call again with
         the same idempotency reference, so a partner that did receive the first call does not book twice. The job
         moves it to `resolved` on success or back to `investigating` on failure. A `resolved` or `closed`
         incident answers `409` `notRetryable`.
+
+
+        **The retry is a fact written to the outbox and carried out by a job** (ADAM CR-457, decided by Chinmay on 2
+        November 2026, option A). In one transaction: an incident that is `resolved` or `closed` answers `409
+        not-retryable` and nothing changes. Otherwise the `catalogue.channel_incident` moves to `retrying`,
+        `retry_count` goes up by 1 and `updated_at` is set; where `api_request_reference` is null it is set to the
+        incident''s id as text, so this retry and every later one share one reference. One `catalogue.audit_entry` is
+        written (domain `channel`, action `retry`, entity_type `channelIncident`, entity_id the incident) and one
+        `platform.outbox` row for `catalogue.channelIncidentRetryRequested` v1 (aggregate `channelIncident`,
+        aggregateId the incident''s id). The answer is `202` with the incident. **Catalogue''s channel retry job** (the
+        workers host) consumes the event and sends the call again (`events/catalogue-channelIncidentRetryRequested.yaml`
+        says how): `apiRequestReference` is the partner''s idempotency reference, `correlationId` only finds the
+        original call''s trace and is never sent to the partner. An incident is never marked `resolved` without a
+        partner''s success.
 
         '
       tags:
@@ -19939,7 +20377,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [not-retryable]
-          description: '`notRetryable`.'
+          description: '`notRetryable`: the incident is `resolved` or `closed`, and nothing changes (ADAM CR-457).'
           content:
             application/problem+json:
               schema:
@@ -20858,13 +21296,48 @@ paths:
       operationId: listTaxProfiles
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
+      x-ticvai-reads:
+      - table: catalogue.tax_rule
+        for: 'consumingProductCount and consumingVenueCount: the active tax rules whose taxes list the profile (ADAM
+          CR-468; CHG-CR468-001)'
+      - table: catalogue.product
+        for: 'consumingProductCount: the products whose category_id is a counted rule''s product_category_id (ADAM
+          CR-468; CHG-CR468-001)'
+      x-ticvai-read-via:
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'ratePercent and country: ledger.tax_code.rate and country_code for the profile''s tax_code_id, Ledger''s
+          data (ADAM CR-468; CHG-CR468-001)'
+      - query: finance#legalEntityRecords
+        route: in-process
+        for: 'currency: ledger.legal_entity.currency of the profile''s legal_entity_id, Ledger''s data (ADAM CR-468;
+          CHG-CR468-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'currency when the profile has no legal entity: the trading currency of the venue its scope_path names
+          (ADAM CR-468; CHG-CR468-001)'
       summary: The tax profiles
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; ADM-069): the screen manages many reusable tax profiles and the contract had one
-        record per venue with no list.** Every `catalogue.tax_profile` at or above the caller's scope, in the shape
-        `getTaxProfileJurisdiction` returns, ordered by `taxProfileCode`. A profile is opened with
+        record per venue with no list.** Every `catalogue.tax_profile` the caller's row security shows, which is at or
+        beneath the caller's scope (ADAM CR-468: profiles are written at venue scope, so head office sees every venue's
+        profiles and a venue its own), in the shape `getTaxProfileJurisdiction` returns, filtered by `legalEntityId`
+        and `status`, ordered by `taxProfileCode`, then `id`. A profile is opened with
         `getTaxProfileJurisdiction?taxProfileId=` and saved with `setTaxProfileJurisdiction`, which creates a profile when the
         body's `taxProfileId` is empty and updates that profile otherwise.
+
+        **The members** (ADAM CR-468, decided 2 November 2026; CHG-CR468-001). `ratePercent` is `ledger.tax_code.rate`,
+        and `country` its `country_code`, for the profile's `tax_code_id`, read in process through
+        `finance#taxCodeRecords`. `currency` is the legal entity's currency (`ledger.legal_entity.currency`, through
+        `finance#legalEntityRecords`) when `legal_entity_id` is set, and otherwise the trading currency of the venue the
+        row's `scope_path` names (`tenancy#venueSettingsRecords`). `legalEntity` is `legal_entity_id` and `owner` is
+        `owner_principal_id`, both as uuid text: the view is the write's own shape, and the screen takes the names from
+        its pickers (`listLegalEntities`). `consumingProductCount` is the number of distinct products named by active
+        `catalogue.tax_rule` rows whose `taxes` list this profile's id: the rule's `product_id`, plus the products whose
+        `category_id` is the rule's `product_category_id`. `consumingVenueCount` is the number of distinct venues of
+        those rules (`venue_id`, or else the venue their `scope_path` names). `effectiveFrom` and `effectiveTo` stay
+        dates, because `catalogue.tax_profile` stores dates. `status` takes `CatalogueConfigStatus` and matches the
+        stored status, as in ADAM CR-464.
       tags:
       - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -20884,8 +21357,9 @@ paths:
       - name: status
         in: query
         required: false
+        description: 'Matches the stored status exactly (`CatalogueConfigStatus`; ADAM CR-468, CR-464)'
         schema:
-          type: string
+          $ref: '#/components/schemas/CatalogueConfigStatus'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -21713,7 +22187,7 @@ paths:
         for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'a `venue` rule''s target must be an active venue the caller''s grants reach: platform.scope, Tenancy''s data'
       - query: tenancy#workstationRecords
         route: in-process
@@ -21883,7 +22357,7 @@ paths:
       operationId: listSalePermissionTargets
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'the venues a `venue` rule can name: platform.scope, Tenancy''s data'
       - query: tenancy#workstationRecords
         route: in-process
@@ -22915,6 +23389,8 @@ components:
         type:
           type: string
           maxLength: 50
+          description: 'The condition''s type. `membershipProgramme` makes the rule a membership rule (ADAM CR-439): its
+            `ruleOperator` is `in` and its `valueJson` a JSON array of membership programme ids.'
         ruleOperator:
           type: string
           maxLength: 20
@@ -23249,7 +23725,13 @@ components:
     SeatPricingRule:
       type: object
       x-ticvai-persistence: catalogue.seat_pricing_rule
-      description: '**One seat-level dynamic pricing rule: which seats, which strategy, and the bounds** (CHG-CSP-049; BO-1044).'
+      description: '**One seat-level dynamic pricing rule: which seats, which strategy, and the bounds** (CHG-CSP-049; BO-1044).
+
+
+        **Covered seats** (ADAM CR-467; CHG-CR467-001). A rule covers the seats of its seat map that match every selector it sets: `seat_section_codes`, `rows` (row
+        labels, within those sections when sections are set), `seat_ids`, and `seat_category`. A rule that sets none
+        covers the whole map. The pricing step that applies seat rules uses this same definition of covered seats. `setSeatPricingRule` states the overlap
+        rule.'
       required:
       - name
       - strategyId
@@ -25389,6 +25871,23 @@ components:
             `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on
             input. Null where no price list prices it on that channel, and null from every other operation that answers
             `Product` for now.'
+        isFeatured:
+          type: boolean
+          default: false
+          description: '**The plan card''s Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026):
+            the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct`
+            and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured
+            plan.'
+        compareAtPrice:
+          x-ticvai-column: compare_at_amount
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: '**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan
+            card''s saving. Stored on `catalogue.product` as `compare_at_amount` in the venue''s trading currency, set by
+            `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving
+            as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a
+            made-up value.'
         nameLocalised:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
@@ -25833,6 +26332,15 @@ components:
             (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`.
         requiresTimeWindow:
           type: boolean
+        isFeatured:
+          type: boolean
+          description: Marks the product featured, the plan card's Most popular badge (`Product.isFeatured`; ADAM CR-482).
+        compareAtPrice:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: What the same visits cost bought singly, behind the plan card's saving (`Product.compareAtPrice`;
+            ADAM CR-482).
     UpdateProductRequest:
       type: object
       minProperties: 1
@@ -25911,6 +26419,15 @@ components:
             (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`.
         requiresTimeWindow:
           type: boolean
+        isFeatured:
+          type: boolean
+          description: Marks the product featured, the plan card's Most popular badge (`Product.isFeatured`; ADAM CR-482).
+        compareAtPrice:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: What the same visits cost bought singly, behind the plan card's saving (`Product.compareAtPrice`;
+            ADAM CR-482).
     VariantDimension:
       x-ticvai-persistence: catalogue.variant_dimension
       type: object
@@ -26034,6 +26551,13 @@ components:
         isActive:
           type: boolean
           description: False when retired. Retired variants are never deleted — orders reference them.
+        priceCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The variant''s price category, a `catalogue.price_category` id (ADAM CR-455): the winning price
+            assignment''s category rate for it replaces the price (`catalogue#variantPriceRecords`); null for none. Set by
+            `updateProductVariant`.'
         description:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
@@ -27039,21 +27563,25 @@ components:
           description: 'A `percentage` allocation''s share of the capacity, 0 to 100 (ADAM CR-412; the column is
             envelope_percent, naming-and-style 3: Envelope, not Allocation, in DDL): required there,
             and `setChannelAllocations` sets `allocatedUnits` to the floor of capacity x percent / 100. Null for the
-            other types.'
+            other types. The 0 to 100 rule is `setChannelAllocations`'' `400 validation` from this minimum and
+            maximum: the column is numeric(18,4), nullable, with no range check (ADAM CR-461, decided by Chinmay on 2
+            November 2026).'
         releasedUnits:
           type: integer
           minimum: 0
           default: 0
           readOnly: true
-          description: Units the allocation release job gave back to the general pool, added in the same transaction as
-            each release (ADAM CR-412).
+          description: 'Units the allocation release job gave back to the general pool, added in the same transaction as
+            each release (ADAM CR-412). The column is integer DEFAULT 0 and nullable (ADAM CR-461): a reader takes a
+            null count as 0.'
         returnedUnits:
           type: integer
           minimum: 0
           default: 0
           readOnly: true
-          description: Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction
-            as each release (ADAM CR-412).
+          description: 'Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction
+            as each release (ADAM CR-412). The column is integer DEFAULT 0 and nullable (ADAM CR-461): a reader takes a
+            null count as 0.'
     ChannelAllocationSet:
       x-ticvai-persistence: none — projection
       type: object
@@ -34527,20 +35055,23 @@ components:
           description: Tax Type (pp.40-41)
         country:
           type: string
-          description: 'Country: ISO 3166-1 alpha-2 code'
+          description: 'Country: ISO 3166-1 alpha-2 code, the country_code finance#taxCodeRecords answers for the
+            profile''s taxCodeId (ADAM CR-468)'
           pattern: ^[A-Z]{2}$
         jurisdiction:
           type: string
           description: Region/Jurisdiction
         legalEntity:
           type: string
-          description: Legal Entity
+          description: 'Legal Entity: the profile''s `legal_entity_id`, as uuid text (ADAM CR-468); the screen names it
+            from listLegalEntities'
         taxRegistrationNumber:
           type: string
           description: Tax Registration Number
         currency:
           type: string
-          description: 'Currency: ISO 4217 code'
+          description: 'Currency: ISO 4217 code; the legal entity''s currency (finance#legalEntityRecords) when the
+            profile has one, else the trading currency of the venue its scope_path names (ADAM CR-468)'
           pattern: ^[A-Z]{3}$
         effectiveFrom:
           type: string
@@ -34552,15 +35083,18 @@ components:
           description: Effective To; empty for open-ended
           nullable: true
         status:
-          type: string
-          description: 'Status: draft, active, inactive or expired'
+          allOf:
+          - $ref: '#/components/schemas/CatalogueConfigStatus'
+          description: 'Status, as stored (`CatalogueConfigStatus`: draft, active, inactive or retired; ADAM CR-468,
+            CR-464)'
         owner:
           type: string
-          description: Owner
+          description: 'Owner: the profile''s `owner_principal_id`, as uuid text (ADAM CR-468)'
         ratePercent:
           type: number
           nullable: true
-          description: Rate in percent (UAE VAT 5); empty when the tax is a fixed amount set on the tax rule
+          description: Rate in percent (UAE VAT 5), the rate finance#taxCodeRecords answers for the profile's
+            taxCodeId (ADAM CR-468); empty when the tax is a fixed amount set on the tax rule
         taxProfileId:
           type: string
           description: Tax profile ID; empty on create
@@ -34600,10 +35134,12 @@ components:
             is the default (decided 29 September, readiness close-out)
         consumingProductCount:
           type: integer
-          description: 'Dependencies: products using the profile; read-only'
+          description: 'Dependencies: the distinct products named by active catalogue.tax_rule rows whose taxes list
+            this profile (the rule''s product_id, plus the products of its product_category_id); read-only (ADAM CR-468)'
         consumingVenueCount:
           type: integer
-          description: 'Dependencies: venues using the profile; read-only'
+          description: 'Dependencies: the distinct venues of those rules (venue_id, or else the venue their scope_path
+            names); read-only (ADAM CR-468)'
     TaxProfileJurisdictionConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
@@ -34992,8 +35528,9 @@ components:
             - nonRefundable
           description: Refundability when the order is refunded
         status:
-          type: string
-          description: 'Status: draft, active, inactive or expired'
+          allOf:
+          - $ref: '#/components/schemas/CatalogueConfigStatus'
+          description: 'Status, as stored (`CatalogueConfigStatus`: draft, active, inactive or retired; ADAM CR-464)'
         feeId:
           type: string
           description: Fee ID
@@ -35038,12 +35575,15 @@ components:
           description: Fee Visibility (p.44)
         effectiveFrom:
           type: string
-          format: date
-          description: Effective From
+          format: date-time
+          nullable: true
+          description: 'Effective From: the instant `catalogue.fee` stores; null means in effect from when the fee was
+            saved. The screen shows the day in the venue''s time zone (ADAM CR-464, the CR-414 rule).'
         effectiveTo:
           type: string
-          format: date
-          description: Effective To; empty for open-ended
+          format: date-time
+          description: 'Effective To: the instant `catalogue.fee` stores; null means open-ended. The screen shows the day in
+            the venue''s time zone (ADAM CR-464, the CR-414 rule).'
           nullable: true
     FeeApplicabilityChargingRuleBuilderView:
       type: object
@@ -35184,16 +35724,20 @@ components:
           description: 'Mutual Exclusion: rules sharing a group never apply together; empty for none'
         effectiveFrom:
           type: string
-          format: date
-          description: Effective From
+          format: date-time
+          nullable: true
+          description: 'Effective From: the instant `catalogue.fee_rule` stores; null means in effect from when the fee rule was
+            saved. The screen shows the day in the venue''s time zone (ADAM CR-464, the CR-414 rule).'
         effectiveTo:
           type: string
-          format: date
-          description: Effective To; empty for open-ended
+          format: date-time
+          description: 'Effective To: the instant `catalogue.fee_rule` stores; null means open-ended. The screen shows the day in
+            the venue''s time zone (ADAM CR-464, the CR-414 rule).'
           nullable: true
         status:
-          type: string
-          description: 'Status: draft, active, inactive or expired'
+          allOf:
+          - $ref: '#/components/schemas/CatalogueConfigStatus'
+          description: 'Status, as stored (`CatalogueConfigStatus`: draft, active, inactive or retired; ADAM CR-464)'
     FeeApplicabilityChargingRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
@@ -35332,16 +35876,20 @@ components:
           description: 'Mutual Exclusion: rules sharing a group never apply together; empty for none'
         effectiveFrom:
           type: string
-          format: date
-          description: Effective From
+          format: date-time
+          nullable: true
+          description: 'Effective From: the instant `catalogue.fee_rule` stores; null means in effect from when the fee rule was
+            saved. The screen shows the day in the venue''s time zone (ADAM CR-464, the CR-414 rule).'
         effectiveTo:
           type: string
-          format: date
-          description: Effective To; empty for open-ended
+          format: date-time
+          description: 'Effective To: the instant `catalogue.fee_rule` stores; null means open-ended. The screen shows the day in
+            the venue''s time zone (ADAM CR-464, the CR-414 rule).'
           nullable: true
         status:
-          type: string
-          description: 'Status: draft, active, inactive or expired'
+          allOf:
+          - $ref: '#/components/schemas/CatalogueConfigStatus'
+          description: 'Status, as stored (`CatalogueConfigStatus`: draft, active, inactive or retired; ADAM CR-464)'
     FeeWaiverTaxExemptionExceptionRulesView:
       type: object
       x-ticvai-drafted-shape: true
@@ -35423,16 +35971,20 @@ components:
           description: Tax Exemption Evidence must be captured (p.47)
         effectiveFrom:
           type: string
-          format: date
-          description: Effective From
+          format: date-time
+          nullable: true
+          description: 'Effective From: the instant `catalogue.fee_rule` stores; null means in effect from when the exception rule was
+            saved. The screen shows the day in the venue''s time zone (ADAM CR-464, the CR-414 rule).'
         effectiveTo:
           type: string
-          format: date
-          description: Effective To; empty for open-ended
+          format: date-time
+          description: 'Effective To: the instant `catalogue.fee_rule` stores; null means open-ended. The screen shows the day in
+            the venue''s time zone (ADAM CR-464, the CR-414 rule).'
           nullable: true
         status:
-          type: string
-          description: 'Status: draft, active, inactive or expired'
+          allOf:
+          - $ref: '#/components/schemas/CatalogueConfigStatus'
+          description: 'Status, as stored (`CatalogueConfigStatus`: draft, active, inactive or retired; ADAM CR-464)'
     PriceCalculationSequenceFormulaEngineView:
       type: object
       x-ticvai-drafted-shape: true
@@ -35507,12 +36059,15 @@ components:
           description: Formula version
         effectiveFrom:
           type: string
-          format: date
-          description: Effective From
+          format: date-time
+          nullable: true
+          description: 'Effective From: the instant `catalogue.calculation_profile` stores; null means in effect from when the profile was
+            saved. The screen shows the day in the venue''s time zone (ADAM CR-464, the CR-414 rule).'
         effectiveTo:
           type: string
-          format: date
-          description: Effective To; empty for open-ended
+          format: date-time
+          description: 'Effective To: the instant `catalogue.calculation_profile` stores; null means open-ended. The screen shows the day in
+            the venue''s time zone (ADAM CR-464, the CR-414 rule).'
           nullable: true
     CurrencyPrecisionRoundingMonetaryRulesView:
       type: object
@@ -35718,13 +36273,14 @@ components:
         membershipId:
           type: string
           nullable: true
-          description: Membership, the catalogue.membership_programme the simulated customer holds; its membership
-            pricing rules choose the rate at the contextualRateSelection step (ADAM CR-419)
+          description: Membership, the catalogue.membership_programme the simulated customer holds; the one
+            membership rule whose membershipProgramme condition lists it adjusts the rate at the contextualRateSelection
+            step (ADAM CR-419, CR-439, CR-455)
         promotionCode:
           type: string
           nullable: true
-          description: Promotion, evaluated by Promotions' evaluatePromotions in process without orderId, so nothing
-            is stored (ADAM CR-419)
+          description: Promotion. Until Promotions' evaluatePromotions is built, a request with a promotionCode answers
+            422 promotion-evaluation-unavailable and computes nothing (ADAM CR-439)
         paymentMethod:
           type: string
           nullable: true
@@ -36556,7 +37112,8 @@ components:
           description: Affected channels (count)
         b2bPartners:
           type: integer
-          description: Affected b2bPartners (count)
+          nullable: true
+          description: 'Affected b2bPartners (count): no source yet, answered null (ADAM CR-456, LO-CR456-001)'
         memberships:
           type: integer
           description: Affected memberships (count)
@@ -36572,10 +37129,12 @@ components:
           description: Affected futureReservations (count)
         apis:
           type: integer
-          description: Affected apis (count)
+          nullable: true
+          description: 'Affected apis (count): no source yet, answered null (ADAM CR-456, LO-CR456-001)'
         integrations:
           type: integer
-          description: Affected integrations (count)
+          nullable: true
+          description: 'Affected integrations (count): no source yet, answered null (ADAM CR-456, LO-CR456-001)'
         currentRevenue:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Current Revenue
@@ -36584,23 +37143,32 @@ components:
           description: Projected Revenue
         averagePriceChange:
           type: number
-          description: Average price change in percent
+          nullable: true
+          description: 'Average price change in percent, over the lines with both current_amount and proposed_amount; null when there are none
+            (ADAM CR-456)'
         maximumChange:
           type: number
-          description: Largest single price change in percent
+          nullable: true
+          description: 'Largest single price change in percent, over the lines with both current_amount and proposed_amount; null when there are none
+            (ADAM CR-456)'
         minimumChange:
           type: number
-          description: Smallest single price change in percent
+          nullable: true
+          description: 'Smallest single price change in percent, over the lines with both current_amount and proposed_amount; null when there are none
+            (ADAM CR-456)'
         marginImpact:
           type: number
-          description: Margin impact in percentage points
+          nullable: true
+          description: 'Margin impact in percentage points: no cost is stored, so answered null (ADAM CR-456,
+            LO-CR456-001)'
         customerExposure:
           type: integer
-          description: Customers or tickets exposed per year at current volumes (decided 29 September, readiness
-            close-out)
+          description: 'Customers or tickets exposed per year at current volumes (decided 29 September, readiness
+            close-out): the summed quantity of the counted order lines in the 365 days before the read (ADAM CR-456)'
         transactionVolume:
           type: integer
-          description: Transactions per year affected at current volumes (decided 29 September, readiness close-out)
+          description: 'Transactions per year affected at current volumes (decided 29 September, readiness close-out):
+            the distinct orders of the counted order lines in the 365 days before the read (ADAM CR-456)'
         derivedRates:
           type: integer
           description: 'Dependency impact: derivedRates affected (count)'
@@ -36615,7 +37183,9 @@ components:
           description: 'Dependency impact: groupRates affected (count)'
         promotions:
           type: integer
-          description: 'Dependency impact: promotions affected (count)'
+          nullable: true
+          description: 'Dependency impact: promotions affected (count): no source yet, answered null (ADAM CR-456,
+            LO-CR456-001)'
         dynamicPricingGuardrails:
           type: integer
           description: 'Dependency impact: dynamicPricingGuardrails affected (count)'
@@ -36628,11 +37198,11 @@ components:
         analysedAt:
           type: string
           format: date-time
-          description: When the analysis was computed
+          description: When the analysis was computed, which is the time of the read (ADAM CR-456)
         revenueImpact:
           allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Projected minus current revenue (annualised)
+          description: projectedRevenue minus currentRevenue, over the 365 days before the read (ADAM CR-456)
         affectsExistingOrders:
           type: boolean
           description: Whether the change affects existing orders; always false for price changes (never retroactive)
@@ -36649,7 +37219,8 @@ components:
             - medium
             - high
             - critical
-          description: Risk score, classified by the tenant's configurable criteria
+          nullable: true
+          description: Risk score, catalogue.change_request.risk_level as stored; null when unset (ADAM CR-456)
         aiInsights:
           type: array
           items:
@@ -39723,7 +40294,7 @@ components:
           type: number
           nullable: true
           description: 'Competitor Movement: change against the previous observation of the same mapping, date and
-            timeslot, percent; null when there is none or the currency differs (ADAM CR-409)'
+            timeslot, percent to one decimal; null when there is none or the currency differs (ADAM CR-409, CR-446)'
         historicalCorrelation:
           type: object
           nullable: true
@@ -40041,7 +40612,8 @@ components:
         time:
           type: string
           description: 'Time context of the curve: the non-null parts of day type, peak period, season and event
-            proximity (''{from}-{to} days''), joined by '', '' in that order; absent when all are null (ADAM CR-406)'
+            proximity (''{from}-{to} days'', or ''up to {to} days'' with no from and ''{from}+ days'' with no to; left
+            out when both are null), joined by '', '' in that order; absent when all are null (ADAM CR-406, CR-446)'
         product:
           type: string
           description: Product id
@@ -43647,11 +44219,21 @@ components:
           type: string
           maxLength: 200
           nullable: true
-          description: A vault reference, never the secret.
+          description: 'A vault reference, never the secret. **One format for every vault reference, checked in one
+            place** (ADAM CR-459, decided by Chinmay on 2 November 2026): the name of a secret in the cell''s Key Vault
+            (what ADR-0063 says the row keeps), namespaced to the tenant, accepted only when it matches
+            `^t-<tenantId>-[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$`, where `<tenantId>` is the caller''s tenant id as a
+            lowercase uuid with dashes: at most 119 characters, inside Key Vault''s 127 and the column''s 200. The rule
+            is built once, as a shared validator in the kernel that takes the tenant id and the value, so every vault
+            reference a caller types uses it, and the secret store names the secrets it writes in the same form.
+            Anything else is `422 secret-not-reference` on `setChannelConnectionConfiguration`. Returned on reads: it is
+            a name, not a secret.'
         certificateReference:
           type: string
           maxLength: 200
           nullable: true
+          description: 'A vault reference for the certificate, under the same rule as `credentialsReference` (ADAM
+            CR-459).'
         certificateExpiresAt:
           type: string
           format: date-time
@@ -43687,10 +44269,46 @@ components:
           - disabled
           default: notTested
         lastTests:
-          type: object
-          additionalProperties: true
+          type: array
           readOnly: true
-          description: '`[{test, result, testedAt}]`, the latest result per test.'
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: 'The latest result per test (ADAM CR-458, decided by Chinmay on 2 November 2026): each run
+            replaces that test''s entry, and a test not run keeps its last one. Stored as the jsonb list it was
+            (`catalogue.channel_connection.last_tests`), so no migration. `testChannelConnection` says what each test
+            does.'
+          items:
+            type: object
+            required:
+            - test
+            - result
+            - testedAt
+            properties:
+              test:
+                type: string
+                enum:
+                - connectivity
+                - authentication
+                - productSync
+                - availability
+                - pricing
+                - orderCreation
+                - cancellation
+                - webhook
+              result:
+                type: string
+                enum:
+                - passed
+                - failed
+                - notSupported
+                description: The values `ChannelConnectionIntegrationManagerView.lastTests` already lists.
+              testedAt:
+                type: string
+                format: date-time
+              detail:
+                type: string
+                nullable: true
+                description: One plain sentence, never a secret and never a partner's response body.
         createdAt:
           type: string
           format: date-time

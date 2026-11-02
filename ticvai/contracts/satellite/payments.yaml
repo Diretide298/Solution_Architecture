@@ -98,7 +98,10 @@ x-ticvai-queries:
       C# query interface Orders implements, for White Label's getKioskConfigValidation and publishKioskConfigs, which
       report paymentMethodUnavailable for an accepted method that is not an active row available at the venue (its
       venueIds contain the venue or are empty) (ADAM CR-385, 31 October 2026; XDR-028; SELECT on payments.method
-      granted to the operations role).
+      granted to the operations role). **Above the venue, for that check only** (ADAM CR-443, Chinmay, 1 November
+      2026; CHG-CR443-001): for those two operations the read takes the rows at the venue and at its ancestors (a
+      scope_path that is the venue's or an ancestor of it), in process, for that check only, so a tenant-wide method
+      is found; every other asker reads as the caller's scope lets it see them.
     served: [in-process]
   approvedPaymentMethods:
     module: payments
@@ -156,11 +159,13 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/PayInstalmentPolicy'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-003; ADR-0055 rule 2 as amended 14
-      October). Orders answers with its payments.instalment_policy rows, as it stores them and as the caller's
-      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation. It
-      is asked from another deployable through Orders' service route (serviceAuth).
-    served: [service]
+      October). Orders answers with its payments.instalment_policy rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation. It is asked in
+      process by the operations host, which composes Orders's query classes, through the C# query class Orders
+      implements, under the caller's row-level security (CHG-R13INP-001). It is asked from another deployable
+      through Orders' service route (serviceAuth).
+    served: [in-process, service]
 paths:
   /dunning-policy:
     get:

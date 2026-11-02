@@ -7,12 +7,19 @@ publisher: orders
 description: Lines on a paid order were exchanged for different products, dates or performances, settling
   only the difference.
 aggregate: order
-emittedWhen: exchangeOrderLines succeeds
+emittedWhen: exchangeOrderLines, modifyOrder or rescheduleOrder writes its lines (the lead, 2 November 2026,
+  CHG-R13ORD-001)
 emittedBy:
 - orders.exchangeOrderLines
+- orders.modifyOrder
+- orders.rescheduleOrder
 payload:
 - field: orderId
   type: uuid
+- field: kind
+  type: string
+  notes: exchange, modification or reschedule (CHG-R13ORD-001). The consumers move entitlements and capacity alike for
+    all three
 - field: lines
   type: array
   notes: direction (out or in), productId, quantity, amount — the lines given up and the lines that
@@ -45,6 +52,22 @@ payload:
 - field: at
   type: timestamp
 consumers:
+- context: catalogue
+  purpose: Cancel the outgoing lines' entitlements and return their capacity, as order.refunded's consumer does (ADAM
+    CR-480, CHG-CR480-001)
+  idempotencyKey: orderId + eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: seating
+  purpose: Return the outgoing lines' seats to sale, as order.refunded's consumer does (ADAM CR-480)
+  idempotencyKey: orderId + eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: access
+  purpose: Issue the incoming lines' entitlements, as the order-paid saga does (ADAM CR-480)
+  idempotencyKey: orderId + eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 - context: ai
   purpose: Staff leakage and refund-abuse risk (exchanges that return value without a refund record),
     forecast actuals moved from the old date to the new one, and recommendation attribution reversed on the

@@ -111,6 +111,21 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: white-label
+  purpose: 'Publish or schedule a reviewed content block (`subjectType` `whiteLabelPublication`, `subjectId` a
+    whitelabel.content_block row; ADAM CR-462, decided 2 November 2026; CHG-CR462-001), as publishContentBlock
+    states. It reads the request by `requestId` through approvals#requestRecords (route service) for the
+    `publishAt` and `expireAt` the publish stored in its `attributes`, and the block from `subjectId`. A block no
+    longer pending review, or now published or archived, changes nothing. Otherwise the stored schedule is applied
+    by a direct publish''s rules at that moment (a missing, null or passed `publishAt` publishes now, a future one
+    schedules, a missing `expireAt` keeps the stored one), with `reviewStatus` approved, in one transaction, and
+    whitelabel.contentPublished is raised when the block publishes; an `expireAt` no longer after the moment it would
+    go live publishes and schedules nothing and sets `reviewStatus` rejected'
+  writes:
+  - whitelabel.content_block
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 - context: identity
   purpose: 'A guest''s privacy request (`subjectContract` identity; ADAM CR-101, CHG-R10ID-016). Subject type
     `subjectDataExport`: start the export job for the request''s identity.subject_data_export row (running, then ready

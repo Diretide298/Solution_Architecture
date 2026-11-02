@@ -1,0 +1,59 @@
+id: CHG-R13PL-046
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: The query classes r13 serves in process are four tasks, one per owner (Tenancy, Catalogue, Orders, Access), and
+  their in-process readers follow them.
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026, on build lane r''s 16 newly in-process query classes: "One task per owner". docs/active/block-a-extra-tasks.json:
+    R13-QUERIES-TENANCY (Pranay Shinde: accreditation#applicationRecords, credentialRecords, holderRecords, validityRecords,
+    approvals#ruleRecords, tenancy#dataRetentionSettingRecords, workforce#shiftRecords), R13-QUERIES-CATALOGUE (Narayan
+    Gaonkar: catalogue#productEligibilityRuleRecords, promotions#bundleRecords), R13-QUERIES-ORDERS (Pranay Shinde: orders#cartLineRecords,
+    groupBookingRecords, invitationRecords, orderFeeRecords, reservationRecords, payments#instalmentPolicyRecords) and R13-QUERIES-ACCESS
+    (Narayan Gaonkar: access#accessPointRecords), each owner the service''s main first-release back-end builder (the plan''s
+    service-owner rule); each follows R13-DB-IN-PROCESS-READ-GRANTS; `operationWaits` makes 24 reading operations follow
+    their owner''s task; listBiometricLifecycleRetention and setBiometricLifecycleRetention, which read tenancy#dataRetentionSettingRecords,
+    are built by no task yet, so they wait on nothing (listed for the lead). Plan change waived from the cooling-off by
+    the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-438 (the served-query rule) and build lane r''s in-process reads class (fix/r13-r, 93c3a4d3, CHG-R13INP-001):
+  the queries are served in process now, and a query class gets no task from the operation formula.'
+keys_touched:
+  tickets:
+  - R13-QUERIES-TENANCY (new)
+  - R13-QUERIES-CATALOGUE (new)
+  - R13-QUERIES-ORDERS (new)
+  - R13-QUERIES-ACCESS (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a query class made served in process, with no plan task building it
+tickets:
+  started: []
+  unstarted:
+  - 'the 24 waiting readers (askReportingQuestion, getKpiValues, listAgentWorkloadAvailability, runSemanticQuery, setDataRetentionPolicy,
+    suggestWorkOrderAssignee, recordAttendance, setVenueSettings, bookVisitPlan, generateVisitPlan, getVisitPlannerOptions,
+    listVisitPlanAlternatives, previewGuidedChoice, setVenuePoint, updateVisitPlan, actOnWaiverRequirements, respondToInvitation,
+    setMembershipCommercialConfig and six with no ticket yet): all New or not ticketed, so none started; each follows its
+    owner''s task'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-438
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Query names confirmed on fix/r13-r''s contracts (accreditation.yaml, approvals.yaml, tenancy.yaml, workforce.yaml,
+  catalogue.yaml, promotions.yaml, orders.yaml, payments.yaml, access.yaml). The plan has no task under a task or sub-task,
+  so the ticket the work belongs to is named in the task''s text; its OpenProject parent is the app-module the plan places
+  it in, and it follows the migration that creates its tables. A change-only [DB] task is `area: database` and its key does
+  not end in -DB (a -DB task''s `table` builds count as created by it, CHG-R8MIG-016, CHG-R12PL-008).'

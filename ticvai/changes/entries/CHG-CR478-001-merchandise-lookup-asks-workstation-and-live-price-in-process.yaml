@@ -1,0 +1,55 @@
+id: CHG-CR478-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'lookupMerchandise asks tenancy#workstationRecords in process from the operations host, through Tenancy''s
+  query class as assignKiosk does (CR-384), for the caller''s workstation and its outlet (400 outlet-required and 404
+  as stated; no grant, V0118). promotions#liveEffectivePrice is asked in process too: an in-process query class of
+  Catalogue''s Promotions module, registered in the operations host with Catalogue''s other query classes, running the
+  evaluation code evaluatePromotions uses (#31714) for stacking, precedence and the zero floor, never a copy, with
+  venueId, the caller''s channel and one item per merchandise (itemRef the merchandise id, unitPrice its list price);
+  its result gives PriceCheck.effectivePrice. The query is served [in-process, service] and reads promotions.promotion
+  and promotions.promotion_rule; XDR-072 grants the operations role USAGE on schema promotions and SELECT on both.'
+decision:
+  what: 'Posted on #30871 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" of 2 November
+    2026: "Build now: (1) lookupMerchandise asks tenancy#workstationRecords in process from the operations host,
+    through Tenancy''s query class as assignKiosk does (CR-384) ... (2) promotions#liveEffectivePrice is asked in
+    process too. Implement it as an in-process query class of Catalogue''s Promotions module, registered in the
+    operations host with Catalogue''s other query classes. It runs the same evaluation code evaluatePromotions uses
+    (#31714) for stacking, precedence and the zero floor, never a copy, so this part depends on #31714 ... Database:
+    Hrushikant adds a guarded grant of USAGE on schema promotions and SELECT on promotions.promotion and
+    promotions.promotion_rule to the operations role ... tenancy#venueSettingsRecords stays in process, and
+    retail.merchandise is Retail''s own table."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-478 (Deep Khanvilkar, #30871 lookupMerchandise, blocking): both reads were declared on the service route
+  although the operations host composes Tenancy''s and Catalogue''s query classes (CR-383, CR-384, CR-426), and
+  liveEffectivePrice was served on the service route only, with no grant on the promotions tables.'
+keys_touched:
+  operations: [lookupMerchandise]
+  tables: [promotions.promotion, promotions.promotion_rule, platform.workstation]
+  files:
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/promotions.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-072 (operations reads promotions.promotion and promotions.promotion_rule through promotions#liveEffectivePrice)'
+  - 'query promotions#liveEffectivePrice served [in-process, service], reads promotions.promotion_rule'
+root_class: 'a read the host already asks in process declared on the service route (the class of CHG-R13INP-001)'
+tickets:
+  started: []
+  unstarted:
+  - '30871 (lookupMerchandise, Deep): both reads in process; the liveEffectivePrice query class on evaluatePromotions''
+    code, so this part waits for #31714.'
+  - '37211 ([DB] the grant, Hrushikant, made by hand on 2 November): XDR-072''s guarded USAGE and SELECT.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-478
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MERCH-LIVE-PRICE
+status: open
+notes: 'Beyond the posted words: the query''s rule says it reads promotions.promotion_rule (a `reads` entry), so the
+  grant follows the query; that is the table the posted grant names.'

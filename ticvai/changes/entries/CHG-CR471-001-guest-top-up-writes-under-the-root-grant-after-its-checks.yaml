@@ -1,0 +1,52 @@
+id: CHG-CR471-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: topUpWallet holds a guest to its own wallet (x-ticvai-self-scoped subject, the shared 404), runs every check under
+  the caller's grant in the stated order, and for a guest runs exactly the balance update, the paid and bonus lots, one
+  wallet_transaction per lot, the wallet update and the wallet.credited outbox row under ITenantRootGrant, then restores
+  the caller's grant. Each lot sits at the top-up line's venue path and each transaction carries that venue. x-ticvai-writes
+  lists the five tables.
+decision:
+  what: 'Posted on #30860 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" (2 November 2026):
+    "as you recommended (option A), with the outbox row added and the guest held to its own wallet ... (1) Checks, under
+    the caller''s own grant, in this order: a guest caller ... may top up only its own wallet ... else the shared 404 ...
+    (2) Writes ... For a guest caller, once every check has passed, switch the connection to the routed tenant''s root grant
+    (ITenantRootGrant) for exactly these statements ... Nothing else runs under the root grant ... (3) Scope of the rows
+    ... (4) Tests ... No migration. The writes this operation makes ... are listed in its x-ticvai-writes ... #30860 comes
+    off hold."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-471 (Pranay Shinde, #30860, blocking): a guest session can write none of wallet.balance, credit_lot, wallet_transaction
+  or platform.outbox under their policies, and the lot''s scope_path was unstated; the CHG-CR433-001 and identity CR-183
+  precedent of checked statements under the root grant.'
+keys_touched:
+  operations:
+  - topUpWallet
+  tables:
+  - wallet.balance
+  - wallet.credit_lot
+  - wallet.wallet_transaction
+  - wallet.wallet
+  - platform.outbox
+  files:
+  - contracts/satellite/wallet.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: a guest-callable write whose tables refuse a guest session, and a row whose scope is unstated
+tickets:
+  started:
+  - '30860 (topUpWallet, Pranay, On hold): the order of checks, the guest''s 404, the root-grant block, the lots'' scope,
+    and the three tests the decision lists.'
+  unstarted:
+  - '32872 (POS-005 connect to API): no change.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-471
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-WALLET-TOPUP-GUEST
+status: open
+notes: 'No migration. The carried lineage override''s writes are now derived and removed. Beyond the posted words: the 404
+  is declared on the operation (the shared NotFound).'

@@ -261,6 +261,14 @@ export async function buildMigrations(root) {
           if (!file.rlsTables.includes(target)) file.rlsTables.push(target);
           continue;
         }
+        // **A primary key a later migration replaces is the table's key** (TICVAI ADAM CR-436, 2 November 2026):
+        // tenant/V0115 rekeys platform.configuration_profile (id, version) (CR-228) with `DROP CONSTRAINT ..._pkey,
+        // ADD CONSTRAINT ..._pkey PRIMARY KEY (id, version)`, and the record kept the CREATE's (id).
+        const rekey = body.match(/ADD\s+CONSTRAINT\s+[\w".]+\s+PRIMARY\s+KEY\s*(\([^)]*\))/i);
+        if (rekey && table) {
+          table.primaryKey = columnList(rekey[1]);
+          continue;
+        }
         if (/FOREIGN\s+KEY/i.test(body) && table) {
           const columns = columnList(body.match(/FOREIGN\s+KEY\s*(\([^)]*\))/i)?.[1] ?? '');
           const reference = body.match(REFERENCES);

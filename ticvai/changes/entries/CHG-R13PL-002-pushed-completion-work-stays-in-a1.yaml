@@ -1,0 +1,48 @@
+id: CHG-R13PL-002
+date: '2026-11-02'
+source: audit
+kind: plan
+proposed: '2026-11-02'
+summary: 'After the r12 apply, P08''s completion work (272 tasks) fell from A1 to A2 at a fresh plan build and the plan''s
+  waits had a cycle: a ticketed hand-written [DB] task keeps the waits it was pushed with, and pushed A1 completion work
+  stays in A1.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. tools/build-service-docs.py:
+    (1) a ticketed hand-written [DB] task is waited on by a forward migration only where the last release bundle had a migration
+    waiting on it (PRD-W1-DB), or for a key into its tables, not merely because it now has a ticket; (2) in the two drops
+    of Block A, a completion app-module the last release bundle (op-release.json) pushed under BLOCK-A stays in A1, whatever
+    the overtime test says, as CHG-R10GFP-001 keeps a pushed later-block app-module in its block; moving one out is a plan
+    change for the lead. Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding of this lane''s first plan build of 2 November 2026 (before any r13 change), against commit 02aa4412: the
+  55 tickets the r12 apply made kept the owners r12 gave them, the measured A1 overtime went from 37 to 117 hours, and P08''s
+  completion work went to A2 (check-plan-closure C-BOUND 30, C-CALLS 7, C-REACH 1). The cause: the r12 apply made CR409-COMPETITOR-PRICE-OBSERVATION-DB''s
+  ticket (#37177), so CHG-R12PL-034''s rule (a [DB] task not ticketed yet is waited on only for a key into it) stopped holding,
+  every later catalogue forward migration waited on it again, MIG-CATALOGUE-10 and it waited on each other (op-release.py
+  refuses the cycle), and A1''s overtime rose as CHG-R12PL-034 had seen.'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+  other:
+  - Block A1 completion app-modules of P06, P08, P09, P12, P13, P14, P16 and API
+root_class: a pushed app-module moved between drops of Block A because the measured load around it changed
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: this lane''s plan build (follows the r12 apply, 02aa4412)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: With both rules the plan keeps every task's block and parent as r12 pushed them, the cycle is gone, and A1's overtime
+  is back to 46 hours (43 accepted; 37 when r12 was planned), with the r13 tasks in it.

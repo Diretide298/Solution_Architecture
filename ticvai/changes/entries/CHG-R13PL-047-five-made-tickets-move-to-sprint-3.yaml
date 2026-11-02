@@ -1,0 +1,44 @@
+id: CHG-R13PL-047
+date: '2026-11-02'
+source: plan
+kind: plan
+proposed: '2026-11-02'
+summary: The five CR tickets made by hand in Sprint 1 (#37210 to #37214) move to Sprint 3, the current sprint, in
+  OpenProject and in their made records, so the r13 apply keeps them there.
+decision:
+  what: 'The lead, 2 November 2026, asked whether the five hand-made tickets that sit in Sprint 1, which is over, should
+    move to the current sprint: "Yesss". #37210 CR477-DB-OPERATIONS-READS-ORDER-LINE, #37211 CR478-DB-OPERATIONS-READS-PROMOTIONS,
+    #37212 CR480-ORDER-EXCHANGED-CONSUMERS, #37213 CR482-PRODUCT-FEATURED-COMPARE-AT and #37214 CR483-DB-END-PRINCIPAL-SESSIONS
+    moved to Sprint 3 (2-13 November) in OpenProject on 2 November 2026 (mail off), and their `made` records in
+    docs/active/block-a-extra-tasks.json say sprint 3, which tools/op-release.py puts on their bundle rows (CHG-R13PL-003).
+    Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'CHG-R13PL-008 to CHG-R13PL-012 recorded the five as made, in Sprint 1, which ended on 16 October; a made record keeps
+  its sprint in the bundle, so without this the apply would hold them in a past sprint.'
+keys_touched:
+  tickets:
+  - CR477-DB-OPERATIONS-READS-ORDER-LINE (37210)
+  - CR478-DB-OPERATIONS-READS-PROMOTIONS (37211)
+  - CR480-ORDER-EXCHANGED-CONSUMERS (37212)
+  - CR482-PRODUCT-FEATURED-COMPARE-AT (37213)
+  - CR483-DB-END-PRINCIPAL-SESSIONS (37214)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: work the lead ticketed in OpenProject between releases that the plan did not have (CHG-R11PLN-001)
+tickets:
+  started: []
+  unstarted:
+  - '#37210, #37211, #37214 (Hrushikant Patkar), #37212 (Pranay Shinde), #37213 (Sanket Keluskar): New, now Sprint 3'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/op-release.py
+status: open

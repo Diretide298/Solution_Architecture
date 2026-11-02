@@ -167,9 +167,11 @@ x-ticvai-queries:
       October). Tenancy answers with its approvals.rule rows, as it stores them and as the caller's scope lets it
       see them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
       an asker that refuses or chooses on these rows states that rule in its own operation, and a question with a
-      rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another deployable
-      through Tenancy's service route (serviceAuth).
-    served: [service]
+      rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process by the access
+      host, which composes Tenancy's query classes, through the C# query class Tenancy implements, under the
+      caller's row-level security (CHG-R13INP-001). It is asked from another deployable through Tenancy's service
+      route (serviceAuth).
+    served: [in-process, service]
 x-ticvai-jobs:
   # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
   # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
@@ -1402,8 +1404,18 @@ paths:
 
             `matrix-id-mismatch` (ADAM CR-245): a record for `kind` and the scope node the caller acts at exists and the path''s `matrixId` is not its id (or names another such record); nothing changes.
 
+
+            **One problem type per refusal** (ADAM CR-481, Chinmay, 2 November 2026; CHG-CR481-001): `loosens-parent-rule`
+            (`refusedReason` `loosensParentRule`, with `ruleOrder` and `parentScopePath`) and `unreachable-rule`
+            (`refusedReason` `unreachableRule`, with `ruleOrder` and `blockingRuleOrder`), the same type URIs
+            `approveMatrixMultiLevel` answers, so a client sees one type per refusal whichever operation refused; and
+            `matrix-id-mismatch` as now. The body stays `ApprovalMatrixRefusedProblem`, `refusedReason`, `ruleOrder`,
+            `blockingRuleOrder` and `parentScopePath` riding as its members.
+
             '
           x-ticvai-problem-types:
+          - loosens-parent-rule
+          - unreachable-rule
           - matrix-id-mismatch
           content:
             application/problem+json:
@@ -1412,14 +1424,17 @@ paths:
         '422':
           description: 'A rule''s `condition` does not parse in the condition language (`ApprovalRule.condition`: clauses
             `<attribute> <operator> <value>` joined by ` AND `, at most 10; ADAM CR-102, CHG-R10ID-015), so it could
-            never be evaluated. Nothing is stored; `errors[]` names the rule''s `order` and the first clause that failed.
+            never be evaluated. Nothing is stored. The answer is `ApprovalConditionInvalidProblem`: `Problem` plus
+            `ruleOrder` (the rule''s `order` in the body) and `clause` (the first clause that failed, exactly as sent),
+            with the condition parser''s message as `detail`, and no `errors[]`, which stays on the `400` validation
+            answers only (ADAM CR-481, Chinmay, 2 November 2026; CHG-CR481-001).
             Until r10 any non-null condition was refused here (`condition-not-supported`, APPROVALS-TENANCY-C06); the
             grammar lifts that.'
           x-ticvai-problem-types: [condition-invalid]
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ApprovalConditionInvalidProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegations:
@@ -1472,6 +1487,15 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: identity#principalHoldsRoleAtVenue
+        route: in-process
+        for: 'the delegation-authority check (ADAM CR-479): whether the delegator holds an approver role of the in-force
+          matrix''s rules at the delegation''s scope (its limit, 403 exceedsDelegatorAuthority), and whether the delegate
+          holds requiredRoleId (409 delegateLacksRequiredRole), as a yes or no under the routed tenant''s root grant'
+      - query: identity#principalHoldsPermissionAtVenue
+        route: in-process
+        for: 'the delegation-authority check (ADAM CR-479): whether the delegate holds APPROVAL_DECIDE at the delegation''s
+          scope or above (403 delegateLacksPermission), as a yes or no under the routed tenant''s root grant'
       x-ticvai-audience:
       - staff
       summary: Delegate approval authority
@@ -1481,6 +1505,31 @@ paths:
         The delegate cannot exceed the delegator''s own authority, and **cannot approve a request the
         delegator raised** — segregation of duties survives delegation, or delegation becomes the way
         around it.
+
+
+        **The delegation-authority check** (ADAM CR-479, Chinmay, 2 November 2026, option A for the rules with the reads
+        asked as yes/no questions under the routed tenant''s root grant, as CR-336 and CR-362 did; CHG-CR479-001). One
+        check in the Approvals module, called by `createApprovalDelegation` and `approveRoleAuthorityDelegation` alike,
+        before anything is written. The `400`s (`invalidWindow`, `delegateIsDelegator`) are checked first, then the
+        `403`s, then the `409`.
+
+        1. `delegateLacksPermission` (`403 delegate-lacks-permission`): the delegate must hold `APPROVAL_DECIDE` at the
+        delegation''s `scopePath` (the caller''s venue) or above, asked of `identity#principalHoldsPermissionAtVenue`.
+
+        2. `exceedsDelegatorAuthority` (`403 exceeds-delegator-authority`): for each kind the delegation covers (its
+        `kinds`, or, when `kinds` is absent, every kind of `approvals.matrix`), take the in-force matrix for that kind at
+        the delegation''s `scopePath`: the nearest node''s matrix (venue, else region, else tenant), its highest version,
+        passing to the next ancestor when that version is inactive (`ApprovalMatrix`). The delegator''s limit for the
+        kind is the highest `approvals.rule.max_amount` among that matrix''s rules where
+        `identity#principalHoldsRoleAtVenue(delegator, role, scopePath)` is true for at least one role in
+        `approver_role_ids`; a matching rule with `max_amount` null makes the limit unlimited. Refuse when a named kind
+        has no such rule; when `kinds` is absent, refuse only if no kind has one. Refuse when `maxAmount` (compared in
+        the venue''s currency, CR-102) exceeds the limit of any kind the delegation covers that has a finite limit.
+        `maxPercentage` is the delegation''s own cap and is not compared with the matrix, which stores no percentage
+        ceiling.
+
+        3. `delegateLacksRequiredRole` (`409 delegate-lacks-required-role`): when `requiredRoleId` is set,
+        `identity#principalHoldsRoleAtVenue(delegate, requiredRoleId, scopePath)` must be true.
 
         '
       tags:
@@ -1520,8 +1569,8 @@ paths:
                 $ref: '#/components/schemas/DelegationRefusedProblem'
         '403':
           description: 'The delegation would hand over authority that is not there. `refusedReason` is
-            `delegateLacksPermission` where the delegate does not hold the permission being delegated,
-            or `exceedsDelegatorAuthority` where `kinds` or `maxAmount` go beyond what the delegator may
+            `delegateLacksPermission` where the delegate does not hold `APPROVAL_DECIDE` at the delegation''s scope or
+            above (ADAM CR-479), or `exceedsDelegatorAuthority` where `kinds` or `maxAmount` go beyond what the delegator may
             approve, that is **the delegator''s own approval limit**, the highest amount it may approve itself under the matrix
             in force for that kind at the scope (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020).
             The shared `Forbidden`, with no `refusedReason`, is the caller lacking
@@ -2059,12 +2108,15 @@ paths:
         '422':
           description: '`skipConditions` cannot become the rule''s `condition` (ADAM CR-102, CHG-R10ID-015): a clause does
             not parse in the condition language (`ApprovalRule.condition`), or it joins clauses with ` AND `, whose
-            negation the language cannot hold. Nothing is stored; `errors[]` names the clause.'
+            negation the language cannot hold. Nothing is stored. The answer is `ApprovalConditionInvalidProblem`, as
+            `setApprovalMatrix` answers it (ADAM CR-481, Chinmay, 2 November 2026; CHG-CR481-001): `clause` is the
+            `skipConditions` clause that failed, `ruleOrder` the rule''s `sort_order` as the server fills it, the
+            parser''s message is `detail`, and there is no `errors[]`.'
           x-ticvai-problem-types: [condition-invalid]
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/ApprovalConditionInvalidProblem'
         '403':
           description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
           x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
@@ -2088,6 +2140,15 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: identity#principalHoldsRoleAtVenue
+        route: in-process
+        for: 'the delegation-authority check (ADAM CR-479): whether the delegator holds an approver role of the in-force
+          matrix''s rules at the delegation''s scope (its limit, 403 exceedsDelegatorAuthority), and whether the delegate
+          holds requiredRoleId (409 delegateLacksRequiredRole), as a yes or no under the routed tenant''s root grant'
+      - query: identity#principalHoldsPermissionAtVenue
+        route: in-process
+        for: 'the delegation-authority check (ADAM CR-479): whether the delegate holds APPROVAL_DECIDE at the delegation''s
+          scope or above (403 delegateLacksPermission), as a yes or no under the routed tenant''s root grant'
       x-ticvai-body-key: [delegator, delegate]
       x-ticvai-body-key-note: 'Keyed by the body''s `delegator` and `delegate`, not a singleton (ADAM CR-352, Chinmay, 30
         October 2026; CHG-CR352-001): one delegation per pair of people at the caller''s venue. The PUT finds the active
@@ -2117,7 +2178,7 @@ paths:
         | `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
         | `start`, `end`, `reason` | `from`, `to`, `reason` |
         | `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
-        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
+        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap. `maxAmount` never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it); `maxPercentage` is not compared with the matrix, which stores no percentage ceiling (ADAM CR-479) |
         | `scope`, `venue`, `region`, `department` | `scopePath`: the most specific scope node given |
         | `businessUnit`, `legalEntity` | **not a scope, and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): neither is a level of the scope tree, so neither sets `scopePath`. Kept in the schema so an r1 client still validates; a value sent is ignored |
         | `delegationType` | `delegationType` |
@@ -2130,6 +2191,10 @@ paths:
         venue (`x-ticvai-body-key-note`); no other delegation at the venue is touched. The `200` stays
         `RolesAuthorityDelegationApprovalLimitsView`, filled from the row written; it does not become
         `ApprovalDelegation`. The `400`, `403` and `409` and their problem types are unchanged.
+
+        **The same delegation-authority check as `createApprovalDelegation`** (ADAM CR-479, Chinmay, 2 November 2026;
+        CHG-CR479-001): one check in the Approvals module, called by both operations before anything is written, as
+        `createApprovalDelegation` states it (the `400`s first, then the `403`s, then the `409`).
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_CONFIGURE
@@ -6738,6 +6803,27 @@ components:
             type: string
             nullable: true
             description: With `loosensParentRule`, the scope whose matrix sets the rule being loosened.
+    ApprovalConditionInvalidProblem:
+      x-ticvai-persistence: none — error shape
+      description: 'The `422 condition-invalid` of `setApprovalMatrix` and `approveMatrixMultiLevel` (ADAM CR-481,
+        Chinmay, 2 November 2026; CHG-CR481-001): `Problem` plus the rule and the clause, as members and not in
+        `errors[]`, which is for the `400` field validation answers (common.yaml). `detail` is the condition parser''s
+        message. Nothing is stored.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - ruleOrder
+        - clause
+        properties:
+          ruleOrder:
+            type: integer
+            description: '`setApprovalMatrix`: the rule''s `order` in the body. `approveMatrixMultiLevel`: the rule''s
+              `sort_order`, as the server fills it.'
+          clause:
+            type: string
+            description: The first clause that failed, exactly as sent (for `approveMatrixMultiLevel`, the
+              `skipConditions` clause).
     DelegationRefusedProblem:
       x-ticvai-persistence: none — error shape
       description: 'Why `createApprovalDelegation` stored nothing. `invalidWindow` and

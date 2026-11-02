@@ -1,0 +1,61 @@
+id: CHG-R13PL-001
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'CR-460: #31608 (catalogue.approval_policy, MIG-CATALOGUE-3) moves into Block A, before #31816 and #34699; a Block
+  A task whose operation needs a table created in a later block is refused (check-plan-closure C-TABLE).'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. docs/active/block-a-extra-tasks.json
+    `decidedReads`: listProductApprovalWorkflows reads catalogue.approval_policy (the decision: "Declare its read of catalogue.approval_policy").
+    tools/build-service-docs.py adds a decided read to the operation''s reads for the plan, so SVC-CATALOGUE-DRAFTED-5 (#31816,
+    Block A1) waits on MIG-CATALOGUE-3 and the migration is pulled into Block A (AM-TICKETING-P08-BLOCK-A), scheduled before
+    both. tools/check-plan-closure.py C-TABLE refuses a Block A task whose operation reads or writes a table whose creating
+    migration is only in a later block. Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-460, the lead''s decision of 2 November 2026 posted on #31816: "Hrushikant lands #31608 before #31816 and
+  #34699 start, even though it is planned for Block B".'
+keys_touched:
+  tickets:
+  - MIG-CATALOGUE-3 (28092)
+  - MIG-CATALOGUE-3#catalogue.approval_policy (31608)
+  - SVC-CATALOGUE-DRAFTED-5#listProductApprovalWorkflows (31816)
+  - SVC-CATALOGUE-DRAFTED-2#approveWorkflow (34699)
+  tables:
+  - catalogue.approval_policy
+  operations:
+  - listProductApprovalWorkflows
+  - approveWorkflow
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+  - tools/check-plan-closure.py
+root_class: an operation's read the contract did not declare, so the plan neither waited on nor pulled the migration that
+  creates the table it reads
+tickets:
+  started: []
+  unstarted:
+  - '#31608 and #28092 (Hrushikant Patkar, New): planned in Block A now, before #31816'
+  - '#31816 (listProductApprovalWorkflows, New): follows MIG-CATALOGUE-3'
+  - '#34699 (approveWorkflow, Chinmay Patkar, New): already followed MIG-CATALOGUE-3; its task stays in Block B'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-460
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'Why the plan let it happen: listProductApprovalWorkflows declared no read (its lineage reads were empty), so its
+  task waited only on MIG-CATALOGUE-5, and MIG-CATALOGUE-3 went with the first app-module whose back end needed it, approveWorkflow''s
+  (AM-APPROVALS-P08-2, Block B). Lane n declares the read in the contract; with it the generator pulls the migration by
+  itself (tried on this tree: MIG-CATALOGUE-3 lands in AM-TICKETING-P08-BLOCK-A), and the decidedReads entry is then redundant
+  (build-service-docs.py and check-plan-closure print it) and is removed. #34699 is a Block B task in the plan (SVC-CATALOGUE-DRAFTED-2,
+  Sprint 4), not Block A. C-TABLE on the plan before this change finds exactly this one Block A task; no other.'

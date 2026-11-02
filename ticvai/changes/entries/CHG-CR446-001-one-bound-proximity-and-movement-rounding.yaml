@@ -1,0 +1,42 @@
+id: CHG-CR446-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'listPriceElasticityRevenue writes a proximity with one bound as ''up to {to} days'' (from null) or ''{from}+
+  days'' (to null), both bounds stay ''{from}-{to} days'', both null leaves it out; listCompetitorPricingMarket rounds
+  movementPercent to one decimal, like positionVsMedian.'
+decision:
+  what: 'ADAM CR-446, posted 1 November 2026 on #35226: "Decided (Chinmay, 1 November 2026): as you recommended.
+    Proximity with one bound is written ''up to {to} days'' (from null) or ''{from}+ days'' (to null); both bounds stay
+    ''{from}-{to} days''; both null leaves it out. movementPercent is rounded to one decimal, like positionVsMedian." The
+    lead, 1 November 2026: "Approve all".'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-446 (Hrushikant Patkar, #35226): CR-406 wrote the proximity only with both bounds and CR-409 gave
+  movementPercent no rounding, so the build left the proximity out with one bound and answered movementPercent
+  unrounded; both are figures staff see (ADM-105, ADM-102).'
+keys_touched:
+  screens: [ADM-105, ADM-102]
+  operations: [listPriceElasticityRevenue, listCompetitorPricingMarket]
+  schemas: [PriceElasticityRevenueResponseIntelligenceView, CompetitorPricingMarketPositionIntelligenceView]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'a display format stated for the common case only (both bounds; one rounded figure of two)'
+tickets:
+  started:
+  - '35226 (listPriceElasticityRevenue, Hrushikant Patkar, Ready for QA): write a one-bound proximity as ''up to {to}
+    days'' or ''{from}+ days'' instead of leaving it out. Told through the CR-446 comment.'
+  - '35327 (listCompetitorPricingMarket, Hrushikant Patkar, Ready for QA): round movementPercent to one decimal.'
+  unstarted:
+  - 'ADM-105 and ADM-102 front ends (36698 to 36700, 36689 to 36691): the label and the figure are the server''s; no
+    change to the approved screens.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-446
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ELASTICITY-LABELS
+status: open
+notes: 'No shape change; descriptions only. No database change.'

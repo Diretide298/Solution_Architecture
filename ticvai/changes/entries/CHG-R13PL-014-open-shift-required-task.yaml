@@ -1,0 +1,55 @@
+id: CHG-R13PL-014
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'A [DB] task for CR-441: workforce.open_shift''s venue_id, position_code, valid_from and valid_to become NOT NULL
+  in a later forward migration, once existing rows are checked.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR441-DB-OPEN-SHIFT-REQUIRED (Hrushikant Patkar, migrations.owner in docs/active/team.json, `area: database`,
+    not before 2 November 2026): following MIG-WORKFORCE: list the rows missing any of the four and stop with the count
+    and ids if there is one, then SET NOT NULL on the four. Its text carries the decision''s statements and names the release''s
+    forward migration as its Source DDL after r1. Plan change waived from the cooling-off by the lead ("1 waive", 2 November
+    2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-441; the lead''s decision of 1 November 2026, posted on #37102 (claimOpenShift). The ticket the work belongs
+  to has started or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release
+  apply makes.'
+keys_touched:
+  tickets:
+  - CR441-DB-OPEN-SHIFT-REQUIRED (new)
+  tables:
+  - workforce.open_shift
+  operations:
+  - createOpenShift
+  - updateOpenShift
+  - claimOpenShift
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27670 (MIG-WORKFORCE, [DB] V0018__workforce.sql, Ready for QA, Hrushikant Patkar): not rewritten'
+  unstarted:
+  - '#37189 (MIG-WORKFORCE#workforce.open_shift, a sub-task, New): unchanged'
+  - '#37102 (claimOpenShift, On hold): keeps its interim until the task lands'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-441
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the task''s text; its
+  OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its tables. A change-only
+  [DB] task is `area: database` and its key does not end in -DB (a -DB task''s `table` builds count as created by it, CHG-R8MIG-016,
+  CHG-R12PL-008).'

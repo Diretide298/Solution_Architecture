@@ -45,6 +45,15 @@ approving a journal entry need a second factor?* has to be one answer and not th
   operation that declares `x-ticvai-step-up: mfa` therefore lists both `step-up-token-missing` and
   `step-up-token-expired` on its `403`; on 31 October none of the 20 did, so the refusal had no type.
 
+- **SU-PLATFORM-STEP-UP: a platform caller's step-up read from a tenant session** (r13, CHG-R13ID-001; ADR-0072 point
+  4, ADAM CR-175 and CR-375). CR-375 gave every MFA operation the same 403 text, "the caller's session has no
+  verified, unconsumed MFA step-up ... by the rule in identity `verifyMfaChallenge`", and three operations whose
+  caller is a platform operator (`x-ticvai-permission` `PLATFORM_*`: openPlatformStaffGrant and two
+  PLATFORM_CELL_MANAGE operations in subscription.yaml) took it, against their own text and ADR-0072: a platform
+  caller's step-up is read from the Control Plane token (`ticvai_step_up` {action, at} within 5 minutes, `amr`
+  includes `mfa`), never from a tenant session or an `identity.mfa_challenge` row. Such an operation's 403 names
+  `ticvai_step_up` and never `verifyMfaChallenge`.
+
 **And what it reports without refusing:** a screen calling a step-up operation that declares no way
 to present the challenge. That is authoring work on real screens rather than a defect in the
 contract, and failing the package for it would only teach people to run the pipeline less.
@@ -154,7 +163,29 @@ def mfa_refusal_problems(oid: str, op: dict) -> list:
             "refusal for an absent or stale step-up has no type (ADAM CR-375, CHG-CR375-001)"]
 
 
+def platform_step_up_problems(oid: str, op: dict) -> list:
+    """SU-PLATFORM-STEP-UP: a platform caller's MFA 403 reads the token's ticvai_step_up (ADR-0072 point 4)."""
+    if op.get("x-ticvai-step-up") != "mfa" or not str(op.get("x-ticvai-permission") or "").startswith("PLATFORM_"):
+        return []
+    text = str(((op.get("responses") or {}).get("403") or {}).get("description") or "")
+    if "ticvai_step_up" in text and "verifyMfaChallenge" not in text:
+        return []
+    return [f"{oid}: SU-PLATFORM-STEP-UP a platform caller's step-up is read from the Control Plane token "
+            "(ticvai_step_up, amr), never from a tenant session or verifyMfaChallenge; its 403 must say so "
+            "(ADR-0072 point 4; CHG-R13ID-001)"]
+
+
 def _self_test() -> int:
+    plat = {"x-ticvai-step-up": "mfa", "x-ticvai-permission": "PLATFORM_CELL_MANAGE"}
+    ok_plat = (platform_step_up_problems("p1", dict(plat, responses={"403": {
+                   "description": "the caller's session ... by the rule in identity `verifyMfaChallenge`"}}))
+               and not platform_step_up_problems("p2", dict(plat, responses={"403": {
+                   "description": "read from the token's `ticvai_step_up`"}}))
+               and not platform_step_up_problems("p3", {"x-ticvai-step-up": "mfa", "x-ticvai-permission": "APPROVAL_DECIDE",
+                                                        "responses": {"403": {"description": "verifyMfaChallenge"}}}))
+    if not ok_plat:
+        print("self-test FAIL (SU-PLATFORM-STEP-UP)")
+        return 1
     ok = (not mfa_refusal_problems("a", {"x-ticvai-step-up": "pin"})
           and mfa_refusal_problems("b", {"x-ticvai-step-up": "mfa", "responses": {"403": {"$ref": "x"}}})
           and len(mfa_refusal_problems("c", {"x-ticvai-step-up": "mfa", "responses": {"403": {
@@ -199,6 +230,7 @@ def main() -> int:
                                     op.get("x-ticvai-scope-level"), f.name)
                     carrier_errors += carrier_problems(oid, op, doc, item.get("parameters") or [])
                     carrier_errors += mfa_refusal_problems(oid, op)
+                    carrier_errors += platform_step_up_problems(oid, op)
                 if oid in ("listStepUpPolicies", "setStepUpPolicy"):
                     policy_ops[oid] = op.get("x-ticvai-config-scope")
 

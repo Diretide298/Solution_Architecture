@@ -4443,14 +4443,6 @@
    "reason": "the map's own seat state; the orders side comes through the orders service operation, not a table read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "getSignageQueueBoard": {
-   "reads": [
-    "queue.queue",
-    "queue.reading"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "getSignageQueueCalls": {
    "reads": [
     "queue.entry"
@@ -14941,13 +14933,10 @@
    "carried": true
   },
   "setSeoMetadata": {
-   "reads": [
-    "catalogue.product"
-   ],
    "writes": [
     "cache:resolution"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001). Its carried read of catalogue.product is removed: the operation reads nothing from Catalogue and does not check that the entity exists (ADAM CR-474, 2 November 2026; CHG-CR474-001)",
    "carried": true
   },
   "setServiceQueueDefinition": {
@@ -15710,15 +15699,14 @@
    "reads": [
     "marketing.consent_record",
     "marketing.form_definition",
-    "marketing.waiver_requirement",
-    "pii.subject"
+    "marketing.waiver_requirement"
    ],
    "writes": [
     "marketing.consent_record",
     "marketing.waiver_requirement",
     "marketing.waiver_requirement_event"
    ],
-   "reason": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): a waiver submission completes its waiver_requirement (form_submission_id, completed_at, status completed) and appends signatureSubmitted/markedComplete events (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): a waiver submission completes its waiver_requirement (form_submission_id, completed_at, status completed) and appends signatureSubmitted/markedComplete events (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)). Its carried read of pii.subject is removed: submitForm reads nothing from pii.subject (ADAM CR-472, 2 November 2026; CHG-CR472-001)",
    "carried": true
   },
   "submitGuestIdentityDocument": {
@@ -16001,10 +15989,6 @@
   "topUpWallet": {
    "reads": [
     "wallet.balance"
-   ],
-   "writes": [
-    "wallet.balance",
-    "wallet.wallet_transaction"
    ],
    "reason": "4 October 2026 (CHG-FXC-004): the one balance writer (SD-027) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true

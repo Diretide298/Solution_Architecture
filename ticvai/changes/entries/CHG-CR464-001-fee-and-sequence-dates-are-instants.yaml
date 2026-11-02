@@ -1,0 +1,54 @@
+id: CHG-CR464-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'The CR-414 rule for fees and the calculation sequence: in FeeSurchargeLibraryView,
+  FeeApplicabilityChargingRuleBuilderView and its Input, FeeWaiverTaxExemptionExceptionRulesView and
+  PriceCalculationSequenceFormulaEngineView, effectiveFrom and effectiveTo are nullable date-times (null from: in effect
+  from when saved; null to: open-ended); listPriceCalculationSequence''s asOf is an instant (absent means now); the
+  status filters and members take CatalogueConfigStatus and expired leaves the enum (BC-580).'
+decision:
+  what: 'ADAM CR-464, posted 2 November 2026 on #35385: "Decided (Chinmay, 2 November 2026): As you recommended (A), the
+    CR-414 rule. Build now: In FeeSurchargeLibraryView, FeeApplicabilityChargingRuleBuilderView and its Input,
+    FeeWaiverTaxExemptionExceptionRulesView and PriceCalculationSequenceFormulaEngineView, effectiveFrom and effectiveTo
+    become format date-time ... Both stay nullable ... The screens show the day in the venue''s time zone ...
+    listPriceCalculationSequence''s asOf becomes date-time and returns the steps of profiles in force at that instant
+    ...; an absent asOf means now. The status query parameters of listFeeSurcharge and listFeeWaiverTax, and the status
+    members of these views, take CatalogueConfigStatus ... expired leaves the enum. The same applies in
+    setFeeApplicabilityCharging (#35165), listFeeWaiverTax (#35386) and listPriceCalculationSequence (#35387)." The
+    lead, 2 November 2026: "approve all as a recommended".'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-464 (Hrushikant Patkar, #35385): the views typed dates as date over timestamptz columns (catalogue.fee,
+  fee_rule, calculation_profile), which PricingFee, FeeRule and CalculationProfile already type as instants, and offered
+  an expired status no store writes; CR-414 settled the same question for channel sale rules, CR-423 the status.'
+keys_touched:
+  screens: [ADM-071, ADM-072, ADM-073, ADM-074]
+  operations: [listFeeSurcharge, setFeeApplicabilityCharging, listFeeWaiverTax, listPriceCalculationSequence]
+  schemas: [FeeSurchargeLibraryView, FeeApplicabilityChargingRuleBuilderView, FeeApplicabilityChargingRuleBuilderInput,
+            FeeWaiverTaxExemptionExceptionRulesView, PriceCalculationSequenceFormulaEngineView]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-580 (the four operations), approved by the posted decision'
+root_class: 'a view answering a day over an instant column, and a status filter offering a value no store writes'
+tickets:
+  started: []
+  unstarted:
+  - '35385 (listFeeSurcharge), 35165 (setFeeApplicabilityCharging), 35386 (listFeeWaiverTax), 35387
+    (listPriceCalculationSequence), all New: the instants, asOf and CatalogueConfigStatus at the next tag (BC-580).'
+  - 'ADM-071 to ADM-074 front ends (29874, 35720, 29704, 36629 to 36631, 29875, 36659 to 36661, 29876, 36662 to 36664):
+    show the day in the venue''s time zone; no visible change.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-464
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FEE-INSTANTS
+status: open
+notes: 'Named beyond the posted words: effectiveFrom was not nullable in these views; "both stay nullable" is read as
+  both nullable, as CR-414 did. The three lists that order by effectiveFrom now say nulls last (check-list-order
+  LO-NULLABLE-KEY asks a nullable sort key to say where nulls go; CR-414''s order did the same). No database change.'

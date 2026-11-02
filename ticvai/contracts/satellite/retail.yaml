@@ -542,11 +542,14 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
-        route: service
-        for: 'the caller''s workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003)'
+        route: in-process
+        for: 'the caller''s workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003; in process since ADAM
+          CR-478, as assignKiosk under CR-384)'
       - query: promotions#liveEffectivePrice
-        route: service
-        for: 'the price after any live promotion (ADAM CR-096)'
+        route: in-process
+        for: 'the price after any live promotion, PriceCheck.effectivePrice: venueId, the caller''s channel and one item
+          per merchandise (itemRef the merchandise id, unitPrice its list price) (ADAM CR-096; in process since ADAM
+          CR-478, XDR-072)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PriceCheck.effectivePrice, PriceCheck.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
@@ -580,6 +583,19 @@ paths:
         (`x-ticvai-staff-only`) and are left out of a guest response, which shows `isAvailable`. `onHand` stays in it,
         because `PriceCheck` requires it and leaving it out would break the tills built against it. "Published" is the
         merchandise record's `isPublished` flag, set by `PRODUCT_CONFIGURE` holders.
+
+
+        **The workstation and the promotion price are asked in process** (ADAM CR-478, Chinmay, 2 November 2026).
+        `tenancy#workstationRecords` is asked in process from the operations host, through Tenancy's query class
+        as assignKiosk does (CR-384), for the caller's workstation and its outlet; `400 outlet-required` and `404`
+        answer as above, and no grant is needed (V0118). `promotions#liveEffectivePrice` is asked in process too:
+        an in-process query class of Catalogue's Promotions module, registered in the operations host with
+        Catalogue's other query classes, running the same evaluation code `evaluatePromotions` uses (#31714) for
+        stacking, precedence and the zero floor, never a copy. Its inputs are `venueId`, the caller's channel, and
+        one item per merchandise (`itemRef` the merchandise id, `unitPrice` its list price); its result gives
+        `PriceCheck.effectivePrice`, under the caller's row-level security. The operations role reads
+        `promotions.promotion` and `promotions.promotion_rule` on a guarded read grant (XDR-072).
+        `tenancy#venueSettingsRecords` stays in process, and `retail.merchandise` is Retail's own table.
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-guest-callable: true
@@ -696,11 +712,11 @@ paths:
         for: 'the stock on hand each line (or kit component) draws on, from its movements (409 insufficientStock) (r8
           re-walk, CHG-R8RW-004)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'the order lines the sale lines name (orderLineId): unit price, tax, net and gross as Orders priced them (422
           order-line-mismatch) (r8 re-walk, CHG-R8RW-004)'
       - query: orders#orderLineDiscountRecords
-        route: service
+        route: in-process
         for: 'the discounts Orders applied to those lines, summed onto each sale line (r8 re-walk, CHG-R8RW-004)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1282,8 +1298,9 @@ paths:
         - "P04 POS-005 Payment"
       x-ticvai-read-via:
       - query: orders#orderLineRecords
-        route: service
-        for: 'the retail lines lineIds names on the orderId path (ADAM CR-096)'
+        route: in-process
+        for: 'the retail lines lineIds names on the orderId path, where {orderId} (ADAM CR-096; in process since ADAM
+          CR-477, XDR-071)'
       - query: fnb#deliveryLocationRecords
         route: in-process
         for: 'collectionPointClosed: the collection point and its serving outlets (ADAM CR-096; the hours rule is CR-104)'
@@ -1327,6 +1344,16 @@ paths:
         does today (CR-104), so every item is droppable. **`dropReference`** is server-assigned, the venue prefix
         and a sequence per venue, as `orderNumber` is (for example `DXB1-SD-000123`), unique in the tenant; the slip
         prints it and `lookupShopAndDrop` matches it exactly.
+
+
+        **The order's lines are asked in process** (ADAM CR-477, Chinmay, 2 November 2026). On the `orderId` path
+        it asks `orders#orderLineRecords` with where {orderId} in process from the operations host, through
+        Orders' query class already composed there (CR-385), under the caller's row-level security; no service
+        route is called. An `orderId` with no visible line is `422 unknown-order`, and a `lineIds` entry that is
+        not one of those lines is `422 unknown-line`. The `saleId` path reads Retail's own tables, and
+        `fnb#deliveryLocationRecords` stays in process. The operations role reads `orders.order_line` on a
+        guarded grant of USAGE on schema orders and SELECT on the table (XDR-071), read only; row security still
+        decides the rows.
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation

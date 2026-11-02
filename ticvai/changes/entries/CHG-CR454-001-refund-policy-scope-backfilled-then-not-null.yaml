@@ -1,0 +1,44 @@
+id: CHG-CR454-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'orders.refund_calculation_policy.scope_path stays required and is reached by a backfill:
+  RefundCalculationPolicyView.scopePath states the new forward migration, UPDATE ... SET scope_path = the tenant root''s
+  path WHERE scope_path IS NULL, then ALTER COLUMN scope_path SET NOT NULL, as db/tenant/089 did for invitation and
+  ticket_template. The table record stays required.'
+decision:
+  what: 'ADAM CR-454, posted on #37037: "Decided (Chinmay, 1 November 2026): as you recommended (A). A new forward
+    migration backfills orders.refund_calculation_policy.scope_path from the tenant root where it is null, then sets it
+    NOT NULL, as db/tenant/089 did for invitation and ticket_template. The table record stays required. Build to it now;
+    the package is updated to match at the next release." The lead''s "Approve all", 1 November 2026.'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-454 (Hrushikant Patkar, #37037 [DB] orders.refund_calculation_policy): the table record says required while
+  V0104 adds the column with ADD COLUMN IF NOT EXISTS scope_path ltree and nothing later sets NOT NULL (#28276''s expected
+  schema has notNull false). Row-level security reads the path, so it should never be null; a derived forward file never
+  adds a NOT NULL, and handoff/migration-review.md already listed the step for a person.'
+keys_touched:
+  schemas: [RefundCalculationPolicyView]
+  tables: [orders.refund_calculation_policy]
+  files:
+  - contracts/spine/orders.yaml
+  - tools/check-business-rules.py
+root_class: 'a NOT NULL column added nullable by an additive migration, with no stated backfill on its contract'
+tickets:
+  started:
+  - '37037 ([DB] orders.refund_calculation_policy, Hrushikant Patkar): write the forward migration: backfill scope_path
+    from the tenant root where null, then SET NOT NULL; expect notNull true.'
+  - '28276 ([DB] V1028 orders, Hrushikant Patkar): its expected schema''s scope_path notNull false becomes true once
+    #37037''s migration is in; nothing else.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-454
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-REFUND-POLICY-SCOPE
+status: open
+notes: 'The package''s forward migration for the release is written once by the integration refresh, and a derived
+  forward file lists a NOT NULL for a person rather than writing it (tools/ddl_forward.py); handoff/migration-review.md''s
+  row for this column already carries the exact UPDATE and SET NOT NULL.'

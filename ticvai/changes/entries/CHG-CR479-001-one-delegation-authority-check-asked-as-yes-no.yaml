@@ -1,0 +1,52 @@
+id: CHG-CR479-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'createApprovalDelegation and approveRoleAuthorityDelegation call one delegation-authority check in Approvals before
+  anything is written: 400s first, then 403 delegate-lacks-permission (APPROVAL_DECIDE at the scope or above, the new rule
+  question identity#principalHoldsPermissionAtVenue) and 403 exceeds-delegator-authority (the in-force matrix''s highest
+  max_amount among rules whose approver role the delegator holds, null unlimited, no rule refused, maxPercentage not compared),
+  then 409 delegate-lacks-required-role (principalHoldsRoleAtVenue). Both declare the two rule questions in process.'
+decision:
+  what: 'Posted on #30847 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" (2 November 2026):
+    "option A as you recommended for the rules, with the reads asked as yes/no questions under the routed tenant''s root
+    grant, as CR-336 and CR-362 did. Build now, as one delegation-authority check in the Approvals module, called by approveRoleAuthorityDelegation
+    (#30847) and createApprovalDelegation (#31182) alike ... Declare identity#principalHoldsRoleAtVenue and identity#principalHoldsPermissionAtVenue
+    (route in-process) beside the two reads both operations already declare when the package is next updated."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-479 (Deep Khanvilkar, #30847, blocking): the refusals named no permission, no limit rule and no read of roles
+  or permissions; the CR-336 and CR-362 pattern (CHG-CR336-001, CHG-CR362-001).'
+keys_touched:
+  operations:
+  - createApprovalDelegation
+  - approveRoleAuthorityDelegation
+  tables:
+  - identity.delegated_access
+  - identity.role_permission
+  - approvals.matrix
+  - approvals.rule
+  files:
+  - contracts/spine/approvals.yaml
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+  other:
+  - query identity#principalHoldsPermissionAtVenue (new)
+root_class: a rule check that must see beyond the caller's scope, read under the caller's row security
+tickets:
+  started: []
+  unstarted:
+  - '30847 (approveRoleAuthorityDelegation, Deep): build the check and identity#principalHoldsPermissionAtVenue inside Identity;
+    the decision''s three tests.'
+  - '31182 (createApprovalDelegation, Chinmay Patkar): call the same check.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-479
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DELEGATION-AUTHORITY
+status: open
+notes: 'Beyond the posted words: identity#principalHoldsPermissionAtVenue declares reads [identity.delegated_access, identity.role_permission,
+  identity.principal]; approveRoleAuthorityDelegation''s field table line on maxPercentage is corrected (the decision''s
+  ''the package''s line is corrected'').'

@@ -1,0 +1,55 @@
+id: CHG-CR440-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'A table''s record names the file of a forward migration: build-schema-workbook.py matched "Migration V..."
+  with a capital M only, so the 137 "[DB] Forward migration V1nnn__..." tickets left their tables'' records (the
+  schema reference''s Migration column, which ADAM''s adam_table serves) with the task key and no file;
+  marketing.processing_purpose and marketing.minor_privacy_rule now read "V1228__marketing.sql (MIG-MARKETING-22)"
+  (#37071). check-migration-tickets M-RECORD-FILE holds it. listPrivacyConsent asks white-label#policyRecords (the
+  in-force policy) under the routed tenant''s root grant (ITenantRootGrant), as CR-336 and CR-362 read; every other
+  read is under the caller''s grant.'
+decision:
+  what: 'Posted on #37138 (Chinmay, 1 November 2026), the lead''s "Approve all" of the same day: "A, with one
+    correction: the storage already has its ticket. marketing.processing_purpose and marketing.minor_privacy_rule are
+    created by #37071 (MIG-MARKETING-22, V1228__marketing.sql, assigned to you); ADAM''s table record shows no
+    migration only because the record does not name it, which the next release fixes. Build #37071 first, then finish
+    #37138 with both rules as CR-378 decided. The in-force policy (policyRecords) is read under the routed tenant''s
+    root grant, as CR-336 and CR-362 did, so a venue manager''s command centre sees the tenant''s published policies;
+    everything else stays under the caller''s grant. #37138 comes off hold once #37071 is applied."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-440 (Hrushikant Patkar, #37138 listPrivacyConsent, blocking): the developer found no migration for the
+  two tables CR-378''s rules read, because the table record named none; MIG-MARKETING-22 (#37071) creates both, and
+  the record lost its file to a case-sensitive match. whitelabel.policy is scope_path row security and policies are
+  published at the tenant, so a venue-scoped caller saw no policy under its own grant.'
+keys_touched:
+  operations: [listPrivacyConsent]
+  tables: [marketing.processing_purpose, marketing.minor_privacy_rule, whitelabel.policy]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/build-schema-workbook.py
+  - tools/check-migration-tickets.py
+  - tools/check-business-rules.py
+  other:
+  - 'the Migration column of handoff/TICVAI_Schema_Reference.xlsx (derived): 444 table records gain their file'
+root_class: 'a derived record that drops a value its source carries (a case-sensitive match)'
+tickets:
+  started:
+  - '37071 (MIG-MARKETING-22, [DB] V1228__marketing.sql, Hrushikant): build it first; no change to what it creates.'
+  - '37138 (listPrivacyConsent, Hrushikant): off hold once #37071 is applied; ask white-label#policyRecords under
+    ITenantRootGrant for the in-force policy, every other read under the caller''s grant. Told through the lead''s
+    comment; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-440
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open
+notes: 'M-RECORD-FILE fails 444 tables on the r12 workbook and passes once build-schema-workbook.py runs with the
+  fixed match; the grant half is held by tools/check-business-rules.py::BR-PRIVACY-POLICY-GRANT. Every table whose
+  first migration is a forward one (MIG-<SCHEMA>-<n>) now shows its V1nnn file in ADAM; nothing else in the record
+  changes. Hold and release of #37138 is the lead''s, in OpenProject.'

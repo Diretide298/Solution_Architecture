@@ -1,0 +1,50 @@
+id: CHG-R13PL-026
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'CR-379: Access''s in-process query liveEntitlementSubjects is a plan task, and broadcastToGuests and sendGuestBroadcast
+  follow it.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026: "Can you check for all the missing tickets as well". docs/active/block-a-extra-tasks.json: CR379-LIVE-ENTITLEMENT-SUBJECTS
+    (Sanket Keluskar, Access''s back-end owner; follows MIG-ACCESS); `operationWaits` broadcastToGuests and sendGuestBroadcast
+    wait on it. Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-379 (CHG-CR379-001): "New child task needed (Access backend): access#liveEntitlementSubjects, the query served
+  in process"; a query class gets no task from the operation formula.'
+keys_touched:
+  operations:
+  - broadcastToGuests
+  - sendGuestBroadcast
+  tables:
+  - access.entitlement
+  files:
+  - docs/active/block-a-extra-tasks.json
+  tickets:
+  - CR379-LIVE-ENTITLEMENT-SUBJECTS (new)
+root_class: a decision that promised a follow-up ticket, with no plan task carrying it
+tickets:
+  started: []
+  unstarted:
+  - '#37101 (broadcastToGuests, On hold) with its task SVC-TENANCY-WORKFORCE-3 (#37060, New)'
+  - '#37183 (SVC-MARKETING-MESSAGE-4, New)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-379
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the task''s text; its
+  OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its tables. A change-only
+  [DB] task is `area: database` and its key does not end in -DB (a -DB task''s `table` builds count as created by it, CHG-R8MIG-016,
+  CHG-R12PL-008).'

@@ -1,0 +1,61 @@
+id: CHG-CR442-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'marketing.message_dispatch keeps source_ref (r12) and gains body (MessageDispatch.body, text, nullable: the
+  resolved message as sent) and a non-unique index on (source_ref, subject_id, channel); the table stays
+  partitioned by queued_at (ADR-0056). sendGuestBroadcast writes every queued dispatch row of one delivery in the
+  inbox''s transaction, after a check that no row for that sourceRef, subjectId and channel exists, and leaves the
+  sending to Marketing''s message sender, the dispatch worker that sends queued rows through the provider each
+  channel has configured (setChannelProvider, ranked by role and priority with fallback) and records delivered or
+  failed with the provider''s reference; until the sender exists the consumer dead-letters each delivery.
+  sendGuestOneTimeCode sends through the same worker.'
+decision:
+  what: 'Posted on #37101 (Chinmay, 1 November 2026), the lead''s "Approve all" of the same day: "A.
+    marketing.message_dispatch keeps source_ref (r12 already adds it: the [DB] ticket for CR-379) and gains body text,
+    nullable: the resolved message as sent. Add a non-unique index on (source_ref, subject_id, channel). Idempotency
+    comes from the consumer''s inbox: every dispatch row of one delivery is written in the inbox''s transaction, after
+    a check that no row for that source_ref, subject_id and channel exists. The partitioning stays (ADR-0056). The
+    sending itself is a new ticket, filed as a child of this one: Marketing''s message sender, the dispatch worker
+    that sends queued dispatch rows through the provider each channel has configured (setChannelProvider: email, SMS
+    and push, ranked by role and priority with fallback) and records delivered or failed with the provider''s
+    reference. Guest one-time codes (CR-370) send through the same worker. Until it exists broadcastToGuests stays as
+    built, the consumer dead-letters rather than pretending to send, and #37101 stays On hold."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-442 (Hrushikant Patkar, #37101 broadcastToGuests, blocking): CR-379''s sendGuestBroadcast had no column
+  for the text to send and could not hold a unique key on broadcast + subject + channel on a table partitioned by
+  queued_at, and nothing in the package or the code sends push, SMS or email, so an evacuation accepted with 202
+  reached no guest.'
+keys_touched:
+  operations: [sendGuestBroadcast, sendGuestOneTimeCode, broadcastToGuests]
+  schemas: [MessageDispatch]
+  tables: [marketing.message_dispatch, marketing.communication_provider]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+root_class: 'a send with nowhere to keep its text and no sender behind it'
+tickets:
+  started:
+  - '37101 (broadcastToGuests and its consumer sendGuestBroadcast, Hrushikant): stays On hold; broadcastToGuests as
+    built; the consumer dead-letters each delivery until the message sender exists, then writes the queued rows with
+    body in the inbox''s transaction after the check. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - '37203 (Marketing''s message sender, the child task made by hand on 1 November): build to sendGuestBroadcast''s
+    "Who sends it" and MessageDispatch.body.'
+  - 'The [DB] work for body and the index: a child of the marketing MIG ticket that owns marketing.message_dispatch,
+    assigned to the migration owner; the release''s forward migration carries ADD COLUMN body text and the index.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-442
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MESSAGE-DISPATCH-BODY
+status: open
+notes: 'The single-column index on sourceRef (r12, for listMessageDispatches) is kept; the posted decision adds the
+  three-column one. Beyond the comment''s words, for the lead: sendGuestBroadcast still declares its read of
+  marketing.communication_provider, though the provider is now chosen by the message sender; and the one-time code
+  rule (CR-370) says the code is never stored and a code with no subject writes no dispatch row, while the message
+  sender sends queued dispatch rows, so how the worker is handed a code is not settled by either decision (the
+  contract says only that the code sends through the same worker).'

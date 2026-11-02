@@ -1,0 +1,43 @@
+id: CHG-R13ID-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'The 403 of openPlatformStaffGrant (identity) and of approvePartnerStatuLifecycle and approveBookingLimitCommercial
+  (subscription, PLATFORM_CELL_MANAGE) read the step-up from the tenant session by verifyMfaChallenge''s rule, which CR-375
+  gave every MFA operation. A platform caller''s step-up is read from the Control Plane token (ticvai_step_up {action, at}
+  within 5 minutes, amr includes mfa), never from a tenant session or a tenant MFA challenge row: the three 403s say so,
+  and check-step-up SU-PLATFORM-STEP-UP holds it.'
+decision:
+  what: 'The r13 root-cause re-check (2 November 2026) found CR-375''s step-up text on platform-caller operations against
+    ADR-0072 point 4 and the operations'' own text; the coordinator added the fix to this lane. ADR-0072 as decided by Chinmay
+    under ADAM CR-175 (option A, accepted 21 October 2026): the step-up is recorded in the Control Plane and carried in
+    the token; CR-375 (31 October 2026) only named the two refusal types.'
+  by: Chinmay
+  date: '2026-10-21'
+why: 'ADR-0072 point 4 (ADAM CR-175; CHG-R10ID-007) against CR-375''s 403 text (CHG-CR375-001): a correction of an earlier
+  change, found by the root-cause re-check.'
+keys_touched:
+  operations:
+  - openPlatformStaffGrant
+  - approvePartnerStatuLifecycle
+  - approveBookingLimitCommercial
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/subscription.yaml
+  - tools/check-step-up.py
+root_class: one refusal text applied to every operation of a class, over a sub-class the decided model reads differently
+tickets:
+  started: []
+  unstarted:
+  - '30742 (openPlatformStaffGrant, Sanket), 33864 (approvePartnerStatuLifecycle) and 33863 (approveBookingLimitCommercial),
+    Narayan: read the step-up from the platform token as ADR-0072 says.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-375
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py::SU-PLATFORM-STEP-UP (with its self-test)
+status: open
+notes: No tool wrote the CR-375 text (it was applied once), so the source fix is the text plus the rule that fails when
+  a PLATFORM_* MFA operation's 403 does not name ticvai_step_up or names verifyMfaChallenge.

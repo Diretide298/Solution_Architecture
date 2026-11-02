@@ -1,0 +1,169 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Windows device host, ticket printer
+  version: 1.0.0
+  x-ticvai-tier: device
+  x-ticvai-platforms:
+    - "P04 Point of Sale"
+    - "P05 Guest Kiosk"
+  description: >
+    ## What this contract covers
+
+    **The localhost API of the Windows device host beside a BOCA ticket printer** (ADAM CR-448, Chinmay, 1 November
+    2026; ADAM CR-463, Chinmay, 2 November 2026, option A: "the device host's API as built is the contract, written
+    down once, and the Android path implements the same one later"; CHG-CR463-001). On Windows kiosks and tills a small
+    .NET device host runs beside the printer, composing the driver of #35592 (the `ticketPrinter` port, the FGL
+    encoder, raw TCP on port 9100, the status mapper); the kiosk app (guest-app, KSK-009 and KSK-010) and the POS app
+    (venue-pos, POS-026) call it on localhost. It is not a TICVAI server: no tenant, no session, no row of the
+    database. The host's own OpenAPI 3 file, as built on feature/35592-boca-windows-device-host, is the spec; this file
+    writes it down under the same paths, names and codes so the host does not change.
+
+
+    **Two operations.** `GET /ticket-printer/status` says whether the printer can print now. `POST
+    /ticket-printer/print-jobs` prints one filled `TicketLayout` (orders.yaml), Idempotency-Key required.
+
+
+    **Part of the contract** (ADAM CR-463 (2)):
+
+    - The host listens on 127.0.0.1 only, on the port its local settings name.
+
+    - It answers only the kiosk and POS app origins named in its local settings (CORS and the private-network
+    preflight) and refuses any other origin with 403.
+
+    - A POST retried with the same Idempotency-Key answers the first job's outcome and never prints again. Keys are
+    kept locally for at least 24 hours, which matters most after a 504 print-not-confirmed.
+
+    - The host keeps no secret.
+
+
+    **Errors** are application/problem+json in the shared `Problem` shape (common.yaml): paper out, jam, offline,
+    busy and fault are 503; `printer-rejected-ticket` is 502; `print-not-confirmed` is 504; `stock-not-configured`
+    and the two RFID codes are 409; validation is 400. A 502, 503 or 504 takes the kiosk guest to KSK-010, which stays
+    as it is ('Send to my phone', reprintOrder with reason printerFault); the POS does the same and offers POS-026's
+    reprint.
+
+
+    **The mock API (SETUP-MOCK-API) serves this file**, so the front-end builders work without a printer; the host's
+    emulator stays for the module test (TEST-AM-DEVICES-BOCA). Android is decided once the client answers how the
+    printer connects (CR-448); it implements this same contract.
+paths:
+  /ticket-printer/status:
+    get:
+      operationId: getTicketPrinterStatus
+      summary: Whether the printer can print now
+      description: >
+        Called by the kiosk before KSK-009 issues the tickets and by the POS before it prints (ADAM CR-463 (3)). A
+        printer that cannot print answers 503 with the problem type that says why.
+      tags: [ticketPrinter]
+      responses:
+        '200':
+          description: The printer is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketPrinterStatus'
+        '403':
+          $ref: '#/components/responses/OriginRefused'
+        '503':
+          $ref: '#/components/responses/PrinterUnavailable'
+  /ticket-printer/print-jobs:
+    post:
+      operationId: submitTicketPrintJob
+      summary: Print one filled ticket layout
+      description: >
+        The body is a filled `TicketLayout` (orders.yaml; each `field` content replaced by its value for the ticket),
+        which the BOCA driver translates into its print job. A POST retried with the same Idempotency-Key answers
+        the first job's outcome and never prints again; keys are kept locally for at least 24 hours.
+      tags: [ticketPrinter]
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketPrintJob'
+      responses:
+        '200':
+          description: Printed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketPrintJobResult'
+        '400':
+          description: The body or the Idempotency-Key is not valid
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '403':
+          $ref: '#/components/responses/OriginRefused'
+        '409':
+          description: >
+            The printer has no stock configured for the layout's stock (`stock-not-configured`), or one of the two
+            RFID refusals as built (their codes as the host's file names them).
+          x-ticvai-problem-types: [stock-not-configured]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '502':
+          description: The printer rejected the ticket (`printer-rejected-ticket`)
+          x-ticvai-problem-types: [printer-rejected-ticket]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '503':
+          $ref: '#/components/responses/PrinterUnavailable'
+        '504':
+          description: >
+            The job was sent and the printer did not confirm it (`print-not-confirmed`). A retry with the same
+            Idempotency-Key answers this outcome again and never prints twice.
+          x-ticvai-problem-types: [print-not-confirmed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+components:
+  responses:
+    OriginRefused:
+      description: The request's origin is not a kiosk or POS app origin named in the host's local settings
+      x-ticvai-problem-types: [forbidden]
+      content:
+        application/problem+json:
+          schema:
+            $ref: '../shared/common.yaml#/components/schemas/Problem'
+    PrinterUnavailable:
+      description: The printer cannot print now; the problem type says why
+      x-ticvai-problem-types: [printer-paper-out, printer-jam, printer-offline, printer-busy, printer-fault]
+      content:
+        application/problem+json:
+          schema:
+            $ref: '../shared/common.yaml#/components/schemas/Problem'
+  schemas:
+    TicketPrinterStatus:
+      x-ticvai-persistence: none — the device host's answer
+      type: object
+      description: The printer is ready. A printer that is not answers 503 instead.
+      properties:
+        ready:
+          type: boolean
+    TicketPrintJob:
+      x-ticvai-persistence: none — request only, to the device host
+      type: object
+      required: [layout]
+      properties:
+        layout:
+          $ref: '../spine/orders.yaml#/components/schemas/TicketLayout'
+    TicketPrintJobResult:
+      x-ticvai-persistence: none — the device host's answer
+      type: object
+      description: The job printed.
+      properties:
+        printed:
+          type: boolean

@@ -1156,7 +1156,7 @@ paths:
       operationId: checkGuestCheckoutMatch
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       summary: Does this contact already have a profile here
       deprecated: true
@@ -1217,7 +1217,7 @@ paths:
       operationId: decideGuestCheckoutMatch
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: orders.cart
@@ -1574,10 +1574,10 @@ paths:
       operationId: createInvitationCampaign
       x-ticvai-read-via:
       - query: catalogue#eventRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: A quota-bounded, addressed invitation
       description: 'BL-150 and CF-74''s issuance half. **A campaign broadcasts; an invitation is addressed
@@ -1630,7 +1630,7 @@ paths:
         - "P02 GST-072 Share & Group Booking"
       x-ticvai-read-via:
       - query: orders#invitationRecords
-        route: service
+        route: in-process
         for: 'its read of orders.invitation, Orders''s data (CHG-MOD-001)'
       x-ticvai-names-for-context: [access.entitlement]
       security:
@@ -1807,7 +1807,7 @@ paths:
         - "P13 CMS-043 Digital Waiver & Form Builder"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: Define a waiver, survey or capture form
       description: 'CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey
@@ -1924,10 +1924,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
-      x-ticvai-read-via:
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      x-ticvai-reads:
+      - table: marketing.waiver_version_control
+        for: 'the submitted form version''s resign rule, whether an earlier version''s live acceptance counts (Marketing''s
+          own data; ADAM CR-472)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1949,6 +1949,24 @@ paths:
         version that does not exist or is not published is `404 form-version-not-found`. Where a live
         acceptance already exists, the answer is `200` with the existing submission and no new row is
         written; a new acceptance is `201`.
+
+
+        **It reads nothing from `pii.subject`** (ADAM CR-472, Chinmay, 2 November 2026). It asks no query of
+        Identity and calls no service route: a guest submits for its own subject, and staff with a grant at the
+        venue submit for any guest, both guarded by the grant-holder-write policy on `marketing.form_submission`
+        (CR-318). It checks no one''s age; where a form asks about age, the form''s own fields carry it.
+
+
+        **What a live acceptance is** (ADAM CR-472). Before writing, it looks for a `marketing.form_submission`
+        row for the same form id, the same `subjectId` and the same `onBehalfOfSubjectId` (both null or both
+        equal), with `expires_at` later than now; only versions with `validForMonths` set give a row an
+        `expires_at`. The row counts when its `form_version` is the version being submitted. It also counts when
+        it is an earlier version and `marketing.waiver_version_control.resign_rule` for the submitted form and
+        version is `noResign` (Marketing''s own data; no route is needed). When a row counts, the answer is `200`
+        with that submission and nothing is written. Every other case is a new acceptance: there is no live row,
+        or the submitted version''s resign rule is `resignAtNextBooking` or `resignBeforeNextVisit`, or the version
+        has no resign rule. It is written with its own `form_version`, `expires_at` set from that version''s
+        `validForMonths`, and answered `201`. No grant or migration is needed.
 
         '
       tags:
@@ -2017,7 +2035,7 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -2127,7 +2145,7 @@ paths:
         - "P08 BO-829 Family, Team & Event Challenges"
       x-ticvai-read-via:
       - query: catalogue#eventRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
         route: in-process
@@ -2449,10 +2467,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
-      x-ticvai-read-via:
-      - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [entityId]
       x-ticvai-body-key-note: 'Keyed by the body''s `entityId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per entity and locale within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Titles, descriptions, canonicals and hreflang
@@ -2467,6 +2481,19 @@ paths:
         database, so Marketing owns the table beside them, under the tenant''s row-level security, and no
         write crosses a module or a database. It moved from the shared control
         database, which Platform owned and Marketing wrote with no declared route.
+
+
+        **It reads nothing from Catalogue** (ADAM CR-474, Chinmay, 2 November 2026). It asks no Catalogue query
+        and calls no service route. It stores the metadata for the `entityKind`, `entityId` and `locale` sent,
+        creating or replacing the one record for that key within the caller''s tenant, and does not check that
+        the entity exists.
+
+
+        **A changed slug is stored, and the redirect is a separate call** (ADAM CR-474). A PUT that changes
+        `slug` stores the new slug; it does not refuse and does not write a redirect. The 301 from the old
+        address to the new one is made by `createUrlRedirect` (POST /seo-redirects, #33242), which CMS-013 calls
+        when a live slug is edited. That redirect lives in `control.url_redirect`, outside this tenant
+        transaction. No grant or migration is needed.
 
         '
       tags:
@@ -2694,7 +2721,7 @@ paths:
         - "P08 BO-830 Referral & Streak Management"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -3607,7 +3634,7 @@ paths:
       operationId: accrueLoyaltyPoints
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Award points for a completed order
       description: '**`games` awards points on play and ticketing did not**, so a guest earned for an
@@ -4312,10 +4339,10 @@ paths:
         - "P08 BO-799 Agent Workspace"
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       - query: tenancy#deviceRecords
-        route: service
+        route: in-process
         for: 'its read of platform.device, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -5384,14 +5411,24 @@ paths:
 
 
         **What is sent.** To each guest on every channel they have: push to each active `marketing.guest_device`, then
-        SMS and email to the contacts on `marketing.guest_profile`, through the tenant''s configured provider for the
-        channel (`marketing.communication_provider`). The text is `messageLocalised` in the guest''s language, else
-        `message`. It ignores suppression, quiet hours, throttling and channel preference, and writes one
-        transactional `marketing.message_dispatch` row per guest and channel with `sourceRef` the `broadcastId`.
+        SMS and email to the contacts on `marketing.guest_profile`. The text is `messageLocalised` in the guest''s
+        language, else `message`. It ignores suppression, quiet hours, throttling and channel preference, and writes
+        one transactional `marketing.message_dispatch` row per guest and channel, queued, with `sourceRef` the
+        `broadcastId` and `body` the resolved text (ADAM CR-442).
 
 
-        **Idempotent on `broadcastId` + `subjectId` + `channel`**: a redelivered event finds the dispatch already
-        written and does not send it again.'
+        **Who sends it** (ADAM CR-442, Chinmay, 1 November 2026; CHG-CR442-001). This consumer writes the queued
+        rows; Marketing''s message sender, the dispatch worker, sends queued dispatch rows through the provider each
+        channel has configured (`setChannelProvider`: email, SMS and push, ranked by `role` and `priority`, with
+        fallback) and records `delivered` or `failed` with the provider''s reference. Until the message sender
+        exists, the consumer dead-letters each delivery rather than pretend to send.
+
+
+        **Idempotent on `broadcastId` + `subjectId` + `channel`, through the consumer''s inbox** (ADAM CR-442).
+        Every dispatch row of one delivery is written in the inbox''s transaction, after a check that no row for
+        that `sourceRef`, `subjectId` and `channel` exists (the non-unique index on the three; the table stays
+        partitioned by `queued_at`, ADR-0056). A redelivered event finds the dispatch already written and does
+        not write it again.'
       tags:
       - message
       x-ticvai-permission: null
@@ -5520,7 +5557,8 @@ paths:
 
         **What it does.** It decrypts `destination` and `code` at send time through the kernel''s field encryption
         (#37050) and sends the code on `channel` through the tenant''s configured provider for that channel
-        (`marketing.communication_provider`), with the system template `guestOneTimeCode` in the guest''s `locale`. The
+        (`marketing.communication_provider`), through Marketing''s message sender, the same dispatch worker guest
+        broadcasts send through (ADAM CR-442; CHG-CR442-001), with the system template `guestOneTimeCode` in the guest''s `locale`. The
         template carries its own subject line, so the message needs none. It writes a transactional
         `marketing.message_dispatch` row for the send, without the code: sent under contract performance, not marketing
         consent. The decrypted values are never logged or stored.
@@ -9451,13 +9489,14 @@ paths:
       - query: white-label#policyRecords
         route: in-process
         for: 'what its text calls "whitelabel.policy": whitelabel.policy, WhiteLabel''s data (CHG-R10GEN-001), served
-          in process within the operations host; the policies in force, scheduled and in the directory (ADAM CR-378)'
+          in process within the operations host; the policies in force, scheduled and in the directory (ADAM CR-378),
+          asked under the routed tenant''s root grant (ITenantRootGrant), as CR-336 and CR-362 read, so a venue
+          manager''s command centre sees the tenant''s published policies; every other read is under the caller''s
+          grant (ADAM CR-440; CHG-CR440-001)'
       x-ticvai-reads:
       - table: marketing.consent_purpose
         for: 'activeConsentPurposes, the review and policyExpired checks on noticeVersion, and the directory''s
           consentPurpose items (ADAM CR-378; CHG-CR378-001)'
-      - table: marketing.consent_purpose_channel
-        for: 'the channel filter on consent purposes (ADAM CR-378)'
       - table: marketing.communication_preference_type
         for: 'communicationPreferenceTypes and the directory''s communicationPreference items (ADAM CR-378)'
       - table: marketing.consent_capture_point
@@ -9498,6 +9537,12 @@ paths:
         at the item's scope or above.
 
 
+        **Whose grant each read is under** (ADAM CR-440, Chinmay, 1 November 2026; CHG-CR440-001). The in-force
+        policy (`white-label#policyRecords`) is read under the routed tenant's root grant (`ITenantRootGrant`), as
+        CR-336 and CR-362 read, so a venue manager's command centre sees the tenant's published policies. Every
+        other read is under the caller's grant.
+
+
         **Counts.** `activeConsentPurposes` = `marketing.consent_purpose` rows. `activePrivacyPolicies` = in-force
         policies of kind `privacy` or `cookie`. `pendingPolicyApprovals` = `marketing.privacy_notice_governance` rows
         with status `review`. `scheduledPolicyChanges` = published `privacy` or `cookie` policies whose
@@ -9509,7 +9554,13 @@ paths:
         purposes whose `noticeVersion` is not the in-force privacy policy's version.
 
 
-        **Warnings**, most severe first, then by `configurationId`, at most 100. `capturePointWithoutNotice`: a
+        **Warnings**, most severe first, at most 100 (ADAM CR-469, Chinmay, 2 November 2026; CHG-CR469-001). The
+        ranking is the order CR-378 lists the codes in: `capturePointWithoutNotice`, `policyExpired`,
+        `purposeWithoutLawfulBasis`, `purposeWordingDiffersByChannel`, `translationMissing`; within a code, by
+        `configurationId`, nulls last. With no privacy policy in force, every consent purpose raises `policyExpired`
+        and counts in `consentConfigurationsRequiringReview`, and a published capture point whose notice step names
+        a kind with no policy in force raises `capturePointWithoutNotice`; the cap of 100 keeps the list bounded.
+        `capturePointWithoutNotice`: a
         published capture point with no `privacyNotice` step, or whose `privacyNotice` step's `policyKind` has no
         policy in force. `policyExpired`: a consent purpose whose `noticeVersion` is not the in-force privacy
         policy's version. `purposeWithoutLawfulBasis`: an active `marketing.processing_purpose` whose `lawfulBasis`
@@ -9530,16 +9581,29 @@ paths:
         `consent_capture_point` (its `publicationStatus`; `superseded`, or status `retired`, as `retired`).
         `communicationPreference` from `communication_preference_type` (`active` as `published`, `retired` as
         `retired`). `minorPrivacy` from `marketing.minor_privacy_rule` (`name` "Minor privacy, <country>", status
-        `published`). `effectiveFrom` is set only on policies; the other items sort by `updatedAt`.
+        `published`). `effectiveFrom` is set only on policies; the other items sort by `updatedAt`. Items with no
+        date (consent purposes, and rows whose `updated_at` is null) sort after every dated item, by id (ADAM
+        CR-469).
 
 
         **Filters.** `status`, `effectiveFrom` and `effectiveTo` narrow only the directory (by status, and by
         `effectiveFrom` or else `updatedAt`). `brandId`, `country`, `venueId`, `channel`, `language`,
         `consentPurpose` and `policyId` narrow every count and item that carries that attribute. Brand: capture
         point `brandId`, preference type `applicableBrandIds`, banner `brandId`. Country: capture point, preference
-        type `applicableCountries`, minor rule, tracking technology `countries`. Venue: `scopePath` at or beneath
-        the venue. Channel: capture point, `marketing.consent_purpose_channel`, preference type
-        `availableChannels`, banner, tracking technology `channels`. Language: capture point and banner
+        type `applicableCountries`, minor rule, tracking technology `countries`. Venue (ADAM CR-469): policies
+        (`whitelabel.policy` items and counts, with their `privacy_notice_governance` rows) are kept when their
+        scope is the venue's or an ancestor's, the tenant root included, read under the tenant root grant as
+        CR-440 decided; a policy in force at the venue is the latest of its kind at the venue or above. Every other
+        item keeps `scopePath` at or beneath the venue. Channel (ADAM CR-469): the filter takes a `ConsentSource`
+        value. Capture points match it exactly. Cookie banners and tracking technologies use the web channel list,
+        so the filter maps onto it: `website` to `b2cWebsite`, `customerPortal`, `whiteLabelSite` and
+        `partnerMicrosite`; `guestApp` to `mobileApp`; `checkout` to `embeddedCheckout`; `cookieBanner` to all six.
+        `kiosk`, `pos`, `callCentre`, `import` and `agentRecorded` map to none of them, so banners and tracking
+        technologies drop out under those filters, because no cookie banner shows there. Consent purposes
+        (`consent_purpose_channel`) and communication preference types (`availableChannels`) hold message channels
+        (`email`, `sms` and the rest), which say how a guest is contacted, not where consent is captured, so the
+        channel filter does not narrow them: they count as items without the attribute and stay in. The channel
+        rule applies alike to the counts, the warnings and the directory. Language: capture point and banner
         `languages`, policy body keys. `consentPurpose`: the purpose, capture points with a consent step for it,
         preference types naming it. `policyId`: that policy and its governance row. An item without the attribute
         applies everywhere and stays in.
@@ -11808,7 +11872,7 @@ paths:
         - "P12 SUP-010 Customer 360° Service Profile"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: identity#subjectRecords
         route: service
@@ -11878,13 +11942,13 @@ paths:
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#reservationRecords
-        route: service
+        route: in-process
         for: 'its read of orders.reservation, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       - query: wallet#balanceRecords
         route: service
@@ -12215,16 +12279,16 @@ paths:
         - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'the order and its policies (422 not-permitted-by-policy) (CHG-MOD-003)'
       - query: access#entitlementRecords
         route: service
         for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_line": orders.order_line, Order''s data (CHG-R10GEN-001)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.payment": orders.payment, Order''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
@@ -12298,19 +12362,19 @@ paths:
         - "P12 SUP-015 Refund, Compensation & Service Exception Workspace"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: orders#orderFeeRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_fee": orders.order_fee, Order''s data (CHG-R10GEN-001)'
       - query: orders#refundRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.refund": orders.refund, Order''s data (CHG-R10GEN-001)'
       - query: orders#refundPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.refund_policy": orders.refund_policy, Order''s data (CHG-R10GEN-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.sales_order": orders.sales_order, Order''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -12539,7 +12603,7 @@ paths:
         - "P12 SUP-017 Case Resolution, Closure & Customer Feedback"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -12652,7 +12716,7 @@ paths:
       operationId: setCaseResolution
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -13088,7 +13152,7 @@ paths:
         - "P12 SUP-023 Agent Workload, Availability & Workforce Control"
       x-ticvai-read-via:
       - query: workforce#shiftRecords
-        route: service
+        route: in-process
         for: 'what its text calls "workforce.shift": workforce.shift, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
@@ -13255,7 +13319,7 @@ paths:
         - "P12 SUP-024 Escalation & Critical Case Monitor"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -13702,7 +13766,7 @@ paths:
         - "P12 SUP-027 Service Analytics & Root-Cause Intelligence"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15328,13 +15392,13 @@ paths:
         - "P13 CMS-051 Waiver Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15470,16 +15534,16 @@ paths:
         - "P13 CMS-052 Participant Waiver Status & Tracking"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15599,7 +15663,7 @@ paths:
       operationId: actOnWaiverRequirements
       x-ticvai-read-via:
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15876,10 +15940,10 @@ paths:
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -16176,16 +16240,16 @@ paths:
         - "P13 CMS-056 Missing, Expired & Invalid Waiver Management"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -16333,7 +16397,7 @@ paths:
         route: service
         for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_line": orders.order_line, Order''s data (CHG-R10GEN-001)'
       - query: identity#subjectRecords
         route: service
@@ -16435,7 +16499,7 @@ paths:
       operationId: setWaiverException
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'the performance the exception''s scope names (422 scope-incomplete) (CHG-MOD-003)'
       x-ticvai-audience:
         - staff
@@ -16906,7 +16970,7 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Everything this guest did, in order, across the platform
       description: 'Board 1.5. Purchases, scans, reservations, visits, membership changes, loyalty,
@@ -17061,7 +17125,7 @@ paths:
         - "P08 BO-832 AI Engagement Optimization"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Value, engagement, churn and propensity, with their reasons
       description: 'Board 1.10 — *"turn the unified record into **explainable** customer insight."*
@@ -17295,7 +17359,7 @@ paths:
       operationId: setDataRetentionPolicy
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
-        route: service
+        route: in-process
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       summary: How long guest data is kept, and what happens at expiry
       description: 'Board 2.8. **`listDataRetentionExpiry` could read them and nothing set them.**
@@ -17674,7 +17738,7 @@ paths:
         - "P08 BO-828 Milestones & Reward Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'whether a rule''s product exists (409 unknown-reward-or-product) (CHG-MOD-003)'
       summary: Replace a programme's rules as one set
       description: '**Applied whole or not at all.** Setting rules one at a time leaves a live
@@ -18799,7 +18863,7 @@ paths:
         - "P02 GST-007 Select Date & Time"
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'the questions the cart asks (409, 422 question-not-asked) (CHG-MOD-003)'
       security:
       - guestAuth: []
@@ -20328,10 +20392,10 @@ paths:
       x-ticvai-auth: service
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'the order must exist, be of the sent venue, and a reservation owner must be its buyer: orders.sales_order, Orders'' data'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'a ticket owner''s order line must be on the order and its unit within the line''s quantity: orders.order_line, Orders'' data'
       - query: identity#subjectRecords
         route: service
@@ -24259,7 +24323,9 @@ components:
           type: string
           nullable: true
           description: '22.11.6. **Human-readable, and changing one is a redirect rather than an edit**
-            — a slug that changes without a 301 is a page that was ranking and now is not.
+            — a slug that changes without a 301 is a page that was ranking and now is not. `setSeoMetadata`
+            stores the new slug and writes no redirect; the 301 is `createUrlRedirect`, which CMS-013 calls when a
+            live slug is edited (ADAM CR-474).
 
             '
         hreflang:
@@ -27398,7 +27464,10 @@ components:
     MessageDispatch:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getCampaignPerformance, getGuestTimeline, getJourneyPerformance, getMessageStatus and others
       x-ticvai-append-only: queuedAt
-      x-ticvai-index: [[sourceRef]]   # listMessageDispatches filters on it (ADAM CR-379; CHG-CR379-001)
+      # [sourceRef]: listMessageDispatches filters on it (ADAM CR-379; CHG-CR379-001). [sourceRef, subjectId, channel]:
+      # non-unique, the check sendGuestBroadcast makes before each insert (ADAM CR-442; CHG-CR442-001); the table stays
+      # partitioned by queued_at (ADR-0056), so no unique key on the three can exist.
+      x-ticvai-index: [[sourceRef], [sourceRef, subjectId, channel]]
       x-ticvai-persistence: marketing.message_dispatch
       type: object
       required:
@@ -27492,6 +27561,12 @@ components:
           nullable: true
           description: The id of the record whose business event triggered the message (a performance id, a guest
             broadcast id), which `listMessageDispatches` filters on (ADAM CR-379; CHG-CR379-001). Null for a campaign.
+        body:
+          type: string
+          nullable: true
+          description: '**The resolved message as sent** (ADAM CR-442, Chinmay, 1 November 2026; CHG-CR442-001), which
+            Marketing''s message sender sends; for a guest broadcast, `messageLocalised` in the guest''s language,
+            else `message` (`sendGuestBroadcast`).'
     CaseStatus:
       type: string
       enum:
@@ -30455,6 +30530,9 @@ components:
           x-ticvai-persistence-column: jsonb
           x-ticvai-persistence-kind: valueObject
           type: array
+          description: '**The change set''s contents, stored whole** (ADAM CR-437, Chinmay, 1 November 2026;
+            CHG-CR437-001). `marketing.privacy_change_set.items` (jsonb, nullable) holds this list exactly as this view
+            returns it, written whole on each save.'
           items:
             type: object
             properties:
@@ -30520,7 +30598,9 @@ components:
         approvalRequestId:
           type: string
           nullable: true
-          description: The approvals-engine request, once submitted.
+          x-ticvai-references: approvals.request
+          description: The approvals-engine request, once submitted. A foreign key to `approvals.request(id)`, as
+            `workforce.leave_request.approval_request_id` is (ADAM CR-437; CHG-CR437-001).
         publishAt:
           type: string
           format: date-time

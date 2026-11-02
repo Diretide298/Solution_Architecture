@@ -1,0 +1,57 @@
+id: CHG-CR436-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'The seven table records follow the package SQL. AuditRead no longer requires readAt and target, so the derived
+  record (handoff/ddl-column-types.json records, the workbook''s Required) says nullable as tenant V0108 adds them. ADAM''s
+  table record (viewer lib/backend.mjs, lib/migrations.mjs) reads a table renamed after r1 from the CREATE under its
+  current name when one exists, so control.contract, module_listing, plan, plan_limit and plan_module are read from
+  control/V0108 (no row security; control.plan keyed (id, version)) instead of the frozen tenant/010-subscription.sql''s
+  old names (tenant_isolation, keyed id); and a later ADD CONSTRAINT ... PRIMARY KEY replaces the key, so
+  platform.configuration_profile is keyed (id, version) as tenant/V0115 makes it (CR-228). No database change.'
+decision:
+  what: 'ADAM CR-436, posted on #36260: "Decided (Chinmay, 1 November 2026): as you recommended (A). The seven table
+    records follow the package SQL, not the other way round: control.contract, control.module_listing, control.plan,
+    control.plan_limit and control.plan_module have no row security (the control database has none by design);
+    control.plan and platform.configuration_profile are keyed (id, version) (CR-228); platform.audit_read.read_at and
+    target are nullable. No database change: db/ stays as built ... The records are regenerated from the SQL at the next
+    release." The lead''s "Approve all", 1 November 2026.'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-436 (Hrushikant Patkar, #36260 [DB] control.plan): the [DB] sub-tasks for these seven tables are built to
+  the package SQL, and ADAM''s table record (adam_table at r11) said something different. The package''s own derived
+  records already had six right (records in handoff/ddl-column-types.json: no policy on the five, (id, version) on plan
+  and configuration_profile); the record a developer reads is assembled by ADAM from the SQL files, where the old-name
+  CREATE of a moved table overwrote the new one in file order and a DO-block rekey was never read. audit_read''s two
+  columns were required in the contract, so every record said NOT NULL.'
+keys_touched:
+  schemas: [AuditRead]
+  tables: [control.contract, control.module_listing, control.plan, control.plan_limit, control.plan_module,
+           platform.audit_read, platform.configuration_profile]
+  files:
+  - contracts/spine/tenancy.yaml
+  - viewer/lib/backend.mjs
+  - viewer/lib/migrations.mjs
+  - viewer/checks/table-record-check.mjs
+  - tools/check-business-rules.py
+root_class: 'a table record assembled from the SQL by a reader that let a moved table''s old CREATE win and never read a
+  later rekey, and a storage-only schema that required columns its SQL adds nullable'
+tickets:
+  started:
+  - '36258, 36259, 36260, 36261, 36262 ([DB] control subscription tables), 36268 ([DB] platform.audit_read), 37027 ([DB]
+    platform.configuration_profile), Hrushikant Patkar: nothing to change; db/ stays as built. Until ADAM serves the
+    regenerated records, compare these seven against the SQL.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-436
+triage: fix-forward
+prevention:
+  type: check
+  ref: viewer/checks/table-record-check.mjs
+status: open
+notes: 'tools/check-business-rules.py BR-AUDIT-READ-NULLABLE holds the contract side. viewer/checks/table-record-check.mjs
+  (node, needs no viewer) holds ADAM''s record to the SQL for the seven tables and, for every table renamed after r1
+  that the SQL creates under its current name, holds the record to that CREATE: 42 such tables. The viewer change
+  reaches developers only when ADAM is redeployed from this commit, which is outside this lane. handoff/migration-review.md
+  stops listing read_at and target as NOT NULL hand changes once regenerated.'

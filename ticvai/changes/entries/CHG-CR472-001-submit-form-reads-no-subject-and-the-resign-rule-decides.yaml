@@ -1,0 +1,51 @@
+id: CHG-CR472-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'submitForm reads nothing from pii.subject: the identity#subjectRecords read is removed (and the lineage''s
+  carried pii.subject read), it calls no service route and checks no one''s age. A live acceptance is a
+  marketing.form_submission row for the same form id, subjectId and onBehalfOfSubjectId (both null or both equal) with
+  expires_at later than now, of the version being submitted, or of an earlier version when the submitted version''s
+  marketing.waiver_version_control.resign_rule is noResign (Marketing''s own data, now an x-ticvai-reads); it answers
+  200 with that submission and writes nothing. Every other case is a new acceptance, written with its own form_version
+  and expires_at from validForMonths, 201.'
+decision:
+  what: 'Posted on #31165 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" of 2 November
+    2026: "Build now: (1) submitForm reads nothing from pii.subject. Remove the identity#subjectRecords read and call no
+    service route ... This operation checks no one''s age ... (2) Before writing, look for a live acceptance: a
+    marketing.form_submission row for the same form id, the same subjectId and the same onBehalfOfSubjectId (both null
+    or both equal), with expires_at later than now ... It also counts when it is an earlier version and
+    marketing.waiver_version_control.resign_rule for the submitted form and version is noResign ... When a row counts,
+    answer 200 with that submission and write nothing. Every other case is a new acceptance ... answer 201. No grant
+    or migration is needed."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-472 (Pranay Shinde, #31165 submitForm, blocking): the read of pii.subject was written mechanically from the
+  lineage (CHG-MOD-001) and no rule used it, holding the operation behind the service route (#37051); and "a live
+  acceptance" did not say whether an earlier version''s counted, which the form version''s resign rule decides
+  (CR-318, CR-359).'
+keys_touched:
+  operations: [submitForm]
+  tables: [marketing.form_submission, marketing.waiver_version_control]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+  - tools/check-cross-module-reads.py
+root_class: 'a read written from the lineage that no rule uses, and a rule left open where the package already holds
+  the deciding field'
+tickets:
+  started: []
+  unstarted:
+  - '31165 (submitForm, Pranay, On hold): build to the posted decision; no Identity read, the live-acceptance rule with
+    the resign rule.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-472
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FORM-LIVE-ACCEPTANCE
+status: open
+notes: 'check-cross-module-reads NOT_READ_FOR holds the sentence "It reads nothing from pii.subject" to submitForm, so
+  XR-FACT does not read it as a read. Beyond the posted words: none.'

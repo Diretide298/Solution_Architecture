@@ -376,6 +376,11 @@ def derive(stored: dict) -> dict:
     out = {}
     for c, doc in contract_docs():
         contract = c.stem
+        # **A device host's contract has no lineage** (ADAM CR-463, CHG-CR463-001): contracts/devices/*.yaml is the API a
+        # device host serves on localhost (the Windows ticket-printer host), not an operation of any TICVAI deployable, so
+        # it has no service, no table and no row to trace. Its schemas stay readable for a $ref.
+        if ((doc.get("info") or {}).get("x-ticvai-tier")) == "device":
+            continue
         for path, item in (doc.get("paths") or {}).items():
             for verb, op in (item or {}).items():
                 if not isinstance(op, dict) or not op.get("operationId"):

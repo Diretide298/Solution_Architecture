@@ -1,0 +1,44 @@
+id: CHG-R13PL-037
+date: '2026-11-02'
+source: plan
+kind: plan
+proposed: '2026-11-02'
+summary: ADR-0065's CAT-AVAIL-CACHE (getAvailability from a one-second cache, single-flight, jitter) is a plan task, following
+  getAvailability's task.
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026: "Can you check for all the missing tickets as well"; a read-only scan of the package for work it describes that
+    no task builds. docs/active/block-a-extra-tasks.json: CAT-AVAIL-CACHE (`pool: backend`, follows KERNEL-REDIS and SVC-CATALOGUE-CAPACITY-1).
+    Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: ADR-0065 item 3 (CAT-AVAIL-CACHE, Sprint 2, before the first on-sale); flows/F01 ("Availability is read from a one-second
+  cache").
+keys_touched:
+  operations:
+  - getAvailability
+  tickets:
+  - CAT-AVAIL-CACHE (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: work the package or an ADR describes that no plan task builds
+tickets:
+  started: []
+  unstarted:
+  - '#28151 (SVC-CATALOGUE-CAPACITY-1, New)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the package''s own text'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: The contract side of ADR-0065 (getAvailability still routes to the primary and has no asOf) is a package change for
+  a build lane, reported to the lead.

@@ -1,0 +1,49 @@
+id: CHG-R13PL-041
+date: '2026-11-02'
+source: plan
+kind: plan
+proposed: '2026-11-02'
+summary: Object storage per cell and tenant (media with signed uploads and a CDN origin, private storage with five-minute
+  links, the kernel's interface) is a plan task; getSubjectDataExport follows it.
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026: "Can you check for all the missing tickets as well"; a read-only scan of the package for work it describes that
+    no task builds. docs/active/block-a-extra-tasks.json: SETUP-OBJECT-STORAGE (DevOps, Hrushikant Patkar; follows SETUP-ENV
+    and PLATFORM-KERNEL); `operationWaits` getSubjectDataExport. Plan change waived from the cooling-off by the lead ("1
+    waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: contracts/satellite/assets.yaml createUpload, contracts/spine/identity.yaml getSubjectDataExport, contracts/satellite/marketing-crm.yaml
+  writeSubjectDataExportPart; ADR-0063.
+keys_touched:
+  operations:
+  - createUpload
+  - getSubjectDataExport
+  - writeSubjectDataExportPart
+  tickets:
+  - SETUP-OBJECT-STORAGE (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: work the package or an ADR describes that no plan task builds
+tickets:
+  started:
+  - 'SVC-VENUEOPS-UPLOAD-1#createUpload (Ready for QA): not rewritten, no wait added'
+  unstarted:
+  - '#37010 (SVC-IDENTITY-IDENTITY-11, New): follows'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the package''s own text'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Owner by the plan''s rules: a named owner where the work belongs to a person''s service or setup, else `pool: backend`
+  (the least-loaded back-end owner at the plan build). The waiting operations'' tasks follow it only where they are not
+  started; their builders work against the mock or double meanwhile.'

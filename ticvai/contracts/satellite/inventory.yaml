@@ -631,10 +631,10 @@ paths:
       operationId: bulkUpdateProducts
       x-ticvai-read-via:
       - query: catalogue#priceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: finance#taxCodeRecords
         route: service

@@ -1,0 +1,49 @@
+id: CHG-CR474-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'setSeoMetadata reads nothing from Catalogue: the catalogue#productRecords read is removed (and the lineage''s
+  carried catalogue.product read); it stores the metadata for the entityKind, entityId and locale sent, creating or
+  replacing the one record for that key in the caller''s tenant, and does not check that the entity exists. A PUT that
+  changes the slug stores the new slug, neither refusing nor writing a redirect; the 301 is createUrlRedirect (POST
+  /seo-redirects, #33242), which CMS-013 calls when a live slug is edited, kept in control.url_redirect outside the
+  tenant transaction.'
+decision:
+  what: 'Posted on #31164 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" of 2 November
+    2026: "Build now: (1) setSeoMetadata reads nothing from Catalogue. Remove the catalogue#productRecords read and
+    call no service route. It stores the metadata for the entityKind, entityId and locale sent, creating or replacing
+    the one record for that key within the caller''s tenant, and does not check that the entity exists. (2) A PUT that
+    changes the slug stores the new slug. It does not refuse and does not write a redirect. The 301 from the old
+    address to the new one is made by createUrlRedirect (POST /seo-redirects, #33242), which CMS-013 calls when a live
+    slug is edited. That redirect lives in control.url_redirect, outside this tenant transaction. No grant or
+    migration is needed."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-474 (Pranay Shinde, #31164 setSeoMetadata, blocking): the read of catalogue.product came from the lineage
+  (CHG-MOD-001) and no rule used it, holding the operation behind the service route (#37051); and SeoMetadata.slug''s
+  "a redirect rather than an edit" did not say what the PUT does, while CMS-013 already wires createUrlRedirect.'
+keys_touched:
+  operations: [setSeoMetadata]
+  schemas: [SeoMetadata]
+  tables: [marketing.seo_metadata]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+  - tools/check-cross-module-reads.py
+root_class: 'a read written from the lineage that no rule uses, and a field rule that named no operation to carry it'
+tickets:
+  started: []
+  unstarted:
+  - '31164 (setSeoMetadata, Pranay, On hold): build to the posted decision; no Catalogue read, a changed slug is stored.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-474
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SEO-METADATA-STORE
+status: open
+notes: 'SeoMetadata.slug''s description gains one sentence saying setSeoMetadata stores the new slug and the 301 is
+  createUrlRedirect (page info on BO-842 and CMS-013; nothing visible changes). check-cross-module-reads NOT_READ_FOR
+  holds "That redirect lives in control.url_redirect" to setSeoMetadata. Beyond the posted words: none.'

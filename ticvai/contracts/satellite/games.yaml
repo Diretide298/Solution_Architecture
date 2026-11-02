@@ -164,7 +164,7 @@ paths:
         - "P08 BO-476 Communication Protocol Configuration"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: How a reader behaves and what it shows
       description: 'BL-153. **A guest at an arcade machine cannot read a message, they can only see a

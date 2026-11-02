@@ -66,7 +66,11 @@ if _TASKS.exists():
             _ts = re.search(r'Tables: (.*?)\. Source DDL', _r.get('description') or '')
             if not _ts:
                 continue  # MIG-BASELINE and MIG-FOREIGN-KEYS create no table of their own
-            _fn = re.search(r'Migration (V\d{4}__\w+\.sql)', _r.get('subject') or '')
+            # **"Forward migration V1228__marketing.sql" names its file too** (ADAM CR-440, 1 November 2026;
+            # CHG-CR440-001). Matched on a capital M only, the 137 forward migrations' subjects ("[DB] Forward
+            # migration V1228__...") never matched, so their tables' records named the task key and no file, and a
+            # developer reading adam_table for marketing.processing_purpose saw no migration to build.
+            _fn = re.search(r'[Mm]igration (V\d{4}__\w+\.sql)', _r.get('subject') or '')
             _label = f'{_fn.group(1)} ({_k})' if _fn else _k
             for _t in _ts.group(1).split(', '):
                 # First-release migration wins over a later Venue Management one: the table is

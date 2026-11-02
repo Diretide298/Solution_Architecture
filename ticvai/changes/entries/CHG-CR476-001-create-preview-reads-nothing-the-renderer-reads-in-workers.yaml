@@ -1,0 +1,55 @@
+id: CHG-CR476-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'createPreview reads nothing from Catalogue or Orders and calls no service route; its two reads are removed and
+  the operations role gets no grant on orders.ticket_template. It validates the body, writes
+  cache:preview:{tenantId}:{previewId} with expiresAt and, in the same transaction, preview.requested to the outbox
+  (previewId, platform, language, outputs, productId as sent, expiresAt), and answers 201 with the Preview (CR-106).
+  The white-label jobs component in the workers host renders from preview.requested and asks catalogue#productRecords
+  (ids [productId]) and orders#ticketTemplateRecords in process; Orders serves ticketTemplateRecords in process as an
+  in-process query class.'
+decision:
+  what: 'Posted on #30767 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" of 2 November
+    2026: "Build now: createPreview reads nothing from Catalogue or Orders and calls no service route. Do not add a
+    grant on orders.ticket_template for the operations role. It validates the body and writes
+    cache:preview:{tenantId}:{previewId} with expiresAt. In the same transaction it writes preview.requested to the
+    outbox (previewId, platform, language, outputs, productId as sent, expiresAt), then answers 201 with the Preview
+    (CR-106) ... Like every consumer in the workers host, it asks catalogue#productRecords (ids [productId]) and
+    orders#ticketTemplateRecords in process, and Orders implements ticketTemplateRecords as an in-process query class.
+    That renderer is a new ticket, not this one."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-476 (Deep Khanvilkar, #30767 createPreview, blocking): both reads were declared on the service route from
+  the operations host, but the rendering that uses them is the workers-host consumer of preview.requested (CR-106),
+  which composes every module (ADR-0055 as amended 25 October 2026).'
+keys_touched:
+  operations: [createPreview]
+  tables: [orders.ticket_template, catalogue.product]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/orders.yaml
+  - events/preview-requested.yaml
+  - tools/check-business-rules.py
+  - tools/check-cross-module-reads.py
+  other:
+  - 'query orders#ticketTemplateRecords served [in-process, service]'
+  - 'preview.requested consumer purpose: the renderer asks both reads in process'
+root_class: 'a read declared on the operation that only emits the job, not on the job that uses it'
+tickets:
+  started: []
+  unstarted:
+  - '30767 (createPreview, Deep): no Catalogue or Orders read; cache entry, outbox row, 201.'
+  - '37209 (the preview renderer, made by hand on 2 November): the workers-host consumer of preview.requested, asking
+    both reads in process, with Orders'' ticketTemplateRecords as an in-process query class.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-476
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PREVIEW-READS-NOTHING
+status: open
+notes: 'check-cross-module-reads NOT_READ_FOR holds createPreview''s "ticket and pass templates" and "no grant on
+  orders.ticket_template" sentences to it: they name what the renderer reads, not what createPreview reads. Beyond the
+  posted words: none.'

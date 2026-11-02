@@ -1,0 +1,43 @@
+id: CHG-CR466-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'setChannelSalesRule''s 409 rule-conflict is defined: an active rule with a productId and overridesProductRule
+  false conflicts with another active rule (not the one replaced) on the same sales channel, product and rule kind
+  whose effective window overlaps, windows as instants (a null effective_from from when that rule was saved, CR-414; a
+  null effective_to open-ended); ruleLevel plays no part (CR-411); a switch-off never conflicts; a transaction advisory
+  lock on the three; the problem names the rule it collides with; a rule with no product never gets the 409.'
+decision:
+  what: 'ADAM CR-466, posted on #35233: "Decided (Chinmay, 2 November 2026): A, as you built it, with two corrections
+    from earlier decisions. Build now: saving an active rule (isActive true) that has a productId and overridesProductRule
+    false is refused with 409 rule-conflict ... A null effective_from means from when that rule was saved (its
+    created_at, or now for the rule being saved), not open to the past (CR-414) ... take a transaction lock on the sales
+    channel, product and rule kind (pg_advisory_xact_lock on a hash of the three) ..." The lead''s "approve all as a
+    recommended", 2 November 2026.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-466 (Hrushikant Patkar, #35233 setChannelSalesRule): "product-level", "already has one" and "same window"
+  each had two readings. CR-411 (31 October) already counts conflicts as rows with a product whose dates overlap, active
+  only, and CR-414 makes a null effectiveFrom start when the rule was saved; backend/tenant/910-indexes.sql has no
+  exclusion constraint, so the check is the operation''s.'
+keys_touched:
+  operations: [setChannelSalesRule]
+  schemas: [ChannelSalesRule]
+  tables: [catalogue.channel_sales_rule]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal whose words each have two readings'
+tickets:
+  started:
+  - '35233 (setChannelSalesRule): keep option A as built, with the two corrections (a null start is the save time, not
+    open to the past; a switch-off never conflicts), the advisory lock, and the colliding rule''s id in detail.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-466
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CHANNEL-RULE-CONFLICT
+status: open

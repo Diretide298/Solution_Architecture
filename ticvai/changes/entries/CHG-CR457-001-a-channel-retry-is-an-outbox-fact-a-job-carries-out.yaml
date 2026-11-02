@@ -1,0 +1,61 @@
+id: CHG-CR457-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'retryChannelIncident writes the retry as a fact: in one transaction it refuses a resolved or closed incident
+  (409 not-retryable), moves the incident to retrying, adds 1 to retry_count, sets api_request_reference to the incident
+  id where null, writes one catalogue.audit_entry (channel, retry) and one platform.outbox row for the new event
+  catalogue.channelIncidentRetryRequested v1, and answers 202; x-ticvai-emits names it (BC-590). The event names its
+  payload and its consumer, Catalogue''s channel retry job in the workers host (incidentId+retryCount,
+  retryThenDeadLetter, not critical, 30 days), and what the job does: resend through the connector with the reused
+  reference, resolved only on a partner''s success, connectorNotAvailable until a connector exists, retryNotDelivered
+  on dead-letter. states/channel-incident.yaml names the job on the retrying transitions.'
+decision:
+  what: 'ADAM CR-457, posted on #35231: "Decided (Chinmay, 2 November 2026): A, as you recommended: the retry is a fact
+    written to the outbox and carried out by a job. Build now: (1) retryChannelIncident, in one transaction ... Write one
+    platform.outbox row for catalogue.channelIncidentRetryRequested v1 ... declare x-ticvai-emits ... (2) The event ...
+    Consumer: Catalogue''s channel retry job in the workers host; idempotency key incidentId + retryCount; onFailure
+    retryThenDeadLetter; isCritical false. Retention 30 days after publication. (3) The job (its own ticket) ... an
+    incident is never marked resolved without a partner''s success ..." The lead''s "approve all as a recommended", 2
+    November 2026.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-457 (Hrushikant Patkar, #35231 retryChannelIncident, blocking): the operation queues the failed call
+  again and ADAM records it writing platform.outbox, but no event said what the retry queues, which reference is reused,
+  or which job moves the incident on (events/_schema.yaml: every event has a consumer; an operation names what it
+  emits). The precedents are appBuild.requested (a requested fact handled by a job) and CR-422''s catalogue.priceExecuted
+  (CHG-CR422-001).'
+keys_touched:
+  operations: [retryChannelIncident]
+  schemas: [ChannelIncident]
+  tables: [catalogue.channel_incident, catalogue.audit_entry, platform.outbox]
+  files:
+  - contracts/spine/catalogue.yaml
+  - events/catalogue-channelIncidentRetryRequested.yaml
+  - states/channel-incident.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-590 (retryChannelIncident: x-ticvai-emits gains catalogue.channelIncidentRetryRequested), approved by the posted
+    decision'
+root_class: 'an operation that promises queued work with no event, payload or consumer that carries it out'
+tickets:
+  started:
+  - '35231 (retryChannelIncident): build the one transaction as posted (409 not-retryable, retrying, retry_count + 1,
+    the reference set once, the audit entry, the outbox row) and declare the emitted event.'
+  unstarted:
+  - '37206 (Catalogue''s channel retry job, made by hand on 1-2 November): consumes the event as
+    events/catalogue-channelIncidentRetryRequested.yaml says.'
+  - '36755, 36756 ([FE] ADM-273): no visible change; the incident answers retrying as before (BC-590 moves them to r13).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-457
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CHANNEL-RETRY
+status: open
+notes: 'The posted decision names the job''s writes; the event file lists them as the consumer''s writes
+  (catalogue.channel_incident, catalogue.audit_entry). It also says the job finds the trace by the incident''s original
+  apiRequestReference, or by correlationId when it had none, and every retry after the first carries the reference set
+  on the first.'

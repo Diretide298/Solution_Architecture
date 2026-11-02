@@ -186,8 +186,10 @@ x-ticvai-queries:
       lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Ledger's service route (serviceAuth).
-    served: [service]
+      from another deployable through Ledger's service route (serviceAuth), and in process within commerce, through
+      the C# query interface Ledger implements, by Catalogue's listTaxProfiles and getTaxProfileJurisdiction for a
+      tax profile's currency (ADAM CR-468; CHG-CR468-001).
+    served: [in-process, service]
   postingRecords:
     module: finance
     table: ledger.posting

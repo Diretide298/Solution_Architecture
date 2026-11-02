@@ -1,0 +1,48 @@
+id: CHG-CR452-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'getSignageQueueBoard states every shaping rule: grey when closed or isStale, else green up to 15 minutes, amber
+  16 to 45, red above 45; displayText ''{n} min'', ''Closed'' or ''Ride Now'' from a string table per language with English
+  as the fallback; heightRequirementText ''Min {n} cm''; isStale when waitTimeAsOf is older than twice the feed''s expectedIntervalSeconds
+  (queue.feed read); refreshSeconds 30; ride and attraction queues only, by zone, by name.'
+decision:
+  what: 'Posted on #33061 (Chinmay, 1 November 2026), under the lead''s "Approve all" (1 November 2026): "A, with these
+    values (proposed defaults the client may correct). statusColour: grey when the queue is closed or isStale; otherwise
+    green up to 15 minutes, amber from 16 to 45, red above 45. displayText: the wait as ''{n} min'', or ''Closed'', or ''Ride
+    Now'' when the wait is 0, from a string table per language with English as the fallback ... heightRequirementText: ''Min
+    {n} cm'' ... isStale: wait_time_as_of older than twice the feed''s expected_interval_seconds (add queue.feed to #33061''s
+    reads). refreshSeconds: 30. Listed: ride and attraction queues only, filtered by zone, ordered by name."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-452 (Hrushikant Patkar, #33061, blocking): SignageBoard entries were ''shaped for rendering'' with no rule
+  for colour, text, staleness, refresh or order.'
+keys_touched:
+  operations:
+  - getSignageQueueBoard
+  schemas:
+  - SignageBoard
+  tables:
+  - queue.queue
+  - queue.reading
+  - queue.feed
+  files:
+  - contracts/satellite/queue.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: a projection promised ready to render with none of its shaping rules stated
+tickets:
+  started:
+  - '33061 (getSignageQueueBoard, Hrushikant, On hold): build to these rules; read queue.feed.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-452
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SIGNAGE-BOARD
+status: open
+notes: 'The operation now declares x-ticvai-reads (queue.queue, queue.reading, queue.feed), so its carried lineage override
+  is removed. Beyond the posted words: none. Not stated by the decision: the string table is not stored anywhere the package
+  names, and a queue with no feed has no expected interval for isStale.'

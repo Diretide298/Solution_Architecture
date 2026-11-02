@@ -1,0 +1,57 @@
+id: CHG-CR447-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'orders gains TicketLayout (stock: kind ticket or wristband, widthMm, heightMm, dpi; elements: kind text, code128,
+  qr or image, xMm, yMm, rotation 0/90/180/270, font, fontSize, moduleSizeMm, content as field, text or assetRef, the seven
+  bound fields). TicketTemplateRequest.layoutRef names a stored TicketLayout; printTicketProof renders the same model the
+  device host prints. CR-463''s names are the field names.'
+decision:
+  what: 'Posted on #35592 (Chinmay, 1 November 2026), under the lead''s "Approve all" (1 November 2026): "as you recommended
+    (A). Add a TicketLayout schema: stock (ticket or wristband, width and height in mm, dpi) and elements, each with kind
+    (text, code128, qr or image), x and y in mm, rotation (0, 90, 180, 270), and for text a font and size, for codes a module
+    size, for images an asset reference; its content is a bound field (mediaCode, performanceStartsAt, performanceName,
+    seatLabel, guestName, venueName, priceAmount), fixed text, or an image asset. TicketTemplateRequest.layoutRef names
+    a stored TicketLayout. The BOCA driver translates a filled layout into its print job, and printTicketProof renders the
+    same model ... Build the layout model and the translation on #35592; the designer screen saves it."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-447 (Hrushikant Patkar, #35592, blocking): layoutRef was only an artwork reference, so no element model said
+  how a template becomes a BOCA print job or what the proof previews; ADR-0015.'
+keys_touched:
+  operations:
+  - createTicketTemplate
+  - updateTicketTemplate
+  - listTicketTemplates
+  - printTicketProof
+  schemas:
+  - TicketLayout
+  - TicketLayoutElement
+  - TicketTemplateRequest
+  - TicketTemplate
+  files:
+  - contracts/spine/orders.yaml
+  - tools/check-business-rules.py
+root_class: a print path with no element model between the designer and the device
+tickets:
+  started:
+  - '35592 (DEVICE-BOCA-FGL, Hrushikant): build the layout model and its translation to the FGL job under these names.'
+  unstarted:
+  - '30993 (updateTicketTemplate), 31680 (printTicketProof), Pranay: layoutRef names a stored TicketLayout; the proof renders
+    it.'
+  - '32276 (setPdfPrintablePos) and 32280 (BO-346): the designer screen saves the layout.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-447
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TICKET-LAYOUT
+status: open
+notes: 'STOPPED on where the stored layout lives, reported to the lead: ''layoutRef names a stored TicketLayout ... the
+  designer screen saves it'' names no table. The designer screen is BO-346 (setPdfPrintablePos), which stores its design
+  in access.media_template.design on the access deployable, while layoutRef and printTicketProof are Orders'' (commerce);
+  reading the layout from Orders needs a cross-deployable read (an XDR grant and an Access query), or the layout is stored
+  by Orders, which the designer''s write cannot reach. The package states the model and that layoutRef names the stored
+  layout, and no storage. Beyond the posted words: the stock''s kind field is named kind (CR-463 gives no name for it);
+  fontSize has no stated unit; layoutRef keeps type string.'

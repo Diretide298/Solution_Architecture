@@ -1271,7 +1271,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it accepts: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: catalogue#priceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       - query: finance#taxCodeRecords
         route: service
@@ -1505,7 +1505,7 @@ paths:
         - "P08 BO-011 Packages & Bundles"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#regionSettingsRecords
         route: in-process
@@ -3647,7 +3647,7 @@ paths:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-read-via:
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -3792,11 +3792,22 @@ paths:
       operationId: setTemperatureCheckpoint
       x-ticvai-consumed-by:
         - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the venue''s outlets (platform.outlet, Tenancy''s data), so an outletId that is not one of them is refused
+          400 (ADAM CR-453; XDR-004)'
       summary: Define a checkpoint and its safe range
       description: '**The range is the configuration; the reading is the record.** `TemperatureLog`
         keeps `minCelsius` and `maxCelsius` as the snapshot in force when it was taken, for the reason
         the log already gives — *"deleting a bad reading is the one thing an inspector looks for"*, and
         silently restating the range a past reading was judged against is the same act by other means.
+
+
+        **The checks before anything is stored** (ADAM CR-453, Chinmay, 1 November 2026; CHG-CR453-001). The venue''s
+        outlets are read in process (Tenancy''s `tenancy#outletRecords`, XDR-004); an `outletId` that is not one of them
+        is `400` on `outletId`. `minCelsius` greater than `maxCelsius` is `400`, and a `checkFrequencyMinutes` of 0 or
+        less is `400`; each names its field in `errors[]`.
 
         '
       tags:
@@ -3834,6 +3845,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TemperatureCheckpoint'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: 'An `outletId` that is not one of the venue''s outlets, `minCelsius` greater than `maxCelsius`,
+            or a `checkFrequencyMinutes` of 0 or less; `errors[]` names the field (ADAM CR-453)'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/temperature-logs:
@@ -4571,10 +4590,10 @@ paths:
         route: in-process
         for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
       - query: orders#depositRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.deposit": orders.deposit, Order''s data (CHG-R10GEN-001)'
       - query: orders#depositPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [orders.deposit]
       security:
@@ -4679,7 +4698,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#depositPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
@@ -5709,7 +5728,7 @@ paths:
         route: in-process
         for: 'the outlet''s admissionContext and whether it is taking orders (403 entry-ticket-required, 409 outlet-closed, 422 the outlet''s delivery policy) (CHG-MOD-003)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'the order''s payment (402 payment-required, payment-declined) (CHG-MOD-003)'
       x-ticvai-emits:
       - fnb.kitchenTicketCreated
@@ -5903,7 +5922,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - guest
@@ -7457,7 +7476,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -7601,7 +7620,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)'
       - query: tenancy#outletRecords
         route: in-process
@@ -8043,7 +8062,7 @@ paths:
         - "P08 BO-134 Kitchen & Preparation Stations"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
-        route: service
+        route: in-process
         for: 'the display workstations it assigns (400 workstation-on-two-stations) (CHG-MOD-003)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
@@ -9241,7 +9260,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#depositPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -9393,7 +9412,7 @@ paths:
         route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       - query: seating#seatRecords
-        route: service
+        route: in-process
         for: 'the seat a `seat` location names (422 seat-id-required) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff
@@ -9901,12 +9920,14 @@ components:
           type: number
           nullable: true
           description: '**Null at either end is legitimate** — a core probe has a floor and no ceiling.
-            Both null is not, and is what an unconfigured checkpoint looks like.'
+            Both null is not, and is what an unconfigured checkpoint looks like. With both set, `minCelsius` is not
+            greater than `maxCelsius` (`400` at `setTemperatureCheckpoint`; ADAM CR-453).'
         checkFrequencyMinutes:
           type: integer
           nullable: true
           description: '**How often it must be read.** The gap this leaves open otherwise is the one an
-            inspector finds: not a bad reading, but a missing one.'
+            inspector finds: not a bad reading, but a missing one. Greater than 0 when set (`400` at
+            `setTemperatureCheckpoint`; ADAM CR-453).'
         requiresCorrectiveActionOnBreach:
           type: boolean
         isActive:

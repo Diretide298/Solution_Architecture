@@ -2548,6 +2548,18 @@ paths:
       - table: wallet.funding_rule
         for: 'the venue''s default funding rules (walletTypeId null): the applying bonus rule, its bonus and its
           bonusCreditTypeId (ADAM CR-357)'
+      x-ticvai-writes:
+      - table: wallet.balance
+        for: 'the one balance writer: the wallet''s balance row locked and moved by one guarded update (ADAM CR-471)'
+      - table: wallet.credit_lot
+        for: 'the paid lot (source_kind topUp) and, where CR-357''s rule gives one, the bonus lot (source_kind
+          promotion), each at the scope_path of the top-up line''s venue (ADAM CR-471)'
+      - table: wallet.wallet_transaction
+        for: 'one row per lot, kind topUp or bonus, venue_id the top-up line''s venue (ADAM CR-471)'
+      - table: wallet.wallet
+        for: 'balance, bonus_balance and last_activity_at (ADAM CR-471)'
+      - table: platform.outbox
+        for: 'wallet.credited, at the same scope_path as the lot (ADAM CR-471)'
       x-ticvai-note: >-
         **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
         locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
@@ -2560,6 +2572,7 @@ paths:
       - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-guest-callable: true
+      x-ticvai-self-scoped: subject
       summary: Add value to a wallet
       description: >
         Creates a liability, not revenue. Recognition happens when the value is spent, or as
@@ -2604,6 +2617,36 @@ paths:
         `bonusAmount` differs from the rule's bonus, or that sends one when no rule applies, is refused
         `422 bonus-not-applicable` and nothing is credited, so no caller, the guest app included, can credit a bonus
         the venue did not set. No migration.
+
+
+        **Who may top up which wallet, and the order of the checks** (ADAM CR-471, Chinmay, 2 November 2026, option A
+        with the outbox row added and the guest held to its own wallet; CHG-CR471-001). Under the caller's own grant,
+        in this order: a guest caller (a session with a subject) tops up only its own wallet, so the path's
+        `subjectId` must be the session's subject, else the shared `404`, as `getWallet` answers; a staff caller needs
+        `WALLET_OPERATE`. Then the checks above: `orders#paymentRecords` (`402 payment-declined` unless captured),
+        `orders#salesOrderRecords` (the order's `subject_id` is `subjectId` and it is paid in full, else `422
+        payment-not-for-top-up`), `orders#orderLineRecords` with `catalogue#variantRecords` and
+        `catalogue#productRecords` (a `walletTopUp` line, quantity 1, `grossAmount` = `amount`, else `422
+        payment-not-for-top-up`), then the cash credit type and the bonus rule as CR-357 decided (500 on a
+        misconfigured credit type, `422 bonus-not-applicable`).
+
+
+        **The writes.** A staff caller writes under its own grant, as before. For a guest caller, once every check has
+        passed, the connection switches to the routed tenant's root grant (ITenantRootGrant) for exactly these
+        statements inside the request's transaction, and the caller's grant is put back before anything else runs:
+        lock the wallet's `wallet.balance` row and apply the guarded update (the one balance writer); insert the paid
+        `wallet.credit_lot` (`source_kind` `topUp`, `source_reference` the payment id, `order_line_id` the line);
+        insert the bonus lot where CR-357's rule gives one (`source_kind` `promotion`, `order_line_id` null); insert
+        one `wallet.wallet_transaction` per lot (kind `topUp`, and kind `bonus` for the bonus lot) with `subject_id` =
+        `subjectId`, `order_id` the order, `venue_id` the order line's `venue_id` and `principal_id` null; update
+        `wallet.wallet`'s `balance`, `bonus_balance` and `last_activity_at`; and write the `platform.outbox` row for
+        `wallet.credited` with the same `scope_path` as the lot. Nothing else runs under the root grant. A unique
+        violation on `credit_lot_order_line_id_uniq` is still `409 payment-already-used`.
+
+
+        **Where the rows sit, for staff and guest alike.** Each lot's `scope_path` (the paid lot and the bonus lot) is
+        the `platform.scope` path of the top-up line's venue (`orders.order_line.venue_id`), and each
+        `wallet.wallet_transaction.venue_id` is that venue's id. No migration.
       tags: [wallet]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-scope-level: workstation
@@ -2666,6 +2709,7 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '422':
           x-ticvai-problem-types: [payment-not-for-top-up, bonus-not-applicable]
           description: 'The body''s `orderLineId` and `paymentId` are not a paid top-up: the payment is not of the
