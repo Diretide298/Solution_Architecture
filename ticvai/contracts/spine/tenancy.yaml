@@ -128,6 +128,32 @@ x-ticvai-queries:
       previousValue and newValue absent. A failed sign-in opens no session and records nothing here
       (identity.loginRecorded carries it). listDeviceAuditRecords returns these rows with the scans.'
     served: [in-process]
+  # **Which device a key belongs to, as one answer** (ADAM CR-451; the lead, 2 November 2026, "yes for both";
+  # CHG-CR451-001). The device-key sign-in runs before any session exists, in whichever host serves the apiKeyAuth
+  # operation, and the credential and the device are Tenancy's.
+  deviceForApiKey:
+    module: tenancy
+    table: tenancy.device_credential
+    reads: [tenancy.device_credential, platform.device]
+    inputs:
+      keyHash: {type: string, description: 'The hash of the X-Api-Key the request presents, computed as issueDeviceCredential stored it (DeviceCredential.fingerprint).'}
+    returns:
+      type: object
+      properties:
+        deviceId: {type: string, format: uuid, nullable: true, description: 'The device the key is bound to; null when no live key matches.'}
+        deviceKind: {type: string, nullable: true, description: 'Its kind (platform.device.kind), signageDisplay for a display key.'}
+        venueId: {type: string, format: uuid, nullable: true, description: 'Its venue, which the device session is scoped to.'}
+        venueScopePath: {type: string, nullable: true, description: 'That venue''s scope path.'}
+    rule: >-
+      A rule question (ADAM CR-451, Chinmay, 1 November 2026; the read's route, the lead, 2 November 2026: "yes for
+      both"). Matches a tenancy.device_credential row of kind apiKey whose fingerprint is keyHash, revoked_at null and
+      expires_at absent or after now, and its platform.device (retired or unapproved answers nothing), and returns only
+      the device, its kind and its venue. Tenancy answers it with one statement under the routed tenant's root grant
+      (ITenantRootGrant), since no session exists yet; the sign-in then opens the device session scoped to that venue,
+      and no match is 401. Asked in process by the device-key sign-in for every apiKeyAuth operation (#37205), in
+      commerce and in the operations host, a read the lead granted across deployables
+      (docs/active/cross-deployable-writes.yaml XDR-068). Read only: the sign-in writes nothing to Tenancy.
+    served: [in-process]
   deadLetterRecords:
     module: tenancy
     table: platform.dead_letter

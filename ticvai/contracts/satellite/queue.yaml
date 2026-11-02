@@ -1234,6 +1234,11 @@ paths:
   /queue-feeds/readings:
     post:
       operationId: submitQueueReading
+      x-ticvai-read-via:
+      - query: tenancy#deviceForApiKey
+        route: in-process
+        for: 'the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM
+          CR-451; XDR-068)'
       x-ticvai-audience: [device]
       summary: Inbound sensor reading
       description: >
@@ -1380,6 +1385,11 @@ paths:
   /signage/queue-board:
     get:
       operationId: getSignageQueueBoard
+      x-ticvai-read-via:
+      - query: tenancy#deviceForApiKey
+        route: in-process
+        for: 'the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM
+          CR-451; XDR-068)'
       x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
       x-ticvai-reads:
@@ -1443,6 +1453,11 @@ paths:
   /signage/queue-calls:
     get:
       operationId: getSignageQueueCalls
+      x-ticvai-read-via:
+      - query: tenancy#deviceForApiKey
+        route: in-process
+        for: 'the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM
+          CR-451; XDR-068)'
       x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
       summary: Currently called party numbers

@@ -2862,6 +2862,10 @@ paths:
       - query: catalogue#productRecords
         route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: access#mediaTemplateRecords
+        route: in-process
+        for: 'the stored TicketLayout layoutRef names: the design''s layout of that access.media_template (designer
+          pdfPrintablePos), Access''s data (ADAM CR-447; XDR-067)'
       summary: Print a sample without selling anything
       description: '2.16.6. **Artwork is checked by looking at it, and the only way to look at it was
         to sell something.**
@@ -2871,7 +2875,8 @@ paths:
 
 
         **It renders the model that prints** (ADAM CR-447, Chinmay, 1 November 2026; CHG-CR447-001): the template''s
-        `TicketLayout` (the one `layoutRef` names), filled with the sample''s values, so the proof previews exactly what
+        `TicketLayout` (the one `layoutRef` names, read from Access in process through `access#mediaTemplateRecords`,
+        XDR-067: the design''s `layout` of that designer template), filled with the sample''s values, so the proof previews exactly what
         the device host prints from the same layout (contracts/devices/ticket-printer.yaml).
 
         '
@@ -22711,7 +22716,8 @@ components:
         layoutRef:
           type: string
           description: 'Names the stored `TicketLayout` this template prints (ADAM CR-447, Chinmay, 1 November 2026;
-            CHG-CR447-001): the layout the ticket designer screen saves. Until r13 it was the artwork as a media-asset
+            CHG-CR447-001): the layout the ticket designer screen saves, the id of the Access media template (designer
+            `pdfPrintablePos`) whose design holds it (the lead, 2 November 2026, "yes for both"). Until r13 it was the artwork as a media-asset
             reference, which carried no element model a printer could render.'
         localeVariants:
           type: object
@@ -22804,7 +22810,7 @@ components:
         isActive:
           type: boolean
     TicketLayout:
-      x-ticvai-persistence: none — the ticket designer's layout document; `TicketTemplate.layoutRef` names the stored one
+      x-ticvai-persistence: none — the ticket designer's layout document, stored as the `layout` of the design the designer screen saves (Access, read through access#mediaTemplateRecords); `TicketTemplate.layoutRef` names it
       type: object
       description: '**What a ticket or wristband prints, element by element** (ADAM CR-447, Chinmay, 1 November 2026, as
         recommended (A); the names as the Windows device host built them, ADAM CR-463, Chinmay, 2 November 2026;

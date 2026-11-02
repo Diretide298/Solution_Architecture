@@ -100,8 +100,8 @@ x-ticvai-queries:
       venueIds contain the venue or are empty) (ADAM CR-385, 31 October 2026; XDR-028; SELECT on payments.method
       granted to the operations role). **Above the venue, for that check only** (ADAM CR-443, Chinmay, 1 November
       2026; CHG-CR443-001): for those two operations the read takes the rows at the venue and at its ancestors (a
-      scope_path that is the venue's or an ancestor of it), in process, for that check only, so a tenant-wide method
-      is found; every other asker reads as the caller's scope lets it see them.
+      scope_path that is the venue's or an ancestor of it), under the routed tenant's root grant (ITenantRootGrant), filtered in the statement to the venue's scope_path and its ancestors, in process, for that check only, as CR-336 and CR-362 did; the caller's grant is in force again for every other statement (the lead, 2 November 2026: "yes for both"), so a tenant-wide method is found;
+      every other asker reads as the caller's scope lets it see them.
     served: [in-process]
   approvedPaymentMethods:
     module: payments
