@@ -91,6 +91,20 @@ check('a bundle from another release than the one served is not used: the plan\'
   later.found && later.source === 'plan' && later.release === 'r99'
   && later.text.includes('- Written at release `r99`') && later.text.includes('**Done when:** a deliberate cross-module reference')
   && later.text.includes('Features/<Module>'), later.text?.slice(0, 500));
+// R12 (r13, CHG-R13R12-001): the fallback is never silent. The answer says why the pointer was not used and
+// names the pointer's sections the plan row lacks.
+check('**R12: the plan fallback carries a notice: the bundle is another release\'s, and the plan row has What and Done when only**',
+  typeof later.notice === 'string' && later.notice.includes(`is ${SERVED}'s, not r99's`)
+  && later.notice.includes('which has the summary, What and Done when only') && later.bundleRelease === SERVED
+  && Array.isArray(later.missing) && !later.missing.includes('What') && !later.missing.includes('Done when'),
+  JSON.stringify({ notice: later.notice, missing: later.missing }));
+const dev = bundle.tickets.find((t) => /^\*\*Design[^*]*\*\*/m.test(t.pointer ?? '') && bundle.ids[t.key]);
+if (dev) {
+  const got = await ticketText(TICVAI, { id: String(bundle.ids[dev.key]), served: 'r99' });
+  check(`R12: a pointer with a design section (${dev.key}): the notice names Design as not here`,
+    got.source === 'plan' && got.missing.includes('Design') && got.notice.includes('Design'), JSON.stringify(got.missing));
+}
+check('the bundle\'s own release has no notice', !('notice' in arch) && arch.source === 'bundle');
 const nobody = await ticketText(TICVAI, { id: '1', served: SERVED });
 check('a number that is no ticket of the plan is not found', nobody.found === false && /not a ticket/.test(nobody.why));
 const demoRoot = (await stat(DEMO).catch(() => null)) ? DEMO : tmpdir();
@@ -157,6 +171,25 @@ check('a ticket whose OpenProject text is no pointer: the release\'s text, and "
 check('textNotice is empty when the texts agree', textNotice({ same: true, release: 'r8' }) === '');
 check('a description the accounts service cut at its limit is the same text when the release\'s starts with it',
   sameText(arch.text.slice(0, 600), arch.text, true) && !sameText(R6.slice(0, 500), arch.text, true));
+
+// R12: a pull whose text is the plan row's prints the notice at the top of the Description, and keeps it in
+// ticket.json; an ADAM that sends no notice gets the general one.
+const fromPlan = async (params) => ({ project: 'ticvai', served: 'r99',
+  ...(await ticketText(TICVAI, { id: params.id, key: params.key, served: 'r99' })) });
+const planPull = await pull(stub(R6, fromPlan));
+const planDesc = planPull.readme.slice(planPull.readme.indexOf('## Description'));
+check('**R12: a README whose text is the plan row\'s says so first, naming why and what is missing**',
+  planDesc.startsWith('## Description\n\n**This text is the plan row\'s, not the release\'s pointer:** the release bundle')
+  && planDesc.includes(`is ${SERVED}'s, not r99's`) && planPull.saved.releaseText?.source === 'plan'
+  && planPull.saved.releaseText?.notice?.startsWith('**This text is the plan row\'s'), planDesc.slice(0, 500));
+const bare = await pull(stub(R6, async (params) => {
+  const { notice, missing, ...rest } = await fromPlan(params);
+  return rest;
+}));
+check('R12: from an ADAM that sends no notice, the general one (PLAN_FALLBACK)',
+  bare.readme.includes('## Description\n\n**This text is the plan row\'s, not the release\'s pointer:** ADAM had no pointer'),
+  bare.readme.slice(bare.readme.indexOf('## Description'), bare.readme.indexOf('## Description') + 300));
+check('R12: a README whose text is the bundle\'s has no plan notice', !stale.readme.includes('This text is the plan row'));
 
 const older = await pull(stub(R6, async () => null));
 check('an ADAM without the route (or a package without the files): OpenProject\'s description, as before',

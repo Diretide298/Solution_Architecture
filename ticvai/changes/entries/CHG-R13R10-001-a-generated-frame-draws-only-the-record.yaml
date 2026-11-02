@@ -1,0 +1,43 @@
+id: CHG-R13R10-001
+date: '2026-11-02'
+source: audit
+kind: process
+summary: tools/derive-wireframes.py draws a generated frame from the screen and platform records only. It draws every
+  region of layout.regions in order, every component with its label, and a table's declared columns. There is no
+  invented nav, brand, header chips or KPI strip, no sample figure, every state is listed, and the offline strip
+  appears only from the platform's banner. Drawn and captured frames, and so every client-verified screen, are
+  unchanged.
+decision:
+  what: 'The lead, 2 November 2026, on fixing the mechanical root causes of the Block A developer pull in parallel with
+    the r13 build lanes: "lets see if we can do something in parallel", then "yes". AUDIENCE_CHROME, KPI_BY_MODULE,
+    DEFAULT_KPIS, kpis(), panel() and the template-implied panels are gone. gen_panel() draws each declared
+    component, and the generator adds only GENERATED_LABELS of its own. Names and notes are clipped before they are
+    escaped. check-wireframes W-FIDELITY (with --self-test) fails a generated frame that draws text no record holds,
+    or that leaves out a declared component. Generated frames are not approved designs: all 159 client-verified screens
+    have drawn frames, and their 318 frame cards on the boards are byte-identical after the change.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'r13 root R10 of the Block A developer pull (31 October 2026; finding 2.27985.8 and 24 more across 25 tickets).
+  #27985 DEV-008, a staff screen, was drawn with the partner portal''s nav and the tiles "Allocation 2,400, Sold
+  1,860, Credit AED 84k". #27755 EMP-002 got a "This venue" picker its record rules out and lost its session panel and
+  Select role button. 149 of the 655 frames pulled drew "Primary action", and every table was Name/Status/Value.'
+keys_touched:
+  files:
+  - tools/derive-wireframes.py
+  - tools/check-wireframes.py
+root_class: a generator that fills a thin record with furniture of its own, presented as the record
+tickets:
+  started: []
+  unstarted:
+  - '#27755, #27758, #27761, #27769, #27810, #27842, #27886, #27978, #27984, #27985, #28010, #28012, #28013, #28054,
+    #28168, #28195, #28213, #28867, #29778, #29883, #36206, #36207, #37014, #37057, #37067 (New at the 31 October
+    pull): the next pull''s frame draws the record''s regions, components and columns; build from the screen record
+    (CHG-R13R11-001).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 2 November 2026 (r13 root-cause lanes)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-wireframes.py::W-FIDELITY (--self-test)
+status: open

@@ -151,6 +151,9 @@ CHECKS = [
     # 14 October (Chinmay, CHG-ADM-004): a blocker is always a CR, the ticket goes On hold, and the agent takes the next
     # ticket no open blocking CR affects; every text an agent reads says so and ADAM answers it on the board and the pull.
     "check-adam-blocker-rule",
+    # 2 November (r13 root R13, CHG-R13R13-001): no README under repos/ is a copy of another package file (104 were the
+    # Active page); derive-mirrors writes each from its docs/repos/ source or as an index of its folder.
+    "check-repo-readmes",
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",

@@ -1,0 +1,39 @@
+id: CHG-R13R18-001
+date: '2026-11-02'
+source: audit
+kind: process
+summary: derive-carries-from-entrystate.py no longer writes a required deep-link id as a pre-select. Only an optional
+  param pre-selects. A required one is found by the screen itself, read off a list it opens on (a gap in the screen),
+  or the edge is cold. Only the edges' provenance text changes, not what any screen shows.
+decision:
+  what: 'The lead, 2 November 2026, on fixing the mechanical root causes of the Block A developer pull in parallel with
+    the r13 build lanes: "lets see if we can do something in parallel", then "yes". why_nothing() puts a param under
+    "only pre-selects" only when it is optional. At the next refresh, 42 owned edges that said a required id "only
+    pre-selects ... opens on its own" say what is true: 31 say the destination opens on a list and the id has no
+    source on it yet, 10 open cold, and 1 is a hub''s menu entry. About 360 more read "(optional)" for "(deep link or
+    optional)". The screens'' contents other than provenance are unchanged.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'r13 root R18 of the Block A developer pull (31 October 2026; finding 2.28195.1, with 2.28213.3, 2.37014.4, 2.37067.2 and
+  2.27985.3). why_nothing() read every from: deepLink param as optional, so BO-103 -> BO-094 said mapId "only
+  pre-selects ... BO-094 opens on its own" while BO-094 has no list of maps.'
+keys_touched:
+  files:
+  - tools/derive-carries-from-entrystate.py
+  - tools/tests/test_carries_required_deep_link.py
+root_class: a generator that reads a field's origin (deep link) as its optionality
+tickets:
+  started: []
+  unstarted:
+  - '#28213 APP-SETUP-BO-094-REST (New at the 31 October pull): the BO-103 -> BO-094 edge now says mapId has no source
+    on BO-094; how BO-094 gets its map is a question for the lead.'
+  - '#28195 BO-015 and #37014 BO-129 (New): nothing to do; at r12 each finds its id itself (listPerformances,
+    listWorkstations).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 2 November 2026 (r13 root-cause lanes)'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-carries-from-entrystate.py::why_nothing, held by tools/tests/test_carries_required_deep_link.py
+status: open

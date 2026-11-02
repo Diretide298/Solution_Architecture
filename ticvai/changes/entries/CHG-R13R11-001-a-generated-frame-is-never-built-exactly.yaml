@@ -1,0 +1,40 @@
+id: CHG-R13R11-001
+date: '2026-11-02'
+source: audit
+kind: process
+summary: ADAM's README stops telling the developer to build a generated wireframe frame exactly. For a generated frame
+  it says to build from the screen record, which is the source of the regions, components and copy. The frame is a
+  sketch that may leave parts out and draws placeholders the record does not declare. "Exactly" stays for a drawn or
+  captured frame and for a client-approved prototype.
+decision:
+  what: 'The lead, 2 November 2026, on fixing the mechanical root causes of the Block A developer pull in parallel with
+    the r13 build lanes: "lets see if we can do something in parallel", then "yes". viewer/mcp/tools.mjs lookSection():
+    a generated frame gets "Build the page from the screen record, not from the frame" and no "exactly", and the line
+    "build its regions and components in the order the frame shows" is gone. saveFrameFor and the adam_pull answer and
+    description say the same. Drawn and captured frames keep their text unchanged.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'r13 root R11 of the Block A developer pull (31 October 2026; finding 2.27985.8 and 24 more under root R10): the README said "Build the page to match the
+  wireframe exactly" and "build its regions and components in the order the frame shows" for generated frames too, so
+  the generator''s invented and missing parts (root R10) became build instructions. Seen on #27985 APP-SETUP-DEV-008,
+  where the frame drew the partner portal''s nav and KPI tiles, and on the 24 other screen tickets of root R10.'
+keys_touched:
+  files:
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/pull-files-check.mjs
+root_class: a build instruction written for one kind of input (a drawn design) applied to every kind (a generated sketch)
+tickets:
+  started: []
+  unstarted:
+  - '#27755, #27758, #27761, #27769, #27810, #27842, #27886, #27978, #27984, #27985, #28010, #28012, #28013, #28054,
+    #28168, #28195, #28213, #28867, #29778, #29883, #36206, #36207, #37014, #37057, #37067 (New at the 31 October
+    pull): the next pull, once ADAM is redeployed, says to build from the screen record.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 2 November 2026 (r13 root-cause lanes)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: viewer/mcp/pull-files-check.mjs section 2 (R11, a generated frame's README has no "exactly" and names the record
+    as the source)
+status: open

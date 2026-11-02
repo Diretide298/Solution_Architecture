@@ -13,6 +13,8 @@
 //   2. otherwise the plan, handoff/service-docs/tasks.csv: the row's description, its "Done when" on its own line.
 //
 // Neither file (another package) is an answer too: `found: false`, and the pull shows the OpenProject text as before.
+// A plan row's answer carries `notice` (why the pointer was not used, and what the plan row lacks): the README prints
+// it, so the fallback is never silent (r13 root R12).
 // The connector (mcp/tools.mjs) compares the answer with the OpenProject description; it cannot import this file.
 
 import { readFile, stat } from 'node:fs/promises';
@@ -114,6 +116,36 @@ export async function ticketText(root, { id = '', key = '', served = null } = {}
   const row = plan?.get(planKey);
   if (!row) return { found: false, key: planKey, why: `${planKey} is not in this release's plan` };
   const release = served || bundle?.release || null;
+  // **The fallback says so** (2 November 2026, r13 root R12, CHG-R13R12-001; #27985 APP-SETUP-DEV-008 in the r12
+  // rehearsal: the candidate's committed bundle was r11's, so the README's Description was the plan row and lost the
+  // pointer's scope, repository and design lines without a word). The answer names why the plan row is used and the
+  // pointer's sections it does not have (from the other release's pointer, where that bundle has one).
+  const why = !bundle ? `the package has no release bundle (${BUNDLE_FILE})`
+    : !bundle.pointers.has(planKey) ? `the release bundle (${BUNDLE_FILE}, ${bundle.release || 'no release'}) has no pointer for ${planKey}`
+      : `the release bundle (${BUNDLE_FILE}) is ${bundle.release || 'no release'}'s, not ${served}'s`;
+  const missing = bundle?.pointers.has(planKey) ? pointerSections(bundle.pointers.get(planKey)) : [];
   return { found: true, release, key: planKey, id: number || null, source: 'plan', file: PLAN_FILE,
-    text: planText(planKey, row, release) };
+    text: planText(planKey, row, release), bundleRelease: bundle?.release || null, missing,
+    notice: planNotice(why, missing) };
+}
+
+/** The bold-labelled sections of a pointer the plan row has no line for (Scope, Repository, Design, ...). */
+export function pointerSections(pointer) {
+  const out = [];
+  for (const m of String(pointer ?? '').matchAll(/^\*\*([^*\n]{2,60}?):?\*\*/gm)) {
+    const label = m[1].replace(/\s*\(.*\)\s*$/, '').replace(/:$/, '').trim();
+    if (/^(What|Done when)$/i.test(label) || m.index === 0) continue;
+    if (!out.includes(label)) out.push(label);
+  }
+  return out;
+}
+
+/** The line a README prints above a plan row's text. */
+export function planNotice(why, missing = []) {
+  return `**This text is the plan row's, not the release's pointer:** ${why}, so ADAM fell back to the plan `
+    + `(${PLAN_FILE}), which has the summary, What and Done when only. `
+    + (missing.length
+      ? `The pointer's other sections are not here: ${missing.join(', ')}. `
+      : 'Any other section the pointer has (scope, repository, mock API, design, calls not in this release) is not here. ')
+    + 'Say so in your comment, and ask the lead before building past what this text says.';
 }
