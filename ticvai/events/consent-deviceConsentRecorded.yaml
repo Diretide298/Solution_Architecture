@@ -7,6 +7,8 @@ publisher: marketing
 description: A visitor nobody has identified yet made a cookie decision on a banner or preference centre — accepted, rejected, saved preferences, withdrew or opted out of sale and sharing.
 aggregate: deviceConsent
 emittedWhen: recordDeviceConsent succeeds (one append-only marketing.device_consent row)
+emittedBy:
+- marketing-crm.recordDeviceConsent
 payload:
 - field: deviceConsentId
   type: uuid

@@ -200,6 +200,61 @@ x-ticvai-queries:
       rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
       operations, through the C# query interface F&B implements.
     served: [in-process]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  forecastViews:
+    module: fnb
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.forecastPublished, ai.operationalRequirementIssued]
+    reads: []
+    writes: []
+    for: 'Forecast-bound operational views: F&B prep and par, Inventory replenishment, Workforce rota (critical: shows the
+      requirement a manager applies), Resources demand, refreshed on a published forecast or an issued operational requirement.'
+    source:
+    - events/ai-forecastPublished.yaml:45
+    - events/ai-forecastPublished.yaml:50
+    - events/ai-forecastPublished.yaml:55
+    - events/ai-forecastPublished.yaml:60
+  kitchenTicketPush:
+    module: fnb
+    host: workers
+    trigger: {kind: event}
+    consumes: [fnb.kitchenTicketCreated]
+    reads: []
+    writes: []
+    for: 'Smaller module consumers: F&B pushes a new kitchen ticket to the station''s KDS screens (the KDS also polls listKitchenTickets;
+      POS-KDS-ROUTING builds routing only); the Queue releases a held virtual-queue slot on entry (''capacity leaks if this
+      is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
+      wallet.credited and re-enables a repair'
+    source:
+    - events/access-validated.yaml:45
+    - events/approval-granted.yaml:41
+    - events/entitlement-issued.yaml:53
+    - events/fnb-kitchenTicketCreated.yaml:29
+  timers:
+    module: fnb
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: restaurant-waitlist, from: notified, to: noShow}
+    - {model: table, from: reserved, to: free}
+    - {model: table-reservation, from: awaitingDeposit, to: cancelled}
+    - {model: table-reservation, from: booked, to: noShow}
+    - {model: table-reservation, from: confirmed, to: noShow}
+    reads: [fnb.dining_table, fnb.table_reservation, fnb.table_visit, fnb.waitlist_entry]
+    writes: [fnb.dining_table, fnb.table_reservation, fnb.table_visit, fnb.waitlist_entry]
+    for: F&B's table and reservation timers.
+    source:
+    - states/restaurant-waitlist.yaml:32
+    - states/table-reservation.yaml:26
+    - states/table.yaml:52
 paths:
   /reservation-policy:
     get:

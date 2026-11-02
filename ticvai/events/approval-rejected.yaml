@@ -36,11 +36,6 @@ consumers:
   idempotencyKey: requestId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Rejection analytics
-  idempotencyKey: requestId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Close the action plan waiting on this approval, as rejected (AI system design section 3.2)
   idempotencyKey: requestId

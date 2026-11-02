@@ -249,6 +249,349 @@ x-ticvai-queries:
       with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
       deployable through Ai's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  actionPlanExecutor:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    moves:
+    - {model: ai-action-plan, from: draft, to: validated}
+    - {model: ai-action-plan, from: validated, to: simulated}
+    - {model: ai-action-plan, from: simulated, to: awaitingApproval}
+    - {model: ai-action-plan, from: approved, to: executing}
+    - {model: ai-action-plan, from: executing, to: completed}
+    - {model: ai-action-plan, from: executing, to: partiallyCompleted}
+    - {model: ai-action-plan, from: executing, to: compensated}
+    - {model: ai-action-plan, from: executing, to: failed}
+    - {model: ai-action-plan, from: executing, to: paused}
+    reads: [ai.action_plan, ai.decision_record]
+    writes: [ai.action_plan, ai.decision_record]
+    emits: [ai.planExecuted, ai.planFailed]
+    for: 'AI configuration action-plan pipeline: validate, simulate, govern, execute, compensate.'
+    source: ['states/ai-action-plan.yaml:25']
+  anomalyDetection:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    reads: [ai.anomaly_detector]
+    writes: [ai.insight]
+    emits: [ai.insightRaised]
+    reliesOn: [configureAnomalyDetector]
+    builtBy: AI-ENGINE-ANOMALY-DETECTION
+    for: 'The anomaly detectors configureAnomalyDetector sets: each crossing raises an AiInsight with ai.insightRaised.'
+    source: ['contracts/satellite/ai.yaml:6228']
+  answerCache:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    context: cache
+    consumes:
+    - ai.capabilityPaused
+    - ai.planExecuted
+    - approval.granted
+    - assets.documentIndexed
+    - catalogue.priceExecuted
+    - catalogue.productPublished
+    - catalogue.productWithdrawn
+    - fnb.menuPublished
+    - maintenance.templatePublished
+    - marketing.caseClosed
+    - reporting.definitionPublished
+    - retail.merchandisePublished
+    - whitelabel.contentPublished
+    reads: []
+    writes: []
+    for: 'The AI answer-cache invalidation consumers (ADR-0034): drop cached answers under the affected scope when the content,
+      configuration, prices or an AI capability they came from change.'
+    source:
+    - events/ai-capabilityPaused.yaml:32
+    - events/ai-planExecuted.yaml:41
+    - events/approval-granted.yaml:61
+    - events/assets-documentIndexed.yaml:37
+  evaluationRunner:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    moves:
+    - {model: ai-evaluation-run, from: queued, to: running}
+    - {model: ai-evaluation-run, from: running, to: passed}
+    - {model: ai-evaluation-run, from: running, to: failed}
+    - {model: ai-evaluation-run, from: running, to: error}
+    - {model: ai-evaluation-run, from: queued, to: error}
+    reads: [ai.eval_run]
+    writes: [ai.eval_run]
+    builtBy: AI-ENGINE-EVAL
+    for: The evaluation worker that runs a queued evaluation run.
+    source: ['states/ai-evaluation-run.yaml:1']
+  evidencePackage:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    moves:
+    - {model: ai-evidence-package, from: building, to: ready}
+    - {model: ai-evidence-package, from: building, to: failed}
+    reads: [ai.evidence_package]
+    writes: [ai.evidence_package]
+    reliesOn: [exportAiEvidencePackage]
+    for: AI evidence package builder.
+    source: ['states/ai-evidence-package.yaml:22']
+  expiryTimers:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: timer}
+    moves:
+    - {model: ai-operational-requirement, from: issued, to: expired}
+    - {model: ai-policy-exception, from: active, to: expired}
+    - {model: ai-proposed-action, from: proposed, to: expired}
+    - {model: ai-proposed-action, from: approved, to: expired}
+    reads: [ai.decision_record, ai.message, ai.operational_requirement, ai.policy_exception]
+    writes: [ai.decision_record, ai.message, ai.operational_requirement, ai.policy_exception]
+    for: 'AI expiry timers: proposed actions, policy exceptions, operational requirements.'
+    source:
+    - contracts/satellite/ai.yaml:18981
+    - states/ai-operational-requirement.yaml:54
+    - states/ai-policy-exception.yaml:23
+    - states/ai-proposed-action.yaml:42
+  forecastActuals:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    consumes: [access.validated, ledger.periodClosed, order.completed, order.paid, order.refunded]
+    reads: []
+    writes: []
+    for: 'AI''s forecast-actuals consumers: attendance, delivered demand and net sales actuals from orders, refunds and scans,
+      and the accuracy window closed at period close.'
+    source:
+    - events/access-validated.yaml:51
+    - events/ledger-periodClosed.yaml:36
+    - events/order-completed.yaml:38
+    - events/order-paid.yaml:81
+  forecastRun:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: timer, every: P1D}
+    moves:
+    - {model: ai-forecast-scenario, from: computing, to: ready}
+    - {model: ai-forecast-scenario, from: computing, to: failed}
+    - {model: ai-forecast-version, from: running, to: draft}
+    - {model: ai-forecast-version, from: running, to: failed}
+    - {model: ai-forecast-version, from: draft, to: published}
+    - {model: ai-forecast-version, from: draft, to: awaitingApproval}
+    - {model: ai-forecast-version, from: published, to: superseded}
+    reads: [ai.decision_record, ai.forecast_scenario, ai.forecast_version, ai.operational_requirement]
+    writes: [ai.decision_record, ai.forecast_scenario, ai.forecast_version, ai.operational_requirement]
+    emits: [ai.forecastPublished]
+    for: 'AI nightly forecast run: snapshot, produce, reconcile, score, auto-publish.'
+    source:
+    - contracts/satellite/ai.yaml:6491
+    - states/ai-forecast-scenario.yaml:22
+    - states/ai-forecast-version.yaml:24
+  fraudRiskSignals:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    consumes:
+    - access.rejected
+    - entitlement.transferred
+    - identity.loginRecorded
+    - order.cancelled
+    - payment.attemptFailed
+    reads: []
+    writes: []
+    emits: [ai.riskAlertRaised]
+    builtBy: AI-ENGINE-FRAUD-RISK-RULES
+    for: The five owner events the fraud and risk scoring reads, and the risk alert a crossing raises.
+    source: ['events/ai-riskAlertRaised.yaml:1']
+  governanceAndPlans:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    consumes:
+    - approval.expired
+    - approval.granted
+    - approval.rejected
+    - approval.withdrawn
+    - conversation.handedOver
+    - promotions.recommendationStrategyPublished
+    - reporting.definitionPublished
+    - reporting.questionAnswered
+    - tenant.suspended
+    reads: [ai.activity]
+    writes: [ai.activity]
+    for: 'AI''s governance and action-plan consumers: mark a proposed action approved or close its plan as rejected, expired
+      or withdrawn; stop batch work and freeze plans for a suspended tenant; write the ai.activity audit row for a reporting
+      question (critical, 8.3.55-57); learn from handover reasons; index a saved report definition; refresh the Redis strategy
+      cache Help me choose ranks with.'
+    source:
+    - events/approval-expired.yaml:26
+    - events/approval-granted.yaml:51
+    - events/approval-rejected.yaml:44
+    - events/approval-withdrawn.yaml:38
+  guidedChoiceSuggestion:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    moves:
+    - {model: ai-guided-choice-suggestion, from: running, to: proposed}
+    - {model: ai-guided-choice-suggestion, from: running, to: noSuggestion}
+    - {model: ai-guided-choice-suggestion, from: running, to: failed}
+    reads: [ai.guided_choice_suggestion]
+    writes: [ai.guided_choice_suggestion]
+    reliesOn: [runGuidedChoiceSuggestionJob, proposeGuidedChoice, suggestGuidedChoice]
+    builtBy: AI-ENGINE-GUIDED
+    for: The help-me-choose job that proposes a question set from the catalogue.
+    source: ['states/ai-guided-choice-suggestion.yaml:1']
+  historyImport:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    reads: [ai.history_import]
+    writes: [ai.history_import, ai.history_observation]
+    reliesOn: [importVenueHistory]
+    for: AI venue-history import job.
+    source: ['contracts/satellite/ai.yaml:11399']
+  indexJob:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    moves:
+    - {model: ai-index-job, from: building, to: verifying}
+    - {model: ai-index-job, from: verifying, to: swapping}
+    - {model: ai-index-job, from: swapping, to: complete}
+    - {model: ai-index-job, from: building, to: failed}
+    - {model: ai-index-job, from: verifying, to: failed}
+    - {model: ai-index-job, from: swapping, to: failed}
+    reads: [ai.index_job]
+    writes: [ai.index_job]
+    builtBy: AI-ENGINE-QDRANT
+    for: 'The index job: a shadow collection built, verified and swapped.'
+    source: ['states/ai-index-job.yaml:1']
+  knowledgeDocument:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    moves:
+    - {model: ai-knowledge-document, from: processing, to: indexed}
+    - {model: ai-knowledge-document, from: processing, to: failed}
+    - {model: ai-knowledge-document, from: indexed, to: failed}
+    reads: [ai.knowledge_document]
+    writes: [ai.knowledge_document]
+    builtBy: AI-ENGINE-CONCIERGE
+    for: 'Knowledge ingest: a document chunked and embedded, or failed.'
+    source: ['states/ai-knowledge-document.yaml:1']
+  knowledgeIndex:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    consumes:
+    - assets.documentIndexed
+    - catalogue.productPublished
+    - catalogue.productWithdrawn
+    - fnb.menuPublished
+    - maintenance.templatePublished
+    - marketing.caseClosed
+    - retail.merchandisePublished
+    - whitelabel.contentPublished
+    reads: []
+    writes: [ai.chunk_embedding, ai.knowledge_document]
+    for: 'AI''s knowledge-index consumers: re-embed or remove indexed text when a document, product, menu, procedure, case
+      resolution, merchandise or web content is published or withdrawn.'
+    source:
+    - events/assets-documentIndexed.yaml:31
+    - events/catalogue-productPublished.yaml:35
+    - events/catalogue-productWithdrawn.yaml:23
+    - events/fnb-menuPublished.yaml:27
+  layoutDraft:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    moves:
+    - {model: ai-layout-draft, from: parsing, to: previewReady}
+    - {model: ai-layout-draft, from: parsing, to: failed}
+    reads: [ai.layout_draft]
+    writes: [ai.layout_draft]
+    reliesOn: [generateVenueLayout]
+    for: AI layout draft parsing.
+    source: ['states/ai-layout-draft.yaml:20']
+  nightlyInsights:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: timer, every: P1D}
+    moves:
+    - {model: ai-insight, from: actioned, to: measured}
+    reads: [ai.anomaly_detector, ai.insight]
+    writes: [ai.anomaly_detector, ai.insight]
+    for: 'AI nightly jobs: insight impact measurement, marketing recommendations, suggestion outcomes, governance controls.'
+    source:
+    - contracts/satellite/ai.yaml:15997
+    - contracts/satellite/ai.yaml:17970
+    - contracts/satellite/ai.yaml:6152
+    - states/ai-insight.yaml:42
+  orderExchanged:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    consumes: [order.exchanged]
+    reads: []
+    writes: []
+    builtBy: '#37212'
+    for: CR-480 order.exchanged consumers (AI's staff-leakage, forecast and attribution consumer).
+    source: []
+  providerHealth:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: queue}
+    reads: [ai.provider]
+    writes: [ai.provider, ai.activity]
+    reliesOn: [testAiProvider]
+    for: 'AI scheduled provider test: re-run testAiProvider after activation.'
+    source: ['contracts/satellite/ai.yaml:1613']
+  qdrantTenant:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    consumes: [tenant.provisioned, tenant.terminated]
+    reads: [ai.vector_store]
+    writes: [ai.vector_store]
+    builtBy: AI-ENGINE-QDRANT
+    for: 'AI''s Qdrant tenant-lifecycle consumers: create the tenant''s collection, alias and first token on tenant.provisioned,
+      delete them and revoke the token on tenant.terminated.'
+    source: ['events/tenant-provisioned.yaml:22', 'events/tenant-terminated.yaml:18']
+  recommendationAndRiskSignals:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    consumes:
+    - cart.abandoned
+    - device.statusChanged
+    - entitlement.expiringSoon
+    - entitlement.issued
+    - event.lifecycleChanged
+    - identity.credentialResetRequested
+    - order.chargebackRecorded
+    - payment.captured
+    - performance.cancelled
+    - seat.sold
+    - shift.closed
+    - stock.depleted
+    - storefront.sessionEvent
+    reads: []
+    writes: []
+    for: 'AI''s recommendation and risk signal consumers beyond the five owner events AI-ENGINE-FRAUD-RISK-RULES names: recommendation
+      attribution, candidate availability, renewal moments, risk velocity and chargebacks, browsing signals, account-takeover
+      resets, staff leakage, device-health anomalies, and the risk-case outcome for Identity and Orders.'
+    source:
+    - events/ai-riskCaseClosed.yaml:30
+    - events/ai-riskCaseClosed.yaml:35
+    - events/cart-abandoned.yaml:51
+    - events/device-statusChanged.yaml:48
 paths:
   /ai/translate:
     post:

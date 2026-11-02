@@ -171,6 +171,9 @@ CHECKS = [
     # data is a view named for the reader inside one deployable, or a declared query (x-ticvai-read-via) by a route
     # the deployables allow; Identity reads nothing above it but a projection.
     "check-cross-module-reads",
+    # 2 November 2026 (r13, CHG-R13JOB-001): every job, timer and event consumer the package describes is declared in
+    # its contract's x-ticvai-jobs, and a task builds it; a reporting consumer keeps no separate read model (ADR-0016).
+    "check-jobs",
     # 14 October (ADAM CR-076, CHG-GEN-010): a table's row-level security lets in the scope its operations run at.
     "check-rls-scope-fit",
     # 12 October (CHG-R6-030): a screen is gated on a permission its operations require; the ticket media designers

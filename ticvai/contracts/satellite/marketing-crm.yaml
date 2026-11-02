@@ -415,6 +415,199 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within operations, through the C# query interface Marketing implements.
     served: [in-process]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  campaignScheduler:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: campaign, from: scheduled, to: sending}
+    - {model: campaign, from: sending, to: completed}
+    - {model: campaign, from: sending, to: failed}
+    reads: [marketing.campaign]
+    writes: [marketing.campaign]
+    for: 'Marketing''s campaign scheduler: start a scheduled campaign at its send window.'
+    source: ['states/campaign.yaml:30']
+  consentAndPrivacy:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - approval.granted
+    - approval.rejected
+    - biometric.enrolmentChanged
+    - identity.guestRegistered
+    - identity.privacyRequestRaised
+    - paymentToken.stored
+    reads: [marketing.consent_record, marketing.privacy_request]
+    writes: [marketing.consent_record, marketing.privacy_notice_governance, marketing.privacy_request]
+    for: 'Marketing''s consent and privacy consumers: record the consent given at registration, at a Face Pass enrolment and
+      when a payment method is stored as marketing.consent_record rows Marketing owns; open the privacy request in the queue;
+      apply an approval decision to the privacy-notice governance record.'
+    source:
+    - events/approval-granted.yaml:102
+    - events/approval-rejected.yaml:34
+    - events/biometric-enrolmentChanged.yaml:71
+    - events/identity-guestRegistered.yaml:27
+  eventRegistration:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: queue}
+    reads: [marketing.business_event]
+    writes: [marketing.business_event]
+    reliesOn: [setBusinessEventMapping]
+    for: Marketing's event-catalogue registration job.
+    source: ['contracts/satellite/marketing-crm.yaml:39190']
+  journeys:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - access.validated
+    - accreditation.applicationDecided
+    - accreditation.credentialIssued
+    - accreditation.holderStatusChanged
+    - accreditation.renewalDue
+    - ai.riskAlertRaised
+    - cart.abandoned
+    - catalogue.productPublished
+    - entitlement.expiringSoon
+    - order.completed
+    - order.created
+    - stock.depleted
+    - wallet.debited
+    reads: []
+    writes: [marketing.consent_record]
+    for: 'Marketing''s journey, campaign and later notification consumers: attendance behaviour, products available to campaigns,
+      abandoned-cart and abandoned-payment journeys, post-visit campaigns, low-balance journeys, pre-expiry alerts, low-stock
+      alerts, fraud-analyst alerts and the accreditation notices.'
+    source:
+    - events/access-validated.yaml:40
+    - events/accreditation-applicationDecided.yaml:57
+    - events/accreditation-credentialIssued.yaml:58
+    - events/accreditation-holderStatusChanged.yaml:65
+  messageSender:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: guest-device, from: active, to: failed}
+    - {model: message-dispatch, from: queued, to: suppressed}
+    - {model: message-dispatch, from: queued, to: sent}
+    - {model: message-dispatch, from: sent, to: delivered}
+    - {model: message-dispatch, from: sent, to: bounced}
+    - {model: message-dispatch, from: delivered, to: opened}
+    - {model: message-dispatch, from: opened, to: clicked}
+    - {model: message-dispatch, from: delivered, to: clicked}
+    - {model: message-dispatch, from: queued, to: failed}
+    - {model: message-dispatch, from: sent, to: failed}
+    reads: [marketing.guest_device, marketing.message_dispatch]
+    writes: [marketing.guest_device, marketing.message_dispatch]
+    builtBy: '#37203'
+    for: Marketing message sender (CR-442).
+    source: ['states/guest-device.yaml:24', 'states/message-dispatch.yaml:22']
+  notifications:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - ai.capabilityPaused
+    - ai.ceilingApproaching
+    - ai.incidentOpened
+    - ai.insightRaised
+    - ai.operationalRequirementIssued
+    - ai.planExecuted
+    - ai.planFailed
+    - approval.rejected
+    - conversation.handedOver
+    - fnb.orderReady
+    - whitelabel.passCertificateExpiring
+    reads: []
+    writes: [marketing.privacy_notice_governance]
+    for: 'Marketing''s operational notifications: route a handed-over conversation to a queue and notify agents (critical),
+      push the guest that their food is ready (critical), tell a requester their approval was rejected, notify owners of an
+      AI capability pause, ceiling, incident, insight, plan result or operational requirement, and warn the tenant admin 30
+      days before the Apple pass certificate expires.'
+    source:
+    - events/ai-capabilityPaused.yaml:37
+    - events/ai-ceilingApproaching.yaml:38
+    - events/ai-incidentOpened.yaml:29
+    - events/ai-insightRaised.yaml:31
+  profileAndLoyalty:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes: [entitlement.issued, order.paid, order.refunded]
+    reads: []
+    writes: [marketing.guest_profile, marketing.loyalty_points]
+    for: 'Marketing''s guest-profile and loyalty consumers: record purchase behaviour and accrue loyalty on a paid order,
+      adjust loyalty and lifetime value on a refund, attach an issued entitlement to the guest profile.'
+    source:
+    - events/entitlement-issued.yaml:58
+    - events/order-paid.yaml:71
+    - events/order-refunded.yaml:49
+  timers:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: case, from: resolved, to: closed}
+    - {model: challenge, from: active, to: ended}
+    - {model: conversation, from: withAssistant, to: abandoned}
+    - {model: conversation, from: queued, to: abandoned}
+    - {model: conversation, from: waitingOnGuest, to: timedOut}
+    - {model: conversation, from: queued, to: withAssistant}
+    - {model: invitation, from: issued, to: expired}
+    - {model: invitation, from: viewed, to: expired}
+    - {model: invitation-campaign, from: open, to: closed}
+    - {model: lost-item, from: open, to: disposed}
+    - {model: lost-item, from: matched, to: disposed}
+    - {model: privacy-notice-governance, from: scheduled, to: published}
+    - {model: referral, from: issued, to: expired}
+    - {model: referral, from: registered, to: expired}
+    - {model: waiver-requirement, from: notAssigned, to: assigned}
+    - {model: waiver-requirement, from: sent, to: expired}
+    - {model: waiver-requirement, from: opened, to: expired}
+    - {model: waiver-requirement, from: verified, to: expired}
+    reads:
+    - marketing.case
+    - marketing.case_resolution
+    - marketing.challenge
+    - marketing.conversation
+    - marketing.invitation
+    - marketing.invitation_campaign
+    - marketing.lost_item
+    - marketing.privacy_notice_governance
+    - marketing.referral
+    - marketing.waiver_requirement
+    - marketing.waiver_requirement_event
+    writes:
+    - marketing.case
+    - marketing.case_resolution
+    - marketing.challenge
+    - marketing.conversation
+    - marketing.invitation
+    - marketing.invitation_campaign
+    - marketing.lost_item
+    - marketing.privacy_notice_governance
+    - marketing.referral
+    - marketing.waiver_requirement
+    - marketing.waiver_requirement_event
+    emits: [marketing.caseClosed]
+    for: 'Marketing''s guest-facing timers: cases, conversations, challenges, invitations, referrals, lost items, notices,
+      waivers.'
+    source:
+    - states/case.yaml:70
+    - states/challenge.yaml:33
+    - states/conversation.yaml:86
+    - states/invitation-campaign.yaml:23
 paths:
   /my/cases:
     get:

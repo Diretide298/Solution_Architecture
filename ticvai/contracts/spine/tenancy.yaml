@@ -414,6 +414,58 @@ x-ticvai-queries:
       CHG-CR430-001): platform.scope is a kernel table every host's role may read (CR-002), as CR-296 ruled for
       Tenancy's other reads, so no grant is added.
     served: [in-process, service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  deviceHeartbeat:
+    module: tenancy
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: registered-device, from: online, to: offline}
+    - {model: registered-device, from: localMode, to: offline}
+    - {model: registered-device, from: offline, to: unknown}
+    reads: [platform.device, tenancy.device_telemetry]
+    writes: [platform.device, tenancy.device_telemetry]
+    emits: [device.statusChanged]
+    for: 'Tenancy''s device heartbeat timer: offline after 15 minutes, unknown after 7 days.'
+    source:
+    - contracts/spine/tenancy.yaml:2750
+    - contracts/spine/tenancy.yaml:6087
+    - states/registered-device.yaml:29
+  profileDeploy:
+    module: tenancy
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: configuration-profile, from: published, to: deploying}
+    - {model: configuration-profile, from: deploying, to: deployed}
+    - {model: profile-deployment, from: queued, to: inProgress}
+    - {model: profile-deployment, from: inProgress, to: completed}
+    - {model: profile-deployment, from: inProgress, to: partiallyFailed}
+    reads: [platform.configuration_profile, platform.profile_deployment, platform.workstation]
+    writes: [platform.configuration_profile, platform.profile_deployment, platform.workstation]
+    for: Tenancy's configuration-profile deployment job (CR-188).
+    source:
+    - contracts/spine/tenancy.yaml:1265
+    - contracts/spine/tenancy.yaml:1274
+    - states/configuration-profile.yaml:45
+    - states/profile-deployment.yaml:31
+  retentionJobs:
+    module: tenancy
+    host: undecided
+    trigger: {kind: timer}
+    reads: [tenancy.data_retention_setting]
+    writes: []
+    decision: 'Which modules run a retention job: the text says ''every retention job resolves its period here'' and names
+      marketing''s setDataRetentionPolicy, not the set. Awaiting the lead.'
+    for: The retention jobs every module runs, each resolving its period from Tenancy's data retention settings.
+    source: ['contracts/spine/tenancy.yaml:3840']
 paths:
   /tenant-domains/{hostname}:
     parameters:

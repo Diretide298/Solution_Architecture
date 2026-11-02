@@ -1,0 +1,50 @@
+id: CHG-R13JOB-002
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'Forty-four reporting consumers that kept a separate read model or dimension (tables no migration creates) are
+  removed from their events: access.validated, accreditation.applicationDecided, accreditation.credentialIssued,
+  accreditation.holderStatusChanged, accreditation.renewalDue, ai.capabilityPaused, ai.ceilingApproaching,
+  ai.forecastPublished, ai.incidentOpened, ai.insightRaised, ai.planExecuted, ai.planFailed, ai.riskAlertRaised,
+  ai.riskCaseClosed, approval.escalated, approval.granted, approval.rejected, approval.requested, approval.stepCompleted,
+  approval.withdrawn, cart.abandoned, catalogue.productPublished, conversation.handedOver, device.statusChanged,
+  event.lifecycleChanged, fnb.kitchenTicketCreated, fnb.menuPublished, fnb.orderReady, inventory.purchaseOrderReceived,
+  inventoryHold.expired, ledger.periodClosed, maintenance.assetReturnedToService, maintenance.templatePublished,
+  maintenance.workOrderCompleted, marketing.caseClosed, order.completed, order.created, order.paid, payment.captured,
+  performance.cancelled, retail.merchandisePublished, seat.sold, shift.closed, stock.depleted. Reports read the owning
+  modules'' data. events/_schema.yaml says so. The 45th, ledger.journalPosted''s, is kept: it is that event''s only
+  consumer (see notes).'
+decision:
+  what: 'The lead, 2 November 2026, on the 45 reporting "read model" consumers that write tables that do not exist:
+    "Drop them" (ADR-0016 rules out separate read models; reports read the owning modules'' data). With "Hold r13 until
+    tomorrow", so the fix goes into r13.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'The r13 job scan of 2 November 2026 (a finding: no reporting table holds a read model or a dimension;
+  backend/tenant reporting.* has definitions, executions, alerts and dashboards only). ADR-0016 serves dashboards from
+  the analytical replica and rejects separate read models; root R19 is the same class (no task builds a consumer).'
+keys_touched:
+  files:
+  - events/_schema.yaml
+  - events/ (44 event files, the reporting consumer only)
+  other:
+  - reporting consumers of the 44 events above
+root_class: an event consumer described for a store the architecture rules out, so no table and no task exists for it
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 job scan (the lead, 2 November 2026)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-jobs.py
+status: open
+notes: 'J-READ-MODEL fails on a reporting consumer that keeps a read model or dimension, and on a reporting consumer job
+  that writes no reporting table; J-CONSUMER makes any new consumer a declared job with real tables. Stopped:
+  ledger.journalPosted''s reporting consumer ("Update the financial read model") is the event''s only consumer, so
+  dropping it leaves an event nobody consumes (events/_schema.yaml: at least one consumer), while public-api.yaml lists
+  ledger.journalPosted as a webhook event type with no public-api consumer entry. The lead decides: retire the event,
+  or give it its public-api consumer. check-jobs prints it as KEPT. No ticket text changes: no plan task built these
+  consumers.'

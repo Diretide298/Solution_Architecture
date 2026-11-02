@@ -33,11 +33,6 @@ consumers:
   idempotencyKey: planId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: AI action analytics
-  idempotencyKey: planId
-  onFailure: retry
-  isCritical: false
 - context: cache
   purpose: Drop cached answers under the affected scope; configuration changed
   idempotencyKey: scopePath+planId

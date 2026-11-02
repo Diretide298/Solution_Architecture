@@ -159,6 +159,39 @@ x-ticvai-queries:
       409 rota-assignment-overlap when it is true; the exclusion constraint on RotaAssignment
       (x-ticvai-exclude) holds the same rule when two writes race.
     served: [in-process]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  forecastViews:
+    module: workforce
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.forecastPublished, ai.operationalRequirementIssued]
+    reads: []
+    writes: []
+    for: 'Forecast-bound operational views: F&B prep and par, Inventory replenishment, Workforce rota (critical: shows the
+      requirement a manager applies), Resources demand, refreshed on a published forecast or an issued operational requirement.'
+    source:
+    - events/ai-forecastPublished.yaml:45
+    - events/ai-forecastPublished.yaml:50
+    - events/ai-forecastPublished.yaml:55
+    - events/ai-forecastPublished.yaml:60
+  rota:
+    module: workforce
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: rota-assignment, from: confirmed, to: noShow}
+    - {model: rota-assignment, from: published, to: noShow}
+    reads: [workforce.rota_assignment]
+    writes: [workforce.rota_assignment]
+    for: Workforce rota no-show timer.
+    source: ['states/rota-assignment.yaml:61']
 paths:
   /rota-assignments:
     get:

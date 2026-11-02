@@ -55,11 +55,6 @@ consumers:
   idempotencyKey: performanceId + subjectId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Cancelled revenue, separated from refunded revenue
-  idempotencyKey: performanceId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Drop the performance from recommendation candidates, close forecasts for it, and give risk
     context to the refund run it causes (AI system design section 3.2)

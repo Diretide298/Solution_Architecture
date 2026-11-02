@@ -30,11 +30,6 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Withdrawal analytics, kept apart from rejections (11.1.22)
-  idempotencyKey: requestId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Close the action plan waiting on this approval, as withdrawn (AI system design section 3.2)
   idempotencyKey: requestId

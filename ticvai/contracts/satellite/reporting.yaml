@@ -85,6 +85,65 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Reporting's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  alertEvaluation:
+    module: reporting
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: alert, from: raised, to: expired}
+    - {model: alert, from: acknowledged, to: expired}
+    reads: [reporting.alert]
+    writes: [reporting.alert]
+    reliesOn: [setAlertRule, acknowledgeAlert]
+    for: Reporting alert evaluation and alert expiry.
+    source: ['contracts/satellite/reporting.yaml:4137', 'states/alert.yaml:31']
+  alertRaising:
+    module: reporting
+    host: workers
+    trigger: {kind: event}
+    consumes: [apiClient.anomalyDetected, device.tamperDetected]
+    reads: [reporting.alert_rule]
+    writes: [reporting.alert]
+    for: 'Reporting''s alert consumers: raise an API anomaly to the tenant''s and TICVAI''s API administrators (ADM-015, DEV-006)
+      and a device tamper alert to the venue''s security roles.'
+    source: ['events/apiClient-anomalyDetected.yaml:40', 'events/device-tamperDetected.yaml:28']
+  execution:
+    module: reporting
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: report-execution, from: queued, to: running}
+    - {model: report-execution, from: running, to: completed}
+    - {model: report-execution, from: running, to: failed}
+    - {model: report-execution, from: completed, to: expired}
+    - {model: report-export, from: generating, to: ready}
+    - {model: report-export, from: generating, to: failed}
+    - {model: report-export, from: ready, to: expired}
+    reads: [reporting.execution, reporting.export]
+    writes: [reporting.execution, reporting.export]
+    for: Reporting execution worker and export generation.
+    source:
+    - contracts/spine/tenancy.yaml:7041
+    - states/report-execution.yaml:20
+    - states/report-export.yaml:24
+  syncRejectionAlert:
+    module: reporting
+    host: workers
+    trigger: {kind: event}
+    context: platform
+    consumes: [sync.rejectionRaised]
+    reads: []
+    writes: [reporting.alert]
+    for: 'Platform''s sync-rejection alert: raise an operator alert (BO-133 Offline Alerts) for each refused offline entry.'
+    source: ['events/sync-rejectionRaised.yaml:27']
 paths:
   /reports/seeded:
     get:

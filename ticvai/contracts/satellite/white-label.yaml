@@ -357,6 +357,142 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through WhiteLabel's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  appBuild:
+    module: white-label
+    host: workers
+    trigger: {kind: event}
+    consumes: [appBuild.requested]
+    reads: [whitelabel.config_version, whitelabel.store_account]
+    writes: [whitelabel.app_build]
+    reliesOn: [requestAppBuild]
+    for: 'White-label app build job: build and publish the branded apps.'
+    source: ['contracts/satellite/white-label.yaml:7508', 'contracts/satellite/white-label.yaml:9574']
+  appIconRenditions:
+    module: white-label
+    host: workers
+    trigger: {kind: queue}
+    reads: [whitelabel.tenant_config]
+    writes: [whitelabel.tenant_config]
+    reliesOn: [setAppIcons]
+    for: The white-label jobs component asks Assets for each derived icon size (requestMediaRendition) and fills each assetRef
+      when Assets has made it (ADAM CR-106).
+    source: ['contracts/satellite/white-label.yaml:2224']
+  approvalsAndCatalogue:
+    module: white-label
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - approval.granted
+    - approval.rejected
+    - catalogue.productPublished
+    - catalogue.productWithdrawn
+    - tenant.suspended
+    - tenantDomain.rejected
+    reads: []
+    writes: [whitelabel.config_version]
+    for: 'White-label''s consumers: make an approved white-label version current or mark it rejected, and publish or reject
+      a content block sent for review (R19 1.27782.1: the declared consumer writes only config_version, so an approved block
+      is never published); rebuild the guest catalogue bundle on a published product; flag guided choices pointing at a withdrawn
+      product; show the branded suspension notice;'
+    source:
+    - events/approval-granted.yaml:110
+    - events/approval-rejected.yaml:69
+    - events/catalogue-productPublished.yaml:30
+    - events/catalogue-productWithdrawn.yaml:29
+  contentSchedule:
+    module: white-label
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: content-block, from: scheduled, to: published}
+    - {model: content-block, from: published, to: expired}
+    - {model: schedule, from: scheduled, to: active}
+    - {model: schedule, from: active, to: expired}
+    reads: [whitelabel.banner, whitelabel.content_block, whitelabel.promo_block]
+    writes: [whitelabel.banner, whitelabel.content_block, whitelabel.promo_block]
+    emits: [whitelabel.contentPublished]
+    for: 'White-label content schedule timer: banners, content blocks and schedules go live and expire in the tenant''s timezone.'
+    source:
+    - contracts/satellite/white-label.yaml:11999
+    - contracts/satellite/white-label.yaml:1676
+    - contracts/satellite/white-label.yaml:3142
+    - states/content-block.yaml:22
+  domain:
+    module: white-label
+    host: workers
+    trigger: {kind: timer, every: PT5M}
+    moves:
+    - {model: custom-domain, from: verified, to: issuing}
+    - {model: custom-domain, from: issuing, to: active}
+    - {model: custom-domain, from: issuing, to: failed}
+    - {model: custom-domain, from: active, to: expired}
+    - {model: custom-domain, from: expired, to: issuing}
+    reads: [whitelabel.custom_domain]
+    writes: [whitelabel.custom_domain]
+    for: 'White-label domain job: certificate issue, renewal, revalidation and expiry (every five minutes).'
+    source:
+    - contracts/satellite/white-label.yaml:545
+    - contracts/satellite/white-label.yaml:9798
+    - contracts/spine/tenancy.yaml:545
+    - states/custom-domain.yaml:67
+  passCertificateExpiry:
+    module: white-label
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [whitelabel.store_account]
+    writes: []
+    emits: [whitelabel.passCertificateExpiring]
+    reliesOn: [setStoreAccounts]
+    for: 'White-label daily job: warn 30 days before a wallet-pass certificate expires.'
+    source: ['contracts/satellite/white-label.yaml:9368']
+  previewRenderer:
+    module: white-label
+    host: workers
+    trigger: {kind: event}
+    consumes: [preview.requested]
+    reads: [whitelabel.config_version]
+    writes: []
+    reliesOn: [createPreview]
+    builtBy: '#37209'
+    for: White-label preview renderer (CR-476).
+    source: ['contracts/satellite/white-label.yaml:4386']
+  receivedReleaseCopy:
+    module: white-label
+    host: workers
+    trigger: {kind: state, 'on': platform-ops rollout-cell complete}
+    reads: []
+    writes: [whitelabel.received_release]
+    reliesOn: [getTenantAppStatus]
+    for: 'Written by the workers host when the cell takes a release: one whitelabel.received_release row when the release''s
+      rollout completes on the tenant''s database (ADAM CR-338).'
+    source: ['contracts/satellite/white-label.yaml:10703']
+  scheduledPublish:
+    module: white-label
+    host: workers
+    trigger: {kind: timer, every: PT1M}
+    reads: [whitelabel.config_version]
+    writes: [whitelabel.config_version]
+    reliesOn: [publishTenantConfig]
+    for: White-label scheduled-publish job (publishTenantConfig at a future time).
+    source: ['contracts/satellite/white-label.yaml:4728']
+  sitePackage:
+    module: white-label
+    host: workers
+    trigger: {kind: event}
+    consumes: [sitePackage.requested]
+    reads: [whitelabel.config_version]
+    writes: [whitelabel.site_package]
+    reliesOn: [exportSitePackage, getSitePackage]
+    for: 'White-label site package job: build the self-hosted package from a published version.'
+    source: ['contracts/satellite/white-label.yaml:1151', 'contracts/satellite/white-label.yaml:1162']
 paths:
   /tenant-domains:
     get:

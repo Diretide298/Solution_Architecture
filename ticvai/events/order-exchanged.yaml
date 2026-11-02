@@ -8,6 +8,8 @@ description: Lines on a paid order were exchanged for different products, dates 
   only the difference.
 aggregate: order
 emittedWhen: exchangeOrderLines succeeds
+emittedBy:
+- orders.exchangeOrderLines
 payload:
 - field: orderId
   type: uuid

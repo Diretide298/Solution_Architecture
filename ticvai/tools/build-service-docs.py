@@ -59,6 +59,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ticket_done  # noqa: E402  (what finishes a ticket: shared with op-release.py, CHG-GTR-002)
 import sprint_plan as sp  # noqa: E402  (the calendar, app-modules and scheduler the plan generators share)
 import frontend_repos as fr  # noqa: E402  (the repository a screen is built in, CHG-R6-060)
+import ticvai_jobs as tj  # noqa: E402  (the declared jobs, timers and consumers: one task each, CHG-R13JOB-001)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -3150,6 +3151,115 @@ def main() -> int:
     for t, k in later_mig.items():
         am_of.setdefault(k, by_key[k]["parent"])
 
+    # **One task per declared job, timer and event consumer** (r13, 2 November 2026; CHG-R13JOB-001). The plan made
+    # a task per operation only, so 77 jobs and timers and 25 consumer groups of Block A had no task (the r13 job
+    # scan): a state model moved by a timer, or an event consumer with no `operation`, was built by nobody. Each
+    # contract now declares its background work in `x-ticvai-jobs` (tools/ticvai_jobs.py), and each declaration that
+    # no `builtBy` task or ticket already builds gets a task here, keyed JOB-/CONS-<contract>-<name>:
+    #   - its service is its contract's, and its waits are its tables' migrations, the kernel, the outbox where it
+    #     consumes or emits, and the workers host (SETUP-HOSTS) where it runs there;
+    #   - **the operations that rely on it** (tj.relies_on: the emitters of what it consumes, the operations of the
+    #     state models it moves, its `reliesOn`) give its block: their tasks wait on it (the waiting tickets follow
+    #     it), so it takes the app-module of the earliest of them, as a shared back-end task does; all of them in later
+    #     blocks, it is planned there, under the earliest one's app-module;
+    #   - its owner follows the plan's rules for a back-end task of its service (the service owner in Block A, the
+    #     AI server's pool for AiService, CHG-R12PL-034; the scheduler's choice in later blocks).
+    # A declaration nothing relies on stops the build: a job with no work handed to it is a declaration error.
+    jobs_decl = tj.load(ROOT)
+    states_ = tj.load_states(ROOT)
+    events_ = tj.load_events(ROOT)
+    svc_of_contract = {}
+    for o_, ln_ in sorted(lineage.items()):
+        svc_of_contract.setdefault(ln_.get("contract"), ln_.get("service"))
+    task_of_op_j = {**op_task, **vm_op_task, **later_op_task}
+    job_keys, job_bad, job_waiting = set(), [], {}
+    # a started ticket is never made to wait on a new task (started_plan_keys): its text names the job instead
+    started_j, told_j = started_plan_keys(), defaultdict(list)
+    for ref_, j_ in sorted(jobs_decl.items()):
+        if j_.get("builtBy") or j_.get("decision"):
+            continue
+        k_ = j_["key"]
+        if k_ in by_key:
+            job_bad.append(f"{ref_}: its key {k_} is already a plan task")
+            continue
+        svc_ = svc_of_contract.get(j_["contract"]) or ""
+        reads_, writes_ = list(j_.get("reads") or []), list(j_.get("writes") or [])
+        deps_ = {mig_of.get(t) for t in reads_ + writes_} - {None}
+        deps_.add("PLATFORM-KERNEL")
+        if j_.get("consumes") or j_.get("emits"):
+            deps_.add("PLATFORM-OUTBOX")
+        if j_.get("host") == "workers":
+            deps_.add("SETUP-HOSTS")
+        deps_ &= set(by_key)
+        rel_ = tj.relies_on(j_, states_, events_)
+        waiting_ = sorted({task_of_op_j[o] for o in rel_ if o in task_of_op_j and task_of_op_j[o] in by_key}
+                          - deps_ - {k_})
+        waiting_ = [w for w in waiting_ if not w.startswith(("PLATFORM-", "KERNEL-", "SETUP-", "MIG-"))]
+        if not waiting_:
+            job_bad.append(f"{ref_}: no planned operation relies on it ({', '.join(sorted(rel_)) or 'none named'})")
+            continue
+        trig_ = j_.get("trigger") or {}
+        moves_ = j_.get("moves") or []
+        word_ = "consumer" if trig_.get("kind") == "event" else "job"
+        what_ = " ".join(str(j_.get("for") or "").split())
+        later_ = all(w in later_keys for w in waiting_)
+        host_ = j_.get("host") or "workers"
+        adr_ = "ADR-0020" if host_ == "ticvai-ai" else "ADR-0055"
+        parts_ = [f"Builds: `adr {adr_}`. The {word_} `{ref_}` (`{j_['file']}`, `x-ticvai-jobs.{j_['name']}`), in the "
+                  f"{host_} host: {what_}"]
+        trig_txt = trig_.get("kind", "")
+        if trig_.get("every"):
+            trig_txt += f", every {trig_['every']}"
+        if trig_.get("on"):
+            trig_txt += f", on {trig_['on']}"
+        parts_.append(f"Trigger: {trig_txt}.")
+        if j_.get("consumes"):
+            parts_.append("Consumes: " + ", ".join(j_["consumes"]) + " (its consumer entry in events/, with that "
+                          "entry's idempotencyKey and onFailure).")
+        if moves_:
+            parts_.append("Moves: " + "; ".join(f"{m['model']} {m['from']} to {m['to']}" for m in moves_) + ".")
+        if reads_:
+            parts_.append("Reads: " + ", ".join(reads_) + ".")
+        if writes_:
+            parts_.append("Writes: " + ", ".join(writes_) + ".")
+        if j_.get("emits"):
+            parts_.append("Emits: " + ", ".join(j_["emits"]) + ".")
+        parts_.append("Waiting on it (they follow this task): " + ", ".join(waiting_) + ".")
+        parts_.append(f"Spec: the contract at the release tag, served by ADAM; {svc_}'s first-release owner "
+                      f"({svc_owner.get(svc_) or 'its owner'}) reviews.")
+        parts_.append("Done when: an integration test on seeded rows shows each move it makes (a due row moves once, a "
+                      "row not yet due does not), each event it consumes is handled once when delivered twice, a "
+                      "failure follows the consumer's onFailure, it reads and writes only the tables listed above, "
+                      "and a peer in the same stack has reviewed and tested it.")
+        task(k_, "", "Task", f"{svc_} {word_} {ref_}: {what_}"[:250], " ".join(parts_), 3, service=svc_,
+             pts=points_of(tj.points_raw(j_)), area="backend",
+             assignee="" if later_ else svc_owner.get(svc_, ""), depends=deps_)
+        job_keys.add(k_)
+        if later_:
+            am_ = min({am_of[w] for w in waiting_ if am_of.get(w)}, key=lambda a: am_info[a]["order"])
+            by_key[k_]["parent"] = am_
+            by_key[k_]["phase"] = 2
+            am_of[k_] = am_
+        job_waiting[k_] = waiting_
+        for w in waiting_:
+            if w in started_j:
+                told_j[w].append(f"{k_} ({ref_})")
+            else:
+                by_key[w]["dependsOn"] = " ".join(sorted(set(by_key[w]["dependsOn"].split()) | {k_}))
+    for w, ks_ in sorted(told_j.items()):
+        d_ = by_key[w]["description"].rstrip()
+        by_key[w]["description"] = (d_ + ("" if not d_ or d_[-1] in ".!?" else ".") + " Background work: "
+                                    + ", ".join(ks_) + (" builds" if len(ks_) == 1 else " build")
+                                    + " the job or consumer its operations hand work to; planned after this ticket "
+                                    "started (r13, CHG-R13JOB-001), so this ticket does not wait for it and its status "
+                                    "and sprint stay.")
+    if job_bad:
+        raise SystemExit("x-ticvai-jobs: " + "; ".join(job_bad))
+    print(f"tasks for declared jobs, timers and consumers (x-ticvai-jobs): {len(job_keys)} "
+          f"({sum(1 for j_ in jobs_decl.values() if j_.get('builtBy'))} more built by a named task or ticket, "
+          f"{sum(1 for j_ in jobs_decl.values() if j_.get('decision'))} open for the lead); started tickets told, "
+          f"not made to wait: {len(told_j)}")
+
     # **Services stand on the platform** (30 September). A service task used to wait only for its
     # migration, so the build order put 60-odd service tasks in front of the kernel they run on (tenant
     # routing, scope, auth) and every sale-path write in front of idempotency and the outbox. Now:
@@ -3428,6 +3538,11 @@ def main() -> int:
                 moved = True
         if not moved:
             break
+    for k in sorted(job_keys):                             # a declared job: the earliest app-module waiting on it,
+        if k not in am_of:                                 # started or not, Venue Management too (CHG-R13JOB-001)
+            cand = {am_of[d] for d in job_waiting[k] if am_of.get(d) and am_of[d] != "AM-FOUNDATION-SETUP"}
+            if cand:
+                am_of[k] = min(cand, key=lambda x: am_info[x]["order"])
     for t_ in leaf:                                        # nothing waits on it: its module's first app-module
         k = t_["key"]
         if k in am_of:

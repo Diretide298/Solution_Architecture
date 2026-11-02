@@ -111,6 +111,32 @@ tags:
   - name: favourite
   - name: networkImport
 
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  departuresAndImport:
+    module: transport
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    moves:
+    - {model: transport-departure, from: scheduled, to: onSale}
+    - {model: transport-departure, from: onSale, to: departed}
+    - {model: transport-departure, from: soldOut, to: departed}
+    - {model: transport-network-import, from: validating, to: previewReady}
+    - {model: transport-network-import, from: validating, to: failed}
+    - {model: transport-network-import, from: previewReady, to: expired}
+    reads: [transport.departure, transport.network_import]
+    writes: [transport.departure, transport.network_import]
+    for: Transport's nightly departure release, departure timers and network import job.
+    source:
+    - contracts/satellite/transport.yaml:947
+    - states/transport-departure.yaml:21
+    - states/transport-network-import.yaml:22
 paths:
   # ---------------------------------------------------------------- stations
   /transport/stations:

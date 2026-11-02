@@ -202,6 +202,60 @@ x-ticvai-queries:
       touches comes back at its unitPrice with no promotionIds. It is asked from another deployable through
       Catalogue's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  partnerSync:
+    module: promotions
+    host: workers
+    trigger: {kind: queue}
+    reads: [promotions.partner_bundle_product]
+    writes: [promotions.partner_bundle_product]
+    reliesOn: [setBundlePartnerProductMappings, listBundlePartnerProductMappings]
+    for: Promotions' partner sync job for bundle partner products.
+    source: ['contracts/satellite/promotions.yaml:8929']
+  scheduleAndChannelSync:
+    module: promotions
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: coupon, from: issued, to: expired}
+    - {model: coupon, from: assigned, to: expired}
+    - {model: promotion, from: scheduled, to: live}
+    - {model: promotion, from: live, to: expired}
+    - {model: promotion-channel-publication, from: pendingPublication, to: synchronizing}
+    - {model: promotion-channel-publication, from: synchronizing, to: published}
+    - {model: promotion-channel-publication, from: synchronizing, to: publicationFailed}
+    - {model: promotion-channel-publication, from: publicationFailed, to: pendingPublication}
+    - {model: promotion-channel-publication, from: outOfSync, to: synchronizing}
+    - {model: voucher, from: issued, to: expired}
+    - {model: voucher, from: partiallyRedeemed, to: expired}
+    reads:
+    - promotions.coupon_code
+    - promotions.promotion
+    - promotions.promotion_audit
+    - promotions.promotion_channel_publication
+    - promotions.promotion_conflict
+    - promotions.voucher
+    writes:
+    - promotions.coupon_code
+    - promotions.promotion
+    - promotions.promotion_audit
+    - promotions.promotion_channel_publication
+    - promotions.promotion_conflict
+    - promotions.voucher
+    emits: [promotions.recommendationStrategyPublished]
+    for: Promotions' schedule timers, channel sync, conflict detection and monitoring jobs.
+    source:
+    - contracts/satellite/promotions.yaml:10538
+    - contracts/satellite/promotions.yaml:1137
+    - states/coupon.yaml:34
+    - states/promotion-channel-publication.yaml:24
 paths:
   /promotions/{promotionId}/simulate:
     parameters:

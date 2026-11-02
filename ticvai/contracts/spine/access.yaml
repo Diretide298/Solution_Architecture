@@ -228,6 +228,192 @@ x-ticvai-queries:
       C# query interface Access implements, in its own transaction, under the caller's own scope. Tenancy's
       listDeviceAuditRecords reads its device's scans the same way (ADAM CR-232, option A, 25 October 2026).
     served: [in-process, service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  credentialPipeline:
+    module: access
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: access-credential-binding, from: pending, to: active}
+    - {model: access-credential-binding, from: active, to: revoked}
+    - {model: access-credential-binding, from: pending, to: expired}
+    - {model: access-credential-binding, from: active, to: expired}
+    - {model: access-credential-binding, from: suspended, to: expired}
+    - {model: access-credential-delivery, from: pending, to: sent}
+    - {model: access-credential-delivery, from: pending, to: failed}
+    - {model: access-credential-delivery, from: pending, to: completed}
+    - {model: access-credential-delivery, from: sent, to: delivered}
+    - {model: access-credential-delivery, from: sent, to: bounced}
+    - {model: access-credential-delivery, from: sent, to: failed}
+    - {model: access-credential-delivery, from: sent, to: expired}
+    - {model: access-credential-delivery, from: delivered, to: openedDownloaded}
+    - {model: access-credential-delivery, from: delivered, to: completed}
+    - {model: access-credential-delivery, from: delivered, to: expired}
+    - {model: access-credential-delivery, from: openedDownloaded, to: completed}
+    - {model: access-credential-exception, from: open, to: resolved}
+    - {model: access-credential-exception, from: inProgress, to: resolved}
+    - {model: access-credential-exception, from: escalated, to: resolved}
+    - {model: access-credential-issuance, from: requested, to: queued}
+    - {model: access-credential-issuance, from: queued, to: templateResolved}
+    - {model: access-credential-issuance, from: queued, to: failed}
+    - {model: access-credential-issuance, from: templateResolved, to: dataMapped}
+    - {model: access-credential-issuance, from: templateResolved, to: failed}
+    - {model: access-credential-issuance, from: dataMapped, to: credentialGenerated}
+    - {model: access-credential-issuance, from: dataMapped, to: failed}
+    - {model: access-credential-issuance, from: credentialGenerated, to: bound}
+    - {model: access-credential-issuance, from: credentialGenerated, to: failed}
+    - {model: access-credential-issuance, from: bound, to: ready}
+    - {model: access-credential-issuance, from: ready, to: delivered}
+    - {model: access-credential-issuance, from: failed, to: queued}
+    reads:
+    - access.credential_binding
+    - access.credential_delivery
+    - access.credential_event
+    - access.credential_exception
+    - access.credential_issuance
+    - access.entitlement
+    writes:
+    - access.credential_binding
+    - access.credential_delivery
+    - access.credential_event
+    - access.credential_exception
+    - access.credential_issuance
+    - access.entitlement
+    for: Access credential issuance, delivery and binding pipeline.
+    source:
+    - states/access-credential-binding.yaml:27
+    - states/access-credential-delivery.yaml:29
+    - states/access-credential-exception.yaml:46
+    - states/access-credential-issuance.yaml:24
+  entitlements:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - approval.granted
+    - entitlement.issued
+    - entitlement.reissued
+    - entitlement.shareChanged
+    - entitlement.transferred
+    - invitation.issued
+    - performance.cancelled
+    reads: [access.blacklist, access.entitlement]
+    writes: [access.blacklist, access.entitlement]
+    for: 'Access''s entitlement consumers: write access.entitlement for changes Orders makes in commerce (reissue, share,
+      transfer, invitation, performance cancellation, an approved whitelist entry) and refresh the offline validation bundle
+      so a gate admits or refuses without a network.'
+    source:
+    - events/approval-granted.yaml:130
+    - events/entitlement-issued.yaml:48
+    - events/entitlement-reissued.yaml:40
+    - events/entitlement-shareChanged.yaml:33
+  entitlementsLater:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - accreditation.credentialIssued
+    - accreditation.holderStatusChanged
+    - entitlement.statusChanged
+    - entitlement.voided
+    reads: [access.entitlement]
+    writes: [access.entitlement]
+    for: 'Access''s later entitlement and accreditation consumers: frozen or suspended entitlements, voided entitlements,
+      and accreditation credentials and holder status in the validation bundle.'
+    source:
+    - events/accreditation-credentialIssued.yaml:48
+    - events/accreditation-holderStatusChanged.yaml:55
+    - events/entitlement-statusChanged.yaml:51
+    - events/entitlement-voided.yaml:33
+  expiryNotice:
+    module: access
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [access.entitlement]
+    writes: []
+    emits: [entitlement.expiringSoon]
+    reliesOn: [issueOrderEntitlements]
+    for: 'The daily expiry-notice run: an entitlement whose validTo is within its template''s expiryNoticeDays gets entitlement.expiringSoon,
+      once per entitlement per validTo.'
+    source: ['events/entitlement-expiringSoon.yaml:1']
+  fraudDetection:
+    module: access
+    host: undecided
+    trigger: {kind: queue}
+    reads: []
+    writes: [access.identity_lock]
+    reliesOn: [lockIdentity]
+    decision: 'Access''s workers or ticvai-ai: the text names both (the fraud detection job''s identity locks, access.yaml;
+      AI-ENGINE-FRAUD-RISK-RULES is Block D). Awaiting the lead.'
+    for: 'Access''s detection jobs: fraud rules, sharing detection and biometric anomaly; they raise access security alerts,
+      write sharing-detection bindings and cases, and set temporary identity locks.'
+    source: ['contracts/spine/access.yaml:17159', 'contracts/spine/access.yaml:23434']
+  offlinePackageBuild:
+    module: access
+    host: workers
+    trigger: {kind: queue}
+    reads: [access.entitlement]
+    writes: [access.edge_package]
+    reliesOn: [getOfflinePackage]
+    for: Access offline package build job.
+    source: ['contracts/spine/access.yaml:22264']
+  parking:
+    module: access
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: parking-entitlement, from: pending, to: pushFailed}
+    - {model: parking-entitlement, from: pushed, to: active}
+    - {model: parking-entitlement, from: active, to: used}
+    - {model: parking-entitlement, from: active, to: expired}
+    - {model: parking-entitlement, from: pushed, to: expired}
+    reads: [access.parking_entitlement]
+    writes: [access.parking_entitlement]
+    for: Access parking entitlement push and timers.
+    source: ['states/parking-entitlement.yaml:26']
+  scheduledChanges:
+    module: access
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: access-configuration-version, from: scheduled, to: active}
+    - {model: access-dynamic-policy, from: active, to: expired}
+    - {model: access-dynamic-policy, from: inactive, to: expired}
+    - {model: access-dynamic-policy, from: pendingApproval, to: expired}
+    - {model: access-gate-mode-change, from: pending, to: applied}
+    - {model: access-identity-lock, from: active, to: released}
+    - {model: access-media-template, from: scheduled, to: published}
+    - {model: access-media-template-version, from: scheduled, to: published}
+    reads:
+    - access.configuration_change
+    - access.configuration_version
+    - access.dynamic_policy
+    - access.dynamic_policy_version
+    - access.gate_mode_change
+    - access.identity_lock
+    - access.media_template
+    writes:
+    - access.configuration_change
+    - access.configuration_version
+    - access.dynamic_policy
+    - access.dynamic_policy_version
+    - access.gate_mode_change
+    - access.identity_lock
+    - access.media_template
+    for: 'Access scheduled changes and expiry timers: gate modes, configuration versions, media templates, dynamic policies,
+      identity locks.'
+    source:
+    - contracts/spine/access.yaml:2531
+    - states/access-configuration-version.yaml:82
+    - states/access-dynamic-policy.yaml:78
+    - states/access-gate-mode-change.yaml:29
 paths:
   /access/validate:
     post:

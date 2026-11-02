@@ -170,6 +170,61 @@ x-ticvai-queries:
       rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another deployable
       through Tenancy's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  actionExecutor:
+    module: approvals
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: approved-action-execution, from: queued, to: executing}
+    - {model: approved-action-execution, from: executing, to: succeeded}
+    - {model: approved-action-execution, from: executing, to: failed}
+    reads: [approvals.approved_action_execution]
+    writes: [approvals.approved_action_execution]
+    for: 'Approvals: run an approved action under the approver''s permission.'
+    source: ['states/approved-action-execution.yaml:24']
+  sla:
+    module: approvals
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: approval-request, from: pending, to: escalated}
+    - {model: approval-request, from: pending, to: expired}
+    - {model: approval-request, from: escalated, to: expired}
+    reads: [approvals.request]
+    writes: [approvals.request]
+    emits: [approval.escalated, approval.expired]
+    for: 'Approvals SLA job: escalate and expire approval requests.'
+    source:
+    - contracts/spine/approvals.yaml:6335
+    - contracts/spine/approvals.yaml:807
+    - states/approval-request.yaml:39
+  workflowEngine:
+    module: approvals
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: workflow-instance, from: running, to: waitingApproval}
+    - {model: workflow-instance, from: running, to: waitingTask}
+    - {model: workflow-instance, from: running, to: waitingSystem}
+    - {model: workflow-instance, from: waitingApproval, to: escalated}
+    - {model: workflow-instance, from: waitingTask, to: escalated}
+    - {model: workflow-instance, from: running, to: failed}
+    - {model: workflow-instance, from: waitingSystem, to: failed}
+    - {model: workflow-instance, from: failed, to: running}
+    - {model: workflow-instance, from: running, to: completed}
+    - {model: workflow-version, from: scheduled, to: active}
+    reads: [approvals.workflow_instance, approvals.workflow_intervention, approvals.workflow_version]
+    writes: [approvals.workflow_instance, approvals.workflow_intervention, approvals.workflow_version]
+    for: 'Approvals workflow engine: run workflow instances and activate versions.'
+    source: ['states/workflow-instance.yaml:25', 'states/workflow-version.yaml:74']
 paths:
   /approval-requests:
     get:

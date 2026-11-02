@@ -49,11 +49,6 @@ consumers:
   idempotencyKey: conversationId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Containment rate — the proportion the assistant finished alone
-  idempotencyKey: conversationId
-  onFailure: retry
-  isCritical: false
 retention: Two years with the conversation
 notes: '**Containment rate is the number this event exists to produce**: the proportion of conversations
   the assistant finishes without a person. It is what decides whether the concierge pays for its tokens

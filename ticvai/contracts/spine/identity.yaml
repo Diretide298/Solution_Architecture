@@ -400,6 +400,165 @@ x-ticvai-queries:
       getPublishedTenantConfig for guestSignIn, under the caller's connection and the table's row-level security
       (XDR-021).
     served: [in-process]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  accessReviewTimers:
+    module: identity
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: access-review-campaign, from: open, to: expired}
+    - {model: access-review-item, from: pending, to: notReviewed}
+    reads:
+    - identity.access_review_campaign
+    - identity.access_review_item
+    - identity.delegated_access
+    - identity.session
+    writes:
+    - identity.access_review_campaign
+    - identity.access_review_item
+    - identity.delegated_access
+    - identity.session
+    for: 'Identity''s access-review timers: campaign due date and recurrence.'
+    source:
+    - contracts/spine/identity.yaml:8015
+    - states/access-review-campaign.yaml:27
+    - states/access-review-item.yaml:32
+  delegationExpiry:
+    module: identity
+    host: workers
+    trigger: {kind: queue}
+    reads: [identity.delegated_access]
+    writes: [identity.delegated_access]
+    reliesOn: [createDelegatedAccess, grantDelegation]
+    for: Identity delegated-access expiry sweep.
+    source: ['contracts/spine/identity.yaml:12608']
+  guestErasure:
+    module: identity
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [identity.subject_data_export, pii.subject]
+    writes: [pii.subject, identity.subject_data_export]
+    reliesOn: [deleteGuestAccount, eraseSubject]
+    for: Identity's guest erasure job and its daily sweep.
+    source:
+    - contracts/satellite/ai.yaml:3518
+    - contracts/spine/identity.yaml:4469
+    - contracts/spine/identity.yaml:4484
+  privacyApprovals:
+    module: identity
+    host: workers
+    trigger: {kind: event}
+    consumes: [approval.expired, approval.granted, approval.rejected, approval.withdrawn]
+    reads: [identity.subject_data_export]
+    writes: [identity.subject_data_export, pii.subject]
+    for: 'Identity''s privacy-request approval consumers (ADAM CR-101, CHG-R10ID-016): an approved subjectDataExport starts
+      the export job, a rejected, expired or withdrawn one closes identity.subject_data_export.'
+    source:
+    - events/approval-expired.yaml:36
+    - events/approval-granted.yaml:119
+    - events/approval-rejected.yaml:77
+    - events/approval-withdrawn.yaml:43
+  riskCaseOutcome:
+    module: identity
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.riskCaseClosed]
+    reads: []
+    writes: []
+    for: 'AI''s recommendation and risk signal consumers beyond the five owner events AI-ENGINE-FRAUD-RISK-RULES names: recommendation
+      attribution, candidate availability, renewal moments, risk velocity and chargebacks, browsing signals, account-takeover
+      resets, staff leakage, device-health anomalies, and the risk-case outcome for Identity and Orders.'
+    source:
+    - events/ai-riskCaseClosed.yaml:30
+    - events/ai-riskCaseClosed.yaml:35
+    - events/cart-abandoned.yaml:51
+    - events/device-statusChanged.yaml:48
+  sessionTimeout:
+    module: identity
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: operator-session, from: active, to: expired}
+    reads: [identity.session]
+    writes: [identity.session]
+    for: 'Identity''s operator-session idle timeout: expire idle sessions and free the workstation.'
+    source: ['states/operator-session.yaml:33']
+  signInProjections:
+    module: identity
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - assets.guestUploadChanged
+    - biometric.enrolmentChanged
+    - shift.closed
+    - shift.opened
+    - whitelabel.customDomainChanged
+    reads:
+    - identity.guest_upload_ref
+    - identity.open_shift_marker
+    - identity.redirect_host
+    - pii.subject
+    - pii.subject_biometric
+    writes:
+    - identity.guest_upload_ref
+    - identity.open_shift_marker
+    - identity.redirect_host
+    - pii.subject
+    - pii.subject_biometric
+    for: 'Identity''s sign-in projections: the open-shift marker ActiveSession.hasOpenShift reads, the redirect hosts guestUaePassLogin
+      checks, and the biometric enrolment on pii.subject.'
+    source:
+    - events/biometric-enrolmentChanged.yaml:61
+    - events/shift-closed.yaml:66
+    - events/shift-opened.yaml:27
+    - events/whitelabel-customDomainChanged.yaml:37
+  subjectExport:
+    module: identity
+    host: workers
+    trigger: {kind: queue}
+    reads: [identity.subject_data_export]
+    writes: [identity.subject_data_export]
+    reliesOn: [exportSubjectData, recordSubjectDataExportPart, writeSubjectDataExportPart]
+    for: 'Identity''s subject-data export job: assemble the parts, write the file, delete it after 7 days.'
+    source:
+    - contracts/spine/identity.yaml:1556
+    - contracts/spine/identity.yaml:1565
+    - contracts/spine/identity.yaml:1709
+  subjectHolding:
+    module: identity
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - entitlement.issued
+    - entitlement.reissued
+    - entitlement.statusChanged
+    - entitlement.transferred
+    - entitlement.voided
+    - guest.merged
+    - order.cancelled
+    - order.completed
+    - order.created
+    - order.lapsed
+    - order.linkedToGuest
+    - order.paid
+    - order.refunded
+    reads: [identity.membership_history, identity.subject_holding, pii.subject]
+    writes: [identity.membership_history, identity.subject_holding, pii.subject]
+    for: 'Identity''s subject-holding projection (ADAM CR-084, CHG-GDL-001): keep identity.subject_holding in step with every
+      order and entitlement a guest holds, so deleteGuestAccount knows what still blocks a deletion and linkGuestCheckout
+      can match guest-checkout orders.'
+    source:
+    - events/entitlement-issued.yaml:69
+    - events/entitlement-reissued.yaml:48
+    - events/entitlement-statusChanged.yaml:42
+    - events/entitlement-transferred.yaml:51
 paths:
   /internal/step-up/verify:
     post:
