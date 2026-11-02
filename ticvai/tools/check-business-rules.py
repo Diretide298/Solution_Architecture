@@ -2085,7 +2085,9 @@ def main() -> int:
     # BR-PRIVACY-CONSENT (ADAM CR-378; CHG-CR378-001)
     lpc = op("listPrivacyConsent")[3]
     lpc_t = flat(lpc.get("description") or "")
-    miss = {"marketing.consent_purpose", "marketing.consent_purpose_channel", "marketing.communication_preference_type",
+    # marketing.consent_purpose_channel is no longer read: the channel filter does not narrow consent purposes (ADAM
+    # CR-469; CHG-CR469-001).
+    miss = {"marketing.consent_purpose", "marketing.communication_preference_type",
             "marketing.consent_capture_point", "marketing.tracking_technology", "marketing.cookie_banner_design",
             "marketing.minor_privacy_rule", "marketing.privacy_notice_governance",
             "marketing.processing_purpose"} - reads_of("listPrivacyConsent")
@@ -2798,6 +2800,7 @@ def main() -> int:
     need("BR-MERCH-LIVE-PRICE", "one item per merchandise (`itemRef` the merchandise id, `unitPrice` its list price)"
          in w13(lkm.get("description")), "lookupMerchandise does not state liveEffectivePrice's inputs (CR-478)")
     channel_rules_r13(need, op)
+    lane_p_rules_r13(need, op, ops)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2840,7 +2843,7 @@ def main() -> int:
              "BR-VARIANT-PRICE", "BR-ELASTICITY-LABELS", "BR-CHANGE-IMPACT", "BR-PRODUCT-WORKFLOW", "BR-FEE-INSTANTS",
              "BR-SEAT-RULE-OVERLAP", "BR-TAX-PROFILE-LIST",
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
-             "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE"] + LANE_Q_R13_RULES + R13_O_RULES
+             "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE"] + LANE_Q_R13_RULES + R13_O_RULES + R13_LANE_P_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -2848,6 +2851,166 @@ def main() -> int:
     print(f"  {len(PAIR_EXEMPT)} create/update pair(s) exempt with a reason")
     print(f"\n{'FAIL' if total else 'PASS'} - {total} finding(s) against the 3 October business rules")
     return 1 if total else 0
+
+
+R13_LANE_P_RULES = ["BR-PRIVACY-CHANGE-SET", "BR-PRIVACY-POLICY-GRANT", "BR-OPEN-SHIFT-COMPLETE",
+                    "BR-MESSAGE-DISPATCH-BODY", "BR-LICENCE-IN-FORCE", "BR-DASHBOARD-GET-HIDDEN",
+                    "BR-PRIVACY-CONSENT-READINGS", "BR-CONTENT-BLOCK-APPROVAL"]
+
+
+def lane_p_rules_r13(need, op, ops):
+    """r13 lane p (ADAM CR-437, CR-440, CR-441, CR-442, CR-449, CR-450, CR-469, CR-462; the lead, 1 November 2026
+    "Approve all", and 2 November 2026 "approve all as a recommended" and, for CR-462, "Yes to both"). Each fails on
+    the r12 contract.
+
+      BR-PRIVACY-CHANGE-SET       (CR-437) the change set's items are stored whole (jsonb) and approvalRequestId is a
+                                  declared key into approvals.request.
+      BR-PRIVACY-POLICY-GRANT     (CR-440) listPrivacyConsent asks white-label#policyRecords under the tenant root
+                                  grant, and every other read under the caller's.
+      BR-OPEN-SHIFT-COMPLETE      (CR-441) OpenShift requires venueId, positionCode, from and to, from before to; any
+                                  other operation that writes workforce.open_shift declares a 400; claimOpenShift's 409
+                                  names open-shift-incomplete.
+      BR-MESSAGE-DISPATCH-BODY    (CR-442) MessageDispatch carries body and the non-unique (sourceRef, subjectId,
+                                  channel) index; sendGuestBroadcast writes in the inbox's transaction after a check
+                                  and leaves the sending to Marketing's message sender; guest codes send through it.
+      BR-LICENCE-IN-FORCE         (CR-449) LicencePosition states the in-force contract rule, and no contract takes
+                                  the licensed modules from control.tenant.plan_id.
+      BR-DASHBOARD-GET-HIDDEN     (CR-450) getDashboard asks the licence reads and answers 404 for a hidden dashboard.
+      BR-PRIVACY-CONSENT-READINGS (CR-469) listPrivacyConsent ranks the warning codes in their stated order, maps every
+                                  ConsentSource value onto the banner channels, keeps a venue's ancestor policies and
+                                  sorts undated items last.
+      BR-CONTENT-BLOCK-APPROVAL   (CR-462) publishContentBlock keeps the asked-for schedule in the approval request's
+                                  attributes and reads it back through approvals#requestRecords; approval.granted,
+                                  rejected, withdrawn and expired each have a white-label consumer that writes
+                                  whitelabel.content_block.
+    """
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def vias(o_):
+        return {str((v or {}).get("query")): words((v or {}).get("for"))
+                for v in o_.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    mkt = schemas("contracts/satellite/marketing-crm.yaml")
+
+    # BR-PRIVACY-CHANGE-SET (CR-437)
+    pcs = (mkt.get("PrivacyConfigurationTestingApprovalPublicationView") or {}).get("properties") or {}
+    it, ar = pcs.get("items") or {}, pcs.get("approvalRequestId") or {}
+    need("BR-PRIVACY-CHANGE-SET", it.get("x-ticvai-persistence-column") == "jsonb" and it.get("x-ticvai-persisted") is not False
+         and "written whole on each save" in words(it.get("description")),
+         "PrivacyConfigurationTestingApprovalPublicationView.items is not stored whole as jsonb (CR-437)")
+    need("BR-PRIVACY-CHANGE-SET", ar.get("x-ticvai-references") == "approvals.request",
+         "PrivacyConfigurationTestingApprovalPublicationView.approvalRequestId declares no key into approvals.request "
+         "(CR-437)")
+
+    # BR-PRIVACY-POLICY-GRANT (CR-440)
+    lpc = op("listPrivacyConsent")[3]
+    lpd = words(lpc.get("description"))
+    need("BR-PRIVACY-POLICY-GRANT", "ITenantRootGrant" in vias(lpc).get("white-label#policyRecords", ""),
+         "listPrivacyConsent does not ask white-label#policyRecords under the tenant root grant (CR-440)")
+    need("BR-PRIVACY-POLICY-GRANT", "Every other read is under the caller's grant" in lpd,
+         "listPrivacyConsent does not say every other read is under the caller's grant (CR-440)")
+
+    # BR-PRIVACY-CONSENT-READINGS (CR-469)
+    order = ["capturePointWithoutNotice", "policyExpired", "purposeWithoutLawfulBasis",
+             "purposeWordingDiffersByChannel", "translationMissing"]
+    ranked = ", ".join(f"`{c}`" for c in order) + "; within a code, by `configurationId`, nulls last"
+    need("BR-PRIVACY-CONSENT-READINGS", ranked in lpd,
+         "listPrivacyConsent does not rank its warning codes in CR-378's order, then by configurationId nulls last "
+         "(CR-469)")
+    need("BR-PRIVACY-CONSENT-READINGS",
+         "With no privacy policy in force, every consent purpose raises `policyExpired`" in lpd,
+         "listPrivacyConsent does not say what happens with no privacy policy in force (CR-469)")
+    need("BR-PRIVACY-CONSENT-READINGS", "sort after every dated item, by id" in lpd,
+         "listPrivacyConsent does not sort undated items after every dated item, by id (CR-469)")
+    need("BR-PRIVACY-CONSENT-READINGS", "an ancestor's, the tenant root included" in lpd
+         and "Venue: `scopePath` at or beneath" not in lpd,
+         "listPrivacyConsent's venue filter drops the tenant's policies (CR-469)")
+    chan = lpd.split("Channel (ADAM CR-469)", 1)[-1].split("Language:", 1)[0] if "Channel (ADAM CR-469)" in lpd else ""
+    for v in (mkt.get("ConsentSource") or {}).get("enum") or []:
+        need("BR-PRIVACY-CONSENT-READINGS", f"`{v}`" in chan,
+             f"listPrivacyConsent's channel filter does not say what ConsentSource {v} maps to on banners and "
+             "tracking technologies (CR-469)")
+    need("BR-PRIVACY-CONSENT-READINGS", "channel filter does not narrow them" in chan,
+         "listPrivacyConsent narrows consent purposes and preference types (message channels) by a ConsentSource "
+         "(CR-469)")
+
+    # BR-OPEN-SHIFT-COMPLETE (CR-441)
+    osh = schemas("contracts/satellite/workforce.yaml").get("OpenShift") or {}
+    osd = words(osh.get("description"))
+    need("BR-OPEN-SHIFT-COMPLETE", {"venueId", "positionCode", "from", "to"} <= set(osh.get("required") or []),
+         "OpenShift does not require venueId, positionCode, from and to (CR-441)")
+    need("BR-OPEN-SHIFT-COMPLETE", "with `from` before `to`" in osd and "reported, not guessed" in osd,
+         "OpenShift does not state from before to and the checked NOT NULL migration (CR-441)")
+    need("BR-OPEN-SHIFT-COMPLETE", "open-shift-incomplete" in ptypes(op("claimOpenShift")[3], "409"),
+         "claimOpenShift's 409 does not name open-shift-incomplete (CR-441)")
+    for oid, (_f, _p, _m, o_, _d) in sorted(ops.items()):
+        if oid == "claimOpenShift":
+            continue
+        if any((w or {}).get("table") == "workforce.open_shift"
+               for w in o_.get("x-ticvai-writes") or [] if isinstance(w, dict)):
+            need("BR-OPEN-SHIFT-COMPLETE", "400" in (o_.get("responses") or {}),
+                 f"{oid} writes an open shift and declares no 400 for a missing venueId, positionCode, from or to "
+                 "(CR-441)")
+
+    # BR-MESSAGE-DISPATCH-BODY (CR-442)
+    md = mkt.get("MessageDispatch") or {}
+    body = (md.get("properties") or {}).get("body") or {}
+    need("BR-MESSAGE-DISPATCH-BODY", body.get("type") == "string" and body.get("nullable") is True,
+         "MessageDispatch has no nullable body, the resolved message as sent (CR-442)")
+    need("BR-MESSAGE-DISPATCH-BODY", ["sourceRef", "subjectId", "channel"] in (md.get("x-ticvai-index") or []),
+         "MessageDispatch has no non-unique index on (sourceRef, subjectId, channel) (CR-442)")
+    sgb = words(op("sendGuestBroadcast")[3].get("description"))
+    for frag in ("written in the inbox's transaction", "after a check that no row", "Marketing's message sender",
+                 "dead-letters"):
+        need("BR-MESSAGE-DISPATCH-BODY", frag in sgb, f"sendGuestBroadcast does not say {frag!r} (CR-442)")
+    need("BR-MESSAGE-DISPATCH-BODY",
+         "Marketing's message sender" in words(op("sendGuestOneTimeCode")[3].get("description")),
+         "sendGuestOneTimeCode does not send through Marketing's message sender (CR-442)")
+
+    # BR-LICENCE-IN-FORCE (CR-449)
+    lp = schemas("contracts/satellite/subscription.yaml").get("LicencePosition") or {}
+    lpt = words(lp.get("description"))
+    for frag in ("its status is not `expired`", "`startsAt` is on or before today",
+                 "`cancelledAt` is null or after today", "`core` always licensed", "not `control.tenant.plan_id`"):
+        need("BR-LICENCE-IN-FORCE", frag in lpt, f"LicencePosition does not state {frag!r} of the in-force rule (CR-449)")
+    for f in sorted((ROOT / "contracts").rglob("*.yaml")):
+        if "frozen" in f.parts:
+            continue
+        need("BR-LICENCE-IN-FORCE", "control.tenant.plan_id -> control.plan_module" not in words(f.read_text(encoding="utf-8")),
+             f"{f.relative_to(ROOT)} still takes the licensed modules from control.tenant.plan_id (CR-449)")
+
+    # BR-CONTENT-BLOCK-APPROVAL (CR-462)
+    pcb = op("publishContentBlock")[3]
+    pcd = words(pcb.get("description"))
+    need("BR-CONTENT-BLOCK-APPROVAL", vias(pcb).get("approvals#requestRecords") is not None
+         and any((v or {}).get("query") == "approvals#requestRecords" and (v or {}).get("route") == "service"
+                 for v in pcb.get("x-ticvai-read-via") or [] if isinstance(v, dict)),
+         "publishContentBlock's approval.granted consumer does not read approvals#requestRecords over the service "
+         "route (CR-462)")
+    need("BR-CONTENT-BLOCK-APPROVAL", "with `attributes` set to `publishAt` and `expireAt` exactly as sent" in pcd
+         and "the block stays a draft" not in pcd,
+         "publishContentBlock does not keep the asked-for schedule in the approval request's attributes, or still "
+         "says a rejected block stays a draft (CR-462)")
+    for ev in ("granted", "rejected", "withdrawn", "expired"):
+        evd = load(f"events/approval-{ev}.yaml")
+        need("BR-CONTENT-BLOCK-APPROVAL", any((c or {}).get("context") == "white-label"
+                                              and "whitelabel.content_block" in ((c or {}).get("writes") or [])
+                                              for c in evd.get("consumers") or []),
+             f"approval.{ev} has no white-label consumer that writes whitelabel.content_block (CR-462)")
+
+    # BR-DASHBOARD-GET-HIDDEN (CR-450)
+    gd = op("getDashboard")[3]
+    miss = {"subscription#contractRecords", "subscription#licenceAddOnRecords", "subscription#planRecords"} - set(vias(gd))
+    need("BR-DASHBOARD-GET-HIDDEN", not miss, f"getDashboard does not ask {', '.join(sorted(miss))} in process (CR-450)")
+    need("BR-DASHBOARD-GET-HIDDEN", "`404 not-found`" in words(gd.get("description")) and "404" in (gd.get("responses") or {}),
+         "getDashboard does not answer 404 not-found for a dashboard whose module fails the rule (CR-450)")
 
 
 def access_rules_r12(need, op):

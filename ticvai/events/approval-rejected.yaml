@@ -74,6 +74,15 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: white-label
+  purpose: 'Mark a reviewed content block rejected (`subjectId` a whitelabel.content_block row pending review; ADAM
+    CR-462, decided 2 November 2026; CHG-CR462-001): `reviewStatus` rejected, and the block keeps the status and
+    schedule it had (draft, scheduled or expired), as publishContentBlock states'
+  writes:
+  - whitelabel.content_block
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 - context: identity
   purpose: 'A guest''s privacy request rejected (`subjectContract` identity; ADAM CR-101, CHG-R10ID-016): a
     `subjectDataExport` request''s identity.subject_data_export row ends `rejected` with no file; a `subjectErasure`

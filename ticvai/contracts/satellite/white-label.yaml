@@ -1660,6 +1660,11 @@ paths:
         route: service
         for: 'approvedByPrincipalId: the publisher on a single publish, the approver from approval.granted
           (identity.principal, Identity''s data; CHG-MOD-001; ADAM CR-365, CHG-CR365-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'white-label''s approval.granted consumer of a content block: the approval request by requestId, for the
+          publishAt and expireAt the publish stored in its attributes (approvals.request, Approvals'' data; ADAM
+          CR-462, CHG-CR462-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -1687,12 +1692,32 @@ paths:
         calls approvals'' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix
         subject `whiteLabelPublication`, `subjectId` the block id; the request points at the block, and the block keeps no link back), leaves `status`
         as it is and sets `reviewStatus` `pending`, and answers 202. White-label''s consumer of `approval.granted`
-        then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected`
-        sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block
+        then publishes or schedules the block (`reviewStatus` `approved`); its consumers of `approval.rejected`,
+        `approval.withdrawn` and `approval.expired` set `reviewStatus` `rejected` and the block keeps the status
+        and schedule it had (ADAM CR-462). While `pending`, a second publish of the block
         is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether
         review applies and shows `reviewStatus` on the block. **Until the request is approved the block keeps its
         current status and schedule** (ADAM CR-365). **When approvals refuses `422 no-approval-route`**, this call
         passes it on as 422 `no-approval-route`, leaves `status` and `reviewStatus` unchanged, and writes nothing.
+
+
+        **Where the asked-for schedule waits, and how the grant applies it** (ADAM CR-462, Chinmay, 2 November 2026;
+        CHG-CR462-001). In the approval request''s `attributes`, as a tenant suspension keeps its change; no column
+        is added to the block. (1) With review on, the body is checked exactly as for a direct publish (a 400 raises
+        nothing); then `createApprovalRequest` is called with `attributes` set to `publishAt` and `expireAt` exactly
+        as sent: a field the publisher left out is left out, and a sent null is kept (a null `publishAt` means
+        publish now, a null `expireAt` clears the expiry). The block keeps its `status`, `publishAt` and `expireAt`;
+        only `reviewStatus` becomes `pending`, and the call answers 202. (2) White-label''s `approval.granted`
+        consumer takes events whose `subjectType` is `whiteLabelPublication`, keyed on `requestId`, reads the
+        request through `approvals#requestRecords` (route `service`) and the block from `subjectId`. A block no longer
+        `pending` review, or now `published` or `archived`, changes nothing. Otherwise the stored `publishAt` and
+        `expireAt` are applied by the rules a direct publish uses at that moment: a missing, null or already-passed
+        `publishAt` publishes now, a future one schedules, and a missing `expireAt` keeps the stored one. Status,
+        schedule and `reviewStatus` `approved` are written in one transaction, and `whitelabel.contentPublished` is
+        raised when the block publishes. If the `expireAt` is no longer after the moment the block would go live,
+        nothing is published or scheduled and `reviewStatus` becomes `rejected`. (3) When the request is rejected,
+        withdrawn or expires, `reviewStatus` becomes `rejected`; the block keeps the status and schedule it had
+        (`draft`, `scheduled` or `expired`).
 
         '
       tags:
@@ -4034,7 +4059,8 @@ paths:
         not licensed cannot be enabled, so the two are returned together.
 
         **`isLicensed` uses the map on `ModuleKey`** (common.yaml; R8 blocker fix, IDENTITY-C31): a feature here is
-        licensed when its `x-ticvai-licence-module` is in the tenant''s `LicencePosition.licensedModules`.
+        licensed when its `x-ticvai-licence-module` is in the tenant''s `LicencePosition.licensedModules`, by the
+        in-force contract rule `LicencePosition` states (ADAM CR-449; CHG-CR449-001).
         **A platform operator sends `X-Tenant-Id`** (`TenantId`; APPROVALS-TENANCY-C44) to read a tenant''s
         enablement from the cell that holds many tenants; the cell address is `Tenant.cellHost`.
 
@@ -4573,7 +4599,8 @@ paths:
         `setModuleEnablement` ask them: `catalogue#productRecords` and `tenancy#activeVenues` (`bookingFlowMissing`),
         `assets#mediaAssetRecords` (`missingRequiredAsset`), and `subscription#contractRecords`,
         `subscription#licenceAddOnRecords` and `subscription#planRecords`, which give the tenant''s
-        `LicencePosition.licensedModules` (`unlicensedModuleEnabled`).
+        `LicencePosition.licensedModules` (`unlicensedModuleEnabled`), by the in-force contract rule
+        `LicencePosition` states (ADAM CR-449; CHG-CR449-001).
 
         '
       tags:

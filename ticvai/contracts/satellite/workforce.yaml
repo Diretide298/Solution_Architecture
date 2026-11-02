@@ -1526,6 +1526,12 @@ paths:
         rota-assignment-overlap`.
 
 
+        **An open shift missing a place or a time** (ADAM CR-441, Chinmay, 1 November 2026; CHG-CR441-001). Until
+        `workforce.open_shift`''s `venue_id`, `position_code`, `valid_from` and `valid_to` are NOT NULL (a later
+        forward migration, `OpenShift`), a missing value is taken from the released assignment (`rotaAssignmentId`);
+        otherwise the claim answers `409 open-shift-incomplete` and writes nothing.
+
+
         **Effect, in one transaction under the row lock on the open shift.** When `rotaAssignmentId` is set, that
         assignment''s `principalId` becomes the claimant and its `breachesWorkingHourLimit` is worked out again.
         Otherwise a rota assignment is created with the claimant, `venueId`, `position` = `positionCode`, `startsAt`
@@ -1566,9 +1572,10 @@ paths:
                 $ref: '#/components/schemas/OpenShift'
         '409':
           x-ticvai-problem-types: [open-shift-already-taken, shift-claimant-not-eligible, working-hour-rule-breach,
-            rota-assignment-overlap]
+            rota-assignment-overlap, open-shift-incomplete]
           description: Already taken, not eligible, it would breach a working-hour rule, or it overlaps another
-            assignment of the claimant at any venue of the tenant (ADAM CR-380)
+            assignment of the claimant at any venue of the tenant (ADAM CR-380); or the open shift lacks a venue,
+            position or time its released assignment cannot give (`open-shift-incomplete`, ADAM CR-441)
           content:
             application/problem+json:
               schema:
@@ -4064,7 +4071,20 @@ components:
       description: 'Resource board 4.6. **How a gap gets filled at nine on a Friday without a manager
         ringing round.**
 
+
+        **An open shift has a place and a time** (ADAM CR-441, Chinmay, 1 November 2026; CHG-CR441-001). `venueId`,
+        `positionCode`, `from` and `to` are required on an open shift''s create and update (`400 validation` when
+        one is missing), with `from` before `to`. `workforce.open_shift`''s four columns become NOT NULL in a later
+        forward migration, after the existing rows are checked: any row missing one is reported, not guessed.
+        Until then `claimOpenShift` takes a missing value from the released assignment, otherwise it answers
+        `409 open-shift-incomplete`.
+
         '
+      required:
+      - venueId
+      - positionCode
+      - from
+      - to
       properties:
         id:
           type: string

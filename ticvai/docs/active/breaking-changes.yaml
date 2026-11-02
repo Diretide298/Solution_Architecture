@@ -1920,3 +1920,19 @@ changes:
     tag: r13
     producer-tickets: ['35235', '35232']
     consumer-tickets: ['35250', '29779', '35712']
+  - id: BC-600
+    contract: workforce
+    operation: claimOpenShift
+    operations: [claimOpenShift, listOpenShifts]
+    reason: 'ADAM CR-441 (CHG-CR441-001): an open shift must have venueId, positionCode, from and to, required on an
+      open shift''s create and update (400 validation when one is missing) with from before to, and claimOpenShift
+      answers the new 409 open-shift-incomplete while the four columns are still nullable. A shift with no place or
+      time cannot become the rota assignment CR-380 makes, and a new required request field cannot be additive. The
+      package has no operation that creates or updates an open shift today (BO-887 records the gap, CHG-WIR-004), so
+      check-contract-compat finds no breaking change for this entry to match until one is added; it approves that
+      operation''s required fields when it is.'
+    approved-by: 'Chinmay, 1 November 2026 (CR-441 posted on #37102: "This is a breaking contract change, approved by
+      the lead and listed in breaking-changes.yaml at the next release"), the lead''s "Approve all" of the same day'
+    tag: r13
+    producer-tickets: ['37102']
+    consumer-tickets: [none-linked]

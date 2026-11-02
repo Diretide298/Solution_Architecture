@@ -1,0 +1,42 @@
+id: CHG-CR450-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'getDashboard answers 404 not-found for a dashboard whose module is not licensed or whose module permissions
+  the caller does not hold, exactly as if it did not exist, matching listDashboards: it asks the three Subscription
+  reads in process (subscription#contractRecords, licenceAddOnRecords, planRecords) by the rule on
+  CreateDashboardRequest.module, which now names getDashboard.'
+decision:
+  what: 'Posted on #33107 (Chinmay, 1 November 2026), the lead''s "Approve all" of the same day: "as you recommended
+    (A). getDashboard answers 404 not-found for a dashboard whose module is not licensed or whose module permissions
+    the caller does not hold, exactly as if it did not exist, matching listDashboards."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-450 (Hrushikant Patkar, #33107): CR-373 hid such dashboards from listDashboards and getCommandCentre and
+  refused them on create and update, but did not name getDashboard, so a hidden dashboard still opened by id or
+  bookmark, showing a module the tenant has not licensed or the caller may not see.'
+keys_touched:
+  operations: [getDashboard]
+  schemas: [CreateDashboardRequest]
+  files:
+  - contracts/satellite/reporting.yaml
+  - tools/check-business-rules.py
+root_class: 'a guard stated on the list and the writes, and missed on the read by id'
+tickets:
+  started:
+  - '33108 (getDashboard, Hrushikant, Ready for QA): answer 404 not-found for a dashboard whose module fails either
+    check, asking the three Subscription reads in process by the rule CR-449 states. Told through the lead''s comment
+    on #33107; its text is not rewritten.'
+  - '33107 (createDashboard, Hrushikant, Ready for QA, where the CR was raised): no change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-450
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DASHBOARD-GET-HIDDEN
+status: open
+notes: 'No new response: getDashboard already declares the shared 404. No screen shows anything new: a dashboard a
+  screen could not list now also does not open (the screens bound to getDashboard keep their not-found state). The
+  operations role already reads the Subscription tables for CR-320 and CR-373, so no grant is new.'

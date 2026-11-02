@@ -2285,9 +2285,12 @@ paths:
       - white-label.getModuleEnablement
       x-ticvai-reads:
       - table: control.tenant
-        for: 'the tenant''s plan (plan_id), the base of the LicencePosition it answers'
+        for: 'the tenant''s plan (plan_id), the base of the limits of the LicencePosition it answers'
+      - table: control.contract
+        for: 'the tenant''s in-force contract, whose plan version licenses the modules, by LicencePosition''s rule
+          (ADAM CR-449; CHG-CR449-001)'
       - table: control.plan_module
-        for: 'the modules the plan licenses, half of LicencePosition'
+        for: 'the modules the in-force contract''s plan version licenses, half of LicencePosition (ADAM CR-449)'
       - table: control.plan_limit
         for: 'the limits the plan sets, half of LicencePosition'
       - table: control.licence_add_on
@@ -2304,8 +2307,9 @@ paths:
         CHG-R8RW-003): its `control.licence_add_on` row gets `validTo` today, `removedAt` now, `removedByPrincipalId`
         the caller and `removalReason` the body''s `reason`, so the row is the record of who removed it, when and
         why. Nothing else is written; the tenant''s contract row does not change. The answer is the
-        tenant''s `LicencePosition` after it: the plan''s modules and limits (control.tenant.plan_id ->
-        control.plan_module, control.plan_limit) and the add-ons still in force (control.licence_add_on rows with no
+        tenant''s `LicencePosition` after it: the modules of the in-force contract''s plan version, by the rule
+        `LicencePosition` states (ADAM CR-449), the plan''s limits (control.tenant.plan_id -> control.plan_limit) and
+        the add-ons still in force (control.licence_add_on rows with no
         `removedAt`, and their control.licence_add_on_limit rows).
 
 
@@ -18099,10 +18103,18 @@ components:
           readOnly: true
           description: Why it was removed (`removeLicenceAddOn`'s `reason`); null while it is in force.
     LicencePosition:
-      x-ticvai-persistence: none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module,
-        control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit
-        by tenant_id)
+      x-ticvai-persistence: none — union of the modules of the plan version on the tenant's in-force control.contract
+        (control.contract.plan_id, plan_version -> control.plan_module; ADAM CR-449) and the add-ons in force
+        (control.licence_add_on by tenant_id), core always; the limits as before CR-449 (control.tenant.plan_id ->
+        control.plan_limit, and control.licence_add_on_limit by tenant_id)
       type: object
+      description: '**Which contract licenses what, stated once** (ADAM CR-449, Chinmay, 1 November 2026;
+        CHG-CR449-001). A `control.contract` row counts (is in force) when its status is not `expired`, `startsAt`
+        is on or before today, and `cancelledAt` is null or after today: `pastDue` keeps service, and a
+        cancellation takes effect on its date. The licensed modules are the in-force contract''s plan version''s
+        modules (`control.plan_module` by `plan_id` and `plan_version`) plus the add-ons in force, with `core`
+        always licensed; not `control.tenant.plan_id`. One rule (Application/Common/Licensing), used by
+        `createDashboard`, `listDashboards`, `validateTenantConfig` and `getModuleEnablement`.'
       required:
       - tenantId
       - licensedModules

@@ -1,0 +1,58 @@
+id: CHG-CR449-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'LicencePosition states once which contract licenses what: a control.contract counts (is in force) when its
+  status is not expired, starts_at is on or before today and cancelled_at is null or after today (pastDue keeps
+  service; a cancellation takes effect on its date); the licensed modules are the in-force contract''s plan
+  version''s modules (control.plan_module) plus the add-ons in force, core always licensed, not
+  control.tenant.plan_id. One rule (Application/Common/Licensing), used by createDashboard, listDashboards,
+  validateTenantConfig and getModuleEnablement, each of which now points at it. removeLicenceAddOn''s answer, a
+  LicencePosition, takes its modules by the same rule.'
+decision:
+  what: 'Posted on #33107 (Chinmay, 1 November 2026), the lead''s "Approve all" of the same day: "as you recommended
+    (A), as built. A control.contract counts (is in force) when its status is not expired, starts_at <= today, and
+    cancelled_at is null or after today (pastDue keeps service; a cancellation takes effect on its date). The licensed
+    modules are the in-force contract''s plan version''s modules plus the add-ons in force, with core always licensed;
+    not control.tenant.plan_id. One rule in Application/Common/Licensing, used by createDashboard, listDashboards,
+    validateTenantConfig and getModuleEnablement."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-449 (Hrushikant Patkar, #33107 createDashboard): CR-373 reads the licence through
+  subscription#contractRecords, licenceAddOnRecords and planRecords, but LicencePosition''s persistence note (and
+  removeLicenceAddOn) took the plan from control.tenant.plan_id, and "in force" was not defined; the state model lets
+  a pastDue contract keep service and a cancelled one run to its effective date.'
+keys_touched:
+  operations: [createDashboard, listDashboards, validateTenantConfig, getModuleEnablement, removeLicenceAddOn]
+  schemas: [LicencePosition, CreateDashboardRequest]
+  tables: [control.contract, control.plan_module, control.licence_add_on, control.tenant]
+  files:
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'one figure with two sources, and a state word ("in force") with no rule'
+tickets:
+  started:
+  - '33107 (createDashboard, updateDashboard, Hrushikant): no change; built to this rule in Application/Common/Licensing.'
+  - '33109 (listDashboards): use the same rule from Application/Common/Licensing.'
+  - '30778 (validateTenantConfig, Narayan Gaonkar, On hold): use the same rule from Application/Common/Licensing;
+    needs the lead''s comment.'
+  unstarted:
+  - '30761 (getModuleEnablement), 31277 (removeLicenceAddOn): the rule on LicencePosition, picked up at their next
+    pull.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-449
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-LICENCE-IN-FORCE
+status: open
+notes: 'Beyond the comment''s words, for the lead: removeLicenceAddOn (Subscription''s own control-plane operation)
+  described its LicencePosition answer as control.tenant.plan_id -> control.plan_module; it now takes the modules by
+  LicencePosition''s rule and declares a read of control.contract. Not changed: LicencePosition''s limits still come
+  from control.tenant.plan_id -> control.plan_limit (the decision covers the modules only), and tenantRequestLimits
+  still says "control.contract, in force today" without pointing at the rule. If the limits should follow the same
+  contract, that is a follow-up comment. BR-LICENCE-IN-FORCE fails on any contract text that again takes the modules
+  from control.tenant.plan_id.'

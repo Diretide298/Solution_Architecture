@@ -1,0 +1,70 @@
+id: CHG-CR462-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'A content block publish under review keeps the asked-for schedule in the approval request''s attributes
+  (publishAt and expireAt exactly as sent, a left-out field left out, a sent null kept), as a tenant suspension does;
+  no column is added. White-label gains the content-block approval consumer: on approval.granted
+  (subjectType whiteLabelPublication, keyed on requestId) it reads the request through approvals#requestRecords
+  (route service, declared on publishContentBlock) and the block from subjectId, does nothing for a block no longer
+  pending review or now published or archived, else applies the stored schedule by a direct publish''s rules with
+  reviewStatus approved in one transaction and raises whitelabel.contentPublished when it publishes (an expireAt no
+  longer after go-live sets reviewStatus rejected); on approval.rejected, withdrawn and expired it sets reviewStatus
+  rejected and the block keeps the status and schedule it had. The events now list a white-label consumer writing
+  whitelabel.content_block beside the config_version one.'
+decision:
+  what: 'Posted on #30785 (Chinmay, 2 November 2026), for #27782, the lead''s "Yes to both" of the same day: "Option
+    A, as you built it. While a publish waits for review, the schedule the publisher asked for lives in the approval
+    request''s attributes ... No column is added to the content block, and the Page Builder screen does not change.
+    Build now: (1) With review on, publishContentBlock first checks the body exactly as it does today; a 400 still
+    raises nothing. It then calls createApprovalRequest with attributes set to publishAt and expireAt exactly as
+    sent. Leave a field out if the publisher left it out, and keep a sent null ... (2) White-label''s approval.granted
+    consumer takes events whose subjectType is whiteLabelPublication and uses requestId as its idempotency key. It
+    reads the request through approvals#requestRecords over the service route (declare this read on the consumer)
+    and reads the block from subjectId. If the block is no longer pending review, or is now published or archived,
+    it does nothing. Otherwise it applies the stored publishAt/expireAt using the same rules a direct publish uses at
+    that moment ... Status, schedule and reviewStatus approved are written in one transaction, and
+    whitelabel.contentPublished is raised when the block publishes. If the expireAt is no longer after the moment
+    the block would go live, nothing is published or scheduled and reviewStatus becomes rejected. (3) When the
+    request is rejected, withdrawn or expires, set reviewStatus to rejected; the block keeps the status and schedule
+    it had, which may be draft, scheduled or expired."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-462 (Hrushikant Patkar, #30785 publishContentBlock): CR-365 kept a reviewed block''s status and schedule
+  until approval but did not say where the asked-for schedule waits, and white-label never read the approval request
+  back; events/approval-granted.yaml and approval-rejected.yaml gave white-label''s consumers only
+  whitelabel.config_version, so no consumer applied a content block''s decision. The watcher closed the CR as needing
+  no fix; the package still lacked it.'
+keys_touched:
+  operations: [publishContentBlock]
+  tables: [whitelabel.content_block, approvals.request]
+  screens: [CMS-007]
+  files:
+  - contracts/satellite/white-label.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
+  - events/approval-withdrawn.yaml
+  - events/approval-expired.yaml
+  - tools/check-business-rules.py
+root_class: 'a change waiting for approval with no stated place to hold it'
+tickets:
+  started:
+  - '30785 (publishContentBlock, Hrushikant, On hold): raise the request with attributes publishAt and expireAt as
+    sent; the block keeps its status and schedule. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'New task needed (from the plan lane): white-label''s content-block approval consumer of approval.granted,
+    rejected, withdrawn and expired, as publishContentBlock states.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-462
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONTENT-BLOCK-APPROVAL
+status: open
+notes: 'CMS-007 is approved UI and shows nothing new (reviewStatus rejected already exists). Beyond the comment''s
+  words: the rejected, withdrawn and expired consumers are new consumer entries on approval.withdrawn and
+  approval.expired, which had no white-label consumer at all (white-label''s config_version consumer is still on
+  granted and rejected only); and the r12 sentence "the block stays a draft" on a rejection is replaced by "keeps
+  the status and schedule it had", as the decision''s point 3 says. The approval.rejected, withdrawn and expired
+  payloads carry no subjectType, so those consumers find the block by subjectId.'

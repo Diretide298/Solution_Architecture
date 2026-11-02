@@ -1,0 +1,65 @@
+id: CHG-CR469-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'listPrivacyConsent settles the four readings of CR-378 that #37138 built: (1) warnings ranked in the order
+  CR-378 lists the codes (capturePointWithoutNotice, policyExpired, purposeWithoutLawfulBasis,
+  purposeWordingDiffersByChannel, translationMissing), within a code by configurationId, nulls last; (2) the channel
+  filter takes a ConsentSource: capture points match it exactly, banners and tracking technologies by a stated map
+  onto the web channel list (kiosk, pos, callCentre, import and agentRecorded map to none), and consent purposes and
+  preference types, which hold message channels, are not narrowed by it, alike for counts, warnings and directory;
+  (3) a venue keeps the policies at the venue or an ancestor, the tenant root included, read under the tenant root
+  grant (CR-440), every other item at or beneath the venue; (4) with no privacy policy in force every consent purpose
+  raises policyExpired and counts for review, and a capture point whose notice kind has no policy in force raises
+  capturePointWithoutNotice; undated items sort after every dated one, by id.'
+decision:
+  what: 'Posted on #37138 (Chinmay, 2 November 2026), the lead''s "approve all as a recommended" of the same day: "A
+    for points 1 and 4, B for points 2 and 3. ... (1) Severity: the order CR-378 lists the codes in is the ranking
+    ...; within a code, by configurationId, nulls last. As built. (2) Channel: the filter takes a ConsentSource value.
+    Capture points match it exactly. Cookie banners and tracking technologies use the web channel list, so the filter
+    maps onto it: website to b2cWebsite, customerPortal, whiteLabelSite and partnerMicrosite; guestApp to mobileApp;
+    checkout to embeddedCheckout; cookieBanner to all six. kiosk, pos, callCentre, import and agentRecorded map to
+    none of them ... Consent purposes (consent_purpose_channel) and communication preference types
+    (availableChannels) hold message channels ... so the channel filter does not narrow them: they count as items
+    without the attribute and stay in. This applies alike to the counts, the warnings and the directory. (3) Venue:
+    policies (whitelabel.policy items and counts, with their privacy_notice_governance rows) are kept when their scope
+    is the venue''s or an ancestor''s, the tenant root included, read under the tenant root grant as CR-440 decided.
+    ... Every other item keeps ''scopePath at or beneath the venue''. (4) With no privacy policy in force, every
+    consent purpose raises policyExpired and counts in consentConfigurationsRequiringReview, and a published capture
+    point whose notice step names a kind with no policy in force raises capturePointWithoutNotice. As built ... Items
+    with no date (consent purposes, and rows whose updated_at is null) sort after every dated item, by id. As built.
+    The contract text of listPrivacyConsent is updated to match at the next release."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-469 (Hrushikant Patkar, #37138 listPrivacyConsent): the r12 contract repeated CR-378 and settled none of
+  the four readings the build made: no ranking for "most severe first"; a ConsentSource filter applied literally to
+  banners and tracking technologies (web channels) and to purposes and preference types (message channels) dropped
+  nearly everything; "at or beneath the venue" dropped the tenant''s policies CR-440 wants a venue to see.'
+keys_touched:
+  operations: [listPrivacyConsent]
+  tables: [whitelabel.policy, marketing.privacy_notice_governance, marketing.cookie_banner_design,
+    marketing.tracking_technology, marketing.consent_purpose_channel, marketing.communication_preference_type]
+  screens: [CMS-021]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+root_class: 'a filter over vocabularies that do not share their values, applied as if they did'
+tickets:
+  started:
+  - '37138 (listPrivacyConsent, Hrushikant): points 1 and 4 and the undated sort as built; change the channel filter
+    to the map and stop narrowing consent purposes and preference types by it; keep a venue''s ancestor policies,
+    read under the tenant root grant. Told through the lead''s comment; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-469
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRIVACY-CONSENT-READINGS
+status: open
+notes: 'CMS-021 is approved UI and shows nothing new: the figures change, the screen does not, and its page info is not
+  edited. BR-PRIVACY-CONSENT-READINGS fails on a ConsentSource value the channel paragraph does not map, so a new
+  source needs its mapping. Beyond the comment''s words, for the lead: listPrivacyConsent no longer declares its read
+  of marketing.consent_purpose_channel (CR-378 read it only for the channel filter, which no longer narrows consent
+  purposes), and BR-PRIVACY-CONSENT stops requiring it.'
