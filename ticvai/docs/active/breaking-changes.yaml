@@ -1865,3 +1865,18 @@ changes:
     tag: r13
     producer-tickets: ['31818', '32588', '32575']
     consumer-tickets: ['29883', '35400', '35706', '28504', '32601']
+  - id: BC-620
+    contract: identity
+    operation: listSubjectBiometricRecords
+    reason: 'ADAM CR-438 (CHG-CR438-001): a served service query''s route is POST /queries/<the query''s name in kebab case>
+      with the query''s declared inputs as the JSON body (the rule for every served service query), so
+      listSubjectBiometricRecords moves from GET /internal/subject-biometrics, with ids, subjectId and kind as query
+      parameters (r12, CR-391), to POST /queries/subject-biometric-records, with ids and where as the body (subjectId and
+      kind travel in where), answering 200 a JSON array of the rows in camelCase, 400 validation and 401. A moved
+      operation and removed parameters cannot be additive.'
+    approved-by: 'Chinmay, 1 November 2026 (CR-438 posted on #30952: "as you recommended (A), as built. A served:
+      [service] query is POST /queries/<the query name in kebab case> on the owning deployable ...
+      subjectBiometricRecords is POST /api/v1/queries/subject-biometric-records")'
+    tag: r13
+    producer-tickets: ['37202']
+    consumer-tickets: ['30952']

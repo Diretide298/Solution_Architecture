@@ -2539,7 +2539,7 @@ paths:
         - "P08 BO-964 PDF & Image Import"
       x-ticvai-read-via:
       - query: assets#mediaAssetRecords
-        route: service
+        route: in-process
         for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       summary: Import a seat map from a plan or a manifest
       description: '**AI-assisted import, decided 21 August** — PDF, image, Excel or CSV alongside manual

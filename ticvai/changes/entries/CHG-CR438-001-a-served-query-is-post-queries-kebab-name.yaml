@@ -1,0 +1,62 @@
+id: CHG-CR438-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'A served service query''s route is POST /queries/<the query''s name in kebab case> on the owning deployable,
+  with the query''s declared inputs as the JSON body, answering 200 with a JSON array of its rows in camelCase, 401 to
+  any caller that is not a fellow deployable (serviceAuth), and 400 validation when neither ids nor where is given or
+  where names a field the row lacks. listSubjectBiometricRecords moves from GET /internal/subject-biometrics (ids,
+  subjectId and kind as query parameters, r12) to POST /queries/subject-biometric-records with {ids, where} as the
+  body (BC-620). ADR-0055 is amended with the rule for every served service query, and check-cross-module-reads
+  XR-SERVICE-PATH holds every operation declared as a query''s service route to it.'
+decision:
+  what: 'Posted on #30952 (Chinmay, 1 November 2026), under the lead''s "Approve all" of 1 November 2026: "as you
+    recommended (A), as built. A served: [service] query is POST /queries/<the query name in kebab case> on the owning
+    deployable, with the query''s declared inputs as the JSON body, answering 200 with a JSON array of its rows in
+    camelCase, 401 to any caller that is not a fellow deployable (serviceAuth), and 400 validation when neither ids
+    nor where is given or where names a field the row lacks. subjectBiometricRecords is POST
+    /api/v1/queries/subject-biometric-records. This is the rule for every route-service read that follows
+    (activeVenues, cellEndpointRecords, subjectContactRecords and the rest)."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-438 (Hrushikant Patkar, #30952 revokeFacePass): CR-391 decided that Identity serves subjectBiometricRecords
+  on its service route but named no path; #30952 built the caller to POST /api/v1/queries/subject-biometric-records,
+  and r12 then wrote GET /internal/subject-biometrics with other parameters. No service-route query had a path rule
+  (ADR-0073 is not written; ADR-0055 rule 4), so every route-service read would have needed its own decision.'
+keys_touched:
+  operations: [listSubjectBiometricRecords, revokeFacePass]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/access.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - docs/active/breaking-changes.yaml
+  - tools/check-cross-module-reads.py
+  - tools/check-business-rules.py
+  - tools/tests/test_cross_module_inprocess_host.py
+  other:
+  - 'query identity#subjectBiometricRecords (its rule names the route)'
+  - 'BC-620 (listSubjectBiometricRecords moved from GET /internal/subject-biometrics to POST
+    /queries/subject-biometric-records; ids, subjectId and kind parameters replaced by the {ids, where} body)'
+root_class: 'a service route with no path rule: each served query''s HTTP shape left to whoever built the first caller'
+tickets:
+  started:
+  - '30952 (revokeFacePass, Hrushikant, Ready for QA): nothing to change; it already calls POST
+    /api/v1/queries/subject-biometric-records with {ids, where} as the body, and connects when #37051 is ready.'
+  unstarted:
+  - '37202 (listSubjectBiometricRecords, Pranay): build POST /queries/subject-biometric-records with {ids, where} as the
+    body, 200 array, 400 validation, 401; not GET /internal/subject-biometrics.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-438
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py::XR-SERVICE-PATH
+status: open
+notes: 'BR-FACE-PASS-REVOKE (check-business-rules) now expects the new path and method. Beyond the posted words: (1)
+  subjectId and kind, r12''s query parameters, travel in where, as any column does; (2) the 200 items stay
+  access FacePassEnrolment, the pii.subject_biometric row in camelCase, at most 50; (3) the rule is held for an
+  operation that is a data read''s service route (returns an array of rows): identity#verifySupervisorStepUp, a rule
+  question answering one object that names its own operation (POST /internal/step-up/verify), keeps it. The other
+  served service queries have no declared operation; the ADR-0055 rule is their route, and a new one declared later
+  must match it.'

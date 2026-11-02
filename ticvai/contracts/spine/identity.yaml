@@ -333,8 +333,9 @@ x-ticvai-queries:
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through Identity's service route (serviceAuth): `listSubjectBiometricRecords`,
-      GET /internal/subject-biometrics, which the access host's revokeFacePass asks for the enrolment it revokes
-      (ADAM CR-391, Chinmay, 31 October 2026). The access role has no grant on pii.subject_biometric; the route
+      POST /queries/subject-biometric-records with the declared inputs as the JSON body (ADAM CR-438, Chinmay, 1
+      November 2026, the rule for every served service query), which the access host's revokeFacePass asks for
+      the enrolment it revokes (ADAM CR-391, Chinmay, 31 October 2026). The access role has no grant on pii.subject_biometric; the route
       needs the kernel's service sign-in (#37051, ADAM CR-281).
     served: [service]
   subjectContactRecords:
@@ -459,8 +460,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /internal/subject-biometrics:
-    get:
+  /queries/subject-biometric-records:
+    post:
       operationId: listSubjectBiometricRecords
       security:
       - serviceAuth: []
@@ -479,6 +480,14 @@ paths:
         The route needs the kernel''s service sign-in (#37051, ADAM CR-281), and revokeFacePass connects to it when
         that is ready.
 
+
+        **Where a served query is asked from another deployable** (ADAM CR-438, Chinmay, 1 November 2026: the rule
+        for every served `service` query). A query served on the service route is POST /queries/<the query''s name
+        in kebab case> on the owning deployable, with the query''s declared inputs as the JSON body, answering `200`
+        with a JSON array of its rows in camelCase, `401` to any caller that is not a fellow deployable
+        (serviceAuth), and `400 validation` when neither `ids` nor `where` is given or `where` names a field the
+        row lacks. For this query that is POST /api/v1/queries/subject-biometric-records.
+
         '
       tags:
       - identity
@@ -486,32 +495,27 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      parameters:
-      - name: ids
-        in: query
-        required: false
-        description: The `pii.subject_biometric` rows asked for, by id. With `subjectId` or `kind`, the two narrow.
-        style: form
-        explode: false
-        schema:
-          type: array
-          maxItems: 50
-          items: { type: string, format: uuid }
-      - name: subjectId
-        in: query
-        required: false
-        description: Or the rows of this subject.
-        schema: { type: string, format: uuid }
-      - name: kind
-        in: query
-        required: false
-        description: Only `facePass` or only `faceTag` rows.
-        schema:
-          type: string
-          enum: [facePass, faceTag]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The query's declared inputs (identity#subjectBiometricRecords); at least one of the two.
+              properties:
+                ids:
+                  type: array
+                  maxItems: 50
+                  description: The `pii.subject_biometric` rows asked for, by id; with `where`, the two narrow.
+                  items: { type: string, format: uuid }
+                where:
+                  type: object
+                  additionalProperties: true
+                  description: Or the rows whose columns equal these values (a key the asker holds, such as
+                    `subjectId`, `entitlementId` or `kind`); a field the row lacks is `400 validation`.
       responses:
         '200':
-          description: The rows found; an id with no visible row is absent.
+          description: The rows found, in camelCase; an id with no visible row is absent.
           content:
             application/json:
               schema:
@@ -520,7 +524,14 @@ paths:
                 items:
                   $ref: ../spine/access.yaml#/components/schemas/FacePassEnrolment
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: Neither `ids` nor `where` is given, or `where` names a field the row lacks (`validation`;
+            ADAM CR-438).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '401':
           description: The calling workload's token is missing or invalid (`unauthenticated`).
           x-ticvai-problem-types:
@@ -8353,7 +8364,7 @@ paths:
       operationId: getSessionVenue
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'the names of the venues the session may act at, and that each is active: platform.scope, Tenancy''s data'
       x-ticvai-self-service: true
       x-ticvai-audience:
@@ -8414,7 +8425,7 @@ paths:
       x-ticvai-singleton-note: 'One per session, the caller''s own: a PUT replaces it. There is no key in the path.'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'the chosen venue must be an active venue the session''s grants reach: platform.scope, Tenancy''s data'
       x-ticvai-self-service: true
       x-ticvai-audience:
