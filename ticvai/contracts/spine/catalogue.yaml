@@ -480,8 +480,8 @@ x-ticvai-queries:
       (or an ancestor's) and, at publish, active with a product on sale (ADAM CR-394, Chinmay, 31 October 2026;
       XDR-033). **Above the venue, for these checks only** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001):
       for those four operations the read takes the rows at the choice's venue and at its ancestors (a scope_path that
-      is the venue's or an ancestor of it), in process, for that check only, so a brand-level category head office
-      set up is found; every other asker reads as the caller's scope lets it see them, below.
+      is the venue's or an ancestor of it), under the routed tenant's root grant (ITenantRootGrant), filtered in the statement to the venue's scope_path and its ancestors, in process, for that check only, as CR-336 and CR-362 did; the caller's grant is in force again for every other statement (the lead, 2 November 2026: "yes for both"), so a brand-level category head office set up is
+      found; every other asker reads as the caller's scope lets it see them, below.
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
       October). Catalogue answers with its catalogue.product_category rows, as it stores them and as the
       caller's scope lets it see them (the table's row-level security, under the caller's connection and

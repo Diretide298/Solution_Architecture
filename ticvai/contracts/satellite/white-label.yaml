@@ -5248,7 +5248,9 @@ paths:
         **Rows above the venue** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001): `paymentMethodUnavailable` reads
         the `payments.method` rows and `mediaDoesNotFit` the `assets.media_asset` rows at the venue and at its ancestors
         (a method whose `scope_path` is the venue''s or an ancestor of it; an asset whose `venue_id` is the venue or null,
-        the tenant''s library), in process, for this check only, so a tenant-wide method or a library asset is found.
+        the tenant''s library), read under the routed tenant''s root grant, filtered to the venue''s scope_path and its ancestors (the lead, 2
+        November 2026, "yes for both"; as CR-336 and CR-362 did), in process, for this check only, so a tenant-wide method or a
+        library asset is found.
         Module enablement is read under the routed tenant''s root grant, as `getPublishedKioskConfig` reads it (confirmed
         as built). Every other read stays under the caller''s grant. A configuration whose `deletedAt` is set answers 404
         `not-found` (ADAM CR-382).
@@ -5361,8 +5363,9 @@ paths:
 
         **Rows above the venue** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001): the category check reads the
         `catalogue.product_category` rows at the venue and at its ancestors (a `scope_path` that is the venue''s or an
-        ancestor of it), in process, for this check only, so a brand-level category head office set up is found;
-        every other read stays under the caller''s grant.
+        ancestor of it), read under the routed tenant''s root grant, filtered to the venue''s scope_path and its ancestors (the lead, 2
+        November 2026, "yes for both"; as CR-336 and CR-362 did), in process, for this check only, so a brand-level category head office
+        set up is found; every other read stays under the caller''s grant.
 
         '
       tags:
@@ -5441,8 +5444,9 @@ paths:
 
         **Rows above the venue** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001): the category check reads the
         `catalogue.product_category` rows at the venue and at its ancestors (a `scope_path` that is the venue''s or an
-        ancestor of it), in process, for this check only, so a brand-level category head office set up is found;
-        every other read stays under the caller''s grant.
+        ancestor of it), read under the routed tenant''s root grant, filtered to the venue''s scope_path and its ancestors (the lead, 2
+        November 2026, "yes for both"; as CR-336 and CR-362 did), in process, for this check only, so a brand-level category head office
+        set up is found; every other read stays under the caller''s grant.
 
         '
       tags:
@@ -5772,8 +5776,9 @@ paths:
         **The rule for each kind** (ADAM CR-394, Chinmay, 31 October 2026). Catalogue is asked in process from the
         operations host, through Catalogue''s own query classes and under the caller''s row security
         (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033), except that a category
-        target is read at the venue and at its ancestors, for this check only (ADAM CR-443, Chinmay, 1 November
-        2026; CHG-CR443-001). Module enablement is read under the routed tenant''s root grant, as
+        target is read at the venue and at its ancestors, for this check only, under the routed tenant''s root grant
+        filtered to the venue''s scope_path and its ancestors (ADAM CR-443, Chinmay, 1 November 2026, and the lead''s
+        "yes for both" of 2 November 2026; CHG-CR443-001). Module enablement is read under the routed tenant''s root grant, as
         `getPublishedKioskConfig` reads it (ADAM CR-443: confirmed as built). A target is on sale
         (else `422 answer-target-not-on-sale`) when it is: a product with `is_sellable` true, `guest_listing`
         `bookable`, and the current time inside `on_sale_from` and `on_sale_to` where they are set; a category

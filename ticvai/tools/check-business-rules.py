@@ -2801,8 +2801,10 @@ def lane_q_rules_r13(need, op):
     for contract, name in (("contracts/spine/catalogue.yaml", "productCategoryRecords"),
                            ("contracts/satellite/payments.yaml", "paymentMethodRecords"),
                            ("contracts/satellite/assets.yaml", "mediaAssetRecords")):
-        need("BR-CATALOGUE-ANCESTORS", "CR-443" in words(query(contract, name).get("rule")),
-             f"{name}'s rule does not state the read above the venue for White Label's checks (CR-443)")
+        need("BR-CATALOGUE-ANCESTORS", "CR-443" in words(query(contract, name).get("rule"))
+             and "ITenantRootGrant" in words(query(contract, name).get("rule")),
+             f"{name}'s rule does not state the read above the venue for White Label's checks under the routed tenant's "
+             "root grant (CR-443; the lead, 2 November 2026)")
 
     # BR-GUIDED-CHOICE-UPDATE (ADAM CR-444)
     ugc = op("updateGuidedChoice")[3]
@@ -2835,8 +2837,14 @@ def lane_q_rules_r13(need, op):
     need("BR-TICKET-LAYOUT", "TicketLayout" in words(((osch.get("TicketTemplateRequest") or {}).get("properties") or {})
                                                      .get("layoutRef", {}).get("description")),
          "TicketTemplateRequest.layoutRef does not name a stored TicketLayout (CR-447)")
-    need("BR-TICKET-LAYOUT", "TicketLayout" in words(op("printTicketProof")[3].get("description")),
-         "printTicketProof does not say it renders the TicketLayout that prints (CR-447)")
+    need("BR-TICKET-LAYOUT", "TicketLayout" in words(op("printTicketProof")[3].get("description"))
+         and ("access#mediaTemplateRecords", "in-process") in vias(op("printTicketProof")[3])
+         and "printTicketProof" in ((xdr.get("XDR-067") or {}).get("operations") or []),
+         "printTicketProof does not render the stored TicketLayout read from Access in process (access#mediaTemplateRecords, "
+         "XDR-067; CR-447)")
+    need("BR-TICKET-LAYOUT", "layout" in ((schemas("contracts/spine/access.yaml").get("PdfPrintablePosTicketDesignerInput")
+                                           or {}).get("properties") or {}),
+         "the ticket designer's input (BO-346) has no layout to save (CR-447)")
     tp = load("contracts/devices/ticket-printer.yaml") if (ROOT / "contracts/devices/ticket-printer.yaml").exists() else {}
     paths = tp.get("paths") or {}
     need("BR-TICKET-LAYOUT", "/ticket-printer/status" in paths and "/ticket-printer/print-jobs" in paths,
@@ -2868,6 +2876,12 @@ def lane_q_rules_r13(need, op):
              f"{oid} does not sign the display in by its key, with 401 and 403 (CR-451)")
     need("BR-DEVICE-KEY", "CR-451" in words(op("submitQueueReading")[3].get("description")),
          "submitQueueReading does not use the device-key sign-in (CR-451)")
+    for oid in ("getSignageQueueBoard", "getSignageQueueCalls", "submitQueueReading"):
+        need("BR-DEVICE-KEY", ("tenancy#deviceForApiKey", "in-process") in vias(op(oid)[3])
+             and oid in ((xdr.get("XDR-068") or {}).get("operations") or []),
+             f"{oid}'s device-key sign-in does not ask tenancy#deviceForApiKey in process under XDR-068 (CR-451)")
+    need("BR-DEVICE-KEY", "ITenantRootGrant" in words(query("contracts/spine/tenancy.yaml", "deviceForApiKey").get("rule")),
+         "tenancy#deviceForApiKey is not one statement under the routed tenant's root grant (CR-451)")
 
     # BR-SIGNAGE-BOARD (ADAM CR-452)
     gsb = op("getSignageQueueBoard")[3]

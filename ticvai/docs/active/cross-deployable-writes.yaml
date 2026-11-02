@@ -484,7 +484,39 @@ reads:
     (XDR-008, XDR-022); SELECT on catalogue.event is new, and the operations role already has USAGE on schema
     catalogue. updateGuidedChoice (#30938, ADAM CR-444, Chinmay, 1 November 2026) applies the same venue
     check to a draft''s new questions and asks the same three queries; no grant is added. The category rows are read
-    at the venue and at its ancestors for these checks only (ADAM CR-443).'
+    at the venue and at its ancestors for these checks only, under the routed tenant''s root grant filtered to the
+    venue''s scope_path and its ancestors (ADAM CR-443; the lead, 2 November 2026, "yes for both"); no read-beneath
+    policy and no migration.'
+- id: XDR-067
+  reader: commerce
+  tables: [access.media_template]
+  privileges: [SELECT]
+  queries: [access#mediaTemplateRecords]
+  operations: [printTicketProof]
+  added: '2026-11-02'
+  decision_ref: ADAM CR-447, Chinmay, 1 November 2026 (as recommended); where the stored layout lives and how Orders
+    reads it, the lead, 2 November 2026 ("yes for both")
+  why: 'orders printTicketProof (commerce) renders the stored TicketLayout a ticket template''s layoutRef names, and the
+    ticket designer screen (BO-346, setPdfPrintablePos) saves it in access.media_template.design, Access''s data in the
+    access deployable. The service route between deployables is not built (CR-174), so Orders asks
+    access#mediaTemplateRecords in process, through Access''s own query class, in the caller''s transaction under the
+    caller''s row-level security, as XDR-001 and XDR-002 do. SELECT only; the grant is new.'
+- id: XDR-068
+  reader: operations
+  tables: [tenancy.device_credential, platform.device]
+  privileges: [SELECT]
+  queries: [tenancy#deviceForApiKey]
+  operations: [getSignageQueueBoard, getSignageQueueCalls, submitQueueReading]
+  added: '2026-11-02'
+  decision_ref: ADAM CR-451, Chinmay, 1 November 2026 (as recommended); the sign-in's read, the lead, 2 November 2026
+    ("yes for both")
+  why: 'The device-key sign-in (#37205) verifies an X-Api-Key before any session exists, and the signage and feed
+    operations it serves run in the operations host (VenueOps), while the key (tenancy.device_credential) and its
+    device (platform.device) are Tenancy''s, in commerce. The operations host asks tenancy#deviceForApiKey in process,
+    through Tenancy''s own query class, one statement under the routed tenant''s root grant that answers only the
+    device, its kind and its venue. A read only: the sign-in writes nothing to Tenancy. SELECT on the two tables is
+    new for the operations role. The grant is the role''s, so every apiKeyAuth operation the host serves signs in the
+    same way.'
 - id: XDR-035
   reader: access
   tables: [identity.delegated_access]

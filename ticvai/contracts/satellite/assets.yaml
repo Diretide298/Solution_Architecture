@@ -127,8 +127,10 @@ x-ticvai-queries:
       deployable through VenueOps' service route (serviceAuth).
       **The tenant's library, for White Label's kiosk checks only** (ADAM CR-443, Chinmay, 1 November 2026;
       CHG-CR443-001): for white-label getKioskConfigValidation and publishKioskConfigs (mediaDoesNotFit) the read
-      takes the rows whose venue_id is the kiosk's venue or null (a null venue_id is the tenant's library), in
-      process, for that check only, so a library asset is found; every other asker reads as the caller's scope lets
+      takes the rows whose venue_id is the kiosk's venue or null (a null venue_id is the tenant's library), under the
+      routed tenant's root grant (ITenantRootGrant), filtered in the statement to those, in process, for that check
+      only, as CR-336 and CR-362 did; the caller's grant is in force again for every other statement (the lead, 2
+      November 2026: "yes for both"), so a library asset is found; every other asker reads as the caller's scope lets
       it see them.
     served: [in-process, service]
   # **A guest's identity uploads, as Identity's projection** (r11 gate, 29 October 2026; CHG-R11FXV-001; the lead's

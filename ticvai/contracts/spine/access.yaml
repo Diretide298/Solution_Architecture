@@ -73,6 +73,28 @@ x-ticvai-queries:
   # Rule questions other modules ask Access, answered by the owner (ADR-0055 amendment, 14 October 2026; the shape is
   # the r6 shared convention: module, inputs, returns, rule, served). An asking operation names one in
   # `x-ticvai-read-via`.
+  # **The stored ticket layout, for Orders** (ADAM CR-447; the lead, 2 November 2026, "yes for both"; CHG-CR447-001).
+  # The designer screen BO-346 saves it in access.media_template.design; Orders' printTicketProof renders it.
+  mediaTemplateRecords:
+    module: access
+    table: access.media_template
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The access.media_template rows asked for, by id: a ticket template''s layoutRef.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as designer or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Access stores it, its design document included; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccessMediaTemplate'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October). Access answers with its
+      access.media_template rows, as it stores them and as the caller's scope lets it see them (the table's row-level
+      security, under the caller's connection and transaction). It decides nothing. The stored TicketLayout is the
+      `layout` member of the design document of a template whose designer is pdfPrintablePos, as the ticket designer
+      screen (BO-346, setPdfPrintablePos) saves it, and a ticket template's layoutRef names that template (ADAM CR-447,
+      Chinmay, 1 November 2026; where it lives, the lead, 2 November 2026: "yes for both"; CHG-CR447-001). It is asked
+      in process from commerce by orders printTicketProof, a read the lead granted across deployables
+      (docs/active/cross-deployable-writes.yaml XDR-067, as XDR-001 and XDR-002).
+    served: [in-process]
   mediaEncodingProfileRecords:
     module: access
     table: access.media_encoding_profile
@@ -29611,6 +29633,13 @@ components:
         supportedPrinterIntegration:
           type: string
           description: Supported printer integration
+        layout:
+          allOf:
+          - $ref: ../spine/orders.yaml#/components/schemas/TicketLayout
+          description: 'The ticket layout this design prints (ADAM CR-447; CHG-CR447-001): stored in the design document,
+            named by a ticket template''s layoutRef, read by orders printTicketProof through access#mediaTemplateRecords.
+            The canvas''s own model; nothing the screen shows changes.'
+          x-ticvai-stored-as: access.media_template.design
       required:
       - templateId
       - outputFormat
@@ -29701,6 +29730,13 @@ components:
         supportedPrinterIntegration:
           type: string
           description: Supported printer integration
+        layout:
+          allOf:
+          - $ref: ../spine/orders.yaml#/components/schemas/TicketLayout
+          description: 'The ticket layout this design prints (ADAM CR-447; CHG-CR447-001): stored in the design document,
+            named by a ticket template''s layoutRef, read by orders printTicketProof through access#mediaTemplateRecords.
+            The canvas''s own model; nothing the screen shows changes.'
+          x-ticvai-stored-as: access.media_template.design
       required:
       - templateId
       - outputFormat
