@@ -1,0 +1,36 @@
+id: CHG-R13RVA-004
+date: '2026-11-03'
+source: audit
+kind: process
+summary: The rehearsal's stand-in follows the apply's rule for held tickets. tools/rehearse/simulate.py reopens an On
+  hold ticket only when the lead does not hold it and it has no assignee (a release's deferral); one with an assignee is
+  its developer's hold and is left. A held New ticket goes On hold with the hold comment and loses its assignee and
+  sprint, a held started one is left, and held tickets get no person, sprint, plan-update comment, pointer or new
+  title, as tools/op-release.rb's assign and descriptions phases do.
+decision:
+  what: 'The lead, 3 November 2026, on the review of all 1,582 Block A tickets at the r13 candidate: "why are these
+    coming back again and again?", "get going on those as well so we close it", "you get the rest sorted". Review
+    finding rehearsal-reopens-held: tools/rehearse/simulate.py replays op-release.rb''s held rule (CHG-R8DEC-004) and the
+    developer''s-own-hold rule (r11), with self-tests for each.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 candidate review finding rehearsal-reopens-held: the stand-in reopened every On hold ticket as "Back in the
+  plan" (simulate.py assign step), while op-release.rb never reopens a key in held-tasks.yaml and leaves a ticket its
+  developer holds. 108 of one batch''s 145 tickets are lead-held (backoffice-module-wireframe) and were pulled as New,
+  assigned, with "Back in the plan (release r13)", so the rehearsal pulls of held tickets differed from what production
+  serves, and most of the rehearsal''s status (272) and owner (229) changes came from it.'
+keys_touched:
+  files:
+  - tools/rehearse/simulate.py
+root_class: a replay of the apply that kept an older rule after the apply changed
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 3 November 2026 (r13 candidate review, lane x1)'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/rehearse/simulate.py::self_test
+status: open
