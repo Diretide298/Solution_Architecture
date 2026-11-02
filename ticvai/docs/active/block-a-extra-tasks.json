@@ -2234,7 +2234,7 @@
     "parentId": 27675,
     "assignee": "Hrushikant Patkar",
     "accountable": "Pranay Shinde",
-    "sprint": 1,
+    "sprint": 3,
     "subject": "[CR-477] [DB] Grant the operations role USAGE on orders and SELECT on orders.order_line (guarded)",
     "on": "2026-11-02"
    }
@@ -2261,7 +2261,7 @@
     "parentId": 27674,
     "assignee": "Hrushikant Patkar",
     "accountable": "Hrushikant Patkar",
-    "sprint": 1,
+    "sprint": 3,
     "subject": "[CR-478] [DB] Grant the operations role USAGE on promotions and SELECT on promotion and promotion_rule",
     "on": "2026-11-02"
    }
@@ -2290,7 +2290,7 @@
     "parentId": 30685,
     "assignee": "Pranay Shinde",
     "accountable": "Pranay Shinde",
-    "sprint": 1,
+    "sprint": 3,
     "subject": "[CR-480] [BE] Consumers of order.exchanged: entitlements, capacity and seats move as on a refund",
     "on": "2026-11-02"
    }
@@ -2317,7 +2317,7 @@
     "parentId": 31742,
     "assignee": "Sanket Keluskar",
     "accountable": "Pranay Shinde",
-    "sprint": 1,
+    "sprint": 3,
     "subject": "[CR-482] [BE] Product gains isFeatured and compareAtPrice (the membership card's badge and saving)",
     "on": "2026-11-02"
    }
@@ -2344,7 +2344,7 @@
     "parentId": 30744,
     "assignee": "Hrushikant Patkar",
     "accountable": "Hrushikant Patkar",
-    "sprint": 1,
+    "sprint": 3,
     "subject": "[CR-483] [DB] identity.end_principal_sessions takes the tenant root from the proved scope, raises on none",
     "on": "2026-11-02"
    }
