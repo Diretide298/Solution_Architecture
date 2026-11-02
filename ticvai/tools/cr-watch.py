@@ -76,7 +76,7 @@ STATUSES = ("open", "accepted", "rejected", "done")   # settle_changes.py
 LOCK_HOURS = 2
 DRAFT_MINUTES = 15
 MAX_TRIES = 2                        # a draft that fails this often is answered by hand (fix round 1, I-4)
-MAX_TURNS = "30"                     # the drafting turn's limits (fix round 1, I-4; 12 stopped 11 of the first 27 drafts mid-check, 2 November)
+MAX_TURNS = "12"                     # the drafting turn's limits (fix round 1, I-4)
 MAX_BUDGET_USD = "1.00"
 # What the drafting turn must never read, whatever folder it is in (fix rounds 1 and 2, I-3). Rule paths start with
 # `//` for an absolute path; the home-folder places are built from the home folder, not from a drive letter.
