@@ -43,3 +43,4 @@ prevention:
   type: generator-rule
   ref: tools/build-service-docs.py
 status: open
+notes: AI-SERVER-RUNTIME links the AiService service (builds), so its pull carries the AI server's service document (check-ticket-builds B-BARE-TASK).
