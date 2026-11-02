@@ -370,6 +370,12 @@ function applyMigrations(tables, columns, migrations, problems) {
 
   for (const [ddlName, ddl] of Object.entries(migrations.tables)) {
     const name = byName.has(ddlName) ? ddlName : current(ddlName);
+    // **A table created under its name now keeps that DDL** (TICVAI ADAM CR-436, 2 November 2026). The old name's
+    // CREATE is the record only while nothing creates the table under its current name: control.plan is created by
+    // control/V0108 keyed (id, version) with no row security, and the frozen tenant/010-subscription.sql's
+    // subscription.plan (keyed id, tenant_isolation), read later in file order, overwrote it, so five control tables
+    // showed a policy the control database does not have.
+    if (name !== ddlName && migrations.tables[name]) continue;
     const table = byName.get(name);
     if (!table) {
       // a table in the DDL that the workbook has never heard of

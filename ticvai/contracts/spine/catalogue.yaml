@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 238
+  x-ticvai-screen-count: 240
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -3336,6 +3336,7 @@ paths:
       operationId: listProductVariants
       x-ticvai-consumed-by:
         - "P01 WEB-005 Ticket Type Selection"
+        - "P01 WEB-022 Membership Plans"
         - "P01 WEB-048 Book a Space by the Hour"
         - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-041 Checkout Entry"
@@ -9193,6 +9194,12 @@ paths:
         Product, Price, Availability, Order and Cancellation are buttons on ADM-269, results land in lastTests;
         secrets are never returned; enabling an existing adapter for a new tenant creates a connection that
         references it.
+
+
+        **The stored test results, in the view''s names** (ADAM CR-458, decided by Chinmay on 2 November 2026). Each
+        `lastTests` entry is the stored `catalogue.channel_connection.last_tests` entry with `productSync` answered as
+        `product`, `pricing` as `price` and `orderCreation` as `order`; a `webhook` entry is left out. Where the
+        view''s text says `failed`, the stored `offline` is answered. No screen changes visibly.
 
         **Order.** Sorted by `channel` ascending, then by `adapterId`.'
       tags:
@@ -18545,6 +18552,8 @@ paths:
   /membership-benefits:
     get:
       operationId: listMembershipBenefits
+      x-ticvai-consumed-by:
+        - "P01 WEB-022 Membership Plans"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -18638,6 +18647,8 @@ paths:
   /entitlement-templates/{templateId}/benefits:
     get:
       operationId: getPlanBenefits
+      x-ticvai-consumed-by:
+        - "P01 WEB-022 Membership Plans"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -18817,6 +18828,13 @@ paths:
         plus `segmentRef` for `loyaltyTier` or `customSegment`; `location` needs `locationLevel` and `locationId`. A
         contextual rule has no conditions or actions. Otherwise the call answers `422 contextual-rule-incomplete` and
         writes nothing.
+
+
+        **What the table leaves to this call** (ADAM CR-470, decided by Chinmay on 2 November 2026: the package's
+        statements are what is built). `pricing.dynamic_price_rule.sales_channel` is plain nullable text with no check,
+        so this call refuses a value outside `SalesChannel` with `400 validation` on `salesChannel`.
+        `is_dynamic_pricing_enabled` is boolean DEFAULT true and nullable: this call always writes true or false, true
+        when the body leaves `dynamicPricingEnabled` out, and a reader takes a null as true.
       tags:
       - catalogue
       x-ticvai-permission: PRICE_CONFIGURE
@@ -19586,10 +19604,22 @@ paths:
       description: '**How TICVAI reaches one channel, per environment** (29 September, writers pass). Creates or
         updates a `catalogue.channel_connection`, keyed by `salesChannelId`, `connectorName` and `environment`.
         **Credentials are never sent or stored here**: `credentialsReference` and `certificateReference` name
-        secrets in the vault (`422` `secretNotReference` if a value looks like a secret). A new or changed
+        secrets in the vault (`422` `secretNotReference` if a value is not a vault reference). A new or changed
         connection is saved `notTested`; `testChannelConnection` moves it to `connected` or `degraded`/`offline`.
         `disabled` switches it off. An existing OTA adapter is enabled for a venue by naming its `adapterId`, with
         no rebuild (MoM 31 Aug 2026 §4.3). Written to `catalogue.audit_entry` (`domain: channel`).
+
+
+        **What a vault reference is** (ADAM CR-459, decided by Chinmay on 2 November 2026, option A: one format,
+        checked in one place). `credentialsReference` and `certificateReference`, when not null, are checked with the
+        kernel''s shared vault-reference validator, which takes the caller''s tenant id and the value: the value must be
+        the name of a secret in the cell''s Key Vault namespaced to the tenant, matching
+        `^t-<tenantId>-[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$`, `<tenantId>` the caller''s tenant id as a lowercase uuid
+        with dashes (at most 119 characters). Anything else is `422 secret-not-reference`: `errors[]` names the field,
+        nothing is stored, and the refused value is never echoed in the problem, logged or written to
+        `catalogue.audit_entry`, because it may be a secret. The save does not check that the secret exists, since it
+        may be put in the vault later; `testChannelConnection`''s authentication test checks that it resolves. Reads
+        keep returning the reference: it is a name, not a secret.
 
         '
       tags:
@@ -19638,7 +19668,9 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [secret-not-reference]
-          description: '`secretNotReference`.'
+          description: '`secretNotReference`: `credentialsReference` or `certificateReference` is not a vault reference
+            under the CR-459 rule (`errors[]` names the field); nothing is stored and the refused value is never echoed,
+            logged or audited (ADAM CR-459).'
           content:
             application/problem+json:
               schema:
@@ -19663,6 +19695,40 @@ paths:
         overall `connectionStatus` (`connected`, `degraded` or `offline`) on the `catalogue.channel_connection`.
         A test in `production` sends no order and no booking: order tests run only in `sandbox` or `uat`
         (`422` `orderTestInProduction`). A `disabled` connection is not tested (`409` `connectionDisabled`).
+
+
+        **What each test does, and the status it gives** (ADAM CR-458, decided by Chinmay on 2 November 2026, option
+        B, with the result values `ChannelConnectionIntegrationManagerView.lastTests` already lists).
+
+        - **Which tests apply.** `ticvaiNative` has none (no call is made, and the status is `connected`). `fileSftp`
+        gets `connectivity` and `authentication`. A connection whose `direction` is `inbound` gets `authentication`
+        only. Every other `connectionType` gets all eight. Leaving `tests` out means all that apply, minus
+        `orderCreation` and `cancellation` in `production`; naming either of those in `production` stays `422
+        order-test-in-production`, and a `disabled` connection stays `409 connection-disabled`.
+
+        - **connectivity.** The endpoint must be `https` (`sftp` for `fileSftp`). Its host is resolved, and the test
+        fails with detail ''endpoint address not allowed'' for a loopback, private, link-local or cloud metadata address,
+        so the probe can never reach inside our network. One request is made with no credentials and no redirects
+        followed (`HEAD`, or a TCP connect for `sftp`) within `timeoutMs`, or 10000 ms when that is null. Any HTTP
+        answer over a valid TLS handshake passes; a DNS, TLS, refused or timed-out call fails.
+
+        - **authentication.** Not run when `authenticationType` is `none`. Otherwise it passes when
+        `credentialsReference` (and `certificateReference` for `certificate`) is a valid vault reference under the
+        CR-459 rule (`setChannelConnectionConfiguration`), resolves in the secret store (`ISecretStore`, with a test
+        double until the store lands; the value never enters the answer, a log or an audit entry), and, for
+        `certificate`, `certificateExpiresAt` is in the future. Its detail reads ''Credential found; the partner''s
+        sign-in is checked once its connector exists''.
+
+        - **productSync, availability, pricing, orderCreation, cancellation and webhook** answer `notSupported` with
+        detail ''No connector for <connectionType> yet''.
+
+        - **connectionStatus**, from the latest entries: `offline` if `connectivity` or `authentication` failed;
+        otherwise `degraded` if any test failed; otherwise `connected`. `notSupported` counts as neither.
+
+        - **What is written.** Each test run replaces that test''s earlier `lastTests` entry; tests not run this time
+        keep their last entry. `last_tests`, `connection_status` and `updated_at`, plus one `catalogue.audit_entry`
+        (domain `channel`, action `test`, result `success` or `failure`), in one transaction; the answer is `200` with
+        the connection.
 
         '
       tags:
@@ -19804,6 +19870,22 @@ paths:
         `eligibilityEffect` (`422` `eligibilityIncomplete`); a product-level rule on a product that already
         has one for the same `ruleKind` and window needs `overridesProductRule` (`409` `ruleConflict`).
 
+
+        **When a save conflicts** (ADAM CR-466, decided by Chinmay on 2 November 2026: option A as built, with two
+        corrections from earlier decisions). Saving an active rule (`isActive` true) that has a `productId` and
+        `overridesProductRule` false is refused with `409 rule-conflict`, and nothing is stored, when another active
+        `catalogue.channel_sales_rule` (not the one being replaced) has the same `sales_channel_id`, `product_id` and
+        `rule_kind` and an overlapping effective window. `ruleLevel` plays no part: CR-411 already reads a
+        product-level rule as a row with a product. Windows are instants: a null `effective_from` means from when that
+        rule was saved (its `created_at`, or now for the rule being saved), not open to the past (CR-414); a null
+        `effective_to` is open-ended; two windows overlap when each starts before the other ends. A save with
+        `isActive` false never conflicts, so a rule can always be switched off, and `overridesProductRule` true lets
+        the save through. Before the check the save takes a transaction lock on the sales channel, product and rule
+        kind (`pg_advisory_xact_lock` on a hash of the three), so two saves at once cannot both pass. The problem''s
+        `detail` names the id of the rule it collides with. A rule with no `productId` never gets this 409;
+        `listChannelSaleSchedule`''s conflicts count (CR-411) still shows a channel-wide rule overlapping a product
+        rule.
+
         '
       tags:
       - catalogue
@@ -19839,7 +19921,9 @@ paths:
                 $ref: '#/components/schemas/ChannelSalesRule'
         '409':
           x-ticvai-problem-types: [rule-conflict]
-          description: '`ruleConflict`.'
+          description: '`ruleConflict`: another active rule on the same channel, product and rule kind has an
+            overlapping effective window, and `overridesProductRule` is false; `detail` names that rule''s id and
+            nothing is stored (ADAM CR-466).'
           content:
             application/problem+json:
               schema:
@@ -19960,12 +20044,28 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ChannelIncident.businessImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      x-ticvai-emits:
+      - catalogue.channelIncidentRetryRequested
       summary: Retry the failed channel call behind an incident
       description: '**Retry, as a call** (29 September, writers pass). Moves an `open` or `investigating`
         `catalogue.channel_incident` to `retrying`, increments `retryCount` and queues the failed call again with
         the same idempotency reference, so a partner that did receive the first call does not book twice. The job
         moves it to `resolved` on success or back to `investigating` on failure. A `resolved` or `closed`
         incident answers `409` `notRetryable`.
+
+
+        **The retry is a fact written to the outbox and carried out by a job** (ADAM CR-457, decided by Chinmay on 2
+        November 2026, option A). In one transaction: an incident that is `resolved` or `closed` answers `409
+        not-retryable` and nothing changes. Otherwise the `catalogue.channel_incident` moves to `retrying`,
+        `retry_count` goes up by 1 and `updated_at` is set; where `api_request_reference` is null it is set to the
+        incident''s id as text, so this retry and every later one share one reference. One `catalogue.audit_entry` is
+        written (domain `channel`, action `retry`, entity_type `channelIncident`, entity_id the incident) and one
+        `platform.outbox` row for `catalogue.channelIncidentRetryRequested` v1 (aggregate `channelIncident`,
+        aggregateId the incident''s id). The answer is `202` with the incident. **Catalogue''s channel retry job** (the
+        workers host) consumes the event and sends the call again (`events/catalogue-channelIncidentRetryRequested.yaml`
+        says how): `apiRequestReference` is the partner''s idempotency reference, `correlationId` only finds the
+        original call''s trace and is never sent to the partner. An incident is never marked `resolved` without a
+        partner''s success.
 
         '
       tags:
@@ -19995,7 +20095,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [not-retryable]
-          description: '`notRetryable`.'
+          description: '`notRetryable`: the incident is `resolved` or `closed`, and nothing changes (ADAM CR-457).'
           content:
             application/problem+json:
               schema:
@@ -25489,6 +25589,23 @@ components:
             `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on
             input. Null where no price list prices it on that channel, and null from every other operation that answers
             `Product` for now.'
+        isFeatured:
+          type: boolean
+          default: false
+          description: '**The plan card''s Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026):
+            the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct`
+            and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured
+            plan.'
+        compareAtPrice:
+          x-ticvai-column: compare_at_amount
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: '**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan
+            card''s saving. Stored on `catalogue.product` as `compare_at_amount` in the venue''s trading currency, set by
+            `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving
+            as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a
+            made-up value.'
         nameLocalised:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
@@ -25933,6 +26050,15 @@ components:
             (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`.
         requiresTimeWindow:
           type: boolean
+        isFeatured:
+          type: boolean
+          description: Marks the product featured, the plan card's Most popular badge (`Product.isFeatured`; ADAM CR-482).
+        compareAtPrice:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: What the same visits cost bought singly, behind the plan card's saving (`Product.compareAtPrice`;
+            ADAM CR-482).
     UpdateProductRequest:
       type: object
       minProperties: 1
@@ -26011,6 +26137,15 @@ components:
             (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`.
         requiresTimeWindow:
           type: boolean
+        isFeatured:
+          type: boolean
+          description: Marks the product featured, the plan card's Most popular badge (`Product.isFeatured`; ADAM CR-482).
+        compareAtPrice:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: What the same visits cost bought singly, behind the plan card's saving (`Product.compareAtPrice`;
+            ADAM CR-482).
     VariantDimension:
       x-ticvai-persistence: catalogue.variant_dimension
       type: object
@@ -27146,21 +27281,25 @@ components:
           description: 'A `percentage` allocation''s share of the capacity, 0 to 100 (ADAM CR-412; the column is
             envelope_percent, naming-and-style 3: Envelope, not Allocation, in DDL): required there,
             and `setChannelAllocations` sets `allocatedUnits` to the floor of capacity x percent / 100. Null for the
-            other types.'
+            other types. The 0 to 100 rule is `setChannelAllocations`'' `400 validation` from this minimum and
+            maximum: the column is numeric(18,4), nullable, with no range check (ADAM CR-461, decided by Chinmay on 2
+            November 2026).'
         releasedUnits:
           type: integer
           minimum: 0
           default: 0
           readOnly: true
-          description: Units the allocation release job gave back to the general pool, added in the same transaction as
-            each release (ADAM CR-412).
+          description: 'Units the allocation release job gave back to the general pool, added in the same transaction as
+            each release (ADAM CR-412). The column is integer DEFAULT 0 and nullable (ADAM CR-461): a reader takes a
+            null count as 0.'
         returnedUnits:
           type: integer
           minimum: 0
           default: 0
           readOnly: true
-          description: Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction
-            as each release (ADAM CR-412).
+          description: 'Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction
+            as each release (ADAM CR-412). The column is integer DEFAULT 0 and nullable (ADAM CR-461): a reader takes a
+            null count as 0.'
     ChannelAllocationSet:
       x-ticvai-persistence: none — projection
       type: object
@@ -43798,11 +43937,21 @@ components:
           type: string
           maxLength: 200
           nullable: true
-          description: A vault reference, never the secret.
+          description: 'A vault reference, never the secret. **One format for every vault reference, checked in one
+            place** (ADAM CR-459, decided by Chinmay on 2 November 2026): the name of a secret in the cell''s Key Vault
+            (what ADR-0063 says the row keeps), namespaced to the tenant, accepted only when it matches
+            `^t-<tenantId>-[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$`, where `<tenantId>` is the caller''s tenant id as a
+            lowercase uuid with dashes: at most 119 characters, inside Key Vault''s 127 and the column''s 200. The rule
+            is built once, as a shared validator in the kernel that takes the tenant id and the value, so every vault
+            reference a caller types uses it, and the secret store names the secrets it writes in the same form.
+            Anything else is `422 secret-not-reference` on `setChannelConnectionConfiguration`. Returned on reads: it is
+            a name, not a secret.'
         certificateReference:
           type: string
           maxLength: 200
           nullable: true
+          description: 'A vault reference for the certificate, under the same rule as `credentialsReference` (ADAM
+            CR-459).'
         certificateExpiresAt:
           type: string
           format: date-time
@@ -43838,10 +43987,46 @@ components:
           - disabled
           default: notTested
         lastTests:
-          type: object
-          additionalProperties: true
+          type: array
           readOnly: true
-          description: '`[{test, result, testedAt}]`, the latest result per test.'
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: 'The latest result per test (ADAM CR-458, decided by Chinmay on 2 November 2026): each run
+            replaces that test''s entry, and a test not run keeps its last one. Stored as the jsonb list it was
+            (`catalogue.channel_connection.last_tests`), so no migration. `testChannelConnection` says what each test
+            does.'
+          items:
+            type: object
+            required:
+            - test
+            - result
+            - testedAt
+            properties:
+              test:
+                type: string
+                enum:
+                - connectivity
+                - authentication
+                - productSync
+                - availability
+                - pricing
+                - orderCreation
+                - cancellation
+                - webhook
+              result:
+                type: string
+                enum:
+                - passed
+                - failed
+                - notSupported
+                description: The values `ChannelConnectionIntegrationManagerView.lastTests` already lists.
+              testedAt:
+                type: string
+                format: date-time
+              detail:
+                type: string
+                nullable: true
+                description: One plain sentence, never a secret and never a partner's response body.
         createdAt:
           type: string
           format: date-time

@@ -397,6 +397,26 @@ And one rule per decision:
   BR-MERCH-LIVE-PRICE (r13, ADAM CR-478, CHG-CR478-001) lookupMerchandise asks tenancy#workstationRecords and
                    promotions#liveEffectivePrice in process; liveEffectivePrice is served in process, reads promotion
                    and promotion_rule, and runs evaluatePromotions' code; XDR-072 grants the two tables.
+  r13, lane o (ADAM CR-436 to CR-482, decided 1 and 2 November 2026; channel_rules_r13), each failing on the r12 package
+  but the last, which holds a condition r12 already met:
+  BR-AUDIT-READ-NULLABLE (CR-436, CHG-CR436-001) AuditRead does not require readAt or target: the SQL adds both nullable
+                   and the table record follows the SQL.
+  BR-REFUND-POLICY-SCOPE (CR-454, CHG-CR454-001) RefundCalculationPolicyView.scopePath stays required and states the
+                   backfill from the tenant root, then SET NOT NULL.
+  BR-CHANNEL-RETRY (CR-457, CHG-CR457-001) retryChannelIncident emits catalogue.channelIncidentRetryRequested, whose
+                   event names Catalogue's channel retry job (incidentId+retryCount, never resolved without a success).
+  BR-CHANNEL-TESTS (CR-458, CHG-CR458-001) ChannelConnection.lastTests is an array of {test, result, testedAt, detail};
+                   testChannelConnection states the tests per type, the address guard and the status rule;
+                   listChannelConnectionIntegration maps the stored names to the view's.
+  BR-VAULT-REFERENCE (CR-459, CHG-CR459-001) the one vault-reference format, checked by the kernel's shared validator,
+                   with 422 secret-not-reference that never echoes the value.
+  BR-CHANNEL-RULE-CONFLICT (CR-466, CHG-CR466-001) setChannelSalesRule's 409 rule-conflict: same channel, product and
+                   kind, overlapping instants (CR-414), never on a switch-off, under an advisory lock.
+  BR-R12-DB-STATEMENTS (CR-461, CR-470, CHG-CR461-001) what the r12 [DB] tickets left to the operations and the NOT NULL
+                   the package means for seating.section.seat_map_id and seating.seat_map_template.
+  BR-MEMBERSHIP-PLAN-PAGE (CR-482, CHG-CR482-001) Product.isFeatured and compareAtPrice (compare_at_amount), set on
+                   create and update; WEB-022 sells through the cart and goes on to WEB-011.
+  BR-WEB035-PRICE-CARDS (CR-473, CHG-CR473-001) WEB-035 keeps CR-358's Prices in your currency cards on listProducts.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2777,6 +2797,7 @@ def main() -> int:
          "XDR-072 does not grant the operations role SELECT on promotions.promotion and promotion_rule (CR-478)")
     need("BR-MERCH-LIVE-PRICE", "one item per merchandise (`itemRef` the merchandise id, `unitPrice` its list price)"
          in w13(lkm.get("description")), "lookupMerchandise does not state liveEffectivePrice's inputs (CR-478)")
+    channel_rules_r13(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2819,7 +2840,7 @@ def main() -> int:
              "BR-VARIANT-PRICE", "BR-ELASTICITY-LABELS", "BR-CHANGE-IMPACT", "BR-PRODUCT-WORKFLOW", "BR-FEE-INSTANTS",
              "BR-SEAT-RULE-OVERLAP", "BR-TAX-PROFILE-LIST",
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
-             "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE"] + LANE_Q_R13_RULES
+             "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE"] + LANE_Q_R13_RULES + R13_O_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -3249,6 +3270,143 @@ def lane_q_rules_r13(need, op):
              "order event's consumers (CHG-R13ORD-001)")
     need("BR-ORDER-SETTLEMENT", "modifyOrder" in str(ev.get("emittedWhen")) and "rescheduleOrder" in str(ev.get("emittedWhen")),
          "events/order-exchanged.yaml is not emitted by modifyOrder and rescheduleOrder (CHG-R13ORD-001)")
+
+R13_O_RULES = ["BR-AUDIT-READ-NULLABLE", "BR-REFUND-POLICY-SCOPE", "BR-CHANNEL-RETRY", "BR-CHANNEL-TESTS",
+               "BR-VAULT-REFERENCE", "BR-CHANNEL-RULE-CONFLICT", "BR-R12-DB-STATEMENTS", "BR-MEMBERSHIP-PLAN-PAGE",
+               "BR-WEB035-PRICE-CARDS"]
+
+
+def channel_rules_r13(need, op):
+    """r13 lane o (ADAM CR-436 to CR-482, decided by Chinmay on 1 and 2 November 2026). Each fails on the r12 package but
+    BR-WEB035-PRICE-CARDS, which holds CR-473's condition (the CR-358 cards stay)."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    cat = schemas("contracts/spine/catalogue.yaml")
+
+    # BR-AUDIT-READ-NULLABLE (CR-436)
+    ar = schemas("contracts/spine/tenancy.yaml").get("AuditRead") or {}
+    need("BR-AUDIT-READ-NULLABLE", not ({"readAt", "target"} & set(ar.get("required") or [])),
+         "AuditRead requires readAt or target, so the table record says NOT NULL where the SQL adds them nullable (CR-436)")
+
+    # BR-REFUND-POLICY-SCOPE (CR-454)
+    rcp = schemas("contracts/spine/orders.yaml").get("RefundCalculationPolicyView") or {}
+    rsd = words(((rcp.get("properties") or {}).get("scopePath") or {}).get("description"))
+    need("BR-REFUND-POLICY-SCOPE", "scopePath" in (rcp.get("required") or [])
+         and "WHERE level = 'tenant'" in rsd and "SET NOT NULL" in rsd,
+         "RefundCalculationPolicyView.scopePath does not stay required and state the backfill from the tenant root, then "
+         "SET NOT NULL (CR-454)")
+
+    # BR-CHANNEL-RETRY (CR-457)
+    rci = op("retryChannelIncident")[3]
+    need("BR-CHANNEL-RETRY", "catalogue.channelIncidentRetryRequested" in (rci.get("x-ticvai-emits") or []),
+         "retryChannelIncident does not emit catalogue.channelIncidentRetryRequested (CR-457)")
+    rcd = words(rci.get("description"))
+    for frag in ("id as text", "action `retry`", "never marked `resolved` without"):
+        need("BR-CHANNEL-RETRY", frag in rcd, f"retryChannelIncident does not say {frag!r} (CR-457)")
+    ev = load("events/catalogue-channelIncidentRetryRequested.yaml")
+    cons = [c for c in ev.get("consumers") or [] if (c or {}).get("context") == "catalogue"]
+    need("BR-CHANNEL-RETRY", ev.get("emittedBy") == ["retryChannelIncident"] and cons
+         and cons[0].get("idempotencyKey") == "incidentId+retryCount"
+         and "connectorNotAvailable" in words(cons[0].get("purpose")) and "retryNotDelivered" in words(cons[0].get("purpose"))
+         and {"catalogue.channel_incident", "catalogue.audit_entry"} <= set(cons[0].get("writes") or []),
+         "events/catalogue-channelIncidentRetryRequested.yaml does not name the channel retry job as CR-457 decided")
+    need("BR-CHANNEL-RETRY", {p.get("field") for p in ev.get("payload") or []} >= {
+        "incidentId", "salesChannelId", "channelConnectionId", "errorType", "apiRequestReference", "correlationId",
+        "retryCount", "requestedByPrincipalId"},
+         "catalogue.channelIncidentRetryRequested does not carry CR-457's payload")
+
+    # BR-CHANNEL-TESTS (CR-458)
+    lt = ((cat.get("ChannelConnection") or {}).get("properties") or {}).get("lastTests") or {}
+    need("BR-CHANNEL-TESTS", lt.get("type") == "array"
+         and set(((lt.get("items") or {}).get("properties") or {})) == {"test", "result", "testedAt", "detail"}
+         and (((lt.get("items") or {}).get("properties") or {}).get("result") or {}).get("enum") == ["passed", "failed", "notSupported"],
+         "ChannelConnection.lastTests is not an array of {test, result, testedAt, detail} with passed, failed, notSupported (CR-458)")
+    tcd = words(op("testChannelConnection")[3].get("description"))
+    for frag in ("`ticvaiNative` has none", "`authentication` only", "endpoint address not allowed", "no redirects",
+                 "10000 ms", "Credential found", "No connector for <connectionType> yet", "`notSupported` counts as neither",
+                 "action `test`"):
+        need("BR-CHANNEL-TESTS", frag in tcd, f"testChannelConnection does not say {frag!r} (CR-458)")
+    lcd = words(op("listChannelConnectionIntegration")[3].get("description"))
+    need("BR-CHANNEL-TESTS", "`productSync` answered as `product`" in lcd and "`webhook` entry is left out" in lcd
+         and "stored `offline`" in lcd,
+         "listChannelConnectionIntegration does not map the stored test names and status to the view's (CR-458)")
+
+    # BR-VAULT-REFERENCE (CR-459)
+    rx = "^t-<tenantId>-[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$"
+    scc = op("setChannelConnectionConfiguration")[3]
+    cr = words(((cat.get("ChannelConnection") or {}).get("properties") or {}).get("credentialsReference", {}).get("description"))
+    need("BR-VAULT-REFERENCE", rx in words(scc.get("description")) and rx in cr and "shared validator in the kernel" in cr,
+         "the vault-reference format is not stated once for the kernel's shared validator and on "
+         "setChannelConnectionConfiguration (CR-459)")
+    need("BR-VAULT-REFERENCE", "secret-not-reference" in ptypes(scc, "422") and "never echoed" in words(scc.get("description")),
+         "setChannelConnectionConfiguration does not answer 422 secret-not-reference without echoing the value (CR-459)")
+
+    # BR-CHANNEL-RULE-CONFLICT (CR-466)
+    csr = op("setChannelSalesRule")[3]
+    cd = words(csr.get("description"))
+    for frag in ("`ruleLevel` plays no part", "not open to the past (CR-414)", "`isActive` false never conflicts",
+                 "pg_advisory_xact_lock", "names the id of the rule it collides with"):
+        need("BR-CHANNEL-RULE-CONFLICT", frag in cd, f"setChannelSalesRule does not say {frag!r} (CR-466)")
+    need("BR-CHANNEL-RULE-CONFLICT", "rule-conflict" in ptypes(csr, "409"),
+         "setChannelSalesRule does not answer 409 rule-conflict (CR-466)")
+
+    # BR-R12-DB-STATEMENTS (CR-461, CR-470)
+    seat = schemas("contracts/satellite/seating.yaml")
+    smd = words(((seat.get("Section") or {}).get("properties") or {}).get("seatMapId", {}).get("description"))
+    order = ["if the table holds any row, stop", "then `SET NOT NULL`", "`section_seat_map_id_fkey`",
+             "`section_seat_map_id_idx`", "`section_seat_map_id_code_uniq`"]
+    at, pos = [], 0
+    for f in order:   # each step after the one before it
+        pos = smd.find(f, max(pos, 0))
+        at.append(pos)
+    need("BR-R12-DB-STATEMENTS", all(i >= 0 for i in at),
+         "Section.seatMapId does not give CR-470's guarded migration in its order (guard, NOT NULL, key, index, unique)")
+    tpl = seat.get("SeatMapTemplate") or {}
+    std = words(((tpl.get("properties") or {}).get("structure") or {}).get("description"))
+    need("BR-R12-DB-STATEMENTS", {"structure", "scopePath"} <= set(tpl.get("required") or [])
+         and "NOT NULL" in std and "from `region_id` first" in std,
+         "SeatMapTemplate does not keep structure and scope_path NOT NULL with CR-461's migration rule")
+    dpd = words(op("setDynamicPriceRule")[3].get("description"))
+    need("BR-R12-DB-STATEMENTS", "`400 validation` on `salesChannel`" in dpd and "a reader takes a null as true" in dpd,
+         "setDynamicPriceRule does not say what pricing.dynamic_price_rule leaves to it (CR-470)")
+    ca = (cat.get("ChannelAllocation") or {}).get("properties") or {}
+    need("BR-R12-DB-STATEMENTS", all("a reader takes a null count as 0" in words((ca.get(k) or {}).get("description"))
+                                     for k in ("releasedUnits", "returnedUnits")),
+         "ChannelAllocation's released and returned counts do not say a reader takes a null as 0 (CR-461)")
+
+    # BR-MEMBERSHIP-PLAN-PAGE (CR-482)
+    pp = (cat.get("Product") or {}).get("properties") or {}
+    need("BR-MEMBERSHIP-PLAN-PAGE", (pp.get("isFeatured") or {}).get("type") == "boolean"
+         and (pp.get("isFeatured") or {}).get("default") is False
+         and (pp.get("compareAtPrice") or {}).get("x-ticvai-column") == "compare_at_amount"
+         and (pp.get("compareAtPrice") or {}).get("nullable") is True,
+         "Product has no isFeatured (boolean, default false) or compareAtPrice (Money, nullable, compare_at_amount) (CR-482)")
+    for req in ("CreateProductRequest", "UpdateProductRequest"):
+        need("BR-MEMBERSHIP-PLAN-PAGE", {"isFeatured", "compareAtPrice"} <= set(((cat.get(req) or {}).get("properties") or {})),
+             f"{req} does not take isFeatured and compareAtPrice (CR-482)")
+    p01 = load("screens/P01-guest-web-storefront.yaml").get("screens") or []
+    scr = next((x for x in p01 if (x or {}).get("id") == "WEB-022"), {})
+    apis = {a.get("operationId") for a in scr.get("apis") or []}
+    need("BR-MEMBERSHIP-PLAN-PAGE", {"getPlanBenefits", "listMembershipBenefits", "listProductVariants", "createCart",
+                                     "addCartLine", "updateCartLine", "removeCartLine", "getCart",
+                                     "getPublishedBookingFlow"} <= apis
+         and "WEB-011" in ((scr.get("navigation") or {}).get("exitTo") or []),
+         "WEB-022 does not sell through the cart and go on into the membership booking flow (CR-482)")
+
+    # BR-WEB035-PRICE-CARDS (CR-473)
+    w35 = next((x for x in p01 if (x or {}).get("id") == "WEB-035"), {})
+    cards = [c for r in ((w35.get("layout") or {}).get("regions") or []) for c in (r or {}).get("components") or []
+             if (c or {}).get("label") == "Prices in your currency"]
+    need("BR-WEB035-PRICE-CARDS", bool(cards) and cards[0].get("operation") == "listProducts"
+         and "Product.fromPrice" in (cards[0].get("columns") or []),
+         "WEB-035 no longer has CR-358's Prices in your currency cards on listProducts (CR-473's condition)")
 
 
 if __name__ == "__main__":

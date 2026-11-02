@@ -1,0 +1,68 @@
+id: CHG-CR482-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'WEB-022 Membership Plans keeps the client-verified frame, basket included, and binds the operations that
+  already exist: cards from listProducts with fromPrice and the displayTags term line; What you get from
+  getPlanBenefits (by entitlementTemplateId) and listMembershipBenefits, ticks and dashes; Choose <plan> through
+  listProductVariants, createCart, addCartLine, updateCartLine and removeCartLine; the right panel Your membership is
+  getCart (membership lines, subtotal, VAT from taxTotal, total), with Continue off until a membership line is in it;
+  Continue goes on into the membership booking flow (getPublishedBookingFlow), WEB-011 a new exit; productId selects a
+  card (getProduct); getMyMemberships marks a held plan. Product gains isFeatured (boolean, default false) and
+  compareAtPrice (Money, nullable), stored as is_featured and compare_at_amount, set by createProduct and updateProduct,
+  returned by listProducts and getProduct: the Most popular badge and the saving, shown only once built.'
+decision:
+  what: 'ADAM CR-482, posted on #31742: "Decided (Chinmay, 2 November 2026): not as recommended. The page keeps the
+    client-verified frame, basket included, because the package does not change approved UI and every part of the frame
+    except two already has an operation. Build now on #31742 ... The ''Most popular'' badge and the ''Saves ... vs paying
+    per visit'' line have no field yet. They come from a new ticket: Product gains isFeatured (boolean, default false)
+    and compareAtPrice (Money, nullable ...), stored on catalogue.product as is_featured and compare_at_amount, set by
+    createProduct and updateProduct, and returned by listProducts and getProduct ... Until that ticket is built, the
+    cards show neither, never a made-up value. WEB-022''s screen record, its approved-UI entry and its page info are
+    brought in line with the frame at the next release." The lead''s "approve all as a recommended", 2 November 2026.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-482 (Chitrangi Mestry, #31742 WEB-022): the client-verified rev 3 frame (REV3, Summit Peaks, Annual pass /
+  membership) draws a purchase page with a basket, and the screen record bound no cart operation, Product carried none
+  of the badge or saving, and the cards did not bind fromPrice. The review found the purchase (the membership booking
+  flow and the cart operations, as on WEB-005, WEB-006 and WEB-010), the benefits (getPlanBenefits,
+  listMembershipBenefits), the term line (displayTags) and the price (CR-358) already in the package; only the badge and
+  the saving need fields.'
+keys_touched:
+  screens: [WEB-022]
+  operations: [listProducts, getProduct, getMyMemberships, getPlanBenefits, listMembershipBenefits, listProductVariants,
+               createCart, addCartLine, updateCartLine, removeCartLine, getCart, getPublishedBookingFlow, createProduct,
+               updateProduct]
+  schemas: [Product, CreateProductRequest, UpdateProductRequest]
+  tables: [catalogue.product]
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-business-rules.py
+root_class: 'an approved frame''s purchase and basket that the screen record never bound, though the operations exist'
+tickets:
+  started:
+  - '31742 (WEB-022 build, Chitrangi Mestry): build the cards, What you get, Choose, the basket and Continue as posted;
+    show no badge and no saving until the product fields are built.'
+  unstarted:
+  - '37213 (Product isFeatured and compareAtPrice, made by hand on 1-2 November): the two fields, the two columns, set on
+    create and update, returned on the two reads.'
+  - '31743, 31744 ([FE] WEB-022 connect to API, tests): the thirteen operations at their next pull.'
+  - '31652 (createProduct), 30950 (updateProduct), 31009 (listProducts), 31727 (getProduct): the two optional fields at
+    their next pull, by #37213.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-482
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MEMBERSHIP-PLAN-PAGE
+status: open
+notes: '**Design change: WEB-022 is the plan step of the membership booking flow, drawn as the client-verified frame
+  draws it** (the lead''s own design decision; the frame is kept, the record follows it). The cards'' columns gain
+  fromPrice, displayTags, isFeatured and compareAtPrice; the right panel''s two detail panels (getProduct,
+  getMyMemberships) become the basket, and those two reads now drive the card selection and the held-plan mark.
+  docs/active/approved-ui-changes.yaml records the changed fields against the client-verified frame and CR-482. The
+  frame (wireframes/frames/web-022.html, the rev 3 capture) is unchanged. The page info (design-r1) is generated from
+  screens/ and follows at the next design batch rebuild.'

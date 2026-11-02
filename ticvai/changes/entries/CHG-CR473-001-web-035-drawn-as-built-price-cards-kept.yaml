@@ -1,0 +1,57 @@
+id: CHG-CR473-001
+date: '2026-11-02'
+source: cr
+kind: spec
+summary: 'WEB-035 Prices in your currency is drawn and specified as the guest-web build on #32309: the coins icon in a
+  tinted tile beside a larger heading and lead, a faded skyline at the top right on wide screens, currency chips with a
+  round flag (two initials where none is drawn) and the picked chip in the brand colour, How you pay in a tinted box with
+  a wallet icon, Exchange rates in use as a bold title with each row''s flag, pair, approx. tag and rate pill, and the
+  Rates as of footnote under a divider with an info icon; colours from the tenant''s tokens, flags their own. The
+  condition: the CR-358 Prices in your currency cards stay, in the new style. Same operations, fields and states.'
+decision:
+  what: 'ADAM CR-473, posted on #32309: "Decided (Chinmay, 2 November 2026): as you recommended, with one condition.
+    Design change, logged under the rule of 28 October 2026. WEB-035''s wireframe, screen UI and page info are updated
+    to match the build on #32309 ... The condition: the page keeps the Prices in your currency cards CR-358 decided
+    (listProducts: Product.name, fromPrice as the price charged, and fromPrice converted at the selected rate as the price
+    shown, marked approx. where the selected currency is not chargeable) ... if the build dropped those cards, put them
+    back in the new style. Nothing else comes back. Build now: nothing else changes behind the screen."
+    wireframes/frames/web-035.html: the frame redrawn from the CR''s description of the build in the guest-web tokens
+    (the prototype capture it held is replaced), with loading, error, a not-chargeable currency, offline and Arabic.
+    screens/P01 WEB-035: notes, the How you pay note, wireframe.prototype.differences, match partial.
+    tools/capture-plans/guest-web-v2.json: WEB-035 is not captured from the prototype. The lead''s "approve all as a
+    recommended", 2 November 2026.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-473 (Chitrangi Mestry, #32309 WEB-035): the build differs from the client-verified frame in look only.
+  The lead''s rule of 28 October 2026 (frontend starter, 28eb978d): a frontend developer changes a screen''s design and
+  logs it, and the lead updates the wireframe, the screen''s UI and its page info (precedents CHG-CR349-001,
+  CHG-CR351-001). The CR names only the two listFxRates reads, so the condition keeps CR-358''s cards
+  (CHG-CR358-001).'
+keys_touched:
+  screens: [WEB-035]
+  operations: [listFxRates, listProducts]
+  files:
+  - wireframes/frames/web-035.html
+  - screens/P01-guest-web-storefront.yaml
+  - tools/capture-plans/guest-web-v2.json
+  - tools/check-business-rules.py
+root_class: a frontend design change logged after the build, brought back into the package's frame and screen record
+tickets:
+  started:
+  - '32309 (WEB-035, Chitrangi Mestry): keep the Prices in your currency cards (Product.name, fromPrice charged, the
+    converted price shown, approx. where not chargeable) in the new style; put them back if the build dropped them.
+    Nothing else.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-473
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: '**Design change: WEB-035 restyled as built (flag chips, wallet banner, rate pills, skyline header).** No visible
+  field of the screen record changed (the regions, columns and states are as approved), so
+  docs/active/approved-ui-changes.yaml needs no entry. tools/check-business-rules.py BR-WEB035-PRICE-CARDS holds the
+  condition: the price cards stay on listProducts with Product.fromPrice. The skyline is decoration in the tenant''s
+  tokens, hidden below wide screens, and needs nothing from the back end.'

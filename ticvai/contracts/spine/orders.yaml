@@ -513,6 +513,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-022 Membership Plans"
         - "P01 WEB-048 Book a Space by the Hour"
         - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-041 Checkout Entry"
@@ -3890,6 +3891,7 @@ paths:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-022 Membership Plans"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
@@ -4034,6 +4036,7 @@ paths:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-008 Add-ons & Upsell"
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-022 Membership Plans"
         - "P01 WEB-033 Shop"
         - "P01 WEB-036 F&B – Browse & Order"
         - "P01 WEB-041 Parking – Reserve & Pay"
@@ -4266,6 +4269,7 @@ paths:
       operationId: updateCartLine
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-022 Membership Plans"
         - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-read-via:
@@ -4362,6 +4366,7 @@ paths:
       operationId: removeCartLine
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-022 Membership Plans"
         - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-read-via:
@@ -19329,7 +19334,15 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).
+
+
+            **NOT NULL, reached by a backfill** (ADAM CR-454, decided by Chinmay on 1 November 2026, option A): tenant
+            V0104 added the column nullable (a derived forward file never adds NOT NULL), so a new forward migration
+            backfills it from the tenant root where it is null, `UPDATE orders.refund_calculation_policy SET scope_path =
+            (SELECT path FROM platform.scope WHERE level = ''tenant'') WHERE scope_path IS NULL`, then sets it `ALTER TABLE
+            orders.refund_calculation_policy ALTER COLUMN scope_path SET NOT NULL`, as db/tenant/089 did for invitation
+            and ticket_template. The table record stays required (handoff/migration-review.md lists the step).'
         id:
           type: string
           format: uuid

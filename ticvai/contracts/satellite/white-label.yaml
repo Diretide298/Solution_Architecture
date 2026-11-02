@@ -6828,6 +6828,7 @@ paths:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-012 Checkout — Payment"
+        - "P01 WEB-022 Membership Plans"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-009 Review & Payment"
