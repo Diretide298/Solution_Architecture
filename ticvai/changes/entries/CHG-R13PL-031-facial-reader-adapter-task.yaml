@@ -1,0 +1,45 @@
+id: CHG-R13PL-031
+date: '2026-11-02'
+source: plan
+kind: plan
+proposed: '2026-11-02'
+summary: ADR-0063's BIO-ADAPTER (the facial-reader vendor port and mock, enrol and delete with a receipt) is a plan task;
+  enrolFacePass follows it.
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026: "Can you check for all the missing tickets as well"; a read-only scan of the package for work it describes that
+    no task builds. docs/active/block-a-extra-tasks.json: BIO-ADAPTER (`pool: backend`); `operationWaits` enrolFacePass
+    on it. Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: ADR-0063 item 5 (BIO-ADAPTER, before POS-005 is built); contracts/spine/access.yaml enrolFacePass.
+keys_touched:
+  operations:
+  - enrolFacePass
+  - setFacePassEnrollment
+  tickets:
+  - BIO-ADAPTER (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: work the package or an ADR describes that no plan task builds
+tickets:
+  started: []
+  unstarted:
+  - '#28331 (SVC-ACCESS-ACCESS-1, New): follows'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the package''s own text'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Owner by the plan''s rules: a named owner where the work belongs to a person''s service or setup, else `pool: backend`
+  (the least-loaded back-end owner at the plan build). The waiting operations'' tasks follow it only where they are not
+  started; their builders work against the mock or double meanwhile.'

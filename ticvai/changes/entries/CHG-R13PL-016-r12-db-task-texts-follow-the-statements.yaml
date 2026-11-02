@@ -1,0 +1,65 @@
+id: CHG-R13PL-016
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'CR-461: the texts of nine r12 [DB] tasks follow the package''s statements (V0120, V0122), with the seat map template''s
+  NOT NULL as the exception.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. docs/active/block-a-extra-tasks.json:
+    the texts of CR412-DB-CHANNEL-ENVELOPE-PERCENT (#37163), CR409-COMPETITOR-PRICE-OBSERVATION-DB (#37177), CR379-GUEST-BROADCAST-DB
+    (#37158), CR363-DB-GUEST-VERIFICATION-CURRENCY (#37148), CR376-DB-AUDIT-RECORD-REASON (#37156), CR396-DB-GATE-MODE-TURNSTILE-MODE
+    (#37172), CR392-DB-POLICY-VERSION-UNIQUE (#37153), CR339-FIELD-KEY-TABLES-DB (#37154) and CR403-DB-SEAT-MAP-TEMPLATE-STRUCTURE
+    (#37186) say what the statements build, ticket by ticket as the decision lists it; #37186 keeps structure and scope_path
+    NOT NULL, with the guarded fill if its migration ran without them, and no ON DELETE action. No new task. Plan change
+    waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-461, the lead''s decision of 2 November 2026 posted on #27645: "their texts are corrected to the statements
+  at the next release".'
+keys_touched:
+  tickets:
+  - CR412-DB-CHANNEL-ENVELOPE-PERCENT (37163)
+  - CR409-COMPETITOR-PRICE-OBSERVATION-DB (37177)
+  - CR379-GUEST-BROADCAST-DB (37158)
+  - CR363-DB-GUEST-VERIFICATION-CURRENCY (37148)
+  - CR376-DB-AUDIT-RECORD-REASON (37156)
+  - CR396-DB-GATE-MODE-TURNSTILE-MODE (37172)
+  - CR392-DB-POLICY-VERSION-UNIQUE (37153)
+  - CR339-FIELD-KEY-TABLES-DB (37154)
+  - CR403-DB-SEAT-MAP-TEMPLATE-STRUCTURE (37186)
+  tables:
+  - catalogue.channel_envelope
+  - catalogue.competitor_price_observation
+  - workforce.guest_broadcast
+  - identity.guest_verification_policy
+  - platform.audit_record
+  - access.gate_mode_change
+  - whitelabel.policy
+  - platform.tenant_field_key
+  - seating.seat_map_template
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: hand-written [DB] task texts written from a decision before the package's statements were derived
+tickets:
+  started: []
+  unstarted:
+  - '#37163, #37177, #37158, #37148, #37156, #37172, #37153, #37154, #37186 (Hrushikant Patkar): New in ADAM''s status cache
+    of 1 November; text corrected at r13'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-461
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: A New ticket's text is the plan's at the release apply (its pointer), so the correction reaches the developer at
+  r13; a ticket started since ADAM's status cache of 1 November keeps its text and gets r13's as a comment (op-release.rb,
+  in progress only).

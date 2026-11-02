@@ -1055,6 +1055,23 @@ def main() -> int:
     prior_files = {} if "--renumber-migrations" in sys.argv[1:] else prior_migration_files()
     sl = json.loads((HANDOFF / "delivery-slice.json").read_text(encoding="utf-8"))
     lineage = json.loads((HANDOFF / "api-data-lineage.json").read_text(encoding="utf-8"))
+    # **A read the lead decided before the contract states it** (2 November 2026, CHG-R13PL-001; ADAM CR-460):
+    # block-a-extra-tasks.json `decidedReads`, operation -> the tables a posted decision says it reads. The plan waits
+    # and pulls on the lineage's reads, so a read the contract does not declare yet leaves the operation's task free
+    # of the migration that creates the table: listProductApprovalWorkflows (#31816, Block A) reads
+    # catalogue.approval_policy, whose migration (#31608, MIG-CATALOGUE-3) the plan had put in Block B behind
+    # approveWorkflow only. Each read joins the operation's reads here, for the plan alone; once the contract declares
+    # it the entry is redundant (printed) and is removed. check-plan-closure C-TABLE refuses the gap either way.
+    for o_, x_ in sorted(((json.loads(EXTRA.read_text(encoding="utf-8")).get("decidedReads") or {})
+                          if EXTRA.exists() else {}).items()):
+        if o_ not in lineage:
+            raise SystemExit(f"block-a-extra-tasks.json decidedReads: {o_} is no operation of the lineage")
+        have_ = lineage[o_].setdefault("reads", [])
+        for t_ in x_.get("tables") or []:
+            if t_ in have_:
+                print(f"  decidedReads {o_}: {t_} is in the contract's reads now; remove the entry (CHG-R13PL-001)")
+            else:
+                have_.append(t_)
     decomp = json.loads((HANDOFF / "service-decomposition.json").read_text(encoding="utf-8"))
     ref = json.loads((HANDOFF / "schema-reference.json").read_text(encoding="utf-8"))
     cols = ref["cols"]
@@ -2375,6 +2392,13 @@ def main() -> int:
     # tables they reach that no earlier migration creates. Which app-module and block each lands in is decided
     # below (the sprint plan); the keys follow the same rules as Block A's, so a ticket keeps its key once pushed.
     kmap_early = json.loads((OUT / "pms-map.json").read_text(encoding="utf-8")) if (OUT / "pms-map.json").exists() else {}
+    # the tasks a migration waited on in the last release bundle (CHG-R13PL-002: a ticketed hand-written [DB] task keeps
+    # its waits as pushed, and gains none)
+    try:
+        mig_waited_ = {d for k, d in json.loads((OUT / "op-release.json").read_text(encoding="utf-8")).get("edges") or []
+                       if k.startswith(("MIG-", "VM-MIG-"))}
+    except (OSError, ValueError):
+        mig_waited_ = set()
     op_module = {o: sp.MODULE_OF_CONTRACT.get(x["contract"], "Platform Operations") for o, x in ops.items()}
 
     def screen_module(sid):
@@ -2831,8 +2855,14 @@ def main() -> int:
             # them wait for it, so Block A1's overtime went from 35 to 109 hours and the plan moved Venue Management's
             # completion work into A2. A table added by a CR after those migrations were planned is no earlier step of
             # them; one whose keys point into it still waits. A ticketed one (PRD-W1-DB) keeps its waits as pushed.
+            # **"As pushed" is the last release's waits, not "has a ticket"** (2 November 2026, CHG-R13PL-002): the r12
+            # apply made CR409's ticket (#37177), so the rule above stopped holding for it, every later catalogue
+            # forward migration waited on it again (MIG-CATALOGUE-10 too, which it waits on itself: a cycle that
+            # op-release.py refuses), and Block A1's overtime went back from 37 to 117 hours. A ticketed hand-written
+            # [DB] task is waited on by a forward migration only where the last release bundle had a migration waiting
+            # on it (PRD-W1-DB), or for a key into its tables.
             keys_into = {x for t in ts_all for x in ddl[t]["fks"]}
-            hand_late_ = {t for t, m in hand_db.items() if m not in kmap_early}
+            hand_late_ = {t for t, m in hand_db.items() if m not in kmap_early or m not in mig_waited_}
             prior = sorted({m for t, m in mig_of.items() if t.split(".")[0] == sch and m not in later_mig.values()
                             and (t not in fwd_kept or t in keys_into) and (t not in hand_late_ or t in keys_into)})
             for mk, ts in parts:
@@ -3139,7 +3169,12 @@ def main() -> int:
             k = dec_ or add_am(m_, pf, None, 1, variant="" if pf != "API" else "platform",
                                name=None if pf != "API" else f"{sp.MODULE_SHORT.get(m_, m_)} · platform (later blocks)")
             task(t_["key"], k, "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 3,
-                 pts=int(t_["points"]), area="backend", assignee=t_.get("assignee") or "", depends=t_.get("depends") or ())
+                 pts=int(t_["points"]), area=t_.get("area") or "backend", assignee=t_.get("assignee") or "",
+                 depends=t_.get("depends") or ())
+            # a front-end task of a decided app-module names its area (CHG-R13PL-006: CR-463's kiosk and POS printing
+            # under AM-DEVICES-BOCA), so it is a [FE] ticket in that stack's pool, as a Block A one is (CHG-R9UI-001)
+            if t_.get("notBefore"):
+                by_key[t_["key"]]["notBefore"] = float(sp.index_of(dt.date.fromisoformat(t_["notBefore"])))
             am_of[t_["key"]] = k
     later_keys = set(am_of) | set(later_op_task.values()) | set(later_mig.values())
     for t_ in tasks:
@@ -3577,6 +3612,21 @@ def main() -> int:
     groups = defaultdict(list)
     for k in comp_ams:
         groups[am_info[k]["platform"] or "API"].append(k)
+    # **A completion app-module the last release pushed in A1 stays in A1** (2 November 2026, CHG-R13PL-002): the
+    # overtime test below decides where completion work first goes, but once its tickets are in OpenProject under
+    # Block A1 a later run must not move them because the load measured around them changed. After the r12 apply the
+    # 55 tickets it made kept the owners r12 gave them (stable owners, pms-map.json), the measured A1 overtime went from
+    # 37 to 117 hours, and P08's completion work (272 tasks, pushed under BLOCK-A) fell to A2 with no one deciding
+    # (check-plan-closure C-BOUND, C-CALLS, C-REACH). The rule CHG-R10GFP-001 gives the later blocks: moving pushed
+    # work out of A1 is a plan change, decided by the lead.
+    kept_a1 = set()
+    try:
+        _b1 = json.loads((OUT / "op-release.json").read_text(encoding="utf-8"))
+        _p1 = set(_b1.get("ids") or {})
+        kept_a1 = {t_["key"] for t_ in _b1.get("tickets") or [] if t_.get("type") == "Feature"
+                   and t_.get("key") in comp_ams and t_["key"] in _p1 and t_.get("parent") == "BLOCK-A"}
+    except (OSError, ValueError):            # no bundle yet: nothing has been pushed, nothing is kept
+        kept_a1 = set()
     base_ot = a1_overtime() if comp_ams else 0.0
     allow = max(base_ot, accepted) + 1.0
     a1_apps = []
@@ -3584,6 +3634,12 @@ def main() -> int:
         for k in groups[pf]:
             am_info[k]["block"] = "A"
         ot = a1_overtime()
+        if any(k in kept_a1 for k in groups[pf]):
+            a1_apps.append(pf)
+            base_ot = max(base_ot, ot)
+            print(f"  kept in A1: the completion work of {pf} ({', '.join(sorted(k for k in groups[pf] if k in kept_a1))}), "
+                  f"pushed there by release {_b1.get('release')} ({ot:.0f} h of overtime with it; CHG-R13PL-002)")
+            continue
         if ot <= allow:
             a1_apps.append(pf)
             base_ot = max(base_ot, ot)

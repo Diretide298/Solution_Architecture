@@ -1,0 +1,48 @@
+id: CHG-R13PL-021
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'CR-275: updateMyProfile''s displayName and preferredLanguage, written through Identity over serviceAuth, is a
+  plan task.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. The lead, 2 November
+    2026: "Can you check for all the missing tickets as well". docs/active/block-a-extra-tasks.json: CR275-PROFILE-NAME-AND-LANGUAGE-TO-IDENTITY
+    (Sanket Keluskar, #31167''s assignee; follows KERNEL-SERVICE-AUTH, SVC-MARKETING-MARKETING-7 and SVC-IDENTITY-IDENTITY-12).
+    Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-275, option B (CHG-R11GST-004): "Until a follow-up ticket wires the call to Identity''s updateGuestSubjectDetails
+  ... 400 validation"; no ticket was made.'
+keys_touched:
+  operations:
+  - updateMyProfile
+  - updateGuestSubjectDetails
+  files:
+  - docs/active/block-a-extra-tasks.json
+  tickets:
+  - CR275-PROFILE-NAME-AND-LANGUAGE-TO-IDENTITY (new)
+root_class: a decision that promised a follow-up ticket, with no plan task carrying it
+tickets:
+  started: []
+  unstarted:
+  - '#31167 (updateMyProfile, On hold) and #27924 (New)'
+  - '#35805 (updateGuestSubjectDetails, New)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-275
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the task''s text; its
+  OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its tables. A change-only
+  [DB] task is `area: database` and its key does not end in -DB (a -DB task''s `table` builds count as created by it, CHG-R8MIG-016,
+  CHG-R12PL-008).'

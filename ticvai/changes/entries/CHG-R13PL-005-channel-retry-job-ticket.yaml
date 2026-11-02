@@ -1,0 +1,56 @@
+id: CHG-R13PL-005
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: The ticket the lead made for CR-457 (#37206, CR457-CHANNEL-RETRY-JOB) is a plan task, with the parent, owner and
+  sprint it was made with.
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. docs/active/block-a-extra-tasks.json:
+    CR457-CHANNEL-RETRY-JOB, the ticket #37206 the lead made in OpenProject on 2 November 2026 under #35231 (SVC-CATALOGUE-CATALOGUE-14#retryChannelIncident),
+    assignee Hrushikant Patkar, accountable Pranay Shinde, Sprint 4; its title and text as made; its id in handoff/service-docs/pms-map.json.
+    It follows SVC-CATALOGUE-CATALOGUE-14 (retryChannelIncident) and PLATFORM-OUTBOX. Plan change waived from the cooling-off
+    by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-457; the lead''s decision of 2 November 2026 (posted on #35231) files the work as a new ticket, a child of
+  #35231, which the lead made by hand (#37206); the plan did not have it, so a full apply would make it again or leave it
+  outside the plan.'
+keys_touched:
+  tickets:
+  - CR457-CHANNEL-RETRY-JOB (37206)
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - handoff/service-docs/pms-map.json
+  tables:
+  - catalogue.channel_incident
+  operations:
+  - retryChannelIncident
+root_class: work the lead ticketed in OpenProject between releases that the plan did not have (CHG-R11PLN-001)
+tickets:
+  started: []
+  unstarted:
+  - '#35231 (retryChannelIncident, New)'
+  - '#37206 (CR457-CHANNEL-RETRY-JOB, Hrushikant Patkar): made 1-2 November, not in ADAM''s status cache of 1 November;
+    New as made'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-457
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/op-release.py
+status: open
+notes: 'A ticket the lead made in OpenProject on 1-2 November is recorded as CHG-R11PLN-001 recorded the kernel tickets:
+  a hand-written task of docs/active/block-a-extra-tasks.json whose text is the ticket''s text as made, and its id in handoff/service-docs/pms-map.json
+  (tools/op-created-merge.py), so the r13 apply never makes it again. Its `made` record keeps the parent, assignee, accountable,
+  sprint and title it was made with, and tools/op-release.py puts those, and its text as made as its pointer, on its bundle
+  row (CHG-R13PL-003), so the apply neither moves it under the plan''s app-module nor reassigns, re-sprints, retitles or
+  rewrites it. The plan still schedules it (notBefore the start of the sprint it was made in, or 2 November) and orders
+  its waits.'
