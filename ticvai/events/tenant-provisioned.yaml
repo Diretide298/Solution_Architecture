@@ -6,9 +6,10 @@ version: 1
 publisher: subscription
 description: A tenant's database was provisioned on a cell and the tenant can be used.
 aggregate: tenant
-emittedWhen: 'TenantStatus provisioning to active: the provisioning job (createTenant''s, or the verified onboarding
-  application''s) writes it to control.outbox in the transaction that marks the tenant active; drained by the
-  workers relay. No operation emits it directly, as for tenant.suspended'
+emittedWhen: 'TenantStatus onboarding to active: Subscription''s provisioning job (subscription#tenantProvisioning, a
+  Control Plane job; the lead, 2 November 2026, CHG-R13INT-012), handed the tenant by createTenant or a verified
+  onboarding application, writes it to control.outbox in the transaction that marks the tenant active once its cell
+  is ready; drained by the workers relay. No operation emits it directly, as for tenant.suspended'
 payload:
 - field: tenantId
   type: uuid

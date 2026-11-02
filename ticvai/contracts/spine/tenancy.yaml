@@ -488,16 +488,6 @@ x-ticvai-jobs:
     - contracts/spine/tenancy.yaml
     - states/configuration-profile.yaml:45
     - states/profile-deployment.yaml:31
-  retentionJobs:
-    module: tenancy
-    host: undecided
-    trigger: {kind: timer}
-    reads: [tenancy.data_retention_setting]
-    writes: []
-    decision: 'Which modules run a retention job: the text says ''every retention job resolves its period here'' and names
-      marketing''s setDataRetentionPolicy, not the set. Awaiting the lead.'
-    for: The retention jobs every module runs, each resolving its period from Tenancy's data retention settings.
-    source: ['contracts/spine/tenancy.yaml']
 paths:
   /tenant-domains/{hostname}:
     parameters:

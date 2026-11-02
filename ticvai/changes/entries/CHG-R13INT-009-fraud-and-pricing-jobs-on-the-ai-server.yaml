@@ -1,0 +1,44 @@
+id: CHG-R13INT-009
+date: '2026-11-02'
+source: cr
+kind: contract
+proposed: '2026-11-02'
+summary: 'access#fraudDetection and catalogue#pricingEngine run on the AI server (host ticvai-ai, hostDecision quoting the
+  lead) and are the AI engineers'': tools/build-service-docs.py gives a job on ticvai-ai the AiService service, so the AI
+  server rule (team.json aiServer, CHG-R12PL-034) owns its task; check-jobs accepts a module''s job on ticvai-ai only with
+  the lead''s hostDecision.'
+decision:
+  what: 'The lead, 2 November 2026, answering build lane s''s open questions (CHG-R13JOB-001), each "(Recommended)": "access#fraudDetection
+    and catalogue#pricingEngine run on the AI server (ticvai-ai, Python) and are the AI engineers''" (the lead''s AI server
+    rule of 31 October 2026). Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (ADAM CR-438''s r13 job scan, lane s): both declarations were host undecided, so no task built them (check-jobs
+  OPEN).'
+keys_touched:
+  tickets:
+  - JOB-ACCESS-FRAUD-DETECTION (new)
+  - JOB-CATALOGUE-PRICING-ENGINE (new)
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - tools/build-service-docs.py
+  - tools/check-jobs.py
+root_class: background work declared with its host undecided, built by no task
+tickets:
+  started: []
+  unstarted:
+  - 'the two job tasks (new): the AI engineers, in ticvai-ai.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-438
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: check
+  ref: tools/check-jobs.py::J-SHAPE
+status: open

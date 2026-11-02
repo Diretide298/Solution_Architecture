@@ -1,0 +1,39 @@
+id: CHG-R13INT-010
+date: '2026-11-02'
+source: cr
+kind: contract
+proposed: '2026-11-02'
+summary: 'ledger.journalPosted is kept as a webhook: its consumer is the public API''s webhook delivery (public-api#webhookDelivery
+  consumes it; events/ledger-journalPosted.yaml''s consumer is public-api), and it stays in public-api''s webhook event
+  list. The reporting read-model consumer goes, as CHG-R13JOB-002 dropped the other 44.'
+decision:
+  what: 'The lead, 2 November 2026, answering build lane s''s open questions (CHG-R13JOB-001), each "(Recommended)": "ledger.journalPosted
+    is kept as a webhook: its consumer is the public API''s webhook delivery (public-api), so partners can subscribe; it
+    stays in public-api''s webhook event list." Plan change waived from the cooling-off by the lead ("1 waive", 2 November
+    2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (CHG-R13JOB-002, lane s): dropping its reporting read-model consumer left the event with none, while public-api.yaml
+  lists it as a webhook event type with no public-api consumer entry (check-jobs KEPT).'
+keys_touched:
+  files:
+  - events/ledger-journalPosted.yaml
+  - contracts/satellite/public-api.yaml
+root_class: an event offered to partners as a webhook with no webhook consumer
+tickets:
+  started: []
+  unstarted:
+  - 'public-api''s webhook delivery task: one more event type.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: check
+  ref: tools/check-jobs.py::J-READ-MODEL
+status: open

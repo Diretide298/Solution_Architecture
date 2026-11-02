@@ -426,16 +426,17 @@ x-ticvai-jobs:
     source: ['states/cell-cluster.yaml:19', 'states/tenant-migration.yaml:26']
   tenantProvisioning:
     module: subscription
-    host: undecided
+    host: workers
     trigger: {kind: queue}
+    moves:
+    - {model: tenant, from: onboarding, to: active}
     reads: [control.tenant]
-    writes: [control.tenant]
+    writes: [control.outbox, control.tenant]
     emits: [tenant.provisioned]
     reliesOn: [createTenant]
-    decision: "Which job moves a tenant provisioning to active and writes tenant.provisioned: the event says the
-      provisioning job (createTenant's, or the verified onboarding application's) and that no operation emits it, while
-      states/tenant.yaml gives that move to updateTenant, an operation. Awaiting the lead."
-    for: The provisioning job that makes a new tenant active and writes tenant.provisioned to control.outbox.
+    for: 'Subscription''s provisioning job, a Control Plane job (the lead, 2 November 2026, "(Recommended)";
+      CHG-R13INT-012): when a new tenant''s cell is ready it makes the tenant active and writes tenant.provisioned to
+      control.outbox in the same transaction.'
     source: ['events/tenant-provisioned.yaml', 'states/tenant.yaml:16']
 paths:
   /onboarding-applications:

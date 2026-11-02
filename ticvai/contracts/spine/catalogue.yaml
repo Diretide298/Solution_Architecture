@@ -801,13 +801,13 @@ x-ticvai-jobs:
     source: ['states/price-execution.yaml:1']
   pricingEngine:
     module: catalogue
-    host: undecided
+    host: ticvai-ai
+    hostDecision: 'The lead, 2 November 2026, on lane s''s question ("(Recommended)"): it runs on the AI server
+      (ticvai-ai, Python) and is the AI engineers'' (the AI server rule of 31 October 2026; CHG-R13INT-009).'
     trigger: {kind: timer}
     reads: []
     writes: [catalogue.demand_forecast, catalogue.pricing_recommendation]
     reliesOn: [listDemandBookingCurve, listPriceElasticityRevenue]
-    decision: 'ticvai-ai or Catalogue''s workers: the text says only ''the forecasting job'' (AI-ENGINE-DYNAMIC-PRICING-AI
-      is Block D, phase 2). Awaiting the lead.'
     for: 'Catalogue''s demand forecasting and price recommendation jobs: the forecasting job writes catalogue.demand_forecast
       and the engine its recommendations.'
     source: ['contracts/spine/catalogue.yaml', 'contracts/spine/catalogue.yaml']

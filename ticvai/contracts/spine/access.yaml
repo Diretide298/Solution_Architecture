@@ -369,13 +369,13 @@ x-ticvai-jobs:
     source: ['events/entitlement-expiringSoon.yaml']
   fraudDetection:
     module: access
-    host: undecided
+    host: ticvai-ai
+    hostDecision: 'The lead, 2 November 2026, on lane s''s question ("(Recommended)"): it runs on the AI server
+      (ticvai-ai, Python) and is the AI engineers'' (the AI server rule of 31 October 2026; CHG-R13INT-009).'
     trigger: {kind: queue}
     reads: []
     writes: [access.identity_lock]
     reliesOn: [lockIdentity]
-    decision: 'Access''s workers or ticvai-ai: the text names both (the fraud detection job''s identity locks, access.yaml;
-      AI-ENGINE-FRAUD-RISK-RULES is Block D). Awaiting the lead.'
     for: 'Access''s detection jobs: fraud rules, sharing detection and biometric anomaly; they raise access security alerts,
       write sharing-detection bindings and cases, and set temporary identity locks.'
     source: ['contracts/spine/access.yaml', 'contracts/spine/access.yaml']

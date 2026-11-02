@@ -1,0 +1,51 @@
+id: CHG-R13INT-011
+date: '2026-11-02'
+source: cr
+kind: contract
+proposed: '2026-11-02'
+summary: 'tenancy#retentionJobs becomes one retention job in each module that holds personal data, each run every day by
+  its retention setting (tenancy.data_retention_setting): identity#personalDataRetention (guestProfile, facePassBiometric,
+  faceTagBiometric: the pii tables), marketing-crm#personalDataRetention (guestProfile: guest profiles, notes, documents,
+  preferences, form submissions, consent records, conversation messages), orders#personalDataRetention (paymentRecord: orders.payment)
+  and ai#personalDataRetention (aiPrompts, aiConversations, aiDecisionRecords, on the AI server).'
+decision:
+  what: 'The lead, 2 November 2026, answering build lane s''s open questions (CHG-R13JOB-001), each "(Recommended)": "tenancy#retentionJobs:
+    one retention job in each module that holds personal data, run by that module''s retention setting (tenancy.data_retention_setting)."
+    Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (lane s''s r13 job scan): Tenancy''s text says every retention job resolves its period from its settings and
+  names no set, so the declaration was host undecided and no task built any (check-jobs OPEN).'
+keys_touched:
+  tickets:
+  - JOB-IDENTITY-PERSONAL-DATA-RETENTION (new)
+  - JOB-MARKETING-CRM-PERSONAL-DATA-RETENTION (new)
+  - JOB-ORDERS-PERSONAL-DATA-RETENTION (new)
+  - JOB-AI-PERSONAL-DATA-RETENTION (new)
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/spine/tenancy.yaml
+root_class: background work declared with its host undecided, built by no task
+tickets:
+  started: []
+  unstarted:
+  - '#33992 (setDataRetentionSetting, New) and #33369 (setDataRetentionPolicy, New): the retention jobs follow them.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: check
+  ref: tools/check-jobs.py::J-TASK
+status: open
+notes: 'The set is the modules whose rows the platform''s retention classes (TenantDataRetentionClass) name as personal
+  data: guest profile and biometrics, payment records, AI prompts and conversations. auditRecord, approvalRecord, financialRecord
+  and complianceInspection are not guest personal data and get no job here; the report lists them for the lead.'

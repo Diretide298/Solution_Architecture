@@ -3218,6 +3218,12 @@ def main() -> int:
             job_bad.append(f"{ref_}: its key {k_} is already a plan task")
             continue
         svc_ = svc_of_contract.get(j_["contract"]) or ""
+        # **A job on the AI server is the AI server's** (the lead, 2 November 2026, on lane s's question, "(Recommended)":
+        # access#fraudDetection and catalogue#pricingEngine run on ticvai-ai and are the AI engineers'; CHG-R13INT-009).
+        # Its service is AiService whatever contract declares it, so the AI server's rule (team.json `aiServer`,
+        # CHG-R12PL-034) gives it to the AI engineers and the text says where it is built.
+        if j_.get("host") == "ticvai-ai":
+            svc_ = "AiService"
         reads_, writes_ = list(j_.get("reads") or []), list(j_.get("writes") or [])
         deps_ = {mig_of.get(t) for t in reads_ + writes_} - {None}
         deps_.add("PLATFORM-KERNEL")

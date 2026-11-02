@@ -1,0 +1,42 @@
+id: CHG-R13INT-012
+date: '2026-11-02'
+source: cr
+kind: contract
+proposed: '2026-11-02'
+summary: subscription#tenantProvisioning is a Control Plane job in Subscription (workers) that makes a tenant active when
+  its cell is ready and emits tenant.provisioned in the same transaction; states/tenant.yaml gives the onboarding-to-active
+  move to that job (trigger job, emits tenant.provisioned), not to updateTenant, and events/tenant-provisioned.yaml says
+  so.
+decision:
+  what: 'The lead, 2 November 2026, answering build lane s''s open questions (CHG-R13JOB-001), each "(Recommended)": "subscription#tenantProvisioning:
+    a Control Plane job in Subscription that emits tenant.provisioned when the cell is ready; make the event file and states/tenant.yaml
+    agree with that." Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (lane s''s r13 job scan): the event named the provisioning job and no operation, while states/tenant.yaml
+  gave the move to updateTenant; the declaration was host undecided (check-jobs OPEN).'
+keys_touched:
+  tickets:
+  - JOB-SUBSCRIPTION-TENANT-PROVISIONING (new)
+  files:
+  - contracts/satellite/subscription.yaml
+  - states/tenant.yaml
+  - events/tenant-provisioned.yaml
+root_class: a state move given to two movers at once, an operation in the state model and a job in the event
+tickets:
+  started: []
+  unstarted:
+  - 'createTenant''s ticket: the job takes the new tenant from it; updateTenant no longer moves the status.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: check
+  ref: tools/check-jobs.py::J-TRANSITION
+status: open

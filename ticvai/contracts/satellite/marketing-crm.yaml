@@ -423,6 +423,15 @@ x-ticvai-jobs:
   # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
   # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
   # work. Checked by tools/check-jobs.py.
+  personalDataRetention:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [tenancy.data_retention_setting, marketing.guest_profile, marketing.guest_note, marketing.guest_document, marketing.guest_preference, marketing.form_submission, marketing.consent_record, marketing.conversation_message]
+    writes: [marketing.guest_profile, marketing.guest_note, marketing.guest_document, marketing.guest_preference, marketing.form_submission, marketing.consent_record, marketing.conversation_message]
+    reliesOn: [setDataRetentionSetting, setDataRetentionPolicy]
+    for: "Marketing's retention job: guest profiles, notes, documents, preferences, form submissions, consent records and conversation messages. Every day it reads the tenant's period for guestProfile from Tenancy's data retention settings (tenancy#dataRetentionSettingRecords; a class with no row takes the platform default, ADR-0047) and applies its onExpiry (archive, anonymise or delete) to its own rows past the period, counted from the class's anchor; another module's rows are that module's job (the lead, 2 November 2026, on lane s's question (\"(Recommended)\"): one retention job in each module that holds personal data, run by that module's retention setting (tenancy.data_retention_setting); CHG-R13INT-011)."
+    source: ['contracts/spine/tenancy.yaml']
   campaignScheduler:
     module: marketing-crm
     host: workers

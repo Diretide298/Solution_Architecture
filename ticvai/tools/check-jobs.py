@@ -99,9 +99,12 @@ def findings(jobs: dict, states: dict, events: dict, ops: dict, lineage: dict, c
         if host == "undecided":
             if not j.get("decision"):
                 bad.append(("J-SHAPE", ref, "host undecided with no `decision` saying what the lead is asked"))
-        elif host not in tj.HOSTS or (host == "ticvai-ai") != (c == "ai"):
+        # a module's job on the AI server only where the lead decided it, quoted in `hostDecision` (2 November 2026:
+        # access#fraudDetection and catalogue#pricingEngine, CHG-R13INT-009); any other is a declaration error
+        elif host not in tj.HOSTS or ((host == "ticvai-ai") != (c == "ai")
+                                      and not (host == "ticvai-ai" and str(j.get("hostDecision") or "").strip())):
             bad.append(("J-SHAPE", ref, f"host {host!r}: AI's jobs run in ticvai-ai (ADR-0020), every other "
-                                        "module's in workers (ADR-0055)"))
+                                        "module's in workers (ADR-0055), unless `hostDecision` quotes the lead"))
         if kind not in tj.KINDS:
             bad.append(("J-SHAPE", ref, f"trigger kind {kind!r} is not one of {sorted(tj.KINDS)}"))
         if (kind == "event") != bool(j.get("consumes")):
@@ -284,6 +287,11 @@ def self_test() -> list:
     for want in ("host 'ticvai-ai'", "written by their owner", "an event trigger consumes", "builtBy NOT-A-TASK"):
         if want not in msgs:
             fails.append(f"J-SHAPE/J-TASK missed: {want}")
+    decided = json.loads(json.dumps(good))
+    decided["orders#holdExpiry"].update(host="ticvai-ai", hostDecision="the lead, a test")
+    b, _ = findings(decided, st, ev_ok, ops, lin, contracts, plan, tables)
+    if any(r == "J-SHAPE" and k == "orders#holdExpiry" and "host" in m for r, k, m in b):
+        fails.append("J-SHAPE refused a module's AI-server job the lead decided (hostDecision)")
     b, _ = findings({k: v for k, v in good.items() if k != "finance#postings"} | {
         "orders#holdExpiry": dict(good["orders#holdExpiry"])}, st, ev_ok, ops, lin, contracts, {}, tables)
     if not any(r == "J-TASK" for r, _, _ in b):

@@ -193,6 +193,7 @@ x-ticvai-jobs:
     - device.statusChanged
     - device.tamperDetected
     - entitlement.expiringSoon
+    - ledger.journalPosted
     - order.chargebackRecorded
     - seat.blocked
     - seat.held
