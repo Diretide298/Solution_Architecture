@@ -101,7 +101,7 @@ def policies(backend: Path) -> dict:
     out = {}
     for st in statements(backend):
         m = CALL.match(st)
-        if m and m.group(1) != "apply_split_rls":
+        if m and m.group(1) not in ("apply_split_rls", "apply_split_insert_rls"):   # CR-506's variant (CHG-CR506-001)
             out[fwd.unq(m.group(2))] = (m.group(1), m.group(3))
     return out
 

@@ -1,0 +1,43 @@
+id: CHG-CR485-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: enrolDevice requires testResult (and testResult.passed) on the move to provisioned and refuses testResult and configurationProfileId
+  on any other move, all 400 validation naming the field, checked before the move check; the tester is recorded in the move's
+  transaction; approveDevice is unchanged.
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "the move to provisioned must carry the acceptance test, and the profile
+    is set only on that move. Both are validation added to what is built ... these body checks come first, then the move check
+    (409 device-transition-not-allowed), then the enrolment code and approval checks as now ... approveDevice does not change"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-485 (Sanket Keluskar, #33989, On hold): DeviceEnrolment left testResult optional on the move to provisioned,
+  so a device could be provisioned untested and then never approved (409 device-not-tested), and configurationProfileId was
+  accepted on any move.'
+keys_touched:
+  operations:
+  - enrolDevice
+  schemas:
+  - DeviceEnrolment
+  tables:
+  - platform.device
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/check-business-rules.py
+root_class: a request field a state move needs, left optional and accepted on every move
+tickets:
+  started:
+  - '33989 (enrolDevice, Sanket Keluskar, On hold): add the 400s and their order, store the test and the tester in the move''s
+    transaction, and the tests the decision names; the posted comment carries it.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-485
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ENROL-FIELDS
+status: open
+notes: Breaking contract change BC-690 (docs/active/breaking-changes.yaml, check-contract-compat). The schema's 'always sent
+  with testResult (422 otherwise)' now reads 400, as posted. enrolDevice declares the 400 response (validation).

@@ -1,0 +1,37 @@
+id: CHG-CR527-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'contracts/devices/ticket-printer.yaml states the device host''s file store for Idempotency-Keys: one file per operation
+  and key, saved and flushed before printing, the answer renamed over the claim, replay and 409 idempotency-conflict, a claimed
+  key after a restart answered 504 and never printed, an hourly sweep.'
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "the device host keeps its Idempotency-Keys in files on its own disk,
+    so they survive a restart for 24 hours. No database, no new package ... Save the key before printing ... the same key
+    with a different request hash is a 409 with problem type idempotency-conflict ... After a restart, a claimed file with
+    no answer ... is answered as print not confirmed ... and is never sent to the printer again"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-527 (Hrushikant Patkar, #35592, On hold): CR-463 required keys kept 24 hours across a restart but did not say
+  where; the shared rule (common.yaml) makes the record durable, never memory alone.'
+keys_touched:
+  operations:
+  - submitTicketPrintJob
+  files:
+  - contracts/devices/ticket-printer.yaml
+  - tools/check-business-rules.py
+root_class: a device host's idempotency record that does not survive a restart
+tickets:
+  started:
+  - '35592 (BOCA Windows device host, Hrushikant Patkar, On hold): replace the in-memory store with the file store, and the
+    tests the decision names; the posted comment carries it.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-527
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-HOST-IDEMPOTENCY
+status: open

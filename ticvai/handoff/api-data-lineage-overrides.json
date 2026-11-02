@@ -1408,7 +1408,6 @@
   },
   "closeShift": {
    "reads": [
-    "ledger.fx_rate",
     "orders.cash_count_line",
     "orders.cash_movement",
     "orders.payment",
@@ -1423,7 +1422,7 @@
     "orders.pos_shift_approval",
     "orders.pos_shift_incident"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause APPROVALS-TENANCY-C40 (CHG-R8GEN-009): no ledger.journal_entry write: the shift.closed consumer in Ledger posts the cash position (the lead, 20 October 2026, option A; ADR-0055 rule 3)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause APPROVALS-TENANCY-C40 (CHG-R8GEN-009): no ledger.journal_entry write: the shift.closed consumer in Ledger posts the cash position (the lead, 20 October 2026, option A; ADR-0055 rule 3); ADAM CR-518 (CHG-CR518-001): no ledger.fx_rate read, foreign cash stays out of the single figure",
    "carried": true
   },
   "closeTableVisit": {
@@ -15768,7 +15767,6 @@
   },
   "submitShiftCount": {
    "reads": [
-    "ledger.fx_rate",
     "orders.cash_count_line",
     "orders.cash_movement",
     "orders.payment",
@@ -15781,7 +15779,7 @@
     "orders.cash_count_line",
     "orders.pos_shift"
    ],
-   "reason": "CHG-FIN-003 (2 October 2026): the cashier-facing blind close; reads and writes as closeShift, returns no expected figure (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause APPROVALS-TENANCY-C40 (CHG-R8GEN-009): no ledger.journal_entry write: the shift.closed consumer in Ledger posts the cash position (the lead, 20 October 2026, option A; ADR-0055 rule 3)",
+   "reason": "CHG-FIN-003 (2 October 2026): the cashier-facing blind close; reads and writes as closeShift, returns no expected figure (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)); r8 cause APPROVALS-TENANCY-C40 (CHG-R8GEN-009): no ledger.journal_entry write: the shift.closed consumer in Ledger posts the cash position (the lead, 20 October 2026, option A; ADR-0055 rule 3); ADAM CR-518 (CHG-CR518-001): no ledger.fx_rate read, foreign cash stays out of the single figure",
    "carried": true
   },
   "suggestGuidedChoice": {

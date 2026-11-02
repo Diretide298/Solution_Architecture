@@ -1,0 +1,62 @@
+id: CHG-CR506-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'reprintOrder: print increments reprint_count only; a guest''s print is 400; email, sms and whatsapp append one ticketsResent
+  order_event row and write order.ticketsResent, which Access consumes (one pending credential_delivery per entitlement);
+  wallet takes walletPlatform and answers walletPasses; orders.order_event gains an insert-only guest branch for ticketsResent
+  (x-ticvai-guest-insert, apply_split_insert_rls).'
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "reprintOrder records a guest''s resend as one order event, sends
+    remote deliveries through Access as an event, and returns wallet passes in its answer ... write order.ticketsResent to
+    the outbox ... Access consumes it and delivers each credential as deliverCredential does ... New optional body field walletPlatform
+    (apple or google), required with wallet ... orders.order_event''s write policy gains, beside the scope rule, an insert-only
+    branch: event_type = ''ticketsResent'' AND the order''s orders.sales_order.subject_id = ticvai.subject_id"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-506 (Narayan Gaonkar, #30679): a guest could not write its resend under row security, and email, SMS, WhatsApp
+  and wallet had no mechanism the package named.'
+keys_touched:
+  operations:
+  - reprintOrder
+  schemas:
+  - OrderEvent
+  other:
+  - order.ticketsResent
+  tables:
+  - orders.order_event
+  - orders.order_line
+  - orders.wallet_pass
+  - platform.outbox
+  - access.credential_delivery
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/access.yaml
+  - events/order-ticketsResent.yaml
+  - tools/derive-ddl.py
+  - tools/check-rls-scope-fit.py
+  - tools/check-business-rules.py
+root_class: row security that hides a row from the guest the operation serves
+tickets:
+  started: []
+  unstarted:
+  - '30679 (reprintOrder, Narayan Gaonkar): everything but a signed-in guest''s remote resend now; that waits on the migration
+    task.'
+  - 'New task under Access: the order.ticketsResent consumer (x-ticvai-jobs orderTicketsResent), one pending access.credential_delivery
+    per entitlement, idempotent on the event id plus the entitlement id.'
+  - 'New migration task for the migration owner under the orders migration: orders.order_event''s insert-only guest branch
+    for ticketsResent.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-506
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-RESEND-THROUGH-ACCESS
+status: open
+notes: 'Breaking contract change BC-691 (docs/active/breaking-changes.yaml, check-contract-compat). Replaces r13 root R27''s
+  ''Email, SMS and WhatsApp are sent through Marketing''s sendTransactionalMessage'' (CHG-R13R27-001), which the posted decision
+  supersedes; BR-R13-REPRINT-GUEST now asks for order.ticketsResent. R27''s token path and walletPasses stay. Database change:
+  orders.order_event''s policy (tenant), by the new helper platform.apply_split_insert_rls. Beyond the posted words: destination
+  is nullable; walletPlatform is not stored.'

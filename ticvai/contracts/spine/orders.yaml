@@ -721,6 +721,10 @@ paths:
         route: in-process
         for: 'the new cart''s window and cap: cartLeaseSeconds and cartMaxExtensions of the venue''s row, else of the
           tenant''s own row of platform.venue_settings (ADAM CR-184, option A; CHG-R9CR-003)'
+      - query: tenancy#activeVenues
+        route: in-process
+        for: 'whether body.venueId is an active venue of this tenant, for every caller (404 when absent; ADAM CR-486):
+          platform.scope, which every host''s role may read, so no grant is added'
       - query: catalogue#productRecords
         route: in-process
         for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
@@ -793,6 +797,27 @@ paths:
         `setVenueSettingsDefaults` writes); where that is null too, the field''s proposed default (900 seconds, 1
         extension). `extensionsUsed` starts at 0.
 
+
+        **The anonymous path, corrected** (ADAM CR-486, Chinmay, 3 November 2026: "#30682''s anonymous path stands in
+        shape, with three corrections: the venue check, the anonymous subjectId answer, and how the cart token is
+        stored"; CHG-CR486-001). **Which grant writes the cart**: a signed-in guest''s cart is written under its own
+        subject; a staff or partner cart under the session''s venue grant, as before. For a caller with no
+        credential, after the venue check, the single insert of the `orders.cart` row runs under the routed
+        tenant''s root grant (ITenantRootGrant), and the request''s read-only venue scope is back for every other
+        statement: the same one-cart reach Identity''s anonymous session gives that cart''s later statements; then
+        `identity#openAnonymousGuestSession` is called in the same transaction, as above. **The venue, for every
+        caller**: `tenancy#activeVenues` is asked in process with `[body.venueId]`; absent (not this tenant''s venue,
+        or not active) is `404` and nothing is written. `tenancy#scopeRecords` is not used for this: it returns
+        inactive venues too. **`body.subjectId`**: with no credential, any `subjectId` is `403`; a signed-in guest
+        may omit it or send their own subject, anything else is `403`, and the cart takes the session''s subject; a
+        staff or partner caller may send one, looked up with `identity#subjectRecords`: unknown is `400
+        validation`, known is stored on `orders.cart.subject_id`. **`Cart.token`** is minted only for a cart
+        created with no credential: 32 bytes from a cryptographic random generator, base64url without padding (43
+        characters); null on a signed-in guest''s or a staff cart. It is stored field-encrypted with the tenant''s key
+        (never plain at rest and never hashed), because the server reads it back for `getCart`''s answer,
+        `claimCart`''s comparison (constant-time) and the recovery link `cart.abandoned` carries. `createCart` and
+        `getCart` answer it in clear to the cart''s caller. `claimCart`''s rotation is `claimCart`''s.
+
         '
       tags:
       - cart
@@ -821,6 +846,10 @@ paths:
                   type: string
                   format: uuid
                   nullable: true
+                  description: 'With no credential, refused `403`. A signed-in guest omits it or sends their own subject
+                    (`403` otherwise). A staff or partner caller may name the guest, looked up with
+                    `identity#subjectRecords` (`400 validation` when unknown) and stored on `orders.cart.subject_id`
+                    (ADAM CR-486).'
                 locale:
                   type: string
                 deviceId:
@@ -834,6 +863,10 @@ paths:
       responses:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '201':
@@ -8788,6 +8821,13 @@ paths:
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: orders.sales_order
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: platform.outbox
+        for: 'order.ticketsResent, for delivery email, sms or whatsapp, in the same transaction as its order_event row
+          (ADAM CR-506)'
+      - table: orders.wallet_pass
+        for: 'each ticket''s pass, issued through issueWalletPass''s own step for delivery wallet (ADAM CR-506)'
+      x-ticvai-emits:
+      - order.ticketsResent
       x-ticvai-reads:
       - table: orders.order_line
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -8839,8 +8879,7 @@ paths:
         **What delivery `wallet` answers** (r13 root R27, CHG-R13R27-001): `walletPasses`, one per ticket reissued,
         each issued and shaped as `issueWalletPass` issues and answers it (an `orders.wallet_pass` row per ticket, the
         one already issued for that ticket reissued rather than duplicated), so the browser and the app have the pass
-        to add. Absent for the other deliveries. **Email, SMS and WhatsApp** are sent through Marketing''s
-        `sendTransactionalMessage` to `destination`, as `resendPaymentLink` sends.
+        to add. Absent for the other deliveries.
 
 
         **A guest who checked out without an account** (r13 root R27; IDENTITY-C52 and getOrder''s rule, ADAM CR-191,
@@ -8849,6 +8888,29 @@ paths:
         device); any failure is the shared `404`, as an order that does not exist. A verified token resends or
         reprints that one order: its statements run under the routed tenant''s root grant (ITenantRootGrant), as
         getOrder''s token read does, and nothing else in the same transaction.
+
+
+        **Who records what, and how a resend travels** (ADAM CR-506, Chinmay, 3 November 2026: "reprintOrder records a
+        guest''s resend as one order event, sends remote deliveries through Access as an event, and returns wallet
+        passes in its answer"; CHG-CR506-001). **Staff and device printing**: `ORDER_REPRINT` for staff, the device
+        credential for a kiosk. Delivery `print` increments `orders.order_line.reprint_count` for each line named
+        (or all lines) and appends one `order_event` row; the answer carries `reprintCount`, `lines` and
+        `reissuedTicketIds` (the lines'' entitlement ids). Only `print` increments `reprint_count`. **Who else may
+        call**: a guest whose subject is the order''s subject, or a caller with a valid `X-Order-Access-Token` for
+        this order, checked as `getOrder` checks it; any other order is `404`. A guest''s delivery `print` is `400`:
+        no guest screen sends it. **Email, SMS and WhatsApp** (any caller): in the same transaction, one
+        `order_event` row with `event_type` `ticketsResent` is appended and `order.ticketsResent` is written to the
+        outbox (`orderId`, `entitlementIds`, `channel`, `destination`, optional, null meaning the recipient already
+        on each credential, `scopePath`, `tenantId`, `at`). Orders sends nothing itself: Access consumes the event
+        and delivers each credential as `deliverCredential` does, one pending credential delivery row per
+        entitlement (`sms` is `smsLink`), idempotent on the event id plus the entitlement id. **Wallet**: each
+        ticket''s pass is issued through `issueWalletPass`''s own step (same module) and answered in `walletPasses`,
+        which WEB-013''s Add to wallet expects; `walletPlatform` (`apple` or `google`) is required with `wallet`,
+        and `400` otherwise; the `ticketsResent` row is appended as well. **Grants**: a signed-in guest writes the
+        `ticketsResent` row under its own session, through `orders.order_event`''s insert-only branch for that event
+        type on an order whose subject it is (`order_line`''s policy is unchanged); an order-access-token caller writes
+        that one row under the routed tenant''s root grant, the one-order reach the verified token gives; staff and
+        devices write under their venue grant.
 
         '
       tags:
@@ -8890,6 +8952,17 @@ paths:
                   - wallet
                 destination:
                   type: string
+                  nullable: true
+                  description: 'For email, sms or whatsapp: where to send; omitted or null means the recipient already on
+                    each credential (ADAM CR-506).'
+                walletPlatform:
+                  type: string
+                  enum:
+                  - apple
+                  - google
+                  x-ticvai-persisted: false
+                  description: 'Required with delivery `wallet`, `400` otherwise: which wallet the passes are issued for,
+                    through `issueWalletPass`''s step (ADAM CR-506).'
                 lineIds:
                   type: array
                   description: Omit to reprint every line.
@@ -8991,6 +9064,11 @@ paths:
         The recipient receives a claim link. **Ownership moves only when they claim it**, so a transfer
         to a mistyped address expires rather than stranding the ticket somewhere nobody can reach.
 
+
+        **Written under the caller''s own session** (ADAM CR-502, Chinmay, 3 November 2026; CHG-CR502-001): the
+        transfer row is inserted with `from_subject_id` = the caller''s subject, admitted by `orders.ticket_transfer`''s
+        write branch for the guest who is the sender and the order''s subject; no wider grant.
+
         '
       tags:
       - order
@@ -9087,6 +9165,11 @@ paths:
       x-ticvai-audience:
       - guest
       summary: Claim transferred tickets
+      description: '**The recipient''s claim** (ADAM CR-502, Chinmay, 3 November 2026; CHG-CR502-001). The transfer is
+        found by its claim token''s keyed hash. Once the token is verified, the update of that one row (`status`
+        claimed, `to_subject_id` the caller) runs under the routed tenant''s root grant (ITenantRootGrant), the
+        one-row reach a verified token gives elsewhere, since no subject clause can admit the recipient before
+        `to_subject_id` is set. Every other statement runs under the caller''s own grant.'
       tags:
       - order
       x-ticvai-permission: null
@@ -9155,7 +9238,17 @@ paths:
         IDENTITY-C26, option A; CHG-R8SPN-025): it carries the claim token, and the sender must not be able to
         claim on the recipient''s behalf. It is returned only on the recipient''s own rows.
 
-        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+
+
+        **Admitted by subject, as `orders.cart` and `orders.sales_order` are** (ADAM CR-502, Chinmay, 3 November 2026:
+        "orders.ticket_transfer admits a guest''s own transfers by subject, as orders.cart and orders.sales_order
+        already do. No wider grant, and no subject filter in code as the only safeguard"; CHG-CR502-001). It runs
+        under the caller''s own guest session. Rows: `from_subject_id` = the caller''s subject (sent) or
+        `to_subject_id` = the caller''s subject (received; `to_subject_id` is set only on claim), a condition kept in
+        the query as well as in the table''s policy. `direction` `sent` narrows to `from_subject_id`, `received` to
+        `to_subject_id`; `status` is an exact match; the cursor is (`expires_at`, `id`). Another guest''s transfers
+        are never shown.'
       tags:
       - order
       x-ticvai-permission: null
@@ -20755,6 +20848,10 @@ components:
       # getOrderCalendarEvent counts its reschedules for the event's SEQUENCE (ADAM CR-199 and CR-191, option A;
       # CHG-R9CR-006). The staff branch admits only a session with no guest subject (CR-295; CHG-R11GST-001).
       x-ticvai-rls: guest-reads-own
+      # A signed-in guest appends one row, insert only: eventType ticketsResent on an order whose subject it is, for
+      # reprintOrder's remote resend (ADAM CR-506, Chinmay, 3 November 2026; CHG-CR506-001). Updates and deletes keep the
+      # staff rule.
+      x-ticvai-guest-insert: {eventType: ticketsResent}
       description: '**The order and reservation lifecycle log** (DM5, 29 September: data model for
         the agreed operations). Append-only: one row per state change or integration step, with
         the correlation id that ties a payment callback, a sync rejection and the order it touched
@@ -20816,7 +20913,8 @@ components:
           maxLength: 60
           description: What happened, in camelCase (`created`, `voided`, ...). `rescheduled` is written by
             `rescheduleOrder` once per reschedule, and `getOrderCalendarEvent` counts those rows as the event's
-            SEQUENCE (ADAM CR-199, option A; CHG-R9CR-006).
+            SEQUENCE (ADAM CR-199, option A; CHG-R9CR-006). `ticketsResent` is written by `reprintOrder` once per
+            remote or wallet delivery (ADAM CR-506).
         previousState:
           type: string
           maxLength: 40
@@ -23925,6 +24023,10 @@ components:
       # names, so listTicketTransfers' `received` has rows; written only where the order may be written, as before.
       x-ticvai-rls: guest-reads-own
       x-ticvai-guest-subject: [fromSubjectId, toSubjectId]
+      # **The sender writes its own transfer** (ADAM CR-502, Chinmay, 3 November 2026; CHG-CR502-001): written where the
+      # order may be written (staff), or by the guest fromSubjectId names when the parent order's subject_id is that
+      # guest too, which covers transferOrderTickets' insert and the sender's own changes to an offer.
+      x-ticvai-guest-writer: fromSubjectId
       required:
       - id
       - orderId
@@ -25213,9 +25315,17 @@ components:
             credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart.'
         token:
           type: string
+          nullable: true
           readOnly: true
+          x-ticvai-secret: field-encrypted
           description: '**How an anonymous guest returns to their cart**, including from a recovery email.
             Rotated on claim, so a link shared before signing in does not reach the account after.
+
+            **Minted only for a cart created with no credential, and stored field-encrypted** (ADAM CR-486, Chinmay, 3
+            November 2026; CHG-CR486-001): 32 bytes from a cryptographic random generator, base64url without padding
+            (43 characters); null on a signed-in guest''s or a staff cart. Encrypted with the tenant''s key, never plain
+            at rest and never hashed, since the server reads it back for `getCart`, `claimCart`''s constant-time
+            comparison and `cart.abandoned`''s recovery link; answered in clear to the cart''s caller.
 
             '
         sessionId:

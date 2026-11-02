@@ -328,6 +328,14 @@ x-ticvai-queries:
       session with a guest subject (`ticvai.subject_id` set), so a signed-in guest's read above venue level
       (listMyOrders pricing an order at a venue other than the request's) sees that venue's row and the tenant's
       default row; writes stay scoped and an anonymous session gains nothing.
+      **Every scoped session reads the tenant's own row** (ADAM CR-487, option A, Chinmay, 3 November 2026;
+      CHG-CR487-001): the table's read is platform.venue_in_scope(venue_id) OR (venue_id IS NULL AND
+      cardinality(platform.current_scope_paths()) > 0) OR a guest subject is set; its write stays
+      platform.venue_in_scope(venue_id), so only a tenant-root grant writes the tenant's row. A venue-level staff
+      session and an anonymous guest session (its scope the venue's path) now see the tenant's default row and no
+      other venue's; a session with no scope and no subject still reads nothing. Every reader that applies the
+      venue's row, else the tenant's default, else the proposed default (createCart, extendCart, the F&B limits and
+      the others) reads it under the caller's own row security, with no change of its own.
     served: [in-process, service]
   workstationRecords:
     module: tenancy
@@ -1742,6 +1750,10 @@ paths:
         the tenant has saved nothing the answer is `200` with the schema defaults, which are the
         proposed values, client to correct. Only the configured limits are read from this row; the
         venue facts on the schema (support hours, biometrics, segregated access) are ignored here.
+
+        **Each limit is the tenant's saved value, else its proposed default** (ADAM CR-484, Chinmay, 3 November
+        2026; CHG-CR484-001): for `stepMinutes`, the tenant row's `step_minutes` when it is not null, else 30. This
+        covers a tenant with no row and a tenant whose row was saved before the column existed.
       tags: [tenancy]
       x-ticvai-permission: TENANT_VIEW
       x-ticvai-scope-level: tenant
@@ -2928,6 +2940,23 @@ paths:
         move to `active` is refused `409 device-approval-required` until `approveDevice` has approved the
         device.
 
+
+        **The body''s rules, checked first** (ADAM CR-485, Chinmay, 3 November 2026: "the move to provisioned must
+        carry the acceptance test, and the profile is set only on that move"; CHG-CR485-001). On the move to
+        `provisioned`, `testResult` is required: without it, `400 validation` naming `testResult`, and nothing is
+        written; `testResult.passed` is required inside it, else the same `400` naming `testResult.passed` (the
+        schema''s earlier "422 otherwise" is this `400`: the operation''s `422` is only for the enrolment code). On
+        success `test_result` is stored and `tested_by_principal_id` set to the caller, in the same transaction as
+        the move and its `tenancy.device_audit` row; a failed test (`passed` false) is recorded as sent and the move
+        succeeds, and the approver sees it and rejects. `testResult` sent with any other target state is `400
+        validation` naming `testResult`. `configurationProfileId` is accepted only with the move to `provisioned`,
+        where it stays optional; with any other target state it is `400 validation` naming
+        `configurationProfileId`. It is stored as `configuration_profile_id` on that move only and is not changed by
+        any later move. **Order:** these body checks, then the move check (`409 device-transition-not-allowed`),
+        then the enrolment code and approval checks. `approveDevice` does not change: it already refuses a device
+        with no recorded test (`409 device-not-tested`) and the tester or the registrar (`403 approver-is-tester`),
+        and with this rule every provisioned device has a recorded tester.
+
         '
       tags:
       - devices
@@ -2953,6 +2982,15 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '400':
+          description: '`testResult` (or `testResult.passed`) missing on the move to `provisioned`, or `testResult` or
+            `configurationProfileId` sent with any other target state (`validation`, naming the field; ADAM CR-485).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -3792,7 +3830,14 @@ paths:
         must hold to record one by hand. **The reporter never sets the trust**: the server stores `deviceTrusted`
         false on every new event, whatever the body says, and ignores `resolvedAt`, `resolvedBy` and
         `resolution` on input; they are set only when a person clears the device. The device is untrusted from
-        this moment.'
+        this moment.
+
+
+        **`detectedAt` is stored and published exactly as the device sent it** (ADAM CR-492, Chinmay, 3 November
+        2026: "detectedAt on device.tamperDetected may be null, as the request body already allows"; CHG-CR492-001):
+        `tenancy.device_tamper_event.detected_at` and `device.tamperDetected`''s `detectedAt` carry the same value,
+        null when the body left it out. It is never filled from `recordedAt`, from the row''s creation time or from
+        the server clock; `recordedAt` is when the device reported.'
       security:
       - bearerAuth: []
       - deviceAuth: []
@@ -6374,6 +6419,11 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: >
+            **The profile the device is provisioned with, accepted only on the move to `provisioned`**, where it
+            stays optional (ADAM CR-485, Chinmay, 3 November 2026; CHG-CR485-001). With any other target state it
+            is `400 validation` naming `configurationProfileId`. Stored as `configuration_profile_id` on that move
+            only, and not changed by any later move.
         reason:
           type: string
           nullable: true
@@ -6396,8 +6446,13 @@ components:
           description: >
             **The acceptance test, recorded on the move to `provisioned`** (DEC-245; CHG-CSP-011). The
             caller is recorded as `RegisteredDevice.testedByPrincipalId` and may not approve the device.
+            **Required on the move to `provisioned`, refused on every other move** (ADAM CR-485, Chinmay, 3 November
+            2026; CHG-CR485-001): missing on that move is `400 validation` naming `testResult`, and sent with any
+            other target state is the same `400` naming `testResult`.
+          required:
+          - passed
           properties:
-            passed: { type: boolean, description: 'Whether the device passed; always sent with `testResult` (422 otherwise).' }
+            passed: { type: boolean, description: 'Whether the device passed; always sent with `testResult`: without it, `400 validation` naming `testResult.passed` (ADAM CR-485). A failed test (false) is recorded as sent and the move succeeds; the approver sees it and rejects.' }
             notes: { type: string, maxLength: 1000, nullable: true }
 
     DeviceCapability:
@@ -6490,6 +6545,9 @@ components:
       # A guest reads every venue's settings (its orders' currency, time zone and rules, whatever venue they name);
       # writes stay the venue's (ADAM CR-341, settled 30 October 2026; CHG-CR341-001, CHG-R12DB-008).
       x-ticvai-guest-read: true
+      # Every session with a scope reads the tenant's own row (venue_id null), the default its readers fall back to;
+      # writes unchanged (ADAM CR-487, option A, Chinmay, 3 November 2026; CHG-CR487-001).
+      x-ticvai-tenant-row-read: true
       type: object
       x-ticvai-persistence: "platform.venue_settings"
       # ADAM CR-341 (Chinmay, 30 October 2026; CHG-CR341-001): read 'platform.venue_in_scope(venue_id) OR a guest subject
@@ -6882,10 +6940,15 @@ components:
           type: integer
           enum: [15, 30, 60]
           nullable: true
+          default: 30
           x-ticvai-persistence-column: integer
           description: '**The venue''s start-time step for a space sold by the hour** (accepted 26 October 2026,
             Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers
-            (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13).'
+            (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13).
+            **The `default` is the proposed tenant default only** (ADAM CR-484, Chinmay, 3 November 2026;
+            CHG-CR484-001), as every other configured limit carries its own: it is never written into a venue''s
+            row, and a venue''s own null stays null when the venue''s settings are read, as `cartLeaseSeconds` and
+            the other limits behave. When the client corrects it, only this default changes.'
         cartLeaseSeconds:
           type: integer
           nullable: true

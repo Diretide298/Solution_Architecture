@@ -693,6 +693,15 @@ paths:
       x-ticvai-reads:
       - table: queue.entry
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: queue.queue
+        for: 'the entry''s queue (by its queue_id), for queueEntry.redeemed''s venueId and accessPointId; read only when
+          the entry carries an entitlement_id (ADAM CR-519)'
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue''s scope path (platform.scope, by the queue''s venue_id), the outbox envelope''s ScopePath for
+          queueEntry.redeemed, through Tenancy''s query class, never its SQL; read only when the entry carries an
+          entitlement_id (ADAM CR-519)'
       x-ticvai-audience: [staff]
       summary: Admit a party at the ride
       description: |-
@@ -708,6 +717,22 @@ paths:
         counter is never maintained here. `entitlementRemaining` is null in the answer. **Offline**, the redemption is
         recorded on the device and the event is written when the device syncs. An entry with no `entitlementId` writes
         no event.
+
+        **What the event carries, and the count** (ADAM CR-519, Chinmay, 3 November 2026: "option A, for both
+        overrideWaitingGuest (#33058) and redeemWaitingGuest (#33059)"; CHG-CR519-001). Where the entry carries an
+        `entitlement_id`, the operation reads the entry's queue (`queue.queue`, by `queue_id`: `venue_id` and
+        `access_point_id`) and the venue's scope path (`tenancy#scopeRecords`, in process, by `venue_id`: Tenancy's
+        query class, never its SQL), and writes `queueEntry.redeemed` through the outbox in the same transaction as
+        the entry's update, with `entryId`; `queueId` (the entry's `queue_id`); `venueId` (the queue's `venue_id`);
+        `entitlementId`; `accessPointId` (the queue's `access_point_id`, null where the queue names none);
+        `admittedCount` (the value recorded on the entry); and `recordedAt` (from the body). The outbox envelope's
+        `ScopePath` is the venue's scope path from Tenancy. An entry with no `entitlement_id` writes no event and
+        makes no extra reads. For a redemption made offline, these reads and the event happen when the device
+        syncs. **`admittedCount`, the same in both operations**: omitted, the entry's `party_size` is recorded in
+        `admitted_count` and sent in the event; given, it must be from 1 to the entry's `party_size`. Above
+        `party_size` is `400 validation`: nothing is written, no state changes, no event. Partial admission (fewer
+        than the party) stays normal. The states, the override's three `409`s and fields, the answer
+        (`entitlementRemaining` null) and idempotency are unchanged.
       tags: [entry]
       x-ticvai-permission: QUEUE_REDEEM
       x-ticvai-scope-level: workstation
@@ -727,7 +752,8 @@ paths:
                 admittedCount:
                   type: integer
                   minimum: 1
-                  description: May be fewer than the party. Partial admission is normal.
+                  description: May be fewer than the party. Partial admission is normal. Omitted, the entry's
+                    `party_size`; above `party_size` is `400 validation` (ADAM CR-519).
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
@@ -738,6 +764,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -760,6 +787,15 @@ paths:
       x-ticvai-reads:
       - table: queue.entry
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: queue.queue
+        for: 'the entry''s queue (by its queue_id), for queueEntry.redeemed''s venueId and accessPointId; read only when
+          the entry carries an entitlement_id (ADAM CR-519)'
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue''s scope path (platform.scope, by the queue''s venue_id), the outbox envelope''s ScopePath for
+          queueEntry.redeemed, through Tenancy''s query class, never its SQL; read only when the entry carries an
+          entitlement_id (ADAM CR-519)'
       x-ticvai-audience: [staff]
       summary: Admit against a failed redemption
       description: >
@@ -778,6 +814,22 @@ paths:
         has not been called, so no redemption has failed. **An override that admits a Fast Pass entry writes
         `queueEntry.redeemed`** through the outbox in the same transaction, as `redeemWaitingGuest` does (ADAM CR-238),
         so Access takes the entitlement's use; `entitlementRemaining` is null.
+
+        **What the event carries, and the count** (ADAM CR-519, Chinmay, 3 November 2026: "option A, for both
+        overrideWaitingGuest (#33058) and redeemWaitingGuest (#33059)"; CHG-CR519-001). Where the entry carries an
+        `entitlement_id`, the operation reads the entry's queue (`queue.queue`, by `queue_id`: `venue_id` and
+        `access_point_id`) and the venue's scope path (`tenancy#scopeRecords`, in process, by `venue_id`: Tenancy's
+        query class, never its SQL), and writes `queueEntry.redeemed` through the outbox in the same transaction as
+        the entry's update, with `entryId`; `queueId` (the entry's `queue_id`); `venueId` (the queue's `venue_id`);
+        `entitlementId`; `accessPointId` (the queue's `access_point_id`, null where the queue names none);
+        `admittedCount` (the value recorded on the entry); and `recordedAt` (from the body). The outbox envelope's
+        `ScopePath` is the venue's scope path from Tenancy. An entry with no `entitlement_id` writes no event and
+        makes no extra reads. For a redemption made offline, these reads and the event happen when the device
+        syncs. **`admittedCount`, the same in both operations**: omitted, the entry's `party_size` is recorded in
+        `admitted_count` and sent in the event; given, it must be from 1 to the entry's `party_size`. Above
+        `party_size` is `400 validation`: nothing is written, no state changes, no event. Partial admission (fewer
+        than the party) stays normal. The states, the override's three `409`s and fields, the answer
+        (`entitlementRemaining` null) and idempotency are unchanged.
       tags: [entry]
       x-ticvai-permission: QUEUE_OVERRIDE
       x-ticvai-scope-level: venue
@@ -794,7 +846,10 @@ paths:
               required: [reason, recordedAt]
               properties:
                 reason: { type: string, minLength: 3, maxLength: 500 }
-                admittedCount: { type: integer, minimum: 1 }
+                admittedCount:
+                  type: integer
+                  minimum: 1
+                  description: Omitted, the entry's `party_size`; above `party_size` is `400 validation` (ADAM CR-519).
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
@@ -805,6 +860,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
           description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`), or is still `waiting` and has not been called (`queue-entry-not-called`; CHG-R10ORD-023); there is no failed redemption to override. Nobody is admitted.'
           x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled, queue-entry-not-called]

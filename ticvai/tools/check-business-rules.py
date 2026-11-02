@@ -128,6 +128,12 @@ And one rule per decision:
                    operations it named: a unique key behind a keyed upsert, the transfer rules' version, row security
                    for the guest an operation names, reprintOrder for a guest-checkout buyer, the tables and reads a
                    text uses, a column for each field kept, and one rule where a text contradicted itself.
+  BR-VENUE-LIMIT-DEFAULT, BR-ENROL-FIELDS, BR-CART-ANONYMOUS, BR-TENANT-ROW-READ, BR-TAMPER-DETECTED-AT,
+  BR-TRANSFER-GUEST-WRITE, BR-RESEND-THROUGH-ACCESS, BR-HELD-LEASES-NOOP, BR-EXPECTED-CASH, BR-QUEUE-EVENT-READS,
+  BR-HOST-IDEMPOTENCY (r13 second CR round, lane w2: ADAM CR-484 to CR-527, CHG-CR484-001 to CHG-CR527-001): a
+                   venue limit's proposed default, enrolDevice's field rules, the anonymous cart, the tenant's settings
+                   row, a nullable event field, a guest's own transfer and resend, the shift close, the queue event's
+                   reads and the device host's idempotency store.
   BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
                    version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
                    ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
@@ -2027,6 +2033,7 @@ def main() -> int:
     pricing_rules_r13(need, op)
     lane_q_rules_r13(need, op)
     roots_r13_v(need, op)
+    lane_w2_rules_r13(need, op)
 
     # ---------------------------------------------------------------- r12 CR lane F (31 October 2026; the lead: "for
     # each one actually check if they hold and if not then find out the best way keeping in mind what client needs").
@@ -2852,7 +2859,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + R13_O_RULES + R13_LANE_P_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -3673,8 +3680,10 @@ def roots_r13_v(need, op):
              .get("schema") or {}).get("properties") or {}
     need("BR-R13-REPRINT-GUEST", "WalletPass" in str((props.get("walletPasses") or {}).get("items")),
          "reprintOrder's 200 carries no walletPasses for delivery wallet (R27)")
-    need("BR-R13-REPRINT-GUEST", "`sendTransactionalMessage` to `destination`" in words(rp.get("description")),
-         "reprintOrder does not say email, sms and whatsapp are sent through sendTransactionalMessage (R27)")
+    # email, sms and whatsapp go through Access as order.ticketsResent since ADAM CR-506 (CHG-CR506-001), which replaced
+    # R27's sendTransactionalMessage route; BR-RESEND-THROUGH-ACCESS holds it
+    need("BR-R13-REPRINT-GUEST", "order.ticketsResent" in (rp.get("x-ticvai-emits") or []),
+         "reprintOrder does not say how email, sms and whatsapp are sent (R27; CR-506)")
 
     # BR-R13-WRITES-LISTED (R21): the tables the text writes or reads are listed.
     for oid, key, want in (("restoreConfigVersion", "x-ticvai-writes",
@@ -3724,6 +3733,145 @@ def roots_r13_v(need, op):
          "createShopAndDrop's read-via still gives CR-104's outlet hours as the rule the lead replaced (R41)")
     need("BR-R13-ONE-RULE", "stored with `requiresApproval` true" in words(op("setSubstitutionRules")[3].get("description")),
          "setSubstitutionRules does not state when requiresApproval is true (R41)")
+
+
+LANE_W2_R13_RULES = ["BR-VENUE-LIMIT-DEFAULT", "BR-ENROL-FIELDS", "BR-CART-ANONYMOUS", "BR-TENANT-ROW-READ",
+                     "BR-TAMPER-DETECTED-AT", "BR-TRANSFER-GUEST-WRITE", "BR-RESEND-THROUGH-ACCESS",
+                     "BR-HELD-LEASES-NOOP", "BR-EXPECTED-CASH", "BR-QUEUE-EVENT-READS", "BR-HOST-IDEMPOTENCY"]
+
+
+def lane_w2_rules_r13(need, op):
+    """r13 second CR round, lane w2 (ADAM CR-484 to CR-527, decided by Chinmay on 3 November 2026; CHG-CR484-001 to
+    CHG-CR527-001). Each rule fails on the r13 candidate before the lane (f599f2c6) and passes on its change."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route")))
+                for v in o_.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def tables(o_, key):
+        return {str((t or {}).get("table") if isinstance(t, dict) else t) for t in o_.get(key) or []}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def codes(o_):
+        return {str(k) for k in (o_.get("responses") or {})}
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    def body(o_):
+        return ((((o_.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema")
+                or {})
+
+    def payload(rel):
+        return {str((f or {}).get("field")): f for f in load(rel).get("payload") or [] if isinstance(f, dict)}
+
+    ten = schemas("contracts/spine/tenancy.yaml")
+    ords = schemas("contracts/spine/orders.yaml")
+
+    # BR-VENUE-LIMIT-DEFAULT (CR-484): every configured limit a venue inherits carries its proposed tenant default, and
+    # no read fills the venue's value from a parameter default before the venue is asked.
+    vs = ten.get("VenueSettings") or {}
+    for name, pr in (vs.get("properties") or {}).items():
+        if (isinstance(pr, dict) and pr.get("type") in ("integer", "number") and pr.get("nullable") is True
+                and "inherits the tenant default" in words(pr.get("description"))):
+            need("BR-VENUE-LIMIT-DEFAULT", "default" in pr,
+                 f"VenueSettings.{name} inherits the tenant default but carries no proposed default, so "
+                 "getVenueSettingsDefaults answers null (CR-484)")
+    sm = next((x for x in op("listProductStartTimes")[3].get("parameters") or []
+               if isinstance(x, dict) and x.get("name") == "stepMinutes"), {})
+    need("BR-VENUE-LIMIT-DEFAULT", "default" not in (sm.get("schema") or {}),
+         "listProductStartTimes' stepMinutes parameter carries a default that fills it before the venue is asked (CR-484)")
+
+    # BR-ENROL-FIELDS (CR-485)
+    edv = op("enrolDevice")[3]
+    tr = ((ten.get("DeviceEnrolment") or {}).get("properties") or {}).get("testResult") or {}
+    need("BR-ENROL-FIELDS", "validation" in ptypes(edv, "400") and tr.get("required") == ["passed"]
+         and "these body checks, then the move check" in words(edv.get("description")),
+         "enrolDevice does not require testResult on the move to provisioned and refuse it, and configurationProfileId, "
+         "on any other move with 400 validation, checked first (CR-485)")
+
+    # BR-CART-ANONYMOUS (CR-486)
+    cc = op("createCart")[3]
+    tok = ((ords.get("Cart") or {}).get("properties") or {}).get("token") or {}
+    need("BR-CART-ANONYMOUS", ("tenancy#activeVenues", "in-process") in vias(cc) and {"403", "404"} <= codes(cc)
+         and "ITenantRootGrant" in words(cc.get("description")),
+         "createCart does not check the venue with tenancy#activeVenues (404), refuse a subjectId it may not name "
+         "(403), or write the anonymous cart's one insert under ITenantRootGrant (CR-486)")
+    need("BR-CART-ANONYMOUS", tok.get("x-ticvai-secret") == "field-encrypted" and tok.get("nullable") is True,
+         "Cart.token is not stored field-encrypted, or not null on a signed-in guest's or staff cart (CR-486)")
+
+    # BR-TENANT-ROW-READ (CR-487)
+    ddl = (ROOT / "tools/derive-ddl.py").read_text(encoding="utf-8")
+    need("BR-TENANT-ROW-READ", vs.get("x-ticvai-tenant-row-read") is True
+         and "(venue_id IS NULL AND cardinality(platform.current_scope_paths()) > 0)" in ddl,
+         "platform.venue_settings does not let a scoped session read the tenant's own row (CR-487)")
+
+    # BR-TAMPER-DETECTED-AT (CR-492): a field the request may leave out is not published as always there
+    det = payload("events/device-tamperDetected.yaml").get("detectedAt") or {}
+    tbody = ten.get("DeviceTamperEvent") or {}
+    need("BR-TAMPER-DETECTED-AT", "detectedAt" in (tbody.get("required") or []) or det.get("required") is False,
+         "device.tamperDetected requires detectedAt, which recordDeviceTamperEvent's body may leave out (CR-492)")
+    need("BR-TAMPER-DETECTED-AT", "never filled from `recordedAt`" in words(op("recordDeviceTamperEvent")[3]
+                                                                             .get("description")).replace("It is ", ""),
+         "recordDeviceTamperEvent does not say detectedAt is stored and published as sent, never filled (CR-492)")
+
+    # BR-TRANSFER-GUEST-WRITE (CR-502)
+    need("BR-TRANSFER-GUEST-WRITE", (ords.get("TicketTransfer") or {}).get("x-ticvai-guest-writer") == "fromSubjectId"
+         and "ITenantRootGrant" in words(op("claimTicketTransfer")[3].get("description")),
+         "orders.ticket_transfer does not admit the sender's own write by subject, or claimTicketTransfer does not "
+         "update its one row under ITenantRootGrant once the token is verified (CR-502)")
+
+    # BR-RESEND-THROUGH-ACCESS (CR-506)
+    rp = op("reprintOrder")[3]
+    rpb = (body(rp).get("properties") or {})
+    evp = ROOT / "events/order-ticketsResent.yaml"
+    ev = load("events/order-ticketsResent.yaml") if evp.exists() else {}
+    need("BR-RESEND-THROUGH-ACCESS", "order.ticketsResent" in (rp.get("x-ticvai-emits") or [])
+         and (rpb.get("walletPlatform") or {}).get("enum") == ["apple", "google"]
+         and "sendTransactionalMessage" not in words(rp.get("description"))
+         and any((c or {}).get("context") == "access" for c in ev.get("consumers") or [])
+         and (ords.get("OrderEvent") or {}).get("x-ticvai-guest-insert") == {"eventType": "ticketsResent"}
+         and "apply_split_insert_rls" in ddl,
+         "reprintOrder does not send email, sms and whatsapp through Access as order.ticketsResent, take walletPlatform, "
+         "or let a guest append its ticketsResent row by an insert-only branch (CR-506)")
+
+    # BR-HELD-LEASES-NOOP (CR-517) and BR-EXPECTED-CASH (CR-518)
+    for oid in ("closeShift", "submitShiftCount"):
+        o_ = op(oid)[3]
+        d_ = words(o_.get("description"))
+        need("BR-HELD-LEASES-NOOP", not any(q.startswith("catalogue#") for q, _r in vias(o_))
+             and "`releaseHeldLeases` changes nothing" in d_ and "400" in codes(o_),
+             f"{oid} gives releaseHeldLeases a path to Catalogue, or does not say it changes nothing (CR-517)")
+        need("BR-EXPECTED-CASH", ("finance#fxRateRecords", "in-process") not in vias(o_)
+             and {"orders.refund", "orders.refund_payment", "orders.cash_movement", "orders.payment"}
+             <= tables(o_, "x-ticvai-reads"),
+             f"{oid} still reads ledger.fx_rate, or does not read the refunds and cash its expected cash is made of "
+             "(CR-518)")
+    need("BR-EXPECTED-CASH", "A + B - C + D - E - F" in words(op("submitShiftCount")[3].get("description"))
+         and "`pending`, `held` or `partiallyPaid`" in words(op("closeShift")[3].get("description")),
+         "submitShiftCount does not state the expected-cash formula, or closeShift what an open order is (CR-518)")
+
+    # BR-QUEUE-EVENT-READS (CR-519)
+    for oid in ("redeemWaitingGuest", "overrideWaitingGuest"):
+        o_ = op(oid)[3]
+        need("BR-QUEUE-EVENT-READS", "queue.queue" in tables(o_, "x-ticvai-reads")
+             and ("tenancy#scopeRecords", "in-process") in vias(o_) and "400" in codes(o_)
+             and "`party_size`" in words(o_.get("description")),
+             f"{oid} writes queueEntry.redeemed with the queue's venue, access point and scope path but declares no "
+             "read of them, or does not bound admittedCount by party_size (CR-519)")
+
+    # BR-HOST-IDEMPOTENCY (CR-527)
+    tp = load("contracts/devices/ticket-printer.yaml")
+    pj = ((tp.get("paths") or {}).get("/ticket-printer/print-jobs") or {}).get("post") or {}
+    td = words((tp.get("info") or {}).get("description"))
+    need("BR-HOST-IDEMPOTENCY", "idempotency-conflict" in ptypes(pj, "409") and "%ProgramData%" in td
+         and "The key is saved before printing" in td and "never sent to the printer again" in td,
+         "the device host does not keep its Idempotency-Keys in files saved before printing, with the 409 and the "
+         "restart rule (CR-527)")
 
 
 if __name__ == "__main__":

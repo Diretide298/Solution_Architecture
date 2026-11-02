@@ -1,0 +1,53 @@
+id: CHG-CR518-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: closeShift and submitShiftCount compute expected cash = A + B - C + D - E - F in the venue's currency, read the payments,
+  cash movements, refunds and refund payments for it (x-ticvai-reads), keep foreign cash out of the single figure and no longer
+  read ledger.fx_rate; closeShift's 409 open-orders-remain is an order of the shift pending, held or partiallyPaid.
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "the expected cash is the package''s own formula, in the venue''s
+    currency, and is the same figure for closeShift and submitShiftCount ... expected cash = A + B - C + D - E - F ... Remove
+    the finance fx-rate read: neither operation reads ledger.fx_rate ... Open orders: before the count is written, refuse
+    409 open-orders-remain if an order with shift_id equal to this shift is pending, held or partiallyPaid"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-518 (Pranay Shinde, #30806): closeShift had no rule for the expected cash (cash movements, refunds, foreign
+  cash, the FX read) and ''open orders'' was undefined.'
+keys_touched:
+  operations:
+  - closeShift
+  - submitShiftCount
+  schemas:
+  - CloseShiftRequest
+  tables:
+  - orders.pos_shift
+  - orders.payment
+  - orders.cash_movement
+  - orders.refund
+  - orders.refund_payment
+  - orders.sales_order
+  - ledger.fx_rate
+  files:
+  - contracts/spine/shift.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: an undecided rule an operation's figure depends on
+tickets:
+  started: []
+  unstarted:
+  - '30806 (closeShift and submitShiftCount, Pranay Shinde): the formula, foreign cash kept apart, the 409 and the tests the
+    decision names.'
+  - 'New task under createRefund (#31924): a cash refund records the shift that paid it out (F stays zero until it lands).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-518
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-EXPECTED-CASH
+status: open
+notes: The carried lineage overrides for both operations lose ledger.fx_rate. The 409 open-orders-remain is closeShift's;
+  submitShiftCount declares no open-orders 409 and the posted text does not add one there, so it is left as it is (a question
+  for the lead if the cashier's own close should refuse too).

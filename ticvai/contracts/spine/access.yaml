@@ -449,6 +449,16 @@ x-ticvai-jobs:
     for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
       as on the order-paid saga.'
     source: ['events/order-exchanged.yaml']
+  orderTicketsResent:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.ticketsResent]
+    reads: [access.entitlement, access.credential_delivery]
+    writes: [access.credential_delivery]
+    for: 'This module''s consumer of order.ticketsResent (ADAM CR-506, CHG-CR506-001): one pending credential delivery per
+      entitlement, as deliverCredential writes it (sms is smsLink), idempotent on the event id plus the entitlement id.'
+    source: ['events/order-ticketsResent.yaml']
 paths:
   /access/validate:
     post:

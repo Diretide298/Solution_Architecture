@@ -1,0 +1,50 @@
+id: CHG-CR484-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: VenueSettings.stepMinutes carries default 30, the proposed tenant default only; getVenueSettingsDefaults answers
+  the tenant's saved value else the proposed default; listProductStartTimes' stepMinutes parameter carries no default, so
+  an omitted step is the venue's, else the tenant's, else 30.
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "VenueSettings.stepMinutes carries the proposed default 30, as every
+    other configured limit carries its own ... getVenueSettingsDefaults: for each limit, answer the tenant''s saved value,
+    else the proposed default ... listProductStartTimes: when the request sends no stepMinutes, the step is the venue''s stepMinutes,
+    else the tenant''s saved stepMinutes, else 30 ... the parameter''s own default of 30 must not fill the value before the
+    venue is asked"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-484 (Surendra Loke, #27959): VenueSettings.stepMinutes was the one configured limit written without its proposed
+  default, so getVenueSettingsDefaults answered null; the query parameter''s own default could fill the step before the venue
+  was asked.'
+keys_touched:
+  operations:
+  - getVenueSettingsDefaults
+  - listProductStartTimes
+  schemas:
+  - VenueSettings
+  tables:
+  - platform.venue_settings
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/resources.yaml
+  - tools/check-business-rules.py
+root_class: a configured limit written without the proposed default its own comment promises
+tickets:
+  started:
+  - '27959 (getVenueSettingsDefaults, Surendra Loke, Ready for QA): answer the tenant''s saved value, else the proposed default
+    (stepMinutes 30), with the four tests the decision names; the posted comment carries it.'
+  unstarted:
+  - '28148 (listProductStartTimes): an omitted stepMinutes is absent; venue, then tenant, then 30.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-484
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-VENUE-LIMIT-DEFAULT
+status: open
+notes: 'Beyond the posted words: none in the text. Fact for the lead: derive-ddl turns a property''s default into a column
+  DEFAULT, so platform.venue_settings.step_minutes gets DEFAULT 30 in the release''s migration, exactly as cart_lease_seconds
+  has DEFAULT 900; a row inserted without the column would hold 30. The setters write every limit (PUT replaces the row whole),
+  so no venue row is written with it.'
