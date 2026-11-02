@@ -1,0 +1,60 @@
+id: CHG-CR441-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'OpenShift requires venueId, positionCode, from and to (required on an open shift''s create and update, 400
+  validation when one is missing, from before to); workforce.open_shift''s four columns become NOT NULL in a later
+  forward migration after the existing rows are checked, any row missing one reported, not guessed. Until then
+  claimOpenShift takes a missing value from the released assignment, otherwise answers 409 open-shift-incomplete
+  (new) and writes nothing. BC-600 records the lead''s approval of the breaking change.'
+decision:
+  what: 'Posted on #37102 (Chinmay, 1 November 2026), the lead''s "Approve all" of the same day: "as you recommended
+    (A). An open shift must have venueId, positionCode, from and to: required on OpenShift''s create and update (400
+    validation when missing), with from before to. This is a breaking contract change, approved by the lead and
+    listed in breaking-changes.yaml at the next release. workforce.open_shift''s four columns become NOT NULL in a
+    later forward migration, after existing rows are checked (any row missing one is reported, not guessed). Until
+    then claimOpenShift keeps your interim: a missing value is taken from the released assignment, otherwise the
+    claim answers 409 open-shift-incomplete instead of 500."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-441 (Hrushikant Patkar, #37102 claimOpenShift): CR-380 creates a rota assignment from the open shift''s
+  venueId, positionCode, from and to, all optional on OpenShift and nullable on workforce.open_shift, while
+  workforce.rota_assignment holds them NOT NULL; a shift with no place or time cannot be claimed as decided.'
+keys_touched:
+  operations: [claimOpenShift, listOpenShifts]
+  schemas: [OpenShift]
+  tables: [workforce.open_shift, workforce.rota_assignment]
+  files:
+  - contracts/satellite/workforce.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-600'
+  - 'problem type open-shift-incomplete (new)'
+root_class: 'a write built from fields the source row may not have'
+tickets:
+  started:
+  - '37102 (claimOpenShift, Hrushikant): keep the interim: a missing venueId, positionCode, from or to is taken from
+    the released assignment, otherwise 409 open-shift-incomplete (not 500) and nothing written. Told through the
+    lead''s comment; its text is not rewritten.'
+  - '37104 (listOpenShifts, Hrushikant, Ready for QA): no change; OpenShift now always carries the four fields.'
+  unstarted:
+  - 'New task needed ([DB] workforce, the migration owner): check workforce.open_shift for rows missing venue_id,
+    position_code, valid_from or valid_to and report them (never guess a value), then SET NOT NULL on the four
+    columns in a forward migration, when the lead schedules it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-441
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-OPEN-SHIFT-COMPLETE
+status: open
+notes: '**For the lead: no operation in the package creates or updates an open shift** (only claimOpenShift writes
+  workforce.open_shift, to claim it; BO-887 records the gap since 2 October, CHG-WIR-004). So "required on create
+  and update, 400 when missing" is stated on OpenShift and has no request to land on, and check-contract-compat
+  counts the required list as additive (a response field now always present): BC-600 matches no reported change and
+  shows as a NOTE until such an operation exists. BR-OPEN-SHIFT-COMPLETE fails on any later operation that writes
+  workforce.open_shift with no 400. The NOT NULL step is derive-ddl''s hand-change row in handoff/migration-review.md
+  (the four columns, "backfill, then SET NOT NULL"); this release writes no NOT NULL. Beyond the comment''s words:
+  the 409 also writes nothing, as every refusal of the claim does.'

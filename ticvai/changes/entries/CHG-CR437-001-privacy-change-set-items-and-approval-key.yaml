@@ -1,0 +1,52 @@
+id: CHG-CR437-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'marketing.privacy_change_set keeps items (jsonb, nullable), the change set''s contents exactly as
+  PrivacyConfigurationTestingApprovalPublicationView.items returns them, written whole on each save (stated on the
+  field), and approval_request_id becomes a declared foreign key to approvals.request(id)
+  (PrivacyConfigurationTestingApprovalPublicationView.approvalRequestId x-ticvai-references approvals.request), as
+  workforce.leave_request.approval_request_id is. The table''s DDL is then 9 columns plus the key; the release''s
+  forward migration carries the key.'
+decision:
+  what: 'Posted on #37087 (Chinmay, 1 November 2026), the lead''s "Approve all" of the same day: "as you recommended
+    (A). marketing.privacy_change_set gets items jsonb, nullable: the change set''s contents exactly as
+    PrivacyConfigurationTestingApprovalPublicationView.items returns them, written whole on each save.
+    approval_request_id gets a foreign key to approvals.request(id), as workforce.leave_request and
+    platform.dsar_request already have. Write it as one guarded forward migration for #37087 (CREATE TABLE with the
+    9 columns, then the foreign key, each applying twice cleanly)."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-437 (Hrushikant Patkar, #37087 [DB] marketing.privacy_change_set, blocking): the table record listed
+  items while the r1 DDL (010-marketing.sql) created 8 columns (items arrives only in the after-r1 V0104), and
+  approval_request_id was a naming convention, indexed but not a key, although the record says the table references
+  approvals.request. A change set without its items cannot be tested, approved or published.'
+keys_touched:
+  schemas: [PrivacyConfigurationTestingApprovalPublicationView]
+  tables: [marketing.privacy_change_set, approvals.request]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+root_class: 'a reference the record describes, left a naming convention with no declared key'
+tickets:
+  started:
+  - '37087 ([DB] marketing.privacy_change_set, Hrushikant): one guarded forward migration: CREATE TABLE IF NOT
+    EXISTS with the 9 columns (items jsonb nullable included), then the key privacy_change_set_approval_request_id_fkey
+    to approvals.request(id) guarded by a pg_constraint check, each applying twice cleanly. Told through the lead''s
+    comment; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-437
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRIVACY-CHANGE-SET
+status: open
+notes: 'No new column: items has been in the package since V0104 (after r1), so the derived forward migration of this
+  release carries only ALTER TABLE marketing.privacy_change_set ADD CONSTRAINT
+  privacy_change_set_approval_request_id_fkey; the integration refresh writes it. The table still has no description
+  (the CR noted it); the posted decision does not ask for one. Not done: platform.dsar_request, which the comment
+  names, is sync.dsar_request in the package now; the contract text cites workforce.leave_request only. The writer
+  (approvePrivacyTesting, #37129) and the reader (listPrivacyChangeSets) need no change: the writer already stores
+  items, now stated as whole on each save.'
