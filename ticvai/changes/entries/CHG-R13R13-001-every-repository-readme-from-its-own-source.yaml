@@ -1,0 +1,50 @@
+id: CHG-R13R13-001
+date: '2026-11-02'
+source: audit
+kind: process
+summary: Every README.md under repos/ is now written by tools/derive-mirrors.py. A repository's own README (and the
+  cell module's) comes from its authored source in docs/repos/. Every other README that is not a mirror of a package
+  file (the setup standards' folder, the older documentation folders, each bible's root, two code folders) is an index
+  of its own folder. 104 of them were byte copies of docs/active/README.md.
+decision:
+  what: 'The lead, 2 November 2026, on fixing the mechanical root causes of the Block A developer pull in parallel with
+    the r13 build lanes: "lets see if we can do something in parallel", then "yes". docs/repos/ holds eight authored
+    sources (the repositories index, the six repositories and the infra cell module). derive-mirrors README_SOURCES
+    writes them and folder_index() writes the rest, each with a one-line header naming its source.
+    tools/check-repo-readmes.py RR-COPY, registered in run-checks, fails when a README under repos/ is a copy of a
+    package file other than its declared source.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'r13 root R13 of the Block A developer pull (31 October 2026; finding 1.27626.2, with 1.27627.2, 2.27633.1,
+  2.27634.1, 3.27640.1 and 5.27637.1). The setup README every onboarding ticket links, each repository''s README and the
+  infra README SETUP-ENV''s Done-when extends were all the Active page, from the first commit d200412e9 on. No tool wrote
+  them, so no refresh put them right.'
+keys_touched:
+  files:
+  - tools/derive-mirrors.py
+  - tools/check-repo-readmes.py
+  - tools/run-checks.py
+  - docs/repos/README.md
+  - docs/repos/index.md
+  - docs/repos/ticvai-ai.md
+  - docs/repos/ticvai-backend.md
+  - docs/repos/ticvai-contracts.md
+  - docs/repos/ticvai-docs.md
+  - docs/repos/ticvai-frontend.md
+  - docs/repos/ticvai-infra.md
+  - docs/repos/ticvai-infra-cell.md
+root_class: generated output nobody generates (a file copied once and never owned by a tool)
+tickets:
+  started: []
+  unstarted:
+  - '#27626 SETUP-CI, #27627 SETUP-ENV, #27633 and #27634 onboarding, #27637 SETUP-ONBOARD-SECOND-AI-ENGINEER, #27640
+    SETUP-CLIENTS (New at the 31 October pull): after the refresh, the linked setup README is the index of the setup
+    standards, and the infra and contracts READMEs describe their repositories.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 2 November 2026 (r13 root-cause lanes)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-repo-readmes.py::RR-COPY (--self-test)
+status: open
