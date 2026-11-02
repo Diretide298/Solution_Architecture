@@ -1,0 +1,37 @@
+id: CHG-CRF-004
+date: '2026-11-02'
+source: plan
+kind: process
+summary: The CR watcher drafts new requests in batches by area, one agent per batch and several at once, and drops from
+  its list every request settled outside it.
+decision:
+  what: 'tools/cr-watch.py run groups the requests to draft by area (the module their artefact names, or a screen''s
+    app), at most six to a batch, and runs one read-only Claude Code agent per batch, four at once (150 turns, 10 dollars
+    and 40 minutes each). The batch prompt carries the settled decisions of every earlier request the batch names, read
+    from ADAM''s export, since the agent may read only the release. Related requests get one consistent rule. Each
+    answer also carries the question for the lead and any new ticket the work needs; a resolution ADAM would refuse
+    (over 4,000 characters) is a failed draft. A request ADAM no longer has Open leaves the watcher''s list, so it is
+    never drafted or closed again over a decision made elsewhere.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Lead, 2 November 2026: "Now lets pull all the CRs. how do we do those manually. I want the watcher to work like
+  that with agents spawned for batch of CRs", then "approve all as a recommended". Finding: the first run drafted each
+  request alone in 12 turns and 11 of 27 drafts stopped mid-check; five batch agents run by hand answered all 27 in 60
+  to 120 tool calls each, with one rule per class (six in-process reads answered alike). The watcher''s list still held
+  the 26 requests settled by hand, which its next run would have drafted and closed again.'
+keys_touched:
+  files:
+  - tools/cr-watch.py
+  - docs/active/release-runbook.md
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 2 November 2026'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/cr-watch.py::_t_batch
+status: open

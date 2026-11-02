@@ -34,6 +34,7 @@ as "nothing new". Output goes to audit/ticvai/cr-watch/ (gitignored). The self-t
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import contextlib
 import csv
 import datetime
@@ -74,10 +75,10 @@ VERDICTS = ("FIXED IN", "PARTLY FIXED", "NOT FIXED", "NOT A PROBLEM")
 NEEDS = ("lead", "client", "none")
 STATUSES = ("open", "accepted", "rejected", "done")   # settle_changes.py
 LOCK_HOURS = 2
-DRAFT_MINUTES = 15
+DRAFT_MINUTES = 40                   # one batch agent (2 November: 13 to 19 minutes for 5 or 6 requests)
 MAX_TRIES = 2                        # a draft that fails this often is answered by hand (fix round 1, I-4)
-MAX_TURNS = "12"                     # the drafting turn's limits (fix round 1, I-4)
-MAX_BUDGET_USD = "1.00"
+MAX_TURNS = "150"                    # a batch agent's limits (fix round 1, I-4; 2 November: 60 to 120 tool calls
+MAX_BUDGET_USD = "10.00"             # per batch of six; 12 turns per single request stopped 11 of 27 mid-check)
 # What the drafting turn must never read, whatever folder it is in (fix rounds 1 and 2, I-3). Rule paths start with
 # `//` for an absolute path; the home-folder places are built from the home folder, not from a drive letter.
 NO_READ = ("Read(//**/*.env)", "Read(//**/.env*)", "Read(//d/Chinmay/adam/audit/**)")
@@ -407,6 +408,143 @@ def draft_prompt(cr: dict, facts: list, release: str, nxt: str, note: str = "") 
                          facts="\n".join(f"  - {x}" for x in facts), note=lead)
 
 
+# Drafting by batch (the lead, 2 November 2026: "I want the watcher to work like that with agents spawned for batch of
+# CRs"): requests about one area go to one agent, so related requests get one consistent answer, and the agent has room
+# to check them (on 2 November, 12 turns stopped 11 of 27 single drafts mid-check; five batch agents answered all 27 in
+# 60 to 120 tool calls and 13 to 19 minutes each).
+BATCH_SIZE = 6                       # requests per drafting agent
+BATCH_JOBS = 4                       # drafting agents at once
+RESOLUTION_LIMIT = 3900              # ADAM refuses a resolution over 4,000 characters (CR-455, 2 November)
+
+REQUEST = """== {ref}, raised {raised} by {raised_by}, ticket #{ticket}, {kind} {artefact}{blocking}
+  Title: {title}
+  Problem: {problem}
+  Evidence: {evidence}
+  Options: {options}
+  The developer recommends: {recommendation}
+  What the watcher found with no AI:
+{facts}{note}
+"""
+
+BATCH_PROMPT = """You answer a batch of {count} change request(s) TICVAI developers raised in ADAM, about {area}, against
+the package as released at {release} (this folder: paths are relative to ticvai/ unless they start with viewer/;
+handoff/service-docs/tasks.csv lists every planned ticket, handoff/service-docs/adam-links.json which tickets build
+what, with their status). Read what you need. Change nothing, run nothing.
+
+The requests
+{requests}
+{earlier}
+Do this, for each request
+1. Check each point against the package at {release}; quote the file and the line. Say which points it already has,
+   which it does not, which were misread, and whether an existing ticket already covers the work.
+2. Look across the batch: requests that are the same kind of gap get one consistent rule. Name the class: the known
+   class given when it fits, else "new: <a name in plain words>".
+3. Verdict: FIXED IN {release}, PARTLY FIXED, NOT FIXED or NOT A PROBLEM.
+4. Recommendation: the option and why, saying where you differ from the developer.
+5. Resolution, what the developer's agent reads on its ticket: start "Decided (Chinmay, {today}): ", then "Build now:"
+   exactly what they build, complete enough to build from: the decision is the whole change (no release carries it;
+   the package catches up later). Plain words, no batch codes or acronyms as names of work. Developers and agents are
+   always on the latest release: never ask anyone to choose or pin a release. Client-approved screens never change
+   visibly: fix the contract, binding or storage to fit the screen; a "Design change:" request records a frontend
+   developer's own design change and is accepted. A started ticket's text is never rewritten. At most 3,500
+   characters.
+6. needs: none (the package, an earlier decision or a standing rule settles it, or there is one sensible consistency
+   answer), lead (a real product or architecture choice), or client (a business rule, law, hardware or money question
+   the package cannot settle). Be honest: a real choice is the lead's.
+7. question: when needs is lead or client, one plain-words question with its options, your recommendation first;
+   else "".
+8. new_ticket: work no existing ticket covers, as {{"subject": "...", "parent": "<ticket id>"}}; else null.
+
+End with one JSON block and nothing after it: an array with one object per request, in this order ({refs}):
+```json
+[{{"cr": "CR-nnn", "verdict": "...", "class": "...", "recommendation": "...", "resolution": "...", "needs": "none",
+  "question": "", "new_ticket": null, "misread": "..."}}]
+```
+"""
+
+
+def area_of(cr: dict) -> str:
+    """The area a request is batched by: the module its artefact names (`catalogue#op`, `catalogue.table`,
+    `white-label:Schema`), a screen's app (`KSK-010` -> screen-ksk), else `other`."""
+    a = (cr.get("artefact") or "").strip().lower()
+    m = re.match(r"([a-z][a-z0-9-]*)[#.:]", a)
+    if m:
+        return m.group(1)
+    m = re.match(r"([a-z]+)-\d+", a)
+    return f"screen-{m.group(1)}" if m else "other"
+
+
+def make_batches(items: list, size: int = BATCH_SIZE) -> list:
+    """The requests to draft, as batches of at most `size`: by area, then by id, so a batch holds related requests."""
+    by = {}
+    for p in sorted(items, key=lambda p: (area_of(p["cr"]), p["id"])):
+        by.setdefault(area_of(p["cr"]), []).append(p)
+    out = []
+    for group in by.values():
+        out += [group[i:i + size] for i in range(0, len(group), size)]
+    return out
+
+
+def earlier_decisions(batch: list, rows: list) -> str:
+    """The settled decisions of the requests a batch refers to (CR-439, CR-365, ...), from ADAM's export: the drafting
+    agent may read only the release, and these decisions are not in it yet."""
+    own = {p["ref"] for p in batch}
+    named = set()
+    for p in batch:
+        cr = p["cr"]
+        named |= set(re.findall(r"\bCR-\d+\b", " ".join(str(cr.get(k) or "") for k in
+                                                         ("title", "problem", "evidence", "options", "recommendation"))))
+    by = {r["ref"]: r for r in rows}
+    lines = []
+    for ref in sorted(named - own, key=lambda r: int(r[3:])):
+        r = by.get(ref)
+        if r and (r.get("our decision") or "").strip():
+            lines.append(f"  {ref} ({r.get('status', '')}): {_fold(r['our decision'])[:2500]}")
+    return ("Earlier decisions these requests refer to (ADAM)\n" + "\n".join(lines) + "\n") if lines else ""
+
+
+def batch_prompt(batch: list, rows: list, release: str, today: str) -> str:
+    requests = []
+    for p in batch:
+        cr = p["cr"]
+        note = f"\n  The lead rejected the last draft: {p['redraft_note']}" if p.get("redraft_note") else ""
+        requests.append(REQUEST.format(
+            ref=cr["ref"], raised=cr["raised"], raised_by=cr["raised by"], ticket=cr["ticket"] or "none",
+            kind=cr["kind"], artefact=cr["artefact"], blocking=", blocking" if cr["blocking"] == "yes" else "",
+            title=cr["title"], problem=cr["problem"], evidence=cr["evidence"] or "none",
+            options=cr["options"] or "none", recommendation=cr["recommendation"] or "none",
+            facts="\n".join(f"    - {x}" for x in p["facts_lines"]), note=note))
+    return BATCH_PROMPT.format(count=len(batch), area=area_of(batch[0]["cr"]), release=release, today=today,
+                               requests="\n".join(requests), earlier=earlier_decisions(batch, rows),
+                               refs=", ".join(p["ref"] for p in batch))
+
+
+def parse_batch(text: str, refs: list, release: str) -> dict:
+    """ref -> the checked draft, or the ValueError saying why that request has none. Raises ValueError when the
+    answer has no JSON block at all."""
+    blocks = re.findall(r"```json\s*(.*?)```", text, re.S)
+    raw = (blocks[-1] if blocks else text).strip()
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"the batch's answer does not end with a JSON block ({e.msg})") from None
+    if isinstance(data, dict):
+        if len(refs) != 1:
+            raise ValueError(f"the batch's answer is one object for {len(refs)} requests")
+        data = [dict(data, cr=data.get("cr") or refs[0])]
+    out = {}
+    for d in data if isinstance(data, list) else []:
+        ref = str((d or {}).get("cr") or "").strip().upper()
+        if ref in refs and ref not in out:
+            try:
+                out[ref] = _check_draft(d, release)
+            except ValueError as e:
+                out[ref] = e
+    for ref in refs:
+        out.setdefault(ref, ValueError("the batch's answer has no entry for it"))
+    return out
+
+
 def parse_draft(text: str, release: str) -> dict:
     """The JSON block that ends a draft, checked. Raises ValueError naming what is wrong."""
     blocks = re.findall(r"```json\s*(\{.*?\})\s*```", text, re.S)
@@ -415,6 +553,13 @@ def parse_draft(text: str, release: str) -> dict:
         d = json.loads(raw)
     except json.JSONDecodeError as e:
         raise ValueError(f"the draft does not end with a JSON block ({e.msg})") from None
+    return _check_draft(d, release)
+
+
+def _check_draft(d: dict, release: str) -> dict:
+    """One request's draft object, checked; raises ValueError naming what is wrong."""
+    if not isinstance(d, dict):
+        raise ValueError("the draft is not a JSON object")
     verdict = " ".join(str(d.get("verdict") or "").split()).upper()
     if not any(verdict.startswith(v) for v in VERDICTS):
         raise ValueError(f"verdict {d.get('verdict')!r} is not FIXED IN {release}, PARTLY FIXED, NOT FIXED or "
@@ -422,11 +567,16 @@ def parse_draft(text: str, release: str) -> dict:
     resolution = " ".join(str(d.get("resolution") or "").split())
     if not resolution:
         raise ValueError("the draft has no resolution")
+    if len(resolution) > RESOLUTION_LIMIT:
+        raise ValueError(f"the resolution is {len(resolution)} characters; ADAM takes at most 4,000")
     needs = str(d.get("needs") or "lead").strip().lower()
     if needs not in NEEDS:
         raise ValueError(f"needs {d.get('needs')!r} is not lead, client or none")
+    new = d.get("new_ticket")
     return {"verdict": verdict, "class": str(d.get("class") or ""), "recommendation": str(d.get("recommendation") or ""),
-            "resolution": resolution, "needs": needs, "misread": str(d.get("misread") or "")}
+            "resolution": resolution, "needs": needs, "misread": str(d.get("misread") or ""),
+            "question": " ".join(str(d.get("question") or "").split()),
+            "new_ticket": new if isinstance(new, dict) and new.get("subject") else None}
 
 
 def releases_from(tags) -> tuple:
@@ -810,6 +960,13 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
         print(f"cr-watch: the release tags could not be read ({e})")
         return 2
     by_ref = {r["ref"]: r for r in rows if r["project"] == state["project"]}
+    # A request settled outside the watcher (by hand, or by a batch the lead ran) leaves the list: drafting it again,
+    # or closing it on its own over the lead's decision, would rewrite what was settled (2 November 2026).
+    gone = [ref for ref in pending if ref in by_ref and by_ref[ref]["status"] != "Open"]
+    for ref in gone:
+        pending.pop(ref)
+    if gone:
+        _log(out, f"{stamp} settled elsewhere, off the list: {', '.join(gone)}")
     for p in pending.values():
         p["cr"] = by_ref.get(p["ref"], p["cr"])          # the request as ADAM has it now
         p["facts"] = sort_request(p["cr"], rows, classes, baseline, idx, branches)
@@ -831,21 +988,34 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
                 cwd = None
                 for p in todo:
                     p["draft_error"] = f"no worktree at {release}: {e}"
-            for p in todo if cwd else []:
-                answer = ""
+            today = datetime.date.today()
+            today = f"{today.day} {today.strftime('%B %Y')}"
+
+            def one(batch):
+                refs = [p["ref"] for p in batch]
                 try:
-                    answer = draft(draft_prompt(p["cr"], p["facts_lines"], release, nxt, p.get("redraft_note", "")),
-                                   cwd)
-                    d = parse_draft(answer, release)
-                    status, ref_to = settle_as(d["verdict"], release, nxt)
-                    p.update(draft=d, draft_error="", drafted_at=_now(), status=status, ref_to=ref_to,
-                             resolution=d["resolution"], redraft_note="")
+                    answer = draft(batch_prompt(batch, rows, release, today), cwd)
+                    return batch, answer, parse_batch(answer, refs, release)
                 except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as e:
-                    p["draft_tries"] = p.get("draft_tries", 0) + 1
-                    p["draft_error"] = _fold(e)[:200]
-                    if p["draft_tries"] >= MAX_TRIES:
-                        p["draft_error"] = f"draft failed twice: answer by hand ({p['draft_error']})"
-                _draft_file(out, p, answer)
+                    return batch, "", {r: e for r in refs}
+
+            batches = make_batches(todo, getattr(a, "batch_size", None) or BATCH_SIZE) if cwd else []
+            jobs = max(1, getattr(a, "jobs", None) or BATCH_JOBS)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as pool:
+                results = list(pool.map(one, batches))
+            for batch, answer, got in results:
+                for p in batch:
+                    d = got[p["ref"]]
+                    if isinstance(d, dict):
+                        status, ref_to = settle_as(d["verdict"], release, nxt)
+                        p.update(draft=d, draft_error="", drafted_at=_now(), status=status, ref_to=ref_to,
+                                 resolution=d["resolution"], redraft_note="")
+                    else:
+                        p["draft_tries"] = p.get("draft_tries", 0) + 1
+                        p["draft_error"] = _fold(d)[:200]
+                        if p["draft_tries"] >= MAX_TRIES:
+                            p["draft_error"] = f"draft failed twice: answer by hand ({p['draft_error']})"
+                    _draft_file(out, p, answer)
     for p in pending.values():
         if not (out / "drafts" / f"{p['ref']}.md").exists():
             _draft_file(out, p, "")
@@ -1174,7 +1344,7 @@ def _t_pipeline(fails):
                               blocking="yes"), _row(2), _row(3)])
         a = argparse.Namespace(out=str(d / "out"), csv=None, project="ticvai", seed=False, start_id=None,
                                no_draft=False, classes=d / "c.yaml", baseline=d / "b.json", links=links, claude="",
-                               release_dir="", adam="https://adam.example", apply=False)
+                               release_dir="", adam="https://adam.example", apply=False, batch_size=1, jobs=1)
         calls = []
 
         def drafter(prompt, cwd):
@@ -1254,7 +1424,7 @@ def _t_pipeline(fails):
 def _pipe_args(d, **kw):
     a = argparse.Namespace(out=str(d / "out"), csv=None, project="ticvai", seed=False, start_id=0, no_draft=False,
                            classes=d / "c.yaml", baseline=d / "b.json", links=_links_file(d, []), claude="",
-                           release_dir="", adam="https://adam.example", apply=False)
+                           release_dir="", adam="https://adam.example", apply=False, batch_size=1, jobs=1)
     for k, v in kw.items():
         setattr(a, k, v)
     return a
@@ -1378,7 +1548,7 @@ def _t_budget(fails):
     _expect(fails, "tools are limited", after("--tools"), "Read,Grep,Glob")
     _expect(fails, "settings only from the project", after("--setting-sources"), "project")
     _expect(fails, "no outside MCP servers", "--strict-mcp-config" in argv, True)
-    _expect(fails, "turn and money limits", (after("--max-turns"), after("--max-budget-usd")), ("12", "1.00"))
+    _expect(fails, "turn and money limits", (after("--max-turns"), after("--max-budget-usd")), ("150", "10.00"))
     deny = argv[argv.index("--disallowedTools") + 1:]
     home = rule_path(Path.home())
     for want in ("Bash", "Edit", "Write", "WebFetch", "Read(//**/*.env)", "Read(//**/.env*)",
@@ -1498,7 +1668,66 @@ def _t_auto(fails):
         _expect(fails, "auto: a failed settle leaves the list as it was", len(state2["pending"]), 8)
 
 
-TESTS = [_t_export, _t_sort, _t_draft, _t_review, _t_default, _t_pipeline, _t_marks, _t_budget, _t_proposed, _t_auto]
+def _t_batch(fails):
+    _expect(fails, "area: operation, table, schema, screen, nothing",
+            [area_of({"artefact": a}) for a in ("catalogue#listX", "catalogue.price", "white-label:Banner", "KSK-010",
+                                                 "")], ["catalogue", "catalogue", "white-label", "screen-ksk", "other"])
+    items = []
+    for i, art in enumerate(["catalogue#a", "orders#b", "catalogue#c", "catalogue#d", "catalogue.e"], 1):
+        p = _item(_row(i, artefact=art))
+        p["facts_lines"] = ["t"]
+        items.append(p)
+    got = [[p["ref"] for p in b] for b in make_batches(items, 3)]
+    _expect(fails, "batches: by area, at most the size", got, [["CR-001", "CR-003", "CR-004"], ["CR-005"], ["CR-002"]])
+    one = {"verdict": "NOT FIXED", "resolution": "Build now: x", "needs": "none"}
+    answer = "```json\n" + json.dumps([dict(one, cr="CR-001"), dict(one, cr="CR-003", needs="boss")]) + "\n```"
+    parsed = parse_batch(answer, ["CR-001", "CR-003", "CR-004"], "r12")
+    _expect(fails, "batch: a good entry is a draft", parsed["CR-001"]["needs"], "none")
+    _expect(fails, "batch: a bad entry is its own error", isinstance(parsed["CR-003"], ValueError), True)
+    _expect(fails, "batch: a missing entry is an error", "no entry" in str(parsed["CR-004"]), True)
+    long = parse_batch("```json\n" + json.dumps([dict(one, cr="CR-001", resolution="x" * 4000)]) + "\n```",
+                       ["CR-001"], "r12")
+    _expect(fails, "batch: a resolution ADAM would refuse is an error", "4,000" in str(long["CR-001"]), True)
+    _expect(fails, "batch: one object answers a batch of one", parse_batch(
+        "```json\n" + json.dumps(one) + "\n```", ["CR-007"], "r12")["CR-007"]["resolution"], "Build now: x")
+    rows = parse_export(_csv([_row(1, problem="follows CR-002"), _row(2, status="Done",
+                                                                   **{"our decision": "Use the queue."})]))
+    p = _item(rows[0])
+    p["facts_lines"] = ["t"]
+    _expect(fails, "earlier decisions named in a request go into the prompt",
+            "CR-002 (Done): Use the queue." in batch_prompt([p], rows, "r12", "2 November 2026"), True)
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        (d / "c.yaml").write_text(TEST_CLASSES, encoding="utf-8")
+        (d / "b.json").write_text(json.dumps(TEST_BASELINE), encoding="utf-8")
+        links = _links_file(d, [(10, "table", "sch.tab", "Ready for QA")])
+        csv_text = _csv([_row(1), _row(2), _row(3, kind="Table", artefact="sch.tab")])
+        a = argparse.Namespace(out=str(d / "out"), csv=None, project="ticvai", seed=False, start_id=0,
+                               no_draft=False, classes=d / "c.yaml", baseline=d / "b.json", links=links, claude="",
+                               release_dir="", adam="https://adam.example", apply=False, batch_size=6, jobs=2)
+        calls = []
+
+        def drafter(prompt, cwd):
+            calls.append(prompt)
+            refs = re.findall(r"^== (CR-\d+)", prompt, re.M)
+            return "```json\n" + json.dumps([dict(one, cr=r) for r in refs]) + "\n```"
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, fetch=lambda _a: csv_text, drafter=drafter, tree=d, rel=("r12", "r13"), branches=set())
+        _expect(fails, "run: one agent per area batch", sorted(len(re.findall(r"^== CR-", c, re.M)) for c in calls),
+                [1, 2])
+        state = load_state(d / "out")
+        _expect(fails, "run: every request drafted from its batch",
+                sorted(r for r, p in state["pending"].items() if p.get("draft")), ["CR-001", "CR-002", "CR-003"])
+        settled = _csv([_row(1, status="Done"), _row(2), _row(3, kind="Table", artefact="sch.tab")])
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, fetch=lambda _a: settled, drafter=drafter, tree=d, rel=("r12", "r13"), branches=set())
+        _expect(fails, "run: a request settled elsewhere leaves the list", sorted(load_state(d / "out")["pending"]),
+                ["CR-002", "CR-003"])
+
+
+TESTS = [_t_export, _t_sort, _t_draft, _t_review, _t_default, _t_pipeline, _t_marks, _t_budget, _t_proposed, _t_auto,
+         _t_batch]
 
 
 def self_test() -> list:
@@ -1530,6 +1759,8 @@ def main(argv=None) -> int:
     ap.add_argument("--claude", default="", help="path of the claude command (default: found on PATH)")
     ap.add_argument("--release-dir", default=RELEASE_DIR, help="the watcher's worktree at the latest release")
     ap.add_argument("--apply", action="store_true", help="settle: really settle (default: dry run)")
+    ap.add_argument("--batch-size", type=int, default=BATCH_SIZE, help="run: requests per drafting agent")
+    ap.add_argument("--jobs", type=int, default=BATCH_JOBS, help="run: drafting agents at once")
     ap.add_argument("--auto", action="store_true",
                     help="run: close on their own the requests that need no decision (needs none, or a class with an "
                          "active default ruling), through settle_changes.py --apply; the rest wait for the lead")

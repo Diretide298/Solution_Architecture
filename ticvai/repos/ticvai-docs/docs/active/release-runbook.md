@@ -20,7 +20,8 @@ If a CR contradicts a registered decision (the Decisions Register or an ADR), it
 **Developer CRs are answered by the CR watcher** (`tools/cr-watch.py`; CHG-CRF-002). Every 30 minutes, on the lead's
 machine, it reads the requests ADAM has received since its last run, sorts each one with no AI (its class from
 `handoff/cr-classes.yaml` and the class's known members across the package, a duplicate, the open blocking requests
-it waits for, the tickets it touches), drafts one answer per request against the latest release, and lists them in
+it waits for, the tickets it touches), drafts the answers against the latest release in batches by area (one
+read-only agent per batch of up to six, four at once, given the earlier decisions the batch names; CHG-CRF-004), and lists them in
 `REVIEW.md` in the watcher's folder on the lead's machine (outside git). The lead marks each `approve`, `change` or `reject: <why>`; the requests in a class
 with an active default ruling come first under one `approve all default-ruled` line that clears them with one mark.
 `python3 tools/cr-watch.py settle` (dry run), then `--apply`, settles the marked ones through
