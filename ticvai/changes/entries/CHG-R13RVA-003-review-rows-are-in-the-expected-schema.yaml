@@ -1,0 +1,42 @@
+id: CHG-R13RVA-003
+date: '2026-11-03'
+source: audit
+kind: process
+summary: A [DB] ticket's expected-schema.json carries the changes no file writes that its text gives it to write
+  (handoff/migration-review.md, the "Changes no file writes, for this migration to write" sentence). ADAM writes a NOT
+  NULL, a column's type, default and check, and an added constraint as the statements that make them, applies them to
+  the expected shape and gives them to db-ticket.mjs after the package's own statements. A row whose change is a
+  decision (a dropped or retired table or column, a key's columns, a dropped statement) is listed in the README as not
+  in the check, never guessed.
+decision:
+  what: 'The lead, 3 November 2026, on the review of all 1,582 Block A tickets at the r13 candidate: "why are these
+    coming back again and again?", "get going on those as well so we close it", "you get the rest sorted". Review
+    finding review-changes-not-in-expected: viewer/mcp/tools.mjs reviewRowsNamed, reviewRows and reviewStatements, used
+    by writeExpectedSchema; the README''s "Checking this migration" names which rows are in the check and which are
+    decisions.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 candidate review finding review-changes-not-in-expected (8 tickets: #27647, #27652, #27653, #27656, #27657,
+  #27658, #27665, #27681): a ticket''s review rows were in its text but not in its expected-schema.json, so a migration
+  written to the text could not reach MATCH. #27647 MIG-CONTROL is told to make control.cell_tenant.root_scope_path NOT
+  NULL and control.url_redirect.status_code an integer with a CHECK, and the expected schema kept them nullable and
+  text. The rows stay out of the package DDL (derive-ddl leaves them to a person, CHG-R8MIG-013), so ADAM writes them.'
+keys_touched:
+  files:
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/db-ticket-check.mjs
+root_class: a ticket told to write a change that the check it must pass did not contain
+tickets:
+  started:
+  - '#27647, #27652, #27653, #27656, #27657, #27658, #27665, #27681 (Ready for QA): pull again and run db-ticket.mjs.
+    MATCH now needs the review rows the text names; a file written to the text matches, one that left them out is
+    DIFFERENT on those columns and constraints and needs them added (after the backfill each row names).'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 3 November 2026 (r13 candidate review, lane x1)'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: viewer/mcp/tools.mjs::reviewStatements
+status: open

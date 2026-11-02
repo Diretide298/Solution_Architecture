@@ -1,0 +1,51 @@
+id: CHG-R13RVA-001
+date: '2026-11-03'
+source: audit
+kind: process
+summary: ADAM's pull tells only a screen ticket how a screen must look. A [BE] or [DB] ticket's README lists the
+  screens that call its operations as "Screens that call this work", built by their own [FE] tickets, with no
+  wireframe file and no "Build the page". A [Test] ticket's README lists "Screens this test covers" with what to test
+  on each (its states, its navigation links and its permission with an allowed and a refused user) and says it builds
+  none of them. A test task now links only what its Builds list, never every screen in the plan that calls one of its
+  operations.
+decision:
+  what: 'The lead, 3 November 2026, on the review of all 1,582 Block A tickets as developers pull them at the r13
+    candidate: "why are these coming back again and again?", "get going on those as well so we close it", "you get the
+    rest sorted". Review findings be-pull-tells-to-build-screens (16 back-end tickets) and
+    test-ticket-linked-as-build-task (21 test tickets): viewer/mcp/tools.mjs ticketKind and screenUseSection replace the
+    "How <screen> must look" sections for [BE], [DB] and [Test] tickets; tools/adam-links.py links a test task to its
+    Builds only; tools/check-ticket-links.py TL-TEST-SCOPE fails a test task linking a screen its Builds do not list.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 candidate review finding be-pull-tells-to-build-screens: the pull wrote a "How <screen> must look" section
+  with "Build the page from the screen record" for every screen a [BE] ticket touches (#27764: 75 sections, 835 lines
+  for four operations). Finding test-ticket-linked-as-build-task: tools/adam-links.py linked a test task like a backend
+  task, its operations plus every screen in the plan that calls them, so 21 of 29 test tickets were told to build up
+  to 80 screens outside their Builds (#27887). A back-end or test ticket''s README now says what that kind of ticket
+  builds.'
+keys_touched:
+  files:
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/pull-files-check.mjs
+  - tools/adam-links.py
+  - tools/check-ticket-links.py
+root_class: a build instruction written for one kind of ticket (a screen ticket) applied to every ticket that touches
+  a screen
+tickets:
+  started:
+  - '#27732, #27749, #27789, #27790, #27791 (Ready for QA, [BE]): nothing to do; their next pull lists the calling
+    screens as context and says the ticket builds no page.'
+  unstarted:
+  - '#27733, #27750, #27764, #27765, #27775, #37010 ([BE], New): the next pull, once ADAM is redeployed, lists the
+    calling screens as context, with no wireframe and no build instruction.'
+  - '#27685, #27703, #27740, #27747, #27794, #27887, #27945, #27967, #27983, #27986, #27998, #28014, #28029, #28140,
+    #28385, #28388, #28446, #28513, #28547, #28643, #28735 ([Test], New): once adam-links.json is regenerated at the
+    release and ADAM is redeployed, the pull links only the screens their Builds list and says what to test on each.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 3 November 2026 (r13 candidate review, lane x1)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-links.py
+status: open

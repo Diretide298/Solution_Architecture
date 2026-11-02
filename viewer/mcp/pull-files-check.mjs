@@ -220,6 +220,10 @@ try {
       9103: { workPackage: { key: '9103', subject: '[FE] BO-100', status: 'New', description: '' }, touches: [{ kind: 'screen', id: 'BO-100' }] },
       9100: { workPackage: { key: '9100', subject: '[BE] Build getPlan', status: 'New', description: 'Builds getPlan.' },
         touches: [{ kind: 'table', id: 'subscription.plan' }] },
+      9104: { workPackage: { key: '9104', subject: '[BE] GuestService: getHome', status: 'New', description: '' },
+        touches: [{ kind: 'screen', id: 'GST-001' }, { kind: 'screen', id: 'BO-100' }] },
+      9105: { workPackage: { key: '9105', subject: '[Test] Module test: Guest home', status: 'New', description: '' },
+        touches: [{ kind: 'screen', id: 'GST-001' }] },
     };
     const screens = { 'XX-001': { id: 'XX-001', name: 'Gone', wireframe: { status: 'review', provenance: 'client-verified',
       board: 'wireframes/P01 Guest Web.dc.html#web-999' } } };
@@ -290,6 +294,32 @@ try {
     await pull.run(client, { key: '9100', dir: dir2 });
     const be = read(dir2, '9100', 'README.md');
     check('a ticket with no screen and nothing to run has neither section', !/must look|Files to run/.test(be));
+    // CHG-R13RVA-001 (3 November 2026, the r13 candidate review): a [BE] ticket's screens call its operations and a
+    // [Test] ticket's are what it tests; neither builds a page, and the pull told both to (#27764, #27887).
+    await pull.run(client, { key: '9104', dir: dir2 });
+    const beScreens = read(dir2, '9104', 'README.md');
+    const beFiles = readdirSync(path.join(dir2, '.adam', 'work', '9104'));
+    check('**a [BE] ticket touching screens: no "must look", no "Build the page", no wireframe file**',
+      !/must look|Build the page/i.test(beScreens) && !beFiles.some((f) => /^wireframe-/.test(f)), beFiles.join(', '));
+    check('**it lists them as the screens that call its work, built by their own [FE] tickets**',
+      beScreens.includes('## Screens that call this work (2)') && beScreens.includes('**this ticket builds no page**')
+        && beScreens.includes('- `GST-001`') && beScreens.includes('[screen-BO-100.json](screen-BO-100.json)'),
+      beScreens.split('## What this touches')[1]?.slice(0, 900));
+    await pull.run(client, { key: '9105', dir: dir2 });
+    const test = read(dir2, '9105', 'README.md');
+    const testFiles = readdirSync(path.join(dir2, '.adam', 'work', '9105'));
+    const gst001 = SCREENS.get('GST-001');
+    check('**a [Test] ticket: no "must look", no "Build the page", no wireframe file**',
+      !/must look|Build the page/i.test(test) && !testFiles.some((f) => /^wireframe-/.test(f)), testFiles.join(', '));
+    check('**it says what to test on each screen: its states, navigation and permission pair, and that it builds none**',
+      test.includes('## Screens this test covers (1)') && test.includes('**it builds none of them**')
+        && test.includes(`States: ${Object.keys(gst001.states).slice(0, 12).join(', ')}`)
+        && (gst001.permission ? test.includes(`Permission: \`${gst001.permission}\`, with an allowed and a refused user`)
+          : test.includes('Permission: none in its record')),
+      test.split('## Screens this test covers')[1]?.slice(0, 900));
+    check('a [DB] ticket is a back-end ticket and an [FE] one a build ticket',
+      tools.ticketKind?.({ subject: '[DB] Tables: a.b' }) === 'backend' && tools.ticketKind?.({ subject: '[FE] GST-001' }) === 'build'
+        && tools.ticketKind?.({ subject: '[Test] Module test: X' }) === 'test');
   }
 
   // ── 2b. each state's look (r9) ─────────────────────────────────────

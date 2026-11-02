@@ -545,7 +545,7 @@ export function descriptionSection(wp, text) {
 }
 
 function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = [],
-  tree = {}, db = null, { looks = [], runs = [] } = {}) {
+  tree = {}, db = null, { looks = [], runs = [], kind = 'build', screens = [] } = {}) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
   out += line('Project', wp.project) + line('Type', wp.type) + line('Part of', partOfText(tree.partOf))
@@ -583,6 +583,7 @@ function ticketReadme(wp, files, missing, when, decisions = [], release = null, 
   }
   out += runSection(runs, release);
   out += lookSection(looks);
+  out += screenUseSection(kind, screens);
   // The files above are summaries. On #20354 (24 September) an agent read them as the whole truth and
   // reported three gaps that were not there - parameters, the item schema and row-level security - and
   // proposed a change request for them. A gap is only a gap once the source says so.
@@ -1015,8 +1016,12 @@ const RLS_MARKER = {
 };
 
 // The r8 helpers that split a table's policy in four (read, append, update, delete), named after the
-// first 55 characters of the table: apply_split_rls and the ones that call it, and append_audit.
-const SPLIT_RLS = new Set(['split', 'read_beneath', 'grant_holder_read', 'grant_holder_subject_read', 'parent_split', 'append_audit', 'own_row']);
+// first 55 characters of the table: apply_split_rls and the ones that call it, and append_audit (and
+// append_audit_read, V0116, which is append_audit with its own read policy). grant_holder_subject (V0118) and
+// parent_split_across (V0105) call apply_split_rls too.
+const SPLIT_RLS = new Set(['split', 'read_beneath', 'grant_holder_read', 'grant_holder_subject_read', 'parent_split',
+  'append_audit', 'append_audit_read', 'own_row', 'grant_holder_subject', 'parent_split_across']);
+const AUDIT_RLS = new Set(['append_audit', 'append_audit_read']);
 
 function applyRls(model, stmt) {
   const m = /^SELECT\s+platform\.apply_(\w+?)_rls\s*\(([\s\S]*)\)$/i.exec(stmt);
@@ -1031,7 +1036,7 @@ function applyRls(model, stmt) {
   if (SPLIT_RLS.has(kind)) {
     const base = shortName(target).slice(0, 55);
     const four = ['read', 'append', 'update', 'delete'].map((s) => `${base}_${s}`);
-    const keep = kind === 'append_audit'
+    const keep = AUDIT_RLS.has(kind)
       ? table.rls.policies.filter((p) => p.name !== `${shortName(target).slice(0, 57)}_scope` && !four.includes(p.name))
       : [];
     table.rls.policies = [...keep, ...four.map((name) => ({ name }))];
@@ -1042,6 +1047,79 @@ function applyRls(model, stmt) {
   const marker = RLS_MARKER[kind];
   table.rls.policies.push({ name: policy, ...(marker ? { uses: marker(args) } : {}) });
   return true;
+}
+
+/**
+ * **Row security a guarded DO block sets** (3 November 2026, the r13 candidate review, class
+ * do-block-rls-not-modelled, CHG-R13RVA-002). From V0113 the after-r1 files apply a table's policies inside a
+ * block guarded on the table and its columns (`DO $$ BEGIN IF to_regclass('identity.redirect_host') IS NOT NULL
+ * THEN PERFORM platform.apply_tenant_rls('identity.redirect_host'::regclass); END IF; END $$`: 77 blocks on 70
+ * tables in V0113-V0122). The reader followed only the ALTER TABLE, key, index and policy-rename statements in a
+ * block, so the expected shape had no policy for a table made after r1 and the older one for a table whose policy
+ * was re-applied, and no ticket was given the block. The block's statements in order, its own `IF` read as below.
+ */
+function doBody(stmt) {
+  const m = /^DO\s+(\$\w*\$)([\s\S]*)\1\s*$/i.exec(String(stmt));
+  if (!m) return [];
+  return sqlStatements(m[2]).map((p) => p.replace(/^\s*BEGIN\s+(?:IF\s+[\s\S]*?\s+THEN\s+)?/i, '').trim()).filter(Boolean);
+}
+
+const DO_RLS_CALL = /^PERFORM\s+platform\.(apply_\w+?_rls|drop_rls_policies)\s*\(\s*'[\w".]+'\s*::\s*regclass/i;
+
+/** A block's row-security call (`PERFORM platform.apply_x_rls('a.t'::regclass, ...)`) as the SELECT a file makes at the top level, or null. */
+export function doRlsCall(one) {
+  return DO_RLS_CALL.test(one) ? one.replace(/^PERFORM\s+/i, 'SELECT ') : null;
+}
+
+/**
+ * Whether a DO block's condition holds on the shape so far: true, false, or null for a condition this reader does
+ * not answer. It answers the after-r1 guards, a conjunction of `to_regclass('a.t') IS NOT NULL` (the table is
+ * there) and `EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'a' AND table_name = 't' AND
+ * column_name = 'c')` (the column is); a block with no IF holds.
+ */
+export function doGuardHolds(model, stmt) {
+  const m = /^DO\s+(\$\w*\$)\s*BEGIN\s+([\s\S]*)\1\s*$/i.exec(String(stmt));
+  if (!m) return null;
+  const cond = /^IF\s+([\s\S]*?)\s+THEN\b/i.exec(m[2]);
+  if (!cond) return true;
+  let rest = cond[1].trim();
+  let holds = true;
+  const TABLE = /^to_regclass\s*\(\s*'([\w".]+)'\s*\)\s+IS\s+NOT\s+NULL/i;
+  const COLUMN = /^EXISTS\s*\(\s*SELECT\s+1\s+FROM\s+information_schema\.columns\s+WHERE\s+table_schema\s*=\s*'(\w+)'\s+AND\s+table_name\s*=\s*'(\w+)'\s+AND\s+column_name\s*=\s*'(\w+)'\s*\)/i;
+  while (rest) {
+    let t;
+    if ((t = TABLE.exec(rest))) holds = holds && model.has(ident(t[1]));
+    else if ((t = COLUMN.exec(rest))) holds = holds && Boolean(model.get(`${ident(t[1])}.${ident(t[2])}`)?.columns.some((c) => c.name === ident(t[3])));
+    else return null;
+    rest = rest.slice(t[0].length).trim();
+    if (rest && !/^AND\s+/i.test(rest)) return null;
+    rest = rest.replace(/^AND\s+/i, '');
+  }
+  return holds;
+}
+
+/** What a guarded block does to row security and indexes, in its order, when its condition holds (doGuardHolds). */
+function doRowSecurity(model, stmt, holds, file, notModelled) {
+  for (const one of doBody(stmt)) {
+    const call = doRlsCall(one);
+    let m;
+    const modelled = call || /^CREATE\s+(UNIQUE\s+)?INDEX\b/i.test(one) || /^DROP\s+POLICY\b/i.test(one);
+    if (!modelled) continue;
+    if (holds === null) {
+      notModelled.push({ file, table: statementTarget(call ?? one), statement: one.slice(0, 200) });
+      continue;
+    }
+    if (!holds) continue;
+    if (call && /^SELECT\s+platform\.apply_/i.test(call)) applyRls(model, call);
+    else if (call && (m = /^SELECT\s+platform\.drop_rls_policies\s*\(\s*'([\w".]+)'/i.exec(call))) {
+      const table = model.get(ident(m[1]));
+      if (table) table.rls.policies = [];
+    } else if (/^CREATE\s+(UNIQUE\s+)?INDEX\b/i.test(one)) createIndex(model, one);
+    else if ((m = /^DROP\s+POLICY\s+(?:IF\s+EXISTS\s+)?([\w"]+)\s+ON\s+([\w".]+)/i.exec(one))) {
+      const table = model.get(ident(m[2]));
+      if (table) table.rls.policies = table.rls.policies.filter((p) => p.name !== ident(m[1]));
+    }
+  }
 }
 
 /**
@@ -1154,14 +1232,20 @@ export function schemaModel(files) {
         // The block runs its statement only when its condition holds: renames and drops are followed
         // (their condition is "the old name is still there"); a foreign key it adds is followed when the
         // block's own conditions hold on the shape so far (keyApplies). Any other constraint it adds is
-        // left out, so the shape never claims more than PostgreSQL will have.
+        // left out, so the shape never claims more than PostgreSQL will have. Its row security and indexes are
+        // followed when its condition holds on the shape before the block (doRowSecurity).
+        const holds = doGuardHolds(model, stmt);
         for (const one of doInner(stmt)) {
+          // A statement a function body builds at run time (V0120's helpers: EXECUTE format('ALTER TABLE %s ...',
+          // target)) names no table of the package; the calls of the helper are what is modelled.
+          if (/^(?:ALTER\s+(?:TABLE|INDEX)|DROP\s+INDEX|CREATE\s+(?:UNIQUE\s+)?INDEX)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:ONLY\s+)?[^\s]*%/i.test(one)) continue;
           if (/^ALTER\s+TABLE\b/i.test(one) && !/\bADD\s+CONSTRAINT\b/i.test(one)) alterTable(model, one, file, notModelled);
           else if (keyApplies(model, keyGuard(one), stmt)) alterTable(model, one, file, notModelled);
           else if ((m = INDEX_RENAME.exec(one))) renameIndex(model, m[1], m[2]);
           else if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(one))) dropIndex(model, m[1]);
         }
         renamePolicies(model, stmt);
+        doRowSecurity(model, stmt, holds, file, notModelled);
         continue;
       }
       if (/^CREATE\s+(?:UNLOGGED\s+)?TABLE\b/i.test(stmt)) createTable(model, stmt, file, notModelled);
@@ -1238,6 +1322,13 @@ export function statementTarget(stmt, indexes = null) {
     }
     // r8's policy renames after a table rename: EXECUTE format('ALTER POLICY %I ON catalogue.channel_envelope RENAME TO %I', ...).
     if ((m = /\bALTER\s+POLICY\s+[\w"%]+\s+ON\s+([\w".]+)/i.exec(s))) return ident(m[1]);
+    // From V0113, a table's row security in a block guarded on the table (CHG-R13RVA-002).
+    for (const one of doBody(s)) {
+      const call = doRlsCall(one);
+      if (call) return statementTarget(call, indexes);
+      // and a table's trigger (V0116's access.entitlement change_version block, V0120's outbox and journal triggers)
+      if ((m = /^(?:CREATE\s+(?:OR\s+REPLACE\s+)?(?:CONSTRAINT\s+)?TRIGGER\s+[\w"]+\s+[\s\S]*?\bON\s+|DROP\s+TRIGGER\s+(?:IF\s+EXISTS\s+)?[\w"]+\s+ON\s+)([\w".]+)/i.exec(one))) return ident(m[1]);
+    }
     return null;
   }
   if ((m = /^DROP\s+INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+EXISTS\s+)?([\w".]+)/i.exec(s))) return indexes?.get(indexKey(indexes, m[1])) ?? null;
@@ -1323,7 +1414,10 @@ export function ticketStatements(files, ticket) {
   const indexes = new Map();
   for (const { name: file, text } of ordered) {
     for (const sql of sqlStatements(text)) {
-      const fn = /^CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+([\w".]+)/i.exec(sql)?.[1];
+      // A helper an after-r1 file defines inside a block recorded by its checksum (V0120's `DO $recorded$ BEGIN IF
+      // <the function is missing or differs> THEN CREATE OR REPLACE FUNCTION ...`) is a helper as a bare one is.
+      const fn = /^CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+([\w".]+)/i.exec(sql)?.[1]
+        ?? (/^DO\s+\$recorded\$/i.test(sql) ? /^CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+([\w".]+)/i.exec(doBody(sql)[0] ?? '')?.[1] : undefined);
       if (ticket.kind === 'baseline') {
         // 000-002 whole; the helper functions every later migration calls: those at the top of 920
         // and 930, and any an after-r1 file adds (V0102 adds platform.apply_append_audit_rls).
@@ -1342,8 +1436,11 @@ export function ticketStatements(files, ticket) {
       }
       const target = statementTarget(sql, indexes);
       // Which table each index is on, for a later DROP INDEX or ALTER INDEX that names only the index.
-      const made = /^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?((?!ON\s)[\w"]+)\s+ON\b/i.exec(sql);
-      if (made && target) indexes.set(`${target.split('.')[0]}.${ident(made[1])}`, target);
+      // An index a guarded block makes counts too (V0116's rule_matrix_id_code_uniq, dropped by name in V0119).
+      for (const one of /^DO\b/i.test(sql) ? doInner(sql) : [sql]) {
+        const made = /^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?((?!ON\s)[\w"]+)\s+ON\b/i.exec(one);
+        if (made && target) indexes.set(`${target.split('.')[0]}.${ident(made[1])}`, target);
+      }
       const renames = [];
       for (const one of /^DO\b/i.test(sql) ? doInner(sql) : [sql]) {
         const renamed = INDEX_RENAME.exec(one);
@@ -1698,16 +1795,117 @@ export function forgetPackageFiles() {
   ddlCache.clear();
 }
 
+// ---- the changes no file writes, which a migration ticket's text gives it ----------------------
+//
+// **Why** (3 November 2026, the r13 candidate review, class review-changes-not-in-expected, CHG-R13RVA-003). derive-ddl
+// leaves a change with a data question behind it (a NOT NULL, a column's type or check, a constraint existing rows may
+// break) to a person: handoff/migration-review.md lists each, and the migration ticket that makes the table carries
+// its rows "for this migration to write" (tools/ticket_done.py review_sentence, CHG-R8MIG-013). The expected schema
+// held only the package's statements, which leave them out, so a migration written to the text could not reach MATCH
+// (#27647 MIG-CONTROL: control.cell_tenant.root_scope_path NOT NULL, control.url_redirect.status_code an integer with
+// a CHECK; 8 tickets). The rows the ticket's text names are now part of what it must leave: each is written as the
+// statements that make it, applied to the expected shape and given to db-ticket.mjs with the package's own. A row whose
+// change is a decision (a drop, a rename, a retired column, a key's columns) is listed, never guessed.
+
+const REVIEW_SENTENCE = /\*\*Changes no file writes, for this migration to write\*\*[^:\n]*:\s*([^\n]+)/;
+const REVIEW_ROW = /^\| ([^|]+?) \| (tenant|control|both) \| `([^`]+)` \| (.*?) \| (.*) \|\s*$/;
+
+/** The review rows a ticket's text names, as [{ kind, object }], in its order. */
+export function reviewRowsNamed(text) {
+  const m = REVIEW_SENTENCE.exec(String(text ?? ''));
+  if (!m) return [];
+  return m[1].replace(/\.\s*$/, '').split(/;\s+/).map((p) => /^(.+?)\s+`([^`]+)`$/.exec(p.trim()))
+    .filter(Boolean).map((x) => ({ kind: x[1].trim(), object: x[2].trim() }));
+}
+
+/** handoff/migration-review.md's rows: [{ kind, database, object, change, action }]. */
+export function reviewRows(markdown) {
+  return String(markdown ?? '').split(/\r?\n/).map((l) => REVIEW_ROW.exec(l)).filter(Boolean)
+    .map((m) => ({ kind: m[1].trim(), database: m[2], object: m[3].trim(), change: m[4].trim(), action: m[5].trim() }));
+}
+
+/** A column definition's parts: { name, type, notNull, default, checks: [{ name, expr }] }. */
+function columnParts(def, table) {
+  const scratch = newTable(table, null);
+  const column = parseColumn(scratch, def, table.split('.')[0]);
+  if (!column) return null;
+  const rest = def.trim().replace(/^("(?:[^"]|"")+"|[\w]+)\s+/, '');
+  const at = topLevel(rest, atClause(COLUMN_CLAUSE));
+  const checks = [];
+  let pending = null;
+  at.forEach((start, n) => {
+    const clause = rest.slice(start, n + 1 < at.length ? at[n + 1] : undefined).trim();
+    if (/^CONSTRAINT\b/i.test(clause)) { pending = ident(clause.split(/\s+/)[1]); return; }
+    if (/^CHECK\b/i.test(clause)) checks.push({ name: pending ?? `${shortName(table)}_${column.name}_check`, expr: group(clause).inner.trim() });
+    pending = null;
+  });
+  return { ...column, checks };
+}
+
+const sameSql = (a, b) => String(a ?? '').replace(/\s+/g, ' ').trim().toLowerCase() === String(b ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+/**
+ * The statements that make one review row, as { table, sql: [...] }, or { table, decision } for a row that is a
+ * decision rather than a statement. On an empty table they apply as they are; the ticket's file writes the backfill
+ * the row's action names before them.
+ */
+export function reviewStatements(row) {
+  const parts = row.object.split(/\s+/)[0].split('.');
+  const table = parts.slice(0, 2).join('.');
+  const column = parts[2];
+  if (row.kind === 'not null' && column) {
+    return { table, sql: [`ALTER TABLE ${table} ALTER COLUMN ${column} SET NOT NULL`] };
+  }
+  if (row.kind === 'column changed' && column) {
+    const m = /^`(.+)`\s*->\s*`(.+)`$/.exec(row.change);
+    const was = m && columnParts(m[1], table);
+    const now = m && columnParts(m[2], table);
+    if (!was || !now) return { table, decision: `its change could not be read: ${row.change.slice(0, 120)}` };
+    // A key on the column that changes (marketing.form_definition.id leaves the primary key for (id, version)) is a
+    // decision about the rows and the keys that point at it, not a statement.
+    const keys = (d) => (d.match(/\b(PRIMARY\s+KEY|UNIQUE|REFERENCES\s+[\w".]+(?:\s*\([^)]*\))?)/gi) ?? [])
+      .map((k) => k.replace(/\s+/g, ' ').toLowerCase()).sort().join('|');
+    if (keys(m[1]) !== keys(m[2])) return { table, decision: 'a key on the column changes: which rows keep it is a decision' };
+    const at = `ALTER TABLE ${table} ALTER COLUMN ${column}`;
+    const sql = [];
+    const kept = (c) => now.checks.some((x) => x.name === c.name && sameSql(x.expr, c.expr));
+    for (const c of was.checks) if (!kept(c)) sql.push(`ALTER TABLE ${table} DROP CONSTRAINT IF EXISTS ${c.name}`);
+    const retype = !sameSql(was.type, now.type);
+    if (was.default !== undefined && (retype || !sameSql(was.default, now.default))) sql.push(`${at} DROP DEFAULT`);
+    if (retype) sql.push(`${at} TYPE ${now.type} USING ${column}::${now.type}`);
+    if (now.default !== undefined && (retype || !sameSql(was.default, now.default))) sql.push(`${at} SET DEFAULT ${now.default}`);
+    if (now.notNull !== was.notNull) sql.push(`${at} ${now.notNull ? 'SET' : 'DROP'} NOT NULL`);
+    for (const c of now.checks) {
+      if (was.checks.some((x) => x.name === c.name && sameSql(x.expr, c.expr))) continue;
+      if (!sql.includes(`ALTER TABLE ${table} DROP CONSTRAINT IF EXISTS ${c.name}`)) sql.push(`ALTER TABLE ${table} DROP CONSTRAINT IF EXISTS ${c.name}`);
+      sql.push(`ALTER TABLE ${table} ADD CONSTRAINT ${c.name} CHECK (${c.expr})`);
+    }
+    return { table, sql };
+  }
+  if (row.kind === 'constraint added') {
+    const m = /^`(ALTER\s+TABLE\s+[\s\S]+\s+ADD\s+CONSTRAINT\s+[\s\S]+)`$/i.exec(row.change);
+    return m ? { table, sql: [m[1].trim()] } : { table, decision: 'a change to a key the table already has: which rows keep it is a decision' };
+  }
+  return { table, decision: `${row.kind}: ${row.action}` };
+}
+
 /**
  * Writes expected-schema.json into a [DB] ticket's folder. Returns what README.md says about it,
  * or null for a ticket that is not a database migration. Never the reason a pull fails: a package
  * without the DDL, or a file that will not read, is said in README.md instead. The pull has already
  * removed the previous pull's copy, so a failure here never leaves an old one behind.
  */
-async function writeExpectedSchema(client, wp, touches, folder, release) {
+async function writeExpectedSchema(client, wp, touches, folder, release, text = '') {
   const ticket = databaseTicket(wp, touches);
   if (!ticket) return null;
   try {
+    // The review rows the ticket's text gives it to write (CHG-R13RVA-003), looked up in the package's list.
+    const named = ticket.kind === 'tables' ? reviewRowsNamed(text) : [];
+    const listed = named.length ? reviewRows(await packageText(client, 'handoff/migration-review.md')) : [];
+    const review = named.map((n) => {
+      const row = listed.find((r) => r.kind === n.kind && r.object === n.object);
+      return row ? { ...n, database: row.database, ...reviewStatements(row) } : { ...n, decision: 'not in handoff/migration-review.md at this release' };
+    });
     if (ticket.kind === 'tables' && !ticket.tables.length) {
       throw new Error('the ticket links no tables, so there is nothing to compare');
     }
@@ -1733,8 +1931,24 @@ async function writeExpectedSchema(client, wp, touches, folder, release) {
       if (!texts.length) throw new Error(`no DDL for ${database} in this package`);
       const statements = ticketStatements(texts, ticket);
       const used = [...new Set(statements.map((s) => s.file))].map((f) => `backend/${database}/${f}`);
-      checks.push({ ...expectedCheck(schemaModel(texts), ticket, statements, { database, sources: used }), server });
+      const model = schemaModel(texts);
+      const own = new Set(ticket.tables.map(ident));
+      const rows = [];
+      for (const r of review) {
+        if (r.database && r.database !== database && r.database !== 'both') continue;
+        const mine = own.has(ident(r.table));
+        const status = r.sql && mine ? 'in the check' : r.sql ? `not this ticket's table (${r.table})` : r.decision;
+        rows.push({ kind: r.kind, object: r.object, status, ...(r.sql && mine ? { sql: r.sql } : {}) });
+        if (!r.sql || !mine) continue;
+        for (const sql of r.sql) {
+          alterTable(model.tables, sql, 'handoff/migration-review.md', model.notModelled);
+          statements.push({ file: 'handoff/migration-review.md', sql, review: `${r.kind} ${r.object}` });
+        }
+      }
+      if (rows.some((r) => r.sql)) used.push('handoff/migration-review.md');
+      checks.push({ ...expectedCheck(model, ticket, statements, { database, sources: used }), ...(rows.length ? { reviewRows: rows } : {}), server });
     }
+    const otherDatabase = review.filter((r) => r.database && !databases.includes(r.database) && r.database !== 'both');
     const body = {
       about: 'What this ticket\'s migration must leave behind, from the package DDL: the tables\' end state, and '
         + 'the package statements that make it. node .claude/scripts/db-ticket.mjs <ticket> applies those statements '
@@ -1748,6 +1962,8 @@ async function writeExpectedSchema(client, wp, touches, folder, release) {
       tables: Object.keys(checks[0]?.tables ?? {}).length,
       statements: checks.reduce((n, c) => n + c.statements.length, 0),
       absent: checks.flatMap((c) => [...(c.notInPackageDdl ?? []), ...(c.keysNotInPackageDdl ?? [])]),
+      review: [...checks.flatMap((c) => c.reviewRows ?? []),
+        ...otherDatabase.map((r) => ({ kind: r.kind, object: r.object, status: `in the ${r.database} database, not this file's` }))],
     };
   } catch (error) {
     return { ...ticket, written: false, error: error.message };
@@ -1790,6 +2006,18 @@ function databaseSection(db, key) {
     + 'every migration applied once, in order, to an empty database, as SqlMigrationRunner does.\n\n'
     + 'No `.claude/scripts/db-ticket.mjs` in this folder, or no "A [DB] ticket" in CLAUDE.md? Run `/update-adam` '
     + 'here: it adds both (running ADAM\'s setup on the folder again does the same).\n';
+  const review = db.review ?? [];
+  if (review.some((r) => r.sql)) {
+    out += '\n**The changes no file writes that this ticket\'s text gives it are part of the check** '
+      + '(handoff/migration-review.md): the package\'s statements in expected-schema.json end with the statements that '
+      + 'make each, so this file must make them too, after the backfill the row says: '
+      + `${review.filter((r) => r.sql).map((r) => `${r.kind} \`${r.object}\``).join('; ')}.\n`;
+  }
+  if (review.some((r) => !r.sql)) {
+    out += '\nNamed in the text but **not in the check**, because each is a decision rather than a statement (say in the '
+      + 'comment what you did with each, and ask the lead before writing one): '
+      + `${review.filter((r) => !r.sql).map((r) => `${r.kind} \`${r.object}\` (${r.status})`).join('; ')}.\n`;
+  }
   if (db.absent.length) {
     out += `\nNot in the package DDL, so the check cannot pass until it is (a change request): ${db.absent.map((t) => `\`${t}\``).join(', ')}.\n`;
   }
@@ -2153,6 +2381,54 @@ async function saveFrameFor(client, ref, { key, dir } = {}) {
   }
 }
 
+/**
+ * What a ticket builds, by its subject's tag: 'backend' for [BE] and [DB], 'test' for [Test], else 'build' (a
+ * screen ticket and the rest). **Only a 'build' ticket is told how a screen must look** (3 November 2026, the r13
+ * candidate review, classes be-pull-tells-to-build-screens and test-ticket-linked-as-build-task, CHG-R13RVA-001):
+ * a [BE] ticket links the screens that call its operations and a [Test] ticket the screens it tests, and the pull
+ * told both to "Build the page" for each one (#27764: 75 sections, 835 lines for four operations; #27887: 80
+ * screens). Their screens are listed as what they are to that ticket, with no frame and no build instruction.
+ */
+export function ticketKind(wp) {
+  const subject = String(wp?.subject ?? '');
+  if (/^\s*\[(BE|DB)\]/i.test(subject)) return 'backend';
+  if (/^\s*\[Test\]/i.test(subject)) return 'test';
+  return 'build';
+}
+
+const listOf = (xs, n = 12) => (xs.length > n ? `${xs.slice(0, n).join(', ')} and ${xs.length - n} more` : xs.join(', '));
+
+/** The screens a [BE]/[DB] or [Test] ticket touches, as what they are to it: called by it, or tested by it. */
+export function screenUseSection(kind, screens) {
+  if (kind === 'build' || !screens.length) return '';
+  const file = (sc) => `[screen-${safeName(sc.id)}.json](screen-${safeName(sc.id)}.json)`;
+  if (kind === 'backend') {
+    let out = `\n## Screens that call this work (${screens.length})\n\n`
+      + 'These screens call the operations this ticket builds. Each is built by its own [FE] ticket, not by this one: '
+      + '**this ticket builds no page**. Read a screen\'s file for how it uses the operations (what it sends, which '
+      + 'responses and states it shows), so that what you build answers what it needs.\n\n';
+    for (const sc of screens) out += `- \`${sc.id}\`${sc.name ? ` ${sc.name}` : ''} - ${file(sc)}\n`;
+    return out;
+  }
+  let out = `\n## Screens this test covers (${screens.length})\n\n`
+    + 'This ticket tests the screens below on the integration environment; **it builds none of them**. For each, test '
+    + 'what its record declares: every state, every navigation link, and its permission with a user who has it and '
+    + 'one who does not. A screen that does not behave as its record says is a defect on the ticket that built it.\n\n';
+  for (const sc of screens) {
+    const states = sc.states && typeof sc.states === 'object' ? Object.keys(sc.states) : [];
+    const nav = sc.navigation && typeof sc.navigation === 'object'
+      ? [...new Set([...(sc.navigation.exitTo ?? []), ...(sc.navigation.transitions ?? []).map((t) => t?.to)]
+        .filter(Boolean))]
+      : [];
+    const perm = typeof sc.permission === 'string' ? sc.permission : sc.permission ? JSON.stringify(sc.permission) : '';
+    out += `- \`${sc.id}\`${sc.name ? ` ${sc.name}` : ''} - ${file(sc)}. `
+      + `States: ${states.length ? listOf(states) : 'none in its record'}. `
+      + `Navigation to: ${nav.length ? listOf(nav) : 'none in its record'}. `
+      + `Permission: ${perm ? `\`${perm}\`, with an allowed and a refused user` : 'none in its record'}.\n`;
+  }
+  return out;
+}
+
 function lookSection(looks) {
   if (!looks.length) return '';
   let out = '';
@@ -2440,15 +2716,18 @@ async function pullOne(client, key, base, when) {
     await writeFile(path.join(folder, 'run', 'SHA256SUMS'),
       runs.filter((r) => !r.error).map((r) => `${r.sha256}  ${r.path}\n`).join(''));
   }
-  // Every screen the ticket touches: the wireframe frame its record names, self-contained (#31848).
+  // Every screen a screen ticket touches: the wireframe frame its record names, self-contained (#31848). A [BE],
+  // [DB] or [Test] ticket's screens are listed as called by it or tested by it, with no frame (ticketKind).
+  const kind = ticketKind(wp);
   const looks = [];
-  const frames = screens.length ? await designFrames(client) : null;
+  const lookAt = kind === 'build' ? screens : [];
+  const frames = lookAt.length ? await designFrames(client) : null;
   const written = new Map();
   // Six frames at a time (2 November 2026). One after another, #27764's 75 frames were 42 of its seconds. Each
   // screenLook names its files before its first wait, in screen order, so the names are the ones a pull one by one
   // gave; only the reads overlap.
   const gate = pool(6);
-  looks.push(...await Promise.all(screens.map((screen) => screenLook(client, screen, folder, frames, written, gate))));
+  looks.push(...await Promise.all(lookAt.map((screen) => screenLook(client, screen, folder, frames, written, gate))));
 
   if (release.previous && release.diff) {
     await writeFile(path.join(folder, 'spec-diff.md'), specDiff(wp, release, when));
@@ -2465,10 +2744,10 @@ async function pullOne(client, key, base, when) {
       matchesOpenProject: text.same, openProjectRelease: text.openProjectRelease,
       ...(text.notice ? { notice: text.notice, missing: text.missing ?? [] } : {}), text: text.text } } : {}),
   }));
-  const db = await writeExpectedSchema(client, wp, touches, folder, release);
+  const db = await writeExpectedSchema(client, wp, touches, folder, release, [text?.text, wp.description].filter(Boolean).join('\n'));
   await writeFile(path.join(folder, 'README.md'),
     ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf, text }, db,
-      { looks, runs }));
+      { looks, runs, kind, screens }));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);

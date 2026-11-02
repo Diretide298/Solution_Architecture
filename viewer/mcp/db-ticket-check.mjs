@@ -357,6 +357,63 @@ section('the snapshot compare');
     && tools.statementTarget("SELECT platform.drop_rls_policies('a.t'::regclass)") === 'a.t'
     && tools.statementTarget("SELECT platform.ensure_month_partitions('a.t'::regclass, 3)") === null,
   'r8\'s guarded DO statements, index drops by name and drop_rls_policies are picked for their table', JSON.stringify(r8));
+
+  // CHG-R13RVA-002 (3 November 2026, the r13 candidate review): from V0113 a table's row security is applied in a block
+  // guarded on the table and its columns (V0116's identity.redirect_host block); the shape and the picked statements
+  // carry it, and a block whose condition does not hold on the shape applies nothing.
+  const guarded = [
+    { name: '010-identity.sql', text: `CREATE TABLE IF NOT EXISTS identity.redirect_host (id uuid PRIMARY KEY NOT NULL, domain_id uuid, scope_path ltree);
+CREATE TABLE IF NOT EXISTS identity.other (id uuid PRIMARY KEY NOT NULL);` },
+    { name: '920-row-level-security.sql', text: "SELECT platform.apply_tenant_rls('identity.other'::regclass);" },
+    { name: 'V0116__after_r1_20261026.sql', text: `DO $$ BEGIN IF to_regclass('identity.redirect_host') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'identity' AND table_name = 'redirect_host' AND column_name = 'domain_id') THEN
+CREATE UNIQUE INDEX IF NOT EXISTS redirect_host_domain_id_uniq ON identity.redirect_host (domain_id);
+END IF; END $$;
+DO $$ BEGIN IF to_regclass('identity.redirect_host') IS NOT NULL THEN
+PERFORM platform.apply_tenant_rls('identity.redirect_host'::regclass);
+END IF; END $$;
+DO $$ BEGIN IF to_regclass('identity.other') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'identity' AND table_name = 'other' AND column_name = 'scope_path') THEN
+PERFORM platform.drop_rls_policies('identity.other'::regclass);
+PERFORM platform.apply_split_rls('identity.other'::regclass, 'platform.in_scope(scope_path)', 'platform.in_scope(scope_path)');
+END IF; END $$;
+DO $$ BEGIN IF to_regclass('identity.redirect_host') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'identity' AND table_name = 'redirect_host' AND column_name = 'scope_path') THEN
+PERFORM platform.drop_rls_policies('identity.redirect_host'::regclass);
+PERFORM platform.apply_split_rls('identity.redirect_host'::regclass, 'platform.in_scope(scope_path)', 'platform.in_scope(scope_path)');
+DROP POLICY IF EXISTS redirect_host_delete ON identity.redirect_host;
+END IF; END $$;` },
+  ];
+  const gm = schemaModel(guarded);
+  const host = gm.tables.get('identity.redirect_host');
+  const other = gm.tables.get('identity.other');
+  ok(host?.rls.enabled && host.rls.forced && host.rls.policies.map((p) => p.name).join() === 'redirect_host_read,redirect_host_append,redirect_host_update'
+    && host.indexes.some((i) => i.name === 'redirect_host_domain_id_uniq' && i.unique)
+    && other?.rls.policies.map((p) => p.name).join() === 'other_scope' && gm.notModelled.length === 0,
+  '**a guarded block\'s row security and index are in the shape, in its order (apply, then drop all, split, drop one); a block whose column is not there applies nothing**',
+  JSON.stringify({ host: host?.rls, idx: host?.indexes.map((i) => i.name), other: other?.rls, nm: gm.notModelled }));
+  const gp = ticketStatements(guarded, { kind: 'tables', tables: ['identity.redirect_host'] }).map((s) => s.sql);
+  ok(gp.filter((s) => /^DO\b/.test(s)).length === 3 && gp.some((s) => /PERFORM platform\.apply_tenant_rls\('identity\.redirect_host'/.test(s))
+    && !gp.some((s) => /identity\.other/.test(s)) && statementTarget(sqlStatements(guarded[2].text)[1]) === 'identity.redirect_host',
+  '**and the ticket that makes the table is given its blocks, and no other table\'s**', gp.join(' | '));
+  ok(tools.doGuardHolds(new Map(), "DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'k') THEN PERFORM 1; END IF; END $$") === null
+    && tools.doGuardHolds(new Map(), "DO $$ BEGIN IF to_regclass('a.t') IS NOT NULL THEN PERFORM 1; END IF; END $$") === false,
+  'a condition the reader does not answer is said as unknown, never as holding');
+
+  // CHG-R13RVA-003: the changes no file writes that a migration ticket's text names, as the statements that make them.
+  const named = tools.reviewRowsNamed('**Changes no file writes, for this migration to write** (handoff/migration-review.md, where each row says what to write; CHG-R8MIG-013): not null `control.cell_tenant.root_scope_path`; column changed `control.url_redirect.status_code`; table dropped `control.seo_metadata`.');
+  const rowOf = (kind, object, change, action = 'by hand') => ({ kind, database: 'control', object, change, action });
+  const nn = tools.reviewStatements(rowOf('not null', 'control.cell_tenant.root_scope_path', 'still nullable'));
+  const cc = tools.reviewStatements(rowOf('column changed', 'control.url_redirect.status_code',
+    '`status_code text NOT NULL` -> `status_code integer NOT NULL CONSTRAINT url_redirect_status_code_chk CHECK (status_code IN (301, 302, 307, 308))`'));
+  const ca = tools.reviewStatements(rowOf('constraint added', 'transport.station station_venue_id_id_uniq', '`ALTER TABLE transport.station ADD CONSTRAINT station_venue_id_id_uniq UNIQUE (venue_id, id)`'));
+  const dec = tools.reviewStatements(rowOf('table dropped', 'control.seo_metadata', 'no longer in the schema reference'));
+  ok(named.map((n) => `${n.kind}|${n.object}`).join() === 'not null|control.cell_tenant.root_scope_path,column changed|control.url_redirect.status_code,table dropped|control.seo_metadata'
+    && nn.sql?.join() === 'ALTER TABLE control.cell_tenant ALTER COLUMN root_scope_path SET NOT NULL'
+    && cc.sql?.join(' ; ') === 'ALTER TABLE control.url_redirect ALTER COLUMN status_code TYPE integer USING status_code::integer ; '
+      + 'ALTER TABLE control.url_redirect DROP CONSTRAINT IF EXISTS url_redirect_status_code_chk ; '
+      + 'ALTER TABLE control.url_redirect ADD CONSTRAINT url_redirect_status_code_chk CHECK (status_code IN (301, 302, 307, 308))'
+    && ca.sql?.join() === 'ALTER TABLE transport.station ADD CONSTRAINT station_venue_id_id_uniq UNIQUE (venue_id, id)'
+    && !dec.sql && /table dropped/.test(dec.decision),
+  '**a ticket\'s review rows: read from its text, each a statement (NOT NULL, a column\'s type and check, an added constraint) or a decision (a drop)**',
+  JSON.stringify({ named, nn, cc, ca, dec }));
 }
 
 // ---- 3. adam_pull writes it ------------------------------------------------------------------------
@@ -386,6 +443,12 @@ const expectedOf = {};
     // r8 final re-walk: MIG-PLATFORM (#27665) owns two tables r8 moves from platform to sync.
     9017: { workPackage: { key: '9017', subject: '[DB] Migration V0017__platform.sql: platform (3 tables)', description: 'Tenant database.' },
       touches: ['platform.scope', 'sync.dsar_request', 'sync.guest_link'].map((id) => ({ kind: 'table', id })) },
+    // CHG-R13RVA-003: MIG-CONTROL (#27647) as the r13 review found it, its text naming three review rows.
+    9647: { workPackage: { key: '9647', subject: '[DB] Migration V0047__control.sql: control (2 tables)',
+      description: 'Control database. Tables: control.cell_tenant, control.url_redirect.\n\n**Changes no file writes, for this migration '
+        + 'to write** (handoff/migration-review.md, where each row says what to write; CHG-R8MIG-013): not null '
+        + '`control.cell_tenant.root_scope_path`; column changed `control.url_redirect.status_code`; table dropped `control.seo_metadata`.' },
+    touches: [{ kind: 'table', id: 'control.cell_tenant' }, { kind: 'table', id: 'control.url_redirect' }] },
   };
   let fileReads = 0;
   let failRead = null;
@@ -464,6 +527,23 @@ const expectedOf = {};
   const fk = JSON.parse(read('9034', 'expected-schema.json') ?? 'null')?.checks?.[0];
   ok(fk?.kind === 'foreign-keys' && fk.statements.length === 2 && Object.keys(fk.tables).length === 0 && !fk.keysNotInPackageDdl,
     'the cross-schema keys ticket: its two keys, and no tables of its own', JSON.stringify(fk?.statements?.map((s) => s.guard?.constraint)));
+
+  await pull.run(client, { key: '9647', dir });
+  const rv = JSON.parse(read('9647', 'expected-schema.json') ?? 'null')?.checks?.[0];
+  const rvReadme = read('9647', 'README.md') ?? '';
+  const tail = rv?.statements?.filter((s) => s.file === 'handoff/migration-review.md').map((s) => s.sql) ?? [];
+  ok(rv?.database === 'control' && tail.length === 4 && rv.statements.slice(-4).every((s) => s.file === 'handoff/migration-review.md')
+    && rv.tables['control.cell_tenant']?.columns.find((c) => c.name === 'root_scope_path')?.notNull === true
+    && rv.tables['control.url_redirect']?.columns.find((c) => c.name === 'status_code')?.type === 'integer'
+    && rv.tables['control.url_redirect']?.checks.some((k) => k.name === 'url_redirect_status_code_chk')
+    && rv.sources.includes('handoff/migration-review.md')
+    && rv.reviewRows?.map((r) => r.status).join('|') === 'in the check|in the check|table dropped: a rename or a drop: decide, then ALTER TABLE ... RENAME or DROP TABLE by hand',
+  '**#27647: the review rows its text names are in its expected state and its package statements, last; a drop is listed, not guessed**',
+  JSON.stringify({ tail, rows: rv?.reviewRows, cols: rv?.tables?.['control.cell_tenant']?.columns?.find((c) => c.name === 'root_scope_path') }));
+  ok(/\*\*The changes no file writes that this ticket's text gives it are part of the check\*\*/.test(rvReadme)
+    && rvReadme.includes('not null `control.cell_tenant.root_scope_path`; column changed `control.url_redirect.status_code`.')
+    && /\*\*not in the check\*\*[\s\S]*table dropped `control\.seo_metadata`/.test(rvReadme),
+  'and README.md says which are in the check and which are decisions', rvReadme.split('## Checking this migration')[1]?.slice(-1200));
 
   failRead = 'tenant/910-indexes.sql';
   forgetPackageFiles();
@@ -1032,8 +1112,13 @@ if (!PACKAGE_RUN) {
   const started = await startContainer();
   ok(started === null, `the ${CONTAINER} container`, started);
   const psql = (db, sql) => docker(['exec', '-i', CONTAINER, 'psql', '-X', '-q', '-At', '-U', 'postgres', '-d', db, '-v', 'ON_ERROR_STOP=1', '-f', '-'], sql);
-  // The package creates no pii.subject_kind or pii.contact_kind; give them one so 010-pii applies.
-  const types = "CREATE TYPE pii.subject_kind AS ENUM ('a'); CREATE TYPE pii.contact_kind AS ENUM ('a');\n";
+  // The package's files create no pii.subject_kind or pii.contact_kind: provisioning makes them as domains before the
+  // tenant files (backend/provision-tenant.sh, CHG-R12DB-001), and V0120 converts the columns and drops the domains.
+  // Read from that script, so this check provisions as a tenant is provisioned (an enum stand-in made V0120's DROP
+  // DOMAIN fail from r12 on).
+  const domains = readFileSync(path.join(PACKAGE, 'backend', 'provision-tenant.sh'), 'utf8').match(/^CREATE DOMAIN pii\.\w+ [^\n]+;$/gm) ?? [];
+  ok(domains.length === 2, 'the two pii domains provisioning makes before the tenant files', domains.join(' '));
+  const types = `CREATE SCHEMA IF NOT EXISTS pii;\n${domains.join('\n')}\n`;
   for (const database of ['tenant', 'control']) {
     const files = pkgFiles(database);
     for (const n of ['pkg', 'picked']) {
@@ -1073,7 +1158,7 @@ if (!PACKAGE_RUN) {
         if (picked.delete(`${f.name}\u0000${sql}`)) ordered.push({ file: f.name, sql });
       }
     }
-    const pickedSql = `SET check_function_bodies = off;\n${database === 'tenant' ? types.replace('CREATE TYPE pii.subject_kind', 'CREATE SCHEMA IF NOT EXISTS pii; CREATE TYPE pii.subject_kind') : ''}`
+    const pickedSql = `SET check_function_bodies = off;\n${database === 'tenant' ? types : ''}`
       + ordered.map((s) => `${s.sql};`).join('\n');
     const pr = psql(`picked_${database}`, pickedSql);
     ok(pr.status === 0, `${database}: the statements tickets are given apply in package order`, pr.stderr);
@@ -1087,7 +1172,7 @@ if (!PACKAGE_RUN) {
     const fromTickets = snap(`picked_${database}`);
     const diff = script.againDiffs(whole, fromTickets);
     ok(diff.length === 0 && Object.keys(whole).length > 1000,
-      `${database}: ${Object.keys(whole).length} objects; the picked statements make exactly what the whole package makes`, diff.slice(0, 10).join(' | '));
+      `${database}: ${Object.keys(whole).length} objects; the picked statements make exactly what the whole package makes`, `${diff.length} difference(s): ${diff.slice(0, 40).join(' | ')}`);
     const missing = [];
     for (const [name, shape] of model.tables) {
       const keys = new Set(Object.keys(whole).filter((k) => k.startsWith(`table ${name} `)));
@@ -1097,8 +1182,30 @@ if (!PACKAGE_RUN) {
       for (const i of shape.indexes) if (!keys.has(`table ${name} index ${i.name}`)) missing.push(`${name} index ${i.name}`);
       for (const k of [...shape.checks, ...shape.foreignKeys, ...shape.unique, shape.primaryKey].filter((x) => x?.name)) if (!keys.has(`table ${name} constraint ${k.name}`)) missing.push(`${name} constraint ${k.name}`);
       for (const p of shape.rls.policies) if (!keys.has(`table ${name} policy ${p.name}`)) missing.push(`${name} policy ${p.name}`);
+      // CHG-R13RVA-002: and the other way, so a policy PostgreSQL has and the shape lacks (a guarded block's) fails too.
+      const parsed = new Set(shape.rls.policies.map((p) => `table ${name} policy ${p.name}`));
+      for (const k of keys) if (/ policy /.test(k) && !parsed.has(k)) missing.push(`${name}: ${k.split(' policy ')[1]} is in PostgreSQL, not in the parsed shape`);
+      const flags = /\brls (true|false) force (true|false)\b/.exec(whole[`table ${name}`] ?? '');
+      if (flags && (String(shape.rls.enabled) !== flags[1] || String(shape.rls.forced) !== flags[2])) {
+        missing.push(`${name}: row security ${flags[1]}, forced ${flags[2]} in PostgreSQL; parsed ${shape.rls.enabled}, ${shape.rls.forced}`);
+      }
     }
-    ok(missing.length === 0 && model.notModelled.length === 0, `${database}: the parsed shape of all ${tables.length} tables names what PostgreSQL has`, missing.slice(0, 10).join(' | '));
+    ok(missing.length === 0 && model.notModelled.length === 0, `${database}: the parsed shape of all ${tables.length} tables names what PostgreSQL has`,
+      [...missing.slice(0, 10), ...model.notModelled.slice(0, 3).map((n) => `not modelled: ${n.statement}`)].join(' | '));
+    // CHG-R13RVA-003: every review row ADAM writes as statements applies, on top of what the package makes, and the shape
+    // it gives (NOT NULL, a type) is PostgreSQL's.
+    const review = tools.reviewRows(readFileSync(path.join(PACKAGE, 'handoff', 'migration-review.md'), 'utf8'))
+      .filter((r) => r.database === database).map((r) => ({ row: r, ...tools.reviewStatements(r) })).filter((r) => r.sql && model.tables.has(r.table));
+    const reviewSql = review.flatMap((r) => r.sql);
+    const rr = reviewSql.length ? psql(`picked_${database}`, `${reviewSql.join(';\n')};`) : { status: 0, stderr: '' };
+    const afterReview = rr.status === 0 && reviewSql.length ? snap(`picked_${database}`) : {};
+    const reviewWrong = [];
+    for (const r of review.filter((x) => x.row.kind === 'not null')) {
+      const col = r.row.object.split('.')[2];
+      if (!/ not null\b/.test(afterReview[`table ${r.table} column ${col}`] ?? '')) reviewWrong.push(`${r.row.object} is not NOT NULL`);
+    }
+    ok(rr.status === 0 && reviewWrong.length === 0, `${database}: the ${review.length} review rows ADAM writes as statements apply on what the package makes, and do what the rows say`,
+      `${rr.stderr ?? ''} ${reviewWrong.slice(0, 5).join(' | ')}`);
   }
 }
 

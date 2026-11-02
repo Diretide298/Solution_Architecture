@@ -1,0 +1,49 @@
+id: CHG-R13RVA-002
+date: '2026-11-03'
+source: audit
+kind: process
+summary: ADAM's schema reader follows the row security and indexes an after-r1 file sets inside a guarded DO block
+  (PERFORM platform.apply_*_rls, drop_rls_policies, DROP POLICY, CREATE INDEX), when the block's condition (the table
+  and the columns it names are there) holds on the shape so far. The block is given to the ticket that makes its
+  table, so a [DB] ticket's expected-schema.json and db-ticket.mjs's reference copy carry the policies the package's
+  V0113-V0122 files apply (77 blocks on 70 tenant tables). A condition the reader cannot answer is listed as not
+  modelled, never assumed. db-ticket-check --package now also fails a policy PostgreSQL has that the parsed shape lacks,
+  and a row-security or forced flag that differs. The same rule gives a table the other statements the after-r1 files
+  guard, such as an index a block makes (so V0119's DROP INDEX by name finds its table), a block's trigger (V0116's
+  access.entitlement change_version, V0120's outbox and journal triggers), and a helper function V0120 defines in a
+  DO $recorded$ block. The --package check provisions the two pii domains as backend/provision-tenant.sh does
+  (CHG-R12DB-001), so the tenant package applies again.
+decision:
+  what: 'The lead, 3 November 2026, on the review of all 1,582 Block A tickets at the r13 candidate: "why are these
+    coming back again and again?", "get going on those as well so we close it", "you get the rest sorted". Review
+    finding do-block-rls-not-modelled: viewer/mcp/tools.mjs schemaModel follows a guarded block''s row security
+    (doGuardHolds, doRowSecurity) and statementTarget gives the block to its table; the guarded indexes of finding
+    expected-shape-drops-guarded-indexes come in with the same rule.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 candidate review finding do-block-rls-not-modelled (#27652, #27657, #27658, #27665, #27681): row security a
+  V01nn file applies inside a guarded DO block was in neither the expected shape nor db-ticket''s reference copy. The
+  reader followed only ALTER TABLE, keys, index changes and policy renames in a block, so a table made after r1 was
+  checked as having no policy and a re-applied policy in its older form, and the database ticket check could pass with
+  policies missing. Finding expected-shape-drops-guarded-indexes (#29186, #27992, #36203, #37186): the shape dropped
+  the indexes those blocks create.'
+keys_touched:
+  files:
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/db-ticket-check.mjs
+root_class: a reader that models a statement only at the top level, while the generator moved it into a guarded block
+tickets:
+  started:
+  - '#27652, #27657, #27658, #27665, #27681 and every Ready for QA [DB] ticket whose tables V0113-V0122 re-secure in a
+    guarded block: run db-ticket.mjs again after the next pull. It now compares the policies those blocks apply; a
+    DIFFERENT naming a policy means the ticket''s file lacks it. Compare the live and db/ policies of the 70 tables too:
+    these tickets reached MATCH without them.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 3 November 2026 (r13 candidate review, lane x1)'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: viewer/mcp/tools.mjs::doRowSecurity
+status: open
