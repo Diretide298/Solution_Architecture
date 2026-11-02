@@ -1,0 +1,40 @@
+id: CHG-R13INT-013
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: exchangeOrderLines asks access#entitlementRecords in process, as modifyOrder now does, and publishContentBlock's
+  approval.granted consumer asks approvals#requestRecords in process, under lane r's in-process reads class; check-business-rules
+  BR-EXCHANGE-QUOTE and BR-CONTENT-BLOCK-APPROVAL now require the in-process route.
+decision:
+  what: 'The lead, 2 November 2026, before sleeping: "Am going to bed. finish up I hope no more deccisions for me now".
+    The coordinator chose the option that follows the lead''s earlier ruling named here; the lead confirms it in the morning.
+    Option A, following the lead''s in-process reads rule (ADAM CR-438, CHG-R13INP-001): CR-480''s posted reason for the
+    service route was "as modifyOrder asks it", and modifyOrder asks it in process; CR-462''s "over the service route" predated
+    the class rule. The two developers are told by follow-up comments the lead sends with the morning batch.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (ADAM CR-480, CR-462): check-cross-module-reads 2 XR-INPROCESS-HOST (exchangeOrderLines, publishContentBlock)
+  after CHG-R13INT-002 kept their posted service route.'
+keys_touched:
+  operations:
+  - exchangeOrderLines
+  - publishContentBlock
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/white-label.yaml
+  - events/approval-granted.yaml
+  - tools/check-business-rules.py
+root_class: a posted route that two decisions of the same day disagree on
+tickets:
+  started: []
+  unstarted:
+  - '#30685 (exchangeOrderLines, New, Pranay Shinde): the follow-up comment in the integration report.'
+  - 'publishContentBlock''s ticket (CR-462''s consumer): the follow-up comment in the integration report.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-480
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py::XR-INPROCESS-HOST
+status: open

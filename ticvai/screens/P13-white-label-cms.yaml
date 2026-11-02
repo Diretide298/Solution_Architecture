@@ -7561,7 +7561,7 @@ screens:
   name: Waiver & Consent Command Center
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
@@ -8888,7 +8888,7 @@ screens:
   name: Waiver Approval, Testing & Publication Workspace
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: GUEST_MANAGE
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
@@ -8978,6 +8978,11 @@ screens:
     contract: marketing-crm
     purpose: Waiver Approval, Testing & Publication Workspace
     trigger: onAction
+  - operationId: getWaiverTesting
+    contract: marketing-crm
+    purpose: The version's checklist, simulation and approval record, which the workspace shows
+    trigger: onLoad
+    provenance: 'r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits'
   wireframe:
     status: notStarted
     provenance: generated

@@ -55202,7 +55202,7 @@ screens:
   name: Membership & Annual Pass Command Center
   module: Sell
   requiresModule: membership
-  wave: 3
+  wave: 1
   permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
@@ -55899,7 +55899,7 @@ screens:
   name: Membership Entitlement & Admission Benefit Builder
   module: Sell
   requiresModule: membership
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
@@ -56065,6 +56065,21 @@ screens:
       pre-expiry notice
     trigger: onAction
     provenance: build, 29 September 2026; reached by Create entitlement template, r11 gate fix (CHG-R11FXS-002)
+  - operationId: listMembershipAnnualPass
+    contract: subscription
+    purpose: The memberships and their entitlement and admission settings as saved, which the builder opens on
+    trigger: onLoad
+    provenance: 'r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits'
+  - operationId: listMembershipBenefits
+    contract: catalogue
+    purpose: The benefits as defined, which Define a benefit edits
+    trigger: onLoad
+    provenance: 'r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits'
+  - operationId: getPlanBenefits
+    contract: catalogue
+    purpose: The benefits a plan grants as saved, which Replace the benefits edits
+    trigger: onLoad
+    provenance: 'r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits'
   wireframe:
     status: notStarted
     provenance: generated

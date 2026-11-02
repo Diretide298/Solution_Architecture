@@ -15293,6 +15293,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getWaiverTesting
+      x-ticvai-consumed-by:
+        - "P13 CMS-050 Waiver Approval, Testing & Publication Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.21-22 (11.1.10 Pre-Publication Checklist, Testing Sandbox, Rule Simulation); the workspace needs its read'

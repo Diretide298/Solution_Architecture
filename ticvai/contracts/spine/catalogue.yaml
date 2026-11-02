@@ -18842,6 +18842,7 @@ paths:
       operationId: listMembershipBenefits
       x-ticvai-consumed-by:
         - "P01 WEB-022 Membership Plans"
+        - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -18940,6 +18941,7 @@ paths:
       operationId: getPlanBenefits
       x-ticvai-consumed-by:
         - "P01 WEB-022 Membership Plans"
+        - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:

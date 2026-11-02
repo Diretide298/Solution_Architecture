@@ -1,0 +1,57 @@
+id: CHG-R13INT-014
+date: '2026-11-02'
+source: audit
+kind: plan
+summary: 'BO-284 (Membership & Annual Pass Command Center) and CMS-041 (Waiver & Consent Command Center) are section homes
+  in the plan (navHomes), so BO-288 and CMS-050, which joined Block A1 as setup screens when WEB-022 read membership benefits
+  (CR-482) and submitForm read the waiver resign rule (CR-472), are reached from their app''s entry through Block A screens.
+  The four screens are wave 1; BO-288 binds listMembershipAnnualPass, listMembershipBenefits and getPlanBenefits and CMS-050
+  binds getWaiverTesting, so each reads what it edits or shows. Bindings and waves are invisible metadata: no approved screen
+  changes.'
+decision:
+  what: 'The lead, 2 November 2026, before sleeping: "Am going to bed. finish up I hope no more deccisions for me now".
+    The coordinator chose the option that follows the lead''s earlier ruling named here; the lead confirms it in the morning.
+    Option A, following the lead''s r11 rulings "Bring BO-873 in" and "Bring CMS-021 in" (CHG-R11INT-004, CHG-R11INT-005)
+    and the r12 gate''s waves and reads for the screens they brought in (CHG-R12GT-001). Plan change waived from the cooling-off
+    by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (ADAM CR-482, CR-472): check-plan-closure 2 new C-REACH (BO-100 > BO-284 > BO-288; CMS-001 > CMS-041 > CMS-050),
+  and check-screen-patterns P8 and READ on BO-288 and CMS-050.'
+keys_touched:
+  screens:
+  - BO-284
+  - BO-288
+  - CMS-041
+  - CMS-050
+  operations:
+  - listMembershipAnnualPass
+  - listMembershipBenefits
+  - getPlanBenefits
+  - getWaiverTesting
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - screens/P08-venue-back-office.yaml
+  - screens/P13-white-label-cms.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/marketing-crm.yaml
+root_class: a screen pulled into Block A whose only way in is a screen outside it
+tickets:
+  started: []
+  unstarted:
+  - the frontend tasks of BO-284, BO-288, CMS-041 and CMS-050 (VM-BO-284 and VM-BO-288 New; the others made at the r13 apply).
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-482
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py::C-REACH
+status: open
+proposed: '2026-11-02'
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive

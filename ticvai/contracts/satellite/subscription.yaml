@@ -4494,6 +4494,7 @@ paths:
       operationId: listMembershipAnnualPass
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
+        - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service

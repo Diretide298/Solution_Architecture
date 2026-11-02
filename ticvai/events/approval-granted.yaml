@@ -114,7 +114,7 @@ consumers:
 - context: white-label
   purpose: 'Publish or schedule a reviewed content block (`subjectType` `whiteLabelPublication`, `subjectId` a
     whitelabel.content_block row; ADAM CR-462, decided 2 November 2026; CHG-CR462-001), as publishContentBlock
-    states. It reads the request by `requestId` through approvals#requestRecords (route service) for the
+    states. It reads the request by `requestId` through approvals#requestRecords (in process, CHG-R13INT-013) for the
     `publishAt` and `expireAt` the publish stored in its `attributes`, and the block from `subjectId`. A block no
     longer pending review, or now published or archived, changes nothing. Otherwise the stored schedule is applied
     by a direct publish''s rules at that moment (a missing, null or passed `publishAt` publishes now, a future one

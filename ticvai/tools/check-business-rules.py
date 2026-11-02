@@ -2990,10 +2990,12 @@ def lane_p_rules_r13(need, op, ops):
     pcb = op("publishContentBlock")[3]
     pcd = words(pcb.get("description"))
     need("BR-CONTENT-BLOCK-APPROVAL", vias(pcb).get("approvals#requestRecords") is not None
-         and any((v or {}).get("query") == "approvals#requestRecords" and (v or {}).get("route") == "service"
+         and any((v or {}).get("query") == "approvals#requestRecords" and (v or {}).get("route") == "in-process"
                  for v in pcb.get("x-ticvai-read-via") or [] if isinstance(v, dict)),
-         "publishContentBlock's approval.granted consumer does not read approvals#requestRecords over the service "
-         "route (CR-462)")
+         # in process since the r13 integration (CHG-R13INT-013): the operations host asks Approvals' queries in
+         # process under lane r's class rule (CHG-R13INP-001), which CR-462's "service route" predated
+         "publishContentBlock's approval.granted consumer does not read approvals#requestRecords in process (CR-462, "
+         "CHG-R13INT-013)")
     need("BR-CONTENT-BLOCK-APPROVAL", "with `attributes` set to `publishAt` and `expireAt` exactly as sent" in pcd
          and "the block stays a draft" not in pcd,
          "publishContentBlock does not keep the asked-for schedule in the approval request's attributes, or still "
@@ -3410,7 +3412,8 @@ def lane_q_rules_r13(need, op):
     eol = op("exchangeOrderLines")[3]
     need("BR-EXCHANGE-QUOTE", ptypes(eol, "409") == {"line-redeemed", "outside-exchange-window", "replacement-unavailable"},
          "exchangeOrderLines' 409 does not name one problem type per reason (CR-480)")
-    for q, r in (("access#entitlementRecords", "service"), ("catalogue#performanceRecords", "in-process"),
+    # access#entitlementRecords in process, as modifyOrder asks it (CR-480's own reason; CHG-R13INT-013)
+    for q, r in (("access#entitlementRecords", "in-process"), ("catalogue#performanceRecords", "in-process"),
                  ("catalogue#inventoryReservationRecords", "in-process"), ("catalogue#variantPriceRecords", "in-process")):
         need("BR-EXCHANGE-QUOTE", (q, r) in vias(eol), f"exchangeOrderLines does not ask {q} ({r}) (CR-480)")
     ed = words(eol.get("description"))

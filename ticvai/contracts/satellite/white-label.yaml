@@ -1805,7 +1805,7 @@ paths:
         for: 'approvedByPrincipalId: the publisher on a single publish, the approver from approval.granted
           (identity.principal, Identity''s data; CHG-MOD-001; ADAM CR-365, CHG-CR365-001)'
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'white-label''s approval.granted consumer of a content block: the approval request by requestId, for the
           publishAt and expireAt the publish stored in its attributes (approvals.request, Approvals'' data; ADAM
           CR-462, CHG-CR462-001)'
