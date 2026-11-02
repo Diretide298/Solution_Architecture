@@ -275,8 +275,17 @@ try {
     await pull.run(client, { key: '9103', dir: dir2 });
     const gen = read(dir2, '9103', 'README.md');
     check('a generated frame is said to give the structure, not the look',
-      /the screen record rendered as boxes by the package's generator, not a drawing: it gives the structure/.test(gen)
-        && /This screen's frame is generated, not drawn/.test(gen), gen.split('must look')[1]?.slice(0, 500));
+      /the screen record rendered as boxes by the package's generator, not a drawing: a sketch of the structure, not the look; the screen record is the source of the structure/.test(gen)
+        && /This screen's frame is generated from the screen record/.test(gen), gen.split('must look')[1]?.slice(0, 500));
+    // R11 (r13, CHG-R13R11-001): a generated frame is never built "exactly"; the record is the source of the
+    // structure, and the frame's placeholders are named as not to be built.
+    const genLook = gen.split('must look')[1]?.split('## Before you report a gap')[0] ?? '';
+    check('**R11: a generated frame\'s README says "Build the page from the screen record, not from the frame", never "exactly"**',
+      genLook.includes('**Build the page from the screen record, not from the frame**')
+        && !/exactly/i.test(genLook)
+        && genLook.includes('the record is the source of the regions, components and copy')
+        && /build what the record declares and none of the\s+placeholders/.test(genLook)
+        && !/in the order the frame\s+shows/.test(genLook), genLook.slice(genLook.indexOf('**Build'), genLook.indexOf('**Build') + 700));
     // A ticket with no screen and nothing to run: README.md is what it was before this change.
     await pull.run(client, { key: '9100', dir: dir2 });
     const be = read(dir2, '9100', 'README.md');

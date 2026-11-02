@@ -1,0 +1,43 @@
+id: CHG-R13R12-001
+date: '2026-11-02'
+source: audit
+kind: process
+summary: When ADAM falls back to the plan row for a ticket's text, the README now says so. A release tag must carry its
+  own release bundle. The fallback was silent, and nothing at the tag checked that handoff/service-docs/op-release.json
+  is the tag's.
+decision:
+  what: 'The lead, 2 November 2026, on fixing the mechanical root causes of the Block A developer pull in parallel with
+    the r13 build lanes: "lets see if we can do something in parallel", then "yes". viewer/lib/ticket-text.mjs: a plan
+    row''s answer carries a notice saying why the pointer was not used and which of the pointer''s sections the plan row
+    lacks, and the README prints it at the top of the Description (viewer/mcp/tools.mjs). tools/check-adam-latest-release.py
+    gets rule LR-BUNDLE (with --tag r<N>, or an r<N> tag on HEAD: the bundle must be r<N>''s). The release runbook''s
+    step 5 runs it before git tag, and cr-release.py tag refuses on a bundle from another release.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'r13 root R12 of the Block A developer pull (31 October 2026; finding 2.27985.10). In the r12 rehearsal the candidate''s committed bundle
+  was still r11''s, so #27985 APP-SETUP-DEV-008''s Description fell back to the plan row. It lost the scope, the "No
+  repository yet" line and the design note, and nothing said so. At live r12 the symptom is gone, but the fallback was
+  still silent and nothing at the tag checked the bundle.'
+keys_touched:
+  files:
+  - viewer/lib/ticket-text.mjs
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/ticket-text-check.mjs
+  - tools/check-adam-latest-release.py
+  - tools/cr-release.py
+  - docs/active/release-runbook.md
+root_class: a fallback that degrades its output without saying so, and a release step with no check on the input it
+  serves
+tickets:
+  started: []
+  unstarted:
+  - '#27985 APP-SETUP-DEV-008 (New at the 31 October pull): nothing to do; at r12 its text is the bundle''s.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 2 November 2026 (r13 root-cause lanes)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-adam-latest-release.py::LR-BUNDLE (--self-test), viewer/mcp/ticket-text-check.mjs (R12 checks),
+    tools/cr-release.py self-test (bundle refusal)
+status: open

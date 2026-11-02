@@ -505,6 +505,10 @@ export async function releaseTextFor(client, wp) {
   if (!t?.found || typeof t.text !== 'string' || !t.text.trim()) return null;
   return {
     release: t.release ?? null, key: t.key ?? key ?? null, source: t.source ?? null, text: t.text,
+    // A plan row's text says why the pointer was not used and what it lacks (lib/ticket-text.mjs planNotice, r13
+    // root R12); from an ADAM before that, PLAN_FALLBACK says it in general terms.
+    ...(t.source === 'plan' ? { notice: typeof t.notice === 'string' && t.notice.trim() ? t.notice.trim()
+      : PLAN_FALLBACK, missing: Array.isArray(t.missing) ? t.missing : [] } : {}),
     // What OpenProject has, said once: the same text, or an older one (the release its pointer was written at).
     same: sameText(wp.description, t.text, Boolean(wp.descriptionTrimmed)),
     openProjectRelease: writtenAt(wp.description),
@@ -521,11 +525,19 @@ export function textNotice(text) {
     + '`workPackage.description`). Build to the text below.';
 }
 
-/** The README's Description: the release's text when ADAM has it, else OpenProject's. */
+/** What a plan row's text says when this ADAM's answer carries no notice of its own. */
+export const PLAN_FALLBACK = '**This text is the plan row\'s, not the release\'s pointer:** ADAM had no pointer for this '
+  + 'ticket at the release it serves, so it fell back to the plan, which has the summary, What and Done when only. Any '
+  + 'other section the pointer has (scope, repository, mock API, design, calls not in this release) is not here. Say so '
+  + 'in your comment, and ask the lead before building past what this text says.';
+
+/** The README's Description: the release's text when ADAM has it, else OpenProject's. A plan row's text is never
+ *  shown without its notice (r13 root R12): the pointer's other lines are missing, and the reader is told. */
 export function descriptionSection(wp, text) {
   if (text) {
     const notice = textNotice(text);
-    return `## Description\n\n${notice ? `${notice}\n\n` : ''}${text.text.trim()}\n`;
+    const plan = text.source === 'plan' ? (text.notice || PLAN_FALLBACK) : '';
+    return `## Description\n\n${plan ? `${plan}\n\n` : ''}${notice ? `${notice}\n\n` : ''}${text.text.trim()}\n`;
   }
   let out = `## Description\n\n${wp.description || '_No description in OpenProject._'}\n`;
   if (wp.descriptionTrimmed) out += '\n_Longer in OpenProject - open the link above for the rest._\n';
@@ -2101,9 +2113,12 @@ async function saveFrameFor(client, ref, { key, dir } = {}) {
       drawn: saved.drawn,
       ...(saved.capture ? { capture: saved.capture } : {}),
       ...(saved.states ? { states: saved.states } : {}),
-      next: `Open ${target} in a browser (it needs nothing else) and read it as the design: `
-        + (saved.drawn ? 'build the screen to look exactly like it, ' : 'it is generated from the screen record, so it gives the structure and not the look; build ')
-        + 'every state included, in the same visual language. The screen record gives the behaviour and bindings.',
+      next: saved.drawn
+        ? `Open ${target} in a browser (it needs nothing else) and read it as the design: build the screen to look exactly `
+          + 'like it, every state included, in the same visual language. The screen record gives the behaviour and bindings.'
+        : `Open ${target} in a browser (it needs nothing else): it is generated from the screen record, a sketch and not a `
+          + 'design, and may leave parts out or draw placeholders. Build from the screen record (its regions, components, '
+          + 'copy, behaviour and bindings), every state included, in the app\'s existing design system.',
     };
   } catch (error) {
     return { found: false, frame: `wireframes/${ref.board}#${ref.anchor}`, error: error.message };
@@ -2126,8 +2141,8 @@ function lookSection(looks) {
         + (frame.drawn
           ? (frame.capture ? `This frame is the client's prototype, captured as an image: ${frame.capture}.`
             : 'A designer drew this frame.')
-          : 'This frame is the screen record rendered as boxes by the package\'s generator, not a drawing: it gives '
-            + 'the structure (regions, components, order), not the look.')
+          : 'This frame is the screen record rendered as boxes by the package\'s generator, not a drawing: a sketch of '
+            + 'the structure, not the look; the screen record is the source of the structure.')
         + '\n';
       if (frame.left.length || frame.remaining) {
         out += `  Not inlined, so missing from the file: ${frame.left.map((l) => `\`${l.ref}\` (${l.why})`).join(', ') || `${frame.remaining} reference(s)`}.\n`;
@@ -2190,6 +2205,33 @@ function lookSection(looks) {
       }
     }
     const states = frame?.states || (look.states.length ? look.states.join(' · ') : null);
+    // **A generated frame is never built "exactly"** (2 November 2026, r13 root R11, CHG-R13R11-001; the Block A
+    // pull of 31 October: #27985 DEV-008 and 24 other tickets were told to match a generated frame's components and
+    // copy exactly, and that frame drew another product's nav and KPI tiles and left out regions the record
+    // declares). The generator draws the record as boxes; the record is the source of the structure, and "exactly"
+    // stays for a drawn or captured frame and for a client-approved prototype.
+    if (frame && !frame.error && !frame.drawn) {
+      out += p?.file
+        ? '\n**Build the page to match the prototype view exactly** where it has one: layout, components, copy, imagery, and every state'
+        : '\n**Build the page from the screen record, not from the frame**: its regions, components, their order and copy, and every state';
+      out += states ? ` (${states})` : ', including error, empty and loading';
+      out += '. This screen\'s frame is generated from the screen record ([the screen file](' + `screen-${safeName(look.id)}.json)), `
+        + 'not drawn: the record is the source of the regions, components and copy, and the frame is a sketch of it. It may '
+        + 'leave out parts the record declares, and it draws placeholders the record does not declare (sample figures and '
+        + 'tiles, Name/Status/Value columns, navigation and header chips): build what the record declares and none of the '
+        + 'placeholders. ';
+      out += p?.file
+        ? 'Client-approved UI is fixed: where the prototype has a view, the prototype wins for the look; a screen or part it '
+          + 'lacks is built from the screen record in the app\'s existing design system. '
+        : 'Build it in the app\'s existing design system and theme. ';
+      out += (viewed
+        ? 'Build each state as "Each state\'s look" says: its frame where one is written, else what the prototype draws '
+          + 'there, never a plain heading, a plain sentence and a plain button. '
+        : 'Build every state in that design system, never a plain heading, a plain sentence and a plain button. ')
+        + 'Where the frame and the record disagree, the record wins; say so in the comment, and say that no drawn design '
+        + 'exists yet.\n';
+      continue;
+    }
     out += '\n**Build the page to match the wireframe';
     out += p?.file ? ' and the prototype view' : '';
     out += ' exactly**: layout, components, copy, imagery, and every state';
@@ -2209,10 +2251,6 @@ function lookSection(looks) {
         + 'never a plain heading, a plain sentence and a plain button. ')
       + 'Where the wireframe and the record disagree on what the screen does, the record wins and you say so; on how it looks, the wireframe wins. '
       + 'A placeholder layout is only for a screen with no frame written here.\n';
-    if (frame && !frame.error && !frame.drawn) {
-      out += '\nThis screen\'s frame is generated, not drawn: build its regions and components in the order the frame '
-        + 'shows, in the app\'s existing design system, and say in the comment that no drawn design exists yet.\n';
-    }
   }
   return out;
 }
@@ -2390,7 +2428,8 @@ async function pullOne(client, key, base, when) {
     ...(partOf ? { partOf } : {}),
     // The text README.md shows: the release's, and whether OpenProject's description still differs from it.
     ...(text ? { releaseText: { release: text.release, key: text.key, source: text.source,
-      matchesOpenProject: text.same, openProjectRelease: text.openProjectRelease, text: text.text } } : {}),
+      matchesOpenProject: text.same, openProjectRelease: text.openProjectRelease,
+      ...(text.notice ? { notice: text.notice, missing: text.missing ?? [] } : {}), text: text.text } } : {}),
   }));
   const db = await writeExpectedSchema(client, wp, touches, folder, release);
   await writeFile(path.join(folder, 'README.md'),
@@ -3587,8 +3626,8 @@ export const TOOLS = [
       + 'subject names its migration file also gets expected-schema.json, the end state of its tables and the statements that make it, from the '
       + 'package DDL, which `node .claude/scripts/db-ticket.mjs <ticket>` compares a database with. For every screen '
       + 'it touches, the wireframe frame the screen record names is written as wireframe-<anchor>.html, one '
-      + 'self-contained file that opens offline: build the screen to look exactly like it (README.md, "How <screen> '
-      + 'must look"). The files a ticket runs (its migrations) are written whole under run/, checked against ADAM\'s '
+      + 'self-contained file that opens offline: a drawn frame is built to look exactly like it; a generated frame is a '
+      + 'sketch of the screen record, which is what is built (README.md, "How <screen> must look"). The files a ticket runs (its migrations) are written whole under run/, checked against ADAM\'s '
       + 'checksum: run those, never a window from adam_file. You are always on '
       + 'the latest release: every pull serves the release ADAM serves now (r1, r2, …), and when that release is '
       + 'newer than the ticket\'s previous pull, README.md says what changed and spec-diff.md has the diffs. There '
@@ -3665,8 +3704,10 @@ export const TOOLS = [
         for (const w of one.wireframes ?? []) {
           next += w.file
             ? ` Screen ${w.screen} (wireframe ${w.status ?? 'status not recorded'}): open ${w.file} and build the page to `
-              + `${w.drawn ? 'look exactly like it' : 'its structure (the frame is generated, not drawn)'}, every state included, `
-              + `in the same visual language (README.md, "How ${w.screen} ... must look")`
+              + `${w.drawn ? 'look exactly like it, every state included, in the same visual language'
+                : 'the screen record, not the frame (the frame is generated from the record, not drawn, and may leave parts out '
+                  + 'or draw placeholders), every state included, in the app\'s existing design system'} `
+              + `(README.md, "How ${w.screen} ... must look")`
               + `${w.prototype ? `; the client-approved prototype ${w.prototype} wins for the look where it has a view` : ''}.`
               + (w.states ? ` Each state has its look in README.md ("Each state's look"): ${Object.entries(w.states)
                 .map(([st, x]) => `${st} ${/\.html$/i.test(x) ? path.basename(x) : `= ${x}`}`).join('; ')}.` : '')
