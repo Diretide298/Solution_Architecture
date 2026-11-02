@@ -873,8 +873,9 @@ paths:
         Chinmay, batch 6 #178, BO-042: "PIN on the same device"; DEC-178; CHG-CSP-015). Until then the
         witness was a name the supervisor typed (`witnessPrincipalId` with no credential). The step-up
         below is answered by the witness, not the caller: the PIN must be that of `witnessPrincipalId`,
-        or the call is refused `403 witness-not-verified`, and the supervisor may not witness their own
-        withdrawal (`403 witness-is-caller`).
+        or the call is refused, and the supervisor may not witness their own withdrawal; both are the
+        declared `403 supervisor-step-up-refused` (CHG-RUL-019, 3 October 2026, which carried the PIN in the body
+        and named the refusal; nobody signs their own act, CHG-R8SPN-035).
 
         **Recorded as one `CashMovement` of kind `lift`** (F32 step 4: a safe drop "is recorded as
         a movement so the settlement adds up"; 26 September, pull audit R099/R104). The row

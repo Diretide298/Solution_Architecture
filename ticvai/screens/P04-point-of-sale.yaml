@@ -8596,7 +8596,8 @@ screens:
       `evaluatePromotions`.'
     offline: '**A retail sale needs the link** (`createRetailSale` is not offline-capable). The tiles
       stay browsable from the cached catalogue; Charge says to reconnect. (Design-notes correction fnb-retail
-      POS-023; the offline-overselling rule is an open question, CHG-SPO-020.)'
+      POS-023; offline retail is refused, as the contract does: the default CHG-SPO-020 recorded on 2 October
+      2026.)'
     denied: Merchandise scans and prices normally; charging needs `payment.take`. Stock reserved on add
       is released rather than held against a sale that cannot complete.
     stockConflict: The merchandise line went out of stock between scan and charge. The line is flagged
@@ -9881,10 +9882,6 @@ screens:
     why: Deferred until after r2 (POS v2 decision POSV2-8, 1 October 2026). Kept in the fnb contract and
       on EMP-058; comes back to the till in a later release.
     source: docs/registers/pos-v2-decisions.md
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-audience table reservation create
-      for the till.'
-    source: contracts/satellite/fnb.yaml#createTableReservation
   wireframe:
     status: approved
     provenance: client-verified

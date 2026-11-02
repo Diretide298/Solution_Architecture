@@ -3813,6 +3813,8 @@ paths:
             schema:
               $ref: '#/components/schemas/DeviceTamperEvent'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '201':
           description: Recorded, and the device marked untrusted
           content:

@@ -64,6 +64,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import contract_shapes as cs_ops  # noqa: E402  response schemas for the stale-gap judgement (CHG-R13RVB-004)
+import screen_gaps  # noqa: E402  which generated gaps a record has overtaken (CHG-R13RVB-004)
 from typed_props import DEVICE_GUEST_PLATFORMS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,7 +113,10 @@ RULES = {
     "S-NO-READ": "a screen that edits (PUT/PATCH) and reads nothing (R265)",
     "S-ASYNC-POLL": "a 202 operation with no read on the screen to follow it (R288)",
     "S-OPENQ-STALE": "an open question cites an endpoint no operation has (R266)",
-    "S-NOTES-STALE": "notes or gaps say an operation was removed or absent while apis hold it (R269)",
+    "S-NOTES-STALE": "notes or gaps say an operation was removed or absent while apis hold it (R269), or a generated "
+                     "gap says the screen writes nothing, answers no schema, reads no X or declares N operations "
+                     "against its own record, or the notes say components, states and operations are still to be "
+                     "written beside all three (r13 review, CHG-R13RVB-004)",
     "S-PURPOSE-TEMPLATE": "an api purpose that is the operationId, empty, or template text (R260)",
     "S-OFFLINE-CLAIM": "an offline state promising queued writes no operation is offline-capable for (R257)",
     "S-WORKSTATION-OP": "a workstation-scoped operation on a platform nobody signs a workstation into (R100)",
@@ -296,6 +301,8 @@ def main() -> int:
         path_index.add((f["method"].upper(), re.sub(r"\{[^}]+\}", "{}", f["path"]).rstrip("/")))
 
     all_screens = g.screens()
+    _, gap_schemas = cs_ops.load_contracts(g.ROOT)
+    gap_twins = screen_gaps.twins(all_screens)
     offline_platforms = {stem: bool(p.get("offlineCapable")) for stem, p in g.platforms().items()}
     by_schema, _ = g.schemas()
     # Platforms that sign a workstation in: some screen takes workstationId from the session.
@@ -508,6 +515,16 @@ def main() -> int:
                          % (re.escape(o), re.escape(o)), prose):
                 guard.add("S-NOTES-STALE", f"{sid}:{o}",
                           f"{sid}: notes say {o} was removed and apis still declare it")
+        # r13 review (3 November 2026, CHG-R13RVB-004): a generated gap the record has overtaken, and the 14 August
+        # board-import sentence on a screen that has its components, states and operations.
+        for gi, kind, _fx in screen_gaps.stale_gaps(s, ops, gap_schemas, gap_twins):
+            guard.add("S-NOTES-STALE", f"{sid}:{kind}:{gi}",
+                      f"{sid}: gap {gi} ({kind}) says what the screen's own operations contradict: correct or drop it "
+                      f"(tools/applied/r13-review-stale-screen-text.py shows how)")
+        if screen_gaps.still_to_be_written(s):
+            guard.add("S-NOTES-STALE", f"{sid}:still-to-be-written",
+                      f"{sid}: notes say components, states and operations are still to be written, and the record "
+                      f"has all three")
         if apis and re.search(r"\bNo contract\b", prose):
             guard.add("S-NOTES-STALE", f"{sid}:no-contract",
                       f"{sid}: notes say 'No contract' beside {len(apis)} operation(s)")

@@ -329,6 +329,8 @@ paths:
       security:
       - guestAuth: []
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:

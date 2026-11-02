@@ -4155,6 +4155,8 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -4200,6 +4202,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '204':
           headers:
             X-Consistency-Token:
@@ -4403,6 +4407,8 @@ paths:
             schema:
               $ref: '#/components/schemas/AddCartLineRequest'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -4539,6 +4545,8 @@ paths:
                   minimum: 0
                   description: The new quantity. 0 removes the line (audit R123 (1)).
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '429':
@@ -4612,6 +4620,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -4694,6 +4704,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -5085,6 +5097,8 @@ paths:
                       holderName:
                         type: string
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '201':
@@ -6500,6 +6514,13 @@ paths:
                   type: string
                   format: date-time
       responses:
+        '403':
+          description: 'The caller holds no `ORDER_VOID` and sent no verified supervisor step-up (`supervisor-step-up-refused`), or is not permitted at this scope (`forbidden`). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, supervisor-step-up-refused]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '200':
           headers:
             X-Consistency-Token:
@@ -9043,6 +9064,8 @@ paths:
                   type: string
                   maxLength: 500
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '202':
           headers:
             X-Consistency-Token:
@@ -9112,6 +9135,8 @@ paths:
                   description: The token carried in the claim link, checked against
                     `TicketTransfer.claimToken`.
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -9484,6 +9509,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '204':
           headers:
             X-Consistency-Token:
@@ -15837,6 +15864,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ApplyCartPromoCodeRequest'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':

@@ -54,7 +54,17 @@ same kind that nothing held:
   C-REFUSAL-UNDECLARED     an operation's own text promises a refusal by status, "(409 when the batch has fewer
                            left)", "is refused (422)", "refused with 404", and its responses declare no such status,
                            so the refusal has no problem type and QA cannot test it (ADAM CR-316, CHG-CR316-001:
-                           setCodeDistributionManager's 409 was described and not declared)
+                           setCodeDistributionManager's 409 was described and not declared). Widened in r13
+                           (the 3 November review, CHG-R13RVB-002): "is `404`", "is the shared 404", "..., or
+                           409." are promises too, and a status written with its problem type, "is a `403`
+                           (`comp-escalation-required`)", "`403 supervisor-step-up-refused`", is declared with
+                           that type. The shared 400 `validation` and 403 `forbidden` stay unread (CR-316)
+  C-LOCK-NOTE-COPIED       an `x-ticvai-lock-note` that writes a guarded `UPDATE ... SET` statement, word for word
+                           the same as another operation's: each states its own movement (r13 review,
+                           CHG-R13RVB-005: capture and release carried the hold's reservation statement)
+  C-SELF-404               an `x-ticvai-self-scoped` operation addressed by a path id that declares no 404: another
+                           caller's record is refused exactly as one that does not exist (contracts/README.md,
+                           CHG-GCF-002), and that answer is the shared `NotFound` (r13 review, CHG-R13RVB-001)
   C-HTML-SANITISED         a schema or property whose description says its values are HTML and does not say they are
                            "sanitised on write" (a schema also states its "Allowed tags"), or a write whose body reaches
                            such a schema or property and whose description does not say it sanitises (ADAM CR-401,
@@ -117,8 +127,13 @@ RULES = {
     "C-PUT-KEY": "a PUT keyed on a natural key whose path id carries the stock 'creates or replaces' text, a promised "
                  "409 <noun>-id-mismatch its 409 does not list, or 'no id in the path' beside a path id (ADAM CR-245, "
                  "CHG-R10CRF-005)",
-    "C-REFUSAL-UNDECLARED": "an operation's own text promises a refusal by status ('(409 when ...)', 'refused (422)') "
-                            "that its responses do not declare (ADAM CR-316, CHG-CR316-001)",
+    "C-REFUSAL-UNDECLARED": "an operation's own text promises a refusal by status ('(409 when ...)', 'refused (422)', "
+                            "'is `404`', 'or 409.', '`403` (`type`)') that its responses do not declare, or declare "
+                            "without the problem type named beside it (ADAM CR-316, CHG-CR316-001; CHG-R13RVB-002)",
+    "C-LOCK-NOTE-COPIED": "two operations' x-ticvai-lock-note state the same guarded UPDATE statement, so one of "
+                          "them states another's movement (r13 review, CHG-R13RVB-005)",
+    "C-SELF-404": "a self-scoped operation addressed by a path id declares no 404, the answer for another caller's "
+                  "record (contracts/README.md, CHG-GCF-002; CHG-R13RVB-001)",
     "C-FINDING-RULE": "a finding-kind enum whose kind table gives a kind no 'reported when' rule (ADAM CR-320, "
                       "CHG-CR320-001)",
     "C-HTML-SANITISED": "a schema documented as HTML that names no sanitising on write, or a write reaching it that "
@@ -127,8 +142,19 @@ RULES = {
 # ADAM CR-316 (CHG-CR316-001): a refusal the operation's own text promises by status. Only the forms that say
 # this operation refuses: "(409 when|if|once|while ...)", "refused (409)", "refused with 409", "refused `409 ...`".
 # Statuses the shared responses carry for every operation (400 validation, 401, 403, 429) are not read.
+# Widened by the r13 review (3 November 2026, CHG-R13RVB-002): "is `404`", "is a 404", "is the shared 404", and a
+# clause ending ", or 409." promise this operation's answer just as plainly; the narrow pattern let voidOrder,
+# transferWalletBalance, updateReport and updateDashboard promise refusals they did not declare.
 PROMISED_STATUS = re.compile(r"\(\s*`?(404|409|410|412|422)\b[^)]{0,40}?\b(?:when|if|once|while)\b"
-                             r"|\brefused\s*(?:with\s*)?\(?`?(404|409|410|412|422)\b", re.I)
+                             r"|\brefused\s*(?:with\s*)?\(?`?(404|409|410|412|422)\b"
+                             r"|\bis\s+(?:therefore\s+|then\s+|also\s+)?(?:an?\s+|the\s+shared\s+)?`?(404|409|410|412|422)\b"
+                             r"|\bor\s+`?(404|409|410|412|422)`?\s*(?=[.;)])", re.I)
+# A status written with its problem type: "`403` (`comp-escalation-required`)", "403 (`x`)", "`403 x`". The response
+# declares that status and lists that type. The shared 400 `validation` and 403 `forbidden` are every operation's.
+# "there is no `409 approval-required`" says the opposite and is not read.
+TYPED_STATUS = re.compile(r"(?<!no )(?<!no `)(?<!never )`?\b(400|403|404|409|410|412|422)\b`?\s*\(\s*`([a-z][a-z0-9]*(?:-[a-z0-9]+)+)`\s*\)"
+                          r"|(?<!no )(?<!never )`(400|403|404|409|410|412|422) ([a-z][a-z0-9]*(?:-[a-z0-9]+)+)`")
+SHARED_TYPED = {("400", "validation"), ("403", "forbidden")}
 
 
 def finding_rule_gaps(schema: dict) -> list:
@@ -148,7 +174,22 @@ def finding_rule_gaps(schema: dict) -> list:
 
 def promised_statuses(text: str) -> set:
     """The refusal statuses an operation's own description or body-key note promises (C-REFUSAL-UNDECLARED)."""
-    return {a or b for a, b in PROMISED_STATUS.findall(text or "")}
+    return {next(x for x in groups if x) for groups in PROMISED_STATUS.findall(text or "")}
+
+
+def promised_types(text: str, oid: str = "", op_ids=()) -> set:
+    """(status, problem type) pairs the text writes together (C-REFUSAL-UNDECLARED, CHG-R13RVB-002). A paragraph that
+    names another operation in backticks ("`bookResource` refuses it with `409 resource-awaiting-inspection`") is
+    telling what that operation answers, not this one, and is not read."""
+    out = set()
+    for para in re.split(r"\n\s*\n|(?=\*\*)", text or ""):
+        if any(x in op_ids and x != oid for x in re.findall(r"`(?:[a-z-]+[.#])?([a-z][A-Za-z0-9]+)`", para)):
+            continue
+        for a, b, c, d in TYPED_STATUS.findall(para):
+            pair = (a or c, b or d)
+            if pair not in SHARED_TYPED:
+                out.add(pair)
+    return out
 # ADAM CR-390 and CR-395 (CHG-CR395-001): a PUT on a required path id that promises the create of a body without the
 # id. The operation's text ("keyed on the body's `id`", "No `id` creates", "A body without `ruleId` creates") or the
 # body key field's ("Absent creates a rule", "Absent in a body, it creates").
@@ -489,6 +530,30 @@ def main() -> int:
             guard.add("C-REFUSAL-UNDECLARED", f"{oid}:{st}",
                       f"{oid}: its text promises a {st} refusal and its responses declare no {st}: declare it with "
                       f"its problem type")
+        for st, ptype in sorted(promised_types(" ".join(str(op.get(k) or "") for k in
+                                                        ("description", "x-ticvai-body-key-note",
+                                                         "x-ticvai-singleton-note")), oid, ops)):
+            resp = (op.get("responses") or {}).get(st) or (op.get("responses") or {}).get(int(st))
+            rr = resp
+            for _ in range(5):  # through a local ref, or one to another contract (the shared responses)
+                if not (isinstance(rr, dict) and "$ref" in rr):
+                    break
+                fpart, _, frag = str(rr["$ref"]).partition("#")
+                cur = docs.get(Path(fpart).stem) if fpart else doc
+                for part in [x for x in frag.split("/") if x]:
+                    cur = cur.get(part) if isinstance(cur, dict) else None
+                rr = cur
+            listed = (rr.get("x-ticvai-problem-types") or []) if isinstance(rr, dict) else []
+            if ptype not in listed:
+                guard.add("C-REFUSAL-UNDECLARED", f"{oid}:{st}:{ptype}",
+                          f"{oid}: its text promises {st} `{ptype}` and "
+                          + (f"its {st} lists {listed or 'no type'}" if resp is not None else f"declares no {st}")
+                          + ": declare the status with that problem type")
+        # C-SELF-404 (r13 review, CHG-R13RVB-001): a self-scoped operation addressed by a path id answers another
+        # caller's record exactly as one that does not exist, the shared NotFound (contracts/README.md, CHG-GCF-002).
+        if op.get("x-ticvai-self-scoped") and "{" in f["path"] and "404" not in codes:
+            guard.add("C-SELF-404", oid, f"{oid}: self-scoped and addressed by {f['path']}, and declares no 404: "
+                                         f"another caller's record is the shared NotFound")
         last = f["path"].rstrip("/").rsplit("/", 1)[-1]
         if m == "post" and re.search(r"/\{[^}]+\}/[a-z][a-z-]*$", f["path"]) and "409" not in codes \
                 and not last.endswith("s") \
@@ -596,7 +661,26 @@ def main() -> int:
     extra_rules(guard, ops, docs)
     segregation_rules(guard, ops, docs)
     html_rules(guard, ops, docs)
+    lock_note_rules(guard, ops)
     return guard.finish()
+
+
+# A lock note that writes the guarded statement is that operation's own movement (r13 review, 3 November 2026,
+# CHG-R13RVB-005): captureWalletHold and releaseWalletHold carried holdWalletFunds' reservation statement word for
+# word, so a developer copying it reserved again on release.
+LOCK_STATEMENT = re.compile(r"`UPDATE\s+[\w.]+\s+SET\b", re.I)
+
+
+def lock_note_rules(guard, ops):
+    by: dict = {}
+    for oid, f in sorted(ops.items()):
+        note = str(f["op"].get("x-ticvai-lock-note") or "")
+        if LOCK_STATEMENT.search(note):
+            by.setdefault(re.sub(r"\s+", " ", note).strip(), []).append(oid)
+    for note, oids in sorted(by.items()):
+        for oid in oids[1:] if len(oids) > 1 else []:
+            guard.add("C-LOCK-NOTE-COPIED", oid, f"{oid}: its x-ticvai-lock-note states the same guarded statement "
+                                                 f"as {oids[0]}'s: write the statement this operation runs")
 
 
 # ADAM CR-401 (CHG-CR401-001): a description that says the values are HTML ("Values are HTML", "is HTML").

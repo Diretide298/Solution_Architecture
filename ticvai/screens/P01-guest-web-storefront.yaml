@@ -1223,7 +1223,7 @@ screens:
       trigger: Continue, when sign-in is asked after add-ons and this booking has no add-ons step
       carries:
       - cartId
-      provenance: 'decided 29 September, rev 3 REV3-3: `BookingFlowConfig.signInAt` `afterAddOns`; the
+      provenance: 'decided 29 September, rev 3 REV3-3: `BookingFlowLevelSettings.signInAt` `afterAddOns`; the
         basket is kept'
     - to: WEB-006
       trigger: Workshop chosen, then date and time (product-first flow)
@@ -1444,14 +1444,14 @@ screens:
     trigger: First booking visit on this device, or Quick tour
     body: '**Four coach marks** over date, time, tickets and basket, with Back, Next and End tour. Shown
       once per device (the flag is kept on the device only) and replayable from Quick tour; only when
-      `BookingFlowConfig.quickTour` is on (decided 29 September, rev 3 REV3-20).'
+      `BookingFlowLevelSettings.quickTour` is on (decided 29 September, rev 3 REV3-20).'
     dismiss:
       label: End tour
       discards: []
     provenance: client-verified
   notes: '**Rev 3 (decided 29 September).** **Order (REV3-2):** in the dated flow the guest picks the
     date, then the time (WEB-006), then tickets here: tickets stay hidden until a time is picked and Continue
-    stays off until both are chosen, per `BookingFlowConfig.performanceReveal` (`dateTimeTicket` default,
+    stays off until both are chosen, per `BookingFlowLevelSettings.performanceReveal` (`dateTimeTicket` default,
     `allAtOnce` shows all). The two steps may render as one staged page. This screen may also render as
     a side panel on WEB-002 and WEB-004 (23SEP-5). **Sign-in (REV3-3):** with `signInAt` `afterAddOns`
     (default) the sign-in or guest code is asked when the guest leaves Add-ons (WEB-008), or on Continue
@@ -1558,7 +1558,7 @@ screens:
 
     **Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** this step now comes before the
     ticket choice (WEB-005); the time sits right after the date and stays hidden until a date is picked,
-    and tickets stay hidden until a time is picked (`BookingFlowConfig.performanceReveal`, default `dateTimeTicket`;
+    and tickets stay hidden until a time is picked (`BookingFlowLevelSettings.performanceReveal`, default `dateTimeTicket`;
     `allAtOnce` shows everything). **Times (REV3-1):** compact tiles paged `timesPerPage` at a time, with
     Morning / Afternoon / Evening chips and counts (`dayPartFilter`, boundaries per venue, default before
     12:00, 12:00-17:00, from 17:00, venue time zone). **Seated events (REV3-4, REV3-7):** `seatEventDateMode`
@@ -1660,7 +1660,7 @@ screens:
         provenance: decided 29 September, rev 3 REV3-19
       - kind: iconButton
         label: Quick tour
-        notes: Replays the coach-mark tour when `BookingFlowConfig.quickTour` is on.
+        notes: Replays the coach-mark tour when `BookingFlowLevelSettings.quickTour` is on.
         provenance: decided 29 September, rev 3 REV3-20
       - kind: datePicker
         notes: Sold-out dates disabled with a reason on hover, not hidden
@@ -1859,7 +1859,7 @@ screens:
     trigger: Once, after the session or date is picked, when the cart has consent questions
     body: '**The venue''s consent questions for this booking**, e.g. *Are you able to swim?*, *Do you
       hold a scuba certification?*, *I accept the risk*: one or several, in the order `Cart.consentQuestions`
-      gives (the booking flow''s `BookingFlowConfig.consentQuestionIds` and every cart product''s `consentQuestionIds`,
+      gives (the booking flow''s `BookingFlowLevelSettings.consentQuestionIds` and every cart product''s `consentQuestionIds`,
       each question once). A question asked **per person** is asked for each member of the party; one
       asked **per booking** once. Themed as the prototype''s pop-up (Yes / No, Next). Next sends the answers
       to `recordConsentAnswers`, which stores each as a consent record (question version, answer, who
@@ -1939,7 +1939,7 @@ screens:
 
 
     **Rev 3 (decided 29 September).** Date and time on seated events: an inline step before this map,
-    or a pop-up over it, per `BookingFlowConfig.seatEventDateMode` (REV3-4); a single-performance event
+    or a pop-up over it, per `BookingFlowLevelSettings.seatEventDateMode` (REV3-4); a single-performance event
     opens straight here. Time bar with performance switcher (REV3-6, `seatTimeBar`). View-from-your-seat
     box placed per `seatViewPosition` (REV3-5) and fed by a section photo or the geometry (23SEP-14).
     Fixture strip and a direct WEB-004 → WEB-007 path (23SEP-16). With WEB-006 this may render as one
@@ -2262,18 +2262,18 @@ screens:
       carries:
       - cartId
       precondition: the guest is not signed in
-      provenance: 'decided 29 September, rev 3 REV3-3: `BookingFlowConfig.signInAt` `afterAddOns` (default)
+      provenance: 'decided 29 September, rev 3 REV3-3: `BookingFlowLevelSettings.signInAt` `afterAddOns` (default)
         places the gate at this exit; the basket is kept'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     Add-ons. Sanket noted on the 20 August review that the screen shows individual add-ons rather than
     bundles, and it does. **Rewired on that review.** **Corrected 1 October (audit R269):** these notes
-    said `listCatalogueBundles` had gone from this screen then; it never left `apis`, and it is still
-    bound to the *Every bundle* table. It lists the signed catalogue snapshots terminals pull (ADR-0013),
-    not the sellable bundles `promotions.listBundles` returns, so unbinding it is still owed; GST-056,
-    in the same add-ons pair, calls it too, and the two change together.
+    said `listCatalogueBundles` had gone from this screen then, while it was still in `apis` and bound
+    to the *Every bundle* table. It lists the signed catalogue snapshots terminals pull (ADR-0013), not
+    the sellable bundles `promotions.listBundles` returns. **It has since come off** this screen and
+    GST-056, the other half of the add-ons pair: neither declares it (r13 review, CHG-R13RVB-004).
 
 
-    **Rev 3 (decided 29 September).** **Sign-in gate (REV3-3):** with `BookingFlowConfig.signInAt` `afterAddOns`
+    **Rev 3 (decided 29 September).** **Sign-in gate (REV3-3):** with `BookingFlowLevelSettings.signInAt` `afterAddOns`
     (default), leaving this step asks the guest to sign in, or for a guest code when guest checkout is
     on (WEB-016); the basket is kept. With `atPayment` the gate is at WEB-012. Floating basket icon and
     cart side (REV3-10). Every booking-flow setting named here is read from `getPublishedTenantConfig`
@@ -3271,7 +3271,7 @@ screens:
       carries:
       - cartId
       precondition: the guest is not signed in
-      provenance: 'decided 29 September, rev 3 REV3-3: `BookingFlowConfig.signInAt` `atPayment`; the basket
+      provenance: 'decided 29 September, rev 3 REV3-3: `BookingFlowLevelSettings.signInAt` `atPayment`; the basket
         is kept'
     - to: WEB-013
       trigger: Receives confirmation and tickets
@@ -3292,7 +3292,7 @@ screens:
     matches go to staff review.
 
 
-    **Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowConfig.signInAt` `atPayment` the
+    **Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowLevelSettings.signInAt` `atPayment` the
     sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and
     declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).
 

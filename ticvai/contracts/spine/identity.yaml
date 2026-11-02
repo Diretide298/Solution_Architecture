@@ -5332,6 +5332,8 @@ paths:
                 code:
                   type: string
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -5399,6 +5401,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '204':
           headers:
             X-Consistency-Token:
@@ -5688,6 +5692,8 @@ paths:
                 code:
                   type: string
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:

@@ -5073,6 +5073,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RecordConsentRequest'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '201':
           headers:
             X-Consistency-Token:
@@ -6247,6 +6249,8 @@ paths:
       security:
       - guestAuth: []
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           description: Devices
           content:
@@ -6358,6 +6362,8 @@ paths:
                 locale:
                   type: string
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -18288,6 +18294,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           description: Badges held
           content:

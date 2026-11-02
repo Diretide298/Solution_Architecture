@@ -1283,7 +1283,7 @@ paths:
 
         
 
-        **Order.** Sorted by `creditAccountId` descending (a UUIDv7, so newest first).'
+        **Order.** By `eventType` ascending, then by `venueId` ascending with the region''s row (no `venueId`) first (NULLS FIRST) (r13 review, CHG-R13RVB-006: `creditAccountId` is the mapped account, not the mapping, so it never said which mapping is newest).'
       tags:
       - accounts
       parameters:
@@ -3581,7 +3581,7 @@ paths:
         - "P08 BO-090 Period Close"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
-      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
+      description: '**Order.** Newest first, by `startDate` descending, then by `id` (r13 review, CHG-R13RVB-006: a period has no `occurredAt`).'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
