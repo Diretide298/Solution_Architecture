@@ -1,0 +1,51 @@
+id: CHG-R13PL-049
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'A [BE] task for CR-459''s shared vault-reference validator in the kernel (named under #35232); the secret store
+  follows it.'
+decision:
+  what: 'The lead, 2 November 2026, on the 46 CRs settled on 1 and 2 November (CR-436 to CR-483; "Approve all", 1 November;
+    "approve all as a recommended", 2 November): "get going on 5", the next release, r13, folds them in. ADAM CR-459, posted
+    on #35232: "(3) Build the rule once, as a shared validator in the kernel that takes the tenant id and the value, so
+    every vault reference a caller types uses it. Name secrets the store writes in the same form." docs/active/block-a-extra-tasks.json:
+    KERNEL-VAULT-REFERENCE (Hrushikant Patkar, the developer of #35232, which the work belongs to; 1 point; follows
+    PLATFORM-KERNEL; not before 2 November 2026); KERNEL-SECRET-STORE follows it and names it. Plan change waived from
+    the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-459 (#35232, setChannelConnectionConfiguration): build lane o put the format in the contract
+  (CHG-CR459-001, ChannelConnection.credentialsReference) and the decision asks for one kernel validator every typed vault
+  reference uses; the operation formula builds operations, not a kernel rule, so no task built it.'
+keys_touched:
+  tickets:
+  - KERNEL-VAULT-REFERENCE (new)
+  - KERNEL-SECRET-STORE (not ticketed; follows it)
+  operations:
+  - setChannelConnectionConfiguration
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled decision naming shared kernel work that the operation formula does not build
+tickets:
+  started:
+  - '35232 (setChannelConnectionConfiguration, Hrushikant Patkar; started by CHG-CR459-001''s account, New in ADAM''s
+    status cache of 1 November): not rewritten and not made to wait; it builds to the posted decision and uses this
+    validator.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-459
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so #35232 is named in the task''s text; its OpenProject parent is
+  the app-module the plan places it in. Owner: the developer of #35232, who is already building to the posted text, so
+  the rule is written once and not twice.'

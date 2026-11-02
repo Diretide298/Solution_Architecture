@@ -1,0 +1,57 @@
+id: CHG-R13PL-050
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'The read grants of XDR-067 (commerce SELECT on access.media_template) and XDR-068 (operations SELECT on
+  tenancy.device_credential and platform.device, USAGE on tenancy) are folded into R13-DB-IN-PROCESS-READ-GRANTS, which
+  printTicketProof and the device-key sign-in (#37205) follow.'
+decision:
+  what: 'The lead, 2 November 2026, on build lane q''s two stops (CR-447, CR-451): "yes for both". docs/active/block-a-extra-tasks.json:
+    R13-DB-IN-PROCESS-READ-GRANTS (not ticketed yet) gains SELECT on access.media_template to commerce and on
+    tenancy.device_credential to operations (platform.device to operations and USAGE on tenancy to operations it already
+    had), with VM-MIG-ACCESS and VM-MIG-TENANCY, which create the two tables, among its waits; printTicketProof
+    (operationWaits) and CR451-DEVICE-KEY-SIGN-IN follow it. Plan change waived from the cooling-off by the lead ("1
+    waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-447 and CR-451: docs/active/cross-deployable-writes.yaml XDR-067 and XDR-068 grant the two in-process reads
+  (lane q, second pass) and no task applied the grants. Folded, not a new task: the grants task has no ticket yet, so its
+  text is the plan''s to write, and r13 keeps its in-process read grants in one [DB] task (CHG-R13PL-045).'
+keys_touched:
+  tickets:
+  - R13-DB-IN-PROCESS-READ-GRANTS (not ticketed)
+  - CR451-DEVICE-KEY-SIGN-IN (37205)
+  operations:
+  - printTicketProof
+  - getSignageQueueBoard
+  - getSignageQueueCalls
+  - submitQueueReading
+  tables:
+  - access.media_template
+  - tenancy.device_credential
+  - platform.device
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a granted cross-deployable read with no [DB] task applying its grant
+tickets:
+  started:
+  - '33061 (getSignageQueueBoard) and 33062 (getSignageQueueCalls), On hold: they already wait on #37205; not rewritten.'
+  unstarted:
+  - '#31680 (printTicketProof, New) and its task #28119: follow the grants task.'
+  - '#37205 (CR451-DEVICE-KEY-SIGN-IN, New as made): follows the grants task; its text as made is unchanged.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-451
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Covers CR-447 (XDR-067) and CR-451 (XDR-068). The plan rules allow the fold: the task is a hand-written plan task
+  with no ticket, so nothing on the server is rewritten, and no started Database task is made to wait on it.'

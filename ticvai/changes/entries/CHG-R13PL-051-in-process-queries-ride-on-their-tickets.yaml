@@ -1,0 +1,52 @@
+id: CHG-R13PL-051
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'The two new in-process queries ride on existing tickets and the plan''s text says so: access#mediaTemplateRecords
+  on printTicketProof''s (#31680), tenancy#deviceForApiKey on the device-key sign-in''s (#37205).'
+decision:
+  what: 'The lead, 2 November 2026, on build lane q''s two stops (CR-447, CR-451): "yes for both"; access#mediaTemplateRecords
+    is built with #31680 and tenancy#deviceForApiKey with #37205. docs/active/block-a-extra-tasks.json readViaBuiltWith
+    gains access#mediaTemplateRecords -> printTicketProof, and tools/op-descriptions.py names a query on the ticket of
+    each operation readViaBuiltWith builds it with ("Builds the query, with this operation"); CR451-DEVICE-KEY-SIGN-IN''s
+    plan done-when (served by ADAM''s pull, not its text as made) names tenancy#deviceForApiKey. Plan change waived from
+    the cooling-off by the lead ("1 waive", 2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-447 and CR-451: a query class gets no task from the operation formula (CHG-R13PL-046), and #31680''s text
+  said only that printTicketProof reads access#mediaTemplateRecords, not that its ticket builds it.'
+keys_touched:
+  tickets:
+  - SVC-ORDER-ORDERS-8#printTicketProof (31680)
+  - CR451-DEVICE-KEY-SIGN-IN (37205)
+  - SVC-WALLET-WALLET-12#getWalletPreCloseChecks (35893)
+  - SVC-WALLET-WALLET-12#getWalletMovementSummary (35892)
+  operations:
+  - printTicketProof
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/op-descriptions.py
+root_class: a query class ridden on an existing ticket whose text does not say it builds it
+tickets:
+  started: []
+  unstarted:
+  - '#31680 (printTicketProof, New): its text gains "Builds the query, with this operation: access#mediaTemplateRecords".'
+  - '#37205 (New as made): its text as made is unchanged; the plan''s done-when, which ADAM serves, names tenancy#deviceForApiKey.'
+  - '#35892 and #35893 (getWalletMovementSummary, getWalletPreCloseChecks, New): their text gains the line for
+    wallet#periodCloseChecks, the entry readViaBuiltWith already had.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-447
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/op-descriptions.py
+status: open
+notes: 'Covers CR-447 (access#mediaTemplateRecords) and CR-451 (tenancy#deviceForApiKey). A ticket made by hand keeps its
+  text as made (CHG-R13PL-003), so #37205''s builder sentence is on its plan done-when only.'

@@ -1,0 +1,55 @@
+id: CHG-R13PL-048
+date: '2026-11-02'
+source: cr
+kind: plan
+proposed: '2026-11-02'
+summary: 'A [DB] task for the scheduled-publish decision (CR-154, #27779): whitelabel.config_version gains activated_at
+  timestamptz NULL, and each tenant''s current version takes its published_at.'
+decision:
+  what: 'The lead''s decision posted to Narayan Gaonkar on 2 November 2026 for #27779 (CR-154, IDENTITY-C63):
+    "whitelabel.config_version gains activated_at timestamptz NULL (ConfigVersion.activatedAt), set whenever a version
+    becomes current (an immediate publishTenantConfig or the job); backfill each tenant''s current version with its
+    published_at." The plan: "a small [DB] task for Hrushikant Patkar (the column and the backfill), under the white-label
+    MIG ticket". docs/active/block-a-extra-tasks.json: CR154-DB-CONFIG-VERSION-ACTIVATED-AT (Hrushikant Patkar,
+    migrations.owner in docs/active/team.json, `area: database`, not before 2 November 2026), following MIG-WHITELABEL:
+    ADD COLUMN activated_at, then UPDATE ... SET activated_at = published_at WHERE is_current; its text names the release''s
+    forward migration as its Source DDL after r1. Plan change waived from the cooling-off by the lead ("1 waive",
+    2 November 2026).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-154 and R8 blocker IDENTITY-C63 (#27779, publishTenantConfig, and white-label#scheduledPublish): build lane s
+  put the column and its backfill in the package (CHG-R13JOB-004, ConfigVersion.activatedAt, x-ticvai-backfill), and no
+  ticket applies them: the table''s migration (#27663) and its sub-task (#30254) have started.'
+keys_touched:
+  tickets:
+  - CR154-DB-CONFIG-VERSION-ACTIVATED-AT (new)
+  tables:
+  - whitelabel.config_version
+  operations:
+  - publishTenantConfig
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled decision whose database work belongs to a started migration ticket, carried by no plan task
+tickets:
+  started:
+  - '27663 (MIG-WHITELABEL, Ready for QA) and 30254 (its sub-task [DB] whitelabel.config_version, Ready for QA), Hrushikant
+    Patkar: not rewritten; the column and its backfill are this task''s.'
+  unstarted:
+  - '#30774 (publishTenantConfig, On hold) and #27779 (Narayan Gaonkar): build to the posted decision; set activated_at on
+    an immediate publish once this lands.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-154
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the task''s text; its
+  OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table. A
+  change-only [DB] task is `area: database` and its key does not end in -DB (CHG-R8MIG-016, CHG-R12PL-008).'
