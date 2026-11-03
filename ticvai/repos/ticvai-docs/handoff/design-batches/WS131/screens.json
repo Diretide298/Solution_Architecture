@@ -665,11 +665,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
-   },
-   {
-    "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A write and read storing the default ticket, reservation and customer treatment per kind of event change (rescheduleEvent performs one change).",
     "source": "screens/P08-venue-back-office.yaml#BO-720"
    }

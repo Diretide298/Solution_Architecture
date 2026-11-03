@@ -460,7 +460,7 @@ Coverage granted may be narrower than coverage requested — *stalls, not pit*. 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Approve (primary button) | `decideAccreditationApplication` POST `/accreditation-applications/{applicationId}/decide` | inline | AccreditationApplication | — | gated `APPROVAL_DECIDE`; opens drawer first |
+| Approve (primary button) | `decideAccreditationApplication` POST `/accreditation-applications/{applicationId}/decide` | inline | AccreditationApplication | — | gated `ACCREDITATION_APPROVE`; opens drawer first |
 | Refuse (destructive button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)

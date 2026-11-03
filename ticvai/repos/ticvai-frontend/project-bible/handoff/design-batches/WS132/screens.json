@@ -361,13 +361,7 @@
   "purpose": "Set the peak, off-peak and super-prime time bands of a slot template.",
   "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-723)",
   "division": "Shares `listPerformanceTemplates`, `setPerformanceTemplate` with BO-016, BO-721, BO-724; this screen is Peak, Off-Peak & Super Prime Time Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 8.07, page 86): set the peak, off-peak and super-prime time bands of a slot template.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

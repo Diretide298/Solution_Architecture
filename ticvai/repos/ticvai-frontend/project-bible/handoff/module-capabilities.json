@@ -1490,11 +1490,12 @@
      "key": "ROLE_MANAGE",
      "label": "create roles and attach grants",
      "group": "Session and identity",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
       "createRole",
       "listRoles",
       "setCapabilityTemplate",
+      "setRolePermissions",
       "setSegregationRules",
       "updateRole"
      ],
@@ -1966,14 +1967,14 @@
      "key": "GUEST_VIEW_PII",
      "label": "personal fields. Distinct from GUEST_VIEW by design",
      "group": "Guest engagement",
-     "operationCount": 11,
+     "operationCount": 12,
      "operations": [
+      "createGuestDocumentUpload",
       "listComplianceEvidenceWaiver",
       "listCustomerPrivacyConsent",
       "listMinorGuardianGroup",
       "listMissingExpiredInvalid",
-      "listParticipantWaiverStatus",
-      "listSiteWaiverException"
+      "listParticipantWaiverStatus"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3467,7 +3468,7 @@
   "subscription": {
    "title": "20 — Subscription & Licensing Management",
    "capabilityCount": 18,
-   "unguardedOperations": 2,
+   "unguardedOperations": 3,
    "capabilities": [
     {
      "key": "CASE_MANAGE",
@@ -3731,7 +3732,7 @@
   },
   "tenancy": {
    "title": "Cross-cutting — organisation hierarchy",
-   "capabilityCount": 11,
+   "capabilityCount": 10,
    "unguardedOperations": 4,
    "capabilities": [
     {
@@ -3797,17 +3798,6 @@
       "createOutlet",
       "updateOutlet",
       "updateRegionSettings"
-     ],
-     "elevated": false,
-     "segregationConstrained": false
-    },
-    {
-     "key": "ROLE_MANAGE",
-     "label": "create roles and attach grants",
-     "group": "Session and identity",
-     "operationCount": 1,
-     "operations": [
-      "setRolePermissions"
      ],
      "elevated": false,
      "segregationConstrained": false

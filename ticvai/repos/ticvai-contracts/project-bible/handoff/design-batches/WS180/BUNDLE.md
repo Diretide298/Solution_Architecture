@@ -145,8 +145,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The hub of the recommendation engine: strategies, placements and their performance; attributed and incremental revenue reported apart.
 
 **Known correction pending (do not draw the wrong version)**
@@ -341,7 +339,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Recommendation Strategy Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recommendation strategies configured centrally: objective, placements, ranking and guardrails stated together.
 
@@ -499,7 +497,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. **Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Revenue, Incremental revenue, Membership conversion, Capacity utilization, Inventory movement. Each needs …
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Revenue, Incremental revenue, Membership conversion, Capacity utilization, Inventory movement. Each needs …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What the engine optimises (revenue, margin, attach, satisfaction) with weights.
 
@@ -662,7 +660,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved: Ticket → Ticket, Ticket → Bundle, Ticket → F&B, Ticket → Retail, Ticket → Parking, Ticket → Locker, Ticket … **Recommendation Type & Product Relationship Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+**Known gaps.** **The pack names 12 actions on this screen and the screen declares 2 operations.** Unserved: Ticket → Ticket, Ticket → Bundle, Ticket → F&B, Ticket → Retail, Ticket → Parking, Ticket → Locker, Ticket … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Declared product relationships: upgrade ladders, cross-sells, affinities, substitutes.
 
@@ -791,7 +789,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Recommendation Placement & Touchpoint Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where in the journey recommendations may appear.
 
@@ -941,7 +939,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Channel & Journey Strategy Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recommendation behaviour across channels and journeys.
 
@@ -1092,7 +1090,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved: Revenue potential, Product affinity, Customer propensity, Inventory, Capacity, Commercial priority … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 7 actions on this screen and the screen declares 3 operations.** Unserved: Revenue potential, Product affinity, Customer propensity, Inventory, Capacity, Commercial priority … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Ranking of eligible recommendations and suppression: fatigue limits, frequency caps, hard exclusions.
 

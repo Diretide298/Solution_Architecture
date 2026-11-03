@@ -70,7 +70,11 @@ contract). **Uniqueness is carried where the contract marks it**: a property wit
 `x-ticvai-unique: tenant` or `venue` becomes a `<table>_<columns>_uniq` unique index (audit R108,
 28 September). A contract schema's `x-ticvai-unique-together: [[a, b, ...]]` is a unique index over
 several columns, each named by property or by column (CHG-R6-006); with `x-ticvai-unique-nulls: not-distinct` on
-the schema a null member still collides (`NULLS NOT DISTINCT`, CHG-MKT-002). **A text member of either is
+the schema a null member still collides (`NULLS NOT DISTINCT`, CHG-MKT-002). **A child table derived from an array
+takes a unique key declared on that array property** (`x-ticvai-unique-together` beside `type: array`; ADAM CR-510,
+CHG-CR510-001: control.plan_module and control.plan_limit, one row per module and per metric of a plan version), its
+members named by the item's property or by column, and `x-ticvai-unique-compare: exact` there keeps the item members
+unlowered. **A text member of either is
 indexed as `lower(column)`**, so a code is unique whatever its case, as common.yaml says; an opaque
 external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). `x-ticvai-required-when:
 {prop: {other: value}}` is a table CHECK that the column is set on rows where `other` is `value`
@@ -438,6 +442,11 @@ ROW_OWNER = {
     "orders.refund_line": "refund_id",            # CHG-R10ORD-014 (CR-208)
     "orders.refund_payment": "refund_id",         # CHG-R10ORD-014 (CR-208)
     "catalogue.product_media": "product_id",   # CHG-R6-005 (CR-009)
+    # r13 gate (CHG-R13BO-001): a plan's benefits are the plan's rows ("keyed by the entitlement template because that
+    # is the plan", getPlanBenefits; setPlanBenefits replaces them whole). Declaring the scope_path of
+    # catalogue.membership_benefit (CHG-MOD-007) gave the table a second protected owner, so it fell to the tenant root
+    # ("several protected owners") and a venue's PRODUCT_CONFIGURE could neither read nor set a plan it owns.
+    "catalogue.plan_benefit": "entitlement_template_id",   # CHG-R13BO-001
     "inventory.quotation_line": "quotation_id",   # CHG-R6-013
     "reporting.dashboard_tile": "dashboard_id",   # CHG-R6-013
     # CHG-R6-015 (ADAM CR-013): declaring `location_id -> inventory.location` gave these a second protected
@@ -945,6 +954,8 @@ NO_GUEST = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NULL"
 # currency, time zone and region rules (platform.venue_settings, by venue_in_scope; platform.region_settings,
 # read-beneath). Defined for a table under its base rule (scope_path or venue_id) or marked read-beneath.
 GUEST_SET = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NOT NULL"
+# The tenant's own row (venue_id null) for any session with a scope set (ADAM CR-487; `x-ticvai-tenant-row-read`).
+TENANT_ROW_READ = "(venue_id IS NULL AND cardinality(platform.current_scope_paths()) > 0)"
 
 # The check apply_split_rls gets for `any-grant-no-delete`: a scope path set, the WITH CHECK the append-only trail's
 # INSERT has (CHG-R6-002).
@@ -1020,6 +1031,24 @@ BEGIN
     EXECUTE format('CREATE POLICY %I ON %s FOR UPDATE USING (%s) WITH CHECK (%s)',
                    base || '_update', target, write_check, write_check);
     EXECUTE format('CREATE POLICY %I ON %s FOR DELETE USING (%s)', base || '_delete', target, write_check);
+END
+$$;
+
+-- **A split policy whose INSERT also admits one narrow kind of row** (ADAM CR-506, Chinmay, 3 November 2026;
+-- CHG-CR506-001): apply_split_rls, then the `_append` policy's check is `write_check OR insert_check`, while UPDATE and
+-- DELETE keep `write_check` alone (orders.order_event: a guest appends a `ticketsResent` row to its own order).
+CREATE OR REPLACE FUNCTION platform.apply_split_insert_rls(target regclass, read_check text, write_check text,
+                                                          insert_check text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    base text := (SELECT left(c.relname, 55) FROM pg_class c WHERE c.oid = target);
+BEGIN
+    PERFORM platform.apply_split_rls(target, read_check, write_check);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', base || '_append', target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR INSERT WITH CHECK ((%s) OR (%s))', base || '_append', target,
+                   write_check, insert_check);
 END
 $$;
 
@@ -1844,12 +1873,20 @@ def seed_rows_sql(db: str, cols: dict) -> str:
 # ends every live session and revokes every live refresh token of that principal. No grant or policy is widened: the
 # function lifts the connection to the tenant root for its own two statements only and puts the caller's scope back
 # before it returns. updatePrincipal (deactivation, validTo, primaryRoleId) and forceLogout call it.
+# **The root comes from what the caller check proved visible** (ADAM CR-483, Chinmay, 2 November 2026, option A with
+# option C's guard; CHG-CR483-001). It used to read the tenant row of platform.scope, whose forced row security hides
+# that row from a venue grant, so for a venue manager root_path was NULL, scope_paths became '' and both UPDATEs ended
+# nothing while updatePrincipal answered 200. Now: the caller's own tenant path when platform.tenant_root_in_scope(),
+# else the first label of the principal's home scope path, read in the same statement as the check; the path is
+# switched to, then confirmed as the tenant node, and a missing root raises P0001 so nothing is written.
 END_PRINCIPAL_SESSIONS_SQL = """
 -- **identity.end_principal_sessions** (ADAM CR-180, option A; CHG-R10ID-006): ends every live session and revokes every
 -- live refresh token of one principal, at every venue, once the caller is shown to be allowed to update that principal
 -- (identity.principal's write rule, home-scope-write). Returns the number of sessions ended. Whatever its owner, it
 -- reads and writes the two tables at the tenant root for these statements only, and restores the caller's
--- ticvai.scope_paths before returning.
+-- ticvai.scope_paths before returning. The root is taken from what the caller check proved visible (ADAM CR-483;
+-- CHG-CR483-001): the caller's own tenant path under the tenant root, else the first label of the principal's home
+-- scope path; it is confirmed as the tenant node once granted, and a missing root raises, so nothing is written.
 CREATE OR REPLACE FUNCTION identity.end_principal_sessions(target_principal_id uuid, ended_by uuid, reason text)
     RETURNS integer
     LANGUAGE plpgsql
@@ -1859,17 +1896,33 @@ CREATE OR REPLACE FUNCTION identity.end_principal_sessions(target_principal_id u
 AS $$
 DECLARE
     caller_paths text := current_setting('ticvai.scope_paths', true);
+    root_in_scope boolean := platform.tenant_root_in_scope();
     root_path text;
+    home_root text;
     ended integer := 0;
 BEGIN
-    IF NOT (platform.tenant_root_in_scope() OR EXISTS (
-            SELECT 1 FROM identity.principal hp JOIN platform.scope hs ON hs.id = hp.home_scope_id
-             WHERE hp.id = target_principal_id AND platform.in_scope(hs.path))) THEN
+    SELECT subpath(hs.path, 0, 1)::text INTO home_root
+      FROM identity.principal hp JOIN platform.scope hs ON hs.id = hp.home_scope_id
+     WHERE hp.id = target_principal_id AND (root_in_scope OR platform.in_scope(hs.path));
+    IF NOT (root_in_scope OR home_root IS NOT NULL) THEN
         RAISE EXCEPTION 'identity.end_principal_sessions: the caller may not update principal %', target_principal_id
             USING ERRCODE = '42501';
     END IF;
-    SELECT s.path::text INTO root_path FROM platform.scope s WHERE s.level = 'tenant' LIMIT 1;
-    PERFORM set_config('ticvai.scope_paths', COALESCE(root_path, ''), true);
+    IF root_in_scope THEN
+        SELECT s.path::text INTO root_path FROM platform.scope s
+         WHERE s.level = 'tenant' AND s.path = ANY (platform.current_scope_paths()) LIMIT 1;
+    ELSE
+        root_path := home_root;
+    END IF;
+    IF root_path IS NULL THEN
+        RAISE EXCEPTION 'identity.end_principal_sessions: no tenant root for principal %', target_principal_id
+            USING ERRCODE = 'P0001';
+    END IF;
+    PERFORM set_config('ticvai.scope_paths', root_path, true);
+    IF (SELECT count(*) FROM platform.scope s WHERE s.level = 'tenant' AND s.path = root_path::ltree) <> 1 THEN
+        RAISE EXCEPTION 'identity.end_principal_sessions: no tenant root for principal %', target_principal_id
+            USING ERRCODE = 'P0001';
+    END IF;
     UPDATE identity.session
        SET status = 'terminated', ended_at = now(), ended_by_principal_id = ended_by, end_reason = left(reason, 500)
      WHERE principal_id = target_principal_id AND status = 'active';
@@ -1903,9 +1956,24 @@ CHANGE_VERSION_MARK = "x-ticvai-change-version"
 # sets it to that value on every row already in the table, in the same guarded block (tools/ddl_forward.py
 # backfill_block); rows written later take the column's default. `MerchandiseItem.isPublished` defaults to false for a
 # new item and is true on every item that was there before it, so no item a guest sees today disappears. A scalar
-# only (boolean, number, string), typed as the column is; BACKFILL: table -> {column: SQL literal}, filled by main.
+# (boolean, number, string), typed as the column is, or `{column, where}`: another column of the same row, on the rows
+# a boolean column marks (backfill_from_column, CHG-R13JOB-004); BACKFILL: table -> {column: SQL}, filled by main.
 BACKFILL_MARK = "x-ticvai-backfill"
 BACKFILL: dict = {}
+
+
+def backfill_from_column(v: dict) -> str | None:
+    """**A backfill copied from another column of the same row** (r13, 2 November 2026; CHG-R13JOB-004, the lead's
+    decision for whitelabel.config_version.activated_at): `x-ticvai-backfill: {column: <snake column>, where: <snake
+    boolean column>}` sets the new column to that column on the rows where the boolean is true (each tenant's current
+    version takes its published_at), and leaves the others null. Two identifiers, nothing else, so it stays one
+    guarded UPDATE."""
+    col, where = v.get("column"), v.get("where")
+    ident = re.compile(r"^[a-z][a-z0-9_]*$")
+    if set(v) - {"column", "where"} or not (isinstance(col, str) and ident.match(col)) or (
+            where is not None and not (isinstance(where, str) and ident.match(where))):
+        return None
+    return col + (f" WHERE {where}" if where else "")
 
 
 def backfill_literal(typ: str, v) -> str | None:
@@ -2057,6 +2125,13 @@ def load_contract_props(docs: dict | None = None) -> dict:
                         ref = str((spec.get("items") or {}).get("$ref") or "")
                         if ref.startswith("#/components/schemas/"):
                             ITEM_SCHEMA[f"{mod}.{name}.{prop}"] = f"{mod}.{ref.rsplit('/', 1)[-1]}"
+                        # **A unique key over the child table, on the array property** (ADAM CR-510, CHG-CR510-001).
+                        aut = spec.get("x-ticvai-unique-together")
+                        if isinstance(aut, list) and aut:
+                            ARRAY_UNIQUE[f"{mod}.{name}.{prop}"] = [g for g in aut if isinstance(g, list) and g]
+                            if str(spec.get(UNIQUE_COMPARE) or "") == "exact":
+                                EXACT_ITEM_SOURCES.update(f"{mod}.{name}.{prop}[].{m}" for g in aut
+                                                          if isinstance(g, list) for m in g)
     return found
 
 
@@ -2085,6 +2160,8 @@ def retired_columns(schema: dict) -> None:
 SCHEMA_MARKS: dict = {}
 ITEM_SCHEMA: dict = {}
 ARRAY_PROPS: set = set()     # `module.Schema.arrayProp`, every array property (a child table's parent key names one)
+ARRAY_UNIQUE: dict = {}      # `module.Schema.arrayProp` -> the unique column sets its child table takes (ADAM CR-510)
+EXACT_ITEM_SOURCES: set = set()  # `module.Schema.arrayProp[].member` an array's x-ticvai-unique-compare: exact keeps
 RETIRED: dict = {}
 # **The tables whose contract says `x-ticvai-scope: none`** (CHG-R9MIG-001, ADAM CR-166 as the lead ruled it, 21
 # October 2026). Filled by main from table_marks; frozen mode hands it to ddl_forward.diff, which removes a scope_path,
@@ -2232,6 +2309,16 @@ def table_marks(cols: dict, tables) -> dict:
             # `NULLS NOT DISTINCT` (PostgreSQL 15 and later; the platform is on 16).
             if str(marks.get("x-ticvai-unique-nulls") or "").strip() == "not-distinct":
                 entry["unique_nulls_not_distinct"] = True
+        # **The array a child table is derived from may name its unique key** (ADAM CR-510, CHG-CR510-001): the
+        # parent-key column's source is the array property (`subscription.Plan.limits`), or an item column's is
+        # `<array>[].<prop>`; its `x-ticvai-unique-together` sets are this table's, named by item property or column.
+        arrays = {str(c.get("source") or "") for c in cols.get(t, []) if str(c.get("source") or "") in ARRAY_PROPS}
+        arrays |= {m.group(1) for c in cols.get(t, [])
+                   for m in [re.match(r"^([\w-]+\.\w+\.\w+)\[\]\.\w+$", str(c.get("source") or ""))] if m}
+        for arr in sorted(arrays):
+            for group in ARRAY_UNIQUE.get(arr) or []:
+                entry.setdefault("unique_together", []).append(
+                    [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group])
         # **Who may read a row the scope rule would hide** (CHG-GEN-005): `x-ticvai-rls: read-beneath` or
         # `grant-holder-read` on the schema; see RLS_MARKS.
         rls = marks.get("x-ticvai-rls")
@@ -2241,12 +2328,38 @@ def table_marks(cols: dict, tables) -> dict:
         # writes and reads it, or any session with a guest subject set. See GUEST_SET.
         if marks.get("x-ticvai-guest-read") is True:
             entry["guest_read"] = True
+        # **The tenant's own row, read by any scoped session** (ADAM CR-487, option A, Chinmay, 3 November 2026;
+        # CHG-CR487-001): `x-ticvai-tenant-row-read: true` beside `x-ticvai-guest-read` on a venue_id table adds the
+        # read branch `venue_id IS NULL AND <a scope is set>` (TENANT_ROW_READ), so a venue-level staff session and an
+        # anonymous guest session (its scope the venue's path) see the tenant's default row their fall-back names.
+        # Writes are unchanged; a session with no scope and no subject still reads nothing.
+        if marks.get("x-ticvai-tenant-row-read") is True:
+            entry["tenant_row_read"] = True
         # **The guest's own rows, by a named column** (ADAM CR-342; CHG-R12DB-009): `x-ticvai-guest-subject: <property>`
         # beside `x-ticvai-rls: guest-reads-own` names the column holding the row's guest (ledger.tax_invoice's
         # buyerSubjectId) where it is not `subject_id`.
         gs = marks.get("x-ticvai-guest-subject")
         if isinstance(gs, str) and gs.strip():
             entry["guest_subject"] = column_of(gs.strip()) or f"?{gs.strip()}"
+        # **Several guests a row names, on a table owned through its parent** (r13 root R28, CHG-R13R28-001): a list
+        # beside `x-ticvai-rls: guest-reads-own` (orders.ticket_transfer's fromSubjectId and toSubjectId) is read by
+        # whoever its parent shows it to, or by the guest any of those columns names. See GUEST_PARENT_READ.
+        elif isinstance(gs, list) and gs:
+            entry["guest_subjects"] = [column_of(str(x).strip()) or f"?{x}" for x in gs]
+        # **The guest who writes its own row, on a table owned through its parent** (ADAM CR-502, Chinmay, 3 November
+        # 2026; CHG-CR502-001): `x-ticvai-guest-writer: <property>` beside a guest-subject list adds to the parent's
+        # write the branch `<column> = the session's subject AND the parent's subject_id = the session's subject`
+        # (orders.ticket_transfer: the sender of a transfer of its own order). See GUEST_PARENT_READ.
+        # **One narrow insert a guest may make** (ADAM CR-506, Chinmay, 3 November 2026; CHG-CR506-001):
+        # `x-ticvai-guest-insert: {<property>: <value>}` beside `x-ticvai-rls: guest-reads-own` on a table read through
+        # its guest's parent adds an INSERT-only branch: the row's column holds that value and the parent's subject_id is
+        # the session's subject (apply_split_insert_rls). Updates and deletes keep the staff rule.
+        gi = marks.get("x-ticvai-guest-insert")
+        if isinstance(gi, dict) and gi:
+            entry["guest_insert"] = [(column_of(str(k)) or f"?{k}", v) for k, v in gi.items()]
+        gw = marks.get("x-ticvai-guest-writer")
+        if isinstance(gw, str) and gw.strip():
+            entry["guest_writer"] = column_of(gw.strip()) or f"?{gw.strip()}"
         # **A table that takes no scope** (CHG-R9MIG-001, CR-166): `x-ticvai-scope: none`; see DESCOPED.
         sc = marks.get("x-ticvai-scope")
         if sc is not None:
@@ -3099,7 +3212,7 @@ def main() -> int:
                 # `x-ticvai-backfill` (CHG-R10OPN-002): the value a forward migration gives the rows already there.
                 bf = (column_spec(c, contract_props) or {}).get(BACKFILL_MARK)
                 if bf is not None:
-                    lit = backfill_literal(typ, bf)
+                    lit = backfill_literal(typ, bf) if not isinstance(bf, dict) else backfill_from_column(bf)
                     if lit is None:
                         print(f"  ! {t}.{col}: x-ticvai-backfill {bf!r} does not fit a {typ} column; nothing backfilled")
                     else:
@@ -3263,7 +3376,9 @@ def main() -> int:
             # A text column in a unique index is indexed as `lower(column)`; an opaque external id whose property
             # says `x-ticvai-unique-compare: exact` (a provider's event id, what a gate reads off a credential)
             # is compared as it is. A key that is not text (`venue_id`, `scope_path`) is never wrapped.
-            src_of = {c["column"]: contract_props.get(str(c.get("source") or ""), {}) for c in cols[t]}
+            src_of = {c["column"]: contract_props.get(str(c.get("source") or ""))
+                      or ({UNIQUE_COMPARE: "exact"} if str(c.get("source") or "") in EXACT_ITEM_SOURCES else {})
+                      for c in cols[t]}
             # **Uniqueness the contract marks, as a unique index** (audit R108, 28 September).
             # `x-ticvai-unique: tenant` is unique within the tenant database -- one tenant per
             # database (ADR-0038), so the column alone, or with `tenant_id` where a table carries
@@ -3562,6 +3677,7 @@ def main() -> int:
     split_write: dict = {}    # table -> its write check, `{a}` standing for the row's alias
     split_depth: dict = {}
     guest_parent: set = set()   # parent-owned tables marked guest-owns (CHG-R11GST-002)
+    guest_parent_read: dict = {}   # parent-owned tables marked guest-reads-own with a guest-subject list (R28)
     parent_of = {p[0]: p for p in by_parent}
     for t in sorted(real):
         mark = (marks.get(t) or {}).get("rls") or TABLE_RLS.get(t)
@@ -3577,6 +3693,8 @@ def main() -> int:
                 rd, wr = "platform.in_scope(scope_path)", "platform.in_scope({a}scope_path)"
             else:
                 rd, wr = "platform.venue_in_scope(venue_id)", "platform.venue_in_scope({a}venue_id)"
+                if (marks.get(t) or {}).get("tenant_row_read"):
+                    rd += " OR " + TENANT_ROW_READ   # ADAM CR-487 (CHG-CR487-001)
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(f'{rd} OR {GUEST_SET}')}, "
                     f"{sql_literal(wr.format(a=''))});")
             split_mark[t] = ((mark + "+" if mark else "") + "guest-read", "scope_path" if t in scoped else "venue_id")
@@ -3605,6 +3723,16 @@ def main() -> int:
                 print(f"  ! {t}: x-ticvai-rls guest-owns needs a subject_id; the base rule stands")
                 continue
             guest_parent.add(t)   # its policy is written with its parent's, below (CHG-R11GST-002, CR-291)
+            continue
+        gsubs = (marks.get(t) or {}).get("guest_subjects")
+        if mark == "guest-reads-own" and gsubs and t in parent_of and t not in shared_scope and t not in APPEND_AUDIT:
+            # **GUEST_PARENT_READ** (r13 root R28, CHG-R13R28-001): read where the parent shows the row, or by the
+            # guest one of the named columns holds; written only where the parent may be written, as before.
+            has_t = {c["column"] for c in cols[t]}
+            if any(g.startswith("?") or g not in has_t for g in gsubs):
+                print(f"  ! {t}: x-ticvai-guest-subject names {gsubs}, not all of them its columns; the base rule stands")
+                continue
+            guest_parent_read[t] = gsubs   # its policy is written with its parent's, below
             continue
         if t in shared_scope or t in parent_of or t in APPEND_AUDIT or t == SCOPE_TABLE:
             print(f"  ! {t}: x-ticvai-rls {mark} on a shared-scope, parent-owned or append-only table is not "
@@ -3656,6 +3784,15 @@ def main() -> int:
             write = staff if mark == "guest-reads-own" else read
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read.format(a=''))}, "
                     f"{sql_literal(write.format(a=''))});")
+            gins = (marks.get(t) or {}).get("guest_insert")
+            if gins and mark == "guest-reads-own" and guest.startswith("EXISTS (SELECT 1 FROM ")                     and all(not c_.startswith("?") and c_ in has and isinstance(v_, str) for c_, v_ in gins):
+                # ADAM CR-506 (CHG-CR506-001): the guest's own parent, and the named value, for INSERT only
+                ins = " AND ".join(f"{q(c_)} = {sql_literal(v_)}" for c_, v_ in gins) + f" AND {guest}"
+                call = (f"SELECT platform.apply_split_insert_rls('{tq(t)}'::regclass, {sql_literal(read.format(a=''))}, "
+                        f"{sql_literal(write.format(a=''))}, {sql_literal(ins.format(a=''))});")
+            elif gins:
+                print(f"  ! {t}: x-ticvai-guest-insert needs guest-reads-own through the guest's parent and columns it has; "
+                      "not applied")
             write = "(" + write + ")"
             base = ("the guest's own subject, or staff by " + base if mark == "guest-owns"
                     else "staff by " + base + "; read also by the guest it belongs to")
@@ -3789,6 +3926,24 @@ def main() -> int:
         protected[t] = "parent"
     # A child of a split row follows it for reading only: its writes take the parent's write check, down the chain.
     for i, (t, col, par, key, *_rest) in enumerate(list(by_parent)):
+        if t in guest_parent_read:
+            # GUEST_PARENT_READ (r13 root R28): the parent's read, or a guest the row names; the parent's write.
+            link = f"pr.{q(key)} = {tq(t)}.{q(col)}"
+            pw = f" AND ({split_write[par].format(a='pr')})" if par in split_write else ""
+            rd = (f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link}) OR "
+                  + " OR ".join("(" + GUEST_SUBJECT.replace("{a}subject_id", q(g)).format(a="") + ")"
+                                for g in guest_parent_read[t]))
+            wr = f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link}{pw})"
+            gw = (marks.get(t) or {}).get("guest_writer")
+            if gw and not gw.startswith("?") and any(c_["column"] == gw for c_ in cols.get(t, []))                     and any(c_["column"] == "subject_id" for c_ in cols.get(par, [])):
+                # ADAM CR-502 (CHG-CR502-001): or the guest the column names, writing a row of its own parent
+                wr = (f"{wr} OR ({GUEST_SUBJECT.replace('{a}subject_id', q(gw)).format(a='')} AND EXISTS (SELECT 1 "
+                      f"FROM {tq(par)} pr WHERE {link} AND {GUEST_SUBJECT.format(a='pr.')}))")
+            elif gw:
+                print(f"  ! {t}: x-ticvai-guest-writer names {gw.lstrip('?')}, not a column of it, or its parent has no "
+                      "subject_id; the parent's write stands")
+            by_parent[i] = (t, col, par, key, split_write.get(par, "TRUE").format(a="parent_row"), rd, wr)
+            continue
         if t in guest_parent:
             # **Staff through the parent, the guest by its own subject** (CHG-R11GST-002; ADAM CR-291, option B, and
             # CR-295's rule): read and written through the parent for a session with no guest subject, as the parent

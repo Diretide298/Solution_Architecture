@@ -1718,6 +1718,12 @@
  "DynamicPricingStrategy": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.dynamic_pricing_strategy",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "code"
+   ]
+  ],
   "description": "**A dynamic pricing strategy: what it prices, from which base and how often** (29 September, data model DM3). ADM-088 and ADM-089. Its rules are `pricing.dynamic_price_rule` rows naming it; its ladder `catalogue.price_ladder`; its limits and automation `catalogue.dynamic_pricing_control`. **Rules-based now; AI factors inform, never replace, the rules** (MoM 19 Aug 2026).",
   "required": [
    "id",
@@ -2624,7 +2630,8 @@
    },
    "type": {
     "type": "string",
-    "maxLength": 50
+    "maxLength": 50,
+    "description": "The condition's type. `membershipProgramme` makes the rule a membership rule (ADAM CR-439): its `ruleOperator` is `in` and its `valueJson` a JSON array of membership programme ids."
    },
    "ruleOperator": {
     "type": "string",

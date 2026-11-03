@@ -571,8 +571,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `productId` (navigation) |
 | Route | `/rentals/timeslot-duration-availability-setup-bo-517` |
 
-**Known gaps.** **Timeslot & Duration Availability Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either …
-
 **From the Food, Beverage & Retail process.** How rental times are offered: slot interval, fixed or flexible start, allowed durations and booking cut-off. The one thing to get right: a preview of the start times a guest would see.
 
 **Known correction pending (do not draw the wrong version)**
@@ -1433,8 +1431,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/availability-intelligence-ai-forecasting-bo-523` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Food, Beverage & Retail process.** A demand forecast against availability per product and station. Reporting only.
 

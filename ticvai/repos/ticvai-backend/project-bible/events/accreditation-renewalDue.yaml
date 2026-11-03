@@ -44,11 +44,6 @@ consumers:
   idempotencyKey: holderId + validTo
   onFailure: retryThenDeadLetter
   isCritical: false
-- context: reporting
-  purpose: Accreditation KPIs — renewals due against renewals made (12.1.50)
-  idempotencyKey: holderId + validTo
-  onFailure: retry
-  isCritical: false
 retention: 30 days after publication
 notes: '**Added 29 September (build pass, BL-180, 12.1.37 and 12.1.45).** Renewal opens a window rather than
   extending silently — the point of an expiry is that somebody looks again — and this is what tells them the

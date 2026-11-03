@@ -163,8 +163,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/reporting-governance-command-center-anl-041` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The reporting administrator's overview: what runs, what was delivered, what failed, what left the platform with personal data in it. The thing to get right: lead with failures and personal-data deliveries, because a report that silently stopped arriving is worse than one that never existed; and several pack counters have no source yet, so draw them as pending rather than as zeros.
 
 **Known correction pending (do not draw the wrong version)**
@@ -564,7 +562,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/subscription-manager-anl-043` |
 
-**Known gaps.** **Subscription Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Who receives which report, in what format, by which route, and under whose access. A subscription is not a schedule: the schedule says when, the subscription says who and how, and one schedule can feed several. The thing to get right: personal data going out, especially to external addresses, is visible on every row, because someone will ask about it later.
 
@@ -744,7 +742,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/distribution-delivery-configuration-anl-044` |
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: TICVAI Notification Center, Secure Download, API, External approved destination. Each needs an operation …
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: TICVAI Notification Center, Secure Download, API, External approved destination. Each needs an operation, or …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Configures how a generated report reaches people: route, format, file and message. The thing to get right: the pack's four "buttons" are delivery routes, not actions, and most of the pack's settings (subject, body template, naming, password, expiry, priority, language) have no field yet; draw what can be stored and keep the rest visibly pending.
 
@@ -895,8 +893,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `executionId` (navigation), `exportId` (navigation) |
 | Route | `/analytics/export-download-center-anl-045` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Where people collect exports and administrators see what data left the platform. Exports are always asynchronous: requested, generating, ready (with a signed link that expires), failed or expired. The thing to get right: personal-data exports are visibly different (who, why, when) and the purpose given is shown; and there is no list of exports to draw from yet.
 
@@ -1441,7 +1437,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/delivery-monitoring-failure-management-anl-048` |
 
-**Known gaps.** **The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Retry, Cancel, View Error, Change Destination, Notify Owner, Escalate. Each needs an operation, or needs … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Retry, Cancel, View Error, Change Destination, Notify Owner, Escalate. Each needs an operation, or needs …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Monitors scheduled runs and deliveries and helps an administrator act on failures without server logs. The thing to get right: failure reasons in plain words, retries visible, and personal-data deliveries flagged; the pack's six actions have no operation yet.
 

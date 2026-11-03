@@ -230,7 +230,7 @@
     "type": "string",
     "maxLength": 64,
     "nullable": true,
-    "description": "**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005; enforced by a unique index on (`matrix_id`, `code`) since ADAM CR-102, CHG-R10ID-015, compared without case). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do not collide. A body with two rules of one code is `400 validation`."
+    "description": "**A stable code for the rule, unique within one version of its matrix** (4 October 2026, CHG-FXC-005; ADAM CR-102, CHG-R10ID-015). Enforced by `rule_matrix_id_matrix_version_code_uniq` on (`matrix_id`, `matrix_version`, `lower(code)`), the only code key since ADAM CR-300 (CHG-CR300-001): codes compare without case, within one version, and null codes do not collide, so a new version repeats the codes of the one before. The old key on (`matrix_id`, `lower(code)`), `rule_matrix_id_code_uniq`, is dropped, guarded, by the names migration `backend/tenant/V0119__names_after_r1_20261029.sql` (ADAM CR-498, CHG-CR498-001). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do not collide. A body with two rules of one code is `400 validation`."
    },
    "minimumApprovals": {
     "type": "integer",
@@ -1846,6 +1846,9 @@
   "type": "object",
   "x-ticvai-persistence": "wallet.transfer_rule",
   "description": "Boards 7.2 and 7.3. **A money-transmission question before it is a feature.**",
+  "required": [
+   "version"
+  ],
   "properties": {
    "peerToPeerAllowed": {
     "type": "boolean",
@@ -1877,6 +1880,13 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "readOnly": true,
+    "description": "**The row's version, its ETag** (ADAM CR-332's rule for the wallet's If-Match PUTs, the one getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): 1 on create and bumped on every write; `getWalletTransferRules` and `setWalletTransferRules` send it as `ETag`, and `setWalletTransferRules` checks `If-Match` against it (`412` on a mismatch)."
    }
   }
  }

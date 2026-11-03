@@ -64,12 +64,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/AccreditationApplication'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its accreditation.application rows, as it stores them and as the caller's
-      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      October). Tenancy answers with its accreditation.application rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process by the
+      operations host, which composes Tenancy's query classes, through the C# query class Tenancy implements, under
+      the caller's row-level security (CHG-R13INP-001). It is asked from another deployable through Tenancy's
+      service route (serviceAuth).
+    served: [in-process, service]
   credentialRecords:
     module: accreditation
     table: accreditation.credential
@@ -82,12 +84,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/AccreditationCredential'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its accreditation.credential rows, as it stores them and as the caller's
-      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      October). Tenancy answers with its accreditation.credential rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process by the
+      operations host, which composes Tenancy's query classes, through the C# query class Tenancy implements, under
+      the caller's row-level security (CHG-R13INP-001). It is asked from another deployable through Tenancy's
+      service route (serviceAuth).
+    served: [in-process, service]
   holderRecords:
     module: accreditation
     table: accreditation.holder
@@ -100,12 +104,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/AccreditationHolder'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its accreditation.holder rows, as it stores them and as the caller's scope
-      lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      October). Tenancy answers with its accreditation.holder rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process by the
+      operations host, which composes Tenancy's query classes, through the C# query class Tenancy implements, under
+      the caller's row-level security (CHG-R13INP-001). It is asked from another deployable through Tenancy's
+      service route (serviceAuth).
+    served: [in-process, service]
   validityRecords:
     module: accreditation
     table: accreditation.validity
@@ -118,12 +124,45 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/AccreditationValidity'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its accreditation.validity rows, as it stores them and as the caller's
-      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      October). Tenancy answers with its accreditation.validity rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process by the
+      operations host, which composes Tenancy's query classes, through the C# query class Tenancy implements, under
+      the caller's row-level security (CHG-R13INP-001). It is asked from another deployable through Tenancy's
+      service route (serviceAuth).
+    served: [in-process, service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  dailyExpiryRun:
+    module: accreditation
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    moves:
+    - {model: accreditation-application, from: approved, to: expired}
+    - {model: accreditation-holder, from: active, to: expired}
+    reads: [accreditation.application, accreditation.holder]
+    writes: [accreditation.application, accreditation.holder]
+    emits: [accreditation.holderStatusChanged]
+    for: Accreditation daily expiry run.
+    source: ['states/accreditation-application.yaml:112', 'states/accreditation-holder.yaml:53']
+  renewalRun:
+    module: accreditation
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [accreditation.holder]
+    writes: []
+    emits: [accreditation.renewalDue]
+    reliesOn: [decideAccreditationApplication, renewAccreditation]
+    for: 'The daily renewal run: an active holder whose validTo is renewalWindowDays away gets accreditation.renewalDue, once
+      per holder per validity period.'
+    source: ['events/accreditation-renewalDue.yaml']
 paths:
   /accreditation-programmes:
     get:
@@ -1728,7 +1767,6 @@ paths:
     put:
       operationId: updateAccreditationProgramme
       x-ticvai-consumed-by:
-        - "P08 BO-618 Accreditation Form Builder"
         - "P08 BO-619 Accreditation Category Management"
         - "P08 BO-620 Accreditation Program Setup"
         - "P08 BO-624 Registration Rules & Publication"

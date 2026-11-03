@@ -4572,12 +4572,12 @@ paths:
   /tenant-config/preview:
     post:
       operationId: createPreview
-      x-ticvai-names-for-context: [orders.ticket_template]
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-names-for-context: [orders.ticket_template]
       x-ticvai-reads:
       - table: whitelabel.tenant_config
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'

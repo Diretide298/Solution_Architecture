@@ -1829,13 +1829,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Use AI to move TICVAI from reactive maintenance toward predictive maintenance. This is where I recommend making the module significantly stronger than the original matrix.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Rental_Management.pdf, page 118 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

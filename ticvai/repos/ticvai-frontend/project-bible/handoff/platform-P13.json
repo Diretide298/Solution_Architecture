@@ -7,19 +7,19 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 104,
-  "operations": 211,
+  "operations": 214,
   "contracts": 8,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 114
+  "operationsWithNoScreen": 111
  },
  "waves": {
-  "wave1": 28,
-  "wave3": 76
+  "wave1": 32,
+  "wave3": 72
  },
  "modules": [
   {
@@ -34,6 +34,7 @@
    "module": "Media Library",
    "screens": 40,
    "waves": [
+    1,
     3
    ]
   },
@@ -59,7 +60,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 67
+   "operations": 68
   },
   {
    "contract": "assets",
@@ -70,11 +71,11 @@
    "operations": 10
   },
   {
-   "contract": "catalogue",
-   "operations": 5
+   "contract": "identity",
+   "operations": 7
   },
   {
-   "contract": "identity",
+   "contract": "catalogue",
    "operations": 5
   },
   {
@@ -174,7 +175,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/media-library",
-   "operations": 11,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -255,7 +256,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/user-access",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -442,7 +443,7 @@
    "id": "CMS-041",
    "name": "Waiver & Consent Command Center",
    "module": "Policy",
-   "wave": 3,
+   "wave": 1,
    "route": "/policy/waiver-consent-command-center-cms-041",
    "operations": 1,
    "drawn": true
@@ -523,9 +524,9 @@
    "id": "CMS-050",
    "name": "Waiver Approval, Testing & Publication Workspace",
    "module": "Policy",
-   "wave": 3,
+   "wave": 1,
    "route": "/policy/waiver-approval-testing-publication-workspace-cms-050",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -622,7 +623,7 @@
    "id": "CMS-061",
    "name": "Digital Asset Management Command Center",
    "module": "Media Library",
-   "wave": 3,
+   "wave": 1,
    "route": "/media-library/digital-asset-management-command-center-cms-061",
    "operations": 1,
    "drawn": true
@@ -658,7 +659,7 @@
    "id": "CMS-065",
    "name": "Metadata & Taxonomy Management",
    "module": "Media Library",
-   "wave": 3,
+   "wave": 1,
    "route": "/media-library/metadata-taxonomy-management-cms-065",
    "operations": 2,
    "drawn": true
@@ -1105,12 +1106,6 @@
     "summary": "What happens to tickets, reservations and guests when an event changes, by default"
    },
    {
-    "operation": "getPlanBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Which benefits a plan grants, and how much of each"
-   },
-   {
     "operation": "getProductChannelTexts",
     "contract": "catalogue",
     "verb": "GET",
@@ -1145,12 +1140,6 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listMembershipBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Benefits a plan can grant"
    },
    {
     "operation": "listMembershipProgrammes",
@@ -1363,6 +1352,12 @@
     "summary": "Send, resend or correct participant waiver requirements, one or in bulk"
    },
    {
+    "operation": "createGuestDocumentUpload",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue the key and a signed upload URL for a guest document"
+   },
+   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -1397,12 +1392,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverTesting",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Checklist, rule simulation and approval record of a waiver version"
    },
    {
     "operation": "issueReward",
@@ -1663,12 +1652,6 @@
     "summary": "What a refund would do, without doing it"
    },
    {
-    "operation": "getConfigurationProfile",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "One profile, at its latest version or at a named one"
-   },
-   {
     "operation": "getConnectivityPolicy",
     "contract": "tenancy",
     "verb": "GET",
@@ -1712,6 +1695,13 @@
    }
   ],
   "modulesSplitAcrossWaves": [
+   {
+    "module": "Media Library",
+    "waves": [
+     1,
+     3
+    ]
+   },
    {
     "module": "Policy",
     "waves": [

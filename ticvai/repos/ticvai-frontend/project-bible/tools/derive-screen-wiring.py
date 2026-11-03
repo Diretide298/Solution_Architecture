@@ -137,6 +137,11 @@ def fix_permission(s: dict, ops: dict, log: list, keeps: list, platform: dict | 
     if s.get("permission") or code.startswith(GUEST_CODES):
         return
     known = [a["operationId"] for a in apis(s) if a["operationId"] in ops]
+    # **A door takes no permission** (r13, CHG-RCR29-001): a screen that declares `login` is reached before anybody
+    # is signed in. POS-000 took SESSION_FORCE_LOGOUT from its supervisor panel's reads, which no cashier at the door
+    # can hold; the panel carries it on its components instead (check-screen-permissions SP-DOOR).
+    if "login" in known:
+        return
     perms = {ops[o]["op"].get("x-ticvai-permission") for o in known}
     perms = {p for p in perms if isinstance(p, str) and p}
     if not perms:

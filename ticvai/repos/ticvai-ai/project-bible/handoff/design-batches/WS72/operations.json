@@ -90,6 +90,70 @@
   "requestBody": null,
   "responds": "SignatorySignatureGuardianRuleConfigurationView"
  },
+ "getWaiverTesting": {
+  "method": "GET",
+  "path": "/waiver-testing",
+  "contract": "marketing-crm",
+  "summary": "Checklist, rule simulation and approval record of a waiver version",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "formId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "participantAge",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "bookingType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "existingCustomer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "missingSignature",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaiverApprovalTestingPublicationWorkspaceView"
+ },
  "listDynamicFieldQuestion": {
   "method": "GET",
   "path": "/dynamic-field-question",

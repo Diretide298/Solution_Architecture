@@ -321,8 +321,10 @@
    },
    "token": {
     "type": "string",
+    "nullable": true,
     "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n**Minted only for a cart created with no credential, and stored field-encrypted** (ADAM CR-486, Chinmay, 3 November 2026; CHG-CR486-001): 32 bytes from a cryptographic random generator, base64url without padding (43 characters); null on a signed-in guest's or a staff cart. Encrypted with the tenant's key, never plain at rest and never hashed, since the server reads it back for `getCart`, `claimCart`'s constant-time comparison and `cart.abandoned`'s recovery link; answered in clear to the cart's caller.\n"
    },
    "sessionId": {
     "type": "string",
@@ -1779,7 +1781,12 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "exchangeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Zero until the client sets a fee rule (ADAM CR-480); `waiveFee` changes nothing meanwhile."
    },
    "difference": {
     "allOf": [
@@ -1787,7 +1794,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round.\n"
+    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round. `incomingValue` + `exchangeFee` - `outgoingValue`, in the venue's currency: positive is the balance due on the order, collected by `createPayment`; negative is refunded by `createRefund` over the outgoing lines (ADAM CR-480).\n"
    },
    "newLineIds": {
     "type": "array",
@@ -2128,7 +2135,7 @@
    },
    "heldLeaseCount": {
     "type": "integer",
-    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
+    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned. **Left null** (ADAM CR-517; CHG-CR517-001): a till holds no standing lease, so nothing sets it.\n"
    },
    "openedAt": {
     "type": "string",

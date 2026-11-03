@@ -37,11 +37,6 @@ consumers:
   idempotencyKey: caseId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Fraud outcome analytics and the label set for the next candidate model
-  idempotencyKey: caseId
-  onFailure: retry
-  isCritical: false
 retention: Two years, with the risk records
 notes: '**The outcome is a person''s**, and it is the label the next candidate model trains on (design
   3.5). Confirmed fraud is kept distinct from the alert that started it (AIP-163).

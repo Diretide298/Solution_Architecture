@@ -166,7 +166,7 @@
 | GST-004 | Attraction Details | productId |  |
 | GST-005 | What's On | eventId |  |
 | GST-006 | Event / Exhibition Details | productId |  |
-| GST-007 | Select Date & Time | eventId |  |
+| GST-007 | Select Date & Time | eventId, productId |  |
 | GST-008 | Tickets & Add-ons | productId |  |
 | GST-009 | Review & Payment | orderId |  |
 | GST-010 | Booking Confirmation | orderId |  |
@@ -533,6 +533,7 @@
 | venueId | session |
 | entryId | navigation |
 | waitingEntryId | GST-046 |
+| productId | GST-008 |
 
 **Operations**
 
@@ -548,7 +549,7 @@
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
 | `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Join the waitlist of a sold-out time (CHG-R6-037) | `None` |
 | `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Leave it (CHG-R6-037) | `None` |
-| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12); sent `{ productId }` when the screen has one, else `{ eventId }` from the entry, never an empty query; a 404 renders date, time, tickets with the defaults, a 400 is the error state (ADAM CR-495) | `None` |
 
 **States**
 

@@ -1141,6 +1141,7 @@
       {
        "kind": "primaryButton",
        "label": "Accept",
+       "collectedBy": "Every recommendation review decision",
        "operation": "decidePricingRecommendation",
        "notes": "Sends `decision: accept`.",
        "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
@@ -1148,6 +1149,7 @@
       {
        "kind": "secondaryButton",
        "label": "Modify",
+       "collectedBy": "Every recommendation review decision",
        "operation": "decidePricingRecommendation",
        "notes": "Sends `decision: modify`.",
        "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
@@ -1155,6 +1157,7 @@
       {
        "kind": "secondaryButton",
        "label": "Reject",
+       "collectedBy": "Every recommendation review decision",
        "operation": "decidePricingRecommendation",
        "notes": "Sends `decision: reject`.",
        "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
@@ -1162,6 +1165,7 @@
       {
        "kind": "secondaryButton",
        "label": "Schedule",
+       "collectedBy": "Every recommendation review decision",
        "operation": "decidePricingRecommendation",
        "notes": "Sends `decision: schedule`.",
        "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
@@ -1169,6 +1173,7 @@
       {
        "kind": "secondaryButton",
        "label": "Send for approval",
+       "collectedBy": "Every recommendation review decision",
        "operation": "decidePricingRecommendation",
        "notes": "Sends `decision: sendForApproval`.",
        "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"

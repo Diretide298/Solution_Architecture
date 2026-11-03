@@ -308,8 +308,10 @@
    },
    "token": {
     "type": "string",
+    "nullable": true,
     "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n**Minted only for a cart created with no credential, and stored field-encrypted** (ADAM CR-486, Chinmay, 3 November 2026; CHG-CR486-001): 32 bytes from a cryptographic random generator, base64url without padding (43 characters); null on a signed-in guest's or a staff cart. Encrypted with the tenant's key, never plain at rest and never hashed, since the server reads it back for `getCart`, `claimCart`'s constant-time comparison and `cart.abandoned`'s recovery link; answered in clear to the cart's caller.\n"
    },
    "sessionId": {
     "type": "string",
@@ -3444,6 +3446,28 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true
+   },
+   "callResolvedByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who recorded the called party's no-show or return to the queue** (`resolveCalledWaitingGuest`; r13 root R40, CHG-R13R40-001), with `callResolutionReason` and `callResolvedAt`. Null until it is resolved; a later resolution of the same entry replaces all three."
+   },
+   "callResolutionReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The operator's reason, as `resolveCalledWaitingGuest` took it."
+   },
+   "callResolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the no-show or return happened, the request's `recordedAt` (device time, offline-capable)."
    }
   }
  }

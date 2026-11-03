@@ -37,11 +37,6 @@ payload:
 - field: publishedAt
   type: timestamp
 consumers:
-- context: reporting
-  purpose: Dashboards read the published version rather than forecasting on their own (design 5.2)
-  idempotencyKey: versionId
-  onFailure: retry
-  isCritical: false
 - context: workforce
   purpose: Refresh staffing views bound to the forecast
   idempotencyKey: versionId

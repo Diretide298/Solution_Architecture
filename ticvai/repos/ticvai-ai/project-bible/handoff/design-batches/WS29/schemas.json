@@ -126,6 +126,7 @@
  },
  "CataloguePlanBenefit": {
   "type": "object",
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "catalogue.plan_benefit",
   "description": "**Taken from the backend workbook, 20 September.** Maps membership benefits to plans and defines usage limits for each benefit.",
   "required": [
@@ -3256,7 +3257,7 @@
    },
    "country": {
     "type": "string",
-    "description": "Country: ISO 3166-1 alpha-2 code",
+    "description": "Country: ISO 3166-1 alpha-2 code, the country_code finance#taxCodeRecords answers for the profile's taxCodeId (ADAM CR-468)",
     "pattern": "^[A-Z]{2}$"
    },
    "jurisdiction": {
@@ -3265,7 +3266,7 @@
    },
    "legalEntity": {
     "type": "string",
-    "description": "Legal Entity"
+    "description": "Legal Entity: the profile's `legal_entity_id`, as uuid text (ADAM CR-468); the screen names it from listLegalEntities"
    },
    "taxRegistrationNumber": {
     "type": "string",
@@ -3273,7 +3274,7 @@
    },
    "currency": {
     "type": "string",
-    "description": "Currency: ISO 4217 code",
+    "description": "Currency: ISO 4217 code; the legal entity's currency (finance#legalEntityRecords) when the profile has one, else the trading currency of the venue its scope_path names (ADAM CR-468)",
     "pattern": "^[A-Z]{3}$"
    },
    "effectiveFrom": {
@@ -3288,17 +3289,21 @@
     "nullable": true
    },
    "status": {
-    "type": "string",
-    "description": "Status: draft, active, inactive or expired"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "description": "Status, as stored (`CatalogueConfigStatus`: draft, active, inactive or retired; ADAM CR-468, CR-464)"
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner: the profile's `owner_principal_id`, as uuid text (ADAM CR-468)"
    },
    "ratePercent": {
     "type": "number",
     "nullable": true,
-    "description": "Rate in percent (UAE VAT 5); empty when the tax is a fixed amount set on the tax rule"
+    "description": "Rate in percent (UAE VAT 5), the rate finance#taxCodeRecords answers for the profile's taxCodeId (ADAM CR-468); empty when the tax is a fixed amount set on the tax rule"
    },
    "taxProfileId": {
     "type": "string",
@@ -3348,11 +3353,11 @@
    },
    "consumingProductCount": {
     "type": "integer",
-    "description": "Dependencies: products using the profile; read-only"
+    "description": "Dependencies: the distinct products named by active catalogue.tax_rule rows whose taxes list this profile (the rule's product_id, plus the products of its product_category_id); read-only (ADAM CR-468)"
    },
    "consumingVenueCount": {
     "type": "integer",
-    "description": "Dependencies: venues using the profile; read-only"
+    "description": "Dependencies: the distinct venues of those rules (venue_id, or else the venue their scope_path names); read-only (ADAM CR-468)"
    }
   }
  },
@@ -3601,7 +3606,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

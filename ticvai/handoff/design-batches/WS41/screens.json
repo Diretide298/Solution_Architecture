@@ -1246,13 +1246,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional configured languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Additional configured languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**Cookie Banner & Preference Center Designer declares no operation that writes anything** — its only declared call is `listCookieBannerPreference`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    }
   ],
   "layout": {

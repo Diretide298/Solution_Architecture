@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ANL-051` | AI Analytics Command Center | D | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-052` | Ask TICVAI — Natural Language Analytics | D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ANL-053` | AI-Generated Dashboard Studio | D | 0 | 0 | 6 | 18 | 1 | 0 | — | notStarted (—) |
+| `ANL-053` | AI-Generated Dashboard Studio | D | 17 | 0 | 6 | 18 | 1 | 0 | — | notStarted (—) |
 | `ANL-054` | AI Report Generator | D | 0 | 14 | 6 | 82 | 1 | 0 | — | notStarted (—) |
 | `ANL-055` | Anomaly Detection Center | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-056` | Root-Cause Analysis Explorer | D | 0 | 14 | 6 | 2 | 1 | 0 | — | notStarted (—) |

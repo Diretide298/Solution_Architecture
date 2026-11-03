@@ -40,11 +40,6 @@ consumers:
   idempotencyKey: deviceId + changedAt
   onFailure: retryThenDeadLetter
   isCritical: false
-- context: reporting
-  purpose: Device uptime and alert rules on device state
-  idempotencyKey: deviceId + changedAt
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: 'Device-health anomaly detectors: failure or offline rate across the devices of a venue (8.9.9); added
     29 September (build pass, group G2, from group G1''s handoff)'

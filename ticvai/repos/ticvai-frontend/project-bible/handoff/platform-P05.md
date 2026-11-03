@@ -9,23 +9,22 @@
 | Contracts | 7 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 14 |
+| Operations with no screen | 13 |
 | Waves | wave1 2 · wave2 15 |
 
 ## Gaps
 
-### 14 operations with no screen here
+### 13 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
-| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `claimTableSession` | fnb | POST | Identify which table a guest is sitting at |
 | `checkGuestCheckoutMatch` | marketing-crm | POST | Does this contact already have a profile here |
+| `createGuestDocumentUpload` | marketing-crm | POST | Issue the key and a signed upload URL for a guest document |
 | `decideGuestCheckoutMatch` | marketing-crm | POST | Use the existing profile or keep this booking separate |
 | `getDeviceConsentHistory` | marketing-crm | GET | A visitor's own cookie decisions, oldest first |
 | `listPublishedTrackingTechnologies` | marketing-crm | GET | The approved cookie registry, as the preference centre shows it |

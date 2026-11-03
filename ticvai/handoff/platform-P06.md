@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 158 |
+| Operations with no screen | 155 |
 | Waves | wave1 30 · wave2 35 · wave3 31 |
 
 ## Gaps
 
-### 158 operations with no screen here
+### 155 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -51,16 +51,16 @@
 | `checkProductSalePermission` | catalogue | POST | Would this seller, here, be allowed to sell these products |
 | `getBundleSigningKeys` | catalogue | GET | The public keys a till verifies catalogue bundles with |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
-| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getProductChannelTexts` | catalogue | GET | The product's texts per sales channel, in each of the tenant's languages |
 | `getProductDashboard` | catalogue | GET | The products dashboard's counts |
 | `getProductOwnerForms` | catalogue | GET | Which form a sale of this product asks the buyer, and which it asks each ticket owner |
 | `getProductSalePermissionRules` | catalogue | GET | Who can sell this product |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
-| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| … | | | 118 more |
+| `listOwnerFormCandidates` | catalogue | GET | The forms a product can link for its reservation owner or ticket owner |
+| `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
+| … | | | 115 more |
 
 ### 3 modules split across waves
 

@@ -722,7 +722,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Single ticket listing, Multiple ticket listing. Each needs an operation, or needs removing from the screen …
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved: Single ticket listing, Multiple ticket listing. Each needs an operation, or needs removing from the screen …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How ticket holders create listings: what they choose, what is fixed.
 
@@ -1081,7 +1081,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Seller fee, Buyer fee, Flat transaction fee, Percentage fee, Payment processing fee, Administrative fee …
+**Known gaps.** **The pack names 8 actions on this screen and the screen declares 4 operations.** Unserved: Seller fee, Buyer fee, Flat transaction fee, Percentage fee, Payment processing fee, Administrative fee …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Resale commission and the price cap: seller fee, buyer fee and proceeds.
 

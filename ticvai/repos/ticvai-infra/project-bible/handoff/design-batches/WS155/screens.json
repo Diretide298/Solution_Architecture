@@ -1096,13 +1096,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Backend Configuration) and no display directory — it is settings, not a population",
   "purpose": "Allow customers to extend resource records with their own attributes without changing the core application.",
   "purposeNote": "Administrators can extend resource records with reusable, validated, type-specific attributes without requiring application development.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Configurable Attribute Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -1430,13 +1424,7 @@
   "patternReason": "the pack gives this screen a display directory (§The system shall display) and no metric row",
   "purpose": "Define operational relationships where one resource requires, depends upon, conflicts with, or influences another resource.",
   "purposeNote": "Administrators can define reusable dependency rules, and the system validates those dependencies before affected resources can be reserved or assigned.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 13 §The system shall display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

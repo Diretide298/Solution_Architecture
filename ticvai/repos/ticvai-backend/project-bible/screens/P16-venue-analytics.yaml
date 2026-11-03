@@ -429,13 +429,7 @@ screens:
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: Provide senior management with an immediate consolidated view of overall organizational
     performance.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 3 §The system shall
-      display
+  gaps: []
   overlays:
   - id: formRequestSuggestion
     component: modal
@@ -3179,12 +3173,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide a consolidated view of customer health and engagement.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 8 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -3215,6 +3204,8 @@ screens:
       components:
       - kind: dataTable
         label: Every customer membership loyalty
+        reads:
+        - getDashboard
         columns:
         - Unique Customers
         - New Customers
@@ -3337,13 +3328,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Each Alert Shall Display) and no metric
     row
   purpose: Create one centralized location for management-level KPI and operational exceptions.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 9 §Each Alert Shall
-      Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -3944,13 +3929,7 @@ screens:
     Dashboard Categories; Dashboard Types) and no metric row
   purpose: Provide a centralized catalogue for all standard, custom, AI-generated and embedded TICVAI
     dashboards.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard
-      cards/table containing
+  gaps: []
   layout:
     template: split
     regions:
@@ -4114,12 +4093,7 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure; Select; Select one
     or multiple domains) and no display directory — it is settings, not a population
   purpose: Guide users through creation of a new dashboard.
-  gaps:
-  - operation: null
-    why: '**Dashboard Creation Wizard declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -4538,12 +4512,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§KPI Components) and no metric row
   purpose: Provide reusable visual components for dashboard construction.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components
+  gaps: []
   layout:
     template: split
     regions:
@@ -4645,13 +4614,7 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure; Define whether) and
     no display directory — it is settings, not a population
   purpose: Allow authorized business users to create standardized enterprise KPIs.
-  gaps:
-  - operation: null
-    why: '**No update or retire operation for a KPI** (design-notes correction ANL-025). `createKpi` writes
-      one; nothing corrects or retires it, so a mistake cannot be put right. Logged as a contract gap
-      2 October 2026 (CHG-SOT-016). The earlier gap ("declares no operation that writes anything") was
-      stale: the screen declares `createKpi`.'
-    source: contracts/satellite/reporting.yaml#createKpi
+  gaps: []
   layout:
     template: form
     regions:
@@ -4796,16 +4759,11 @@ screens:
   purpose: Configure how TICVAI determines whether KPI performance is healthy, warning or critical.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved:
       If Critical → Generate Alert, Notify responsible user, Create operational task, Trigger AI analysis.
       Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
       from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each KPI
   layout:
     template: split
     regions:
@@ -5104,12 +5062,7 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Define) and no display directory
     — it is settings, not a population
   purpose: Configure how users move from high-level KPIs into deeper analytics.
-  gaps:
-  - operation: null
-    why: '**Drill-Down & Interaction Designer declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -5214,12 +5167,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Govern who can access dashboards and how dashboard changes reach production.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -5332,12 +5280,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Validate dashboards before publication and monitor their technical/analytical health afterward.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -5502,13 +5445,7 @@ screens:
     row
   purpose: Provide a centralized repository containing all TICVAI standard, custom, scheduled and AI-generated
     reports.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report shall
-      display
+  gaps: []
   layout:
     template: split
     regions:
@@ -5630,12 +5567,7 @@ screens:
     domains) and no display directory — it is settings, not a population
   purpose: Guide users through creation of a new report without requiring technical knowledge. Step 1
     — Report Information
-  gaps:
-  - operation: null
-    why: '**Report Creation Wizard declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -5735,12 +5667,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Allow users to select approved TICVAI data sources for reporting.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 29 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -5846,10 +5773,10 @@ screens:
   purpose: Allow users to visually select which information appears in the report.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
-      Reorder columns, Rename display labels, Set width, Configure formatting. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Reorder
+      columns, Rename display labels, Set width, Configure formatting. Each needs an operation, or needs
+      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
+      the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30 §Users can
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -5942,11 +5869,6 @@ screens:
     rather than passed off as a decision'
   purpose: Allow report creators to define which records are included.
   gaps:
-  - operation: null
-    why: '**Filter & Parameter Builder declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
@@ -6051,16 +5973,10 @@ screens:
   purpose: Turn detailed transactional data into meaningful management reporting.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
-      Period-over-Period Change. Each needs an operation, or needs removing from the screen; this is the
-      Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Period-over-Period
+      Change. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 32 §Support
-  - operation: null
-    why: '**Grouping, Aggregation & Calculation Builder declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
@@ -6170,11 +6086,6 @@ screens:
     the most important capabilities of Board 3.
   gaps:
   - operation: null
-    why: '**Cross-Domain Report Composer declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -6272,15 +6183,10 @@ screens:
   purpose: Control how the final report is displayed.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
-      TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this is
-      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: TICVAI
+      branding, Report logo. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Support
-  - operation: null
-    why: '**Report Layout & Formatting Designer declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   layout:
     template: form
     regions:
@@ -6386,12 +6292,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Allow users to verify report accuracy before saving or publishing it.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 36 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -6514,13 +6415,7 @@ screens:
     Builder) and a per-row directory (§KPI cards/charts Rows, columns, matrices) — counts over a population,
     then the population
   purpose: Provide the final operational interface for executing and consuming reports.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §KPI cards/charts
-      Rows, columns, matrices
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -6701,12 +6596,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide administrators with a centralized overview of reporting operations, governance, distribution
     and compliance.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 40 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -6998,11 +6888,6 @@ screens:
   purpose: Allow users and administrators to subscribe recipients to dashboards, reports and KPI summaries.
   gaps:
   - operation: null
-    why: '**Subscription Manager declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -7096,8 +6981,8 @@ screens:
   purpose: Configure how generated reporting content reaches approved recipients or destinations.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
-      TICVAI Notification Center, Secure Download, API, External approved destination. Each needs an operation,
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: TICVAI
+      Notification Center, Secure Download, API, External approved destination. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Support configurable
@@ -7238,12 +7123,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide centralized management of report and dashboard exports. The source matrix requires
     reporting export to multiple formats, including PDF, Excel, delimited text and XML.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 45 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -7686,16 +7566,11 @@ screens:
   purpose: Monitor scheduled report execution and distribution and provide operational management of failures.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
-      Retry, Cancel, View Error, Change Destination, Notify Owner, Escalate. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Retry,
+      Cancel, View Error, Change Destination, Notify Owner, Escalate. Each needs an operation, or needs
+      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
+      the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Display
   layout:
     template: split
     regions:
@@ -8137,12 +8012,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display; Show) and no metric row
   purpose: Provide a centralized landing page for all AI-generated analytical intelligence across TICVAI.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 109 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -8365,11 +8235,6 @@ screens:
   purpose: Allow users to generate dashboards from natural-language requests.
   gaps:
   - operation: null
-    why: '**AI-Generated Dashboard Studio declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -8389,6 +8254,9 @@ screens:
         impliedBy: createDashboard
         label: Create dashboard
         notes: The act the screen exists for.
+        operation: createDashboard
+        provenance: contract reporting.yaml POST /dashboards; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -8418,6 +8286,28 @@ screens:
     page 111. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formCreateDashboard
+    component: modal
+    trigger: Create dashboard
+    body: '**Collects what `createDashboard` sends before it is called.** Required: `name`, `module`,
+      `tiles`. Optional: `description`, `venueId`, `isShared`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    bindsTo: CreateDashboardRequest
+    confirm:
+      label: Create dashboard
+      operation: createDashboard
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - module
+      - tiles
+      - description
+      - venueId
+      - isShared
+    provenance: contract reporting.yaml POST /dashboards; design change approved by the lead ("approve
+      all", 3 November 2026; CHG-R13INT-029)
 - id: ANL-054
   name: AI Report Generator
   module: Analytics
@@ -8450,12 +8340,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Generate detailed reports from natural-language instructions.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 112 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -8557,12 +8442,6 @@ screens:
   purpose: Automatically identify unusual behavior across TICVAI data without requiring users to manually
     monitor every KPI.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 113 §Each Anomaly
-      Displays
   - operation: listAnalyticsAnomalies
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-012): The same duplication as ANL-019; listAiInsights (kind
@@ -8782,18 +8661,12 @@ screens:
   purpose: Provide configurable forward-looking analytics across business domains.
   gaps:
   - operation: null
-    why: '**The pack names 11 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 11 actions on this screen and the screen declares 2 operations.** Unserved:
       Revenue, Ticket Sales, Attendance, Capacity, Queue Demand, Cash Collection, Membership Renewals,
       Customer Churn …. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts
       for
-  - operation: null
-    why: '**Forecasting & Predictive Analytics Studio declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   layout:
     template: form
     regions:
@@ -9107,11 +8980,6 @@ screens:
   purpose: Provide administrators with centralized control over how AI may access and use TICVAI analytics.
     This screen is critical because Board 9 should not give an LLM unrestricted access to the TICVAI database.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 119 §Display
   - operation: publishPromptTemplate
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-012): publishPromptTemplate (AI_APPROVE) is model governance
@@ -9288,13 +9156,7 @@ screens:
     (§Each component shall show) — counts over a population, then the population
   purpose: Provide administrators with one consolidated view of the health and governance of the TICVAI
     analytics platform.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each component
-      shall show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -9436,12 +9298,7 @@ screens:
     Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, board 10.10.2, page 124): maintain the
     authoritative catalogue of approved TICVAI business KPIs. This is essential because every dashboard
     must use the same definition of a metric.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories
+  gaps: []
   layout:
     template: split
     regions:
@@ -9841,12 +9698,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Maintain a centralized catalogue of data sources feeding the analytics platform.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -9954,13 +9806,7 @@ screens:
     field (CHG-SOT-012).'
   purpose: Create the governed business layer between raw data and dashboards/AI. This is one of the most
     important technical screens in Board 10.
-  gaps:
-  - operation: null
-    why: '**No certification, owner, glossary or lineage on a dataset or field** (design-notes correction
-      ANL-066). The client asks for certified badges with owner, glossary and lineage; the model holds
-      none of them. Logged as a contract gap 2 October 2026 (CHG-SOT-016). The earlier gap ("operations
-      return no schema with described properties") was stale: `SemanticModel` is fully described.'
-    source: contracts/satellite/reporting.yaml#/components/schemas/SemanticModel
+  gaps: []
   layout:
     template: split
     regions:
@@ -10093,12 +9939,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory
     (§Monitor) — counts over a population, then the population
   purpose: Monitor movement of information from operational systems into the analytics platform.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -10249,6 +10090,7 @@ screens:
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure
       - kind: selectField
         label: Default Dashboard
+        operation: listDashboards
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure
       - kind: selectField
         label: Mobile behavior
@@ -10308,12 +10150,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§Usage KPIs; Performance KPIs) and
     a per-row directory (§Identify) — counts over a population, then the population
   purpose: Monitor BI adoption, system performance, capacity consumption and analytical operating costs.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -10485,11 +10322,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Monitor; Show) and no metric row
   purpose: Provide final governance over the entire BI and analytics environment.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor
   - operation: listSecurityDetectionGovernance
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): listSecurityDetectionGovernance is access fraud analytics

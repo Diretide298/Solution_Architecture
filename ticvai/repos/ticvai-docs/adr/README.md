@@ -1,27 +1,26 @@
-# Active
+<!-- Written by tools/derive-mirrors.py: the index of this folder's files. Edit the files, not this index. -->
 
-> **Purpose:** What is in flight now  
-> **Owner:** Chinmay  
-> **Status:** Living
+# adr/
 
-Current wave, current context, open blockers, this week's gates.
+What `repos/ticvai-docs/adr/` holds.
 
-| Page | |
+| File | What it is |
 |---|---|
-| [sprint-1](sprint-1.md) | Current sprint board |
-| [change-rules](change-rules.md) | **What a change request must say**: the audit classes no checker can see (1 October) |
-| [needs-discussion](needs-discussion.md) | **Client agenda — 19 items** |
-| [seed-data-proposal](seed-data-proposal.md) | Client-facing draft, awaiting correction: UAE denominations and default staff roles SETUP-SEED loads (audit R229) |
-| [configured-limits-proposal](configured-limits-proposal.md) | Client-facing draft, awaiting correction: every "configured" limit with a proposed value |
-| [decisions/answers-2-october](decisions/answers-2-october.md) | **Chinmay's answers of 2 October**, in his words, batch by batch (later sections override earlier ones); the register is [decisions-2-october](../registers/decisions-2-october.md) |
-| [decisions/answers-3-october-r1-additions](decisions/answers-3-october-r1-additions.md) | **Chinmay's r1 additions of 3 October**, verbatim: Block A completes its apps, the venue-map import formats, the F32 shift flow and supervisor PIN, the concierge conversation reads (cited by CHG-RONEC) |
-| [decisions/questions-defaults-to-review](decisions/questions-defaults-to-review.md) | The non-critical questions that took their drawn default without review on 2 October, for Chinmay to overrule before their block is broken into tasks |
-| [research/ai-ml-model-selection-2-october](research/ai-ml-model-selection-2-october.md) | Research of 2 October: the model per AI and ML task, the BYOK map and how UAE apps keep inference in the country (section 2A); with its workbook |
-| [research/cookie-scanner-and-domains-2-october](research/cookie-scanner-and-domains-2-october.md) | Research of 2 October: the cookie scanner (build, buy or hybrid) and the domain options for tenant guest web apps |
-| [ai-suggestion-rules-proposal](ai-suggestion-rules-proposal.md) | Client-facing draft, awaiting correction: the rule and minimum history behind each AI suggestion kind |
-
-Kept short and current. If a page here is stale, delete it — a stale *active* page is worse
-than an empty one.
-
-**Now:** Wave 1 spine. Blockers: hardware models · turnstile SDK · UAE residency ruling ·
-cross-jurisdiction entitlement decision · pilot venue.
+| [0001-cell-architecture-one-tenant-per-jurisdiction.md](0001-cell-architecture-one-tenant-per-jurisdiction.md) | ADR-0001: Cell architecture — one tenant per jurisdiction |
+| [0002-authorisation-is-user-driven-not-workstation-driven.md](0002-authorisation-is-user-driven-not-workstation-driven.md) | ADR-0002: Authorisation is user-driven, not workstation-driven |
+| [0003-conditional-role-selection-at-login.md](0003-conditional-role-selection-at-login.md) | ADR-0003: Conditional role selection at login |
+| [0004-single-session-per-user.md](0004-single-session-per-user.md) | ADR-0004: Single session per user |
+| [0005-venue-isolation-by-partitioning-not-separate-databases.md](0005-venue-isolation-by-partitioning-not-separate-databases.md) | ADR-0005: Venue isolation by partitioning, not separate databases |
+| [0006-tiered-guest-app-distribution.md](0006-tiered-guest-app-distribution.md) | ADR-0006: Tiered guest-app app distribution |
+| [0007-hybrid-repository-topology.md](0007-hybrid-repository-topology.md) | ADR-0007: Hybrid repository topology |
+| [0008-money-carries-per-region-scale.md](0008-money-carries-per-region-scale.md) | ADR-0008: Money carries per-region scale |
+| [0009-ai-data-residency.md](0009-ai-data-residency.md) | ADR-0009: AI Data Residency |
+| [0010-cross-jurisdiction-entitlements.md](0010-cross-jurisdiction-entitlements.md) | ADR-0010: Cross-Jurisdiction Entitlements |
+| [0011-hierarchy-is-binding.md](0011-hierarchy-is-binding.md) | ADR-0011: The Hierarchy Is Binding |
+| [0012-queue-integration-adaptor-first.md](0012-queue-integration-adaptor-first.md) | ADR-0012: Queue Integration — Adaptor-First, Vendor Deferred |
+| [0013-local-first-point-of-sale.md](0013-local-first-point-of-sale.md) | ADR-0013: Local-First Point of Sale |
+| [0014-cell-per-region.md](0014-cell-per-region.md) | ADR-0014: Cell Per Region |
+| [0015-standards-first-device-drivers.md](0015-standards-first-device-drivers.md) | ADR-0015: Standards-First Device Drivers |
+| [0016-read-write-separation.md](0016-read-write-separation.md) | ADR-0016 — Read and write paths are separated, and routing is declared per operation |
+| [0017-deployment-models.md](0017-deployment-models.md) | ADR-0017 — Deployment models |
+| [0018-configuration-scope.md](0018-configuration-scope.md) | ADR-0018 — Configuration scope |

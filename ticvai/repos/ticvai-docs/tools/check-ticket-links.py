@@ -29,6 +29,11 @@ OpenProject id, kind and id; viewer/api/load_links.py), against the plan and the
                        linked, 0 dead links and no open ticket with someone who left as assignee or Accountable. The
                        checks read the package; only a pull reads what a developer gets.
 
+    TL-TEST-SCOPE      a Block A test task (track Test) links a screen its "Builds:" does not list (3 November 2026,
+                       the r13 candidate review, class test-ticket-linked-as-build-task, CHG-R13RVA-001: 21 of 29
+                       test tickets linked every screen in the plan that calls one of their operations, up to 80
+                       beyond their Builds, and ADAM told the tester to build each).
+
 **15 October 2026** (the r6 rehearsal pull, batch GT3, CHG-GT3-001): 36 links on 18 SETUP tickets named
 `repos/ticvai-docs/setup/*.md`, files git tracks and this passed, but ADAM serves a tag from an export that empties
 every `repos/<repo>/<dir>/` but the folders it keeps (viewer/lib/releases.mjs exportRule), so the pull found nothing.
@@ -56,6 +61,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import ticket_done  # noqa: E402  (a task's "Builds:" list, as tools/adam-links.py reads it)
 
 DOCS = g.ROOT / "handoff" / "service-docs"
 # What ADAM's release export keeps under repos/<repo>/ (viewer/lib/releases.mjs reads the same file).
@@ -69,6 +75,7 @@ RULES = {
     "TL-NOTHING-LINKED": "a Block A feature or task has no link adam_pull pulls (an ADR alone is nothing)",
     "TL-DEAD-LINK": "a link in adam-links.json names an operation, table, screen, ADR, file or service HEAD lacks",
     "TL-REHEARSAL": "the release runbook does not gate the tag on a rehearsal pull with its five zero criteria",
+    "TL-TEST-SCOPE": "a Block A test task links a screen its Builds do not list",
 }
 
 # What the runbook's section 4 must say about the rehearsal pull (CHG-GRD-003): each phrase, whitespace collapsed.
@@ -139,6 +146,26 @@ def findings(block: dict, ids: dict, links: list, idx: dict) -> list:
         if not resolves(kind, target, idx):
             out.append(("TL-DEAD-LINK", k, f"#{wp} {key_of.get(wp, '?')}: {kind} `{target}` is not in the package "
                                            f"at HEAD"))
+    return out
+
+
+def test_scope_findings(block: dict, rows: dict, ids: dict, links: list) -> list:
+    """TL-TEST-SCOPE: a Block A test task's linked screens are a subset of the screens its Builds list."""
+    screens = defaultdict(set)
+    for ln in links:
+        if ln.get("kind") == "screen":
+            screens[str(ln.get("key"))].add(str(ln.get("id")))
+    out = []
+    for key in sorted(block):
+        r, wp = rows.get(key) or {}, ids.get(key)
+        if wp is None or r.get("type") != "Task" or r.get("track") != "Test":
+            continue
+        builds = {b.split(" ", 1)[1] for b in ticket_done.listed_builds(r.get("description")) if b.startswith("screen ")}
+        extra = sorted(screens.get(str(wp), set()) - builds)
+        if extra:
+            out.append(("TL-TEST-SCOPE", f"#{wp} {key}",
+                        f"#{wp} {key}: links {len(extra)} screen(s) its Builds do not list "
+                        f"({', '.join(extra[:6])}{' ...' if len(extra) > 6 else ''}); a test task links what it tests"))
     return out
 
 
@@ -266,6 +293,17 @@ def self_test() -> list:
     blk, gone = block_tickets(rows, bundle)
     if blk != {"AM-A": "Feature", "T-C": "Task"} or gone != ["T-GONE"]:
         fails.append(f"block_tickets gave {blk} and gone {gone}")
+    trows = {"T-TEST": {"type": "Task", "track": "Test", "description": "Builds: `screen BO-001`, `operation a#b`. The "
+                                                                        "module test."},
+             "T-C": {"type": "Task", "track": "Backend", "description": ""}}
+    tlinks = [{"key": "7", "kind": "screen", "id": "BO-001"}, {"key": "7", "kind": "operation", "id": "a#b"},
+              {"key": "3", "kind": "screen", "id": "BO-002"}]           # a back-end task may link its callers
+    tblock, tids = {"T-TEST": "Task", "T-C": "Task"}, {"T-TEST": 7, "T-C": 3}
+    if test_scope_findings(tblock, trows, tids, tlinks):
+        fails.append("TL-TEST-SCOPE refused a test task linking only its Builds, or judged a back-end task")
+    got = test_scope_findings(tblock, trows, tids, tlinks + [{"key": "7", "kind": "screen", "id": "BO-002"}])
+    if [k for _, k, _ in got] != ["#7 T-TEST"]:
+        fails.append(f"TL-TEST-SCOPE missed a test task linking a screen outside its Builds: {got}")
     good = ("## 4. Gates\n### The rehearsal pull: before the tag\nTag `r<N>-rc`; `bash tools/rehearse/rehearse.sh`; "
             "tools/rehearse/stand-in-openproject.mjs; viewer/api/load_links.py; the shipped connector; compare with "
             "the last live pull. 0 pull errors; release `r<N>` on every\nticket; 0 tickets with nothing linked; 0 dead "
@@ -308,6 +346,8 @@ def main() -> int:
     links = (g.load_json(links_file, {}) or {}).get("links") or []
     block, gone = block_tickets(rows, bundle)
     for rule, key, msg in findings(block, ids, links, package_index(keep)):
+        guard.add(rule, key, msg, strict=True)
+    for rule, key, msg in test_scope_findings(block, rows, ids, links):
         guard.add(rule, key, msg, strict=True)
     book = g.ROOT / "docs" / "active" / "release-runbook.md"
     for rule, key, msg in rehearsal_findings(book.read_text(encoding="utf-8") if book.is_file() else ""):

@@ -46,11 +46,6 @@ consumers:
   idempotencyKey: scopePath+percentOfCeiling+period
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Spend against ceiling by tenant and audience
-  idempotencyKey: scopePath+percentOfCeiling+period
-  onFailure: retry
-  isCritical: false
 retention: Two years, alongside the billing period it belongs to
 notes: '**Fires at the warning threshold and again at the ceiling, not once.** A manager told at 80%
   can decide with a week left; one told at 100% has already spent it.

@@ -145,6 +145,42 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through VenueOps' service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  entryAndAssetEvents:
+    module: queue
+    host: workers
+    trigger: {kind: event}
+    consumes: [access.validated, maintenance.assetReturnedToService]
+    reads: []
+    writes: [queue.entry, queue.queue]
+    for: 'Smaller module consumers: F&B pushes a new kitchen ticket to the station''s KDS screens (the KDS also polls listKitchenTickets;
+      POS-KDS-ROUTING builds routing only); the Queue releases a held virtual-queue slot on entry (''capacity leaks if this
+      is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
+      wallet.credited and re-enables a repair'
+    source:
+    - events/access-validated.yaml
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/fnb-kitchenTicketCreated.yaml
+  timers:
+    module: queue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: queue-entry, from: called, to: expired}
+    - {model: queue, from: open, to: atCapacity}
+    - {model: queue, from: atCapacity, to: open}
+    reads: [maintenance.work_order, queue.entry, queue.queue]
+    writes: [maintenance.work_order, queue.entry, queue.queue]
+    for: 'Queue timers: call windows and the sensor-fed cycle.'
+    source: ['contracts/satellite/queue.yaml', 'states/queue-entry.yaml:43']
 paths:
   # ---------------------------------------------------------------- queues
   /queues:
@@ -229,7 +265,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Create a queue
@@ -306,7 +342,7 @@ paths:
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Amend queue configuration
@@ -370,7 +406,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Open, pause or close a queue
@@ -494,7 +530,7 @@ paths:
         route: in-process
         for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -625,6 +661,8 @@ paths:
         - guestAuth: []
         - bearerAuth: []
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '204':
           description: Left
           headers:
@@ -657,6 +695,15 @@ paths:
       x-ticvai-reads:
       - table: queue.entry
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: queue.queue
+        for: 'the entry''s queue (by its queue_id), for queueEntry.redeemed''s venueId and accessPointId; read only when
+          the entry carries an entitlement_id (ADAM CR-519)'
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue''s scope path (platform.scope, by the queue''s venue_id), the outbox envelope''s ScopePath for
+          queueEntry.redeemed, through Tenancy''s query class, never its SQL; read only when the entry carries an
+          entitlement_id (ADAM CR-519)'
       x-ticvai-audience: [staff]
       summary: Admit a party at the ride
       description: |-
@@ -672,6 +719,22 @@ paths:
         counter is never maintained here. `entitlementRemaining` is null in the answer. **Offline**, the redemption is
         recorded on the device and the event is written when the device syncs. An entry with no `entitlementId` writes
         no event.
+
+        **What the event carries, and the count** (ADAM CR-519, Chinmay, 3 November 2026: "option A, for both
+        overrideWaitingGuest (#33058) and redeemWaitingGuest (#33059)"; CHG-CR519-001). Where the entry carries an
+        `entitlement_id`, the operation reads the entry's queue (`queue.queue`, by `queue_id`: `venue_id` and
+        `access_point_id`) and the venue's scope path (`tenancy#scopeRecords`, in process, by `venue_id`: Tenancy's
+        query class, never its SQL), and writes `queueEntry.redeemed` through the outbox in the same transaction as
+        the entry's update, with `entryId`; `queueId` (the entry's `queue_id`); `venueId` (the queue's `venue_id`);
+        `entitlementId`; `accessPointId` (the queue's `access_point_id`, null where the queue names none);
+        `admittedCount` (the value recorded on the entry); and `recordedAt` (from the body). The outbox envelope's
+        `ScopePath` is the venue's scope path from Tenancy. An entry with no `entitlement_id` writes no event and
+        makes no extra reads. For a redemption made offline, these reads and the event happen when the device
+        syncs. **`admittedCount`, the same in both operations**: omitted, the entry's `party_size` is recorded in
+        `admitted_count` and sent in the event; given, it must be from 1 to the entry's `party_size`. Above
+        `party_size` is `400 validation`: nothing is written, no state changes, no event. Partial admission (fewer
+        than the party) stays normal. The states, the override's three `409`s and fields, the answer
+        (`entitlementRemaining` null) and idempotency are unchanged.
       tags: [entry]
       x-ticvai-permission: QUEUE_REDEEM
       x-ticvai-scope-level: workstation
@@ -691,7 +754,8 @@ paths:
                 admittedCount:
                   type: integer
                   minimum: 1
-                  description: May be fewer than the party. Partial admission is normal.
+                  description: May be fewer than the party. Partial admission is normal. Omitted, the entry's
+                    `party_size`; above `party_size` is `400 validation` (ADAM CR-519).
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
@@ -702,6 +766,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -724,6 +789,15 @@ paths:
       x-ticvai-reads:
       - table: queue.entry
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: queue.queue
+        for: 'the entry''s queue (by its queue_id), for queueEntry.redeemed''s venueId and accessPointId; read only when
+          the entry carries an entitlement_id (ADAM CR-519)'
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue''s scope path (platform.scope, by the queue''s venue_id), the outbox envelope''s ScopePath for
+          queueEntry.redeemed, through Tenancy''s query class, never its SQL; read only when the entry carries an
+          entitlement_id (ADAM CR-519)'
       x-ticvai-audience: [staff]
       summary: Admit against a failed redemption
       description: >
@@ -742,6 +816,22 @@ paths:
         has not been called, so no redemption has failed. **An override that admits a Fast Pass entry writes
         `queueEntry.redeemed`** through the outbox in the same transaction, as `redeemWaitingGuest` does (ADAM CR-238),
         so Access takes the entitlement's use; `entitlementRemaining` is null.
+
+        **What the event carries, and the count** (ADAM CR-519, Chinmay, 3 November 2026: "option A, for both
+        overrideWaitingGuest (#33058) and redeemWaitingGuest (#33059)"; CHG-CR519-001). Where the entry carries an
+        `entitlement_id`, the operation reads the entry's queue (`queue.queue`, by `queue_id`: `venue_id` and
+        `access_point_id`) and the venue's scope path (`tenancy#scopeRecords`, in process, by `venue_id`: Tenancy's
+        query class, never its SQL), and writes `queueEntry.redeemed` through the outbox in the same transaction as
+        the entry's update, with `entryId`; `queueId` (the entry's `queue_id`); `venueId` (the queue's `venue_id`);
+        `entitlementId`; `accessPointId` (the queue's `access_point_id`, null where the queue names none);
+        `admittedCount` (the value recorded on the entry); and `recordedAt` (from the body). The outbox envelope's
+        `ScopePath` is the venue's scope path from Tenancy. An entry with no `entitlement_id` writes no event and
+        makes no extra reads. For a redemption made offline, these reads and the event happen when the device
+        syncs. **`admittedCount`, the same in both operations**: omitted, the entry's `party_size` is recorded in
+        `admitted_count` and sent in the event; given, it must be from 1 to the entry's `party_size`. Above
+        `party_size` is `400 validation`: nothing is written, no state changes, no event. Partial admission (fewer
+        than the party) stays normal. The states, the override's three `409`s and fields, the answer
+        (`entitlementRemaining` null) and idempotency are unchanged.
       tags: [entry]
       x-ticvai-permission: QUEUE_OVERRIDE
       x-ticvai-scope-level: venue
@@ -758,7 +848,10 @@ paths:
               required: [reason, recordedAt]
               properties:
                 reason: { type: string, minLength: 3, maxLength: 500 }
-                admittedCount: { type: integer, minimum: 1 }
+                admittedCount:
+                  type: integer
+                  minimum: 1
+                  description: Omitted, the entry's `party_size`; above `party_size` is `400 validation` (ADAM CR-519).
                 recordedAt: { type: string, format: date-time }
       responses:
         '200':
@@ -769,6 +862,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
           description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`), or is still `waiting` and has not been called (`queue-entry-not-called`; CHG-R10ORD-023); there is no failed redemption to override. Nobody is admitted.'
           x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled, queue-entry-not-called]
@@ -806,6 +900,11 @@ paths:
 
         **The operator at the front of the queue**, with the permission that calls parties forward
         (`QUEUE_MANAGE`, as `callNextParties`). Offline-capable, as the other entry operations at the ride.
+
+
+        **What it records** (r13 root R40, CHG-R13R40-001): on the entry, `callResolvedAt` (the request's
+        `recordedAt`), `callResolutionReason` (its `reason`, or null) and `callResolvedByPrincipalId` (the caller),
+        beside the status, so the reason is kept and the no-show or return has a time.
       tags: [entry]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
@@ -830,7 +929,13 @@ paths:
                   maxLength: 500
                   nullable: true
                   description: Why, where the operator gives one (called in error, the guest asked for more time).
-                recordedAt: { type: string, format: date-time }
+                    Stored as the entry's `callResolutionReason` (r13 root R40).
+                  x-ticvai-stored-as: queue.entry.call_resolution_reason
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: When it happened, device time; stored as the entry's `callResolvedAt` (r13 root R40).
+                  x-ticvai-stored-as: queue.entry.call_resolved_at
       responses:
         '200':
           headers:
@@ -1008,7 +1113,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: catalogue#productCategoryRecords
-        route: service
+        route: in-process
         for: 'what its text calls "ProductCategory": catalogue.product_category, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
@@ -1234,6 +1339,11 @@ paths:
   /queue-feeds/readings:
     post:
       operationId: submitQueueReading
+      x-ticvai-read-via:
+      - query: tenancy#deviceForApiKey
+        route: in-process
+        for: 'the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM
+          CR-451; XDR-068)'
       x-ticvai-audience: [device]
       summary: Inbound sensor reading
       description: >
@@ -1249,6 +1359,11 @@ paths:
         `disposition: discardedOutOfOrder`, so feed health can count it; it never moves an
         estimate. A duplicate is the same reading ID again, has no row of its own, and is
         counted only in this response's `duplicates`.
+
+        **Signed in by its device key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001). `X-Api-Key` is
+        checked by the device-key sign-in every `apiKeyAuth` operation uses: a device credential (Tenancy's) of kind
+        `apiKey`, of which only a hash is stored, bound to one device and its venue; it opens a device session
+        scoped to that venue. A missing, wrong or revoked key is `401`.
       tags: [feed]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
@@ -1375,13 +1490,42 @@ paths:
   /signage/queue-board:
     get:
       operationId: getSignageQueueBoard
+      x-ticvai-read-via:
+      - query: tenancy#deviceForApiKey
+        route: in-process
+        for: 'the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM
+          CR-451; XDR-068)'
       x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
+      x-ticvai-reads:
+      - table: queue.queue
+        for: 'the venue''s queues: name, status, currentWaitMinutes, heightRequirementCm, zone and waitTimeAsOf (ADAM CR-452)'
+      - table: queue.reading
+        for: 'the readings behind the wait figure (#33061)'
+      - table: queue.feed
+        for: 'each queue''s feed, expectedIntervalSeconds, for isStale (ADAM CR-452)'
       summary: Wait-time board for a display
       description: >
-        Consumed by digital signage. Unauthenticated by display key, cached, and shaped for
+        Consumed by digital signage. Authenticated by display key, cached, and shaped for
         rendering rather than for an application — a signage panel should not need to
         interpret anything.
+
+
+        **Signed in by its display key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001). `X-Api-Key` is a
+        display key: a device credential (Tenancy's) of kind `apiKey`, of which only a hash is stored, bound to one
+        `signageDisplay` device and its venue. A request with it opens a device session scoped to that venue; a
+        `venueId` outside it is `403`, and a missing, wrong or revoked key is `401`.
+
+
+        **How each entry is shaped** (ADAM CR-452, Chinmay, 1 November 2026, option A with these values, proposed
+        defaults the client may correct; CHG-CR452-001). Listed: the venue's ride and attraction queues only,
+        filtered by `zone` where it is given, ordered by name. `statusColour` is `grey` when the queue is `closed` or
+        the entry `isStale`; otherwise `green` up to 15 minutes, `amber` from 16 to 45, `red` above 45.
+        `displayText` is the wait as '{n} min', or 'Closed', or 'Ride Now' when the wait is 0, from a string table
+        per language, with English as the fallback when the requested `language` has no string.
+        `heightRequirementText` is 'Min {n} cm' from the queue's minimum height (`heightRequirementCm`), absent when
+        there is none. `isStale` is true when the queue's `waitTimeAsOf` is older than twice its feed's
+        `expectedIntervalSeconds` (`queue.feed`). `refreshSeconds` is 30.
       tags: [signage]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
@@ -1406,18 +1550,35 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/SignageBoard' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /signage/queue-calls:
     get:
       operationId: getSignageQueueCalls
+      x-ticvai-read-via:
+      - query: tenancy#deviceForApiKey
+        route: in-process
+        for: 'the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM
+          CR-451; XDR-068)'
       x-ticvai-audience: [device]
       x-ticvai-read-routing: replica
       summary: Currently called party numbers
       description: >
         The now-serving display at a ride entrance. Short-lived and polled frequently, so it
         returns only what changed since the supplied cursor.
+
+
+        **Signed in by its display key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001), as
+        `getSignageQueueBoard` says: the key opens a device session scoped to its display's venue; a `queueId`
+        outside it is `403`, and a missing, wrong or revoked key is `401`.
+
+
+        **What changed since the cursor** (ADAM CR-453, Chinmay, 1 November 2026; CHG-CR453-001): the parties called
+        since `since` (`nowServing`), and also the parties that left the `called` state since it (`leftCalled`), each
+        with its new state, so the display drops a redeemed or expired party at once rather than at `expiresAt`.
       tags: [signage]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: venue
@@ -1450,7 +1611,19 @@ paths:
                         partyNumber: { type: integer }
                         calledAt: { type: string, format: date-time }
                         expiresAt: { type: string, format: date-time }
+                  leftCalled:
+                    type: array
+                    description: 'The parties that left the `called` state since the cursor, each with its new state
+                      (ADAM CR-453), so the display drops them at once.'
+                    items:
+                      type: object
+                      required: [partyNumber, status]
+                      properties:
+                        partyNumber: { type: integer }
+                        status: { $ref: '#/components/schemas/QueueEntryStatus' }
                   asOf: { type: string, format: date-time }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1861,6 +2034,27 @@ components:
           format: date-time
           nullable: true
           readOnly: true
+        callResolvedByPrincipalId:
+          x-ticvai-references: identity.principal
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**Who recorded the called party''s no-show or return to the queue** (`resolveCalledWaitingGuest`;
+            r13 root R40, CHG-R13R40-001), with `callResolutionReason` and `callResolvedAt`. Null until it is
+            resolved; a later resolution of the same entry replaces all three.'
+        callResolutionReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The operator's reason, as `resolveCalledWaitingGuest` took it.
+        callResolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the no-show or return happened, the request's `recordedAt` (device time, offline-capable).
 
     QueueRedemptionResult:
       x-ticvai-persistence: "none — computed, persisted as entry state"
@@ -2075,10 +2269,13 @@ components:
         zone: { type: string, nullable: true }
         language: { type: string }
         generatedAt: { type: string, format: date-time }
-        refreshSeconds: { type: integer }
+        refreshSeconds:
+          type: integer
+          description: 30 (ADAM CR-452, a proposed default the client may correct).
         entries:
           type: array
-          description: Shaped for rendering. A signage panel should not need to interpret anything.
+          description: 'Shaped for rendering. A signage panel should not need to interpret anything. The venue''s ride
+            and attraction queues only, filtered by `zone` where given, ordered by name (ADAM CR-452).'
           items:
             type: object
             required: [name, displayText, statusColour]
@@ -2086,13 +2283,23 @@ components:
               name: { type: string }
               displayText:
                 type: string
-                description: Already localised and formatted — "45 min", "Closed", "Ride Now".
+                description: 'Already localised and formatted — "45 min", "Closed", "Ride Now" (ADAM CR-452): the
+                  wait as ''{n} min'', ''Closed'' for a closed queue, or ''Ride Now'' when the wait is 0, from a string
+                  table per language, English when the requested language has no string.'
               waitMinutes: { type: integer, nullable: true }
               statusColour:
                 type: string
                 enum: [green, amber, red, grey]
-              heightRequirementText: { type: string, nullable: true }
-              isStale: { type: boolean }
+                description: '`grey` when the queue is closed or `isStale`; otherwise `green` up to 15 minutes,
+                  `amber` from 16 to 45, `red` above 45 (ADAM CR-452, proposed defaults the client may correct).'
+              heightRequirementText:
+                type: string
+                nullable: true
+                description: '''Min {n} cm'' from the queue''s `heightRequirementCm`; absent when it has none (ADAM CR-452).'
+              isStale:
+                type: boolean
+                description: 'True when the queue''s `waitTimeAsOf` is older than twice its feed''s
+                  `expectedIntervalSeconds` (ADAM CR-452).'
 
   securitySchemes:
     bearerAuth:
@@ -2111,3 +2318,6 @@ components:
       type: apiKey
       in: header
       name: X-Api-Key
+      description: 'A device''s key (ADAM CR-451, CHG-CR451-001): a device credential (Tenancy''s) of kind apiKey, only its
+        hash stored, bound to one device and its venue; it opens a device session scoped to that venue. A missing,
+        wrong or revoked key is 401 (common.yaml apiKeyAuth).'

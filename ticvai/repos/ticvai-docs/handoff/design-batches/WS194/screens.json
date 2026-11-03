@@ -92,13 +92,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide Finance and authorized management users with a consolidated financial view of all wallet obligations and movements. Executive KPIs",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 102 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -981,13 +975,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide Finance and Operations with a governed workspace to investigate reconciliation failures. Exception Examples Payment successful / Wallet not funded Wallet funded / Payment failed Wallet debited / POS transaction missing Duplicate wallet debit Refund issued / Finance event missing Gift card redeemed / Liability unchanged",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 106 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1162,13 +1150,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide detailed financial control of outstanding gift-card obligations. Requirement 4.3.36 explicitly requires reporting of outstanding gift-card balances, redeemed value, unredeemed balances, expired balances and liability exposure by venue, tenant, currency and accounting period. Liability Dashboard",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 107 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1342,11 +1324,6 @@
   "patternReason": "the pack gives this screen a display directory (§Gift Card) and no metric row",
   "purpose": "Configure the wallet-side business rules for expired/unredeemed gift-card value. Requirement 4.3.37 requires configurable expiration policies, gift-card breakage calculation and generation of revenue- recognition entries according to configured accounting policies. Breakage Configuration",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 108 §Gift Card"
-   },
    {
     "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.",
@@ -1709,13 +1686,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Compare; Analyze) and no metric row",
   "purpose": "Provide comprehensive analytics for wallet usage, financial performance and customer behavior. Requirement 4.3.17 requires intensive reporting across wallet credit types, including usage, balance and expiry, while 4.3.33 calls for dashboards covering balances, top-ups, redemptions, refunds, outstanding liability, expired value, usage by channel and transaction volume. Financial Analytics Wallet Liability Outstanding Stored Value Funding Redemption Refunds Transfers Expired Value Breakage Gift Card Liability Operational Analytics Active wallets Average wallet balance Average top-up Average spend Transaction volume Wallet usage frequency Dormant wallets Credit utilization Channel Analytics",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 110 §Compare"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1880,13 +1851,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Compare) and no metric row",
   "purpose": "Provide a final finance-control screen for validating wallet financial integrity and reviewing all financial configuration changes. Finance Health Check Complete the TICVAI Wallet module with the enterprise integration and governance layer that allows Wallet to operate securely across the entire TICVAI ecosystem and with approved third-party platforms. This board covers Wallet APIs, integration profiles, event/webhook orchestration, synchronization, integration monitoring, access/security governance, configuration versioning, approval and publication, audit governance, and end-to-end platform health. It directly addresses requirements 4.3.20 and 4.3.34, while consolidating governance and administration capabilities required across the full wallet scope. The source specifically requires integration with internal and external systems through APIs, including balance inquiry, transaction history, wallet funding, wallet payment, refund processing and wallet-to-wallet transfers.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Compare"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

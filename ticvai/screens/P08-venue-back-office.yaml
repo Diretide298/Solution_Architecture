@@ -94,8 +94,8 @@ screens:
     - to: BO-006
       trigger: Parking Configuration
       provenance: 'derived — BO-006 declares entryState.params parkingFacilityId and BO-001 holds none
-        of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional),
-        and BO-006 opens on its own'
+        of them. The edge carries nothing: parkingFacilityId only pre-selects (optional), and BO-006 opens
+        on its own'
     - to: BO-002
       trigger: Queue Configuration
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-001): flow F09 step 1→2'
@@ -2001,8 +2001,8 @@ screens:
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-007 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
     - to: BO-010
       trigger: Promotions & Coupons
       carries:
@@ -3265,13 +3265,13 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-010 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-010 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
     - to: ANL-009
       trigger: AI Assistant & Action Center
       provenance: flow F90 step 2→3
@@ -4408,8 +4408,8 @@ screens:
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
     - to: BO-1192
       trigger: Entitlement Templates
       provenance: 'decided 12 October 2026, Chinmay: the client''s feedback of 6 October, N32 (CHG-R6-040)'
@@ -4803,8 +4803,8 @@ screens:
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-013 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
     - to: BO-011
       trigger: Packages & Bundles
       provenance: flow F77 step 1→2
@@ -5479,13 +5479,13 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-015 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-015 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
     - to: BO-099
       trigger: Performance manifest
       carries:
@@ -5887,13 +5887,13 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-016 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-016 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August**
@@ -6043,13 +6043,13 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-017 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-017 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -6302,13 +6302,13 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-018 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-018 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -6487,13 +6487,13 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-019 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-019 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 26 August**
@@ -8411,9 +8411,9 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-024
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
     - to: PTR-014
       trigger: Settlement & Payment History
       provenance: flow F99 step 2→3
@@ -8638,9 +8638,9 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-025
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
     - to: BO-024
       trigger: Payment Exceptions
       provenance: flow F99 step 1→2
@@ -9664,9 +9664,9 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-028
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -9763,9 +9763,9 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-029
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -11489,13 +11489,13 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-037 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-037 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
     - to: BO-128
       trigger: The fleet is monitored
       provenance: flow F89 step 3→4
@@ -12935,9 +12935,9 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-043
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
     - to: BO-074
       trigger: Chart of Accounts
       provenance: flow F98 step 1→2
@@ -15250,8 +15250,8 @@ screens:
     - to: BO-079
       trigger: Stock Count
       provenance: 'derived — BO-079 declares entryState.params countId and BO-049 holds none of them.
-        The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on
-        its own'
+        The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its
+        own'
     - to: BO-080
       trigger: Stock Transfers
       carries:
@@ -16630,7 +16630,7 @@ screens:
     trigger: onAction
     provenance: build, 29 September 2026
   - operationId: setRolePermissions
-    contract: tenancy
+    contract: identity
     purpose: Set what this role may do
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-021)
@@ -17693,9 +17693,9 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-059
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -18529,9 +18529,9 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-061
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
     - to: BO-060
       trigger: Attendance & Footfall
       provenance: flow F107 step 2→3
@@ -18723,9 +18723,9 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-062
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -18860,13 +18860,13 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-063 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-063 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20
@@ -21532,8 +21532,8 @@ screens:
     - to: BO-077
       trigger: FX Rates & Variances
       provenance: 'derived — BO-077 declares entryState.params rateId, varianceId and BO-074 holds none
-        of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional),
-        and BO-077 opens on its own'
+        of them. The edge carries nothing: varianceId, rateId only pre-select (optional), and BO-077 opens
+        on its own'
     entryFrom:
     - BO-043
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
@@ -21835,8 +21835,8 @@ screens:
     - to: BO-077
       trigger: FX Rates & Variances
       provenance: 'derived — BO-077 declares entryState.params rateId, varianceId and BO-075 holds none
-        of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional),
-        and BO-077 opens on its own'
+        of them. The edge carries nothing: varianceId, rateId only pre-select (optional), and BO-077 opens
+        on its own'
     - to: ADM-020
       trigger: Creates the first venue manager
       provenance: flow F16 step 6→7
@@ -22099,18 +22099,18 @@ screens:
     - to: BO-074
       trigger: Chart of Accounts
       provenance: 'derived — BO-074 declares entryState.params accountId and BO-076 holds none of them.
-        The edge carries nothing: accountId only pre-selects (deep link or optional), and BO-074 opens
-        on its own'
+        The edge carries nothing: BO-074 finds accountId (listAccounts) itself, and BO-074 opens on its
+        own'
     - to: BO-075
       trigger: Account Mapping
       provenance: 'derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-076 holds
-        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional),
-        and BO-075 opens on its own'
+        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and
+        BO-075 opens on its own'
     - to: BO-077
       trigger: FX Rates & Variances
       provenance: 'derived — BO-077 declares entryState.params rateId, varianceId and BO-076 holds none
-        of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional),
-        and BO-077 opens on its own'
+        of them. The edge carries nothing: varianceId, rateId only pre-select (optional), and BO-077 opens
+        on its own'
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
@@ -22294,13 +22294,13 @@ screens:
     - to: BO-074
       trigger: Chart of Accounts
       provenance: 'derived — BO-074 declares entryState.params accountId and BO-077 holds none of them.
-        The edge carries nothing: accountId only pre-selects (deep link or optional), and BO-074 opens
-        on its own'
+        The edge carries nothing: BO-074 finds accountId (listAccounts) itself, and BO-074 opens on its
+        own'
     - to: BO-075
       trigger: Account Mapping
       provenance: 'derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-077 holds
-        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional),
-        and BO-075 opens on its own'
+        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and
+        BO-075 opens on its own'
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
 
@@ -22547,8 +22547,8 @@ screens:
     - to: BO-079
       trigger: Stock Count
       provenance: 'derived — BO-079 declares entryState.params countId and BO-078 holds none of them.
-        The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on
-        its own'
+        The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its
+        own'
     - to: BO-081
       trigger: Inventory Items
       carries:
@@ -22852,12 +22852,12 @@ screens:
     - to: BO-078
       trigger: Requisitions
       provenance: 'derived — BO-078 declares entryState.params requisitionId and BO-079 holds none of
-        them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078
+        them. The edge carries nothing: BO-078 finds requisitionId (listRequisitions) itself, and BO-078
         opens on its own'
     - to: BO-080
       trigger: Stock Transfers
       provenance: 'derived — BO-080 declares entryState.params transferId and BO-079 holds none of them.
-        The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens
+        The edge carries nothing: BO-080 finds transferId (listStockTransfers) itself, and BO-080 opens
         on its own'
     - to: BO-081
       trigger: Inventory Items
@@ -23219,13 +23219,13 @@ screens:
     - to: BO-078
       trigger: Requisitions
       provenance: 'derived — BO-078 declares entryState.params requisitionId and BO-080 holds none of
-        them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078
+        them. The edge carries nothing: BO-078 finds requisitionId (listRequisitions) itself, and BO-078
         opens on its own'
     - to: BO-079
       trigger: Stock Count
       provenance: 'derived — BO-079 declares entryState.params countId and BO-080 holds none of them.
-        The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on
-        its own'
+        The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its
+        own'
     - to: BO-081
       trigger: Inventory Items
       carries:
@@ -23452,12 +23452,12 @@ screens:
     - to: BO-079
       trigger: Stock Count
       provenance: 'derived — BO-079 declares entryState.params countId and BO-081 holds none of them.
-        The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on
-        its own'
+        The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its
+        own'
     - to: BO-080
       trigger: Stock Transfers
       provenance: 'derived — BO-080 declares entryState.params transferId and BO-081 holds none of them.
-        The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens
+        The edge carries nothing: BO-080 finds transferId (listStockTransfers) itself, and BO-080 opens
         on its own'
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
@@ -23740,12 +23740,12 @@ screens:
     - to: BO-078
       trigger: Requisitions
       provenance: 'derived — BO-078 declares entryState.params requisitionId and BO-082 holds none of
-        them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078
+        them. The edge carries nothing: BO-078 finds requisitionId (listRequisitions) itself, and BO-078
         opens on its own'
     - to: BO-080
       trigger: Stock Transfers
       provenance: 'derived — BO-080 declares entryState.params transferId and BO-082 holds none of them.
-        The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens
+        The edge carries nothing: BO-080 finds transferId (listStockTransfers) itself, and BO-080 opens
         on its own'
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. **Moved to wave 1 on 24 August.** F34 walks a retail sale and its return,
@@ -24218,8 +24218,8 @@ screens:
     - to: BO-087
       trigger: Approval Delegations
       provenance: 'derived — BO-087 declares entryState.params delegationId, matrixId and BO-084 holds
-        none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional),
-        and BO-087 opens on its own'
+        none of them. The edge carries nothing: delegationId, matrixId only pre-select (optional), and
+        BO-087 opens on its own'
     - to: BO-364
       trigger: Back to the approval command centre
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-022): inherited from BO-365 (merged), flow F123
@@ -24434,8 +24434,8 @@ screens:
     - to: BO-087
       trigger: Approval Delegations
       provenance: 'derived — BO-087 declares entryState.params delegationId, matrixId and BO-085 holds
-        none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional),
-        and BO-087 opens on its own'
+        none of them. The edge carries nothing: delegationId, matrixId only pre-select (optional), and
+        BO-087 opens on its own'
     - to: POS-005
       trigger: The till applies it and completes the sale
       provenance: flow F14 step 4→5
@@ -24639,12 +24639,12 @@ screens:
     - to: BO-084
       trigger: Approval Inbox
       provenance: 'derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-086
-        holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional);
-        BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own'
+        holds none of them. The edge carries nothing: BO-084 finds requestId (listApprovalRequests), approvalRequestId
+        (listApprovalRequests) itself, and BO-084 opens on its own'
     - to: BO-085
       trigger: Approval Request
       provenance: 'derived — BO-085 declares entryState.params requestId and BO-086 holds none of them.
-        The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens
+        The edge carries nothing: BO-085 finds requestId (listApprovalRequests) itself, and BO-085 opens
         on its own'
     - to: BO-087
       trigger: Approval Delegations
@@ -24794,12 +24794,12 @@ screens:
     - to: BO-084
       trigger: Approval Inbox
       provenance: 'derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-087
-        holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional);
-        BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own'
+        holds none of them. The edge carries nothing: BO-084 finds requestId (listApprovalRequests), approvalRequestId
+        (listApprovalRequests) itself, and BO-084 opens on its own'
     - to: BO-085
       trigger: Approval Request
       provenance: 'derived — BO-085 declares entryState.params requestId and BO-087 holds none of them.
-        The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens
+        The edge carries nothing: BO-085 finds requestId (listApprovalRequests) itself, and BO-085 opens
         on its own'
     - to: ADM-238
       trigger: Returns to the board's landing screen
@@ -25029,12 +25029,12 @@ screens:
     - to: BO-084
       trigger: Approval Inbox
       provenance: 'derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-088
-        holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional);
-        BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own'
+        holds none of them. The edge carries nothing: BO-084 finds requestId (listApprovalRequests), approvalRequestId
+        (listApprovalRequests) itself, and BO-084 opens on its own'
     - to: BO-085
       trigger: Approval Request
       provenance: 'derived — BO-085 declares entryState.params requestId and BO-088 holds none of them.
-        The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens
+        The edge carries nothing: BO-085 finds requestId (listApprovalRequests) itself, and BO-085 opens
         on its own'
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. **Retail board operations wired 24 August.**
@@ -25130,8 +25130,8 @@ screens:
     - to: BO-075
       trigger: Account Mapping
       provenance: 'derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-089 holds
-        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional),
-        and BO-075 opens on its own'
+        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and
+        BO-075 opens on its own'
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
 
@@ -25370,8 +25370,8 @@ screens:
     - to: BO-075
       trigger: Account Mapping
       provenance: 'derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-090 holds
-        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional),
-        and BO-075 opens on its own'
+        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and
+        BO-075 opens on its own'
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
   density: compact
@@ -26777,9 +26777,8 @@ screens:
         so an edge into it carries them
     - to: BO-097
       trigger: Check Out & Check In
-      provenance: 'derived — BO-097 declares entryState.params authorisationId, bookingId and BO-095 holds
-        none of them. The edge carries nothing: authorisationId, bookingId only pre-select (deep link
-        or optional), and BO-097 opens on its own'
+      provenance: derived — BO-097 declares entryState.params authorisationId, bookingId and BO-095 holds
+        none of them, so the edge carries nothing and BO-097 opens cold
     - to: BO-098
       trigger: Qualifications
       carries:
@@ -28612,24 +28611,24 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       provenance: 'derived — BO-008 declares entryState.params productId, variantId, version and BO-101
-        holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional);
-        BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on
-        its own'
+        holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version
+        (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008
+        yet (a gap in BO-008, not in this edge)'
     - to: BO-022
       trigger: Order Detail
       provenance: 'derived — BO-022 declares entryState.params documentId, invoiceId, orderId and BO-101
-        holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep
-        link or optional), and BO-022 opens on its own'
+        holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (optional),
+        and BO-022 opens on its own'
     - to: BO-023
       trigger: Refunds & Exchanges
       provenance: 'derived — BO-023 declares entryState.params documentId, invoiceId, orderId and BO-101
-        holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep
-        link or optional), and BO-023 opens on its own'
+        holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (optional),
+        and BO-023 opens on its own'
     - to: BO-024
       trigger: Payment Exceptions
       provenance: 'derived — BO-024 declares entryState.params depositId, paymentId and BO-101 holds none
-        of them. The edge carries nothing: paymentId, depositId only pre-select (deep link or optional),
-        and BO-024 opens on its own'
+        of them. The edge carries nothing: depositId only pre-selects (optional); BO-024 opens on listPaymentReconciliationException,
+        and paymentId has no source on BO-024 yet (a gap in BO-024, not in this edge)'
     - to: BO-025
       trigger: Chargebacks & Disputes
       carries:
@@ -28639,18 +28638,19 @@ screens:
     - to: BO-026
       trigger: Group Bookings
       provenance: 'derived — BO-026 declares entryState.params groupBookingId, orderId and BO-101 holds
-        none of them. The edge carries nothing: orderId, groupBookingId only pre-select (deep link or
-        optional), and BO-026 opens on its own'
+        none of them. The edge carries nothing: orderId, groupBookingId only pre-select (optional), and
+        BO-026 opens on its own'
     - to: BO-027
       trigger: Reissue & Media Replacement
       provenance: 'derived — BO-027 declares entryState.params credentialId, mediaCode, mediaId and BO-101
-        holds none of them. The edge carries nothing: mediaCode, mediaId, credentialId only pre-select
-        (deep link or optional), and BO-027 opens on its own'
+        holds none of them. The edge carries nothing: mediaId, credentialId only pre-select (optional);
+        BO-027 opens on listTicketReissueFulfillment, and mediaCode has no source on BO-027 yet (a gap
+        in BO-027, not in this edge)'
     - to: BO-029
       trigger: Report Builder
       provenance: 'derived — BO-029 declares entryState.params conversationId, reportId and BO-101 holds
-        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
-        optional), and BO-029 opens on its own'
+        none of them. The edge carries nothing: conversationId, reportId only pre-select (optional), and
+        BO-029 opens on its own'
     - to: BO-039
       trigger: Shift Directory
       provenance: 'derived — BO-039 declares entryState.params  and BO-101 holds none of them. The edge
@@ -28666,8 +28666,8 @@ screens:
     - to: BO-042
       trigger: Banking & Safe
       provenance: 'derived — BO-042 declares entryState.params boxId, shiftId and BO-101 holds none of
-        them. The edge carries nothing: boxId, shiftId only pre-select (deep link or optional), and BO-042
-        opens on its own'
+        them. The edge carries nothing: boxId, shiftId only pre-select (optional), and BO-042 opens on
+        its own'
     - to: BO-043
       trigger: Daily Reconciliation
       carries:
@@ -28677,23 +28677,22 @@ screens:
     - to: BO-047
       trigger: Order Corrections & Exceptions
       provenance: 'derived — BO-047 declares entryState.params orderId and BO-101 holds none of them.
-        The edge carries nothing: orderId only pre-selects (deep link or optional), and BO-047 opens on
-        its own'
+        The edge carries nothing: orderId only pre-selects (optional), and BO-047 opens on its own'
     - to: BO-048
       trigger: Retail Products
       provenance: 'derived — BO-048 declares entryState.params merchandiseId, productId and BO-101 holds
-        none of them. The edge carries nothing: merchandiseId, productId only pre-select (deep link or
-        optional), and BO-048 opens on its own'
+        none of them. The edge carries nothing: productId only pre-selects (optional); BO-048 finds merchandiseId
+        (listMerchandise) itself, and BO-048 opens on its own'
     - to: BO-059
       trigger: Sales Reports
       provenance: 'derived — BO-059 declares entryState.params conversationId, reportId and BO-101 holds
-        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
-        optional), and BO-059 opens on its own'
+        none of them. The edge carries nothing: conversationId, reportId only pre-select (optional), and
+        BO-059 opens on its own'
     - to: BO-061
       trigger: Scheduled Reports
       provenance: 'derived — BO-061 declares entryState.params reportId, scheduleId and BO-101 holds none
-        of them. The edge carries nothing: reportId only pre-selects (deep link or optional); BO-061 finds
-        scheduleId (listReportSchedules) itself, and BO-061 opens on its own'
+        of them. The edge carries nothing: reportId only pre-selects (optional); BO-061 finds scheduleId
+        (listReportSchedules) itself, and BO-061 opens on its own'
     - to: BO-062
       trigger: Venue Profile
       provenance: 'derived — BO-062 declares entryState.params  and BO-101 holds none of them. The edge
@@ -28701,38 +28700,34 @@ screens:
     - to: BO-065
       trigger: Venue Configuration
       provenance: 'derived — BO-065 declares entryState.params locationId and BO-101 holds none of them.
-        The edge carries nothing: locationId only pre-selects (deep link or optional), and BO-065 opens
-        on its own'
+        The edge carries nothing: locationId only pre-selects (optional), and BO-065 opens on its own'
     - to: BO-074
       trigger: Chart of Accounts
       provenance: 'derived — BO-074 declares entryState.params accountId and BO-101 holds none of them.
-        The edge carries nothing: accountId only pre-selects (deep link or optional), and BO-074 opens
-        on its own'
+        The edge carries nothing: BO-074 finds accountId (listAccounts) itself, and BO-074 opens on its
+        own'
     - to: BO-075
       trigger: Account Mapping
       provenance: 'derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-101 holds
-        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional),
-        and BO-075 opens on its own'
+        none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and
+        BO-075 opens on its own'
     - to: BO-077
       trigger: FX Rates & Variances
       provenance: 'derived — BO-077 declares entryState.params rateId, varianceId and BO-101 holds none
-        of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional),
-        and BO-077 opens on its own'
+        of them. The edge carries nothing: varianceId, rateId only pre-select (optional), and BO-077 opens
+        on its own'
     - to: BO-089
       trigger: Journal Entries
       provenance: 'derived — BO-089 declares entryState.params entryId and BO-101 holds none of them.
-        The edge carries nothing: entryId only pre-selects (deep link or optional), and BO-089 opens on
-        its own'
+        The edge carries nothing: entryId only pre-selects (optional), and BO-089 opens on its own'
     - to: BO-090
       trigger: Period Close
       provenance: 'derived — BO-090 declares entryState.params periodId and BO-101 holds none of them.
-        The edge carries nothing: periodId only pre-selects (deep link or optional), and BO-090 opens
-        on its own'
+        The edge carries nothing: periodId only pre-selects (optional), and BO-090 opens on its own'
     - to: BO-028
       trigger: Refund Approval Queue
       provenance: 'derived — BO-028 declares entryState.params refundId and BO-101 holds none of them.
-        The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens
-        on its own'
+        The edge carries nothing: refundId only pre-selects (optional), and BO-028 opens on its own'
     - to: BO-1088
       trigger: Opens Credit & Balance Type Configuration
       provenance: 'CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the
@@ -28965,70 +28960,70 @@ screens:
     - to: BO-007
       trigger: Product Directory
       provenance: 'derived — BO-007 declares entryState.params productId and BO-102 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens
-        on its own'
+        The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its
+        own'
     - to: BO-009
       trigger: Pricing Rules
       provenance: 'derived — BO-009 declares entryState.params priceListId, ruleId and BO-102 holds none
-        of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional),
-        and BO-009 opens on its own'
+        of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId
+        (listPriceLists) itself, and BO-009 opens on its own'
     - to: BO-010
       trigger: Promotions & Coupons
       provenance: 'derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId,
-        reportId, voucherId and BO-102 holds none of them. The edge carries nothing: campaignId, dashboardId,
-        promotionId, reportId, code, voucherId only pre-select (deep link or optional), and BO-010 opens
-        on its own'
+        reportId, voucherId and BO-102 holds none of them. The edge carries nothing: dashboardId, voucherId
+        only pre-select (optional); BO-010 finds campaignId (listPromotions), promotionId (listPromotions),
+        reportId (getDashboard), code (listPromotions) itself, and BO-010 opens on its own'
     - to: BO-011
       trigger: Packages & Bundles
       provenance: 'derived — BO-011 declares entryState.params bundleId, comboId, productId, version and
-        BO-102 holds none of them. The edge carries nothing: version, comboId only pre-select (deep link
-        or optional); BO-011 finds productId (setPackagePricingDefinition), bundleId (createBundle) itself,
-        and BO-011 opens on its own'
+        BO-102 holds none of them. The edge carries nothing: comboId only pre-selects (optional); BO-011
+        finds version (listCatalogueBundles), productId (setPackagePricingDefinition), bundleId (createBundle)
+        itself, and BO-011 opens on its own'
     - to: BO-012
       trigger: Membership Products
       provenance: 'derived — BO-012 declares entryState.params productId and BO-102 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and BO-012 opens
-        on its own'
+        The edge carries nothing: productId only pre-selects (optional), and BO-012 opens on its own'
     - to: BO-013
       trigger: Channel & Distribution
       provenance: 'derived — BO-013 declares entryState.params channelCapacityId, listingId and BO-102
-        holds none of them. The edge carries nothing: channelCapacityId, listingId only pre-select (deep
-        link or optional), and BO-013 opens on its own'
+        holds none of them. The edge carries nothing: channelCapacityId, listingId only pre-select (optional),
+        and BO-013 opens on its own'
     - to: BO-014
       trigger: Catalogue Publishing
       provenance: 'derived — BO-014 declares entryState.params itemId, priceListId, productId and BO-102
-        holds none of them. The edge carries nothing: itemId, priceListId, productId only pre-select (deep
-        link or optional), and BO-014 opens on its own'
+        holds none of them. The edge carries nothing: itemId only pre-selects (optional); BO-014 finds
+        productId (listProducts) itself; BO-014 opens on listProducts, and priceListId has no source on
+        BO-014 yet (a gap in BO-014, not in this edge)'
     - to: BO-015
       trigger: Performance Calendar
       provenance: 'derived — BO-015 declares entryState.params eventId, performanceId and BO-102 holds
-        none of them. The edge carries nothing: eventId, performanceId only pre-select (deep link or optional),
-        and BO-015 opens on its own'
+        none of them. The edge carries nothing: eventId only pre-selects (optional); BO-015 finds performanceId
+        (getAvailability) itself, and BO-015 opens on its own'
     - to: BO-016
       trigger: Performance Template
       provenance: 'derived — BO-016 declares entryState.params performanceTemplateId and BO-102 holds
-        none of them. The edge carries nothing: performanceTemplateId only pre-selects (deep link or optional),
-        and BO-016 opens on its own'
+        none of them. The edge carries nothing: performanceTemplateId only pre-selects (optional), and
+        BO-016 opens on its own'
     - to: BO-017
       trigger: Capacity Management
       provenance: 'derived — BO-017 declares entryState.params channelCapacityId, entryId and BO-102 holds
-        none of them. The edge carries nothing: channelCapacityId, entryId only pre-select (deep link
-        or optional), and BO-017 opens on its own'
+        none of them. The edge carries nothing: channelCapacityId, entryId only pre-select (optional),
+        and BO-017 opens on its own'
     - to: BO-018
       trigger: Allocation & Holds
       provenance: 'derived — BO-018 declares entryState.params inventoryHoldId and BO-102 holds none of
-        them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional), and
-        BO-018 opens on its own'
+        them. The edge carries nothing: inventoryHoldId only pre-selects (optional), and BO-018 opens
+        on its own'
     - to: BO-019
       trigger: Closures & Blackouts
       provenance: 'derived — BO-019 declares entryState.params eventId, mapId, pathId, performanceId and
         BO-102 holds none of them. The edge carries nothing: eventId, performanceId, mapId, pathId only
-        pre-select (deep link or optional), and BO-019 opens on its own'
+        pre-select (optional), and BO-019 opens on its own'
     - to: BO-037
       trigger: Offline Package Status
       provenance: 'derived — BO-037 declares entryState.params version and BO-102 holds none of them.
-        The edge carries nothing: version only pre-selects (deep link or optional), and BO-037 opens on
-        its own'
+        The edge carries nothing: BO-037 finds version (listCatalogueBundles) itself, and BO-037 opens
+        on its own'
     - to: BO-063
       trigger: Opening Hours & Calendar
       provenance: 'derived — BO-063 declares entryState.params  and BO-102 holds none of them. The edge
@@ -29036,9 +29031,8 @@ screens:
     - to: BO-109
       trigger: Menu Builder & POS Layout Designer
       provenance: 'derived — BO-109 declares entryState.params menuId, saleBoardId and BO-102 holds none
-        of them. The edge carries nothing: saleBoardId only pre-selects (deep link or optional); BO-109
-        opens on listSaleBoards, and menuId has no source on BO-109 yet (a gap in BO-109, not in this
-        edge)'
+        of them. The edge carries nothing: saleBoardId only pre-selects (optional); BO-109 opens on listSaleBoards,
+        and menuId has no source on BO-109 yet (a gap in BO-109, not in this edge)'
     - to: BO-110
       trigger: Recipe & BOM Management
       provenance: 'derived — BO-110 declares entryState.params  and BO-102 holds none of them. The edge
@@ -29046,18 +29040,18 @@ screens:
     - to: BO-111
       trigger: Ingredient Substitution, Allergen & Nutrition
       provenance: 'derived — BO-111 declares entryState.params menuId, menuItemId, recipeId and BO-102
-        holds none of them. The edge carries nothing: menuId, menuItemId, recipeId only pre-select (deep
-        link or optional), and BO-111 opens on its own'
+        holds none of them. The edge carries nothing: recipeId only pre-selects (optional); BO-111 finds
+        menuItemId (setRecipe) itself; BO-111 opens on listRecipes, and menuId has no source on BO-111
+        yet (a gap in BO-111, not in this edge)'
     - to: BO-112
       trigger: Production Planning & Production Sheets
       provenance: 'derived — BO-112 declares entryState.params planId, runId and BO-102 holds none of
-        them. The edge carries nothing: planId, runId only pre-select (deep link or optional), and BO-112
-        opens on its own'
+        them. The edge carries nothing: planId, runId only pre-select (optional), and BO-112 opens on
+        its own'
     - to: BO-113
       trigger: Central Kitchen & Commissary Management
       provenance: 'derived — BO-113 declares entryState.params runId and BO-102 holds none of them. The
-        edge carries nothing: runId only pre-selects (deep link or optional), and BO-113 opens on its
-        own'
+        edge carries nothing: runId only pre-selects (optional), and BO-113 opens on its own'
     - to: BO-114
       trigger: Variants, Attributes, Barcode & RFID Management
       provenance: 'derived — BO-114 declares entryState.params  and BO-102 holds none of them. The edge
@@ -29069,18 +29063,17 @@ screens:
     - to: BO-116
       trigger: Merchandising & Product Presentation
       provenance: 'derived — BO-116 declares entryState.params merchandiseId, saleBoardId and BO-102 holds
-        none of them. The edge carries nothing: merchandiseId, saleBoardId only pre-select (deep link
-        or optional), and BO-116 opens on its own'
+        none of them. The edge carries nothing: merchandiseId, saleBoardId only pre-select (optional),
+        and BO-116 opens on its own'
     - to: BO-117
       trigger: Product Import, Governance & AI Configuration Assistant
       provenance: 'derived — BO-117 declares entryState.params jobId and BO-102 holds none of them. The
-        edge carries nothing: jobId only pre-selects (deep link or optional), and BO-117 opens on its
-        own'
+        edge carries nothing: jobId only pre-selects (optional), and BO-117 opens on its own'
     - to: BO-118
       trigger: Campaign & Audience Management
       provenance: 'derived — BO-118 declares entryState.params executionId, reportId and BO-102 holds
-        none of them. The edge carries nothing: reportId, executionId only pre-select (deep link or optional),
-        and BO-118 opens on its own'
+        none of them. The edge carries nothing: reportId, executionId only pre-select (optional), and
+        BO-118 opens on its own'
     - to: BO-119
       trigger: Cross-Sell, Upsell & Recommendation Rules
       carries:
@@ -29102,33 +29095,32 @@ screens:
     - to: BO-123
       trigger: POS Profile Management
       provenance: 'derived — BO-123 declares entryState.params profileId and BO-102 holds none of them.
-        The edge carries nothing: profileId only pre-selects (deep link or optional), and BO-123 opens
-        on its own'
+        The edge carries nothing: profileId only pre-selects (optional), and BO-123 opens on its own'
     - to: BO-124
       trigger: Layout & Journey Builder
       provenance: 'derived — BO-124 declares entryState.params deviceId, profileId, saleBoardId and BO-102
-        holds none of them. The edge carries nothing: saleBoardId, deviceId, profileId only pre-select
-        (deep link or optional), and BO-124 opens on its own'
+        holds none of them. The edge carries nothing: saleBoardId only pre-selects (optional); BO-124
+        finds deviceId (listDevices) itself; BO-124 opens on listDevices, and profileId has no source
+        on BO-124 yet (a gap in BO-124, not in this edge)'
     - to: BO-125
       trigger: Product & Category Button Configuration
       provenance: 'derived — BO-125 declares entryState.params saleBoardId and BO-102 holds none of them.
-        The edge carries nothing: saleBoardId only pre-selects (deep link or optional), and BO-125 opens
-        on its own'
+        The edge carries nothing: BO-125 opens on listProducts, and saleBoardId has no source on BO-125
+        yet (a gap in BO-125, not in this edge)'
     - to: BO-126
       trigger: Deployment, Preview & Audit
       provenance: 'derived — BO-126 declares entryState.params profileId, saleBoardId and BO-102 holds
-        none of them. The edge carries nothing: profileId, saleBoardId only pre-select (deep link or optional),
-        and BO-126 opens on its own'
+        none of them. The edge carries nothing: BO-126 finds saleBoardId (listSaleBoards) itself; BO-126
+        opens on listAuditRecords, and profileId has no source on BO-126 yet (a gap in BO-126, not in
+        this edge)'
     - to: BO-142
       trigger: Store Rules, Controls & Permissions
       provenance: 'derived — BO-142 declares entryState.params storeRuleId and BO-102 holds none of them.
-        The edge carries nothing: storeRuleId only pre-selects (deep link or optional), and BO-142 opens
-        on its own'
+        The edge carries nothing: storeRuleId only pre-selects (optional), and BO-142 opens on its own'
     - to: BO-143
       trigger: Retail Global Settings & Controls
       provenance: 'derived — BO-143 declares entryState.params dropId and BO-102 holds none of them. The
-        edge carries nothing: dropId only pre-selects (deep link or optional), and BO-143 opens on its
-        own'
+        edge carries nothing: dropId only pre-selects (optional), and BO-143 opens on its own'
     - to: BO-1190
       trigger: Donation Campaigns
       provenance: decided 29 September, VM close-out (venue management and configuration)
@@ -29338,8 +29330,8 @@ screens:
     - to: BO-001
       trigger: Queue Directory
       provenance: 'derived — BO-001 declares entryState.params feedId, queueId and BO-103 holds none of
-        them. The edge carries nothing: feedId, queueId only pre-select (deep link or optional), and BO-001
-        opens on its own'
+        them. The edge carries nothing: BO-001 finds feedId (listQueueFeeds), queueId (listQueues) itself,
+        and BO-001 opens on its own'
     - to: BO-002
       trigger: Queue Configuration
       provenance: 'derived — BO-002 declares entryState.params queueId and BO-103 holds none of them.
@@ -29347,8 +29339,8 @@ screens:
     - to: BO-003
       trigger: Queue Integration Setup
       provenance: 'derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of
-        them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-003 finds
-        feedId (listQueueFeeds) itself, and BO-003 opens on its own'
+        them. The edge carries nothing: orderId only pre-selects (optional); BO-003 finds feedId (listQueueFeeds)
+        itself, and BO-003 opens on its own'
     - to: BO-004
       trigger: Manual Wait Time Entry
       provenance: 'derived — BO-004 declares entryState.params queueId and BO-103 holds none of them.
@@ -29361,18 +29353,18 @@ screens:
     - to: BO-006
       trigger: Parking Configuration
       provenance: 'derived — BO-006 declares entryState.params parkingFacilityId and BO-103 holds none
-        of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional),
-        and BO-006 opens on its own'
+        of them. The edge carries nothing: parkingFacilityId only pre-selects (optional), and BO-006 opens
+        on its own'
     - to: BO-030
       trigger: Work Order Verification
       provenance: 'derived — BO-030 declares entryState.params workOrderId and BO-103 holds none of them.
-        The edge carries nothing: workOrderId only pre-selects (deep link or optional), and BO-030 opens
-        on its own'
+        The edge carries nothing: BO-030 finds workOrderId (listWorkOrders) itself, and BO-030 opens on
+        its own'
     - to: BO-032
       trigger: Admission Profiles
       provenance: 'derived — BO-032 declares entryState.params profileId, ruleId and BO-103 holds none
-        of them. The edge carries nothing: profileId, ruleId only pre-select (deep link or optional),
-        and BO-032 opens on its own'
+        of them. The edge carries nothing: profileId, ruleId only pre-select (optional), and BO-032 opens
+        on its own'
     - to: BO-033
       trigger: Blacklist Management
       carries:
@@ -29382,33 +29374,29 @@ screens:
     - to: BO-038
       trigger: Reconciliation Queue
       provenance: 'derived — BO-038 declares entryState.params rejectionId and BO-103 holds none of them.
-        The edge carries nothing: rejectionId only pre-selects (deep link or optional), and BO-038 opens
-        on its own'
+        The edge carries nothing: rejectionId only pre-selects (optional), and BO-038 opens on its own'
     - to: BO-069
       trigger: Asset Register
       provenance: 'derived — BO-069 declares entryState.params assetId and BO-103 holds none of them.
-        The edge carries nothing: assetId only pre-selects (deep link or optional), and BO-069 opens on
-        its own'
+        The edge carries nothing: BO-069 finds assetId (listAssets) itself, and BO-069 opens on its own'
     - to: BO-071
       trigger: Planned Maintenance
       provenance: 'derived — BO-071 declares entryState.params planId and BO-103 holds none of them. The
-        edge carries nothing: planId only pre-selects (deep link or optional), and BO-071 opens on its
-        own'
+        edge carries nothing: planId only pre-selects (optional), and BO-071 opens on its own'
     - to: BO-072
       trigger: Incident Log
       provenance: 'derived — BO-072 declares entryState.params incidentId and BO-103 holds none of them.
-        The edge carries nothing: incidentId only pre-selects (deep link or optional), and BO-072 opens
-        on its own'
+        The edge carries nothing: incidentId only pre-selects (optional), and BO-072 opens on its own'
     - to: BO-093
       trigger: Map Import & Labelling
       provenance: 'derived — BO-093 declares entryState.params actionId, jobId, mapId, uploadId and BO-103
         holds none of them. The edge carries nothing: mapId, jobId, uploadId, actionId only pre-select
-        (deep link or optional), and BO-093 opens on its own'
+        (optional), and BO-093 opens on its own'
     - to: BO-094
       trigger: Map Editor & Publish
       provenance: 'derived — BO-094 declares entryState.params mapId, pathId, uploadId and BO-103 holds
-        none of them. The edge carries nothing: mapId, pathId, uploadId only pre-select (deep link or
-        optional), and BO-094 opens on its own'
+        none of them. The edge carries nothing: pathId, uploadId only pre-select (optional); BO-094 opens
+        on searchMedia, and mapId has no source on BO-094 yet (a gap in BO-094, not in this edge)'
     - to: BO-096
       trigger: Resource Calendar
       provenance: 'derived — BO-096 declares entryState.params resourceId and BO-103 holds none of them.
@@ -29417,8 +29405,8 @@ screens:
     - to: BO-097
       trigger: Check Out & Check In
       provenance: 'derived — BO-097 declares entryState.params authorisationId, bookingId and BO-103 holds
-        none of them. The edge carries nothing: authorisationId, bookingId only pre-select (deep link
-        or optional), and BO-097 opens on its own'
+        none of them. The edge carries nothing: BO-103 is the Access & Venue hub and this is its menu
+        entry; BO-097 has no source yet for bookingId'
     - to: BO-098
       trigger: Qualifications
       provenance: 'derived — BO-098 declares entryState.params resourceId and BO-103 holds none of them.
@@ -29653,33 +29641,30 @@ screens:
     - to: BO-020
       trigger: F&B Order Management
       provenance: 'derived — BO-020 declares entryState.params orderId, ticketId and BO-104 holds none
-        of them. The edge carries nothing: orderId, ticketId only pre-select (deep link or optional),
-        and BO-020 opens on its own'
+        of them. The edge carries nothing: ticketId only pre-selects (optional); BO-020 finds orderId
+        (setKitchenTicketStatus) itself, and BO-020 opens on its own'
     - to: BO-021
       trigger: Order Search
       provenance: 'derived — BO-021 declares entryState.params orderId and BO-104 holds none of them.
-        The edge carries nothing: orderId only pre-selects (deep link or optional), and BO-021 opens on
-        its own'
+        The edge carries nothing: BO-021 finds orderId (listFnbOrders) itself, and BO-021 opens on its
+        own'
     - to: BO-045
       trigger: Menu Management
       provenance: 'derived — BO-045 declares entryState.params menuId, menuItemId and BO-104 holds none
-        of them. The edge carries nothing: menuId, menuItemId only pre-select (deep link or optional),
+        of them. The edge carries nothing: BO-045 finds menuId (listMenus), menuItemId (getMenu) itself,
         and BO-045 opens on its own'
     - to: BO-046
       trigger: Kitchen Display
       provenance: 'derived — BO-046 declares entryState.params ticketId and BO-104 holds none of them.
-        The edge carries nothing: ticketId only pre-selects (deep link or optional), and BO-046 opens
-        on its own'
+        The edge carries nothing: ticketId only pre-selects (optional), and BO-046 opens on its own'
     - to: BO-134
       trigger: Kitchen & Preparation Stations
       provenance: 'derived — BO-134 declares entryState.params planId and BO-104 holds none of them. The
-        edge carries nothing: planId only pre-selects (deep link or optional), and BO-134 opens on its
-        own'
+        edge carries nothing: planId only pre-selects (optional), and BO-134 opens on its own'
     - to: BO-135
       trigger: Order Routing & KDS/Printer Rules
       provenance: 'derived — BO-135 declares entryState.params outletId and BO-104 holds none of them.
-        The edge carries nothing: outletId only pre-selects (deep link or optional), and BO-135 opens
-        on its own'
+        The edge carries nothing: outletId only pre-selects (optional), and BO-135 opens on its own'
     - to: BO-136
       trigger: F&B Global Settings & Controls
       provenance: 'derived — BO-136 declares entryState.params  and BO-104 holds none of them. The edge
@@ -29832,22 +29817,22 @@ screens:
     - to: BO-052
       trigger: Goods Receipt
       provenance: 'derived — BO-052 declares entryState.params purchaseOrderId, receiptId and BO-105 holds
-        none of them. The edge carries nothing: purchaseOrderId, receiptId only pre-select (deep link
-        or optional), and BO-052 opens on its own'
+        none of them. The edge carries nothing: BO-052 finds purchaseOrderId (createGoodsReceipt), receiptId
+        (createGoodsReceipt) itself, and BO-052 opens on its own'
     - to: BO-078
       trigger: Requisitions
       provenance: 'derived — BO-078 declares entryState.params requisitionId and BO-105 holds none of
-        them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078
+        them. The edge carries nothing: BO-078 finds requisitionId (listRequisitions) itself, and BO-078
         opens on its own'
     - to: BO-079
       trigger: Stock Count
       provenance: 'derived — BO-079 declares entryState.params countId and BO-105 holds none of them.
-        The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on
-        its own'
+        The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its
+        own'
     - to: BO-080
       trigger: Stock Transfers
       provenance: 'derived — BO-080 declares entryState.params transferId and BO-105 holds none of them.
-        The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens
+        The edge carries nothing: BO-080 finds transferId (listStockTransfers) itself, and BO-080 opens
         on its own'
     - to: BO-081
       trigger: Inventory Items
@@ -29858,18 +29843,17 @@ screens:
     - to: BO-083
       trigger: Suppliers
       provenance: 'derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds
-        none of them. The edge carries nothing: supplierId, contractId only pre-select (deep link or optional),
-        and BO-083 opens on its own'
+        none of them. The edge carries nothing: supplierId, contractId only pre-select (optional), and
+        BO-083 opens on its own'
     - to: BO-137
       trigger: Recipe Consumption & Theoretical Inventory
       provenance: 'derived — BO-137 declares entryState.params countId, runId and BO-105 holds none of
-        them. The edge carries nothing: countId, runId only pre-select (deep link or optional), and BO-137
-        opens on its own'
+        them. The edge carries nothing: BO-137 finds runId (listProductionRuns) itself; BO-137 opens on
+        listRecipes, and countId has no source on BO-137 yet (a gap in BO-137, not in this edge)'
     - to: BO-138
       trigger: Production Execution & Batch Management
       provenance: 'derived — BO-138 declares entryState.params runId and BO-105 holds none of them. The
-        edge carries nothing: runId only pre-selects (deep link or optional), and BO-138 opens on its
-        own'
+        edge carries nothing: runId only pre-selects (optional), and BO-138 opens on its own'
     - to: BO-139
       trigger: Wastage, Spoilage, Returns & Write-Off
       provenance: 'derived — BO-139 declares entryState.params  and BO-105 holds none of them. The edge
@@ -29878,13 +29862,12 @@ screens:
       trigger: Product Availability, 86 & Operational Food Safety
       provenance: 'derived — BO-140 declares entryState.params checkpointId, itemId, menuId, outletId
         and BO-105 holds none of them. The edge carries nothing: itemId, outletId, checkpointId only pre-select
-        (deep link or optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source
-        on BO-140 yet (a gap in BO-140, not in this edge)'
+        (optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet
+        (a gap in BO-140, not in this edge)'
     - to: BO-141
       trigger: Operational Alerts, AI Replenishment & Action Center
       provenance: 'derived — BO-141 declares entryState.params alertId and BO-105 holds none of them.
-        The edge carries nothing: alertId only pre-selects (deep link or optional), and BO-141 opens on
-        its own'
+        The edge carries nothing: alertId only pre-selects (optional), and BO-141 opens on its own'
     - to: BO-051
       trigger: Purchase Orders
       provenance: 'moved 29 September, VM close-out: purchase orders sit in Stock & Supply beside Goods
@@ -30059,37 +30042,35 @@ screens:
       trigger: Staff Directory
       provenance: 'derived — BO-053 declares entryState.params challengeId, jobTitleId, principalId, workAssignmentId
         and BO-106 holds none of them. The edge carries nothing: challengeId, principalId, jobTitleId,
-        workAssignmentId only pre-select (deep link or optional), and BO-053 opens on its own'
+        workAssignmentId only pre-select (optional), and BO-053 opens on its own'
     - to: BO-055
       trigger: Rota & Scheduling
       provenance: 'derived — BO-055 declares entryState.params assignmentId and BO-106 holds none of them.
-        The edge carries nothing: assignmentId only pre-selects (deep link or optional), and BO-055 opens
-        on its own'
+        The edge carries nothing: assignmentId only pre-selects (optional), and BO-055 opens on its own'
     - to: BO-056
       trigger: Time & Attendance
       provenance: 'derived — BO-056 declares entryState.params recordId and BO-106 holds none of them.
-        The edge carries nothing: recordId only pre-selects (deep link or optional), and BO-056 opens
-        on its own'
+        The edge carries nothing: recordId only pre-selects (optional), and BO-056 opens on its own'
     - to: BO-066
       trigger: Notification Settings
       provenance: 'derived — BO-066 declares entryState.params announcementId and BO-106 holds none of
-        them. The edge carries nothing: announcementId only pre-selects (deep link or optional), and BO-066
-        opens on its own'
+        them. The edge carries nothing: announcementId only pre-selects (optional), and BO-066 opens on
+        its own'
     - to: BO-084
       trigger: Approval Inbox
       provenance: 'derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-106
-        holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional);
-        BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own'
+        holds none of them. The edge carries nothing: BO-084 finds requestId (listApprovalRequests), approvalRequestId
+        (listApprovalRequests) itself, and BO-084 opens on its own'
     - to: BO-085
       trigger: Approval Request
       provenance: 'derived — BO-085 declares entryState.params requestId and BO-106 holds none of them.
-        The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens
+        The edge carries nothing: BO-085 finds requestId (listApprovalRequests) itself, and BO-085 opens
         on its own'
     - to: BO-087
       trigger: Approval Delegations
       provenance: 'derived — BO-087 declares entryState.params delegationId, matrixId and BO-106 holds
-        none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional),
-        and BO-087 opens on its own'
+        none of them. The edge carries nothing: delegationId, matrixId only pre-select (optional), and
+        BO-087 opens on its own'
     - to: BO-054
       trigger: Role Assignment
       carries:
@@ -30254,14 +30235,12 @@ screens:
     - to: BO-073
       trigger: Lost & Found Register
       provenance: 'derived — BO-073 declares entryState.params itemId and BO-107 holds none of them. The
-        edge carries nothing: itemId only pre-selects (deep link or optional), and BO-073 opens on its
-        own'
+        edge carries nothing: itemId only pre-selects (optional), and BO-073 opens on its own'
     - to: BO-091
       trigger: AI Policy & Spend
       provenance: 'derived — BO-091 declares entryState.params profileKey, tenantId and BO-107 holds none
-        of them. The edge carries nothing: profileKey only pre-selects (deep link or optional); BO-091
-        opens on listIndexFailures, and tenantId has no source on BO-091 yet (a gap in BO-091, not in
-        this edge)'
+        of them. The edge carries nothing: profileKey only pre-selects (optional); BO-091 opens on listIndexFailures,
+        and tenantId has no source on BO-091 yet (a gap in BO-091, not in this edge)'
     - to: BO-755
       trigger: Opens Dynamic Segment Builder
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -30517,33 +30496,33 @@ screens:
     - to: BO-036
       trigger: Device Registry
       provenance: 'derived — BO-036 declares entryState.params deviceId, workstationId and BO-108 holds
-        none of them. The edge carries nothing: workstationId, deviceId only pre-select (deep link or
-        optional), and BO-036 opens on its own'
+        none of them. The edge carries nothing: deviceId only pre-selects (optional); BO-036 finds workstationId
+        (listDevices) itself, and BO-036 opens on its own'
     - to: BO-044
       trigger: F&B Outlets
       provenance: 'derived — BO-044 declares entryState.params actionId, outletId and BO-108 holds none
-        of them. The edge carries nothing: outletId, actionId only pre-select (deep link or optional),
-        and BO-044 opens on its own'
+        of them. The edge carries nothing: actionId only pre-selects (optional); BO-044 finds outletId
+        (getFnbDeliveryPolicy) itself, and BO-044 opens on its own'
     - to: BO-058
       trigger: Reporting Home
       provenance: 'derived — BO-058 declares entryState.params conversationId, reportId and BO-108 holds
-        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
-        optional), and BO-058 opens on its own'
+        none of them. The edge carries nothing: BO-058 finds conversationId (askReportingQuestion), reportId
+        (createReportSchedule) itself, and BO-058 opens on its own'
     - to: BO-060
       trigger: Attendance & Footfall
       provenance: 'derived — BO-060 declares entryState.params conversationId, reportId and BO-108 holds
-        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
-        optional), and BO-060 opens on its own'
+        none of them. The edge carries nothing: conversationId only pre-selects (optional); BO-060 finds
+        reportId (createReport) itself, and BO-060 opens on its own'
     - to: BO-064
       trigger: Zones & Areas
       provenance: 'derived — BO-064 declares entryState.params accessPointId, orgUnitId and BO-108 holds
-        none of them. The edge carries nothing: accessPointId, orgUnitId only pre-select (deep link or
-        optional), and BO-064 opens on its own'
+        none of them. The edge carries nothing: accessPointId, orgUnitId only pre-select (optional), and
+        BO-064 opens on its own'
     - to: BO-067
       trigger: Integrations
       provenance: 'derived — BO-067 declares entryState.params subscriptionId and BO-108 holds none of
-        them. The edge carries nothing: subscriptionId only pre-selects (deep link or optional), and BO-067
-        opens on its own'
+        them. The edge carries nothing: subscriptionId only pre-selects (optional), and BO-067 opens on
+        its own'
     - to: BO-100
       trigger: Venue Home
       provenance: 'derived — BO-100 declares entryState.params  and BO-108 holds none of them. The edge
@@ -30552,18 +30531,18 @@ screens:
     - to: BO-128
       trigger: Live Workstation Health Monitor
       provenance: 'derived — BO-128 declares entryState.params workstationId and BO-108 holds none of
-        them. The edge carries nothing: workstationId only pre-selects (deep link or optional), and BO-128
+        them. The edge carries nothing: BO-128 finds workstationId (listWorkstations) itself, and BO-128
         opens on its own'
     - to: BO-129
       trigger: Software, Configuration & Version Management
       provenance: 'derived — BO-129 declares entryState.params firmwareId, profileId, rolloutId, workstationId
-        and BO-108 holds none of them. The edge carries nothing: profileId, workstationId, rolloutId,
-        firmwareId only pre-select (deep link or optional), and BO-129 opens on its own'
+        and BO-108 holds none of them. The edge carries nothing: profileId, rolloutId, firmwareId only
+        pre-select (optional); BO-129 finds workstationId (listWorkstations) itself, and BO-129 opens
+        on its own'
     - to: BO-130
       trigger: Offline Policy & Rules Configuration
       provenance: 'derived — BO-130 declares entryState.params rejectionId and BO-108 holds none of them.
-        The edge carries nothing: rejectionId only pre-selects (deep link or optional), and BO-130 opens
-        on its own'
+        The edge carries nothing: rejectionId only pre-selects (optional), and BO-130 opens on its own'
     - to: BO-131
       trigger: Connectivity & Auto-Switch Settings
       provenance: 'derived — BO-131 declares entryState.params  and BO-108 holds none of them. The edge
@@ -30576,7 +30555,7 @@ screens:
       trigger: Offline Alerts, Limits & Audit
       provenance: 'derived — BO-133 declares entryState.params alertRuleId, rejectionId, reportId, requestId
         and BO-108 holds none of them. The edge carries nothing: reportId, requestId, rejectionId, alertRuleId
-        only pre-select (deep link or optional), and BO-133 opens on its own'
+        only pre-select (optional), and BO-133 opens on its own'
     - to: BO-1184
       trigger: Transport routes
       provenance: authored 29 September, rev 3 REV3-21 — transport setup is venue configuration in Venue
@@ -178920,8 +178899,7 @@ screens:
     - to: ADM-145
       trigger: Promotion Approval Inbox
       provenance: 'derived — ADM-145 declares entryState.params requestId and ADM-138 holds none of them.
-        The edge carries nothing: requestId only pre-selects (deep link or optional), and ADM-145 opens
-        on its own'
+        The edge carries nothing: requestId only pre-selects (optional), and ADM-145 opens on its own'
     - to: ADM-142
       trigger: Works in Campaign Calendar & Timeline
       provenance: flow F154 step 7→8
@@ -194378,20 +194356,14 @@ screens:
       trigger: Works in Channel Sales Schedule & Availability Windows
       provenance: flow F166 step 9→10
       operation: listSaleChannel
-      carries:
-      - ruleId
     - to: ADM-264
       trigger: Works in Customer & Eligibility Rules by Channel
       provenance: flow F166 step 11→12
       operation: listSaleChannel
-      carries:
-      - ruleId
     - to: ADM-265
       trigger: Works in Channel Sales Rules, Limits & Restrictions
       provenance: flow F166 step 13→14
       operation: listSaleChannel
-      carries:
-      - ruleId
   notes: '**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens";
     CHG-MOV-001). It configures a record the venue owns, so the venue''s own staff use it here, inside
     the tenant''s cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098),
@@ -194406,10 +194378,10 @@ screens:
     operational/configuration status.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
-      POS, Mobile POS, Flying POS, Call Center, API, Partner Portal, Third-Party Channel, Custom Channel.
-      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
-      from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: POS,
+      Mobile POS, Flying POS, Call Center, API, Partner Portal, Third-Party Channel, Custom Channel. Each
+      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
+      the screen side rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as
   layout:
     template: dashboard

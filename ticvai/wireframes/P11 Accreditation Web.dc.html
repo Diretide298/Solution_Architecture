@@ -93,6 +93,12 @@ background:linear-gradient(90deg,var(--brand),var(--accent))}
 .side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
 .two{flex:1;display:flex;gap:12px;min-height:0}
 .grow{flex:1;min-width:0}
+.canvas.gen{overflow:auto}
+.gen .grow,.gen .side{display:flex;flex-direction:column;gap:10px}
+.region{display:flex;flex-direction:column;gap:8px}
+.region > .kind{margin-top:2px}
+.gen .row{grid-template-columns:1fr}
+.panel.btn{flex-direction:row;align-items:center;gap:10px}
 .strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
 background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
 letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
@@ -143,17 +149,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Explain what accreditation at this venue is, what an application needs, and how long it takes — then offer the two ways in. **The explanation is the s</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Applicant Journey</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Accreditation Web</b><span>Applicant Journey</span></div><nav class="nav"><i class="on">Applicant Journey</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Landing / Programme Overview</h2>
                 <small>Accreditation Web &middot; wave 3 &middot; compact</small></div>
-              <div class="acts"><div class="chip cta">Start application</div></div>
             </div>
             
-            <div class="canvas">
-              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>What accreditation is, and is not</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Programme, guidelines, and **what accreditation is not** — the section that prevents most refused applications, because the common failure is applying for the wrong thing</span></div><div class="panel"><b>What you will need</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Press card number if held, the performances they intend to cover, and a commission letter. **Listed before the form opens**, because an applicant who discovers on step th</span></div><div class="panel"><b>How long it takes</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Time to apply, time to a decision, and the cut-off before the performance. **Three numbers, stated** — CF and MoM both record that the absence of a stated turnaround is w</span></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>What accreditation is, and is not</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Programme, guidelines, and **what accreditation is not** — the section that prevents most refused applications, because the common failure is applying for the wrong thing</span></div><div class="panel"><b>What you will need</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Press card number if held, the performances they intend to cover, and a commission letter. **Listed before the form opens**, because an applicant who discovers on step th</span></div><div class="panel"><b>How long it takes</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Time to apply, time to a decision, and the cut-off before the performance. **Three numbers, stated** — CF and MoM both record that the absence of a stated turnaround is w</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Start an application</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Track an existing one</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -174,17 +178,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 </div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Applicant Journey</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Accreditation Web</b><span>Applicant Journey</span></div><nav class="nav"><i class="on">Applicant Journey</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Registration Form</h2>
                 <small>Accreditation Web &middot; wave 3 &middot; compact</small></div>
-              <div class="acts"><div class="chip cta">Start application</div></div>
             </div>
             
-            <div class="canvas">
-              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Organisation</b><div class="chip">Organisation</div><span class="why">Who you work for. Free text — an outlet that is not on a list is still an outlet.</span></div><div class="panel"><b>Role</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Photographer, writer, broadcast, technical. **Drives what coverage may be requested.**</span></div><div class="panel"><b>Press card number</b><div class="chip">Press card number</div><span class="why">Optional, and marked so. Its absence is a reviewer&#x27;s signal, not a blocker.</span></div></div><div class="side"><div class="panel"><b>Commissioning editor</b><div class="chip">Commissioning editor</div><span class="why">Who commissioned the coverage, where there is one.</span></div><div class="panel"><b>Supporting documents</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Commission letter and badge photo. Accepted formats stated before the picker opens.</span></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">progress</span><div class="panel"><b>Step 1 of 4 — Organisation</b><span class="kind">progressIndicator</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Organisation · Coverage · Documents · Check and submit.</span></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Organisation</b><span class="kind">textField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Who you work for. Free text — an outlet that is not on a list is still an outlet.</span></div><div class="panel"><b>Role</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Photographer, writer, broadcast, technical. **Drives what coverage may be requested.**</span></div><div class="panel"><b>Press card number</b><span class="kind">textField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Optional, and marked so. Its absence is a reviewer&#x27;s signal, not a blocker.</span></div><div class="panel"><b>Commissioning editor</b><span class="kind">textField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Who commissioned the coverage, where there is one.</span></div><div class="panel"><b>Supporting documents</b><span class="kind">fileUpload</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Commission letter and badge photo. Accepted formats stated before the picker opens.</span></div><div class="panel"><b>Consent</b><span class="kind">consentBlock</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Stated once, unticked, and collected before documents rather than after.** The 2 September session recorded consent language as a live question for face data; the same </span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Continue</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Save and finish later</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -205,18 +207,16 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 </div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Applicant Journey</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Accreditation Web</b><span>Applicant Journey</span></div><nav class="nav"><i class="on">Applicant Journey</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Application Review &amp; Submit</h2>
                 <small>Accreditation Web &middot; wave 3 &middot; compact</small></div>
-              <div class="acts"><div class="chip cta">Start application</div></div>
             </div>
             
-            <div class="canvas">
-              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Organisation</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Every answer, each with its own Change link back to the step that owns it.** *Change*, not *Back* — an applicant on step four wants to fix one field, not walk backwards</span></div><div class="panel"><b>Coverage requested</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Named performances and named areas — *&quot;stalls, pit&quot;*. **Coverage is specific, and that is the point**: a badge that says *press* and nothing else is a badge a s</span></div><div class="panel"><b>Documents</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Each file with its accepted-or-not state, so a rejected upload is visible before submit.</span></div></div><div class="side"><div class="panel"><b>What happens next</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">An acknowledgement immediately, a decision within a stated number of working days. **Set before submit, not after** — this is where the expectation is formed.
-</span></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">progress</span><div class="panel"><b>Step 4 of 4 — Check and submit</b><span class="kind">progressIndicator</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Organisation</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Every answer, each with its own Change link back to the step that owns it.** *Change*, not *Back* — an applicant on step four wants to fix one field, not walk backwards</span></div><div class="panel"><b>Coverage requested</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Named performances and named areas — *&quot;stalls, pit&quot;*. **Coverage is specific, and that is the point**: a badge that says *press* and nothing else is a badge a steward can</span></div><div class="panel"><b>Documents</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Each file with its accepted-or-not state, so a rejected upload is visible before submit.</span></div><div class="panel"><b>What happens next</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">An acknowledgement immediately, a decision within a stated number of working days. **Set before submit, not after** — this is where the expectation is formed.
+</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Submit application</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -237,17 +237,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 </div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Applicant Journey</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Accreditation Web</b><span>Applicant Journey</span></div><nav class="nav"><i class="on">Applicant Journey</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Application Status Tracking</h2>
                 <small>Accreditation Web &middot; wave 3 &middot; compact</small></div>
-              <div class="acts"><div class="chip cta">Start application</div></div>
             </div>
             
-            <div class="canvas">
-              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Application</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">`AccreditationApplication.reference`, `programmeId`, `categoryCode` and `subject` (check-screen-value-sources, CHG-R10UI-015). The reference, the performances, and what w</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">state</span><div class="panel"><b>With a reviewer</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Where it is now, and **the date a decision is due** — `AccreditationApplication.decisionDueAt`. *&quot;Fourth in the queue&quot;* was considered and rejected on the frame: a positi</span></div><div class="panel"><b>Where it has been</b><span class="kind">timeline</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">From the application itself: `submittedAt`, `requirementStatus` and `missingRequirements` (documents checked), `decidedAt` (check-screen-value-sources, CHG-R10UI-015). Re</span></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Application</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">`AccreditationApplication.reference`, `programmeId`, `categoryCode` and `subject` (check-screen-value-sources, CHG-R10UI-015). The reference, the performances, and what w</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Add a document</div></div><div class="panel btn"><span class="kind">destructiveButton</span><div class="chip">Withdraw this application</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -268,17 +266,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 </div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Applicant Journey</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Accreditation Web</b><span>Applicant Journey</span></div><nav class="nav"><i class="on">Applicant Journey</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Accreditation Badge</h2>
                 <small>Accreditation Web &middot; wave 3 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip cta">Start application</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Valid until</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationCredential.status` carries both (CHG-R10UI-016).</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the fullscreen template — not declared on the screen.</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">credential</span><div class="panel"><b>Your badge</b><span class="kind">credentialDisplay</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The scannable credential, rendered large and bright. **Offline is required** — a stage door is the worst signal in the building, and the 2 September decision that a dynam</span></div></div><div class="region"><span class="kind">identity</span><div class="panel"><b>Holder</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Name, role and outlet, as printed. Photographer · The Northern Review.</span></div><div class="panel"><b>Where it works</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Stage door, stalls and pit, named performances — and *any other door, refused*.** The negative case is stated on the badge because the steward reads this, not a policy.</span></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Valid until</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationCredential.status` carries both (CHG-R10UI-016).</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Add to phone</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Print</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -299,17 +295,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 </div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Reviewer (Internal)</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Accreditation Web</b><span>Reviewer (Internal)</span></div><nav class="nav"><i class="on">Reviewer (Internal)</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Reviewer Queue</h2>
                 <small>Accreditation Web &middot; wave 3 &middot; compact</small></div>
-              <div class="acts"><div class="chip cta">Start application</div></div>
             </div>
             
-            <div class="canvas">
-              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Queue</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Due first, and how long it has waited.** `decisionDueAt` is the sort, not `submittedAt` — an application for tonight outranks one submitted earlier for next month. Rows</span></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">filters</span><div class="panel"><b>Applicant or outlet</b><span class="kind">searchField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Searches holder name and organisation. **Not &quot;find a record&quot;.**</span></div><div class="panel"><b>Performance</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">All performances, or one. A reviewer usually works one night at a time.</span></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Queue</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>reference</span><span>submittedAt</span><span>decisionDueAt</span><span>status</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Due first, and how long it has waited.** `decisionDueAt` is the sort, not `submittedAt` — an application for tonight outranks one submitted earlier for next month. Rows</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Approve</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Approve</div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>Selected application</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Enough to approve without opening `ACC-007`.</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -330,18 +324,16 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 </div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Reviewer (Internal)</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Accreditation Web</b><span>Reviewer (Internal)</span></div><nav class="nav"><i class="on">Reviewer (Internal)</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Reviewer Application Detail</h2>
                 <small>Accreditation Web &middot; wave 3 &middot; compact</small></div>
-              <div class="acts"><div class="chip cta">Start application</div></div>
             </div>
             
-            <div class="canvas">
-              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The application</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Role, outlet, press card, commission — **including the ones that are absent**, stated as *Not stated* and *None attached* rather than left blank. A blank field and a decl</span></div><div class="panel"><b>History with this venue</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Accredited before, and conditions breached.** This is the field the decision usually turns on and the one a reviewer would otherwise go looking for.
-</span></div><div class="panel"><b>Decision due</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>The application</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Role, outlet, press card, commission — **including the ones that are absent**, stated as *Not stated* and *None attached* rather than left blank. A blank field and a decl</span></div><div class="panel"><b>History with this venue</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Accredited before, and conditions breached.** This is the field the decision usually turns on and the one a reviewer would otherwise go looking for.
+</span></div><div class="panel"><b>Decision due</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Approve</div></div><div class="panel btn"><span class="kind">destructiveButton</span><div class="chip">Refuse</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -362,17 +354,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 </div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Reviewer (Internal)</span></div><nav class="nav"><i class="">Apply</i><i class="on">My application</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Accreditation Web</b><span>Reviewer (Internal)</span></div><nav class="nav"><i class="on">Reviewer (Internal)</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Credential Register</h2>
                 <small>Accreditation Web &middot; wave 3 &middot; compact</small></div>
-              <div class="acts"><div class="chip cta">Start application</div></div>
             </div>
             
-            <div class="canvas">
-              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Credential register</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Holder, valid for, issued, last used. **Revoked rows stay visible and read as revoked** — removing them from the register is how a revoked badge gets re-issued by mistake</span></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">filters</span><div class="panel"><b>Holder or reference</b><span class="kind">searchField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Season</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Defaults to the current season. **A register scoped to all time is a register nobody reads.**</span></div><div class="panel"><b>Last used</b><span class="kind">dataTable</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Credential register</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>holderName</span><span>zones</span><span>issuedAt</span><span>status</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Holder, valid for, issued, last used. **Revoked rows stay visible and read as revoked** — removing them from the register is how a revoked badge gets re-issued by mistake</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">destructiveButton</span><div class="chip">Revoke</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Export</div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>Credential</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div></div>
             </div>
           </div>
         </div>

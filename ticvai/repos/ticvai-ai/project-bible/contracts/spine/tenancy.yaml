@@ -128,6 +128,32 @@ x-ticvai-queries:
       previousValue and newValue absent. A failed sign-in opens no session and records nothing here
       (identity.loginRecorded carries it). listDeviceAuditRecords returns these rows with the scans.'
     served: [in-process]
+  # **Which device a key belongs to, as one answer** (ADAM CR-451; the lead, 2 November 2026, "yes for both";
+  # CHG-CR451-001). The device-key sign-in runs before any session exists, in whichever host serves the apiKeyAuth
+  # operation, and the credential and the device are Tenancy's.
+  deviceForApiKey:
+    module: tenancy
+    table: tenancy.device_credential
+    reads: [tenancy.device_credential, platform.device]
+    inputs:
+      keyHash: {type: string, description: 'The hash of the X-Api-Key the request presents, computed as issueDeviceCredential stored it (DeviceCredential.fingerprint).'}
+    returns:
+      type: object
+      properties:
+        deviceId: {type: string, format: uuid, nullable: true, description: 'The device the key is bound to; null when no live key matches.'}
+        deviceKind: {type: string, nullable: true, description: 'Its kind (platform.device.kind), signageDisplay for a display key.'}
+        venueId: {type: string, format: uuid, nullable: true, description: 'Its venue, which the device session is scoped to.'}
+        venueScopePath: {type: string, nullable: true, description: 'That venue''s scope path.'}
+    rule: >-
+      A rule question (ADAM CR-451, Chinmay, 1 November 2026; the read's route, the lead, 2 November 2026: "yes for
+      both"). Matches a tenancy.device_credential row of kind apiKey whose fingerprint is keyHash, revoked_at null and
+      expires_at absent or after now, and its platform.device (retired or unapproved answers nothing), and returns only
+      the device, its kind and its venue. Tenancy answers it with one statement under the routed tenant's root grant
+      (ITenantRootGrant), since no session exists yet; the sign-in then opens the device session scoped to that venue,
+      and no match is 401. Asked in process by the device-key sign-in for every apiKeyAuth operation (#37205), in
+      commerce and in the operations host, a read the lead granted across deployables
+      (docs/active/cross-deployable-writes.yaml XDR-068). Read only: the sign-in writes nothing to Tenancy.
+    served: [in-process]
   deadLetterRecords:
     module: tenancy
     table: platform.dead_letter
@@ -294,10 +320,22 @@ x-ticvai-queries:
       It is asked in process by the access host for setFaceTagTemporaryEnrollment and listFaceTagTemporary, for the
       venue's biometrics settings (consentFormId for the fallback, templatesHeldByTicvai for the view), through
       Tenancy's own query class under the caller's row security (ADAM CR-390, Chinmay, 31 October 2026; XDR-032).
+      When the venue's row names no consent form, setFaceTagTemporaryEnrollment asks it once more for the tenant
+      default (the row with venue_id null), that one statement under the routed tenant's root grant
+      (ITenantRootGrant), since a venue grant cannot see the tenant's row (ADAM CR-445, Chinmay, 1 November 2026;
+      CHG-CR445-001).
       **A signed-in guest reads every venue's settings** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings tables; CHG-CR341-001): platform.venue_settings has a read branch for any
       session with a guest subject (`ticvai.subject_id` set), so a signed-in guest's read above venue level
       (listMyOrders pricing an order at a venue other than the request's) sees that venue's row and the tenant's
       default row; writes stay scoped and an anonymous session gains nothing.
+      **Every scoped session reads the tenant's own row** (ADAM CR-487, option A, Chinmay, 3 November 2026;
+      CHG-CR487-001): the table's read is platform.venue_in_scope(venue_id) OR (venue_id IS NULL AND
+      cardinality(platform.current_scope_paths()) > 0) OR a guest subject is set; its write stays
+      platform.venue_in_scope(venue_id), so only a tenant-root grant writes the tenant's row. A venue-level staff
+      session and an anonymous guest session (its scope the venue's path) now see the tenant's default row and no
+      other venue's; a session with no scope and no subject still reads nothing. Every reader that applies the
+      venue's row, else the tenant's default, else the proposed default (createCart, extendCart, the F&B limits and
+      the others) reads it under the caller's own row security, with no change of its own.
     served: [in-process, service]
   workstationRecords:
     module: tenancy
@@ -338,12 +376,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/TenantDataRetentionSetting'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its tenancy.data_retention_setting rows, as it stores them and as the
-      caller's scope lets it see them (the table's row-level security, under the caller's connection and
-      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
-      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
-      own. It is asked from another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      October). Tenancy answers with its tenancy.data_retention_setting rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process by the access and operations hosts, which compose Tenancy's query classes, through the C# query class
+      Tenancy implements, under the caller's row-level security (CHG-R13INP-001). It is asked from another
+      deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
   scopeRecords:
     module: tenancy
     table: platform.scope
@@ -414,6 +454,48 @@ x-ticvai-queries:
       CHG-CR430-001): platform.scope is a kernel table every host's role may read (CR-002), as CR-296 ruled for
       Tenancy's other reads, so no grant is added.
     served: [in-process, service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  deviceHeartbeat:
+    module: tenancy
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: registered-device, from: online, to: offline}
+    - {model: registered-device, from: localMode, to: offline}
+    - {model: registered-device, from: offline, to: unknown}
+    reads: [platform.device, tenancy.device_telemetry]
+    writes: [platform.device, tenancy.device_telemetry]
+    emits: [device.statusChanged]
+    for: 'Tenancy''s device heartbeat timer: offline after 15 minutes, unknown after 7 days.'
+    source:
+    - contracts/spine/tenancy.yaml
+    - contracts/spine/tenancy.yaml
+    - states/registered-device.yaml:29
+  profileDeploy:
+    module: tenancy
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: configuration-profile, from: published, to: deploying}
+    - {model: configuration-profile, from: deploying, to: deployed}
+    - {model: profile-deployment, from: queued, to: inProgress}
+    - {model: profile-deployment, from: inProgress, to: completed}
+    - {model: profile-deployment, from: inProgress, to: partiallyFailed}
+    reads: [platform.configuration_profile, platform.profile_deployment, platform.workstation]
+    writes: [platform.configuration_profile, platform.profile_deployment, platform.workstation]
+    for: Tenancy's configuration-profile deployment job (CR-188).
+    source:
+    - contracts/spine/tenancy.yaml
+    - contracts/spine/tenancy.yaml
+    - states/configuration-profile.yaml:45
+    - states/profile-deployment.yaml:31
 paths:
   /tenant-domains/{hostname}:
     parameters:
@@ -813,111 +895,6 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
-  /roles/{roleId}/permissions:
-    parameters:
-      - name: roleId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-    put:
-      operationId: setRolePermissions
-      x-ticvai-consumed-by:
-        - "P08 BO-054 Role Assignment"
-      x-ticvai-read-via:
-      - query: identity#rolePermissionRecords
-        route: in-process
-        for: 'its read of identity.role_permission, Identity''s data (CHG-MOD-001)'
-      - query: identity#roleRecords
-        route: in-process
-        for: 'its read of identity.role, Identity''s data (CHG-MOD-001)'
-      - query: identity#segregationRuleRecords
-        route: in-process
-        for: 'its read of identity.segregation_rule, Identity''s data (CHG-MOD-001)'
-      summary: What this role may do
-      description: >
-        POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found
-        `identity.role_permission` with one column** — and nothing wrote it.
-
-        A role that grants no permissions is not a role, and until now a venue could create one and
-        never give it anything.
-
-        **The whole set in one call.** A permission added one at a time leaves a role briefly
-        holding a combination nobody intended, and **a segregation-of-duties rule evaluated against
-        that intermediate state either fires wrongly or misses.**
-
-        **Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two
-        permissions in conflict — a venue told only *not allowed* will grant it another way.
-
-        **The role-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). Every rule is evaluated
-        against the role's own permissions (this body) united with those of `inheritsFromRoleId`, **whatever
-        the rule's `scopeSensitive`**: a role's permissions are granted together at one scope, so a pair
-        inside a role always overlaps. Only `severity: block` refuses, with `409 segregation-breach`
-        (`common.yaml`), the one type and status every segregation check answers with; `requireApproval`
-        and `warn` are accepted and surface when a grant attaches the role and in `listSegregationViolations`.
-        **A parent role's edit re-checks every role that inherits from it** (its own set united with the new
-        one); a breach there refuses this call too, naming the child role. Each change writes one
-        `platform.audit_record` row in the same transaction.
-
-        **No escalated permission** (decided 28 September, audit R197): a role's permission set has
-        no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing.
-        The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a
-        permission ends the live sessions of every principal holding the role at once** (audit
-        R126); an addition takes effect at their next sign-in.
-
-        **The checklist a preset filled stays editable here** (decided 2 October 2026, Chinmay, pre-apply
-        round: roles are preset permission configurations; DEC-007; CHG-CSP-003). A role started from the
-        Viewer preset is given more ticks with this call like any other role; the preset is not consulted
-        and not changed.
-      tags: [identity]
-      x-ticvai-permission: ROLE_MANAGE
-      x-ticvai-audience: [staff]
-      x-ticvai-scope-level: tenant
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [permissions]
-              properties:
-                permissions:
-                  type: array
-                  items: { $ref: '../shared/permissions.yaml#/components/schemas/Permission' }
-                inheritsFromRoleId: { type: string, format: uuid, nullable: true }
-      responses:
-        '200':
-          description: >
-            Set. The role's whole permission set as it now stands — the body echoed back after the
-            replace, so a screen can redraw the checklist without a second read.
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [roleId, permissions]
-                properties:
-                  roleId: { type: string, format: uuid }
-                  permissions:
-                    type: array
-                    items: { $ref: '../shared/permissions.yaml#/components/schemas/Permission' }
-                  inheritsFromRoleId: { type: string, format: uuid, nullable: true }
-          headers:
-            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
-        '409':
-          description: >
-            **Breaches a segregation rule** whose severity is `block`, in this role or in a role inheriting
-            it (`segregation-breach`). Names the rule, both permissions and the role where they meet.
-          x-ticvai-problem-types: [segregation-breach]
-          content:
-            application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-
   /workstations/{workstationId}/health:
     parameters:
       - name: workstationId
@@ -1085,6 +1062,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getConfigurationProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-129 Software, Configuration & Version Management"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: One profile, at its latest version or at a named one
@@ -1572,7 +1551,7 @@ paths:
         - "P08 BO-600 Venue, Calendar & Operational Setup"
       x-ticvai-read-via:
       - query: access#accessPointRecords
-        route: service
+        route: in-process
         for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
       - query: finance#fxRateRecords
         route: in-process
@@ -1666,6 +1645,10 @@ paths:
         the tenant has saved nothing the answer is `200` with the schema defaults, which are the
         proposed values, client to correct. Only the configured limits are read from this row; the
         venue facts on the schema (support hours, biometrics, segregated access) are ignored here.
+
+        **Each limit is the tenant's saved value, else its proposed default** (ADAM CR-484, Chinmay, 3 November
+        2026; CHG-CR484-001): for `stepMinutes`, the tenant row's `step_minutes` when it is not null, else 30. This
+        covers a tenant with no row and a tenant whose row was saved before the column existed.
       tags: [tenancy]
       x-ticvai-permission: TENANT_VIEW
       x-ticvai-scope-level: tenant
@@ -2824,6 +2807,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-581 Terminal Provisioning & Device Configuration"
         - "P08 BO-196 Physical Device Registration & Provisioning"
+      x-ticvai-writes:
+      - table: tenancy.device_audit
+        for: 'the audit row of the move, in the same transaction (ADAM CR-485; r13 integration, CHG-R13INT-023)'
       x-ticvai-conflict-policy: serverWins
       summary: Take a registered device through enrolment to activation
       description: '16.1.2, 16.1.3, 16.1.6. **`registerDevice` created a row; nothing turned it into a
@@ -2852,6 +2838,23 @@ paths:
         move to `active` is refused `409 device-approval-required` until `approveDevice` has approved the
         device.
 
+
+        **The body''s rules, checked first** (ADAM CR-485, Chinmay, 3 November 2026: "the move to provisioned must
+        carry the acceptance test, and the profile is set only on that move"; CHG-CR485-001). On the move to
+        `provisioned`, `testResult` is required: without it, `400 validation` naming `testResult`, and nothing is
+        written; `testResult.passed` is required inside it, else the same `400` naming `testResult.passed` (the
+        schema''s earlier "422 otherwise" is this `400`: the operation''s `422` is only for the enrolment code). On
+        success `test_result` is stored and `tested_by_principal_id` set to the caller, in the same transaction as
+        the move and its `tenancy.device_audit` row; a failed test (`passed` false) is recorded as sent and the move
+        succeeds, and the approver sees it and rejects. `testResult` sent with any other target state is `400
+        validation` naming `testResult`. `configurationProfileId` is accepted only with the move to `provisioned`,
+        where it stays optional; with any other target state it is `400 validation` naming
+        `configurationProfileId`. It is stored as `configuration_profile_id` on that move only and is not changed by
+        any later move. **Order:** these body checks, then the move check (`409 device-transition-not-allowed`),
+        then the enrolment code and approval checks. `approveDevice` does not change: it already refuses a device
+        with no recorded test (`409 device-not-tested`) and the tester or the registrar (`403 approver-is-tester`),
+        and with this rule every provisioned device has a recorded tester.
+
         '
       tags:
       - devices
@@ -2877,6 +2880,15 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '400':
+          description: '`testResult` (or `testResult.passed`) missing on the move to `provisioned`, or `testResult` or
+            `configurationProfileId` sent with any other target state (`validation`, naming the field; ADAM CR-485).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -3024,6 +3036,10 @@ paths:
         - "P04 POS-016 Till Configuration"
         - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
         - "P08 BO-732 POS & Device Assignment"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'custodianPrincipalId must name a principal, else 422 unknown-reference (r13 root R39)'
       x-ticvai-conflict-policy: serverWins
       summary: Who owns it, who holds it, and where it is
       description: '16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and
@@ -3520,6 +3536,12 @@ paths:
         **Rotation is routine rather than exceptional.** A credential that never expires is one nobody
         has practised replacing, and it will be replaced for the first time during an incident.
 
+
+        **A signage display gets a display key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001). For a
+        `signageDisplay` device the credential is of kind `apiKey`, bound to that device and its venue: the key is
+        answered once, in this 201 (`key`), and only a hash of it is stored. `revokeDeviceCredential` revokes it for
+        that device alone; a revoked key is `401` at once.
+
         '
       tags:
       - devices
@@ -3706,7 +3728,14 @@ paths:
         must hold to record one by hand. **The reporter never sets the trust**: the server stores `deviceTrusted`
         false on every new event, whatever the body says, and ignores `resolvedAt`, `resolvedBy` and
         `resolution` on input; they are set only when a person clears the device. The device is untrusted from
-        this moment.'
+        this moment.
+
+
+        **`detectedAt` is stored and published exactly as the device sent it** (ADAM CR-492, Chinmay, 3 November
+        2026: "detectedAt on device.tamperDetected may be null, as the request body already allows"; CHG-CR492-001):
+        `tenancy.device_tamper_event.detected_at` and `device.tamperDetected`''s `detectedAt` carry the same value,
+        null when the body left it out. It is never filled from `recordedAt`, from the row''s creation time or from
+        the server clock; `recordedAt` is when the device reported.'
       security:
       - bearerAuth: []
       - deviceAuth: []
@@ -3727,6 +3756,8 @@ paths:
             schema:
               $ref: '#/components/schemas/DeviceTamperEvent'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '201':
           description: Recorded, and the device marked untrusted
           content:
@@ -4215,8 +4246,6 @@ components:
       required:
       - id
       - principalId
-      - readAt
-      - target
       properties:
         id:
           type: string
@@ -4236,13 +4265,17 @@ components:
         readAt:
           type: string
           format: date-time
-          description: When the read happened.
+          description: 'When the read happened. **Nullable in the table, as the package SQL adds it** (tenant V0108 `ADD
+            COLUMN read_at timestamptz`; ADAM CR-436, decided by Chinmay on 1 November 2026: "platform.audit_read.read_at
+            and target are nullable. No database change"): every writer sets it, and the table record follows the SQL.'
         target:
           type: string
           enum:
           - auditRecord
           - subject
-          description: What was read. `auditRecord` is a `listAuditRecords` call; `subject` is a guest''s PII.
+          description: 'What was read. `auditRecord` is a `listAuditRecords` call; `subject` is a guest''s PII.
+            **Nullable in the table, as the package SQL adds it** (tenant V0108, with its CHECK on the two values; ADAM
+            CR-436): every writer sets it.'
         filter:
           type: object
           nullable: true
@@ -4489,6 +4522,7 @@ components:
             every later call resolve the tenant from that host through `resolveTenantHost`; no tenant header or
             body field is read.'
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setTenantDomainMapping saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - active
@@ -5216,12 +5250,23 @@ components:
           - clientCertificate
           - deviceToken
           - mutualTls
+          - apiKey
+          description: '`apiKey` is a display key (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001): bound to one
+            `signageDisplay` device and its venue, sent as `X-Api-Key` (`apiKeyAuth`) by the device-key sign-in every
+            `apiKeyAuth` operation uses.'
         fingerprint:
           type: string
           description: '**The identifier, never the secret.** The credential material is returned once at
-            issue and is not readable afterwards.
+            issue and is not readable afterwards. For kind `apiKey`, a hash of the key: the only thing stored of it
+            (ADAM CR-451).
 
             '
+        key:
+          type: string
+          readOnly: true
+          x-ticvai-persisted: false
+          description: 'The display key itself, for kind `apiKey` only, in the 201 of `issueDeviceCredential` and
+            never again: only its hash is stored (`fingerprint`), so it is shown once when issued (ADAM CR-451).'
         issuedAt:
           type: string
           format: date-time
@@ -6275,6 +6320,11 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: >
+            **The profile the device is provisioned with, accepted only on the move to `provisioned`**, where it
+            stays optional (ADAM CR-485, Chinmay, 3 November 2026; CHG-CR485-001). With any other target state it
+            is `400 validation` naming `configurationProfileId`. Stored as `configuration_profile_id` on that move
+            only, and not changed by any later move.
         reason:
           type: string
           nullable: true
@@ -6297,8 +6347,13 @@ components:
           description: >
             **The acceptance test, recorded on the move to `provisioned`** (DEC-245; CHG-CSP-011). The
             caller is recorded as `RegisteredDevice.testedByPrincipalId` and may not approve the device.
+            **Required on the move to `provisioned`, refused on every other move** (ADAM CR-485, Chinmay, 3 November
+            2026; CHG-CR485-001): missing on that move is `400 validation` naming `testResult`, and sent with any
+            other target state is the same `400` naming `testResult`.
+          required:
+          - passed
           properties:
-            passed: { type: boolean, description: 'Whether the device passed; always sent with `testResult` (422 otherwise).' }
+            passed: { type: boolean, description: 'Whether the device passed; always sent with `testResult`: without it, `400 validation` naming `testResult.passed` (ADAM CR-485). A failed test (false) is recorded as sent and the move succeeds; the approver sees it and rejects.' }
             notes: { type: string, maxLength: 1000, nullable: true }
 
     DeviceCapability:
@@ -6391,6 +6446,9 @@ components:
       # A guest reads every venue's settings (its orders' currency, time zone and rules, whatever venue they name);
       # writes stay the venue's (ADAM CR-341, settled 30 October 2026; CHG-CR341-001, CHG-R12DB-008).
       x-ticvai-guest-read: true
+      # Every session with a scope reads the tenant's own row (venue_id null), the default its readers fall back to;
+      # writes unchanged (ADAM CR-487, option A, Chinmay, 3 November 2026; CHG-CR487-001).
+      x-ticvai-tenant-row-read: true
       type: object
       x-ticvai-persistence: "platform.venue_settings"
       # ADAM CR-341 (Chinmay, 30 October 2026; CHG-CR341-001): read 'platform.venue_in_scope(venue_id) OR a guest subject
@@ -6783,10 +6841,15 @@ components:
           type: integer
           enum: [15, 30, 60]
           nullable: true
+          default: 30
           x-ticvai-persistence-column: integer
           description: '**The venue''s start-time step for a space sold by the hour** (accepted 26 October 2026,
             Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers
-            (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13).'
+            (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13).
+            **The `default` is the proposed tenant default only** (ADAM CR-484, Chinmay, 3 November 2026;
+            CHG-CR484-001), as every other configured limit carries its own: it is never written into a venue''s
+            row, and a venue''s own null stays null when the venue''s settings are read, as `cartLeaseSeconds` and
+            the other limits behave. When the client corrects it, only this default changes.'
         cartLeaseSeconds:
           type: integer
           nullable: true

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 104 |
-| Operations | 211 |
+| Operations | 214 |
 | Contracts | 8 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 114 |
-| Waves | wave1 28 · wave3 76 |
+| Operations with no screen | 111 |
+| Waves | wave1 32 · wave3 72 |
 
 ## Gaps
 
-### 114 operations with no screen here
+### 111 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -33,14 +33,12 @@
 | `checkProductSalePermission` | catalogue | POST | Would this seller, here, be allowed to sell these products |
 | `getBundleSigningKeys` | catalogue | GET | The public keys a till verifies catalogue bundles with |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
-| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getProductChannelTexts` | catalogue | GET | The product's texts per sales channel, in each of the tenant's languages |
 | `getProductDashboard` | catalogue | GET | The products dashboard's counts |
 | `getProductOwnerForms` | catalogue | GET | Which form a sale of this product asks the buyer, and which it asks each ticket owner |
 | `getProductSalePermissionRules` | catalogue | GET | Who can sell this product |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
-| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listOwnerFormCandidates` | catalogue | GET | The forms a product can link for its reservation owner or ticket owner |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
@@ -60,12 +58,15 @@
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
-| … | | | 74 more |
+| `getAuthorisationPolicy` | identity | GET | One policy, at a version |
+| `getAuthorisationPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| … | | | 71 more |
 
-### 1 modules split across waves
+### 2 modules split across waves
 
 **A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
 
+- **Media Library** — waves 1, 3
 - **Policy** — waves 1, 3
 
 ## Modules
@@ -73,7 +74,7 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Policy | 40 | 1, 3 |
-| Media Library | 40 | 3 |
+| Media Library | 40 | 1, 3 |
 | White Label | 23 | 1 |
 | Kiosk | 1 | 1 |
 
@@ -90,7 +91,7 @@
 | `CMS-007` | Page Builder | White Label | 1 | 16 | yes |
 | `CMS-008` | Content Blocks | White Label | 1 | 11 | yes |
 | `CMS-009` | Navigation & Menus | White Label | 1 | 7 | yes |
-| `CMS-010` | Media Library | White Label | 1 | 11 | yes |
+| `CMS-010` | Media Library | White Label | 1 | 12 | yes |
 | `CMS-011` | Translations | White Label | 1 | 4 | yes |
 | `CMS-012` | RTL Preview | White Label | 1 | 2 | yes |
 | `CMS-013` | SEO & Metadata | White Label | 1 | 3 | yes |
@@ -99,7 +100,7 @@
 | `CMS-016` | Site Settings | White Label | 1 | 5 | yes |
 | `CMS-017` | Domain & Certificate | White Label | 1 | 7 | yes |
 | `CMS-018` | Consent & Legal | White Label | 1 | 8 | yes |
-| `CMS-019` | User Access | White Label | 1 | 3 | yes |
+| `CMS-019` | User Access | White Label | 1 | 5 | yes |
 | `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 1 | 1 | yes |
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | Policy | 3 | 2 | yes |
 | `CMS-023` | Consent Purpose & Consent Type Builder | Policy | 3 | 2 | yes |
@@ -120,7 +121,7 @@
 | `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | Policy | 3 | 2 | yes |
 | `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | Policy | 3 | 2 | yes |
 | `CMS-040` | Privacy Analytics & AI Compliance Intelligence | Policy | 3 | 2 | yes |
-| `CMS-041` | Waiver & Consent Command Center | Policy | 3 | 1 | yes |
+| `CMS-041` | Waiver & Consent Command Center | Policy | 1 | 1 | yes |
 | `CMS-042` | Waiver Template Library & Master Setup | Policy | 3 | 2 | yes |
 | `CMS-043` | Digital Waiver & Form Builder | Policy | 3 | 2 | yes |
 | `CMS-044` | Dynamic Fields, Questions & Conditional Logic | Policy | 3 | 1 | yes |
@@ -129,7 +130,7 @@
 | `CMS-047` | Waiver Trigger, Eligibility & Completion Rules | Policy | 3 | 1 | yes |
 | `CMS-048` | Versioning, Effective Dates & Legal Change Control | Policy | 3 | 1 | yes |
 | `CMS-049` | Localization, Branding & Customer Experience Configuration | Policy | 3 | 2 | yes |
-| `CMS-050` | Waiver Approval, Testing & Publication Workspace | Policy | 3 | 1 | yes |
+| `CMS-050` | Waiver Approval, Testing & Publication Workspace | Policy | 1 | 2 | yes |
 | `CMS-051` | Waiver Operations Command Center | Policy | 3 | 1 | yes |
 | `CMS-052` | Participant Waiver Status & Tracking | Policy | 3 | 1 | yes |
 | `CMS-053` | Digital Signing & Collection Operations | Policy | 3 | 1 | yes |
@@ -140,11 +141,11 @@
 | `CMS-058` | Compliance Evidence, Audit & Waiver Repository | Policy | 3 | 1 | yes |
 | `CMS-059` | Waiver Analytics, Compliance & Operational Insights | Policy | 3 | 1 | yes |
 | `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | Policy | 3 | 1 | yes |
-| `CMS-061` | Digital Asset Management Command Center | Media Library | 3 | 1 | yes |
+| `CMS-061` | Digital Asset Management Command Center | Media Library | 1 | 1 | yes |
 | `CMS-062` | Central Digital Asset Library | Media Library | 3 | 2 | yes |
 | `CMS-063` | Upload & Asset Ingestion Workspace | Media Library | 3 | 3 | yes |
 | `CMS-064` | Folder, Collection & Workspace Management | Media Library | 3 | 2 | yes |
-| `CMS-065` | Metadata & Taxonomy Management | Media Library | 3 | 2 | yes |
+| `CMS-065` | Metadata & Taxonomy Management | Media Library | 1 | 2 | yes |
 | `CMS-066` | Tags, Keywords & Classification | Media Library | 3 | 3 | yes |
 | `CMS-067` | Advanced Search & Discovery | Media Library | 3 | 1 | yes |
 | `CMS-068` | Digital Asset 360° Profile | Media Library | 3 | 3 | yes |

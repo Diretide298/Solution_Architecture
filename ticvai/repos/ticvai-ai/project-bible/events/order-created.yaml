@@ -39,11 +39,6 @@ payload:
   notes: checkoutCart marketingConsents[] as the guest left them (channel, purpose, granted, noticeVersion); never
     defaulted to granted (M18-15, added 30 September)
 consumers:
-- context: reporting
-  purpose: Conversion funnel (orders created against orders paid)
-  idempotencyKey: orderId
-  onFailure: retry
-  isCritical: false
 - context: marketing
   purpose: Abandoned-payment journeys when no order.paid follows
   idempotencyKey: orderId

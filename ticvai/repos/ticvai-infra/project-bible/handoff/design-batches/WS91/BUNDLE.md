@@ -374,8 +374,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `profileId` (navigation) |
 | Route | `/rentals/pricing-profile-builder-bo-525` |
 
-**Known gaps.** **Pricing Profile Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
-
 **From the Food, Beverage & Retail process.** Build a pricing profile: model (flat, duration-based, tiered, peak/off-peak, weekend, seasonal, dynamic, hybrid), base price, channel, segment, locations, dates. The one thing to get right: one model picked, then only its fields.
 
 **Known correction pending (do not draw the wrong version)**

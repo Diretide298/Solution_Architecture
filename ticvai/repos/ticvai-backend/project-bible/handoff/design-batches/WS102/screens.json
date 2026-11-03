@@ -339,7 +339,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Commercial Customer ≠ Operating Venue, Validate Entity / Save / Continue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 5 operations.** Unserved: Commercial Customer ≠ Operating Venue, Validate Entity / Save / Continue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Allow"
    },
    {
@@ -1668,13 +1668,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Retry / Investigate / Assign / Escalate, Revised Board 5 — Commercial Model Behavior. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Retry / Investigate / Assign / Escalate, Revised Board 5 — Commercial Model Behavior. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Actions"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Show"
    }
   ],
   "layout": {

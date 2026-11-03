@@ -1,6 +1,6 @@
 # P13-white-label-02 — P13 · White Label (2 of 3)
 
-**10 screens · 54 operations · 72 schemas · 11 permissions**
+**10 screens · 56 operations · 74 schemas · 12 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 11 permissions apply here:
-  `AI_USE, GUEST_MANAGE, GUEST_VIEW, MARKETING_MANAGE, MARKETING_VIEW, PRODUCT_VIEW, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, USER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `AI_USE, GUEST_MANAGE, GUEST_VIEW, MARKETING_MANAGE, MARKETING_VIEW, PERMISSION_GRANT, PRODUCT_VIEW, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -158,12 +158,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-013` | SEO & Metadata | A | 25 | 14 | 5 | 12 | 0 | 0 | configures | notStarted (generated) |
 | `CMS-011` | Translations | A | 8 | 29 | 5 | 14 | 2 | 0 | configures | notStarted (generated) |
 | `CMS-012` | RTL Preview | A | 0 | 8 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-014` | Publishing Workflow | A | 9 | 32 | 5 | 1 | 2 | 6 | — | notStarted (generated) |
+| `CMS-014` | Publishing Workflow | A | 9 | 33 | 5 | 1 | 2 | 6 | — | notStarted (generated) |
 | `CMS-015` | Version History | A | 1 | 14 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `CMS-016` | Site Settings | A | 71 | 24 | 6 | 6 | 3 | 6 | configures | notStarted (generated) |
 | `CMS-017` | Domain & Certificate | A | 4 | 21 | 6 | 0 | 1 | 0 | configures | notStarted (generated) |
 | `CMS-018` | Consent & Legal | A | 23 | 44 | 6 | 4 | 2 | 4 | configures | notStarted (generated) |
-| `CMS-019` | User Access | A | 6 | 21 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-019` | User Access | A | 2 | 21 | 6 | 12 | 0 | 0 | — | notStarted (generated) |
 | `CMS-101` | Help Me Choose | A | 28 | 23 | 6 | 3 | 4 | 0 | configures | notStarted (generated) |
 
 ## Thin screens in this batch

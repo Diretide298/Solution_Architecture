@@ -38,7 +38,7 @@
   "redis": 9,
   "qdrant": 1
  },
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 148,
@@ -76,9 +76,9 @@
    },
    {
     "name": "Events with a critical consumer",
-    "done": 36,
+    "done": 37,
     "total": 53,
-    "percent": 68,
+    "percent": 70,
     "note": "An event whose loss breaks something must say which consumer."
    }
   ],
@@ -265,6 +265,7 @@
    "file": "tenant.yaml",
    "contract": "subscription",
    "via": [
+    "tenant.provisioned",
     "tenant.suspended"
    ]
   },

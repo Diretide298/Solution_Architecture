@@ -1540,7 +1540,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `executionId` (navigation), `exportId` (navigation) |
 | Route | `/access-venue/report-builder-export-audit-bo-1060` |
 
-**Known gaps.** **Report Builder, Export & Audit declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Building and distributing seat reports: approved dimensions and measures, filters, grouping, chart or map, saved views, scheduled delivery and exports, with every definition, recipient and download logged. Definitions use versioned metrics, so "occupancy" means the same everywhere.
 

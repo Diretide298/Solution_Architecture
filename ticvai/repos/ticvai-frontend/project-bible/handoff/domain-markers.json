@@ -1617,7 +1617,7 @@
   "ai:reached via stock.depleted"
  ],
  "state:tenant.yaml": [
-  "ai:reached via tenant.suspended"
+  "ai:reached via tenant.provisioned, tenant.suspended"
  ],
  "state:ticket-transfer.yaml": [
   "ai:reached via entitlement.transferred"

@@ -1378,17 +1378,17 @@
     {
      "to": "GST-069",
      "trigger": "Face Pass",
-     "provenance": "derived — GST-069 declares entryState.params enrolmentId and GST-039 holds none of them. The edge carries nothing: enrolmentId only pre-selects (deep link or optional), and GST-069 opens on its own"
+     "provenance": "derived — GST-069 declares entryState.params enrolmentId and GST-039 holds none of them. The edge carries nothing: enrolmentId only pre-selects (optional), and GST-069 opens on its own"
     },
     {
      "to": "GST-071",
      "trigger": "Payment Methods",
-     "provenance": "derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none of them. The edge carries nothing: walletId, cardCode only pre-select (deep link or optional), and GST-071 opens on its own"
+     "provenance": "derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none of them. The edge carries nothing: walletId, cardCode only pre-select (optional), and GST-071 opens on its own"
     },
     {
      "to": "GST-073",
      "trigger": "Security & Sign-in",
-     "provenance": "derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds none of them. The edge carries nothing: challengeId, methodId only pre-select (deep link or optional), and GST-073 opens on its own"
+     "provenance": "derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds none of them. The edge carries nothing: challengeId, methodId only pre-select (optional), and GST-073 opens on its own"
     }
    ]
   },

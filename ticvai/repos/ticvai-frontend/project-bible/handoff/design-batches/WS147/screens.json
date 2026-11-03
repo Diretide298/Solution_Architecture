@@ -274,13 +274,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Cards) and no metric row",
   "purpose": "Maintain the centralized catalogue of payment/tender types supported by TICVAI.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 6 §Cards"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -778,7 +772,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Digital Wallet, Gift Card, Card. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Digital Wallet, Gift Card, Card. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 9 §Supports"
    }
   ],
@@ -1114,13 +1108,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Channel, Venue, Product, Product category, Transaction amount, Customer type, Membership, Country/market where applicable …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved: Channel, Venue, Product, Product category, Transaction amount, Customer type, Membership, Country/market where applicable …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 11 §Support conditions such as"
-   },
-   {
-    "operation": null,
-    "why": "**Payment Eligibility & Availability Rule Builder\\t13 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    },
    {
     "operation": null,
@@ -1305,7 +1294,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Fixed payment fee, Percentage fee, Minimum fee, Maximum fee, Payment-method-specific fee, Channel-specific fee, Currency-specific fee, Waiver rule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved: Fixed payment fee, Percentage fee, Minimum fee, Maximum fee, Payment-method-specific fee, Channel-specific fee, Currency-specific fee, Waiver rule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 12 §Support"
    },
    {
@@ -1490,13 +1479,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Effective from, Scheduled expiry. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 4 operations.** Unserved: Effective from, Scheduled expiry. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 13 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**Payment Policy, Governance & Approval Manager\\t15 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    }
   ],
   "layout": {
@@ -1665,13 +1649,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Credit Card) and no metric row",
   "purpose": "Allow administrators to test payment configuration before publishing it. This is especially important because payment configuration errors can immediately stop sales.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 14 §Credit Card"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

@@ -122,7 +122,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-873` | Staff Resource Directory | A | 3 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-874` | Staff Resource Profile | D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-874` | Staff Resource Profile | D | 11 | 6 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-875` | Skills & Competency Management | D | 0 | 7 | 6 | 9 | 1 | 0 | — | notStarted (—) |
 | `BO-876` | Certification & Expiry Management | D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-877` | Qualification & Assignment Rule Engine | A | 12 | 41 | 6 | 34 | 0 | 0 | — | notStarted (—) |

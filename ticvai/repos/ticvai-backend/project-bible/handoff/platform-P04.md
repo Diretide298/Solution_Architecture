@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 171 |
+| Operations with no screen | 167 |
 | Waves | wave1 32 |
 
 ## Gaps
 
-### 171 operations with no screen here
+### 167 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -42,14 +42,12 @@
 | `checkProductSalePermission` | catalogue | POST | Would this seller, here, be allowed to sell these products |
 | `getBundleSigningKeys` | catalogue | GET | The public keys a till verifies catalogue bundles with |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
-| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getProductChannelTexts` | catalogue | GET | The product's texts per sales channel, in each of the tenant's languages |
 | `getProductDashboard` | catalogue | GET | The products dashboard's counts |
 | `getProductOwnerForms` | catalogue | GET | Which form a sale of this product asks the buyer, and which it asks each ticket owner |
 | `getProductSalePermissionRules` | catalogue | GET | Who can sell this product |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
-| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listOwnerFormCandidates` | catalogue | GET | The forms a product can link for its reservation owner or ticket owner |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
@@ -60,7 +58,9 @@
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend an inventory hold's TTL |
-| … | | | 131 more |
+| `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
+| `setProductChannelTexts` | catalogue | PUT | Set the product's texts per sales channel |
+| … | | | 127 more |
 
 ## Modules
 

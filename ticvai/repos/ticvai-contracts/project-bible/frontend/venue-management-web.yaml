@@ -80,9 +80,9 @@ deployment:
   releaseCadence: weekly
 screenCount: 1838
 byWave:
-  wave1: 180
+  wave1: 186
   wave2: 55
-  wave3: 1603
+  wave3: 1597
 screens:
 - id: BO-001
   name: Queue Directory
@@ -2346,7 +2346,7 @@ screens:
   route: /sell/membership-annual-pass-command-center-bo-284
   repo: ticvai-venue-management
   path: src/routes/sell/MembershipAnnualPassCommandCenter.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-285
   name: Membership Product & Tier Builder
@@ -2378,7 +2378,7 @@ screens:
   route: /sell/membership-entitlement-admission-benefit-builder-bo-288
   repo: ticvai-venue-management
   path: src/routes/sell/MembershipEntitlementAdmissionBenefitBuilder.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-289
   name: Membership Usage, Visit & Consumption Rules
@@ -13706,7 +13706,7 @@ screens:
   route: /policy/waiver-consent-command-center-cms-041
   repo: ticvai-venue-management
   path: src/routes/policy/WaiverConsentCommandCenter.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: CMS-042
   name: Waiver Template Library & Master Setup
@@ -13778,7 +13778,7 @@ screens:
   route: /policy/waiver-approval-testing-publication-workspace-cms-050
   repo: ticvai-venue-management
   path: src/routes/policy/WaiverApprovalTestingPublicationWorkspace.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: CMS-051
   name: Waiver Operations Command Center
@@ -13866,7 +13866,7 @@ screens:
   route: /media-library/digital-asset-management-command-center-cms-061
   repo: ticvai-venue-management
   path: src/routes/media-library/DigitalAssetManagementCommandCenter.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: CMS-062
   name: Central Digital Asset Library
@@ -13898,7 +13898,7 @@ screens:
   route: /media-library/metadata-taxonomy-management-cms-065
   repo: ticvai-venue-management
   path: src/routes/media-library/MetadataTaxonomyManagement.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: CMS-066
   name: Tags, Keywords & Classification

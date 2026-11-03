@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1663,
-  "operations": 1894,
+  "operations": 1899,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
-  "operationsWithNoScreen": 212
+  "operationsWithNoScreen": 208
  },
  "waves": {
-  "wave1": 148,
+  "wave1": 150,
   "wave2": 55,
-  "wave3": 1460
+  "wave3": 1458
  },
  "modules": [
   {
@@ -183,7 +183,7 @@
   },
   {
    "contract": "catalogue",
-   "operations": 229
+   "operations": 232
   },
   {
    "contract": "orders",
@@ -195,26 +195,26 @@
   },
   {
    "contract": "promotions",
-   "operations": 133
+   "operations": 134
   },
   {
    "contract": "fnb",
    "operations": 78
   },
   {
-   "contract": "wallet",
-   "operations": 62
-  },
-  {
    "contract": "finance",
    "operations": 62
   },
   {
-   "contract": "ai",
-   "operations": 56
+   "contract": "wallet",
+   "operations": 62
   },
   {
    "contract": "resources",
+   "operations": 56
+  },
+  {
+   "contract": "ai",
    "operations": 56
   },
   {
@@ -246,15 +246,15 @@
    "operations": 44
   },
   {
+   "contract": "identity",
+   "operations": 42
+  },
+  {
    "contract": "workforce",
    "operations": 42
   },
   {
    "contract": "maintenance",
-   "operations": 41
-  },
-  {
-   "contract": "identity",
    "operations": 41
   },
   {
@@ -2280,7 +2280,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/sales-channel-command-center-adm-258",
-   "operations": 3,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -2370,7 +2370,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/channel-operations-command-center-adm-268",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4638,7 +4638,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/session-calendar",
-   "operations": 11,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -6213,7 +6213,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/finance-dashboard-bo-1081",
-   "operations": 6,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -7392,7 +7392,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/venue-operations/software-configuration-version-management",
-   "operations": 10,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -8785,7 +8785,7 @@
    "id": "BO-284",
    "name": "Membership & Annual Pass Command Center",
    "module": "Sell",
-   "wave": 3,
+   "wave": 1,
    "route": "/sell/membership-annual-pass-command-center-bo-284",
    "operations": 4,
    "drawn": true
@@ -8821,9 +8821,9 @@
    "id": "BO-288",
    "name": "Membership Entitlement & Admission Benefit Builder",
    "module": "Sell",
-   "wave": 3,
+   "wave": 1,
    "route": "/sell/membership-entitlement-admission-benefit-builder-bo-288",
-   "operations": 5,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -11775,7 +11775,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue/accreditation-form-builder-bo-618",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -14790,7 +14790,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/venue-canvas-bo-954",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -15460,12 +15460,6 @@
     "summary": "What happens to tickets, reservations and guests when an event changes, by default"
    },
    {
-    "operation": "getPlanBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Which benefits a plan grants, and how much of each"
-   },
-   {
     "operation": "getProductChannelTexts",
     "contract": "catalogue",
     "verb": "GET",
@@ -15500,12 +15494,6 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listMembershipBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Benefits a plan can grant"
    },
    {
     "operation": "listMembershipProgrammes",
@@ -15838,6 +15826,12 @@
     "summary": "Send, resend or correct participant waiver requirements, one or in bulk"
    },
    {
+    "operation": "createGuestDocumentUpload",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue the key and a signed upload URL for a guest document"
+   },
+   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -15872,12 +15866,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverTesting",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Checklist, rule simulation and approval record of a waiver version"
    },
    {
     "operation": "issueReward",
@@ -16168,12 +16156,6 @@
     "summary": "List allocation split definitions"
    },
    {
-    "operation": "listBundles",
-    "contract": "promotions",
-    "verb": "GET",
-    "summary": "List bundles"
-   },
-   {
     "operation": "previewAllocationSplit",
     "contract": "promotions",
     "verb": "POST",
@@ -16412,12 +16394,6 @@
     "contract": "subscription",
     "verb": "PATCH",
     "summary": "Amend, suspend or terminate"
-   },
-   {
-    "operation": "getConfigurationProfile",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "One profile, at its latest version or at a named one"
    },
    {
     "operation": "getConnectivityPolicy",

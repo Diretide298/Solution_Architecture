@@ -953,21 +953,29 @@
       {
        "kind": "selectField",
        "label": "Credential only",
+       "operation": "updateAdmissionRules",
+       "bindsTo": "AdmissionRules.reEntryVerification",
        "provenance": "pack Access Control Module_Reference.pdf, page 106 §Configure"
       },
       {
        "kind": "textField",
        "label": "Credential + UV stamp",
+       "operation": "updateAdmissionRules",
+       "bindsTo": "AdmissionRules.reEntryVerification",
        "provenance": "pack Access Control Module_Reference.pdf, page 106 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Credential + Face",
+       "operation": "updateAdmissionRules",
+       "bindsTo": "AdmissionRules.reEntryVerification",
        "provenance": "pack Access Control Module_Reference.pdf, page 106 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Credential + operator",
+       "operation": "updateAdmissionRules",
+       "bindsTo": "AdmissionRules.reEntryVerification",
        "provenance": "pack Access Control Module_Reference.pdf, page 106 §Configure"
       }
      ]
@@ -1165,7 +1173,14 @@
      "listMultiParkCrossover2",
      "listMultiParkCrossover",
      "listAdmissionRules"
-    ]
+    ],
+    "inputSources": {
+     "id": "listAdmissionRules.id",
+     "code": "listAdmissionRules.code",
+     "name": "listAdmissionRules.name",
+     "openMinutesBefore": "listAdmissionRules.openMinutesBefore",
+     "closeMinutesAfter": "listAdmissionRules.closeMinutesAfter"
+    }
    }
   ],
   "entryState": {
@@ -1479,6 +1494,12 @@
        "permission": "ACCESS_POINT_CONFIGURE",
        "notes": "**The write behind Operating Calendar & Special Access Days** (BO-152) and Special Event, Free View & Alternative Admission (BO-222): one dated entry (a holiday, private event, free-entry day, special event and so on), whether tickets must be validated, and for a free-view or special-event window its admission type.",
        "provenance": "contract access.yaml PUT /operating-calendar-entries"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create admission rule",
+       "operation": "createAdmissionRules",
+       "provenance": "contract access.yaml POST /admission-rules; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       }
      ]
     }
@@ -1550,6 +1571,43 @@
      ]
     },
     "provenance": "contract access.yaml PUT /operating-calendar-entries"
+   },
+   {
+    "id": "formCreateAdmissionRules",
+    "component": "modal",
+    "trigger": "Create admission rule",
+    "body": "**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AdmissionRules",
+    "confirm": {
+     "label": "Create admission rule",
+     "operation": "createAdmissionRules"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "openMinutesBefore",
+      "closeMinutesAfter",
+      "perProductRules",
+      "maxDurationMinutes",
+      "requiresExitBeforeReentry",
+      "maxReentries",
+      "entryLimit",
+      "exitScan",
+      "maxExits",
+      "reEntryWindowMinutes",
+      "sameDayOnly",
+      "designatedAccessPointIds",
+      "validity",
+      "crossover",
+      "allowedAccessPointIds",
+      "reEntryVerification",
+      "ruleConditions",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract access.yaml POST /admission-rules; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
    }
   ],
   "gaps": [

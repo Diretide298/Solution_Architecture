@@ -59,6 +59,140 @@ ERRORS: list[str] = []
 WARNINGS: list[str] = []
 
 
+# ---------------------------------------------------------------------------------------------
+# W-FIDELITY (2 November 2026, r13 root R10, CHG-R13R10-001). A generated frame drew furniture no screen declares --
+# a KPI strip with sample figures, another audience's nav and brand, "This venue", "Live" and "Primary action" chips --
+# and dropped what the screen does declare (components after the fifth, every region but contentBody, a table's
+# columns), while ADAM told developers to build it exactly (#27985 DEV-008, #27755 EMP-002 and 23 more). Every text
+# of a generated frame must come from its screen or platform record or the generator's own GENERATED_LABELS, and every
+# declared component must appear. A drawn frame (class "drawn") is the designer's and is not judged here.
+# ---------------------------------------------------------------------------------------------
+from html.parser import HTMLParser  # noqa: E402
+
+
+class _Text(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.out: list = []
+
+    def handle_data(self, data):
+        t = " ".join(data.split())
+        if t:
+            self.out.append(t)
+
+
+def frame_texts(section: str) -> list:
+    """The texts of one card's frame (between the frame div and the foot)."""
+    i = section.find('<div class="frame')
+    j = section.find('<div class="foot">', i)
+    if i < 0:
+        return []
+    p = _Text()
+    p.feed(section[i:j if j > 0 else None])
+    return p.out
+
+
+def record_strings(obj, out: set) -> set:
+    """Every string a record holds, at any depth (numbers as text), and a column's field name."""
+    if isinstance(obj, dict):
+        for v in obj.values():
+            record_strings(v, out)
+    elif isinstance(obj, list):
+        for v in obj:
+            record_strings(v, out)
+    elif isinstance(obj, (str, int, float)) and not isinstance(obj, bool):
+        t = " ".join(str(obj).split())
+        out.add(t)
+        out.add(t.rsplit(".", 1)[-1])
+    return out
+
+
+def fidelity_findings(texts: list, screen: dict, plat: dict, labels) -> tuple:
+    """(texts from nowhere, declared components not drawn) for one generated frame."""
+    allowed = record_strings(screen, set()) | record_strings(plat, set())
+    allowed.add(f"wave {screen.get('wave')}")
+    labels = set(labels)
+
+    def known(t: str) -> bool:
+        if t in labels or t in allowed:
+            return True
+        if len(t) >= 12 and any(a.startswith(t) for a in allowed):     # clipped (a name, a note)
+            return True
+        return False
+
+    stray = [t for t in texts if not known(t) and not all(known(x.strip()) for x in t.split("·") if x.strip())]
+    drawn = set(texts)
+    missing = []
+    for r in ((screen.get("layout") or {}).get("regions") or []):
+        for c in (r.get("components") or []) if isinstance(r, dict) else []:
+            if not isinstance(c, dict):
+                continue
+            want = " ".join(str(c.get("label") or c.get("kind") or "").split())
+            if want and want not in drawn and not any(t.startswith(want[:44]) for t in drawn):
+                missing.append(f"{r.get('name')}/{want}")
+    return stray, missing
+
+
+def check_fidelity() -> None:
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("derive_wireframes_fid", ROOT / "tools" / "derive-wireframes.py")
+    dw = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(dw)
+    labels = dw.GENERATED_LABELS
+    judged = 0
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        plat = {k: v for k, v in doc["platform"].items() if not str(k).startswith("_")}
+        board = BOARDS / str(plat.get("wireframeBoard") or "").split("/")[-1]
+        if not board.is_file():
+            continue
+        text = board.read_text(encoding="utf-8", errors="replace")
+        cards = {m.group(1): m.start() for m in re.finditer(r'<div id="([a-z0-9-]+)" class="scr"', text)}
+        starts = sorted(cards.values()) + [len(text)]
+        for s in doc["screens"]:
+            at = cards.get(s["id"].lower())
+            if at is None:
+                continue
+            section = text[at:starts[starts.index(at) + 1]]
+            head = section[section.find('<div class="frame'):][:80]
+            if " drawn" in head.split(">")[0]:
+                continue
+            judged += 1
+            stray, missing = fidelity_findings(frame_texts(section), s, plat, labels)
+            if stray:
+                ERRORS.append(f"W-FIDELITY {s['id']} ({board.name}): the generated frame draws text no record holds: "
+                              + "; ".join(repr(x[:40]) for x in stray[:4]) + (f" (+{len(stray) - 4})" if len(stray) > 4 else ""))
+            if missing:
+                ERRORS.append(f"W-FIDELITY {s['id']} ({board.name}): the generated frame leaves out declared components: "
+                              + "; ".join(missing[:4]) + (f" (+{len(missing) - 4})" if len(missing) > 4 else ""))
+    print(f"  W-FIDELITY: {judged} generated frame(s) held to their screen and platform records")
+
+
+def fidelity_self_test() -> int:
+    screen = {"id": "X-001", "name": "Quota settings", "wave": 1, "module": "Developer & API",
+              "layout": {"regions": [{"name": "contentBody", "components": [
+                  {"kind": "dataTable", "label": "Quotas", "columns": ["ApiQuota.dailyCap"]},
+                  {"kind": "primaryButton", "label": "Save quota"}]}]}}
+    plat = {"shortName": "Developer", "audience": "partner"}
+    labels = ("no components declared", "columns not declared", "offline", "wave", "—")
+    cases = [
+        ("a frame drawing only the record passes",
+         fidelity_findings(["Developer", "Developer & API", "Quota settings", "Developer · wave 1",
+                            "contentBody", "Quotas", "dataTable", "dailyCap", "primaryButton", "Save quota"],
+                           screen, plat, labels), ([], [])),
+        ("partner KPI tiles and a stock chip fail (DEV-008)",
+         fidelity_findings(["Quotas", "Save quota", "Allocation", "2,400", "Primary action"], screen, plat, labels)[0],
+         ["Allocation", "2,400", "Primary action"]),
+        ("a component left out fails",
+         fidelity_findings(["Quotas"], screen, plat, labels)[1], ["contentBody/Save quota"]),
+    ]
+    fails = [f"{n}: got {g!r}, expected {w!r}" for n, g, w in cases if g != w]
+    for x in fails:
+        print("  FAIL", x)
+    print(f"check-wireframes W-FIDELITY self-test: {len(cases) - len(fails)} of {len(cases)} passed")
+    return 1 if fails else 0
+
+
 
 
 def check_unmatched_boards(referenced: set) -> None:
@@ -415,6 +549,7 @@ def main() -> int:
     # **Show the strangers first, then the rest.** Truncating at 20 buried the one warning that
     # says a file does not belong under nineteen saying a board is unreferenced — and the buried
     # one is why a consumer counted 811 frames against a real 359.
+    check_fidelity()
     _first = [w for w in WARNINGS if "known client pack" in w]
     _rest = [w for w in WARNINGS if w not in _first]
     for w in (_first + _rest)[:20]:
@@ -432,4 +567,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    if "--self-test" in sys.argv[1:]:
+        sys.exit(fidelity_self_test())
     sys.exit(main())

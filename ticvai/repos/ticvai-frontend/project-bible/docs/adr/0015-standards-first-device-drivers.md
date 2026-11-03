@@ -1,6 +1,6 @@
 # ADR-0015: Standards-First Device Drivers
 
-**Status:** Accepted · amended by [ADR-0067](0067-one-device-register.md), 1 October 2026: every device class, gate devices included, is registered once in `platform.device`; Access keeps only where a device is placed · amended 5 October 2026 (CHG-R4-002): BOCA confirmed as the ticket and wristband printer, its documents received (see the last section)
+**Status:** Accepted · amended by [ADR-0067](0067-one-device-register.md), 1 October 2026: every device class, gate devices included, is registered once in `platform.device`; Access keeps only where a device is placed · amended 5 October 2026 (CHG-R4-002): BOCA confirmed as the ticket and wristband printer, its documents received · amended 1 and 2 November 2026 (CHG-CR448-001, CHG-CR463-001): on Windows kiosks and tills the driver runs in a small .NET device host the apps call on localhost (see the last sections)
 **Date:** 13 August 2026
 **Unblocks:** hardware-dependent work currently waiting on the model list and turnstile SDK
 **Related:** ADR-0012 adaptor-first integration (its Q2 waiting room amended by ADR-0066; the adaptor-first rule stands)
@@ -206,3 +206,24 @@ DEVICE-BOCA-FGL (`docs/active/block-a-extra-tasks.json`).
 **New scope to confirm: RFID encoding on the Lemur.** Encoding RFID wristbands or tickets at print time was not in
 this ADR's Tier A table. It is built behind a flag, off, until the client confirms whether RFID-encoded media are in
 scope, which chip and which data (the questions are in the Decisions Register, pending).
+
+---
+
+## Amendment, 1 November 2026 (ADAM CR-448, CHG-CR448-001): where the BOCA driver runs
+
+The kiosk app (guest-app, KSK-009 and KSK-010) and the POS app (venue-pos, POS-026) are TypeScript and cannot load the
+.NET driver #35592 built (the `ticketPrinter` port, a pure FGL encoder, the raw TCP link on port 9100, the status
+mapper), so "in the device app" named no process that talks to the printer. Decided by Chinmay, 1 November 2026, as
+recommended: **on Windows kiosks and tills a small .NET device host runs beside the printer, composing the existing
+driver; the kiosk and POS apps call it on localhost.** Android is decided once the client answers how the printer
+connects (TCP, USB or serial), with the other BOCA questions already with them; until then the Windows host is built
+and tested. #35592 comes off hold for the Windows path.
+
+## Amendment, 2 November 2026 (ADAM CR-463, CHG-CR463-001): the device host's API is a contract
+
+Decided by Chinmay, 2 November 2026, option A: the device host's API as built is the contract, written down once, and
+the Android path implements the same one later. It is `contracts/devices/ticket-printer.yaml` (`GET
+/ticket-printer/status`, `POST /ticket-printer/print-jobs` with an Idempotency-Key, errors in the shared Problem
+shape), and the layout it prints is `TicketLayout` in the orders contract (ADAM CR-447). The host listens on
+127.0.0.1 only, answers only the kiosk and POS app origins its local settings name (any other origin is 403), never
+prints twice for one Idempotency-Key (keys kept locally for at least 24 hours) and keeps no secret.

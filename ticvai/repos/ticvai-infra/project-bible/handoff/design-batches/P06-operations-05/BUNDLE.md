@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/operations/opening-checklist` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
+**What the spec says about it.** Definition derived from the wireframe board on 14 August.
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Template authoring (createInspectionTemplate, INSPECTION_MANAGE) is tenant-level management in the back office; the opening checklist only works today's checks …
 
@@ -360,7 +360,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `announcementId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/operations/emergency-mode` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
+**What the spec says about it.** Definition derived from the wireframe board on 14 August.
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Emergency mode is a full-screen takeover with one action (acknowledge); the generic announcements set put publish and the reach roll call on it. Declaring goes … Removed 2 October 2026 (CHG-WIR-001): Emergency mode is a full-screen takeover with one action (acknowledge); the generic announcements set put publish and the reach roll call on it. Declaring goes … Contract gap recorded 2 October 2026 (CHG-WIR-004): No staff all-clear (announcement kind or operation) ends emergency mode.
 
@@ -553,7 +553,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 | Opens with | `incidentId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/operations/post-incident-restore` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: reportIncident. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**
+**What the spec says about it.** Definition derived from the wireframe board on 14 August. **Removed 24 August**: reportIncident. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Recording the authority notification is a step of following up the incident (EMP-027), not of restoring the venue; the screen's own note says notification …
 
@@ -924,7 +924,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/operations/sign-out` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
+**What the spec says about it.** Definition derived from the wireframe board on 14 August.
 
 **Known gaps.** **`logout` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.
 
@@ -1022,7 +1022,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/operations/hand-over-the-journal` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
+**What the spec says about it.** Definition derived from the wireframe board on 14 August.
 
 **Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation hands an unsynced scan journal from one device to another or to the edge node.
 

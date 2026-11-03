@@ -300,8 +300,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/new-rental-booking-wizard-bo-535` |
 
-**Known gaps.** **New Rental Booking Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
-
 **From the Food, Beverage & Retail process.** Create a rental booking at the station or the desk; the same steps as the online booking. The one thing to get right: price and deposit quoted live as product, time and quantity change.
 
 **Known correction pending (do not draw the wrong version)**
@@ -786,8 +784,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `bookingId` (navigation) |
 | Route | `/rentals/rental-agreement-waiver-completion-bo-539` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Food, Beverage & Retail process.** Complete the agreement and waiver before confirmation or check-out, against the version in force, individually or as a group. The one thing to get right: who has signed and who has not.
 
 #### Decided on this screen
@@ -1171,7 +1167,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `bookingId` (navigation) |
 | Route | `/rentals/reservation-modification-cancellation-no-show-bo-542` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-008): Modifying is updateRentalBooking; a second booking (createRentalBooking) is not a change (R254; design-notes correction fnb-retail BO-542).
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): Modifying is updateRentalBooking; a second booking (createRentalBooking) is not a change (R254; design-notes correction fnb-retail BO-542).
 
 **From the Food, Beverage & Retail process.** Change, cancel or mark a no-show on a confirmed booking: quantity, product, time; the price difference shown before saving. The one thing to get right: the effect on price and deposit is shown before saving.
 

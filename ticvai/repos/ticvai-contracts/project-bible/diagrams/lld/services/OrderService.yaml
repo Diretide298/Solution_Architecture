@@ -374,7 +374,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_EXCHANGE
     offline: false
-    reads: 5
+    reads: 6
     writes: 5
   - operation: extendCart
     verb: POST
@@ -1318,8 +1318,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 8
-    writes: 5
+    reads: 9
+    writes: 6
   - operation: openGuestCreditAccount
     verb: POST
     path: /guest-credit-accounts
@@ -1454,8 +1454,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_REPRINT
     offline: true
-    reads: 3
-    writes: 4
+    reads: 5
+    writes: 6
   - operation: requestGroupBooking
     verb: POST
     path: /group-booking-requests
@@ -1470,8 +1470,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_RESCHEDULE
     offline: false
-    reads: 5
-    writes: 3
+    reads: 6
+    writes: 5
   - operation: resendPaymentLink
     verb: POST
     path: /payment-links/{linkId}/resend
@@ -2324,7 +2324,7 @@ operationsByContract:
     scope: venue
     permission: SHIFT_CLOSE
     offline: false
-    reads: 11
+    reads: 12
     writes: 4
   - operation: createCashMovement
     verb: POST
@@ -2476,7 +2476,7 @@ operationsByContract:
     scope: workstation
     permission: SHIFT_CLOSE
     offline: false
-    reads: 9
+    reads: 11
     writes: 4
   - operation: suspendShift
     verb: POST
@@ -3753,7 +3753,7 @@ readsFrom:
 - service: IdentityService
   operations: 22
 - service: LedgerService
-  operations: 16
+  operations: 14
 - service: MarketingService
   operations: 11
 - service: TenancyService
@@ -3764,7 +3764,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 40
+  operations: 43
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3837,6 +3837,9 @@ writesOutside:
   - operation: mergeOrders
     tables:
     - platform.outbox
+  - operation: modifyOrder
+    tables:
+    - platform.outbox
   - operation: openShift
     tables:
     - platform.outbox
@@ -3860,6 +3863,12 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: releaseResaleSettlementHold
+    tables:
+    - platform.outbox
+  - operation: reprintOrder
+    tables:
+    - platform.outbox
+  - operation: rescheduleOrder
     tables:
     - platform.outbox
   - operation: respondToChargeback
@@ -4093,6 +4102,7 @@ screens:
 - P01:WEB-018 My Tickets
 - P01:WEB-019 Order History
 - P01:WEB-021 Wallet & Gift Cards
+- P01:WEB-022 Membership Plans
 - P01:WEB-023 Membership Management
 - P01:WEB-026 Survey & Feedback
 - P01:WEB-030 Ticket Transfer

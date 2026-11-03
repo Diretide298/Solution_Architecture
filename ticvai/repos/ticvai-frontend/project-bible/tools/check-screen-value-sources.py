@@ -41,6 +41,12 @@ sent, and what the app shell preloads (`entryState.preloaded`). Rules:
                  declare it (CR-233). Context ids (venueId, subjectId, deviceId, ...) are never picked
     SV-WRITE     a component's notes say a value is stored, saved or written as or to the user's profile or
                  account, and the screen declares no operation that writes (CR-186)
+    SV-NO-SUCH-FIELD  a backticked `Schema.field` anywhere in a screen record names a package schema that has no
+                 such field (through `$ref`, allOf, oneOf, anyOf). The r13 review (3 November 2026, CHG-R13RVB-003)
+                 found 13 references to `BookingFlowConfig.signInAt` and four more fields that the 29 September
+                 decision W12 moved to `BookingFlow.settings` (BookingFlowLevelSettings): the precision rules above
+                 skip a sentence that cites a rule, so a field the schema no longer has went unseen. Read in every
+                 text, parentheses included; an enum schema or one with no properties is not judged
 
 **Precision first.** Prose is a weak signal, so a `Schema.field` in notes, states, entry params or a form's body
 counts only when (a) the component has no operation of its own, or the form no confirm operation (otherwise the
@@ -74,7 +80,10 @@ RULES = {
     "SV-PICK": "a form sends an id the user picks from a list the package has and the screen does not declare "
                "(CR-233)",
     "SV-WRITE": "the text saves a value to the user's record and the screen declares no write (CR-186)",
+    "SV-NO-SUCH-FIELD": "a screen names `Schema.field` for a schema that has no such field (r13 review, "
+                        "CHG-R13RVB-003)",
 }
+SCHEMA_FIELD = re.compile(r"`([A-Z][A-Za-z0-9]+)\.([a-z][A-Za-z0-9]*)")
 OK_STATUS = re.compile(r"^2\d\d$")
 CHOICE = {"selectField", "multiSelect", "radioGroup", "chipGroup", "segmentedControl", "checkboxGroup", "chips",
           "filterChips", "toggleGroup", "combobox"}
@@ -590,6 +599,25 @@ def merged_into(screen: dict):
     return m.group(1) if m else None
 
 
+def no_such_fields(pk: Package, screen: dict) -> list:
+    """SV-NO-SUCH-FIELD (CHG-R13RVB-003): a `Schema.field` the schema does not have."""
+    out, seen = [], set()
+    for t in _texts(screen):
+        for m in SCHEMA_FIELD.finditer(t):
+            name, fld = m.groups()
+            f = pk.sch.find(name)
+            if not f or (name, fld) in seen:
+                continue
+            node = f[1]
+            if node.get("enum") or not pk.sch.props(f[0], node) or node.get("additionalProperties") is True:
+                continue
+            if not pk.sch.has_path(name, [fld]):
+                seen.add((name, fld))
+                out.append(("SV-NO-SUCH-FIELD", f"{screen.get('id')}:{name}.{fld}",
+                            f"{screen.get('id')}: names `{name}.{fld}`, and {name} has no field `{fld}`"))
+    return out
+
+
 def findings(pk: Package = None) -> list:
     """[(rule, key, message)] over every screen that is built: a screen merged into another is skipped."""
     pk = pk or Package()
@@ -598,6 +626,7 @@ def findings(pk: Package = None) -> list:
         if merged_into(s):
             continue
         out += screen_findings(pk, s, p)
+        out += no_such_fields(pk, s)
     return out
 
 

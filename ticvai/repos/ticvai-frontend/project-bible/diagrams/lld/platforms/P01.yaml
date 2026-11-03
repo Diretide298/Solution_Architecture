@@ -43,15 +43,15 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 61
+  operationCalls: 66
 - service: MarketingService
   operationCalls: 58
 - service: CatalogueService
-  operationCalls: 50
+  operationCalls: 54
 - service: VenueOpsService
   operationCalls: 40
 - service: WhiteLabelService
-  operationCalls: 25
+  operationCalls: 26
 - service: IdentityService
   operationCalls: 22
 - service: FnbService
@@ -242,6 +242,7 @@ screens:
   operations:
   - addCartLine
   - evaluatePromotions
+  - getPerformance
   - getPublishedBookingFlow
   - getPublishedGuidedChoice
   - listProductCategories
@@ -257,6 +258,7 @@ screens:
   offlineState: true
   entryParams:
   - productId<-WEB-004
+  - performanceId<-WEB-006
   - venueId<-session
   - cartId<-navigation
   goesTo:
@@ -852,9 +854,18 @@ screens:
   wave: 1
   density: compact
   operations:
+  - addCartLine
+  - createCart
+  - getCart
   - getMyMemberships
+  - getPlanBenefits
   - getProduct
+  - getPublishedBookingFlow
+  - listMembershipBenefits
+  - listProductVariants
   - listProducts
+  - removeCartLine
+  - updateCartLine
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -865,8 +876,13 @@ screens:
   offlineState: true
   entryParams:
   - productId<-WEB-001
+  - cartId<-navigation
+  - lineId<-navigation
+  - templateId<-navigation
+  - venueId<-session
   goesTo:
   - WEB-001
+  - WEB-011
   - WEB-021
   - WEB-023
   - WEB-024

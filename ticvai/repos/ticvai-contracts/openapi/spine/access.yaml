@@ -73,6 +73,28 @@ x-ticvai-queries:
   # Rule questions other modules ask Access, answered by the owner (ADR-0055 amendment, 14 October 2026; the shape is
   # the r6 shared convention: module, inputs, returns, rule, served). An asking operation names one in
   # `x-ticvai-read-via`.
+  # **The stored ticket layout, for Orders** (ADAM CR-447; the lead, 2 November 2026, "yes for both"; CHG-CR447-001).
+  # The designer screen BO-346 saves it in access.media_template.design; Orders' printTicketProof renders it.
+  mediaTemplateRecords:
+    module: access
+    table: access.media_template
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The access.media_template rows asked for, by id: a ticket template''s layoutRef.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as designer or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Access stores it, its design document included; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccessMediaTemplate'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October). Access answers with its
+      access.media_template rows, as it stores them and as the caller's scope lets it see them (the table's row-level
+      security, under the caller's connection and transaction). It decides nothing. The stored TicketLayout is the
+      `layout` member of the design document of a template whose designer is pdfPrintablePos, as the ticket designer
+      screen (BO-346, setPdfPrintablePos) saves it, and a ticket template's layoutRef names that template (ADAM CR-447,
+      Chinmay, 1 November 2026; where it lives, the lead, 2 November 2026: "yes for both"; CHG-CR447-001). It is asked
+      in process from commerce by orders printTicketProof, a read the lead granted across deployables
+      (docs/active/cross-deployable-writes.yaml XDR-067, as XDR-001 and XDR-002).
+    served: [in-process]
   mediaEncodingProfileRecords:
     module: access
     table: access.media_encoding_profile
@@ -161,12 +183,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/AccessPoint'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Access answers with its access.access_point rows, as it stores them and as the caller's scope
-      lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Access' service route (serviceAuth).
-    served: [service]
+      October). Access answers with its access.access_point rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process by the
+      commerce host, which composes Access's query classes, through the C# query class Access implements, under the
+      caller's row-level security (CHG-R13INP-001). It is asked from another deployable through Access' service
+      route (serviceAuth).
+    served: [in-process, service]
   blacklistRecords:
     module: access
     table: access.blacklist
@@ -228,6 +252,213 @@ x-ticvai-queries:
       C# query interface Access implements, in its own transaction, under the caller's own scope. Tenancy's
       listDeviceAuditRecords reads its device's scans the same way (ADAM CR-232, option A, 25 October 2026).
     served: [in-process, service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  credentialPipeline:
+    module: access
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: access-credential-binding, from: pending, to: active}
+    - {model: access-credential-binding, from: active, to: revoked}
+    - {model: access-credential-binding, from: pending, to: expired}
+    - {model: access-credential-binding, from: active, to: expired}
+    - {model: access-credential-binding, from: suspended, to: expired}
+    - {model: access-credential-delivery, from: pending, to: sent}
+    - {model: access-credential-delivery, from: pending, to: failed}
+    - {model: access-credential-delivery, from: pending, to: completed}
+    - {model: access-credential-delivery, from: sent, to: delivered}
+    - {model: access-credential-delivery, from: sent, to: bounced}
+    - {model: access-credential-delivery, from: sent, to: failed}
+    - {model: access-credential-delivery, from: sent, to: expired}
+    - {model: access-credential-delivery, from: delivered, to: openedDownloaded}
+    - {model: access-credential-delivery, from: delivered, to: completed}
+    - {model: access-credential-delivery, from: delivered, to: expired}
+    - {model: access-credential-delivery, from: openedDownloaded, to: completed}
+    - {model: access-credential-exception, from: open, to: resolved}
+    - {model: access-credential-exception, from: inProgress, to: resolved}
+    - {model: access-credential-exception, from: escalated, to: resolved}
+    - {model: access-credential-issuance, from: requested, to: queued}
+    - {model: access-credential-issuance, from: queued, to: templateResolved}
+    - {model: access-credential-issuance, from: queued, to: failed}
+    - {model: access-credential-issuance, from: templateResolved, to: dataMapped}
+    - {model: access-credential-issuance, from: templateResolved, to: failed}
+    - {model: access-credential-issuance, from: dataMapped, to: credentialGenerated}
+    - {model: access-credential-issuance, from: dataMapped, to: failed}
+    - {model: access-credential-issuance, from: credentialGenerated, to: bound}
+    - {model: access-credential-issuance, from: credentialGenerated, to: failed}
+    - {model: access-credential-issuance, from: bound, to: ready}
+    - {model: access-credential-issuance, from: ready, to: delivered}
+    - {model: access-credential-issuance, from: failed, to: queued}
+    reads:
+    - access.credential_binding
+    - access.credential_delivery
+    - access.credential_event
+    - access.credential_exception
+    - access.credential_issuance
+    - access.entitlement
+    writes:
+    - access.credential_binding
+    - access.credential_delivery
+    - access.credential_event
+    - access.credential_exception
+    - access.credential_issuance
+    - access.entitlement
+    for: Access credential issuance, delivery and binding pipeline.
+    source:
+    - states/access-credential-binding.yaml:27
+    - states/access-credential-delivery.yaml:29
+    - states/access-credential-exception.yaml:46
+    - states/access-credential-issuance.yaml:24
+  entitlements:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - approval.granted
+    - entitlement.issued
+    - entitlement.reissued
+    - entitlement.shareChanged
+    - entitlement.transferred
+    - invitation.issued
+    - performance.cancelled
+    reads: [access.blacklist, access.entitlement]
+    writes: [access.blacklist, access.entitlement]
+    for: 'Access''s entitlement consumers: write access.entitlement for changes Orders makes in commerce (reissue, share,
+      transfer, invitation, performance cancellation, an approved whitelist entry) and refresh the offline validation bundle
+      so a gate admits or refuses without a network.'
+    source:
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/entitlement-reissued.yaml
+    - events/entitlement-shareChanged.yaml
+  entitlementsLater:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - accreditation.credentialIssued
+    - accreditation.holderStatusChanged
+    - entitlement.statusChanged
+    - entitlement.voided
+    reads: [access.entitlement]
+    writes: [access.entitlement]
+    for: 'Access''s later entitlement and accreditation consumers: frozen or suspended entitlements, voided entitlements,
+      and accreditation credentials and holder status in the validation bundle.'
+    source:
+    - events/accreditation-credentialIssued.yaml
+    - events/accreditation-holderStatusChanged.yaml
+    - events/entitlement-statusChanged.yaml
+    - events/entitlement-voided.yaml
+  expiryNotice:
+    module: access
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [access.entitlement]
+    writes: []
+    emits: [entitlement.expiringSoon]
+    reliesOn: [issueOrderEntitlements]
+    for: 'The daily expiry-notice run: an entitlement whose validTo is within its template''s expiryNoticeDays gets entitlement.expiringSoon,
+      once per entitlement per validTo.'
+    source: ['events/entitlement-expiringSoon.yaml']
+  fraudDetection:
+    module: access
+    host: ticvai-ai
+    hostDecision: 'The lead, 2 November 2026, on lane s''s question ("(Recommended)"): it runs on the AI server
+      (ticvai-ai, Python) and is the AI engineers'' (the AI server rule of 31 October 2026; CHG-R13INT-009).'
+    trigger: {kind: queue}
+    reads: []
+    writes: [access.identity_lock]
+    reliesOn: [lockIdentity]
+    for: 'Access''s detection jobs: fraud rules, sharing detection and biometric anomaly; they raise access security alerts,
+      write sharing-detection bindings and cases, and set temporary identity locks.'
+    source: ['contracts/spine/access.yaml', 'contracts/spine/access.yaml']
+  offlinePackageBuild:
+    module: access
+    host: workers
+    trigger: {kind: queue}
+    reads: [access.entitlement]
+    writes: [access.edge_package]
+    reliesOn: [getOfflinePackage]
+    for: Access offline package build job.
+    source: ['contracts/spine/access.yaml']
+  parking:
+    module: access
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: parking-entitlement, from: pending, to: pushFailed}
+    - {model: parking-entitlement, from: pushed, to: active}
+    - {model: parking-entitlement, from: active, to: used}
+    - {model: parking-entitlement, from: active, to: expired}
+    - {model: parking-entitlement, from: pushed, to: expired}
+    reads: [access.parking_entitlement]
+    writes: [access.parking_entitlement]
+    for: Access parking entitlement push and timers.
+    source: ['states/parking-entitlement.yaml:26']
+  scheduledChanges:
+    module: access
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: access-configuration-version, from: scheduled, to: active}
+    - {model: access-dynamic-policy, from: active, to: expired}
+    - {model: access-dynamic-policy, from: inactive, to: expired}
+    - {model: access-dynamic-policy, from: pendingApproval, to: expired}
+    - {model: access-gate-mode-change, from: pending, to: applied}
+    - {model: access-identity-lock, from: active, to: released}
+    - {model: access-media-template, from: scheduled, to: published}
+    - {model: access-media-template-version, from: scheduled, to: published}
+    reads:
+    - access.configuration_change
+    - access.configuration_version
+    - access.dynamic_policy
+    - access.dynamic_policy_version
+    - access.gate_mode_change
+    - access.identity_lock
+    - access.media_template
+    writes:
+    - access.configuration_change
+    - access.configuration_version
+    - access.dynamic_policy
+    - access.dynamic_policy_version
+    - access.gate_mode_change
+    - access.identity_lock
+    - access.media_template
+    for: 'Access scheduled changes and expiry timers: gate modes, configuration versions, media templates, dynamic policies,
+      identity locks.'
+    source:
+    - contracts/spine/access.yaml
+    - states/access-configuration-version.yaml:82
+    - states/access-dynamic-policy.yaml:78
+    - states/access-gate-mode-change.yaml:29
+  orderExchanged:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.exchanged]
+    reads: []
+    writes: [access.entitlement]
+    builtBy: CR480-ORDER-EXCHANGED-CONSUMERS
+    for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
+      as on the order-paid saga.'
+    source: ['events/order-exchanged.yaml']
+  orderTicketsResent:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.ticketsResent]
+    reads: [access.entitlement, access.credential_delivery]
+    writes: [access.credential_delivery]
+    for: 'This module''s consumer of order.ticketsResent (ADAM CR-506, CHG-CR506-001): one pending credential delivery per
+      entitlement, as deliverCredential writes it (sms is smsLink), idempotent on the event id plus the entitlement id.'
+    source: ['events/order-ticketsResent.yaml']
 paths:
   /access/validate:
     post:
@@ -334,7 +565,7 @@ paths:
         - "P02 GST-012 My Tickets"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -411,7 +642,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#delegatedAccessRecords
         route: service
@@ -517,7 +748,7 @@ paths:
         route: service
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'productName, imageUrl and guestCategory of each entitlement, Catalogue''s data (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)'
       security:
       - guestAuth: []
@@ -778,7 +1009,7 @@ paths:
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: pii.subject_biometric
@@ -1071,10 +1302,10 @@ paths:
         route: service
         for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: marketing.consent_record
@@ -1367,7 +1598,7 @@ paths:
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
-        for: 'the enrolment it revokes (pii.subject_biometric, Identity''s data; CHG-MOD-001), on Identity''s service route listSubjectBiometricRecords, connected when the kernel''s service sign-in (#37051) is ready (ADAM CR-391)'
+        for: 'the enrolment it revokes (pii.subject_biometric, Identity''s data; CHG-MOD-001), on Identity''s service route listSubjectBiometricRecords (POST /queries/subject-biometric-records, ADAM CR-438), connected when the kernel''s service sign-in (#37051) is ready (ADAM CR-391)'
       x-ticvai-write-via:
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
@@ -1394,8 +1625,9 @@ paths:
 
 
         **How the row is destroyed** (ADAM CR-391, Chinmay, 31 October 2026). The operation reads the enrolment
-        through `identity#subjectBiometricRecords` on Identity''s service route (`listSubjectBiometricRecords`,
-        `serviceAuth`); the access role gets no grant on `pii`. If the `enrolmentId` is unknown, is not a
+        through `identity#subjectBiometricRecords` on Identity''s service route (`listSubjectBiometricRecords`, POST
+        /queries/subject-biometric-records with `ids` or `where` as the body, ADAM CR-438; `serviceAuth`); the
+        access role gets no grant on `pii`. If the `enrolmentId` is unknown, is not a
         `facePass`, or belongs to another guest (for a guest caller), the answer is `404 not-found`. Otherwise it
         publishes `biometric.enrolmentChanged` with `change` `revoked` and the row''s fields, and answers `204`. On
         `revoked`, Identity''s consumer deletes the `pii.subject_biometric` row; it never deactivates it. The
@@ -2011,6 +2243,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateParkingEntitlementRequest'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -2975,10 +3209,10 @@ paths:
         for: 'the caller''s working venue''s path (platform.scope, by id), written as the profile''s scope_path,
           Tenancy''s data (ADAM CR-400, decided 31 October 2026, CR-217''s rule; CHG-CR400-001; XDR-036)'
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -3063,10 +3297,10 @@ paths:
         - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -3175,7 +3409,7 @@ paths:
         operation: createApprovalRequest
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -3347,7 +3581,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the group entitlement''s productName and imageUrl, from catalogue.product and its catalogue.product_media,
           Catalogue''s data (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
       x-ticvai-audience:
@@ -3501,7 +3735,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -4120,7 +4354,7 @@ paths:
         - "P08 BO-342 Media Replacement, Revocation & Rebinding Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the product replacementFeeReference names (422 unknown-product) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff
@@ -4628,7 +4862,7 @@ paths:
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RfidNfcCardWristbandMediaDesignerInput.depositReferenceWhereApplicable, RfidNfcCardWristbandMediaDesignerView.depositReferenceWhereApplicable (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [templateId]
       x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -4979,7 +5213,7 @@ paths:
         - "P08 BO-354 Credential Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -5117,7 +5351,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -5191,7 +5425,7 @@ paths:
         - "P08 BO-356 Credential Generation & Issuance Monitor"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -6348,7 +6582,7 @@ paths:
         - "P08 BO-153 Topology Validation & Publication"
       x-ticvai-read-via:
       - query: approvals#ruleRecords
-        route: service
+        route: in-process
         for: 'what its text calls "ApprovalRule.subjectTypes": approvals.rule, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-body-key: [configurationVersionId]
       x-ticvai-body-key-note: 'Keyed by the body''s `configurationVersionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access configuration version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -8941,10 +9175,10 @@ paths:
         - "P08 BO-187 Biometric Consent & Guardian Management"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -9108,7 +9342,7 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s biometrics settings, consentFormId for the fallback and templatesHeldByTicvai for the view: platform.venue_settings, Tenancy''s data, asked in process through Tenancy''s own query class under the caller''s row security (ADAM CR-390; XDR-032)'
+        for: 'the venue''s biometrics settings, consentFormId for the fallback and templatesHeldByTicvai for the view: platform.venue_settings, Tenancy''s data, asked in process through Tenancy''s own query class under the caller''s row security (ADAM CR-390; XDR-032); then the tenant default (the settings row with venue_id null), read under the routed tenant''s root grant, when the venue''s row names no consent form (ADAM CR-445)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out; pack ''Access Control Module'' p.61 (BO-188); MoM 2 Sep 2026
@@ -9148,8 +9382,16 @@ paths:
         the profile: each capture records the version the guest accepted on its own enrolment record (CHG-CSP-018).
         The venue''s biometrics settings (`consentFormId` for the
         fallback, `templatesHeldByTicvai` for the view) are read through `tenancy#venueSettingsRecords`, in process,
-        through Tenancy''s own query class and under the caller''s row security (XDR-032). No `consentFormId` on the
-        profile and none on the venue is `422 consent-form-required`.
+        through Tenancy''s own query class and under the caller''s row security (XDR-032).
+
+
+        **The consent form in force** (ADAM CR-445, Chinmay, 1 November 2026; CHG-CR445-001): the profile''s
+        `consentFormId`, else the venue''s biometrics settings (`VenueSettings.biometrics.consentFormId`), else the
+        tenant default (the settings row with `venue_id` null, as `VenueSettings` promises a null field inherits it),
+        the last read through the same query under the routed tenant''s root grant (ITenantRootGrant), for that one
+        statement only. Only when all three are empty is it `422 consent-form-required`. The view''s `consentFormId`
+        is the stored value: null means the venue''s (or the tenant''s) form applies, so a client that PUTs the view
+        back keeps following the venue.
 
         '
       tags:
@@ -9198,8 +9440,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
           description: '`retention-threshold-required`: `deletionTrigger` is `operationalRetentionThreshold` and no
-            `retentionThresholdHours` is sent. `consent-form-required`: no `consentFormId` on the profile and none
-            on the venue (CHG-CSP-018; ADAM CR-390).'
+            `retentionThresholdHours` is sent. `consent-form-required`: no `consentFormId` on the profile, none in
+            the venue''s biometrics settings and none in the tenant default (CHG-CSP-018; ADAM CR-390, CR-445).'
           x-ticvai-problem-types:
           - retention-threshold-required
           - consent-form-required
@@ -9453,7 +9695,7 @@ paths:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
-        route: service
+        route: in-process
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -9509,7 +9751,7 @@ paths:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
-        route: service
+        route: in-process
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: tenancy.data_retention_setting
@@ -10921,7 +11163,7 @@ paths:
         - "P08 BO-216 Group Leader & Fast B2B Validation"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
         route: service
@@ -12569,7 +12811,7 @@ paths:
         - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [policyId]
       x-ticvai-body-key-note: 'Keyed by the body''s `policyId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access policy within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -13225,7 +13467,7 @@ paths:
         - "P08 BO-253 Security Analytics, AI Detection & Governance"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SecurityAnalyticsAiDetectionGovernanceView.estimatedFraudPrevented, SecurityAnalyticsAiDetectionGovernanceView.financialExposure (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -13526,7 +13768,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
         route: service
@@ -13650,7 +13892,7 @@ paths:
         - "P08 BO-258 Entry, Exit, Re-entry & Crossover Analytics"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -13743,7 +13985,7 @@ paths:
         - "P08 BO-260 Validation Outcome & Rejection Analytics"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
         route: service
@@ -15348,9 +15590,8 @@ paths:
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-read-via:
       - query: tenancy#deviceRecords
-        route: service
+        route: in-process
         for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
-      x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPhysicalDeviceRegistration reads (pack ''Access
@@ -15439,9 +15680,8 @@ paths:
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-read-via:
       - query: tenancy#deviceRecords
-        route: service
+        route: in-process
         for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
-      x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPhysicalDeviceRegistration reads (pack ''Access
@@ -16350,7 +16590,7 @@ paths:
         - "P08 BO-177 Verification Method Selection & Locking"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [productId]
       x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -17131,7 +17371,7 @@ paths:
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -17226,7 +17466,7 @@ paths:
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -22897,7 +23137,8 @@ components:
           format: uuid
           nullable: true
           description: 'faceTagEnrolment rows. The venue''s consent form this profile''s captures are taken on (DEC-128;
-            ADAM CR-390, 31 October 2026); null falls back to the venue''s biometric consent form. No foreign key: the
+            ADAM CR-390, 31 October 2026); null falls back to the venue''s biometric consent form, else the tenant
+            default (ADAM CR-445). No foreign key: the
             form lives outside Access. The form''s version is not kept here: each capture records the version the
             guest accepted on its own enrolment record (CHG-CSP-018).'
         accessContext:
@@ -23585,6 +23826,7 @@ components:
           nullable: true
           description: e.g. group QR, mixed
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setJourneyProfile saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - active
@@ -25031,9 +25273,10 @@ components:
           nullable: true
           description: '**The venue''s own consent form a Face Tag is captured on** (decided 2 October 2026, Chinmay,
             batch 4, BO-188: "consent first, using a consent form from the venue"; DEC-128, DEC-549; CHG-CSP-018).
-            Null uses the venue''s biometric consent form (`tenancy.VenueSettings.biometrics.consentFormId`); either
-            way the form comes from the one consent-form builder in Venue Management. With neither, the profile is
-            refused `422 consent-form-required`. Stored as `access.biometric_profile.consent_form_id`; the form''s
+            Null uses the venue''s biometric consent form (`tenancy.VenueSettings.biometrics.consentFormId`), else the
+            tenant default, the settings row with `venue_id` null, read under the routed tenant''s root grant (ADAM
+            CR-445); either way the form comes from the one consent-form builder in Venue Management. With none of the
+            three, the profile is refused `422 consent-form-required`. Stored as `access.biometric_profile.consent_form_id`; the form''s
             version is not kept on the profile, each capture records the one the guest accepted (ADAM CR-390).'
           x-ticvai-stored-as: access.biometric_profile.consent_form_id
         consentCapture:
@@ -26537,6 +26780,21 @@ components:
           description: The `note` the latest `freezeEntitlement` took, required there when `reason` is
             `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes
             has something to read.
+        frozenFrom:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: '**The freeze window''s first day** (ADAM CR-543; Chinmay, 3 November 2026): written by
+            `freezeEntitlement` from its `from`. A freeze covers today when `frozenFrom` is on or before today and
+            `frozenUntil` is null or on or after today. Null when never frozen.'
+        frozenUntil:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: '**The freeze window''s last day** (ADAM CR-543): written by `freezeEntitlement` from its `to`;
+            null means open-ended.'
         isNameBound:
           type: boolean
           default: false
@@ -29601,6 +29859,13 @@ components:
         supportedPrinterIntegration:
           type: string
           description: Supported printer integration
+        layout:
+          allOf:
+          - $ref: ../spine/orders.yaml#/components/schemas/TicketLayout
+          description: 'The ticket layout this design prints (ADAM CR-447; CHG-CR447-001): stored in the design document,
+            named by a ticket template''s layoutRef, read by orders printTicketProof through access#mediaTemplateRecords.
+            The canvas''s own model; nothing the screen shows changes.'
+          x-ticvai-stored-as: access.media_template.design
       required:
       - templateId
       - outputFormat
@@ -29691,6 +29956,13 @@ components:
         supportedPrinterIntegration:
           type: string
           description: Supported printer integration
+        layout:
+          allOf:
+          - $ref: ../spine/orders.yaml#/components/schemas/TicketLayout
+          description: 'The ticket layout this design prints (ADAM CR-447; CHG-CR447-001): stored in the design document,
+            named by a ticket template''s layoutRef, read by orders printTicketProof through access#mediaTemplateRecords.
+            The canvas''s own model; nothing the screen shows changes.'
+          x-ticvai-stored-as: access.media_template.design
       required:
       - templateId
       - outputFormat
@@ -35106,7 +35378,9 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: The venue's consent form this profile captures on (DEC-128; CHG-CSP-018).
+          description: 'The consent form stored on this profile (DEC-128; CHG-CSP-018), never the form in effect
+            (ADAM CR-445, Chinmay, 1 November 2026; CHG-CR445-001): null means the venue''s form applies, or the
+            tenant''s where the venue names none, so a client that PUTs the view back keeps following the venue.'
         enrollmentChannels:
           type: array
           items:

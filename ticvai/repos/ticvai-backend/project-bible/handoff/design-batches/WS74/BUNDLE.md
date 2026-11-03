@@ -124,7 +124,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | Media Library · wave 3 · needs the `core` module |
+| Module | Media Library · wave 1 · needs the `core` module |
 | Block | Block B · ticket #29607 (APP-CMS-CMS-061) |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/digital-asset-management-command-center-cms-061` |
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Upload Assets, Browse Library, Create Collection. Each needs an operation, or needs removing from the … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 29 October 2026 (CHG-R11FXU-005): the approved screen has no list, table or chart that shows the assets themselves (its eight tiles are getMediaUsageAnalytics counts and its three buttons are …
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Upload Assets, Browse Library, Create Collection. Each needs an operation, or needs removing from the … Removed 29 October 2026 (CHG-R11FXU-005): the approved screen has no list, table or chart that shows the assets themselves (its eight tiles are getMediaUsageAnalytics counts and its three buttons are …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The DAM board's hub for the tenant's content team: how many assets by type, uploads, updates, downloads, shares and what was recently used, scoped to the tenant and the venues in the person's scope.
 
@@ -412,7 +412,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/central-digital-asset-library-cms-062` |
 
-**Known gaps.** **The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved: File Size, Ticket Media, Preview, View Details, Download, Add to Collection, Move. Each needs an operation … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved: File Size, Ticket Media, Preview, View Details, Download, Add to Collection, Move. Each needs an operation …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The main library workspace: grid or list of assets with thumbnail, name, type, category, dimensions or duration, size, status, owner and updated date; preview, details, download, add to collection, move.
 
@@ -611,7 +611,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `assetId` (navigation), `uploadId` (navigation) |
 | Route | `/media-library/upload-asset-ingestion-workspace-cms-063` |
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Browse Files, Bulk Upload, Import from Approved Source. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 3 operations.** Unserved: Browse Files, Bulk Upload, Import from Approved Source. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Add assets: browse, bulk upload or import from an approved source; each file validated (type, size, pixel limits) before upload with the reason stated, then described.
 
@@ -765,7 +765,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/folder-collection-workspace-management-cms-064` |
 
-**Known gaps.** **The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved: Manual Collection, Dynamic Collection, Campaign Collection, Brand Collection, Event Collection, Create … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 12 actions on this screen and the screen declares 2 operations.** Unserved: Manual Collection, Dynamic Collection, Campaign Collection, Brand Collection, Event Collection, Create … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Organise assets into folders and collections (manual, dynamic, campaign, brand, event) without copying files.
 
@@ -882,7 +882,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | Media Library · wave 3 · needs the `core` module |
+| Module | Media Library · wave 1 · needs the `core` module |
 | Block | Block B · ticket #29608 (APP-CMS-CMS-065) |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
@@ -891,7 +891,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/metadata-taxonomy-management-cms-065` |
 
-**Known gaps.** **The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Asset Name, Asset Type, Venue, Campaign, Event, Attraction, Owner, Source …. Each needs an operation, or … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved: Asset Name, Asset Type, Venue, Campaign, Event, Attraction, Owner, Source …. Each needs an operation, or … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The metadata model (fields, picklists, required fields) that makes the library searchable.
 
@@ -1192,7 +1192,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/advanced-search-discovery-cms-067` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Asset Type, File Format, Venue, Collection, Owner. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Asset Type, File Format, Venue, Collection, Owner. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Find assets in a large library by type, format, venue, collection, owner and text.
 
@@ -1346,8 +1346,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `assetId` (navigation), `mediaId` (navigation) |
 | Route | `/media-library/digital-asset-360-profile-cms-068` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** One asset's authoritative record: metadata, versions, rights, approvals and where it is distributed.
 
@@ -1523,7 +1521,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/bulk-asset-management-workspace-cms-069` |
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Select Individual, Select Search Results, Select Collection. Each needs an operation, or needs removing … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Select Individual, Select Search Results, Select Collection. Each needs an operation, or needs removing from … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Change many assets at once (tags, collection, rights, status) with a preview of how many change.
 
@@ -1637,7 +1635,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/asset-activity-recent-assets-library-health-cms-070` |
 
-**Known gaps.** **The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Review Unclassified, Fix Metadata, Review Duplicate Candidates, Review Orphaned Assets, View Activity Log … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Review Unclassified, Fix Metadata, Review Duplicate Candidates, Review Orphaned Assets, View Activity Log …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Library health: added, updated, unclassified, missing metadata, orphaned, storage used and growth.
 

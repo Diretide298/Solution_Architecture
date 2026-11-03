@@ -27,12 +27,12 @@
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-025 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional), and WEB-027 opens on its own"
+     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-025 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (optional), and WEB-027 opens on its own"
     },
     {
      "to": "WEB-026",
      "trigger": "Survey & Feedback",
-     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-025 holds none of them. The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on its own"
+     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-025 holds none of them. The edge carries nothing: formId only pre-selects (optional), and WEB-026 opens on its own"
     }
    ]
   },
@@ -259,7 +259,7 @@
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-026 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional), and WEB-027 opens on its own"
+     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-026 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (optional), and WEB-027 opens on its own"
     },
     {
      "to": "WEB-025",
@@ -495,12 +495,12 @@
     {
      "to": "WEB-026",
      "trigger": "Survey & Feedback",
-     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-027 holds none of them. The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on its own"
+     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-027 holds none of them. The edge carries nothing: formId only pre-selects (optional), and WEB-026 opens on its own"
     },
     {
      "to": "WEB-025",
      "trigger": "Help Centre / FAQ",
-     "provenance": "derived — WEB-025 declares entryState.params caseId and WEB-027 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-025 opens on its own"
+     "provenance": "derived — WEB-025 declares entryState.params caseId and WEB-027 holds none of them. The edge carries nothing: caseId only pre-selects (optional), and WEB-025 opens on its own"
     }
    ]
   },
@@ -706,17 +706,17 @@
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-028 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional), and WEB-027 opens on its own"
+     "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-028 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (optional), and WEB-027 opens on its own"
     },
     {
      "to": "WEB-026",
      "trigger": "Survey & Feedback",
-     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-028 holds none of them. The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on its own"
+     "provenance": "derived — WEB-026 declares entryState.params formId and WEB-028 holds none of them. The edge carries nothing: formId only pre-selects (optional), and WEB-026 opens on its own"
     },
     {
      "to": "WEB-025",
      "trigger": "Help Centre / FAQ",
-     "provenance": "derived — WEB-025 declares entryState.params caseId and WEB-028 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-025 opens on its own"
+     "provenance": "derived — WEB-025 declares entryState.params caseId and WEB-028 holds none of them. The edge carries nothing: caseId only pre-selects (optional), and WEB-025 opens on its own"
     }
    ]
   },

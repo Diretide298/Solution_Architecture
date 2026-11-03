@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 104 operations
+title: identity — 105 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -141,6 +141,7 @@ operations:
   writes:
   - cache:idempotency
   - identity.mfa_challenge
+  - platform.outbox
 - operation: createPrincipal
   verb: POST
   path: /principals
@@ -302,6 +303,7 @@ operations:
   - cache:idempotency
   - identity.mfa_method
   - identity.mfa_recovery_code
+  - platform.outbox
 - operation: evaluateAccess
   verb: POST
   path: /access-decisions
@@ -327,6 +329,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.subject_data_export
   - identity.subject_holding
   - pii.subject
   writes:
@@ -954,8 +957,8 @@ operations:
   reads: []
   writes: []
 - operation: listSubjectBiometricRecords
-  verb: GET
-  path: /internal/subject-biometrics
+  verb: POST
+  path: /queries/subject-biometric-records
   scope: venue
   permission: null
   audience:
@@ -1294,6 +1297,28 @@ operations:
   writes:
   - cache:idempotency
   - identity.module_access
+- operation: setRolePermissions
+  verb: PUT
+  path: /roles/{roleId}/permissions
+  scope: tenant
+  permission: ROLE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.delegated_access
+  - identity.role
+  - identity.role_permission
+  - identity.segregation_rule
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - identity.refresh_token
+  - identity.role
+  - identity.role_permission
+  - identity.session
+  - platform.audit_record
 - operation: setSegregationRules
   verb: PUT
   path: /segregation-rules

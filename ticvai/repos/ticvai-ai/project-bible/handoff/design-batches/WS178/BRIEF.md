@@ -1,6 +1,6 @@
 # WS178 — TICVAI Finance Backend Structure Reference v1.0 board 1
 
-**1 screens · 6 operations · 17 schemas · 2 permissions**
+**1 screens · 4 operations · 8 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

@@ -403,8 +403,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `spaceId` (navigation) |
 | Route | `/sell/space-access-rules-configuration-bo-702` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Who may use a space and when: the space's access rules (roles, times, accreditation), edited on the space.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)

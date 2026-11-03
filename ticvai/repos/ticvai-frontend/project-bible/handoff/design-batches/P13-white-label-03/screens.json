@@ -650,6 +650,9 @@
       {
        "kind": "secondaryButton",
        "label": "Assign to category",
+       "reads": [
+        "listProductCategories"
+       ],
        "operation": "setProductCategories",
        "provenance": "contract catalogue.yaml PUT /product-categories"
       },

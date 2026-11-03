@@ -33,7 +33,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-013 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-013 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -42,7 +42,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setSeoMetadata`) and no read of a population — it is settings, not a list",
@@ -245,7 +245,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-011 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-011 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -254,7 +254,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \nThe CHG-WIR-017 gap (no read follows a proposeTranslations job) is closed: getTranslationProposals was built (CHG-CSA-045) and is bound here (CHG-SGU-022).\n\n**proposeTranslations bound again 4 October 2026: it was removed because nothing could follow the 202 job (R288); getTranslationProposals now does, so the screen starts the job and follows it by the translationJobId it returns** (CHG-FXS-003)",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \nThe CHG-WIR-017 gap (no read follows a proposeTranslations job) is closed: getTranslationProposals was built (CHG-CSA-045) and is bound here (CHG-SGU-022).\n\n**proposeTranslations bound again 4 October 2026: it was removed because nothing could follow the 202 job (R288); getTranslationProposals now does, so the screen starts the job and follows it by the translationJobId it returns** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setLanguages`) and no read of a population — it is settings, not a list",
@@ -436,7 +436,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-012 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-012 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -445,7 +445,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Build note (r8, WHITE-C03): nothing is read on entry. The preview is made by `createPreview` when the person presses the action and is empty until then (not a 404); Validate calls `validateTenantConfig`; the no-access state names `TENANT_CONFIGURE` for those two operations. Ignore the generated first-run text \"Offers no create action\" and the `getTenantConfig` wording in the no-access state.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Build note (r8, WHITE-C03): nothing is read on entry. The preview is made by `createPreview` when the person presses the action and is empty until then (not a 404); Validate calls `validateTenantConfig`; the no-access state names `TENANT_CONFIGURE` for those two operations. Ignore the generated first-run text \"Offers no create action\" and the `getTenantConfig` wording in the no-access state.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "authored: the preview is made by `createPreview` when the person asks and the draft is checked by `validateTenantConfig`; nothing on this screen reads a record on entry.",
@@ -564,7 +564,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-014 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-014 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -602,7 +602,7 @@
     "CMS-006"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A rollback arrives here as a draft (decided 28 September, audit R139 (b)).** Version History (CMS-015) restores an old version into the working draft with `restoreConfigVersion` and reviews it with `diffConfigVersion`; only this screen's `publishTenantConfig` puts it live, with a note. A rollback is never one click.\n\nThe CHG-WIR-017 gap (getTenantAppStatus and getPublishedBookingFlow need the staff audience) is closed by CHG-CSA-045 (CHG-SGU-022).",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A rollback arrives here as a draft (decided 28 September, audit R139 (b)).** Version History (CMS-015) restores an old version into the working draft with `restoreConfigVersion` and reviews it with `diffConfigVersion`; only this screen's `publishTenantConfig` puts it live, with a note. A rollback is never one click.\n\nThe CHG-WIR-017 gap (getTenantAppStatus and getPublishedBookingFlow need the staff audience) is closed by CHG-CSA-045 (CHG-SGU-022).",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
@@ -911,7 +911,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-015 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-015 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -928,7 +928,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Absorbed CMS-020 on 28 September (audit R276)**: the Change Log listed the same `listConfigVersions` rows (who published what, when, with which note) and nothing else, so it brought no operation; its entry from the Tenant Workspace (CMS-001) now lands here.\n\n**Rollback is restore, then review, then publish — never one click (decided 28 September, audit R139 (b)).** **Restore config version** calls `restoreConfigVersion`, which copies the chosen version into the working draft and publishes nothing. The screen then shows **Diff config version** of the live version against the restored draft (`diffConfigVersion`) as the review, and **Review and publish the restored draft** goes to the Publishing Workflow (CMS-014), where `publishTenantConfig` puts it live with a note.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Absorbed CMS-020 on 28 September (audit R276)**: the Change Log listed the same `listConfigVersions` rows (who published what, when, with which note) and nothing else, so it brought no operation; its entry from the Tenant Workspace (CMS-001) now lands here.\n\n**Rollback is restore, then review, then publish — never one click (decided 28 September, audit R139 (b)).** **Restore config version** calls `restoreConfigVersion`, which copies the chosen version into the working draft and publishes nothing. The screen then shows **Diff config version** of the live version against the restored draft (`diffConfigVersion`) as the review, and **Review and publish the restored draft** goes to the Publishing Workflow (CMS-014), where `publishTenantConfig` puts it live with a note.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listConfigVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1133,7 +1133,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-016 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-016 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -1143,12 +1143,12 @@
     {
      "to": "CMS-017",
      "trigger": "Domain & Certificate",
-     "provenance": "derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them. The edge carries nothing: domainId only pre-selects (deep link or optional), and CMS-017 opens on its own"
+     "provenance": "derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them. The edge carries nothing: domainId only pre-selects (optional), and CMS-017 opens on its own"
     },
     {
      "to": "CMS-018",
      "trigger": "Consent & Legal",
-     "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them. The edge carries nothing: policyKind, questionId only pre-select (deep link or optional), and CMS-018 opens on its own"
+     "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them. The edge carries nothing: policyKind, questionId only pre-select (optional), and CMS-018 opens on its own"
     },
     {
      "to": "CMS-103",
@@ -1162,7 +1162,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1416,7 +1416,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-017 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-017 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -1425,7 +1425,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCustomDomains` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1717,7 +1717,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-018 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-018 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -1726,7 +1726,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**Two permission families on one screen (DI-387; CHG-SGU-017).** Policies need `TENANT_CONFIGURE`; consent purposes and questions need `GUEST_MANAGE` (reads `GUEST_VIEW`). A role holding one and not the other sees the other section read-only, or hidden with the permission named, never a broken page.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**Two permission families on one screen (DI-387; CHG-SGU-017).** Policies need `TENANT_CONFIGURE`; consent purposes and questions need `GUEST_MANAGE` (reads `GUEST_VIEW`). A role holding one and not the other sees the other section read-only, or hidden with the permission named, never a broken page.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPolicies` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1862,7 +1862,7 @@
         "ConsentQuestion.updatedAt"
        ],
        "operation": "listConsentQuestions",
-       "notes": "**A consent, not a data field** (decided 29 September, rev 3 REV3-26). Each question has its own text per locale, a version, and whether it is asked for each person or once per booking. Filter by `kind` and `status`. **Attaching** is done where the question is used: to a booking flow on CMS-016 (`BookingFlowConfig.consentQuestionIds`, per venue), to a product on BO-008 (`Product.consentQuestionIds`).",
+       "notes": "**A consent, not a data field** (decided 29 September, rev 3 REV3-26). Each question has its own text per locale, a version, and whether it is asked for each person or once per booking. Filter by `kind` and `status`. **Attaching** is done where the question is used: to a booking flow on CMS-016 (`BookingFlowLevelSettings.consentQuestionIds`, per venue), to a product on BO-008 (`Product.consentQuestionIds`).",
        "provenance": "contract marketing-crm.yaml GET /consent-questions",
        "permission": "GUEST_VIEW"
       },
@@ -2136,7 +2136,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-019 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-019 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -2145,7 +2145,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "**Who in the tenant may change what, and Change access changes it** (r13, CHG-RCR32-001). A role held at a scope is a grant: Change access adds a role with `createDelegatedAccess` (the role picked from Every role, the scope, the validity) and removes one with `deleteDelegatedAccess` (the picked role's `RoleSummary.grantId` from the selected person's roles); `updatePrincipal` changes only the display name, the active flag and the validity, and never grants or removes a role (decided 20 October 2026, Chinmay, IDENTITY-C15 option A; CHG-R8SPN-024). **Gates:** the screen needs `USER_MANAGE` (`listPrincipals`); the Every role table needs `ROLE_MANAGE` (`listRoles`) and Change access `PERMISSION_GRANT` (the grant writes), each on its component, so a caller without them does not see them (hidden, the components' default; r13, CHG-RCR29-001). A `USER_MANAGE` holder without `PERMISSION_GRANT` sees who has access and cannot change it here.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -2202,6 +2202,7 @@
         "Role.grantCount"
        ],
        "operation": "listRoles",
+       "permission": "ROLE_MANAGE",
        "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)",
        "notes": "The role a principal holds and the role another inherits from are shown by name; raw ids only in the detail panel's copy action."
       }
@@ -2235,8 +2236,10 @@
       {
        "kind": "secondaryButton",
        "label": "Change access",
-       "operation": "updatePrincipal",
-       "provenance": "contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026"
+       "operation": "createDelegatedAccess",
+       "permission": "PERMISSION_GRANT",
+       "provenance": "contract identity.yaml POST /delegated-access, DELETE /delegated-access/{delegatedAccessId} and PATCH /principals/{principalId}; rebound to the grant operations 2 November 2026 (r13, CHG-RCR32-001; IDENTITY-C15, CHG-R8SPN-024)",
+       "notes": "Opens the form for the selected person. The roles it adds and removes are grants (`createDelegatedAccess`, `deleteDelegatedAccess`, which need `PERMISSION_GRANT`); the person's name, active flag and validity go to `updatePrincipal` (`USER_MANAGE`)."
       }
      ]
     }
@@ -2263,11 +2266,31 @@
     "trigger": "onLoad"
    },
    {
+    "operationId": "createDelegatedAccess",
+    "contract": "identity",
+    "purpose": "Give the selected person a role at a scope, for a validity (a grant; IDENTITY-C15, CHG-R8SPN-024)",
+    "trigger": "onAction",
+    "provenance": "r13, CHG-RCR32-001",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   },
+   {
+    "operationId": "deleteDelegatedAccess",
+    "contract": "identity",
+    "purpose": "Take a role away from the selected person (the grant RoleSummary.grantId names; IDENTITY-C15)",
+    "trigger": "onAction",
+    "provenance": "r13, CHG-RCR32-001",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   },
+   {
     "operationId": "updatePrincipal",
     "contract": "identity",
-    "purpose": "Grant or remove a CMS role for the selected person",
+    "purpose": "Change the selected person's display name, active flag or validity; never a role (IDENTITY-C15)",
     "trigger": "onAction",
-    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021); purpose corrected 2 November 2026 (r13, CHG-RCR32-001)"
    }
   ],
   "entryState": {
@@ -2282,6 +2305,12 @@
     {
      "name": "principalId",
      "from": "session"
+    },
+    {
+     "name": "delegatedAccessId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: the grant Change access removes is the picked role's `RoleSummary.grantId` from the selected person's roles; an edge that holds one only pre-selects it (r13, CHG-RCR32-001)."
     }
    ]
   },
@@ -2296,13 +2325,24 @@
     "id": "formUpdatePrincipal",
     "component": "modal",
     "trigger": "Change access",
-    "body": "**Collects what `updatePrincipal` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects the selected person's access, and sends only what changed** (r13, CHG-RCR32-001; IDENTITY-C15, CHG-R8SPN-024). Roles to add: a role from Every role, its scope (`scopePath`, within the caller's own grants) and its validity (`validFrom`, `validTo`), each sent as `createDelegatedAccess` with the person's `principalId` and `effect` ALLOW. Roles to remove: picked from the person's roles, each sent as `deleteDelegatedAccess` with that role's `RoleSummary.grantId`. Display name, active flag and validity: `updatePrincipal`. A refusal names which write failed (400 `scope-outside-own-grants`, 409 `segregation-breach`) and the ones already sent stay sent. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Change access",
-     "operation": "updatePrincipal"
+     "operation": "createDelegatedAccess",
+     "alsoCalls": [
+      "deleteDelegatedAccess",
+      "updatePrincipal"
+     ]
     },
     "dismiss": {
-     "label": "Cancel"
+     "label": "Cancel",
+     "discards": [
+      "roleId",
+      "scopePath",
+      "validFrom",
+      "validTo",
+      "grantId"
+     ]
     },
     "provenance": "contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026"
    }

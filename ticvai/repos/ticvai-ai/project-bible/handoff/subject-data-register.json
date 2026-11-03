@@ -111,6 +111,7 @@
     "marketing.form_submission",
     "marketing.guest_device",
     "marketing.guest_document",
+    "marketing.guest_document_upload",
     "marketing.guest_note",
     "marketing.guest_preference",
     "marketing.guest_profile",

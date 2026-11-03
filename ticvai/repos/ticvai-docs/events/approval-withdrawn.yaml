@@ -30,11 +30,6 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Withdrawal analytics, kept apart from rejections (11.1.22)
-  idempotencyKey: requestId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Close the action plan waiting on this approval, as withdrawn (AI system design section 3.2)
   idempotencyKey: requestId
@@ -46,6 +41,15 @@ consumers:
     request closes unfulfilled and nothing is erased'
   writes:
   - identity.subject_data_export
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: white-label
+  purpose: 'A reviewed content block whose request was withdrawn (`subjectId` a whitelabel.content_block row pending
+    review; ADAM CR-462, decided 2 November 2026; CHG-CR462-001): `reviewStatus` rejected, and the block keeps the
+    status and schedule it had (draft, scheduled or expired), as publishContentBlock states'
+  writes:
+  - whitelabel.content_block
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true

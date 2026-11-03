@@ -923,8 +923,10 @@
    },
    "token": {
     "type": "string",
+    "nullable": true,
     "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n**Minted only for a cart created with no credential, and stored field-encrypted** (ADAM CR-486, Chinmay, 3 November 2026; CHG-CR486-001): 32 bytes from a cryptographic random generator, base64url without padding (43 characters); null on a signed-in guest's or a staff cart. Encrypted with the tenant's key, never plain at rest and never hashed, since the server reads it back for `getCart`, `claimCart`'s constant-time comparison and `cart.abandoned`'s recovery link; answered in clear to the cart's caller.\n"
    },
    "sessionId": {
     "type": "string",
@@ -1760,8 +1762,20 @@
    "name": {
     "type": "string",
     "readOnly": true,
+    "nullable": true,
     "x-ticvai-persisted": false,
-    "description": "**Read from the package's product, not stored here** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): `catalogue.product.name`, in the caller's language."
+    "description": "**Read from the package's product, not stored here** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009; ADAM CR-499, CHG-CR499-001). `listGroupPackages` answers `catalogue.product.name`, beside `nameLocalised`: as on Product, a guest screen shows the entry for its guest's language and falls back to `name`; staff screens show `name`. `setGroupPackageDefinition` answers null and reads no product name."
+   },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The package product's `nameLocalised`, read-only, not stored on the package** (ADAM CR-499, CHG-CR499-001): `catalogue.product.name_localised`, answered by `listGroupPackages`. See `Product.nameLocalised`; `name` is the fallback."
    },
    "unitPrice": {
     "allOf": [
@@ -1770,8 +1784,9 @@
      }
     ],
     "readOnly": true,
+    "nullable": true,
     "x-ticvai-persisted": false,
-    "description": "The product's price per participant (`pricingBasis` perParticipant) or per package, read from the product's current price; not stored here."
+    "description": "**The package product's `fromPrice`, not stored here** (ADAM CR-499, CHG-CR499-001). `listGroupPackages` computes it as `listProducts` computes `Product.fromPrice`: the lowest list price among the product's sellable variants on the caller's channel now, by the same price-list function `listProductVariants` uses, `catalogue#variantPriceRecords` (ADAM CR-439; called, never copied); null where no price list prices it on that channel. `pricingBasis` says what the amount is per (participant or package); it never changes the amount. `setGroupPackageDefinition` answers null and reads no price."
    },
    "minimumSize": {
     "type": "integer",
@@ -2069,7 +2084,7 @@
          "filter": {
           "type": "object",
           "nullable": true,
-          "description": "**What this answer keeps in the list (decided 29 September, W4).** Every field set must hold; answers to different questions are combined with AND. Required with `behaviour` `filter`. The server applies it (catalogue `guidedAnswerIds`), so web, mobile and kiosk show the same list.\n",
+          "description": "**What this answer keeps in the list (decided 29 September, W4).** Every field set must hold; answers to different questions are combined with AND. Required with `behaviour` `filter`. The server applies it (catalogue `guidedAnswerIds`), so web, mobile and kiosk show the same list.\n\n**One shared filter** (ADAM CR-532, Chinmay, 3 November 2026): fields are ANDed within an answer and answers are ANDed with each other; an empty field narrows nothing. Its inputs are the product, its eligibility rule (no rule means every limit is empty) and the kinds of its consent questions. `productIds` keeps the products listed.\n",
           "properties": {
            "productIds": {
             "type": "array",
@@ -2080,6 +2095,7 @@
            },
            "productCategoryIds": {
             "type": "array",
+            "description": "Keeps products filed under a listed category or any category below it in the category tree, as `listProducts`' `categoryId` already does (ADAM CR-532).",
             "items": {
              "type": "string",
              "format": "uuid"
@@ -2087,7 +2103,7 @@
            },
            "segmentTags": {
             "type": "array",
-            "description": "Catalogue `Product.segmentTags`, e.g. a level tag.",
+            "description": "Catalogue `Product.segmentTags`, e.g. a level tag, matched as `listProducts`' `segmentTag` does (a tag matches itself and tags below it; ADAM CR-532).",
             "items": {
              "type": "string"
             }
@@ -2101,18 +2117,18 @@
             "type": "integer",
             "minimum": 0,
             "nullable": true,
-            "description": "With `minAgeYears`, checked against each product's age rule (catalogue `ProductEligibilityRule`)."
+            "description": "**Age** (ADAM CR-532): a product is kept when the answer's range [`minAgeYears`, `maxAgeYears`] and the product's own age limits [`minAgeYears`, `maxAgeYears`] (its eligibility rule) overlap; an empty bound on either side is open. So 'Kids 3-12' keeps a 6+ activity, and a product with no age limits is always kept. Each person's age is still checked at booking."
            },
            "requiresSwimmer": {
             "type": "boolean",
             "nullable": true,
-            "description": "False hides products whose eligibility needs a swimmer; true keeps only those."
+            "description": "**Swimmer** (ADAM CR-532): a product needs a swimmer when any of its consent questions (`Product.consentQuestionIds`) has kind `swim`, or its eligibility rule still has the old `swimAbility` `confident`. false leaves those out; true keeps only those; empty narrows nothing."
            },
            "certificationCode": {
             "type": "string",
             "nullable": true,
             "maxLength": 40,
-            "description": "Keeps products that need this certificate, or with `holdsCertification` false, hides them."
+            "description": "**Certification** (ADAM CR-532), with `holdsCertification`: false leaves out products whose `requiredCertificationCode` is this code; true or no flag keeps products needing this code or no certification."
            },
            "holdsCertification": {
             "type": "boolean",
@@ -2835,6 +2851,55 @@
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
    },
+   "isFeatured": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The plan card's Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured plan."
+   },
+   "compareAtPrice": {
+    "x-ticvai-column": "compare_at_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan card's saving. Stored on `catalogue.product` as `compare_at_amount` in the venue's trading currency, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a made-up value."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "**The card's highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every operation that answers Product, to every audience. WEB-005's card shows the value for the guest's language, falling back to the English value, as the pill on the card image in capitals; null shows no badge."
+   },
+   "rating": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "required": [
+     "average",
+     "count"
+    ],
+    "properties": {
+     "average": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "multipleOf": 0.1,
+      "description": "The average rating, 1.0 to 5.0, one decimal."
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many reviews the average is over."
+     }
+    },
+    "description": "**The card's rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is not null."
+   },
    "nameLocalised": {
     "allOf": [
      {
@@ -3472,6 +3537,12 @@
    "isActive": {
     "type": "boolean",
     "description": "False when retired. Retired variants are never deleted — orders reference them."
+   },
+   "priceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The variant's price category, a `catalogue.price_category` id (ADAM CR-455): the winning price assignment's category rate for it replaces the price (`catalogue#variantPriceRecords`); null for none. Set by `updateProductVariant`."
    },
    "description": {
     "allOf": [

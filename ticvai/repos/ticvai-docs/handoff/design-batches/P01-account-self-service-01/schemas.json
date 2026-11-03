@@ -98,8 +98,10 @@
    },
    "token": {
     "type": "string",
+    "nullable": true,
     "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n**Minted only for a cart created with no credential, and stored field-encrypted** (ADAM CR-486, Chinmay, 3 November 2026; CHG-CR486-001): 32 bytes from a cryptographic random generator, base64url without padding (43 characters); null on a signed-in guest's or a staff cart. Encrypted with the tenant's key, never plain at rest and never hashed, since the server reads it back for `getCart`, `claimCart`'s constant-time comparison and `cart.abandoned`'s recovery link; answered in clear to the cart's caller.\n"
    },
    "sessionId": {
     "type": "string",
@@ -835,6 +837,20 @@
     "nullable": true,
     "maxLength": 500,
     "description": "The `note` the latest `freezeEntitlement` took, required there when `reason` is `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes has something to read."
+   },
+   "frozenFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The freeze window's first day** (ADAM CR-543; Chinmay, 3 November 2026): written by `freezeEntitlement` from its `from`. A freeze covers today when `frozenFrom` is on or before today and `frozenUntil` is null or on or after today. Null when never frozen."
+   },
+   "frozenUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The freeze window's last day** (ADAM CR-543): written by `freezeEntitlement` from its `to`; null means open-ended."
    },
    "isNameBound": {
     "type": "boolean",
@@ -2165,7 +2181,7 @@
     "nullable": true,
     "writeOnly": true,
     "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code."
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code. **20 random bytes, base32 without padding** (ADAM CR-522, RFC 6238; CHG-CR522-001), stored field-encrypted."
    },
    "destination": {
     "type": "string",
@@ -2179,7 +2195,7 @@
     "format": "date-time",
     "nullable": true,
     "writeOnly": true,
-    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
+    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified. **10 minutes after `enrolMfaMethod`** (ADAM CR-522, CHG-CR522-001), the same time as `MfaEnrolment.expiresAt`."
    },
    "kind": {
     "$ref": "#/components/schemas/MfaKind"
@@ -3185,6 +3201,12 @@
  "TicketTransfer": {
   "x-ticvai-persistence": "orders.ticket_transfer",
   "type": "object",
+  "x-ticvai-rls": "guest-reads-own",
+  "x-ticvai-guest-subject": [
+   "fromSubjectId",
+   "toSubjectId"
+  ],
+  "x-ticvai-guest-writer": "fromSubjectId",
   "required": [
    "id",
    "orderId",
@@ -3655,7 +3677,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

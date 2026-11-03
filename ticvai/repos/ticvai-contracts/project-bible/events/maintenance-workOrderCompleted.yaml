@@ -32,10 +32,5 @@ consumers:
   idempotencyKey: workOrderId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Downtime and mean time to repair
-  idempotencyKey: workOrderId
-  onFailure: retry
-  isCritical: false
 retention: 30 days after publication
 notes: Completion is not return to service. The asset stays out until maintenance.assetReturnedToService.

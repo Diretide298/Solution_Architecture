@@ -34,7 +34,9 @@ payload:
 - field: jurisdiction
   type: string
   notes: 'ISO 3166-1 alpha-2 country of the venue the request was raised at (the request''s venue; the lead, 25 October
-    2026, r10 round 3, CHG-R10ID-024); selects the response period'
+    2026, r10 round 3, CHG-R10ID-024); selects the response period. It is the countryCode of the region settings row
+    at the nearest ancestor of that venue''s path (the X-Venue-Id venue, or a staff caller''s working venue; ADAM
+    CR-512, CHG-CR512-001)'
 - field: raisedAt
   type: timestamp
 consumers:

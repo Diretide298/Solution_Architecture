@@ -1,6 +1,6 @@
 # P10-overview-01 — P10 · Overview
 
-**1 screens · 12 operations · 19 schemas · 6 permissions**
+**1 screens · 12 operations · 20 schemas · 6 permissions**
 
 Platform P10 Partner Web · ships as **partner-web** ·
 partner audience · web ·
@@ -94,7 +94,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-002` | Partner Dashboard | C | 114 | 47 | 6 | 71 | 0 | 0 | — | notStarted (generated) |
+| `PTR-002` | Partner Dashboard | C | 115 | 47 | 6 | 71 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

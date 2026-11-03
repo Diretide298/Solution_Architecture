@@ -494,6 +494,15 @@ def judge_review(row, S):
     explains = set()
     if kind == "file changed":
         return "for a person", explains
+    # **A function whose body or signature changed** (derive-ddl's review row, tools/ddl_forward.py: a function a policy
+    # or trigger depends on is not replaced in the forward file but written by hand; r13 integration, CHG-R13INT-007,
+    # ADAM CR-483's platform.end_principal_sessions): done once the target's definition is the package's, else open.
+    if kind == "function changed":
+        k = ("function", obj)
+        explains.add(k)
+        if k not in S.P:
+            return "for a person", explains
+        return ("done" if T.get(k) == S.P.get(k) else "open"), explains
     if kind == "statement dropped":
         tabs = [t.strip() for t in obj.split(",")]
         return ("table not built" if any(t not in S.ttab for t in tabs) else "for a person"), explains
@@ -555,7 +564,7 @@ def judge_review(row, S):
 
 REVIEW_KINDS = ("not null", "column changed", "column dropped", "column retired", "constraint added",
                 "constraint dropped", "table dropped", "index duplicates a unique index", "statement dropped",
-                "file changed")
+                "file changed", "function changed")
 
 
 def names(word, st):
@@ -1245,6 +1254,12 @@ def self_test():
     expect(doc["summary"]["releaseBehind"] == 1 and doc["summary"]["releaseDrops"] == 1
            and doc["summary"]["handOpen"] == 3 and doc["summary"]["notBuiltGaps"] == 3, f"summary: {doc['summary']}")
     expect("# Schema drift" in md_report(doc), "md_report")
+    # a changed function is done once the target's definition is the package's (CHG-R13INT-007)
+    fk = ("function", "platform.f(x int)")
+    fr = {"kind": "function changed", "db": "tenant", "object": "platform.f(x int)", "change": "", "todo": ""}
+    expect(judge_review(fr, Sides({fk: "abc"}, {fk: "abd"}))[0] == "open", "a function the target still differs on")
+    expect(judge_review(fr, Sides({fk: "abc"}, {fk: "abc"}))[0] == "done", "a function the target has as packaged")
+    expect(set(REVIEW_KINDS) >= {"function changed"}, "a changed function has a judging rule")
     return fails
 
 

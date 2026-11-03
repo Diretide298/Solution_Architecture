@@ -1991,10 +1991,6 @@ screens:
       on a kitchen device is a permission leak, and prioritising one ticket is a live act on the pass
       (KIT-003), not a rules setting (R254; design-notes corrections fnb-retail KIT-009).'
     source: contracts/spine/tenancy.yaml#setVenueSettings | R254
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No read of an outlet''s course rules or
-      kitchen SLA.'
-    source: contracts/satellite/fnb.yaml#setCourseRules | contracts/satellite/fnb.yaml#setKitchenSla
 - id: KIT-010
   name: Kitchen Performance, AI & Operational Optimization
   module: Kitchen

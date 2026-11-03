@@ -702,7 +702,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `eventId` (navigation) |
 | Route | `/sell/ticket-reservation-customer-treatment-configuration-bo-720` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A write and read storing the default ticket, reservation and customer treatment per kind of event change (rescheduleEvent performs one change).
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A write and read storing the default ticket, reservation and customer treatment per kind of event change (rescheduleEvent performs one change).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What happens to tickets, reservations and guests when an event changes: the default treatment per change kind (time, date, venue, cancel), applied consistently rather than per guest at a desk.
 

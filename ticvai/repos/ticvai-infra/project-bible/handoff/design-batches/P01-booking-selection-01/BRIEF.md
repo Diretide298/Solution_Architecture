@@ -174,7 +174,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-005` | Ticket Type Selection | A | 29 | 74 | 6 | 31 | 31 | 6 | guest | review (client-verified) |
+| `WEB-005` | Ticket Type Selection | A | 29 | 78 | 6 | 42 | 31 | 6 | guest | review (client-verified) |
 | `WEB-006` | Date & Performance Selection | A | 53 | 19 | 6 | 23 | 32 | 6 | guest | review (client-verified) |
 | `WEB-007` | Interactive Seat Selection | A | 8 | 51 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
 | `WEB-008` | Add-ons & Upsell | A | 27 | 12 | 5 | 47 | 16 | 0 | guest | review (client-verified) |

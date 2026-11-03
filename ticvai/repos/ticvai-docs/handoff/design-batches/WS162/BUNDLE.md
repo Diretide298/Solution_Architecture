@@ -157,8 +157,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/ai-resource-intelligence-command-center-bo-923` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The AI view of resources for managers: readiness, today's and forecast utilisation, predicted shortages and excess, staffing and equipment gaps, conflicts, overtime and maintenance risk, and the recommendations awaiting a decision, over a chosen horizon (Live, Today, Tomorrow, 7 days, 30 days). Its centre is the daily brief. The one thing to get right: every recommendation shows its confidence, the factors and constraints behind it, and waits for a person.
 
 **Known correction pending (do not draw the wrong version)**
@@ -667,8 +665,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/resource-demand-forecasting-bo-926` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the AI & Intelligence process.** Resource demand forecast for the resources team: how many of each resource (carts, lockers, cabanas, equipment, staff roles) will be needed per period, from the published forecast, against what exists - before a shortage happens. The one thing to get right: historical, forecast and actual are three distinct series, and the forecast is a range from a named version with its stage.
 
@@ -1381,7 +1377,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404, 409, 422).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-929?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Send AI message, Cancel.

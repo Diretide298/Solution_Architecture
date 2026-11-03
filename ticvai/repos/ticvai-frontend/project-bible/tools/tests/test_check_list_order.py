@@ -78,3 +78,20 @@ def test_r9_catches_the_three_crs():
             ("LO-UNORDERED", "listSsoProviders")}
     # on r9's text all three are found; once the CR lanes have fixed them at the source, none is
     assert want <= found or not (want & found)
+
+
+def test_r13_an_order_on_a_field_the_item_does_not_have():
+    """CHG-R13RVB-006: listFiscalPeriods by `occurredAt`; listAccountMappings by a foreign key 'newest first'."""
+    period = {"id": {}, "name": {}, "startDate": {}}
+    assert lo.order_field_gaps("**Order.** Newest first, by `occurredAt` descending, then by `id`.", period, {}, {}) \
+        == ["occurredAt"]
+    assert lo.order_field_gaps("**Order.** Newest first, by `startDate` descending, then by `id`.", period, {}, {}) == []
+    mapping = {"eventType": {}, "creditAccountId": {}, "venueId": {}}
+    assert lo.order_field_gaps("Sorted by `creditAccountId` descending (a UUIDv7, so newest first).", mapping, {}, {},
+                               persisted=True)
+    # a projection with no id, keyed by its subject, may say so
+    assert lo.order_field_gaps("Sorted by `partnerId` descending (a UUIDv7, so newest first).", {"partnerId": {}},
+                               {}, {}) == []
+    # a view with no id told "`id` breaks every tie"
+    assert lo.order_field_gaps("Where `product` is null the row sorts after the rows that have it (NULLS LAST), and "
+                               "`id` breaks every tie.", {"product": {}}, {}, {}) == ["id"]

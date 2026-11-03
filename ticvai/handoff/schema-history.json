@@ -1262,7 +1262,9 @@
   "platform.blind_index_rehash": "2026-10-31",
   "platform.tenant_field_key": "2026-10-31",
   "catalogue.competitor_price_observation": "2026-11-01",
-  "workforce.guest_broadcast": "2026-11-01"
+  "workforce.guest_broadcast": "2026-11-01",
+  "catalogue.import_job_row": "2026-11-03",
+  "marketing.guest_document_upload": "2026-11-03"
  },
  "renames": [
   {
@@ -1678,5 +1680,5 @@
   "platform.device_heartbeat": "2026-10-14"
  },
  "baseline": "2026-09-19",
- "generated": "2026-11-01"
+ "generated": "2026-11-03"
 }

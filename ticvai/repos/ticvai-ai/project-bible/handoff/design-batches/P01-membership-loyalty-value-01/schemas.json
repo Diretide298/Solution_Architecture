@@ -31,6 +31,67 @@
    }
   }
  },
+ "AddCartLineRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "variantId",
+   "quantity"
+  ],
+  "properties": {
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Optional; sent by a page or till that shows the engine's recommendations. Not validated against the engine: an unknown id only fails to attribute.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A table deposit line (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` in `awaitingDeposit` this pays for, sent with `variantId` set to the booking's `deposit.variantId` and `quantity` 1. The price is the booking's `deposit.amount`. A booking that is not awaiting a deposit is refused 422 `depositNotDue`.\n"
+   },
+   "seatIds": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
+   },
+   "parentLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For an add-on attaching to a ticket already in the cart. **Removing the parent removes the child** — a locker with no admission is not a sale.\n"
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   }
+  }
+ },
  "AppAvailability": {
   "type": "string",
   "description": "**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n",
@@ -284,6 +345,94 @@
    "operatingDayClose"
   ]
  },
+ "BookedWindow": {
+  "type": "object",
+  "nullable": true,
+  "x-ticvai-persistence": "none — embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+  "description": "**The booked time window of an hourly product, such as a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). The guest picks a date, a length and a start time from `resources.listProductStartTimes`; the length is the product's `length` variant (1 hour, 2 hours, half day, full day), priced per variant, so the price is the variant's. **`endsAt` minus `startsAt` must equal the chosen variant's length** (its `length` dimension value's `durationMinutes`), or the line is refused 422 `windowLengthMismatch`. Required on a product with `catalogue.Product.requiresTimeWindow` true and refused on any other (`windowRequired`, `windowNotAllowed`). The room itself is not named here: the window holds capacity of the room type, and `resources.allocateResources` picks the room at checkout (26 August minute: a guest books a meeting room product, never a raw room).\n",
+  "required": [
+   "startsAt",
+   "endsAt"
+  ],
+  "properties": {
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "After `startsAt`, on the same venue day."
+   }
+  }
+ },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies, chosen by `getPublishedBookingFlow`'s kind rule where several do (ADAM CR-427).\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "BookingFlowConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
@@ -305,6 +454,144 @@
      }
     }
    }
+  ]
+ },
+ "BookingFlowLevelSettings": {
+  "x-ticvai-persistence": "none — jsonb column on whitelabel.booking_flow",
+  "type": "object",
+  "description": "**The settings that belong to one flow, not to the venue (decided 29 September, W12).** Moved here from `BookingFlowSettings`, which keeps the venue-wide ones. Each keeps its rev 3 meaning and default. A field left out takes its default.\n",
+  "properties": {
+   "performanceReveal": {
+    "type": "string",
+    "enum": [
+     "dateTimeTicket",
+     "allAtOnce"
+    ],
+    "default": "dateTimeTicket",
+    "description": "**Performance reveal (rev 3 REV3-2).** `dateTimeTicket` shows the times only once a date is picked and the tickets only once a time is picked; `allAtOnce` shows them together. Product-first (W8) is the step order of `experienceWorkshop`, not a value here.\n"
+   },
+   "signInAt": {
+    "type": "string",
+    "enum": [
+     "afterAddOns",
+     "atPayment"
+    ],
+    "default": "afterAddOns",
+    "description": "**Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3).** `afterAddOns` asks as the guest leaves the extras step; `atPayment` asks at payment. The basket is kept either way.\n"
+   },
+   "seatEventDateMode": {
+    "type": "string",
+    "enum": [
+     "inlineStep",
+     "popupOnSeatMap"
+    ],
+    "default": "inlineStep",
+    "description": "**Date and time on a seated event (rev 3 REV3-4).** `inlineStep` asks for them before the seat map; `popupOnSeatMap` opens the seat map with a date and time pop-up. Read only by the seated flow types.\n"
+   },
+   "extrasStep": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "always",
+     "never"
+    ],
+    "default": "auto",
+    "description": "`auto` shows the extras step only when the cart's products have add-ons; `never` is the same as turning the optional `extras` step off."
+   },
+   "quickTour": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Quick tour (rev 3 REV3-20).** A first visit gets a coach-mark tour of this flow's steps, replayable from a Quick tour button. Seen-state kept on the device only.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "default": [],
+    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400 `consent-question-not-active`, naming the ids: `createBookingFlowDefinition` and `updateBookingFlowDefinition` read them with `marketing-crm#consentQuestionRecords` in process (ADAM CR-429). A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "BookingFlowStep": {
+  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-persistence": "whitelabel.booking_flow_step",
+  "type": "object",
+  "description": "One step of a venue's flow, in the venue's order (decided 29 September, W12).",
+  "required": [
+   "stepKey",
+   "enabled",
+   "sortOrder",
+   "scopePath"
+  ],
+  "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "stepKey": {
+    "$ref": "#/components/schemas/BookingFlowStepKey"
+   },
+   "enabled": {
+    "type": "boolean",
+    "description": "A `required` step cannot be off; the flow saves and `isValid` turns false."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "requirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional",
+     "conditional"
+    ],
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the flow type, so the CMS can mark the step without a second read."
+   },
+   "settings": {
+    "type": "object",
+    "additionalProperties": true,
+    "default": {},
+    "description": "The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."
+   }
+  }
+ },
+ "BookingFlowTypeKey": {
+  "type": "string",
+  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` is the one cabana flow (W6; `cabanaBySize` was removed in r8: a guest books a cabana from the map only, lead decision of 20 October 2026); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
+  "enum": [
+   "datedDayPass",
+   "timedEntry",
+   "openDated",
+   "seatedFixedPerformance",
+   "seatedDateTimeSeatMap",
+   "experienceWorkshop",
+   "surfSession",
+   "meetingRoomHourly",
+   "cabanaMap",
+   "guidedTourByLanguage",
+   "transport",
+   "tableReservation",
+   "membership",
+   "giftCard",
+   "multiLocation"
   ]
  },
  "BrandIdentity": {
@@ -393,6 +680,440 @@
     "type": "boolean",
     "default": true,
     "description": "**\"Powered by TICVAI\", a configuration toggle, on by default** (Chinmay, 2 October, workbook Q160 and the pre-apply round; consistent with DI-297; CHG-CSA-036). Shown on the launch screen and at the foot of Account and the web footer while true. **Switching it off needs the tenant's licence to allow it**: `setBrandIdentity` refuses `false` with `403 powered-by-locked` unless the tenant's plan carries the `poweredByRemoval` add-on (subscription `LicencePosition.poweredByRemovable`)."
+   }
+  }
+ },
+ "Cart": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.cart",
+  "x-ticvai-rls": "guest-owns",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "status",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "anonymousSessionToken": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The `guestAuth` token of the anonymous session `createCart` opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. Not stored on the cart."
+   },
+   "token": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n**Minted only for a cart created with no credential, and stored field-encrypted** (ADAM CR-486, Chinmay, 3 November 2026; CHG-CR486-001): 32 bytes from a cryptographic random generator, base64url without padding (43 characters); null on a signed-in guest's or a staff cart. Encrypted with the tenant's key, never plain at rest and never hashed, since the server reads it back for `getCart`, `claimCart`'s constant-time comparison and `cart.abandoned`'s recovery link; answered in clear to the cart's caller.\n"
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021)."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The workstation of that session; null for a guest's cart."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null while anonymous. Set by `claimCart`."
+   },
+   "status": {
+    "$ref": "#/components/schemas/CartStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartLine"
+    }
+   },
+   "conflicts": {
+    "x-ticvai-persisted": false,
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartConflict"
+    }
+   },
+   "consentQuestions": {
+    "x-ticvai-persisted": false,
+    "type": "array",
+    "readOnly": true,
+    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "lineIds": {
+         "type": "array",
+         "description": "The cart lines that ask it. Empty for a question the flow asks.",
+         "items": {
+          "type": "string",
+          "format": "uuid"
+         }
+        },
+        "answered": {
+         "type": "boolean",
+         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."
+        }
+       }
+      }
+     ]
+    }
+   },
+   "subtotal": {
+    "x-ticvai-column": "net_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "x-ticvai-column": "gross_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPromotionIds": {
+    "type": "array",
+    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "couponCodes": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The promo codes the guest entered through `applyCartPromoCode` (decided 28 September, audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code is re-checked on each read like any promotion; a code that stops qualifying stays listed here and its promotion drops out of `appliedPromotionIds`.\n",
+    "items": {
+     "type": "string",
+     "maxLength": 100
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none. The window is set at creation to now plus the venue's `cartLeaseSeconds`, else the tenant default (ADAM CR-184, option A; CHG-R9CR-003; see `createCart`)."
+   },
+   "extensionsUsed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "maxExtensions": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The venue's `cartMaxExtensions`, else the tenant default, set when the cart is created (ADAM CR-184, option A; CHG-R9CR-003; see `createCart`)."
+   },
+   "locale": {
+    "type": "string"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CartConflict": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed on read",
+  "description": "2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "overlappingTime",
+     "sameSessionDifferentVenue",
+     "exceedsPartySize",
+     "requiresPrerequisite",
+     "consentBlocksBooking"
+    ]
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "message": {
+    "type": "string"
+   },
+   "isBlocking": {
+    "type": "boolean",
+    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold. So is `consentBlocksBooking`: a consent question answered with the answer the venue set to block the booking (decided 29 September, rev 3 REV3-26).\n"
+   }
+  }
+ },
+ "CartLine": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.cart_line",
+  "required": [
+   "id",
+   "variantId",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. Priced from the deposit the booking snapshotted, not from the variant. Becomes an `orders.deposit` row at checkout, not revenue. A table booking with no deposit never has a line (rev 3 REV3-8).\n"
+   },
+   "seatIds": {
+    "type": "array",
+    "maxItems": 50,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "resourceHoldId": {
+    "x-ticvai-column": "resource_reservation_id",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   },
+   "parentLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on the line because **removing the parent removes the child**, and `removeCartLine` has to be able to find the children.\n"
+   },
+   "overridePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "priceMatch",
+     "serviceRecovery",
+     "negotiated",
+     "damagedGoods",
+     "staffSale",
+     "error"
+    ],
+    "description": "BL-085. **An operator could apply an approved discount and not enter a price.** A price match against a competitor and a service-recovery gesture are not discounts off a list — they are a number somebody decided.\n**Escalated above a configured threshold, and the reason is a closed set**: a free-text override reason is an override nobody can report on, and this is the field an auditor reads first.\n"
+   },
+   "feeKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "booking",
+     "transaction",
+     "service",
+     "delivery",
+     "convenience",
+     "cancellation"
+    ],
+    "description": "**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lineTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "inventoryHoldId": {
+    "x-ticvai-column": "inventory_reservation_id",
+    "x-ticvai-references": "catalogue.inventory_reservation",
+    "type": "string",
+    "nullable": true,
+    "description": "The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
+   },
+   "leaseExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Shown to the guest. *\"Your seats are held for 6 minutes\"* is better than discovering it at checkout.\n"
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"
+   }
+  }
+ },
+ "CartStatus": {
+  "type": "string",
+  "enum": [
+   "active",
+   "expiring",
+   "expired",
+   "abandoned",
+   "checkedOut"
+  ]
+ },
+ "CatalogueMembershipBenefit": {
+  "x-ticvai-rls": "grant-holder-read",
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.membership_benefit",
+  "description": "**Taken from the backend workbook, 20 September.** Defines a benefit that can be included in one or more membership plans.",
+  "required": [
+   "code",
+   "name",
+   "type",
+   "isActive",
+   "createdAt",
+   "scopePath"
+  ],
+  "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "value": {
+    "type": "number",
+    "nullable": true
+   },
+   "unit": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "entitlementTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "readOnly": true,
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CataloguePlanBenefit": {
+  "type": "object",
+  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-persistence": "catalogue.plan_benefit",
+  "description": "**Taken from the backend workbook, 20 September.** Maps membership benefits to plans and defines usage limits for each benefit.",
+  "required": [
+   "entitlementTemplateId",
+   "membershipBenefitId",
+   "priority",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "entitlementTemplateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
+    "type": "string",
+    "format": "uuid"
+   },
+   "membershipBenefitId": {
+    "x-ticvai-references": "catalogue.membership_benefit",
+    "type": "string",
+    "format": "uuid"
+   },
+   "usageLimit": {
+    "type": "number",
+    "nullable": true
+   },
+   "usagePeriod": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -1299,6 +2020,20 @@
     "maxLength": 500,
     "description": "The `note` the latest `freezeEntitlement` took, required there when `reason` is `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes has something to read."
    },
+   "frozenFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The freeze window's first day** (ADAM CR-543; Chinmay, 3 November 2026): written by `freezeEntitlement` from its `from`. A freeze covers today when `frozenFrom` is on or before today and `frozenUntil` is null or on or after today. Null when never frozen."
+   },
+   "frozenUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The freeze window's last day** (ADAM CR-543): written by `freezeEntitlement` from its `to`; null means open-ended."
+   },
    "isNameBound": {
     "type": "boolean",
     "default": false
@@ -1896,7 +2631,7 @@
  },
  "GuestMembership": {
   "type": "object",
-  "description": "19.2.26 to 19.2.28. **A view, not a table** — assembled from the entitlement, the product that granted it and the order that bought it.\n",
+  "description": "19.2.26 to 19.2.28. **A view, not a table** — assembled from the entitlement, the product that granted it and the order that bought it.\n\n**Defined field by field** (ADAM CR-543; Chinmay, 3 November 2026; CHG-CR543-001): `getMyMemberships` and `listGuestMemberships` build it with the same code and rules. Rows: the guest's `access.entitlement` rows (`subject_id` is the guest) whose product's kind is `membership`. A chain is the guest's entitlements of one product plus any linked by `supersedes_entitlement_id`; the newest in a chain is the row, the earlier ones its `previousTerms`. A surrendered entitlement (transferred away) is not shown.\n",
   "required": [
    "entitlementId",
    "productId",
@@ -1918,7 +2653,8 @@
    },
    "tier": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "Null (ADAM CR-543) - nothing links a membership to a loyalty programme, so Marketing is not called."
    },
    "status": {
     "type": "string",
@@ -1929,35 +2665,40 @@
      "expired",
      "cancelled"
     ],
-    "description": "**Derived from the entitlement, not held here.** This schema is a view assembled from the entitlement, the product that granted it and the order that bought it — the lifecycle lives in `states/entitlement-status.yaml` and `frozen` is what `freezeEntitlement` sets.\nNo state model of its own, deliberately: **two models over one lifecycle drift.**\n"
+    "description": "**Derived from the entitlement, not held here.** This schema is a view assembled from the entitlement, the product that granted it and the order that bought it — the lifecycle lives in `states/entitlement-status.yaml` and `frozen` is what `freezeEntitlement` sets.\nNo state model of its own, deliberately: **two models over one lifecycle drift.**\n\n**The rule** (ADAM CR-543): `cancelled` becomes `cancelled`; `expired`, `fullyConsumed`, or `valid_to` before today becomes `expired`; `issued` or `partiallyConsumed` with `suspended_reason` set becomes `suspended`; otherwise, with a freeze covering today, `frozen`; otherwise `active`. A freeze covers today when `frozen_from` is on or before today and `frozen_until` is null or on or after today.\n"
    },
    "validFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "The entitlement's `valid_from`, as a date in the venue's time zone (ADAM CR-543)."
    },
    "validTo": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "The entitlement's `valid_to`, as a date in the venue's time zone (ADAM CR-543)."
    },
    "frozenDays": {
     "type": "integer",
-    "description": "Days lost to a freeze and added back to `validTo`. **Shown because a guest who paused a pass will check the maths**, and a validity date that moved without explanation is a support call.\n"
+    "description": "Days lost to a freeze and added back to `validTo`. **Shown because a guest who paused a pass will check the maths**, and a validity date that moved without explanation is a support call. As stored on the entitlement (ADAM CR-543).\n"
    },
    "benefits": {
     "type": "array",
-    "description": "5.4.31. From the product's entitlement template. **Traceable to what grants them**, so a gate can honour what the app promised.\n",
+    "description": "5.4.31. From the product's entitlement template. **Traceable to what grants them**, so a gate can honour what the app promised. **The rule** (ADAM CR-543): `entitlement.template_id` to `catalogue.plan_benefit` (`is_active`) to `catalogue.membership_benefit` (`is_active`), ordered by `plan_benefit.priority` then `code`.\n",
     "items": {
      "type": "object",
      "properties": {
       "code": {
-       "type": "string"
+       "type": "string",
+       "description": "`membership_benefit.code`."
       },
       "name": {
-       "type": "string"
+       "type": "string",
+       "description": "`membership_benefit.name`."
       },
       "value": {
        "type": "string",
-       "nullable": true
+       "nullable": true,
+       "description": "`membership_benefit.value` as a plain decimal string, followed by a space and the `unit` when `unit` is set (`10 percent`); null when `value` is null (ADAM CR-543)."
       }
      }
     }
@@ -1965,11 +2706,12 @@
    "renewsOn": {
     "type": "string",
     "format": "date",
-    "nullable": true
+    "nullable": true,
+    "description": "Null (ADAM CR-543) - nothing stores an automatic renewal."
    },
    "previousTerms": {
     "type": "array",
-    "description": "Prior terms, including lapsed ones.",
+    "description": "Prior terms, including lapsed ones: the chain's earlier entitlements, newest first (ADAM CR-543).",
     "items": {
      "type": "object",
      "properties": {
@@ -1988,7 +2730,8 @@
         "renewed",
         "cancelled",
         "upgraded"
-       ]
+       ],
+       "description": "`upgraded` when the next term is a different product; `cancelled` when the term was cancelled other than by being superseded; `renewed` when the next term starts no later than the day after this term's `validTo`; otherwise `expired` (ADAM CR-543)."
       }
      }
     }
@@ -2722,7 +3465,7 @@
     "nullable": true,
     "writeOnly": true,
     "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code."
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code. **20 random bytes, base32 without padding** (ADAM CR-522, RFC 6238; CHG-CR522-001), stored field-encrypted."
    },
    "destination": {
     "type": "string",
@@ -2736,7 +3479,7 @@
     "format": "date-time",
     "nullable": true,
     "writeOnly": true,
-    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
+    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified. **10 minutes after `enrolMfaMethod`** (ADAM CR-522, CHG-CR522-001), the same time as `MfaEnrolment.expiresAt`."
    },
    "kind": {
     "$ref": "#/components/schemas/MfaKind"
@@ -2919,6 +3662,96 @@
    }
   }
  },
+ "OrderLineAttributes": {
+  "type": "object",
+  "nullable": true,
+  "additionalProperties": true,
+  "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free. **`attendees` is the second** (20 October 2026, R8 blocker cause GPS-C28; CHG-R8SPN-034), and **`parking` and `bundle` have a defined shape too** (R8 blockers ORDERS-MONEY-C22 and C43, CHG-R8MIG-023).\n",
+  "properties": {
+   "transport": {
+    "$ref": "#/components/schemas/TransportLineAttributes"
+   },
+   "attendees": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "**How many people a meeting-room booking is for** (GST-075; R8 blocker cause GPS-C28, CHG-R8SPN-034). Sent with `addCartLine` for a meeting-room product, kept from the cart line to the order line, and shown on the venue's reception list for the booking. It must not exceed the room type's capacity, which the guest step shows beside each room type: more is refused `422 attendees-over-capacity` by `addCartLine`, naming the capacity. The guest steps run in the order `listProductStartTimes` can answer (lead answer, option A): date, room type, length, then start time."
+   },
+   "parking": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A parking line's plate and day** (R8 blocker ORDERS-MONEY-C22, CHG-R8MIG-023): carried from `addCartLine` to the order line and passed to `issueOrderEntitlements`, which writes the parking entitlement's plate, `validFrom` and `validTo` from it. A sold-out answer (`soldOutForDay`) means the facility's capacity on the `validFrom` day.",
+    "required": [
+     "plate",
+     "validFrom",
+     "validTo"
+    ],
+    "properties": {
+     "plate": {
+      "type": "object",
+      "required": [
+       "number"
+      ],
+      "properties": {
+       "number": {
+        "type": "string",
+        "maxLength": 16
+       },
+       "country": {
+        "type": "string",
+        "maxLength": 3,
+        "nullable": true,
+        "description": "ISO 3166 code of the plate's country; null for the venue's own."
+       }
+      }
+     },
+     "validFrom": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "validTo": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "bundle": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A bundle line's picks** (R8 blocker ORDERS-MONEY-C43, the lead's answer B for r8; CHG-R8MIG-023): the bundle and the option the guest chose in each choice group. The line's `variantId` is the bundle's own (`Bundle.variantId`); the server prices it at the bundle's own price and freezes the allocation at `createOrder` (ADR-0019). In r8 a bundle's admission is open-dated, so no date or session is asked.",
+    "required": [
+     "bundleId"
+    ],
+    "properties": {
+     "bundleId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "choices": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "choiceGroupId",
+        "optionId"
+       ],
+       "properties": {
+        "choiceGroupId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "optionId": {
+         "type": "string",
+         "format": "uuid"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -3049,6 +3882,55 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "isFeatured": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The plan card's Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured plan."
+   },
+   "compareAtPrice": {
+    "x-ticvai-column": "compare_at_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan card's saving. Stored on `catalogue.product` as `compare_at_amount` in the venue's trading currency, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a made-up value."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "**The card's highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every operation that answers Product, to every audience. WEB-005's card shows the value for the guest's language, falling back to the English value, as the pill on the card image in capitals; null shows no badge."
+   },
+   "rating": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "required": [
+     "average",
+     "count"
+    ],
+    "properties": {
+     "average": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "multipleOf": 0.1,
+      "description": "The average rating, 1.0 to 5.0, one decimal."
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many reviews the average is over."
+     }
+    },
+    "description": "**The card's rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is not null."
    },
    "nameLocalised": {
     "allOf": [
@@ -3470,6 +4352,100 @@
     ],
     "nullable": true,
     "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
+   }
+  }
+ },
+ "ProductVariant": {
+  "x-ticvai-persistence": "catalogue.variant",
+  "type": "object",
+  "required": [
+   "id",
+   "productId",
+   "sku",
+   "axisValues",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "listPrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
+   },
+   "referencePrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The price a saving is measured against** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (`updateProductVariant`). Null where the variant claims no saving, which is the default. In the same currency as `listPrice`."
+   },
+   "savingPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**Computed by the server, never in the browser** (ADAM CR-253): with a `referencePrice` and a `listPrice` below it, the whole percent the list price saves, `floor((referencePrice - listPrice) / referencePrice * 100)` (rounded down, so the label never overstates; proposed, client to correct); null otherwise. A length tile shows *Save n%* only when this is set."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "axisValues": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150,
+    "nullable": true,
+    "description": "**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"
+   },
+   "barcode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"
+   },
+   "isDefault": {
+    "type": "boolean",
+    "default": false,
+    "description": "Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False when retired. Retired variants are never deleted — orders reference them."
+   },
+   "priceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The variant's price category, a `catalogue.price_category` id (ADAM CR-455): the winning price assignment's category rate for it replaces the price (`catalogue#variantPriceRecords`); null for none. Set by `updateProductVariant`."
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"
    }
   }
  },
@@ -4196,6 +5172,22 @@
     "description": "A saved card other than the one that failed: the id of one of the guest's own `PaymentToken` rows (`payments.token`, stored through `storePaymentToken`), **not** a `payments.method` id, which names a kind of method in the catalogue rather than a card. Required after a hard decline.\n"
    }
   }
+ },
+ "SalesChannel": {
+  "type": "string",
+  "description": "**Where a sale came from.** Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing.\n**Not interchangeable with the local `Channel` enums.** `catalogue.Channel` and `orders.Channel` are byte-identical duplicates of each other listing `pos, kiosk, web, mobile, b2b, ota, callCentre`; `orders.OrderChannel` lists `guestApp, guestWeb, partner, api, backOffice` on top. **Pointing the nine at a local enum would silently narrow them** — and the duplication between the two `Channel` enums is the reason a shared one existed in the first place.\n**This is the reporting dimension**: attribution, promotion eligibility and settlement all group by it, which is why it has to mean the same thing in `orders`, `catalogue`, `subscription` and `marketing-crm` rather than four things that nearly line up.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice",
+   "b2b",
+   "ota"
+  ]
  },
  "StackingMode": {
   "type": "string",

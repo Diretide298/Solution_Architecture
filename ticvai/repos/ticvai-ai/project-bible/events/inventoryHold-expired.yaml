@@ -27,10 +27,5 @@ consumers:
   idempotencyKey: inventoryHoldId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Hold expiry rate per channel and performance
-  idempotencyKey: inventoryHoldId
-  onFailure: retry
-  isCritical: false
 retention: 7 days after publication
 notes: No state model emits this directly; the sweeper's timer transition on the lease model does.

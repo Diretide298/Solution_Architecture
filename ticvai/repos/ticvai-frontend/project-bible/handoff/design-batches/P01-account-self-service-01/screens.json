@@ -43,12 +43,12 @@
     {
      "to": "WEB-018",
      "trigger": "My Tickets",
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-016 holds none of them. The edge carries nothing: entitlementId, orderId only pre-select (deep link or optional), and WEB-018 opens on its own"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-016 holds none of them. The edge carries nothing: WEB-018 finds entitlementId (listMyEntitlements), orderId (listMyEntitlements) itself, and WEB-018 opens on its own"
     },
     {
      "to": "WEB-019",
      "trigger": "Order History",
-     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep link or optional), and WEB-019 opens on its own"
+     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016 holds none of them. The edge carries nothing: documentId, invoiceId only pre-select (optional); WEB-019 finds orderId (listOwnRefundRequests) itself, and WEB-019 opens on its own"
     },
     {
      "to": "WEB-010",
@@ -62,7 +62,7 @@
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "provenance": "derived — WEB-011 declares entryState.params holdId and WEB-016 holds none of them. The edge carries nothing: holdId only pre-selects (deep link or optional), and WEB-011 opens on its own"
+     "provenance": "derived — WEB-011 declares entryState.params holdId and WEB-016 holds none of them. The edge carries nothing: holdId only pre-selects (optional), and WEB-011 opens on its own"
     },
     {
      "to": "WEB-012",
@@ -883,7 +883,7 @@
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params token and WEB-018 holds none of them. The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on its own"
+     "provenance": "derived — WEB-017 declares entryState.params token and WEB-018 holds none of them. The edge carries nothing: WEB-017 opens on getWishlist, and token has no source on WEB-017 yet (a gap in WEB-017, not in this edge)"
     },
     {
      "to": "WEB-019",
@@ -1270,7 +1270,7 @@
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params token and WEB-019 holds none of them. The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on its own"
+     "provenance": "derived — WEB-017 declares entryState.params token and WEB-019 holds none of them. The edge carries nothing: WEB-017 opens on getWishlist, and token has no source on WEB-017 yet (a gap in WEB-017, not in this edge)"
     },
     {
      "to": "WEB-018",
@@ -1631,12 +1631,12 @@
     {
      "to": "WEB-017",
      "trigger": "My Account Dashboard",
-     "provenance": "derived — WEB-017 declares entryState.params token and WEB-020 holds none of them. The edge carries nothing: token only pre-selects (deep link or optional), and WEB-017 opens on its own"
+     "provenance": "derived — WEB-017 declares entryState.params token and WEB-020 holds none of them. The edge carries nothing: WEB-017 opens on getWishlist, and token has no source on WEB-017 yet (a gap in WEB-017, not in this edge)"
     },
     {
      "to": "WEB-018",
      "trigger": "My Tickets",
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-020 holds none of them. The edge carries nothing: entitlementId, orderId only pre-select (deep link or optional), and WEB-018 opens on its own"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-020 holds none of them. The edge carries nothing: WEB-018 finds entitlementId (listMyEntitlements), orderId (listMyEntitlements) itself, and WEB-018 opens on its own"
     }
    ]
   },

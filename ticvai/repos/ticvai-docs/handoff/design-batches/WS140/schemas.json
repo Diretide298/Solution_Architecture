@@ -351,6 +351,11 @@
   "x-ticvai-index": [
    [
     "sourceRef"
+   ],
+   [
+    "sourceRef",
+    "subjectId",
+    "channel"
    ]
   ],
   "x-ticvai-persistence": "marketing.message_dispatch",
@@ -461,6 +466,11 @@
     "type": "string",
     "nullable": true,
     "description": "The id of the record whose business event triggered the message (a performance id, a guest broadcast id), which `listMessageDispatches` filters on (ADAM CR-379; CHG-CR379-001). Null for a campaign."
+   },
+   "body": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The resolved message as sent** (ADAM CR-442, Chinmay, 1 November 2026; CHG-CR442-001), which Marketing's message sender sends; for a guest broadcast, `messageLocalised` in the guest's language, else `message` (`sendGuestBroadcast`)."
    }
   }
  },

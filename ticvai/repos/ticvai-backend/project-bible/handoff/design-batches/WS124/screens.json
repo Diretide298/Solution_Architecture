@@ -467,7 +467,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 21 actions on this screen and the screen declares 0 operations.** Unserved: Customer, Commercial, Financial, Operational, Security, Model / AI Quality, Risk Matrix, Critical …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 21 actions on this screen and the screen declares 5 operations.** Unserved: Customer, Commercial, Financial, Operational, Security, Model / AI Quality, Risk Matrix, Critical …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Governance_Reference.pdf, page 84 §Support"
    },
    {
@@ -960,13 +960,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Compliance KPIs) and a per-row directory (§Show) — counts over a population, then the population",
   "purpose": "Continuously detect AI activity that violates or attempts to violate Board 1 governance policies.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Governance_Reference.pdf, page 87 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1247,13 +1241,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Data Usage KPIs) and a per-row directory (§Show) — counts over a population, then the population",
   "purpose": "Monitor whether AI capabilities are actually using data according to the policies configured in Board 1. This screen is monitoring—not the configuration of the data policies themselves.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Governance_Reference.pdf, page 89 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -2160,7 +2148,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Revalidate thresholds Fraud Team 15 Sep Pending, Run control test Governance 15 Sep Pending. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 9 operations.** Unserved: Revalidate thresholds Fraud Team 15 Sep Pending, Run control test Governance 15 Sep Pending. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Governance_Reference.pdf, page 94 §Action Owner Due Status"
    },
    {
@@ -2572,7 +2560,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: AI Capability Inventory, AI Risk Register, AI Policy Compliance, AI Approval Compliance, AI Data Usage, AI Exceptions, Control Effectiveness, Model / Provider Governance …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 9 actions on this screen and the screen declares 5 operations.** Unserved: AI Capability Inventory, AI Risk Register, AI Policy Compliance, AI Approval Compliance, AI Data Usage, AI Exceptions, Control Effectiveness, Model / Provider Governance …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Governance_Reference.pdf, page 95 §Support predefined reports such as"
    },
    {
@@ -2829,7 +2817,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Critical Continuous Monitoring Architecture. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved: Critical Continuous Monitoring Architecture. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Governance_Reference.pdf, page 97 §Actions"
    },
    {

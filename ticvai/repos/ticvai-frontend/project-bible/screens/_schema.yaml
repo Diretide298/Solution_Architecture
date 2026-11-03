@@ -294,6 +294,17 @@ properties:
                             Which of the screen's declared operations fills this component. A
                             screen with three `onLoad` calls and three components says nothing
                             about which fills which without it.
+                        reads:
+                          type: array
+                          items: { type: string }
+                          description: >
+                            **The other reads that fill a picker whose `operation` is the call it
+                            sends to** (r13, CHG-RCR33-001): operationIds of the screen's own
+                            `apis`. BO-094's Featured offer offers products (`listProducts`) and
+                            promotions bundles (`listBundles`); a filter's options come from a
+                            taxonomy read while the filter sends to the search. As an overlay's
+                            `reads`, check-screen-wiring counts them as reached (S-OP-UNREACHED).
+                            Invisible metadata: check-approved-ui does not compare it.
                         provenance:
                           type: string
                           description: >
@@ -748,6 +759,16 @@ properties:
                   operation:
                     type: string
                     description: One of the screen's own `apis[]`, called on confirm.
+                  alsoCalls:
+                    type: array
+                    items: { type: string }
+                    description: >
+                      **The other writes the same confirm sends, in order** (r13, CHG-RCR32-001):
+                      operationIds of the screen's own `apis`. CMS-019's Change access adds roles with
+                      `createDelegatedAccess`, removes them with `deleteDelegatedAccess` and changes the
+                      person with `updatePrincipal` (IDENTITY-C15, CHG-R8SPN-024): one form, three writes,
+                      each sent only when the form changed what it writes. check-screen-wiring counts them
+                      as reached (S-OP-UNREACHED); the label and target stay the visible part.
               dismiss:
                 type: object
                 additionalProperties: false

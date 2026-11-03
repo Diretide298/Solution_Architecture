@@ -408,6 +408,11 @@ def _exact_props(by: dict) -> set:
                 m = re.match(r"^(?:Create|Update)(\w+)Request$", name)
                 if m:
                     exact.add(f"{stem}.{m.group(1)}.{p}")
+                # an array property's exact unique key names its child table's item columns (ADAM CR-510)
+                if spec.get("type") == "array":
+                    for grp in spec.get("x-ticvai-unique-together") or []:
+                        for k in grp if isinstance(grp, list) else []:
+                            exact.add(f"{stem}.{name}.{p}[].{k}")
     return exact
 
 
@@ -716,7 +721,11 @@ FK_ALIASES = {"venue": "scope", "region": "scope", "department": "scope", "org_u
               # 20 September ("contract rather than subscription.subscription"), and the contract moved to control
               # with the plan catalogue on 18 October (ADAM CR-150; CHG-CRA-003), so `control.tenant.subscription_id`
               # now keys inside one database and is read here for the first time
-              "subscription": ("contract", "subscription")}
+              "subscription": ("contract", "subscription"),
+              # a grant is an identity.delegated_access row everywhere in the contracts (RoleSummary.grantId,
+              # selectRole's grantId); identity.session.grant_id is named for it by the posted decision (ADAM CR-513,
+              # 3 November 2026; CHG-CR513-001)
+              "grant": "delegated_access"}
 
 TYPES = r"(uuid|text|integer|bigint|smallint|numeric|boolean|timestamptz|timestamp|date|time|jsonb|json|" \
         r"ltree|bytea|interval|inet|char|varchar|character|double|real|serial|bigserial|citext|point|" \

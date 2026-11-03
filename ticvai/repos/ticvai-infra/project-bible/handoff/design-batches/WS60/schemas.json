@@ -1998,6 +1998,15 @@
    "supportedPrinterIntegration": {
     "type": "string",
     "description": "Supported printer integration"
+   },
+   "layout": {
+    "allOf": [
+     {
+      "$ref": "../spine/orders.yaml#/components/schemas/TicketLayout"
+     }
+    ],
+    "description": "The ticket layout this design prints (ADAM CR-447; CHG-CR447-001): stored in the design document, named by a ticket template's layoutRef, read by orders printTicketProof through access#mediaTemplateRecords. The canvas's own model; nothing the screen shows changes.",
+    "x-ticvai-stored-as": "access.media_template.design"
    }
   },
   "required": [
@@ -2114,6 +2123,15 @@
    "supportedPrinterIntegration": {
     "type": "string",
     "description": "Supported printer integration"
+   },
+   "layout": {
+    "allOf": [
+     {
+      "$ref": "../spine/orders.yaml#/components/schemas/TicketLayout"
+     }
+    ],
+    "description": "The ticket layout this design prints (ADAM CR-447; CHG-CR447-001): stored in the design document, named by a ticket template's layoutRef, read by orders printTicketProof through access#mediaTemplateRecords. The canvas's own model; nothing the screen shows changes.",
+    "x-ticvai-stored-as": "access.media_template.design"
    }
   },
   "required": [
@@ -2502,7 +2520,8 @@
     "description": "2.16.x. **Automatic media-type selection**, which was absent — a kiosk with no printer and a guest with no smartphone need different answers, and neither should be chosen by the caller.\n"
    },
    "layoutRef": {
-    "type": "string"
+    "type": "string",
+    "description": "Names the stored `TicketLayout` this template prints (ADAM CR-447)."
    },
    "localeVariants": {
     "type": "object",
@@ -2586,7 +2605,7 @@
    },
    "layoutRef": {
     "type": "string",
-    "description": "The artwork, as a media-asset reference."
+    "description": "Names the stored `TicketLayout` this template prints (ADAM CR-447, Chinmay, 1 November 2026; CHG-CR447-001): the layout the ticket designer screen saves, the id of the Access media template (designer `pdfPrintablePos`) whose design holds it (the lead, 2 November 2026, \"yes for both\"). Until r13 it was the artwork as a media-asset reference, which carried no element model a printer could render."
    },
    "localeVariants": {
     "type": "object",

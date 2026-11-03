@@ -83,28 +83,19 @@
      "to": "ADM-263",
      "trigger": "Works in Channel Sales Schedule & Availability Windows",
      "provenance": "flow F166 step 9→10",
-     "operation": "listSaleChannel",
-     "carries": [
-      "ruleId"
-     ]
+     "operation": "listSaleChannel"
     },
     {
      "to": "ADM-264",
      "trigger": "Works in Customer & Eligibility Rules by Channel",
      "provenance": "flow F166 step 11→12",
-     "operation": "listSaleChannel",
-     "carries": [
-      "ruleId"
-     ]
+     "operation": "listSaleChannel"
     },
     {
      "to": "ADM-265",
      "trigger": "Works in Channel Sales Rules, Limits & Restrictions",
      "provenance": "flow F166 step 13→14",
-     "operation": "listSaleChannel",
-     "carries": [
-      "ruleId"
-     ]
+     "operation": "listSaleChannel"
     }
    ]
   },
@@ -310,18 +301,6 @@
     "operationId": "listSaleChannel",
     "contract": "catalogue",
     "purpose": "Sales Channel Command Center",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listChannelSaleSchedule",
-    "contract": "catalogue",
-    "purpose": "Channel Sales Schedule & Availability Windows",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listChannelSaleRule",
-    "contract": "catalogue",
-    "purpose": "Channel Sales Rules, Limits & Restrictions",
     "trigger": "onLoad"
    }
   ],
@@ -1517,87 +1496,104 @@
       {
        "kind": "selectField",
        "label": "Minimum Quantity",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Maximum Quantity",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Maximum Per Transaction",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Maximum Per Customer",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Maximum Per Day",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Maximum Per Event",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Maximum Per Product",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Reservation permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Hold permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Payment link permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Partial payment permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Split payment permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Discount permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Promo code permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Upgrade permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Exchange permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       },
       {
        "kind": "selectField",
        "label": "Reschedule permitted",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure",
+       "operation": "listChannelSaleRule"
       }
      ]
     },

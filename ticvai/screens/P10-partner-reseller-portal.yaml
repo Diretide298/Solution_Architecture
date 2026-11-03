@@ -122,8 +122,8 @@ screens:
     - to: PTR-006
       trigger: Product Catalog (B2B Pricing)
       provenance: 'derived — PTR-006 declares entryState.params priceListId, productId and PTR-001 holds
-        none of them. The edge carries nothing: priceListId, productId only pre-select (deep link or optional),
-        and PTR-006 opens on its own'
+        none of them. The edge carries nothing: priceListId, productId only pre-select (optional), and
+        PTR-006 opens on its own'
     - to: PTR-008
       trigger: Booking Creation
       provenance: derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form,
@@ -131,23 +131,21 @@ screens:
     - to: PTR-009
       trigger: Group / Bulk Booking
       provenance: 'derived — PTR-009 declares entryState.params blockId and PTR-001 holds none of them.
-        The edge carries nothing: blockId only pre-selects (deep link or optional), and PTR-009 opens
-        on its own'
+        The edge carries nothing: blockId only pre-selects (optional), and PTR-009 opens on its own'
     - to: PTR-010
       trigger: Cart & Quote
       provenance: 'derived — PTR-010 declares entryState.params lineId, promotionId and PTR-001 holds
-        none of them. The edge carries nothing: lineId, promotionId only pre-select (deep link or optional),
-        and PTR-010 opens on its own'
+        none of them. The edge carries nothing: lineId, promotionId only pre-select (optional), and PTR-010
+        opens on its own'
     - to: PTR-011
       trigger: Quote Management
       provenance: 'derived — PTR-011 declares entryState.params agreementId and PTR-001 holds none of
-        them. The edge carries nothing: agreementId only pre-selects (deep link or optional), and PTR-011
-        opens on its own'
+        them. The edge carries nothing: agreementId only pre-selects (optional), and PTR-011 opens on
+        its own'
     - to: PTR-012
       trigger: Checkout / Credit Purchase
       provenance: 'derived — PTR-012 declares entryState.params paymentId and PTR-001 holds none of them.
-        The edge carries nothing: paymentId only pre-selects (deep link or optional), and PTR-012 opens
-        on its own'
+        The edge carries nothing: paymentId only pre-selects (optional), and PTR-012 opens on its own'
     - to: PTR-013
       trigger: Credit Limit & Balance
       provenance: derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form,
@@ -155,8 +153,8 @@ screens:
     - to: PTR-014
       trigger: Settlement & Payment History
       provenance: 'derived — PTR-014 declares entryState.params settlementId and PTR-001 holds none of
-        them. The edge carries nothing: settlementId only pre-selects (deep link or optional), and PTR-014
-        opens on its own'
+        them. The edge carries nothing: settlementId only pre-selects (optional), and PTR-014 opens on
+        its own'
     - to: PTR-015
       trigger: Order History
       provenance: derived; the door holds no record id since CHG-DOOR-002/003 made it a sign-in form,
@@ -168,28 +166,26 @@ screens:
     - to: PTR-017
       trigger: Commission Statement
       provenance: 'derived — PTR-017 declares entryState.params agreementId and PTR-001 holds none of
-        them. The edge carries nothing: agreementId only pre-selects (deep link or optional), and PTR-017
-        opens on its own'
+        them. The edge carries nothing: agreementId only pre-selects (optional), and PTR-017 opens on
+        its own'
     - to: PTR-018
       trigger: Reports & Sales Performance
       provenance: 'derived — PTR-018 declares entryState.params conversationId, reportId and PTR-001 holds
-        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
-        optional), and PTR-018 opens on its own'
+        none of them. The edge carries nothing: conversationId, reportId only pre-select (optional), and
+        PTR-018 opens on its own'
     - to: PTR-019
       trigger: API Credentials & Integration
       provenance: 'derived — PTR-019 declares entryState.params clientId and PTR-001 holds none of them.
-        The edge carries nothing: clientId only pre-selects (deep link or optional), and PTR-019 opens
-        on its own'
+        The edge carries nothing: clientId only pre-selects (optional), and PTR-019 opens on its own'
     - to: PTR-020
       trigger: Sub-Agent Management
       provenance: 'derived — PTR-020 declares entryState.params delegatedAccessId and PTR-001 holds none
-        of them. The edge carries nothing: delegatedAccessId only pre-selects (deep link or optional),
-        and PTR-020 opens on its own'
+        of them. The edge carries nothing: delegatedAccessId only pre-selects (optional), and PTR-020
+        opens on its own'
     - to: PTR-021
       trigger: Support & Contact
       provenance: 'derived — PTR-021 declares entryState.params caseId and PTR-001 holds none of them.
-        The edge carries nothing: caseId only pre-selects (deep link or optional), and PTR-021 opens on
-        its own'
+        The edge carries nothing: caseId only pre-selects (optional), and PTR-021 opens on its own'
     - to: PTR-007
       trigger: Availability Search
       provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
@@ -963,8 +959,7 @@ screens:
     - to: PTR-004
       trigger: Notifications
       provenance: 'derived — PTR-004 declares entryState.params messageId and PTR-003 holds none of them.
-        The edge carries nothing: messageId only pre-selects (deep link or optional), and PTR-004 opens
-        on its own'
+        The edge carries nothing: messageId only pre-selects (optional), and PTR-004 opens on its own'
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -7085,9 +7080,9 @@ screens:
   purpose: Control transaction limits and provide a governed mechanism for commercial exceptions.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 3 operations.** Unserved: Price
-      Exception, Credit Exception, Allocation Exception. Each needs an operation, or needs removing from
-      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
+    why: '**The pack names 4 actions on this screen and the screen declares 3 operations.** Unserved:
+      Price Exception, Credit Exception, Allocation Exception. Each needs an operation, or needs removing
+      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support
   layout:

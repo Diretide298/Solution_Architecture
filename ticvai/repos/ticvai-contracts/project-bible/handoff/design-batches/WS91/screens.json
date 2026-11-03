@@ -295,13 +295,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
   "purpose": "Create the master commercial pricing profile associated with a rental product.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Pricing Profile Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [

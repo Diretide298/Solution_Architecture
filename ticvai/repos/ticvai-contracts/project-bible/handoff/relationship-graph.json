@@ -1066,6 +1066,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "identity.session",
+   "col": "grant_id",
+   "to": "identity.delegated_access",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "orders.cash_count_line",
    "col": "denomination_id",
    "to": "platform.denomination",
@@ -2112,6 +2121,15 @@
   {
    "frm": "queue.entry",
    "col": "overridden_by_principal_id",
+   "to": "identity.principal",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "queue.entry",
+   "col": "call_resolved_by_principal_id",
    "to": "identity.principal",
    "how": "declared",
    "cross": "yes",
@@ -3439,6 +3457,15 @@
    "how": "declared",
    "cross": "yes",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "marketing.privacy_change_set",
+   "col": "approval_request_id",
+   "to": "approvals.request",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -7147,6 +7174,42 @@
    "how": "declared",
    "cross": "yes",
    "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "catalogue.import_job_row",
+   "col": "import_job_id",
+   "to": "catalogue.import_job",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "catalogue.import_job_row",
+   "col": "target_product_id",
+   "to": "catalogue.product",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "catalogue.import_job_row",
+   "col": "product_id",
+   "to": "catalogue.product",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "marketing.guest_document_upload",
+   "col": "subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -11286,7 +11349,7 @@
    "to": "platform.scope",
    "how": "declared",
    "cross": "yes",
-   "required": "",
+   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -12519,6 +12582,15 @@
    "to": "inventory.location",
    "how": "convention",
    "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "catalogue.variant",
+   "col": "price_category_id",
+   "to": "catalogue.price_category",
+   "how": "convention",
+   "cross": "",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -16578,15 +16650,6 @@
    "to": "marketing.privacy_incident",
    "how": "convention",
    "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "marketing.privacy_change_set",
-   "col": "approval_request_id",
-   "to": "approvals.request",
-   "how": "convention",
-   "cross": "yes",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -21271,6 +21334,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "marketing.guest_document_upload",
+   "col": "issued_by_principal_id",
+   "to": "identity.principal",
+   "how": "convention",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "catalogue.product",
    "col": "via createProduct",
    "to": "catalogue.product_media",
@@ -21587,33 +21659,6 @@
   },
   {
    "frm": "orders.order_event",
-   "col": "via modifyOrder",
-   "to": "orders.order_line",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "orders.order_event",
-   "col": "via modifyOrder",
-   "to": "orders.payment",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "orders.order_event",
-   "col": "via modifyOrder",
-   "to": "orders.sales_order",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "orders.order_event",
    "col": "via exchangeOrderLines",
    "to": "orders.order_line",
    "how": "lineage",
@@ -21642,15 +21687,6 @@
   {
    "frm": "orders.order_event",
    "col": "via rescheduleOrder",
-   "to": "orders.sales_order",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "orders.order_event",
-   "col": "via reprintOrder",
    "to": "orders.order_line",
    "how": "lineage",
    "cross": "",
@@ -21659,10 +21695,19 @@
   },
   {
    "frm": "orders.order_event",
-   "col": "via reprintOrder",
+   "col": "via rescheduleOrder",
    "to": "orders.sales_order",
    "how": "lineage",
    "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "orders.order_event",
+   "col": "via rescheduleOrder",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
@@ -22131,6 +22176,24 @@
    "to": "identity.mfa_recovery_code",
    "how": "lineage",
    "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "identity.mfa_method",
+   "col": "via enrolMfaMethod",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "identity.mfa_challenge",
+   "col": "via createMfaChallenge",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
@@ -23980,7 +24043,16 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "catalogue.product",
+   "frm": "catalogue.price",
+   "col": "via cloneProduct",
+   "to": "catalogue.product",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "catalogue.price",
    "col": "via cloneProduct",
    "to": "catalogue.product_media",
    "how": "lineage",
@@ -23989,7 +24061,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "catalogue.product",
+   "frm": "catalogue.price",
    "col": "via cloneProduct",
    "to": "catalogue.variant",
    "how": "lineage",
@@ -24034,7 +24106,25 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "catalogue.price_list",
+   "frm": "catalogue.audit_entry",
+   "col": "via bulkChangePrices",
+   "to": "catalogue.price",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "catalogue.audit_entry",
+   "col": "via bulkChangePrices",
+   "to": "catalogue.price_list",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "catalogue.audit_entry",
    "col": "via bulkChangePrices",
    "to": "catalogue.product_version",
    "how": "lineage",
@@ -24044,17 +24134,8 @@
   },
   {
    "frm": "catalogue.import_job",
-   "col": "via commitCatalogueImport",
-   "to": "catalogue.product",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "catalogue.import_job",
-   "col": "via commitCatalogueImport",
-   "to": "catalogue.variant",
+   "col": "via importProductCatalogue",
+   "to": "catalogue.import_job_row",
    "how": "lineage",
    "cross": "",
    "required": "",
@@ -24804,15 +24885,6 @@
    "to": "fnb.production_run",
    "how": "lineage",
    "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "identity.role_permission",
-   "col": "via setRolePermissions",
-   "to": "platform.audit_record",
-   "how": "lineage",
-   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
@@ -26055,6 +26127,15 @@
    "to": "platform.outbox",
    "how": "lineage",
    "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "platform.device",
+   "col": "via enrolDevice",
+   "to": "tenancy.device_audit",
+   "how": "lineage",
+   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
@@ -28282,6 +28363,15 @@
    "edgeKind": "ambient"
   },
   {
+   "frm": "platform.idempotency_record",
+   "col": "via recordStorefrontSessionEvents",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
    "frm": "accreditation.application",
    "col": "via renewAccreditation",
    "to": "accreditation.audit",
@@ -29236,6 +29326,15 @@
    "edgeKind": "ambient"
   },
   {
+   "frm": "marketing.guest_document",
+   "col": "via uploadGuestDocument",
+   "to": "marketing.guest_document_upload",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
    "frm": "marketing.case",
    "col": "via setCallDisposition",
    "to": "marketing.conversation",
@@ -30023,14 +30122,15 @@
    "getPublishedBookingFlow",
    "listVisitPlanAlternatives",
    "bulkUpdateCatalogueProducts",
+   "getTaxProfileJurisdiction",
    "getMembershipProductValidation",
+   "listTaxProfiles",
    "getKioskConfigValidation",
    "setProductClassification",
    "listSalePermissionTargets",
    "createInvitationCampaign",
    "createForm",
    "getWaiverStatus",
-   "setSeoMetadata",
    "getWishlist",
    "addToWishlist"
   ],
@@ -30119,6 +30219,7 @@
    "listProductVersions",
    "restoreProductVersion",
    "bulkChangePrices",
+   "commitCatalogueImport",
    "approveReviewDecision",
    "listProductGovernance",
    "listProductLifecycle",
@@ -30176,6 +30277,7 @@
    "syncOrders",
    "evaluatePromotions",
    "generateConfiguration",
+   "searchCatalogue",
    "bulkChangePrices",
    "setChannelListing",
    "listBulkPricingUpdate",
@@ -30233,6 +30335,9 @@
    "listPrices",
    "publishBundle",
    "generateConfiguration",
+   "searchCatalogue",
+   "cloneProduct",
+   "bulkChangePrices",
    "assignSeats",
    "quoteUpgrade",
    "simulatePromotion",
@@ -30646,8 +30751,11 @@
    "inquirePaymentStatus",
    "capturePayment",
    "syncOrders",
+   "modifyOrder",
    "appendEntitlementToMedia",
    "exchangeOrderLines",
+   "rescheduleOrder",
+   "reprintOrder",
    "transferOrderTickets",
    "claimTicketTransfer",
    "validateAccess",
@@ -30664,6 +30772,8 @@
    "linkGuestCheckout",
    "deleteGuestAccount",
    "completeSsoAuthorization",
+   "enrolMfaMethod",
+   "createMfaChallenge",
    "verifyMfaChallenge",
    "approveJournalEntry",
    "closeFiscalPeriod",
@@ -31316,6 +31426,7 @@
    "issueOrderEntitlements",
    "postOrderRevenue",
    "receivePaymentProviderWebhook",
+   "submitShiftCount",
    "simulateRefund",
    "accrueLoyaltyPoints",
    "listCustomerServiceProfile",
@@ -31406,6 +31517,7 @@
    "exchangeOrderLines",
    "rescheduleOrder",
    "getOrderStatement",
+   "closeShift",
    "getCommissionStatement",
    "listUpgradeException",
    "approveExceptionServiceRecovery",
@@ -31442,12 +31554,16 @@
    "recordExternalReference",
    "issueCreditMemo",
    "settleWalletAtExit",
+   "submitShiftCount",
    "listOwnRefundRequests"
   ],
   "orders.refund_line": [
    "listOrderRefunds",
    "createRefund",
    "approveRefund",
+   "modifyOrder",
+   "exchangeOrderLines",
+   "rescheduleOrder",
    "simulateRefund",
    "listOwnRefundRequests"
   ],
@@ -31455,6 +31571,8 @@
    "listOrderRefunds",
    "createRefund",
    "approveRefund",
+   "closeShift",
+   "submitShiftCount",
    "simulateRefund",
    "listOwnRefundRequests"
   ],
@@ -31543,7 +31661,6 @@
   "ledger.fx_rate": [
    "createPayment",
    "capturePayment",
-   "closeShift",
    "listFxRates",
    "setFxRate",
    "getForeignTenderReport",
@@ -31557,8 +31674,7 @@
    "ingestFxRates",
    "listCommissionCalculationSettlement",
    "listPartner2",
-   "setAgreementContractTerm",
-   "submitShiftCount"
+   "setAgreementContractTerm"
   ],
   "ledger.journal_line": [
    "createPayment",
@@ -31607,6 +31723,7 @@
    "createFnbOrder",
    "addCartLine",
    "checkoutCart",
+   "recordStorefrontSessionEvents",
    "captureWalletHold",
    "holdWalletFunds",
    "issueOrderEntitlements",
@@ -31745,7 +31862,6 @@
    "matchGuest",
    "mergeGuests",
    "recordPrivacyIncident",
-   "submitForm",
    "uploadGuestDocument",
    "recordLostItem",
    "identifyGuest",
@@ -31760,6 +31876,26 @@
    "listWaiverVerificationQueue",
    "listMissingExpiredInvalid",
    "listComplianceEvidenceWaiver"
+  ],
+  "orders.ticket_template": [
+   "reprintOrder",
+   "printTicketProof",
+   "issueWalletPass",
+   "createTicketTemplate",
+   "listTicketTemplates",
+   "updateTicketTemplate",
+   "cloneTicketTemplate",
+   "importTicketTemplate"
+  ],
+  "orders.wallet_pass": [
+   "reprintOrder",
+   "issueWalletPass",
+   "pushWalletPassUpdate",
+   "createUpgradeCredentialRegeneration",
+   "listCredentialRevocationRegeneration",
+   "listGroupTicketFulfillment",
+   "listResaleConfirmationOwnership",
+   "listTicketReissueFulfillment"
   ],
   "orders.ticket_transfer": [
    "transferOrderTickets",
@@ -32297,6 +32433,8 @@
    "closeShift",
    "getVenueSettings",
    "setVenueSettings",
+   "approveMatrixMultiLevel",
+   "approveRoleAuthorityDelegation",
    "getVenueSettingsDefaults",
    "setVenueSettingsDefaults",
    "submitShiftCount"
@@ -32352,6 +32490,7 @@
    "shareEntitlement",
    "listMyEntitlements",
    "getEntitlement",
+   "setRolePermissions",
    "approveRoleAuthorityDelegation",
    "listAuthorizationGovernanceTemporary",
    "listSegregationViolations",
@@ -32407,7 +32546,8 @@
    "refreshToken",
    "logout",
    "updatePrincipal",
-   "completeSsoAuthorization"
+   "completeSsoAuthorization",
+   "setRolePermissions"
   ],
   "identity.role": [
    "login",
@@ -32463,6 +32603,7 @@
    "verifyMfaChallenge",
    "listActiveSessions",
    "revokeAllSessions",
+   "setRolePermissions",
    "changeOwnCredential",
    "resetPrincipalCredential",
    "decideAccessReviewItem",
@@ -32800,6 +32941,7 @@
    "setSubscription",
    "previewSubscriptionChange",
    "getTenantLicences",
+   "removeLicenceAddOn",
    "getUsageMetering",
    "generateInvoice",
    "getModuleEnablement",
@@ -32808,7 +32950,8 @@
    "settleAiUsage",
    "getBillingReconciliation",
    "getLicenceEnforcement",
-   "getPlanRecommendations"
+   "getPlanRecommendations",
+   "getTenantRequestLimits"
   ],
   "control.outbox": [
    "suspendTenant"
@@ -32827,13 +32970,16 @@
    "settleAiUsage",
    "submitOnboardingApplication",
    "simulateCommercialPackage",
-   "getPlanRecommendations"
+   "getPlanRecommendations",
+   "getTenantRequestLimits"
   ],
   "control.plan_limit": [
    "listPlans",
    "createPlan",
    "getPlan",
    "createPlanVersion",
+   "setSubscription",
+   "getTenantLicences",
    "removeLicenceAddOn",
    "getLicenceEnforcement",
    "getPlanRecommendations"
@@ -32843,15 +32989,14 @@
    "createPlan",
    "getPlan",
    "createPlanVersion",
+   "setSubscription",
+   "getTenantLicences",
    "removeLicenceAddOn",
    "generateInvoice",
    "getPlanRecommendations"
   ],
-  "platform.tenant": [
-   "previewSubscriptionChange",
-   "createPartnerAgreement"
-  ],
   "control.licence_add_on": [
+   "setSubscription",
    "getTenantLicences",
    "addLicenceAddOn",
    "removeLicenceAddOn",
@@ -32862,6 +33007,7 @@
    "getPlanRecommendations"
   ],
   "control.licence_add_on_limit": [
+   "setSubscription",
    "getTenantLicences",
    "addLicenceAddOn",
    "removeLicenceAddOn",
@@ -32869,6 +33015,10 @@
    "getLicenceEnforcement",
    "simulateCommercialPackage",
    "getPlanRecommendations"
+  ],
+  "platform.tenant": [
+   "previewSubscriptionChange",
+   "createPartnerAgreement"
   ],
   "control.usage_record": [
    "getEntitlementUsage",
@@ -33603,6 +33753,7 @@
    "createRetailSale",
    "createRetailReturn",
    "getOutletStock",
+   "createShopAndDrop",
    "reserveMerchandise",
    "reindexSource"
   ],
@@ -34630,6 +34781,8 @@
    "updateQueue",
    "setQueueStatus",
    "joinQueue",
+   "redeemWaitingGuest",
+   "overrideWaitingGuest",
    "callNextParties",
    "getWaitTimes",
    "setWaitTime",
@@ -34645,7 +34798,6 @@
   ],
   "marketing.loyalty_position": [
    "joinQueue",
-   "getMyMemberships",
    "listMembershipLoyaltyGuest",
    "getKpiValues",
    "proposeLookalikeSegment",
@@ -34689,7 +34841,8 @@
    "listQueueFeeds",
    "configureQueueFeed",
    "submitQueueReading",
-   "getQueueFeedHealth"
+   "getQueueFeedHealth",
+   "getSignageQueueBoard"
   ],
   "games.card": [
    "issueGameCard",
@@ -34747,6 +34900,7 @@
    "deleteBookingFlow",
    "getBookingFlow",
    "getPublishedBookingFlow",
+   "getSiteSetupProgress",
    "listBookingFlows",
    "updateBookingFlowDefinition",
    "validateBookingFlow",
@@ -34888,6 +35042,7 @@
    "setLanguages",
    "validateTenantConfig",
    "publishTenantConfig",
+   "restoreConfigVersion",
    "reindexSource",
    "proposeMarketingContent"
   ],
@@ -35482,6 +35637,8 @@
   ],
   "catalogue.audit_entry": [
    "restoreProductVersion",
+   "bulkChangePrices",
+   "commitCatalogueImport",
    "approvePricingWorkflowAuthority",
    "approveReviewDecision",
    "approveWorkflow",
@@ -35552,12 +35709,59 @@
    "cancelPricingRollback",
    "requestPricingRollback"
   ],
+  "catalogue.change_request": [
+   "bulkChangePrices",
+   "approveReviewDecision",
+   "listChangeImpactAnalysis",
+   "listChangePropagationDependency",
+   "listPricingChangeImpact",
+   "listPricingGovernance",
+   "listProductGovernance",
+   "publishPricingEffectiveDate",
+   "setPricingChangeRequest",
+   "decidePricingChangeRequest",
+   "submitPricingChangeRequest"
+  ],
+  "catalogue.change_request_line": [
+   "bulkChangePrices",
+   "approveReviewDecision",
+   "listChangeImpactAnalysis",
+   "listPricingChangeImpact",
+   "publishPricingEffectiveDate",
+   "setPricingChangeRequest",
+   "submitPricingChangeRequest"
+  ],
+  "catalogue.package_pricing": [
+   "bulkChangePrices",
+   "listCommercialPricingStructure",
+   "listPackageBundleAdd",
+   "setPackagePricingDefinition",
+   "getPackagePricingDefinition"
+  ],
+  "catalogue.membership_benefit": [
+   "listGuestMemberships",
+   "getMyMemberships",
+   "listProductRetirementSuspension",
+   "listMembershipBenefits",
+   "setMembershipBenefit"
+  ],
+  "catalogue.plan_benefit": [
+   "listGuestMemberships",
+   "getMyMemberships",
+   "listProductRetirementSuspension",
+   "getPlanBenefits",
+   "setPlanBenefits"
+  ],
   "catalogue.import_job": [
    "importProductCatalogue",
    "commitCatalogueImport",
    "listBulkPricingUpdate",
    "listProductImportExport",
    "getCatalogueImportJob"
+  ],
+  "catalogue.import_job_row": [
+   "importProductCatalogue",
+   "commitCatalogueImport"
   ],
   "orders.invitation": [
    "issueInvitation",
@@ -35887,15 +36091,6 @@
    "listResale",
    "listOwnResaleListings"
   ],
-  "orders.ticket_template": [
-   "printTicketProof",
-   "issueWalletPass",
-   "createTicketTemplate",
-   "listTicketTemplates",
-   "updateTicketTemplate",
-   "cloneTicketTemplate",
-   "importTicketTemplate"
-  ],
   "games.reader_profile": [
    "setReaderProfile",
    "getGamePricing",
@@ -35937,15 +36132,6 @@
    "listExpiringBatches",
    "listSerialisedItems",
    "requestSuggestion"
-  ],
-  "orders.wallet_pass": [
-   "issueWalletPass",
-   "pushWalletPassUpdate",
-   "createUpgradeCredentialRegeneration",
-   "listCredentialRevocationRegeneration",
-   "listGroupTicketFulfillment",
-   "listResaleConfirmationOwnership",
-   "listTicketReissueFulfillment"
   ],
   "promotions.promotion_variant": [
    "setPromotionVariants",
@@ -36009,11 +36195,15 @@
    "submitIntegrationListing",
    "requestProductionAccess",
    "getDeveloperAccount",
+   "listDeveloperMembers",
    "verifyDeveloper"
   ],
   "control.developer_member": [
    "registerDeveloper",
    "setDeveloperMembers",
+   "listIntegrationListings",
+   "listProductionAccessRequests",
+   "requestProductionAccess",
    "listDeveloperMembers"
   ],
   "control.api_client": [
@@ -36623,27 +36813,8 @@
    "approveWorkflow",
    "decidePricingChangeRequest",
    "submitPricingChangeRequest",
-   "requestPricingRollback"
-  ],
-  "catalogue.change_request": [
-   "approveReviewDecision",
-   "listChangeImpactAnalysis",
-   "listChangePropagationDependency",
-   "listPricingChangeImpact",
-   "listPricingGovernance",
-   "listProductGovernance",
-   "publishPricingEffectiveDate",
-   "setPricingChangeRequest",
-   "decidePricingChangeRequest",
-   "submitPricingChangeRequest"
-  ],
-  "catalogue.change_request_line": [
-   "approveReviewDecision",
-   "listChangeImpactAnalysis",
-   "listPricingChangeImpact",
-   "publishPricingEffectiveDate",
-   "setPricingChangeRequest",
-   "submitPricingChangeRequest"
+   "requestPricingRollback",
+   "listProductApprovalWorkflows"
   ],
   "approvals.step_up_policy": [
    "approveUnifiedDecision",
@@ -36710,6 +36881,7 @@
    "setChannelFeePayment",
    "setChannelPricingCommercial",
    "setProductCatalogue",
+   "simulatePriceBreakdownCalculation",
    "listChannel",
    "setChannelConnectionConfiguration",
    "setChannelSalesRule",
@@ -37024,7 +37196,9 @@
    "listCalculationValidationReconciliation",
    "listTaxFeeCalculation",
    "setTaxRuleTreatment",
-   "simulatePriceBreakdownCalculation"
+   "simulatePriceBreakdownCalculation",
+   "getTaxProfileJurisdiction",
+   "listTaxProfiles"
   ],
   "promotions.campaign": [
    "listCampaignCalendarTimeline",
@@ -37185,12 +37359,6 @@
    "setProductServicePrice",
    "simulatePriceBreakdownCalculation",
    "setPriceCategoryRateType"
-  ],
-  "catalogue.package_pricing": [
-   "listCommercialPricingStructure",
-   "listPackageBundleAdd",
-   "setPackagePricingDefinition",
-   "getPackagePricingDefinition"
   ],
   "catalogue.price_assignment": [
    "listCommercialPricingStructure",
@@ -37785,16 +37953,6 @@
    "publishActivationScheduler",
    "listScheduledLifecycleActions"
   ],
-  "catalogue.membership_benefit": [
-   "listProductRetirementSuspension",
-   "listMembershipBenefits",
-   "setMembershipBenefit"
-  ],
-  "catalogue.plan_benefit": [
-   "listProductRetirementSuspension",
-   "getPlanBenefits",
-   "setPlanBenefits"
-  ],
   "orders.resale_settlement": [
    "listResaleConfirmationOwnership",
    "listResaleListingSeller",
@@ -38252,6 +38410,13 @@
    "testReader",
    "validateGameConfiguration"
   ],
+  "tenancy.device_audit": [
+   "enrolDevice",
+   "listDeviceAuditRecords",
+   "revokeDeviceCredential",
+   "setDeviceFirmwareStatus",
+   "approveDevice"
+  ],
   "identity.access_decision": [
    "evaluateAccess",
    "listAccessDecisions",
@@ -38533,12 +38698,6 @@
   "accreditation.badge_template": [
    "listBadgeTemplates",
    "setBadgeTemplate"
-  ],
-  "tenancy.device_audit": [
-   "listDeviceAuditRecords",
-   "revokeDeviceCredential",
-   "setDeviceFirmwareStatus",
-   "approveDevice"
   ],
   "tenancy.device_tamper_event": [
    "listDeviceTamperEvents",
@@ -39772,10 +39931,22 @@
    "listWaiverComplianceOperational",
    "listWaiverComplianceRisk"
   ],
+  "marketing.waiver_version_control": [
+   "submitForm",
+   "listWaiverConsent",
+   "listVersioningEffectiveDate",
+   "approveWaiverTesting",
+   "getWaiverTesting",
+   "listWaiverComplianceRisk"
+  ],
   "marketing.guest_document": [
    "uploadGuestDocument",
    "listComplianceEvidenceWaiver",
    "writeSubjectDataExportPart"
+  ],
+  "marketing.guest_document_upload": [
+   "uploadGuestDocument",
+   "createGuestDocumentUpload"
   ],
   "marketing.challenge": [
    "createChallenge",
@@ -39900,8 +40071,7 @@
   ],
   "marketing.consent_purpose_channel": [
    "listConsentPurposes",
-   "setConsentPurposes",
-   "listPrivacyConsent"
+   "setConsentPurposes"
   ],
   "marketing.wishlist_item": [
    "getWishlist",
@@ -40181,13 +40351,6 @@
    "listWaiverTemplateMaster",
    "setWaiverTemplateMaster"
   ],
-  "marketing.waiver_version_control": [
-   "listWaiverConsent",
-   "listVersioningEffectiveDate",
-   "approveWaiverTesting",
-   "getWaiverTesting",
-   "listWaiverComplianceRisk"
-  ],
   "marketing.waiver_form_layout": [
    "setDigitalWaiverForm",
    "getDigitalWaiverForm"
@@ -40414,6 +40577,7 @@
    "BO-280",
    "BO-282",
    "BO-284",
+   "BO-288",
    "BO-291",
    "BO-293",
    "BO-294",
@@ -40596,7 +40760,6 @@
    "ADM-113",
    "ADM-114",
    "ADM-116",
-   "ADM-258",
    "ADM-263",
    "ADM-271",
    "ADM-272",
@@ -40607,6 +40770,170 @@
    "CMS-007",
    "CMS-008",
    "CMS-101"
+  ],
+  "catalogue.price": [
+   "WEB-001",
+   "WEB-002",
+   "WEB-003",
+   "WEB-009",
+   "WEB-017",
+   "WEB-024",
+   "GST-001",
+   "GST-002",
+   "GST-003",
+   "GST-020",
+   "GST-063",
+   "BO-008",
+   "BO-009",
+   "BO-010",
+   "BO-013",
+   "BO-014",
+   "BO-037",
+   "BO-045",
+   "BO-117",
+   "BO-268",
+   "BO-269",
+   "BO-271",
+   "BO-443",
+   "BO-597",
+   "BO-598",
+   "BO-601",
+   "BO-716",
+   "BO-717",
+   "BO-995",
+   "BO-1043",
+   "BO-1044",
+   "BO-1049",
+   "BO-1050",
+   "ADM-048",
+   "ADM-051",
+   "ADM-053",
+   "ADM-057",
+   "ADM-058",
+   "ADM-067",
+   "ADM-069",
+   "ADM-076",
+   "ADM-077",
+   "ADM-079",
+   "ADM-080",
+   "ADM-081",
+   "ADM-082",
+   "ADM-084",
+   "ADM-088",
+   "ADM-089",
+   "ADM-094",
+   "ADM-098",
+   "ADM-102",
+   "ADM-105",
+   "ADM-106",
+   "ADM-108",
+   "ADM-109",
+   "ADM-111",
+   "ADM-112",
+   "ADM-113",
+   "ADM-115",
+   "ADM-157",
+   "ADM-177",
+   "ADM-182",
+   "ADM-187",
+   "ADM-188",
+   "ADM-197",
+   "ADM-213",
+   "ADM-217",
+   "ADM-225",
+   "ADM-231",
+   "ADM-270",
+   "ADM-282",
+   "ADM-312",
+   "ADM-315",
+   "ADM-652",
+   "ADM-653",
+   "ADM-654",
+   "ADM-656",
+   "ADM-068",
+   "PTR-006"
+  ],
+  "catalogue.price_list": [
+   "WEB-001",
+   "WEB-002",
+   "WEB-003",
+   "WEB-005",
+   "WEB-009",
+   "WEB-010",
+   "WEB-017",
+   "WEB-024",
+   "GST-001",
+   "GST-002",
+   "GST-003",
+   "GST-020",
+   "GST-063",
+   "POS-002",
+   "POS-013",
+   "POS-021",
+   "POS-023",
+   "BO-009",
+   "BO-010",
+   "BO-011",
+   "BO-013",
+   "BO-014",
+   "BO-037",
+   "BO-117",
+   "BO-132",
+   "BO-288",
+   "BO-291",
+   "BO-443",
+   "BO-597",
+   "BO-598",
+   "BO-601",
+   "BO-716",
+   "BO-717",
+   "BO-1049",
+   "ADM-048",
+   "ADM-049",
+   "ADM-052",
+   "ADM-053",
+   "ADM-054",
+   "ADM-055",
+   "ADM-056",
+   "ADM-057",
+   "ADM-058",
+   "ADM-059",
+   "ADM-060",
+   "ADM-061",
+   "ADM-062",
+   "ADM-063",
+   "ADM-064",
+   "ADM-065",
+   "ADM-066",
+   "ADM-067",
+   "ADM-076",
+   "ADM-077",
+   "ADM-078",
+   "ADM-079",
+   "ADM-080",
+   "ADM-081",
+   "ADM-082",
+   "ADM-084",
+   "ADM-086",
+   "ADM-087",
+   "ADM-089",
+   "ADM-102",
+   "ADM-126",
+   "ADM-132",
+   "ADM-133",
+   "ADM-135",
+   "ADM-157",
+   "ADM-177",
+   "ADM-258",
+   "ADM-260",
+   "ADM-261",
+   "ADM-267",
+   "ADM-268",
+   "ADM-277",
+   "PTR-035",
+   "PTR-006",
+   "PTR-010",
+   "PTR-034"
   ],
   "catalogue.product": [
    "WEB-001",
@@ -40759,7 +41086,6 @@
    "BO-789",
    "BO-793",
    "BO-815",
-   "BO-842",
    "BO-852",
    "BO-877",
    "BO-1043",
@@ -40852,7 +41178,6 @@
    "CMS-007",
    "CMS-008",
    "CMS-010",
-   "CMS-013",
    "CMS-042",
    "CMS-043",
    "CMS-062",
@@ -41041,6 +41366,7 @@
    "WEB-009",
    "WEB-010",
    "WEB-017",
+   "WEB-022",
    "WEB-024",
    "WEB-033",
    "WEB-036",
@@ -41206,6 +41532,61 @@
    "CMS-032",
    "CMS-040"
   ],
+  "platform.idempotency_record": [
+   "WEB-001",
+   "WEB-005",
+   "WEB-006",
+   "WEB-008",
+   "WEB-010",
+   "WEB-012",
+   "WEB-022",
+   "WEB-033",
+   "WEB-036",
+   "WEB-041",
+   "WEB-042",
+   "WEB-047",
+   "WEB-048",
+   "WEB-049",
+   "GST-001",
+   "GST-007",
+   "GST-008",
+   "GST-009",
+   "GST-026",
+   "GST-027",
+   "GST-032",
+   "GST-041",
+   "GST-048",
+   "GST-050",
+   "GST-056",
+   "GST-070",
+   "GST-074",
+   "GST-075",
+   "GST-077",
+   "GST-078",
+   "POS-002",
+   "POS-004",
+   "POS-005",
+   "POS-012",
+   "POS-013",
+   "POS-021",
+   "POS-022",
+   "POS-023",
+   "POS-027",
+   "POS-030",
+   "KSK-005",
+   "KSK-006",
+   "KSK-007",
+   "KSK-015",
+   "KSK-017",
+   "EMP-035",
+   "EMP-058",
+   "EMP-059",
+   "BO-024",
+   "BO-037",
+   "BO-132",
+   "PTR-010",
+   "PTR-012"
+  ],
   "platform.outbox": [
    "WEB-001",
    "WEB-007",
@@ -41265,12 +41646,16 @@
    "KSK-006",
    "KSK-007",
    "KSK-008",
+   "KSK-009",
+   "KSK-010",
+   "KSK-012",
    "KSK-013",
    "KSK-015",
    "KSK-016",
    "EMP-001",
    "EMP-009",
    "EMP-010",
+   "EMP-014",
    "EMP-015",
    "EMP-017",
    "EMP-005",
@@ -41279,6 +41664,7 @@
    "EMP-034",
    "EMP-035",
    "EMP-036",
+   "EMP-042",
    "EMP-049",
    "EMP-057",
    "EMP-058",
@@ -41326,6 +41712,7 @@
    "BO-196",
    "BO-243",
    "BO-248",
+   "BO-281",
    "BO-284",
    "BO-293",
    "BO-298",
@@ -41452,11 +41839,13 @@
    "ADM-534",
    "PTR-001",
    "PTR-002",
+   "PTR-005",
    "PTR-008",
    "PTR-009",
    "PTR-010",
    "PTR-012",
    "PTR-015",
+   "PTR-016",
    "PTR-018",
    "PTR-030",
    "PTR-040",
@@ -41529,6 +41918,7 @@
    "WEB-011",
    "WEB-012",
    "WEB-021",
+   "WEB-022",
    "WEB-025",
    "WEB-028",
    "WEB-029",
@@ -41595,6 +41985,7 @@
    "CMS-011",
    "CMS-012",
    "CMS-014",
+   "CMS-015",
    "CMS-102",
    "CMS-103"
   ],
@@ -41910,6 +42301,7 @@
    "WEB-009",
    "WEB-010",
    "WEB-017",
+   "WEB-022",
    "WEB-024",
    "WEB-033",
    "WEB-036",
@@ -41993,7 +42385,6 @@
    "ADM-109",
    "ADM-114",
    "ADM-116",
-   "ADM-258",
    "ADM-262",
    "ADM-263",
    "ADM-271",
@@ -42129,6 +42520,7 @@
    "WEB-010",
    "WEB-011",
    "WEB-012",
+   "WEB-022",
    "WEB-033",
    "WEB-036",
    "WEB-041",
@@ -42175,6 +42567,7 @@
    "EMP-035",
    "EMP-059",
    "BO-013",
+   "BO-015",
    "BO-017",
    "BO-018",
    "BO-024",
@@ -42236,6 +42629,7 @@
    "WEB-010",
    "WEB-011",
    "WEB-012",
+   "WEB-022",
    "WEB-033",
    "WEB-050",
    "GST-004",
@@ -42259,6 +42653,7 @@
    "KSK-015",
    "EMP-035",
    "EMP-059",
+   "BO-015",
    "BO-017",
    "BO-018",
    "BO-024",
@@ -42292,6 +42687,7 @@
    "WEB-010",
    "WEB-011",
    "WEB-012",
+   "WEB-022",
    "GST-007",
    "GST-008",
    "GST-009",
@@ -42325,6 +42721,7 @@
    "WEB-010",
    "WEB-011",
    "WEB-012",
+   "WEB-022",
    "GST-007",
    "GST-008",
    "GST-009",
@@ -42336,6 +42733,7 @@
    "BO-843",
    "ADM-016",
    "ADM-018",
+   "CMS-001",
    "CMS-009",
    "CMS-011",
    "CMS-012",
@@ -42346,81 +42744,6 @@
    "CMS-103",
    "CMS-105"
   ],
-  "catalogue.price_list": [
-   "WEB-005",
-   "WEB-009",
-   "WEB-010",
-   "WEB-017",
-   "WEB-024",
-   "GST-020",
-   "POS-002",
-   "POS-013",
-   "POS-021",
-   "POS-023",
-   "BO-009",
-   "BO-010",
-   "BO-011",
-   "BO-013",
-   "BO-014",
-   "BO-037",
-   "BO-117",
-   "BO-132",
-   "BO-288",
-   "BO-291",
-   "BO-443",
-   "BO-597",
-   "BO-598",
-   "BO-601",
-   "BO-716",
-   "BO-717",
-   "BO-1049",
-   "ADM-048",
-   "ADM-049",
-   "ADM-052",
-   "ADM-053",
-   "ADM-054",
-   "ADM-055",
-   "ADM-056",
-   "ADM-057",
-   "ADM-058",
-   "ADM-059",
-   "ADM-060",
-   "ADM-061",
-   "ADM-062",
-   "ADM-063",
-   "ADM-064",
-   "ADM-065",
-   "ADM-066",
-   "ADM-067",
-   "ADM-076",
-   "ADM-077",
-   "ADM-078",
-   "ADM-079",
-   "ADM-080",
-   "ADM-081",
-   "ADM-082",
-   "ADM-084",
-   "ADM-086",
-   "ADM-087",
-   "ADM-089",
-   "ADM-102",
-   "ADM-126",
-   "ADM-132",
-   "ADM-133",
-   "ADM-135",
-   "ADM-157",
-   "ADM-177",
-   "ADM-258",
-   "ADM-260",
-   "ADM-261",
-   "ADM-267",
-   "ADM-268",
-   "ADM-277",
-   "PTR-035",
-   "PTR-006",
-   "PTR-010",
-   "PTR-034"
-  ],
   "marketing.consent_question": [
    "WEB-005",
    "WEB-006",
@@ -42429,6 +42752,7 @@
    "WEB-011",
    "WEB-012",
    "WEB-016",
+   "WEB-022",
    "WEB-033",
    "WEB-036",
    "WEB-041",
@@ -42473,6 +42797,7 @@
    "WEB-010",
    "WEB-011",
    "WEB-016",
+   "WEB-022",
    "WEB-033",
    "WEB-036",
    "WEB-041",
@@ -42518,6 +42843,7 @@
    "WEB-011",
    "WEB-012",
    "WEB-016",
+   "WEB-022",
    "WEB-033",
    "WEB-036",
    "WEB-041",
@@ -42573,6 +42899,7 @@
    "WEB-011",
    "WEB-012",
    "WEB-016",
+   "WEB-022",
    "WEB-033",
    "WEB-036",
    "WEB-041",
@@ -42611,58 +42938,6 @@
    "ADM-305",
    "PTR-010"
   ],
-  "platform.idempotency_record": [
-   "WEB-005",
-   "WEB-006",
-   "WEB-008",
-   "WEB-010",
-   "WEB-012",
-   "WEB-033",
-   "WEB-036",
-   "WEB-041",
-   "WEB-042",
-   "WEB-047",
-   "WEB-048",
-   "WEB-049",
-   "GST-007",
-   "GST-008",
-   "GST-009",
-   "GST-026",
-   "GST-027",
-   "GST-032",
-   "GST-041",
-   "GST-048",
-   "GST-050",
-   "GST-056",
-   "GST-070",
-   "GST-074",
-   "GST-075",
-   "GST-077",
-   "GST-078",
-   "POS-002",
-   "POS-004",
-   "POS-005",
-   "POS-012",
-   "POS-013",
-   "POS-021",
-   "POS-022",
-   "POS-023",
-   "POS-027",
-   "POS-030",
-   "KSK-005",
-   "KSK-006",
-   "KSK-007",
-   "KSK-015",
-   "KSK-017",
-   "EMP-035",
-   "EMP-058",
-   "EMP-059",
-   "BO-024",
-   "BO-037",
-   "BO-132",
-   "PTR-010",
-   "PTR-012"
-  ],
   "promotions.coupon_code": [
    "WEB-005",
    "WEB-010",
@@ -42690,6 +42965,7 @@
    "WEB-006",
    "WEB-010",
    "WEB-011",
+   "WEB-022",
    "WEB-032",
    "WEB-040",
    "WEB-043",
@@ -42851,6 +43127,7 @@
    "WEB-019",
    "WEB-020",
    "WEB-021",
+   "WEB-022",
    "WEB-024",
    "WEB-025",
    "WEB-026",
@@ -42955,6 +43232,7 @@
    "WEB-006",
    "WEB-010",
    "WEB-014",
+   "WEB-022",
    "WEB-048",
    "GST-008",
    "GST-009",
@@ -43405,6 +43683,7 @@
    "GST-004",
    "GST-056",
    "BO-011",
+   "BO-094",
    "ADM-178",
    "ADM-180",
    "ADM-181",
@@ -43419,6 +43698,7 @@
    "GST-004",
    "GST-056",
    "BO-011",
+   "BO-094",
    "ADM-180",
    "ADM-181",
    "ADM-183",
@@ -43432,6 +43712,7 @@
    "GST-004",
    "GST-056",
    "BO-011",
+   "BO-094",
    "BO-518",
    "ADM-178",
    "ADM-180",
@@ -43452,80 +43733,6 @@
    "ADM-197",
    "ADM-232",
    "ADM-271"
-  ],
-  "catalogue.price": [
-   "WEB-009",
-   "WEB-017",
-   "WEB-024",
-   "GST-020",
-   "BO-009",
-   "BO-010",
-   "BO-013",
-   "BO-014",
-   "BO-037",
-   "BO-045",
-   "BO-117",
-   "BO-268",
-   "BO-269",
-   "BO-271",
-   "BO-443",
-   "BO-597",
-   "BO-598",
-   "BO-601",
-   "BO-716",
-   "BO-717",
-   "BO-995",
-   "BO-1043",
-   "BO-1044",
-   "BO-1049",
-   "BO-1050",
-   "ADM-048",
-   "ADM-051",
-   "ADM-053",
-   "ADM-057",
-   "ADM-058",
-   "ADM-067",
-   "ADM-069",
-   "ADM-076",
-   "ADM-077",
-   "ADM-079",
-   "ADM-080",
-   "ADM-081",
-   "ADM-082",
-   "ADM-084",
-   "ADM-088",
-   "ADM-089",
-   "ADM-094",
-   "ADM-098",
-   "ADM-102",
-   "ADM-105",
-   "ADM-106",
-   "ADM-108",
-   "ADM-109",
-   "ADM-111",
-   "ADM-112",
-   "ADM-113",
-   "ADM-115",
-   "ADM-157",
-   "ADM-177",
-   "ADM-182",
-   "ADM-187",
-   "ADM-188",
-   "ADM-197",
-   "ADM-213",
-   "ADM-217",
-   "ADM-225",
-   "ADM-231",
-   "ADM-270",
-   "ADM-282",
-   "ADM-312",
-   "ADM-315",
-   "ADM-652",
-   "ADM-653",
-   "ADM-654",
-   "ADM-656",
-   "ADM-068",
-   "PTR-006"
   ],
   "catalogue.price_assignment": [
    "WEB-009",
@@ -44171,6 +44378,7 @@
    "KSK-010",
    "KSK-011",
    "KSK-012",
+   "EMP-009",
    "EMP-010",
    "EMP-014",
    "EMP-015",
@@ -44438,7 +44646,6 @@
    "GST-071",
    "BO-747",
    "CMS-018",
-   "CMS-021",
    "CMS-023"
   ],
   "marketing.guest_preference": [
@@ -44511,14 +44718,10 @@
    "POS-002",
    "POS-004",
    "POS-005",
-   "POS-007",
    "KSK-007",
-   "EMP-009",
    "EMP-035",
    "EMP-059",
    "BO-024",
-   "BO-040",
-   "BO-043",
    "BO-077",
    "ADM-626",
    "PTR-048",
@@ -44752,6 +44955,59 @@
    "GST-010",
    "GST-042",
    "GST-066"
+  ],
+  "orders.ticket_template": [
+   "WEB-013",
+   "WEB-018",
+   "GST-010",
+   "GST-018",
+   "POS-002",
+   "POS-006",
+   "POS-030",
+   "KSK-009",
+   "KSK-010",
+   "KSK-012",
+   "EMP-014",
+   "EMP-034",
+   "BO-022",
+   "BO-023",
+   "BO-026",
+   "BO-047",
+   "BO-344",
+   "PTR-002",
+   "PTR-005",
+   "PTR-008",
+   "PTR-015",
+   "PTR-016"
+  ],
+  "orders.wallet_pass": [
+   "WEB-013",
+   "WEB-018",
+   "GST-010",
+   "GST-018",
+   "POS-002",
+   "POS-006",
+   "POS-030",
+   "KSK-009",
+   "KSK-010",
+   "KSK-012",
+   "EMP-014",
+   "EMP-034",
+   "BO-022",
+   "BO-023",
+   "BO-026",
+   "BO-027",
+   "BO-047",
+   "BO-279",
+   "ADM-291",
+   "ADM-296",
+   "ADM-306",
+   "ADM-316",
+   "PTR-002",
+   "PTR-005",
+   "PTR-008",
+   "PTR-015",
+   "PTR-016"
   ],
   "pii.subject_contact": [
    "WEB-013",
@@ -45241,11 +45497,6 @@
    "ANL-064",
    "ANL-072"
   ],
-  "orders.ticket_template": [
-   "WEB-018",
-   "GST-018",
-   "BO-344"
-  ],
   "orders.ticket_transfer": [
    "WEB-018",
    "WEB-030",
@@ -45262,16 +45513,6 @@
    "ADM-297",
    "ADM-306"
   ],
-  "orders.wallet_pass": [
-   "WEB-018",
-   "GST-018",
-   "BO-027",
-   "BO-279",
-   "ADM-291",
-   "ADM-296",
-   "ADM-306",
-   "ADM-316"
-  ],
   "ledger.credit_memo": [
    "WEB-019",
    "GST-019",
@@ -45280,7 +45521,6 @@
    "POS-030",
    "BO-022",
    "BO-023",
-   "BO-1081",
    "ADM-077",
    "ANL-072"
   ],
@@ -45290,7 +45530,6 @@
    "POS-011",
    "BO-022",
    "BO-023",
-   "BO-1081",
    "ADM-077",
    "ANL-072"
   ],
@@ -45338,7 +45577,6 @@
    "POS-030",
    "BO-022",
    "BO-023",
-   "BO-1081",
    "ADM-077",
    "ANL-072"
   ],
@@ -45352,7 +45590,6 @@
    "POS-030",
    "BO-022",
    "BO-023",
-   "BO-1081",
    "ADM-077",
    "ANL-072"
   ],
@@ -45372,8 +45609,10 @@
    "GST-015",
    "GST-067",
    "POS-006",
+   "POS-007",
    "POS-010",
    "POS-011",
+   "EMP-009",
    "EMP-014",
    "EMP-034",
    "EMP-060",
@@ -45382,6 +45621,8 @@
    "BO-023",
    "BO-026",
    "BO-028",
+   "BO-040",
+   "BO-043",
    "BO-047",
    "BO-100",
    "BO-103",
@@ -45464,6 +45705,7 @@
    "WEB-019",
    "GST-067",
    "POS-006",
+   "POS-010",
    "POS-011",
    "EMP-014",
    "EMP-034",
@@ -45472,6 +45714,8 @@
    "BO-026",
    "BO-028",
    "BO-047",
+   "BO-281",
+   "BO-315",
    "BO-1147",
    "ADM-609",
    "ADM-610",
@@ -45487,13 +45731,17 @@
    "WEB-019",
    "GST-067",
    "POS-006",
+   "POS-007",
    "POS-011",
+   "EMP-009",
    "EMP-014",
    "EMP-034",
    "BO-022",
    "BO-023",
    "BO-026",
    "BO-028",
+   "BO-040",
+   "BO-043",
    "BO-047",
    "BO-1147",
    "ADM-609",
@@ -45698,61 +45946,20 @@
    "ADM-628",
    "ANL-072"
   ],
-  "marketing.loyalty_position": [
+  "catalogue.membership_benefit": [
    "WEB-022",
    "WEB-023",
-   "WEB-040",
-   "WEB-043",
    "GST-015",
-   "GST-023",
-   "GST-036",
-   "GST-071",
-   "POS-002",
-   "POS-005",
-   "POS-027",
-   "EMP-057",
-   "EMP-060",
-   "BO-005",
-   "BO-100",
-   "BO-103",
-   "BO-104",
-   "BO-105",
-   "BO-106",
-   "BO-107",
-   "BO-108",
-   "BO-585",
-   "BO-684",
-   "BO-685",
-   "BO-688",
-   "BO-735",
-   "BO-737",
-   "BO-738",
-   "BO-740",
-   "BO-743",
-   "BO-761",
-   "BO-762",
-   "BO-799",
-   "BO-831",
-   "BO-832",
-   "BO-833",
-   "BO-1052",
-   "BO-1053",
-   "BO-1054",
-   "BO-1056",
-   "BO-1081",
-   "BO-1082",
-   "ADM-201",
-   "ADM-680",
-   "SUP-009",
-   "SUP-010",
-   "ANL-012",
-   "ANL-013",
-   "ANL-014",
-   "ANL-015",
-   "ANL-016",
-   "ANL-017",
-   "ANL-063",
-   "ANL-072"
+   "BO-288",
+   "ADM-135"
+  ],
+  "catalogue.plan_benefit": [
+   "WEB-022",
+   "WEB-023",
+   "GST-015",
+   "BO-288",
+   "BO-289",
+   "ADM-135"
   ],
   "orders.membership_renewal": [
    "WEB-023",
@@ -45806,6 +46013,7 @@
    "BO-163",
    "BO-243",
    "BO-284",
+   "BO-288",
    "BO-293",
    "BO-298",
    "BO-301",
@@ -46105,6 +46313,15 @@
    "CMS-056",
    "CMS-058",
    "CMS-059",
+   "CMS-060"
+  ],
+  "marketing.waiver_version_control": [
+   "WEB-026",
+   "GST-035",
+   "BO-847",
+   "CMS-041",
+   "CMS-048",
+   "CMS-050",
    "CMS-060"
   ],
   "marketing.subscription": [
@@ -46864,6 +47081,59 @@
    "GST-074",
    "EMP-030",
    "BO-094"
+  ],
+  "marketing.loyalty_position": [
+   "WEB-040",
+   "WEB-043",
+   "GST-023",
+   "GST-036",
+   "GST-071",
+   "POS-002",
+   "POS-005",
+   "POS-027",
+   "EMP-057",
+   "EMP-060",
+   "BO-005",
+   "BO-100",
+   "BO-103",
+   "BO-104",
+   "BO-105",
+   "BO-106",
+   "BO-107",
+   "BO-108",
+   "BO-585",
+   "BO-684",
+   "BO-685",
+   "BO-688",
+   "BO-735",
+   "BO-737",
+   "BO-738",
+   "BO-740",
+   "BO-743",
+   "BO-761",
+   "BO-762",
+   "BO-799",
+   "BO-831",
+   "BO-832",
+   "BO-833",
+   "BO-1052",
+   "BO-1053",
+   "BO-1054",
+   "BO-1056",
+   "BO-1081",
+   "BO-1082",
+   "ADM-201",
+   "ADM-680",
+   "SUP-009",
+   "SUP-010",
+   "ANL-012",
+   "ANL-013",
+   "ANL-014",
+   "ANL-015",
+   "ANL-016",
+   "ANL-017",
+   "ANL-063",
+   "ANL-072"
   ],
   "access.parking_entitlement": [
    "WEB-041",
@@ -48866,7 +49136,6 @@
    "BO-013",
    "BO-014",
    "BO-037",
-   "BO-094",
    "ADM-053",
    "ADM-085"
   ],
@@ -50041,9 +50310,11 @@
   "catalogue.audit_entry": [
    "EMP-033",
    "BO-008",
+   "BO-009",
    "BO-011",
    "BO-013",
    "BO-017",
+   "BO-117",
    "BO-291",
    "BO-441",
    "BO-443",
@@ -51157,6 +51428,7 @@
    "BO-008",
    "BO-009",
    "BO-012",
+   "BO-117",
    "ADM-118",
    "ADM-128",
    "ADM-130",
@@ -51207,6 +51479,34 @@
    "ADM-086",
    "ADM-128",
    "ADM-132"
+  ],
+  "catalogue.change_request": [
+   "BO-009",
+   "BO-443",
+   "ADM-078",
+   "ADM-079",
+   "ADM-082",
+   "ADM-084",
+   "ADM-128",
+   "ADM-130",
+   "ADM-133",
+   "ADM-134"
+  ],
+  "catalogue.change_request_line": [
+   "BO-009",
+   "BO-443",
+   "ADM-079",
+   "ADM-082",
+   "ADM-084",
+   "ADM-130",
+   "ADM-133"
+  ],
+  "catalogue.package_pricing": [
+   "BO-009",
+   "BO-011",
+   "ADM-048",
+   "ADM-053",
+   "ADM-057"
   ],
   "pricing.dynamic_price_action": [
    "BO-009",
@@ -51434,12 +51734,6 @@
    "ANL-061",
    "ANL-069"
   ],
-  "catalogue.package_pricing": [
-   "BO-011",
-   "ADM-048",
-   "ADM-053",
-   "ADM-057"
-  ],
   "fnb.combo": [
    "BO-011"
   ],
@@ -51451,6 +51745,7 @@
   ],
   "promotions.allocation_component": [
    "BO-011",
+   "BO-094",
    "ADM-048",
    "ADM-180",
    "ADM-181",
@@ -51651,7 +51946,9 @@
   "tenancy.device_audit": [
    "BO-036",
    "BO-129",
-   "BO-203"
+   "BO-196",
+   "BO-203",
+   "ADM-581"
   ],
   "tenancy.device_credential": [
    "BO-036"
@@ -51703,7 +52000,8 @@
    "ADM-021",
    "ADM-422",
    "PTR-003",
-   "PTR-020"
+   "PTR-020",
+   "CMS-019"
   ],
   "workforce.job_title": [
    "BO-053",
@@ -52399,6 +52697,9 @@
    "ADM-080",
    "ADM-122"
   ],
+  "catalogue.import_job_row": [
+   "BO-117"
+  ],
   "seating.seat_map": [
    "BO-117",
    "BO-597",
@@ -52851,6 +53152,7 @@
   "subscription.membership_eligibility_rule": [
    "BO-284",
    "BO-286",
+   "BO-288",
    "BO-293"
   ],
   "subscription.membership_entitlement": [
@@ -52861,6 +53163,7 @@
   ],
   "subscription.membership_household_policy": [
    "BO-284",
+   "BO-288",
    "BO-290",
    "BO-293"
   ],
@@ -52893,6 +53196,7 @@
   ],
   "subscription.membership_renewal_policy": [
    "BO-284",
+   "BO-288",
    "BO-292",
    "BO-293",
    "BO-300"
@@ -52910,15 +53214,6 @@
    "ADM-076",
    "ADM-082",
    "ADM-111"
-  ],
-  "catalogue.membership_benefit": [
-   "BO-288",
-   "ADM-135"
-  ],
-  "catalogue.plan_benefit": [
-   "BO-288",
-   "BO-289",
-   "ADM-135"
   ],
   "subscription.membership_household_policy_role_limit": [
    "BO-290"
@@ -52940,6 +53235,8 @@
   "catalogue.sales_channel": [
    "BO-291",
    "BO-601",
+   "BO-1049",
+   "ADM-076",
    "ADM-095",
    "ADM-096",
    "ADM-114",
@@ -52968,6 +53265,15 @@
    "ADM-069",
    "ADM-070",
    "ADM-076",
+   "ADM-068"
+  ],
+  "catalogue.tax_rule": [
+   "BO-291",
+   "BO-1049",
+   "ADM-069",
+   "ADM-070",
+   "ADM-076",
+   "ADM-077",
    "ADM-068"
   ],
   "identity.benefit_usage": [
@@ -53522,25 +53828,6 @@
   "catalogue.pricing_test_case": [
    "BO-441",
    "ADM-077"
-  ],
-  "catalogue.change_request": [
-   "BO-443",
-   "ADM-078",
-   "ADM-079",
-   "ADM-082",
-   "ADM-084",
-   "ADM-128",
-   "ADM-130",
-   "ADM-133",
-   "ADM-134"
-  ],
-  "catalogue.change_request_line": [
-   "BO-443",
-   "ADM-079",
-   "ADM-082",
-   "ADM-084",
-   "ADM-130",
-   "ADM-133"
   ],
   "catalogue.price_list_version": [
    "BO-443",
@@ -54512,13 +54799,6 @@
    "CMS-047",
    "CMS-060"
   ],
-  "marketing.waiver_version_control": [
-   "BO-847",
-   "CMS-041",
-   "CMS-048",
-   "CMS-050",
-   "CMS-060"
-  ],
   "marketing.waiver_signatory_rule": [
    "BO-848",
    "BO-849",
@@ -54878,13 +55158,6 @@
    "ADM-077",
    "ADM-068"
   ],
-  "catalogue.tax_rule": [
-   "BO-1049",
-   "ADM-070",
-   "ADM-076",
-   "ADM-077",
-   "ADM-068"
-  ],
   "reporting.export": [
    "BO-1060",
    "ANL-045"
@@ -54902,6 +55175,17 @@
    "PTR-019",
    "DEV-001",
    "DEV-003",
+   "DEV-008"
+  ],
+  "control.developer_member": [
+   "BO-1073",
+   "BO-1177",
+   "ADM-015",
+   "PTR-019",
+   "DEV-002",
+   "DEV-003",
+   "DEV-004",
+   "DEV-007",
    "DEV-008"
   ],
   "control.production_access_request": [
@@ -55246,7 +55530,6 @@
   "catalogue.ai_finding": [
    "ADM-128",
    "ADM-137",
-   "ADM-268",
    "ADM-277",
    "ADM-365"
   ],
@@ -55334,7 +55617,6 @@
    "ADM-277"
   ],
   "catalogue.channel_sales_rule": [
-   "ADM-258",
    "ADM-263",
    "ADM-264",
    "ADM-265",
@@ -55888,7 +56170,9 @@
    "ADM-400",
    "ADM-406",
    "ADM-407",
+   "ADM-410",
    "ADM-416",
+   "ADM-417",
    "ADM-422",
    "ADM-424",
    "ADM-449",
@@ -55920,7 +56204,9 @@
    "ADM-400",
    "ADM-406",
    "ADM-407",
+   "ADM-410",
    "ADM-416",
+   "ADM-417",
    "ADM-422",
    "ADM-424",
    "ADM-449",
@@ -55975,6 +56261,57 @@
    "SGN-020",
    "SGN-022"
   ],
+  "control.plan_limit": [
+   "ADM-002",
+   "ADM-005",
+   "ADM-006",
+   "ADM-007",
+   "ADM-008",
+   "ADM-009",
+   "ADM-010",
+   "ADM-011",
+   "ADM-012",
+   "ADM-015",
+   "ADM-377",
+   "ADM-378",
+   "ADM-392",
+   "ADM-398",
+   "ADM-400",
+   "ADM-410",
+   "ADM-417",
+   "ADM-422",
+   "ADM-424",
+   "ADM-450",
+   "ADM-452",
+   "ADM-454",
+   "ADM-465",
+   "SGN-012"
+  ],
+  "control.plan_module": [
+   "ADM-002",
+   "ADM-005",
+   "ADM-006",
+   "ADM-007",
+   "ADM-008",
+   "ADM-009",
+   "ADM-010",
+   "ADM-011",
+   "ADM-012",
+   "ADM-015",
+   "ADM-378",
+   "ADM-392",
+   "ADM-398",
+   "ADM-400",
+   "ADM-410",
+   "ADM-417",
+   "ADM-422",
+   "ADM-424",
+   "ADM-450",
+   "ADM-452",
+   "ADM-460",
+   "ADM-465",
+   "SGN-012"
+  ],
   "control.usage_record": [
    "ADM-002",
    "ADM-005",
@@ -56020,36 +56357,6 @@
   ],
   "control.outbox": [
    "ADM-005"
-  ],
-  "control.plan_limit": [
-   "ADM-005",
-   "ADM-007",
-   "ADM-008",
-   "ADM-011",
-   "ADM-377",
-   "ADM-378",
-   "ADM-392",
-   "ADM-398",
-   "ADM-400",
-   "ADM-452",
-   "ADM-454",
-   "ADM-465",
-   "SGN-012"
-  ],
-  "control.plan_module": [
-   "ADM-005",
-   "ADM-007",
-   "ADM-008",
-   "ADM-009",
-   "ADM-011",
-   "ADM-378",
-   "ADM-392",
-   "ADM-398",
-   "ADM-400",
-   "ADM-452",
-   "ADM-460",
-   "ADM-465",
-   "SGN-012"
   ],
   "control.credit_note": [
    "ADM-008",
@@ -56499,7 +56806,8 @@
    "PTR-011"
   ],
   "identity.module_access": [
-   "PTR-020"
+   "PTR-020",
+   "CMS-019"
   ],
   "control.partner_application_review_task": [
    "PTR-024"
@@ -56583,6 +56891,12 @@
    "CMS-099",
    "CMS-100"
   ],
+  "assets.taxonomy": [
+   "CMS-010",
+   "CMS-065",
+   "CMS-066",
+   "CMS-069"
+  ],
   "marketing.consent_capture_point": [
    "CMS-021",
    "CMS-027",
@@ -56614,6 +56928,7 @@
   "marketing.waiver_association": [
    "CMS-041",
    "CMS-046",
+   "CMS-050",
    "CMS-060"
   ],
   "marketing.waiver_field_rule": [
@@ -56658,11 +56973,6 @@
    "CMS-099",
    "CMS-100"
   ],
-  "assets.taxonomy": [
-   "CMS-065",
-   "CMS-066",
-   "CMS-069"
-  ],
   "assets.distribution_channel": [
    "CMS-068",
    "CMS-091",
@@ -56681,9 +56991,6 @@
   ],
   "whitelabel.store_account": [
    "CMS-104"
-  ],
-  "control.developer_member": [
-   "DEV-002"
   ],
   "control.sandbox": [
    "DEV-004"

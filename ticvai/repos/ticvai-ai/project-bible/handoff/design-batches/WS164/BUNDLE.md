@@ -188,7 +188,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-943` | Resource Analytics Command Center | D | 0 | 30 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-944` | Resource Utilization & Capacity Analytics | D | 3 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-945` | Resource Cost, Revenue & Efficiency Analytics | D | 11 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-946` | Demand Forecast Accuracy & Planning Performance | B | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-946` | Demand Forecast Accuracy & Planning Performance | B | 0 | 20 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-947` | Resource KPI, SLA & Performance Framework | D | 0 | 44 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-948` | Resource Governance & Policy Center | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-949` | Approval, Exception & Override Control Center | B | 0 | 20 | 6 | 0 | 0 | 3 | — | notStarted (—) |
@@ -221,8 +221,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/resource-analytics-command-center-bo-943` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The executive dashboard of resource management: a Resource Health score with its components, headline KPIs, breakdown by venue, attraction, event, department, category, type, staff, equipment and space, executive health indicators and an AI executive brief, and the entry to the board 10 screens. The one thing to get right: every tile drills to the screen that explains it, and the health score shows its components and weights.
 
@@ -886,7 +884,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Forecast Demand** (metric tile)
+**Forecast Demand** (metric tile, from `listDemandBookingCurve`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue id |
+| Product | text | Product id |
+| Event | text | Event id |
+| Performance | text | Performance id |
+| Date | 1 Oct 2026 | Date |
+| Timeslot | text | Timeslot |
+| Price category | text | Price category |
+| Section code | text | Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build … |
+| Channel | chip: POS, Kiosk, Web, Mobile, B2B, Ota… | Channel |
+| Confidence | 1,234.5 | Forecast Confidence, percent (`DemandForecast.confidence` x 100; ADAM CR-405) |
+| Forecast final occupancy | 1,234.5 | Forecast Final Occupancy, percent |
+| Demand | 1,234 | Forecast demand |
+| Attendance | 1,234 | Forecast attendance |
+| Occupancy | 1,234.5 | Forecast occupancy, percent |
+| Sell through | 1,234.5 | Forecast sell-through, percent |
+| Expected sell out time | 1 Oct 2026, 14:30 | Expected Sell-Out Time; empty if no sell-out forecast |
+| Revenue | AED 1,234.50 | Forecast revenue |
+| Conversion | 1,234.5 | Forecast conversion, percent |
+| Remaining inventory | 1,234 | Forecast remaining inventory at event |
 
 **Planned Resources** (metric tile)
 
@@ -978,7 +999,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-946?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-943`.
@@ -1003,8 +1024,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/resource-kpi-sla-performance-framework-bo-947` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Where the organisation defines what good looks like: a KPI and SLA library (utilisation, assignment fulfilment, staffing coverage, readiness, equipment availability, downtime, conflict resolution time, replacement time, attendance compliance, overtime, rental return rate, forecast accuracy) with target, warning and critical thresholds, scope, period and owner, and a scorecard of target vs actual. The one thing to get right: each KPI says whether higher or lower is better, so status colours are never inverted.
 
@@ -1362,8 +1381,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/approval-exception-override-control-center-bo-949` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Resource-management exceptions and overrides waiting for a decision, with operational and financial impact.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
@@ -1689,8 +1706,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/resource-integration-system-health-center-bo-951` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Health of the integrations that feed resource management (HR system, workforce provider, booking sync): last success, failures, records affected and what that failure means operationally.
 
 **Known correction pending (do not draw the wrong version)**
@@ -1812,8 +1827,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/executive-resource-intelligence-ai-improvement-center-bo-952` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The executive AI workspace that closes the module: ask "How did our resources perform this month?" and get the headline numbers, AI findings and recommended actions with evidence, confidence, expected benefit, risk, affected resources and financial and operational impact; plus how the AI itself is performing (recommendations generated, accepted, rejected, savings predicted vs realised). The one thing to get right: management reviews, simulates, assigns an owner or dismisses - the AI never makes a strategic change by itself.
 

@@ -30,11 +30,6 @@ consumers:
   idempotencyKey: orderId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Fulfilment metrics
-  idempotencyKey: orderId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Recommendation attribution through the order lines' recommendationId, and forecasting actuals
     for delivered demand (AI system design section 3.2)

@@ -31,9 +31,4 @@ consumers:
   idempotencyKey: requestId + level + escalatedAt
   onFailure: retryThenDeadLetter
   isCritical: false
-- context: reporting
-  purpose: Escalation and bottleneck analytics
-  idempotencyKey: requestId + level + escalatedAt
-  onFailure: retry
-  isCritical: false
 retention: Retained with the request. This is an audit record, not an operational message

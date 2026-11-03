@@ -615,13 +615,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Validate Card Status; Card recognized) and no metric row",
   "purpose": "Configure the first customer step: identifying the customer's game card or digital wallet securely.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 98 §Validate Card Status"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -761,13 +755,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Card Information) and no metric row",
   "purpose": "Present all relevant wallet balances clearly to the customer. The source specifically requires customers' stored credits to be viewable through self-service kiosks.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 99 §Card Information"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

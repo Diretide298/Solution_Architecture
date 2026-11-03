@@ -27,10 +27,10 @@ hld:
   title: TICVAI — seventeen modules in five tiers, five deployables
 - file: diagrams/hld/03-contracts.yaml
   id: HLD-CONTRACTS
-  title: 35 contracts — the join between every other layer
+  title: 36 contracts — the join between every other layer
 - file: diagrams/hld/04-lifecycles.yaml
   id: HLD-LIFECYCLES
-  title: 210 state models and 110 events
+  title: 210 state models and 113 events
 lld:
 - set: services
   files: 17
@@ -39,7 +39,7 @@ lld:
   files: 16
   folder: diagrams/lld/platforms/
 - set: contracts
-  files: 35
+  files: 36
   folder: diagrams/lld/contracts/
 - set: lifecycles
   files: 210

@@ -230,7 +230,7 @@
     "type": "string",
     "maxLength": 64,
     "nullable": true,
-    "description": "**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005; enforced by a unique index on (`matrix_id`, `code`) since ADAM CR-102, CHG-R10ID-015, compared without case). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do not collide. A body with two rules of one code is `400 validation`."
+    "description": "**A stable code for the rule, unique within one version of its matrix** (4 October 2026, CHG-FXC-005; ADAM CR-102, CHG-R10ID-015). Enforced by `rule_matrix_id_matrix_version_code_uniq` on (`matrix_id`, `matrix_version`, `lower(code)`), the only code key since ADAM CR-300 (CHG-CR300-001): codes compare without case, within one version, and null codes do not collide, so a new version repeats the codes of the one before. The old key on (`matrix_id`, `lower(code)`), `rule_matrix_id_code_uniq`, is dropped, guarded, by the names migration `backend/tenant/V0119__names_after_r1_20261029.sql` (ADAM CR-498, CHG-CR498-001). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do not collide. A body with two rules of one code is `400 validation`."
    },
    "minimumApprovals": {
     "type": "integer",
@@ -1069,7 +1069,8 @@
    },
    "b2bPartners": {
     "type": "integer",
-    "description": "Affected b2bPartners (count)"
+    "nullable": true,
+    "description": "Affected b2bPartners (count): no source yet, answered null (ADAM CR-456, LO-CR456-001)"
    },
    "memberships": {
     "type": "integer",
@@ -1089,43 +1090,59 @@
    },
    "apis": {
     "type": "integer",
-    "description": "Affected apis (count)"
+    "nullable": true,
+    "description": "Affected apis (count): no source yet, answered null (ADAM CR-456, LO-CR456-001)"
    },
    "integrations": {
     "type": "integer",
-    "description": "Affected integrations (count)"
+    "nullable": true,
+    "description": "Affected integrations (count): no source yet, answered null (ADAM CR-456, LO-CR456-001)"
    },
    "currentRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current Revenue"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Current Revenue: quantity * server_unit_price over the counted order lines; null when the venues involved trade in more than one currency (ADAM CR-539)"
    },
    "projectedRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Projected Revenue"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Projected Revenue: the same quantities, each reached line's server_unit_price multiplied by the ratio of the most specific change_request_line that reaches it (ADAM CR-539); null when the venues involved trade in more than one currency"
    },
    "averagePriceChange": {
     "type": "number",
-    "description": "Average price change in percent"
+    "nullable": true,
+    "description": "Average price change in percent, over the lines with both current_amount and proposed_amount; null when there are none (ADAM CR-456)"
    },
    "maximumChange": {
     "type": "number",
-    "description": "Largest single price change in percent"
+    "nullable": true,
+    "description": "Largest single price change in percent, over the lines with both current_amount and proposed_amount; null when there are none (ADAM CR-456)"
    },
    "minimumChange": {
     "type": "number",
-    "description": "Smallest single price change in percent"
+    "nullable": true,
+    "description": "Smallest single price change in percent, over the lines with both current_amount and proposed_amount; null when there are none (ADAM CR-456)"
    },
    "marginImpact": {
     "type": "number",
-    "description": "Margin impact in percentage points"
+    "nullable": true,
+    "description": "Margin impact in percentage points: no cost is stored, so answered null (ADAM CR-456, LO-CR456-001)"
    },
    "customerExposure": {
     "type": "integer",
-    "description": "Customers or tickets exposed per year at current volumes (decided 29 September, readiness close-out)"
+    "description": "Customers or tickets exposed per year at current volumes (decided 29 September, readiness close-out): the summed quantity of the counted order lines in the 365 days before the read (ADAM CR-456)"
    },
    "transactionVolume": {
     "type": "integer",
-    "description": "Transactions per year affected at current volumes (decided 29 September, readiness close-out)"
+    "description": "Transactions per year affected at current volumes (decided 29 September, readiness close-out): the distinct orders of the counted order lines in the 365 days before the read (ADAM CR-456)"
    },
    "derivedRates": {
     "type": "integer",
@@ -1145,7 +1162,8 @@
    },
    "promotions": {
     "type": "integer",
-    "description": "Dependency impact: promotions affected (count)"
+    "nullable": true,
+    "description": "Dependency impact: promotions affected (count): no source yet, answered null (ADAM CR-456, LO-CR456-001)"
    },
    "dynamicPricingGuardrails": {
     "type": "integer",
@@ -1162,7 +1180,7 @@
    "analysedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "When the analysis was computed"
+    "description": "When the analysis was computed, which is the time of the read (ADAM CR-456)"
    },
    "revenueImpact": {
     "allOf": [
@@ -1170,7 +1188,8 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Projected minus current revenue (annualised)"
+    "nullable": true,
+    "description": "projectedRevenue minus currentRevenue, over the 365 days before the read (ADAM CR-456); null when the venues involved trade in more than one currency (ADAM CR-539)"
    },
    "affectsExistingOrders": {
     "type": "boolean",
@@ -1192,7 +1211,8 @@
      "high",
      "critical"
     ],
-    "description": "Risk score, classified by the tenant's configurable criteria"
+    "nullable": true,
+    "description": "Risk score, catalogue.change_request.risk_level as stored; null when unset (ADAM CR-456)"
    },
    "aiInsights": {
     "type": "array",

@@ -440,8 +440,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/tenants-licensing/customer-subscription-commercial-portfolio-adm-370` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Every TICVAI customer and its commercial position: model, tier, contracted rate, minimum guarantee, modules.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
@@ -989,8 +987,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/tenants-licensing/revenue-commercial-model-analytics-adm-373` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** TICVAI revenue by commercial structure: guaranteed versus variable, shortfall protection.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
@@ -1517,7 +1513,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/tenants-licensing/renewal-retention-center-adm-375` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-021): listMembershipRenewalRetention is the guest membership renewal and retention read (BO-303); TICVAI's customer renewals are tenant subscriptions, not guest … Contract gap recorded 2 October 2026 (CHG-WIR-024): A cross-tenant read of subscriptions approaching renewal (term end, auto-renew, value, retention risk), paged; getSubscription reads one tenant …
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-021): listMembershipRenewalRetention is the guest membership renewal and retention read (BO-303); TICVAI's customer renewals are tenant subscriptions, not guest … Contract gap recorded 2 October 2026 (CHG-WIR-024): A cross-tenant read of subscriptions approaching renewal (term end, auto-renew, value, retention risk), paged; getSubscription reads one tenant …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** TICVAI customer renewals in the next 30/60/90 days with value, usage trend, payment health and risk.
 
@@ -1825,7 +1821,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/tenants-licensing/commercial-optimization-expansion-opportunities-adm-376` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-021): listRenewalAuto is the guest membership renewal queue (memberships approaching expiry, BO-300); a TICVAI commercial optimisation and expansion screen is about … Contract gap recorded 2 October 2026 (CHG-WIR-024): A cross-tenant read of commercial opportunities (expansion, module, model and cost optimisation, retention value), paged.
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-021): listRenewalAuto is the guest membership renewal queue (memberships approaching expiry, BO-300); a TICVAI commercial optimisation and expansion screen is about … Contract gap recorded 2 October 2026 (CHG-WIR-024): A cross-tenant read of commercial opportunities (expansion, module, model and cost optimisation, retention value), paged.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Commercial optimisation and expansion opportunities with cost and revenue impact.
 
@@ -2207,7 +2203,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/tenants-licensing/executive-ai-commercial-intelligence-adm-378` |
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Board 1 — Standardized Commercial Metrics. Each needs an operation, or needs removing from the screen; this …
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Board 1 — Standardized Commercial Metrics. Each needs an operation, or needs removing from the screen; this …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** AI commercial intelligence for TICVAI leadership, with licence enforcement positions and plan recommendations.
 

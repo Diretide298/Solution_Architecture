@@ -27,7 +27,10 @@
     {
      "to": "WEB-022",
      "trigger": "Membership Plans",
-     "provenance": "derived — WEB-022 declares entryState.params productId and WEB-021 holds none of them. The edge carries nothing: WEB-022 finds productId (listProducts) itself, and WEB-022 opens on its own"
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — WEB-022 declares entryState.params cartId, lineId, productId, templateId and WEB-021 holds productId, so an edge into it carries them"
     },
     {
      "to": "WEB-023",
@@ -40,7 +43,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (optional), and WEB-024 opens on its own"
     }
    ]
   },
@@ -406,6 +409,7 @@
    ],
    "exitTo": [
     "WEB-001",
+    "WEB-011",
     "WEB-021",
     "WEB-023",
     "WEB-024"
@@ -413,23 +417,30 @@
    "inferred": true,
    "transitions": [
     {
+     "to": "WEB-011",
+     "trigger": "Continue",
+     "operation": "getPublishedBookingFlow",
+     "precondition": "The basket holds at least one membership line (`getCart`); until then Continue stays off and the panel reads 'Add at least one membership to continue'",
+     "provenance": "ADAM CR-482, decided by Chinmay on 2 November 2026: Continue goes to the step after the plan in the venue's membership booking flow (getPublishedBookingFlow: plan, then each member's details, consent, review, payment), so WEB-011 is a new exit"
+    },
+    {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-022 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-022 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-023",
      "trigger": "Membership Management",
-     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022 holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep link or optional), and WEB-023 opens on its own"
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022 holds none of them. The edge carries nothing: caseId, statementId only pre-select (optional); WEB-023 finds orderId (listMyPaymentIssues) itself, and WEB-023 opens on its own"
     },
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (optional), and WEB-024 opens on its own"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and could not fetch what it shows** — the app had these and the browser did not, and there is no reason a membership or a bundle should need an app.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and could not fetch what it shows** — the app had these and the browser did not, and there is no reason a membership or a bundle should need an app.\n\n**The page sells memberships as the client-verified frame draws it, basket included** (ADAM CR-482, decided by Chinmay on 2 November 2026: \"The page keeps the client-verified frame, basket included, because the package does not change approved UI and every part of the frame except two already has an operation\"). It is the plan step of the venue's membership booking flow: the cards come from `listProducts`, what each plan gives from `getPlanBenefits` and `listMembershipBenefits`, Choose puts the plan's variant in the guest's real cart (`createCart`, `addCartLine`, `updateCartLine`, `removeCartLine`), the right panel is that cart (`getCart`), and Continue goes on into the flow (`getPublishedBookingFlow`). The Most popular badge and the saving come from `Product.isFeatured` and `Product.compareAtPrice`, a new ticket; until it is built the cards show neither, never a made-up value.\n\n**Design change: WEB-022 as built in 3422264** (ADAM CR-534, Chinmay, 3 November 2026; it replaces CR-516's log; CHG-CR534-001). The build's photo cards on shared rows, the *Your plan* status pill, the sticky *Your membership* basket, the page up to 1408px and the three status tokens are accepted as the screen's design; the package's wireframe, screen layout and page info follow it later (LO-CR534-001). The status pill maps every `GuestMembership.status` from `getMyMemberships`: `active` is *Active* (`--status-active`), `frozen` *Paused* (`--status-paused`), `suspended` *Suspended* (`--status-paused`), `expired` *Expired* (`--status-expired`), `cancelled` *Cancelled* (`--status-expired`); never a raw value or an empty pill. *Most popular* and the saving line stay out until #37213 delivers them. The frame's Passholders section (Adult and Child pass steppers) is left out of this build; it is client-approved and comes back on its own follow-up ticket, bound to the plan's variants the way Ticket Type Selection's guest counters are (LO-CR534-002).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getProduct` reads one of them — list, select, act",
@@ -448,11 +459,57 @@
        "columns": [
         "Product.name",
         "Product.description",
-        "Product.media"
+        "Product.media",
+        "Product.fromPrice",
+        "Product.displayTags",
+        "Product.isFeatured",
+        "Product.compareAtPrice"
        ],
        "operation": "listProducts",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. Membership products only, for the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); the price, term line, badge and saving ADAM CR-482, decided by Chinmay on 2 November 2026",
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. Membership products only, for the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).\n\n**What each card shows** (ADAM CR-482). `Product.name`, `description`, primary photo and `Product.fromPrice` (CR-358). The term line and the price's period ('Weekdays only · 12 months', 'per year') come from the product's `displayTags`: the venue's calendar and other tags, or the validity derived when it wrote none; with no tag, no line. The 'Most popular' badge shows on a featured plan (`isFeatured`), and 'Saves ... vs paying per visit' shows `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; until the new ticket for those two fields is built the cards show neither, never a made-up value. Arriving with `productId` selects that plan's card (`getProduct`). For a signed-in guest, `getMyMemberships` marks a plan they already hold on its card."
+      },
+      {
+       "kind": "cardList",
+       "label": "What you get",
+       "bindsTo": "CataloguePlanBenefit",
+       "columns": [
+        "CataloguePlanBenefit.membershipBenefitId",
+        "CataloguePlanBenefit.priority",
+        "CataloguePlanBenefit.isActive",
+        "CatalogueMembershipBenefit.name"
+       ],
+       "operation": "getPlanBenefits",
+       "provenance": "ADAM CR-482, decided by Chinmay on 2 November 2026",
+       "notes": "Inside each plan card. `getPlanBenefits` is called with the product's `entitlementTemplateId` for each plan on the page, and the names come from `listMembershipBenefits`. A tick for each of this plan's active benefits, in priority order, and a dash for each benefit another plan on the page grants and this one does not."
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Choose <plan>",
+       "operation": "addCartLine",
+       "collectedBy": "Membership plans",
+       "provenance": "ADAM CR-482, decided by Chinmay on 2 November 2026",
+       "notes": "`listProductVariants` gives the plan's variant. `createCart` when the guest has no cart, then `addCartLine` with that `variantId` and quantity 1. Choosing a plan already in the basket raises its quantity with `updateCartLine`; `removeCartLine` takes it out."
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Choose <plan>",
+       "operation": "updateCartLine",
+       "collectedBy": "Membership plans",
+       "provenance": "ADAM CR-482, decided by Chinmay on 2 November 2026",
+       "notes": "The same Choose button on a plan already in the basket, which raises that line's quantity with `updateCartLine` instead of adding a second line."
+      },
+      {
+       "kind": "banner",
+       "label": "Your plan",
+       "bindsTo": "GuestMembership",
+       "columns": [
+        "GuestMembership.name",
+        "GuestMembership.status"
+       ],
+       "operation": "getMyMemberships",
+       "provenance": "ADAM CR-482, decided by Chinmay on 2 November 2026; the pill ADAM CR-534, 3 November 2026",
+       "notes": "For a signed-in guest, `getMyMemberships` marks on its card a plan they already hold, as a status pill (ADAM CR-534) mapped from every `GuestMembership.status`: `active` Active (`--status-active`), `frozen` Paused (`--status-paused`), `suspended` Suspended (`--status-paused`), `expired` Expired (`--status-expired`), `cancelled` Cancelled (`--status-expired`). Never a raw value or an empty pill."
       }
      ]
     },
@@ -461,36 +518,32 @@
      "slot": "selection",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The plan",
-       "bindsTo": "Product",
+       "kind": "cartPanel",
+       "label": "Your membership",
+       "bindsTo": "Cart",
        "columns": [
-        "Product.name",
-        "Product.description",
-        "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.hasVariants",
-        "Product.variantCount"
+        "Cart.lines",
+        "Cart.subtotal",
+        "Cart.taxTotal",
+        "Cart.total"
        ],
-       "operation": "getProduct",
-       "provenance": "contract catalogue.yaml GET /products/{productId}"
+       "operation": "getCart",
+       "provenance": "ADAM CR-482, decided by Chinmay on 2 November 2026 (the client-verified frame's basket)",
+       "notes": "The basket: `getCart`'s membership lines, `subtotal`, `taxTotal` shown as VAT, and `total`. While it has no membership line the panel reads 'Add at least one membership to continue'."
       },
       {
-       "kind": "detailPanel",
-       "label": "Your membership",
-       "bindsTo": "GuestMembership",
-       "columns": [
-        "GuestMembership.name",
-        "GuestMembership.tier",
-        "GuestMembership.status",
-        "GuestMembership.validFrom",
-        "GuestMembership.validTo",
-        "GuestMembership.frozenDays",
-        "GuestMembership.benefits",
-        "GuestMembership.renewsOn"
-       ],
-       "operation": "getMyMemberships",
-       "provenance": "contract catalogue.yaml GET /guests/me/memberships"
+       "kind": "secondaryButton",
+       "label": "Remove",
+       "operation": "removeCartLine",
+       "provenance": "ADAM CR-482, decided by Chinmay on 2 November 2026",
+       "notes": "Takes a plan out of the basket (`removeCartLine`)."
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Continue",
+       "operation": "getPublishedBookingFlow",
+       "provenance": "ADAM CR-482, decided by Chinmay on 2 November 2026",
+       "notes": "Goes to the step after the plan in the venue's membership booking flow (`getPublishedBookingFlow`: plan, then each member's details, consent, review, payment), WEB-011. Off while the basket has no membership line."
       }
      ]
     }
@@ -499,7 +552,7 @@
   "states": {
    "loading": "The membership plans list.",
    "error": "Could not load. Names which read failed and leaves the membership plans untouched.",
-   "emptyFirstRun": "No membership plans yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyFirstRun": "No membership plans on sale at this venue yet, said in words rather than empty cards; with nothing to choose, the basket stays empty and Continue stays off (ADAM CR-482).",
    "emptyNoResults": "Never shown: the plans are the venue's membership products, with no filter a guest sets.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
@@ -514,14 +567,78 @@
    {
     "operationId": "getProduct",
     "contract": "catalogue",
-    "purpose": "Read a product",
-    "trigger": "onLoad"
+    "purpose": "Arriving with productId selects that plan's card (ADAM CR-482). No component of its own: what it finds selects a card.",
+    "trigger": "background"
    },
    {
     "operationId": "getMyMemberships",
     "contract": "catalogue",
-    "purpose": "A guest's own memberships, benefits and history Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
+    "purpose": "A guest's own memberships, benefits and history Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)); marks a plan they already hold on its card (ADAM CR-482).",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPlanBenefits",
+    "contract": "catalogue",
+    "purpose": "What each plan on the page gives, by the product's entitlementTemplateId (ADAM CR-482)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMembershipBenefits",
+    "contract": "catalogue",
+    "purpose": "The benefits' names in What you get (ADAM CR-482)",
+    "trigger": "onLoad",
+    "shownBy": "Fast Track Unlimited included"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "The plan's variant, the one Choose adds (ADAM CR-482). No component of its own: the runtime reads it behind Choose.",
+    "trigger": "background"
+   },
+   {
+    "operationId": "createCart",
+    "contract": "orders",
+    "purpose": "Started the first time a plan is chosen when the guest has no cart, before the first addCartLine; never a button or a form (ADAM CR-482)",
+    "trigger": "background"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Choose <plan> puts the plan's variant in the basket, quantity 1 (ADAM CR-482)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getCart"
+    ]
+   },
+   {
+    "operationId": "updateCartLine",
+    "contract": "orders",
+    "purpose": "Choosing a plan already in the basket raises its quantity (ADAM CR-482)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getCart"
+    ]
+   },
+   {
+    "operationId": "removeCartLine",
+    "contract": "orders",
+    "purpose": "Takes a plan out of the basket (ADAM CR-482)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getCart"
+    ]
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The basket in the right panel: membership lines, subtotal, VAT (taxTotal) and total (ADAM CR-482), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045); a visitor with no cart reads none and sees the empty basket",
+    "trigger": "background"
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The venue's membership booking flow, for Continue: the step after the plan (ADAM CR-482)",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -529,6 +646,28 @@
     {
      "name": "productId",
      "from": "WEB-001"
+    },
+    {
+     "name": "cartId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen makes one with `createCart`."
+    },
+    {
+     "name": "lineId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: the basket's line for a plan already chosen, from `getCart`'s lines; `updateCartLine` and `removeCartLine` take it from the line they act on (ADAM CR-482)."
+    },
+    {
+     "name": "templateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: each plan's `Product.entitlementTemplateId` from `listProducts`, which `getPlanBenefits` is called with for each plan on the page (ADAM CR-482)."
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
@@ -550,7 +689,7 @@
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership → 'Other plans — Compare'",
-    "differences": "Plans are sold as a booking flow, not a plans page; the account 'Compare' action is a toast."
+    "differences": "The page is the plan step of the membership booking flow, drawn as the frame draws it with its basket (ADAM CR-482); the account 'Compare' action is a toast. Since 3 November 2026 the build in 3422264 is the screen's design (ADAM CR-534): photo cards on shared rows, the Your plan status pill, the sticky Your membership basket, the page up to 1408px; this frame is redrawn to it later (LO-CR534-001), and its Passholders section waits for its own ticket (LO-CR534-002)."
    },
    "stateViews": {
     "loading": "P01/turnstile-loader",
@@ -561,7 +700,7 @@
     "offline": "P01/state-offline"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Thirteen operations since ADAM CR-482 (2 November 2026), the frame's purchase and basket. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listGuestMemberships",
@@ -629,7 +768,7 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-023 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-023 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -637,12 +776,12 @@
      "carries": [
       "productId"
      ],
-     "provenance": "derived — WEB-022 declares entryState.params productId and WEB-023 holds productId, so an edge into it carries them"
+     "provenance": "derived — WEB-022 declares entryState.params cartId, lineId, productId, templateId and WEB-023 holds productId, so an edge into it carries them"
     },
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (optional), and WEB-024 opens on its own"
     }
    ]
   },
@@ -967,17 +1106,17 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-024 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, cardKind, walletId and WEB-024 holds none of them. The edge carries nothing: cardCode, cardKind, walletId only pre-select (optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
      "trigger": "Membership Plans",
-     "provenance": "derived — WEB-022 declares entryState.params productId and WEB-024 holds none of them. The edge carries nothing: WEB-022 finds productId (listProducts) itself, and WEB-022 opens on its own"
+     "provenance": "derived — WEB-022 declares entryState.params cartId, lineId, productId, templateId and WEB-024 holds none of them. The edge carries nothing: cartId, lineId, templateId only pre-select (optional); WEB-022 finds productId (listProducts) itself, and WEB-022 opens on its own"
     },
     {
      "to": "WEB-023",
      "trigger": "Membership Management",
-     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024 holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep link or optional), and WEB-023 opens on its own"
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024 holds none of them. The edge carries nothing: caseId, statementId only pre-select (optional); WEB-023 finds orderId (listMyPaymentIssues) itself, and WEB-023 opens on its own"
     },
     {
      "to": "GST-037",

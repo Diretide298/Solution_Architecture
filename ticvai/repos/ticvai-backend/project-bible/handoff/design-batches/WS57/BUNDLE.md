@@ -164,14 +164,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Venue | text field | — | — | `listSaleChannel` ?venue |
 | Brand | text field | — | — | `listSaleChannel` ?brand |
 | Search | text field | — | — | `listSaleChannel` ?search |
-| Channel | text field | — | — | `listChannelSaleSchedule` ?channel |
-| Product | text field | — | — | `listChannelSaleSchedule` ?product |
-| Event | text field | — | — | `listChannelSaleSchedule` ?event |
-| From | date picker | — | — | `listChannelSaleSchedule` ?from |
-| To | date picker | — | — | `listChannelSaleSchedule` ?to |
-| Channel | text field | — | — | `listChannelSaleRule` ?channel |
-| Product | text field | — | — | `listChannelSaleRule` ?product |
-| Rule level | radio group | — | Platform · Product · Channel · Contract partner | `listChannelSaleRule` ?ruleLevel |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -252,7 +244,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **channel list**: Channel, type, venues, status, products assigned, window, open incidents. *(source: contracts/spine/catalogue.yaml#listSaleChannel)*
 
-**Data it reads**: `listSaleChannel` (onLoad, Sales Channel Command Center); `listChannelSaleSchedule` (onLoad, Channel Sales Schedule & Availability Windows); `listChannelSaleRule` (onLoad, Channel Sales Rules, Limits & Restrictions)
+**Data it reads**: `listSaleChannel` (onLoad, Sales Channel Command Center)
 
 **Where the user goes next**
 
@@ -263,9 +255,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `ADM-262` Inventory, Capacity & Channel Allocation: *Works in Inventory, Capacity & Channel Allocation*; calls `listSaleChannel`
 - → `ADM-266` Channel Fees, Payment & Fulfillment Configuration: *Works in Channel Fees, Payment & Fulfillment Configuration*; calls `listSaleChannel`
 - → `ADM-267` Channel Publication, Readiness & AI Validation: *Works in Channel Publication, Readiness & AI Validation*; calls `listSaleChannel`
-- → `ADM-263` Channel Sales Schedule & Availability Windows: *Works in Channel Sales Schedule & Availability Windows*; carries `ruleId`; calls `listSaleChannel`
-- → `ADM-264` Customer & Eligibility Rules by Channel: *Works in Customer & Eligibility Rules by Channel*; carries `ruleId`; calls `listSaleChannel`
-- → `ADM-265` Channel Sales Rules, Limits & Restrictions: *Works in Channel Sales Rules, Limits & Restrictions*; carries `ruleId`; calls `listSaleChannel`
+- → `ADM-263` Channel Sales Schedule & Availability Windows: *Works in Channel Sales Schedule & Availability Windows*; calls `listSaleChannel`
+- → `ADM-264` Customer & Eligibility Rules by Channel: *Works in Customer & Eligibility Rules by Channel*; calls `listSaleChannel`
+- → `ADM-265` Channel Sales Rules, Limits & Restrictions: *Works in Channel Sales Rules, Limits & Restrictions*; calls `listSaleChannel`
 
 #### States
 
@@ -295,8 +287,6 @@ channels:
 #### Permissions
 
 - `listSaleChannel` → `PRODUCT_VIEW` (read) · staff
-- `listChannelSaleSchedule` → `PRODUCT_VIEW` (read) · staff
-- `listChannelSaleRule` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -982,7 +972,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Is corporate account required `isCorporateAccountRequired` | toggle | optional | — | — | — | — | `setChannelSalesRule` body |
 | … 1 more | | | | | | the rest are in `schemas.json` | `setChannelSalesRule` body |
 
-Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`.
+Errors to draw in the form: 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`.
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1173,7 +1163,7 @@ Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibil
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save channel sales rule (primary button) | `setChannelSalesRule` PUT `/channel-sales-rules/{ruleId}` | ChannelSalesRule | ChannelSalesRule | 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`. | gated `PRODUCT_CONFIGURE`; opens modal first |
+| Save channel sales rule (primary button) | `setChannelSalesRule` PUT `/channel-sales-rules/{ruleId}` | ChannelSalesRule | ChannelSalesRule | 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`. | gated `PRODUCT_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listChannelSaleSchedule` (onLoad, Channel Sales Schedule & Availability Windows)
 
@@ -1191,7 +1181,7 @@ Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibil
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the channel sales schedule are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`. |
 
 #### Sample data for the mock-up
 
@@ -1342,7 +1332,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Is corporate account required `isCorporateAccountRequired` | toggle | optional | — | — | — | — | `setChannelSalesRule` body |
 | … 1 more | | | | | | the rest are in `schemas.json` | `setChannelSalesRule` body |
 
-Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`.
+Errors to draw in the form: 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`.
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1354,7 +1344,7 @@ Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibil
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save channel sales rule (primary button) | `setChannelSalesRule` PUT `/channel-sales-rules/{ruleId}` | ChannelSalesRule | ChannelSalesRule | 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`. | gated `PRODUCT_CONFIGURE`; opens modal first |
+| Save channel sales rule (primary button) | `setChannelSalesRule` PUT `/channel-sales-rules/{ruleId}` | ChannelSalesRule | ChannelSalesRule | 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`. | gated `PRODUCT_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listCustomerEligibilityRule` (onLoad, Customer & Eligibility Rules by Channel)
 
@@ -1371,7 +1361,7 @@ Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibil
 | Empty, first run (`?state=emptyFirstRun`) | No customer eligibility rules configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`. |
 
 #### Sample data for the mock-up
 
@@ -1531,7 +1521,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Is corporate account required `isCorporateAccountRequired` | toggle | optional | — | — | — | — | `setChannelSalesRule` body |
 | … 1 more | | | | | | the rest are in `schemas.json` | `setChannelSalesRule` body |
 
-Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`.
+Errors to draw in the form: 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`.
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1543,7 +1533,7 @@ Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibil
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save channel sales rule (primary button) | `setChannelSalesRule` PUT `/channel-sales-rules/{ruleId}` | ChannelSalesRule | ChannelSalesRule | 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`. | gated `PRODUCT_CONFIGURE`; opens modal first |
+| Save channel sales rule (primary button) | `setChannelSalesRule` PUT `/channel-sales-rules/{ruleId}` | ChannelSalesRule | ChannelSalesRule | 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`. | gated `PRODUCT_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listChannelSaleRule` (onLoad, Channel Sales Rules, Limits & Restrictions)
 
@@ -1560,7 +1550,7 @@ Errors to draw in the form: 409 `ruleConflict`.; 422 `invalidRange` or `eligibil
 | Empty, first run (`?state=emptyFirstRun`) | No channel sales rules configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `ruleConflict`.; 422 `invalidRange` or `eligibilityIncomplete`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 `ruleConflict`: another active rule on the same channel, product and rule kind has an overlapping effective window, and `overridesProductRule` is false …; 422 `invalidRange` or `eligibilityIncomplete`. |
 
 #### Sample data for the mock-up
 

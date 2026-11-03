@@ -1,4 +1,47 @@
 {
+ "addCartLine": {
+  "method": "POST",
+  "path": "/carts/{cartId}/lines",
+  "contract": "orders",
+  "summary": "Add a line to the cart",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddCartLineRequest",
+  "responds": "Cart"
+ },
+ "createCart": {
+  "method": "POST",
+  "path": "/carts",
+  "contract": "orders",
+  "summary": "Start a cart",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
  "createReferral": {
   "method": "POST",
   "path": "/referrals",
@@ -32,6 +75,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -47,6 +95,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -84,6 +137,25 @@
   ],
   "requestBody": null,
   "responds": "BillingStatement"
+ },
+ "getCart": {
+  "method": "GET",
+  "path": "/carts/{cartId}",
+  "contract": "orders",
+  "summary": "The cart, priced and checked, right now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
  },
  "getFacePassEnrolment": {
   "method": "GET",
@@ -175,6 +247,30 @@
   "requestBody": null,
   "responds": "GuestMembership"
  },
+ "getPlanBenefits": {
+  "method": "GET",
+  "path": "/entitlement-templates/{templateId}/benefits",
+  "contract": "catalogue",
+  "summary": "Which benefits a plan grants, and how much of each",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "templateId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CataloguePlanBenefit"
+ },
  "getProduct": {
   "method": "GET",
   "path": "/products/{productId}",
@@ -193,6 +289,40 @@
   ],
   "requestBody": null,
   "responds": "Product"
+ },
+ "getPublishedBookingFlow": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flow",
+  "contract": "white-label",
+  "summary": "The published booking flow a product or category books through",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlow"
  },
  "getPublishedTenantConfig": {
   "method": "GET",
@@ -485,6 +615,30 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listMembershipBenefits": {
+  "method": "GET",
+  "path": "/membership-benefits",
+  "contract": "catalogue",
+  "summary": "Benefits a plan can grant",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueMembershipBenefit"
+ },
  "listMfaMethods": {
   "method": "GET",
   "path": "/auth/mfa/methods",
@@ -575,6 +729,40 @@
     "name": "subjectId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductVariants": {
+  "method": "GET",
+  "path": "/products/{productId}/variants",
+  "contract": "catalogue",
+  "summary": "List generated variants",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
     "name": null,
@@ -804,6 +992,25 @@
   "requestBody": null,
   "responds": "LoyaltyPosition"
  },
+ "removeCartLine": {
+  "method": "DELETE",
+  "path": "/carts/{cartId}/lines/{lineId}",
+  "contract": "orders",
+  "summary": "Take something out",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
  "retryMyDunningPayment": {
   "method": "POST",
   "path": "/dunning-cases/{caseId}/retry",
@@ -922,5 +1129,29 @@
   ],
   "requestBody": null,
   "responds": "WalletTransaction"
+ },
+ "updateCartLine": {
+  "method": "PATCH",
+  "path": "/carts/{cartId}/lines/{lineId}",
+  "contract": "orders",
+  "summary": "Change a quantity",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
  }
 }

@@ -888,8 +888,7 @@ screens:
     - to: ACC-008
       trigger: Credential Register
       provenance: 'derived — ACC-008 declares entryState.params exportId and ACC-006 holds none of them.
-        The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens
-        on its own'
+        The edge carries nothing: exportId only pre-selects (optional), and ACC-008 opens on its own'
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-queue
@@ -989,10 +988,10 @@ screens:
       - kind: primaryButton
         label: Approve
         operation: decideAccreditationApplication
-        permission: APPROVAL_DECIDE
+        permission: ACCREDITATION_APPROVE
       - kind: destructiveButton
         label: Refuse
-        permission: APPROVAL_DECIDE
+        permission: ACCREDITATION_APPROVE
   overlays:
   - id: refuse
     component: confirmDialog
@@ -1054,8 +1053,7 @@ screens:
     - to: ACC-008
       trigger: Credential Register
       provenance: 'derived — ACC-008 declares entryState.params exportId and ACC-007 holds none of them.
-        The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens
-        on its own'
+        The edge carries nothing: exportId only pre-selects (optional), and ACC-008 opens on its own'
     - to: ACC-005
       trigger: The badge is issued
       provenance: flow F23 step 2→3

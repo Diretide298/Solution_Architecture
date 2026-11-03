@@ -85,6 +85,65 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Reporting's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  alertEvaluation:
+    module: reporting
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: alert, from: raised, to: expired}
+    - {model: alert, from: acknowledged, to: expired}
+    reads: [reporting.alert]
+    writes: [reporting.alert]
+    reliesOn: [setAlertRule, acknowledgeAlert]
+    for: Reporting alert evaluation and alert expiry.
+    source: ['contracts/satellite/reporting.yaml', 'states/alert.yaml:31']
+  alertRaising:
+    module: reporting
+    host: workers
+    trigger: {kind: event}
+    consumes: [apiClient.anomalyDetected, device.tamperDetected]
+    reads: [reporting.alert_rule]
+    writes: [reporting.alert]
+    for: 'Reporting''s alert consumers: raise an API anomaly to the tenant''s and TICVAI''s API administrators (ADM-015, DEV-006)
+      and a device tamper alert to the venue''s security roles.'
+    source: ['events/apiClient-anomalyDetected.yaml', 'events/device-tamperDetected.yaml']
+  execution:
+    module: reporting
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: report-execution, from: queued, to: running}
+    - {model: report-execution, from: running, to: completed}
+    - {model: report-execution, from: running, to: failed}
+    - {model: report-execution, from: completed, to: expired}
+    - {model: report-export, from: generating, to: ready}
+    - {model: report-export, from: generating, to: failed}
+    - {model: report-export, from: ready, to: expired}
+    reads: [reporting.execution, reporting.export]
+    writes: [reporting.execution, reporting.export]
+    for: Reporting execution worker and export generation.
+    source:
+    - contracts/spine/tenancy.yaml
+    - states/report-execution.yaml:20
+    - states/report-export.yaml:24
+  syncRejectionAlert:
+    module: reporting
+    host: workers
+    trigger: {kind: event}
+    context: platform
+    consumes: [sync.rejectionRaised]
+    reads: []
+    writes: [reporting.alert]
+    for: 'Platform''s sync-rejection alert: raise an operator alert (BO-133 Offline Alerts) for each refused offline entry.'
+    source: ['events/sync-rejectionRaised.yaml']
 paths:
   /reports/seeded:
     get:
@@ -823,6 +882,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateReportRequest'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -1745,10 +1806,29 @@ paths:
         - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
         - "P16 ANL-029 Dashboard Access, Publishing & Versioning"
         - "P16 ANL-030 Dashboard Preview, Validation & Health"
+      x-ticvai-read-via:
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373, CR-450), as getModuleEnablement reads control.contract, Platform''s data'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373, CR-450), as getModuleEnablement reads control.licence_add_on, Platform''s data'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373, CR-450), as getModuleEnablement reads control.plan, Platform''s data'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
       summary: Read a dashboard with tile data
+      description: '**A dashboard the caller may not see does not exist for it** (ADAM CR-450, Chinmay, 1 November
+        2026; CHG-CR450-001). A dashboard whose module fails the rule on `CreateDashboardRequest.module` (not
+        licensed, or none of its module permissions held) answers `404 not-found`, exactly as if it did not exist,
+        matching `listDashboards`, which leaves it out.
+
+        '
       tags:
       - dashboard
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -1835,6 +1915,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateDashboardRequest'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -1945,13 +2027,13 @@ paths:
         route: service
         for: 'its read of ai.provider, AI''s data (CHG-MOD-001)'
       - query: accreditation#applicationRecords
-        route: service
+        route: in-process
         for: 'what its text calls "accreditation.application": accreditation.application, Tenancy''s data (CHG-R10GEN-001)'
       - query: accreditation#credentialRecords
-        route: service
+        route: in-process
         for: 'what its text calls "accreditation.credential": accreditation.credential, Tenancy''s data (CHG-R10GEN-001)'
       - query: accreditation#holderRecords
-        route: service
+        route: in-process
         for: 'what its text calls "accreditation.holder": accreditation.holder, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [ai.knowledge_gap]
       x-ticvai-write-via:
@@ -2128,6 +2210,8 @@ paths:
                 category:
                   $ref: '#/components/schemas/ReportCategory'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '201':
           headers:
             X-Consistency-Token:
@@ -2144,13 +2228,13 @@ paths:
       operationId: runSemanticQuery
       x-ticvai-read-via:
       - query: accreditation#applicationRecords
-        route: service
+        route: in-process
         for: 'what its text calls "accreditation.application": accreditation.application, Tenancy''s data (CHG-R10GEN-001)'
       - query: accreditation#credentialRecords
-        route: service
+        route: in-process
         for: 'what its text calls "accreditation.credential": accreditation.credential, Tenancy''s data (CHG-R10GEN-001)'
       - query: accreditation#holderRecords
-        route: service
+        route: in-process
         for: 'what its text calls "accreditation.holder": accreditation.holder, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [ai.knowledge_gap]
       x-ticvai-agreed: '29 September: AI system design 2.2 E and 5.7; shape follows askReportingQuestion'
@@ -2429,16 +2513,16 @@ paths:
         - "P16 ANL-072 Finance Dashboard"
       x-ticvai-read-via:
       - query: accreditation#applicationRecords
-        route: service
+        route: in-process
         for: 'its read of accreditation.application, Tenancy''s data (CHG-MOD-001)'
       - query: accreditation#credentialRecords
-        route: service
+        route: in-process
         for: 'its read of accreditation.credential, Tenancy''s data (CHG-MOD-001)'
       - query: accreditation#holderRecords
-        route: service
+        route: in-process
         for: 'its read of accreditation.holder, Tenancy''s data (CHG-MOD-001)'
       - query: accreditation#validityRecords
-        route: service
+        route: in-process
         for: 'its read of accreditation.validity, Tenancy''s data (CHG-MOD-001)'
       - query: finance#journalLineRecords
         route: service
@@ -2448,13 +2532,13 @@ paths:
         route: service
         for: 'admissions: admitted in-direction scans in the period (access.scan_event)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'takings: the money taken in the period, by tender, workstation and shift (orders.payment)'
       - query: orders#refundRecords
-        route: service
+        route: in-process
         for: 'takings and refunds: the money paid back in the period (orders.refund)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'grossSales, discounts, netRevenue and taxCollected, split by the dimensions order lines carry (orders.order_line)'
       - query: finance#postingRecords
         route: service
@@ -2467,7 +2551,7 @@ paths:
         for: 'the loyalty KPIs, split by tierCode (marketing.loyalty_position)'
       # The seeded KPIs the walk fix left without a source (r8 re-walk, CHG-R8RW-005).
       - query: orders#orderLineDiscountRecords
-        route: service
+        route: in-process
         for: 'grossSales and discounts: the discounts applied to the order lines of the period (orders.order_line_discount)
           (r8 re-walk, CHG-R8RW-005)'
       - query: fnb#tableReservationRecords
@@ -5468,15 +5552,16 @@ components:
             `listDashboards` and `getCommandCentre`** (ADAM CR-373, Chinmay, 31 October 2026; CHG-CR373-001).
             **Licensed**: the module is in the tenant''s `LicencePosition.licensedModules`, read in process through
             `subscription#contractRecords`, `subscription#licenceAddOnRecords` and `subscription#planRecords`,
-            exactly as `validateTenantConfig` and `getModuleEnablement` read it (ADAM CR-320); `core` is always
-            licensed. **Permission held**: a module''s permissions are the list under that `ModuleKey` in
+            exactly as `validateTenantConfig` and `getModuleEnablement` read it (ADAM CR-320), by the in-force
+            contract rule `LicencePosition` states (ADAM CR-449); `core` is always licensed. **Permission held**: a module''s permissions are the list under that `ModuleKey` in
             `x-ticvai-permission-modules` (contracts/shared/permissions.yaml); the caller holds the module when its
             session (`Session.permissionsByScope`) holds at least one of them at the dashboard''s venue, or anywhere
             in its scope for a tenant-wide dashboard. No other query is asked. `createDashboard` and
             `updateDashboard` refuse `409 module-not-licensed` when the module is not licensed, else `409
             module-permission-not-held`, and write nothing. `listDashboards` and `getCommandCentre` leave out every
             dashboard whose module fails either check, and a `module` filter naming such a module answers `200`
-            with an empty list.
+            with an empty list. `getDashboard` answers `404 not-found` for such a dashboard, exactly as if it did
+            not exist (ADAM CR-450).
 
             '
         description:

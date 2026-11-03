@@ -195,7 +195,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-588` | Rental Duration, Extension & Return Analytics | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-589` | Damage, Loss, Deposit & Exception Analytics | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-590` | Location & Channel Performance | D | 3 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-591` | Rental Forecasting & Demand Intelligence | B | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-591` | Rental Forecasting & Demand Intelligence | B | 0 | 60 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-592` | Audit, Governance & Operational Control | D | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-593` | AI Rental Management Copilot & Action Center | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 
@@ -1519,11 +1519,80 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Expected Rentals** (metric tile)
+**Expected Rentals** (metric tile, from `listDemandBookingCurve`)
 
-**Expected Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue id |
+| Product | text | Product id |
+| Event | text | Event id |
+| Performance | text | Performance id |
+| Date | 1 Oct 2026 | Date |
+| Timeslot | text | Timeslot |
+| Price category | text | Price category |
+| Section code | text | Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build … |
+| Channel | chip: POS, Kiosk, Web, Mobile, B2B, Ota… | Channel |
+| Confidence | 1,234.5 | Forecast Confidence, percent (`DemandForecast.confidence` x 100; ADAM CR-405) |
+| Forecast final occupancy | 1,234.5 | Forecast Final Occupancy, percent |
+| Demand | 1,234 | Forecast demand |
+| Attendance | 1,234 | Forecast attendance |
+| Occupancy | 1,234.5 | Forecast occupancy, percent |
+| Sell through | 1,234.5 | Forecast sell-through, percent |
+| Expected sell out time | 1 Oct 2026, 14:30 | Expected Sell-Out Time; empty if no sell-out forecast |
+| Revenue | AED 1,234.50 | Forecast revenue |
+| Conversion | 1,234.5 | Forecast conversion, percent |
+| Remaining inventory | 1,234 | Forecast remaining inventory at event |
 
-**Forecast Utilization** (metric tile)
+**Expected Revenue** (metric tile, from `listDemandBookingCurve`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue id |
+| Product | text | Product id |
+| Event | text | Event id |
+| Performance | text | Performance id |
+| Date | 1 Oct 2026 | Date |
+| Timeslot | text | Timeslot |
+| Price category | text | Price category |
+| Section code | text | Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build … |
+| Channel | chip: POS, Kiosk, Web, Mobile, B2B, Ota… | Channel |
+| Confidence | 1,234.5 | Forecast Confidence, percent (`DemandForecast.confidence` x 100; ADAM CR-405) |
+| Forecast final occupancy | 1,234.5 | Forecast Final Occupancy, percent |
+| Demand | 1,234 | Forecast demand |
+| Attendance | 1,234 | Forecast attendance |
+| Occupancy | 1,234.5 | Forecast occupancy, percent |
+| Sell through | 1,234.5 | Forecast sell-through, percent |
+| Expected sell out time | 1 Oct 2026, 14:30 | Expected Sell-Out Time; empty if no sell-out forecast |
+| Revenue | AED 1,234.50 | Forecast revenue |
+| Conversion | 1,234.5 | Forecast conversion, percent |
+| Remaining inventory | 1,234 | Forecast remaining inventory at event |
+
+**Forecast Utilization** (metric tile, from `listDemandBookingCurve`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue id |
+| Product | text | Product id |
+| Event | text | Event id |
+| Performance | text | Performance id |
+| Date | 1 Oct 2026 | Date |
+| Timeslot | text | Timeslot |
+| Price category | text | Price category |
+| Section code | text | Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build … |
+| Channel | chip: POS, Kiosk, Web, Mobile, B2B, Ota… | Channel |
+| Confidence | 1,234.5 | Forecast Confidence, percent (`DemandForecast.confidence` x 100; ADAM CR-405) |
+| Forecast final occupancy | 1,234.5 | Forecast Final Occupancy, percent |
+| Demand | 1,234 | Forecast demand |
+| Attendance | 1,234 | Forecast attendance |
+| Occupancy | 1,234.5 | Forecast occupancy, percent |
+| Sell through | 1,234.5 | Forecast sell-through, percent |
+| Expected sell out time | 1 Oct 2026, 14:30 | Expected Sell-Out Time; empty if no sell-out forecast |
+| Revenue | AED 1,234.50 | Forecast revenue |
+| Conversion | 1,234.5 | Forecast conversion, percent |
+| Remaining inventory | 1,234 | Forecast remaining inventory at event |
 
 **Sell-Out Probability** (metric tile)
 
@@ -1609,7 +1678,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (60 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-591?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-584`.
@@ -1634,8 +1703,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline | online only |
 | Opens with | `resourceId` (navigation) |
 | Route | `/rentals/audit-governance-operational-control-bo-592` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The rental audit log for managers and administrators: every material rental action (price change, inventory adjustment, deposit override, late-fee waiver, damage assessment, equipment swap, asset status override, retirement) with who, when, before, after and the approval, searchable and exportable, and visible only to the roles allowed to see it. The one thing to get right: before and after values side by side, and an automatic change marked as such ("Auto"), never shown as a person.
 

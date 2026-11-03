@@ -183,6 +183,25 @@ x-ticvai-queries:
       of its own (open, live, sellable) is declared as a query of its own. It is asked from another deployable
       through Wallet's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  expiry:
+    module: wallet
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: gift-card, from: active, to: expired}
+    - {model: gift-card, from: partiallyRedeemed, to: expired}
+    reads: [wallet.gift_card]
+    writes: [wallet.gift_card]
+    for: Wallet hold sweeper and card expiry timers.
+    source: ['contracts/satellite/wallet.yaml', 'states/game-card.yaml:31', 'states/gift-card.yaml:58']
 paths:
   /wallet-types:
     get:
@@ -1470,7 +1489,8 @@ paths:
         **Added 21 October 2026 (r8 gate, CHG-R8RW-007; the contract gap CHG-WIR-027 of 2 October): `setWalletTransferRules`
         was a PUT nothing read**, so BO-1144 could not show the saved rules. Returns the tenant's rules, the ones
         `setWalletTransferRules` writes, or before the first save the defaults that set would get. The `ETag` header
-        carries the version the PUT takes as `If-Match`.
+        carries the version the PUT takes as `If-Match`: the row's `version` (`wallet.transfer_rule.version`; ADAM
+        CR-332's rule, r13 root R24).
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -1485,6 +1505,7 @@ paths:
           description: The rules
           headers:
             ETag:
+              description: The rules' `version` (wallet.transfer_rule.version), quoted (ADAM CR-332's rule, r13 root R24).
               schema:
                 type: string
           content:
@@ -1516,6 +1537,11 @@ paths:
 
         `transferWalletBalance` performs the transfer; this decides whether it is allowed.
 
+        **Its ETag is the row''s `version`** (ADAM CR-332''s rule for the wallet''s If-Match PUTs, which
+        getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): `wallet.transfer_rule.version` is 1
+        on create and bumped on every write, and is sent as `ETag` on `getWalletTransferRules` and here; an `If-Match`
+        that is not the current version is `412` and nothing changes.
+
         '
       tags:
       - wallet
@@ -1540,6 +1566,10 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            ETag:
+              description: The rules' new `version`, quoted (ADAM CR-332's rule, r13 root R24).
+              schema:
+                type: string
           description: Set
           content:
             application/json:
@@ -2172,6 +2202,9 @@ paths:
                   - validateOnly
                   - publish
                   default: validateOnly
+                  x-ticvai-persisted: false
+                  description: 'What the call does, not a fact about the version: `publish` writes the version and its
+                    snapshots, `validateOnly` writes nothing. Not stored (r13 gate, CHG-R13BO-002).'
                 note:
                   type: string
                   nullable: true
@@ -2292,6 +2325,8 @@ paths:
                     The sender's note, stored as the `reason` of both `transfer` transactions, so the sender's history
                     and the recipient's show it (`WalletTransaction.reason`; CHG-R11FXC-004).
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -2504,6 +2539,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P08 BO-488 Self-Service Wallet Top-Up"
+      x-ticvai-names-for-context: [platform.scope]
       x-ticvai-read-via:
       - query: orders#paymentRecords
         route: in-process
@@ -2529,6 +2565,18 @@ paths:
       - table: wallet.funding_rule
         for: 'the venue''s default funding rules (walletTypeId null): the applying bonus rule, its bonus and its
           bonusCreditTypeId (ADAM CR-357)'
+      x-ticvai-writes:
+      - table: wallet.balance
+        for: 'the one balance writer: the wallet''s balance row locked and moved by one guarded update (ADAM CR-471)'
+      - table: wallet.credit_lot
+        for: 'the paid lot (source_kind topUp) and, where CR-357''s rule gives one, the bonus lot (source_kind
+          promotion), each at the scope_path of the top-up line''s venue (ADAM CR-471)'
+      - table: wallet.wallet_transaction
+        for: 'one row per lot, kind topUp or bonus, venue_id the top-up line''s venue (ADAM CR-471)'
+      - table: wallet.wallet
+        for: 'balance, bonus_balance and last_activity_at (ADAM CR-471)'
+      - table: platform.outbox
+        for: 'wallet.credited, at the same scope_path as the lot (ADAM CR-471)'
       x-ticvai-note: >-
         **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
         locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
@@ -2541,6 +2589,7 @@ paths:
       - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-guest-callable: true
+      x-ticvai-self-scoped: subject
       summary: Add value to a wallet
       description: >
         Creates a liability, not revenue. Recognition happens when the value is spent, or as
@@ -2585,6 +2634,36 @@ paths:
         `bonusAmount` differs from the rule's bonus, or that sends one when no rule applies, is refused
         `422 bonus-not-applicable` and nothing is credited, so no caller, the guest app included, can credit a bonus
         the venue did not set. No migration.
+
+
+        **Who may top up which wallet, and the order of the checks** (ADAM CR-471, Chinmay, 2 November 2026, option A
+        with the outbox row added and the guest held to its own wallet; CHG-CR471-001). Under the caller's own grant,
+        in this order: a guest caller (a session with a subject) tops up only its own wallet, so the path's
+        `subjectId` must be the session's subject, else the shared `404`, as `getWallet` answers; a staff caller needs
+        `WALLET_OPERATE`. Then the checks above: `orders#paymentRecords` (`402 payment-declined` unless captured),
+        `orders#salesOrderRecords` (the order's `subject_id` is `subjectId` and it is paid in full, else `422
+        payment-not-for-top-up`), `orders#orderLineRecords` with `catalogue#variantRecords` and
+        `catalogue#productRecords` (a `walletTopUp` line, quantity 1, `grossAmount` = `amount`, else `422
+        payment-not-for-top-up`), then the cash credit type and the bonus rule as CR-357 decided (500 on a
+        misconfigured credit type, `422 bonus-not-applicable`).
+
+
+        **The writes.** A staff caller writes under its own grant, as before. For a guest caller, once every check has
+        passed, the connection switches to the routed tenant's root grant (ITenantRootGrant) for exactly these
+        statements inside the request's transaction, and the caller's grant is put back before anything else runs:
+        lock the wallet's `wallet.balance` row and apply the guarded update (the one balance writer); insert the paid
+        `wallet.credit_lot` (`source_kind` `topUp`, `source_reference` the payment id, `order_line_id` the line);
+        insert the bonus lot where CR-357's rule gives one (`source_kind` `promotion`, `order_line_id` null); insert
+        one `wallet.wallet_transaction` per lot (kind `topUp`, and kind `bonus` for the bonus lot) with `subject_id` =
+        `subjectId`, `order_id` the order, `venue_id` the order line's `venue_id` and `principal_id` null; update
+        `wallet.wallet`'s `balance`, `bonus_balance` and `last_activity_at`; and write the `platform.outbox` row for
+        `wallet.credited` with the same `scope_path` as the lot. Nothing else runs under the root grant. A unique
+        violation on `credit_lot_order_line_id_uniq` is still `409 payment-already-used`.
+
+
+        **Where the rows sit, for staff and guest alike.** Each lot's `scope_path` (the paid lot and the bonus lot) is
+        the `platform.scope` path of the top-up line's venue (`orders.order_line.venue_id`), and each
+        `wallet.wallet_transaction.venue_id` is that venue's id. No migration.
       tags: [wallet]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-scope-level: workstation
@@ -2647,6 +2726,7 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '422':
           x-ticvai-problem-types: [payment-not-for-top-up, bonus-not-applicable]
           description: 'The body''s `orderLineId` and `paymentId` are not a paid top-up: the payment is not of the
@@ -3463,9 +3543,11 @@ paths:
       x-ticvai-lock-excludes:
       - "cache:idempotency"
       x-ticvai-lock-note: 'SD-027 (29 September). One balance writer: the `wallet.balance` row is locked for one
-        statement, `UPDATE wallet.balance SET available_balance = available_balance - n, hold_balance =
-        hold_balance + n, version = version + 1 WHERE wallet_id = ? AND available_balance >= n`, and the hold
-        and the `wallet.wallet_transaction` row are written in the same transaction.'
+        statement, its own movement (r13 review, CHG-R13RVB-005: the reservation''s statement was copied here). For a
+        hold of h captured for n (n <= h; the rest returns to available): `UPDATE wallet.balance SET hold_balance =
+        hold_balance - h, balance_amount = balance_amount - n, available_balance = available_balance + (h - n),
+        version = version + 1 WHERE wallet_id = ? AND hold_balance >= h`, and the hold (`captured`) and the
+        `wallet.wallet_transaction` row are written in the same transaction.'
       x-ticvai-emits:
       - wallet.debited
       parameters:
@@ -3527,9 +3609,10 @@ paths:
       x-ticvai-lock-excludes:
       - "cache:idempotency"
       x-ticvai-lock-note: 'SD-027 (29 September). One balance writer: the `wallet.balance` row is locked for one
-        statement, `UPDATE wallet.balance SET available_balance = available_balance - n, hold_balance =
-        hold_balance + n, version = version + 1 WHERE wallet_id = ? AND available_balance >= n`, and the hold
-        and the `wallet.wallet_transaction` row are written in the same transaction.'
+        statement, its own movement (r13 review, CHG-R13RVB-005: the reservation''s statement was copied here). For a
+        hold of h: `UPDATE wallet.balance SET available_balance = available_balance + h, hold_balance = hold_balance
+        - h, version = version + 1 WHERE wallet_id = ? AND hold_balance >= h`, and the hold (`released`) and the
+        `wallet.wallet_transaction` row are written in the same transaction.'
       x-ticvai-emits:
       - wallet.credited
       parameters:
@@ -3804,6 +3887,10 @@ paths:
                   type: string
                   minLength: 1
                   maxLength: 500
+                  x-ticvai-stored-as: platform.audit_record.reason
+                  description: 'Reason, recorded in the audit: the operation puts it on the request''s audit context and the
+                    audit interceptor writes it to the audit row''s `reason`, which `listAuditRecords` returns (ADAM CR-376;
+                    CHG-CR376-001). No other row keeps it: the restore writes no version row (r13 gate, CHG-R13BO-002).'
       responses:
         '200':
           headers:
@@ -5838,6 +5925,8 @@ components:
       type: object
       x-ticvai-persistence: wallet.transfer_rule
       description: 'Boards 7.2 and 7.3. **A money-transmission question before it is a feature.**'
+      required:
+      - version
       properties:
         peerToPeerAllowed:
           type: boolean
@@ -5861,6 +5950,15 @@ components:
           default: false
         scopePath:
           type: string
+        version:
+          type: integer
+          minimum: 1
+          default: 1
+          readOnly: true
+          description: '**The row''s version, its ETag** (ADAM CR-332''s rule for the wallet''s If-Match PUTs, the one
+            getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): 1 on create and bumped on every
+            write; `getWalletTransferRules` and `setWalletTransferRules` send it as `ETag`, and `setWalletTransferRules`
+            checks `If-Match` against it (`412` on a mismatch).'
     WalletRefundPolicy:
       type: object
       x-ticvai-persistence: wallet.refund_policy

@@ -64,6 +64,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import contract_shapes as cs_ops  # noqa: E402  response schemas for the stale-gap judgement (CHG-R13RVB-004)
+import screen_gaps  # noqa: E402  which generated gaps a record has overtaken (CHG-R13RVB-004)
 from typed_props import DEVICE_GUEST_PLATFORMS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,7 +113,10 @@ RULES = {
     "S-NO-READ": "a screen that edits (PUT/PATCH) and reads nothing (R265)",
     "S-ASYNC-POLL": "a 202 operation with no read on the screen to follow it (R288)",
     "S-OPENQ-STALE": "an open question cites an endpoint no operation has (R266)",
-    "S-NOTES-STALE": "notes or gaps say an operation was removed or absent while apis hold it (R269)",
+    "S-NOTES-STALE": "notes or gaps say an operation was removed or absent while apis hold it (R269), or a generated "
+                     "gap says the screen writes nothing, answers no schema, reads no X or declares N operations "
+                     "against its own record, or the notes say components, states and operations are still to be "
+                     "written beside all three (r13 review, CHG-R13RVB-004)",
     "S-PURPOSE-TEMPLATE": "an api purpose that is the operationId, empty, or template text (R260)",
     "S-OFFLINE-CLAIM": "an offline state promising queued writes no operation is offline-capable for (R257)",
     "S-WORKSTATION-OP": "a workstation-scoped operation on a platform nobody signs a workstation into (R100)",
@@ -208,8 +213,31 @@ def overlay_refs(o: dict) -> set:
         v = o.get(k)
         if isinstance(v, dict) and v.get("operation"):
             out.add(v["operation"])
+        # the other writes one confirm sends (`alsoCalls`, r13, CHG-RCR32-001): CMS-019's Change access adds and
+        # removes grants and changes the person in one form
+        if isinstance(v, dict):
+            out |= {x for x in (v.get("alsoCalls") or []) if isinstance(x, str) and x}
     out |= {r for r in (o.get("reads") or []) if isinstance(r, str) and r}
     return out
+
+
+def form_also_calls(overlays: list) -> set:
+    """The writes a form's confirm also sends (`confirm.alsoCalls`), whose bodies the form therefore collects
+    (S-BUTTON-FORM; r13 gate, CHG-R13BO-004)."""
+    out = set()
+    for o in overlays:
+        v = o.get("confirm") if isinstance(o, dict) else None
+        if isinstance(v, dict):
+            out |= {x for x in (v.get("alsoCalls") or []) if isinstance(x, str) and x}
+    return out
+
+
+def session_source(src: str) -> bool:
+    """`inputSources` naming the signed-in session's own id (`session.subjectId`; r13 gate, CHG-R13BO-004): GST-015's
+    grant is over the account holder's own account, the session's subject, which no read answers. Only the ids a
+    session carries (SESSION_IDS)."""
+    head, _, field = str(src or "").partition(".")
+    return head == "session" and field in SESSION_IDS
 
 
 def self_test():
@@ -242,6 +270,16 @@ def self_test():
         bad.append(f"overlay_refs: a form's picker read is not reached: {overlay_refs(form)}")
     if overlay_refs({"id": "x", "confirm": {"label": "OK"}}) != set():
         bad.append("overlay_refs: an overlay with no operation reached something")
+    # a form's confirm.alsoCalls is collected by that form; an overlay with none collects nothing more (CHG-R13BO-004)
+    if form_also_calls([{"id": "f", "confirm": {"operation": "verifyMfaEnrolment", "alsoCalls": ["enrolMfaMethod"]}}])             != {"enrolMfaMethod"}:
+        bad.append("form_also_calls: a form's alsoCalls write is not collected")
+    if form_also_calls([{"id": "f", "confirm": {"operation": "x"}}, {"id": "g", "reads": ["listY"]}]):
+        bad.append("form_also_calls: collected a write no form sends")
+    # inputSources may name the session's own ids, and nothing else of the session (CHG-R13BO-004)
+    for src, ok in (("session.subjectId", True), ("session.principalId", True), ("session.guestName", False),
+                    ("getMyMemberships.subjectId", False), ("", False)):
+        if session_source(src) != ok:
+            bad.append(f"session_source: {src!r} expected {'taken' if ok else 'refused'}")
     # a fileUpload on createUpload reaches a declared completeUpload; a button on createUpload does not ("Teach the check")
     up = [{"kind": "fileUpload", "operation": "createUpload"}]
     if upload_completes(up, {"createUpload", "completeUpload"}) != {"completeUpload"}:
@@ -292,6 +330,8 @@ def main() -> int:
         path_index.add((f["method"].upper(), re.sub(r"\{[^}]+\}", "{}", f["path"]).rstrip("/")))
 
     all_screens = g.screens()
+    _, gap_schemas = cs_ops.load_contracts(g.ROOT)
+    gap_twins = screen_gaps.twins(all_screens)
     offline_platforms = {stem: bool(p.get("offlineCapable")) for stem, p in g.platforms().items()}
     by_schema, _ = g.schemas()
     # Platforms that sign a workstation in: some screen takes workstationId from the session.
@@ -403,6 +443,8 @@ def main() -> int:
             guard.add("S-DUP-REGION", f"{sid}:{n}", f"{sid}: region {n!r} appears {names.count(n)} times")
         # --- R273 unreached operations ---------------------------------------------------------
         refs = {c.get("operation") for c in comps if c.get("operation")}
+        # a picker's other reads (`reads` on the component, r13, CHG-RCR33-001), as an overlay's `reads`
+        refs |= {r for c in comps for r in (c.get("reads") or []) if isinstance(r, str) and r}
         refs |= upload_completes(comps, op_ids)
         for o in overlays:
             refs |= overlay_refs(o)
@@ -430,6 +472,10 @@ def main() -> int:
         # --- R264 a button is not a form -------------------------------------------------------
         collected = {((o.get("confirm") or {}).get("operation")) for o in overlays
                      if isinstance(o.get("confirm"), dict)}
+        # **...and the other writes the same form sends** (`alsoCalls`, r13 gate, CHG-R13BO-004): GST-073's two-step
+        # form collects what enrolMfaMethod sends, then the first code for verifyMfaEnrolment, its confirm. A form that
+        # sends a write collects that write's body.
+        collected |= form_also_calls(overlays)
         has_inputs = bool(kinds & INPUTS)
         # A button may name the list whose rows collect its body (collectedBy, 29 October 2026): taken only when a
         # list, card list or table of that label is on the screen and is filled by a read the screen declares.
@@ -462,7 +508,10 @@ def main() -> int:
         # --- R255 screen permission ------------------------------------------------------------
         # **Not on a guest surface** (2 October 2026, CHG-CLN-007): a guest holds no permission (ADR-0025), so a guest
         # screen has none to declare; its no-access state is "not signed in" or "not yours" (GFIX-4).
-        if perms and "emptyNoAccess" in states and not s.get("permission") and not plat.startswith(GUEST_CODES):
+        # **Nor on a door** (r13, CHG-RCR29-001): a screen that declares `login` is reached before anybody holds
+        # a permission (POS-000 was gated on SESSION_FORCE_LOGOUT, which nobody at a till's door can hold); its
+        # supervisor panel carries that permission on the component. check-screen-permissions SP-DOOR.
+        if perms and "emptyNoAccess" in states and not s.get("permission") and not plat.startswith(GUEST_CODES)                 and "login" not in op_ids:
             guard.add("S-SCREEN-PERMISSION", sid, f"{sid}: operations need {', '.join(sorted(perms)[:3])}"
                       f"{' ...' if len(perms) > 3 else ''}; the screen declares no permission")
         # --- R265 edits with no read -----------------------------------------------------------
@@ -499,6 +548,16 @@ def main() -> int:
                          % (re.escape(o), re.escape(o)), prose):
                 guard.add("S-NOTES-STALE", f"{sid}:{o}",
                           f"{sid}: notes say {o} was removed and apis still declare it")
+        # r13 review (3 November 2026, CHG-R13RVB-004): a generated gap the record has overtaken, and the 14 August
+        # board-import sentence on a screen that has its components, states and operations.
+        for gi, kind, _fx in screen_gaps.stale_gaps(s, ops, gap_schemas, gap_twins):
+            guard.add("S-NOTES-STALE", f"{sid}:{kind}:{gi}",
+                      f"{sid}: gap {gi} ({kind}) says what the screen's own operations contradict: correct or drop it "
+                      f"(tools/applied/r13-review-stale-screen-text.py shows how)")
+        if screen_gaps.still_to_be_written(s):
+            guard.add("S-NOTES-STALE", f"{sid}:still-to-be-written",
+                      f"{sid}: notes say components, states and operations are still to be written, and the record "
+                      f"has all three")
         if apis and re.search(r"\bNo contract\b", prose):
             guard.add("S-NOTES-STALE", f"{sid}:no-contract",
                       f"{sid}: notes say 'No contract' beside {len(apis)} operation(s)")
@@ -681,6 +740,8 @@ def body_named(a: dict, on_screen: set, ops: dict, by_schema, answers=None) -> t
         src = str(named.get(n) or "")
         if not src:
             return False, f"its required {n} has no inputSources entry"
+        if session_source(src):
+            continue
         op_name, _, field = src.partition(".")
         if op_name not in on_screen or op_name not in ops:
             return False, f"inputSources names {n} from {op_name}, which is not on the screen"
@@ -759,7 +820,7 @@ def input_sources(guard, all_screens, ops, by_schema) -> None:
                 src = str(named.get(n) or "")
                 if src:
                     op_name, _, field = src.partition(".")
-                    if field in answers.get(op_name, set()):
+                    if field in answers.get(op_name, set()) or session_source(src):
                         continue
                     guard.add("S-INPUT-SOURCE", f"{sid}:{a['operationId']}:{n}",
                               f"{sid} ({plat[:3]}): {a['operationId']} names {n}'s source as {src}, but "

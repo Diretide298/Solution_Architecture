@@ -44,7 +44,7 @@
 | `seat.yaml` | `seating` | `seat.sold` |
 | `shift.yaml` | `shift` | `shift.closed` |
 | `stock-count.yaml` | `inventory` | `stock.depleted` |
-| `tenant.yaml` | `subscription` | `tenant.suspended` |
+| `tenant.yaml` | `subscription` | `tenant.provisioned`, `tenant.suspended` |
 | `ticket-transfer.yaml` | `orders` | `entitlement.transferred` |
 
 ## What it is walled off from
@@ -264,7 +264,7 @@
 | `seat.yaml` | seating | `SeatStatus` | `seat.blocked`, `seat.held`, `seat.released`, `seat.sold` |
 | `shift.yaml` | shift | `ShiftStatus` | `shift.closed` |
 | `stock-count.yaml` | inventory | `CountStatus` | `stock.depleted` |
-| `tenant.yaml` | subscription | `TenantStatus` | `tenant.suspended` |
+| `tenant.yaml` | subscription | `TenantStatus` | `tenant.provisioned`, `tenant.suspended` |
 | `ticket-transfer.yaml` | orders | `TicketTransfer.status` | `entitlement.transferred` |
 
 ## Events
@@ -306,7 +306,7 @@
 | `order.cancelled` | consumes | orders | no |
 | `order.chargebackRecorded` | consumes | orders | no |
 | `order.completed` | consumes | orders | no |
-| `order.exchanged` | consumes | orders | no |
+| `order.exchanged` | consumes | orders | yes |
 | `order.paid` | consumes | orders | yes |
 | `order.refunded` | consumes | orders | yes |
 | `payment.attemptFailed` | consumes | payments | no |

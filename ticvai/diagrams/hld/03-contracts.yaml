@@ -1,5 +1,5 @@
 id: HLD-CONTRACTS
-title: 35 contracts — the join between every other layer
+title: 36 contracts — the join between every other layer
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**The API is the join.** Screens name operations, operations resolve here, and this persists
@@ -17,16 +17,16 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 284
+  operations: 285
   holds: null
   service: MarketingService
   verbs:
     GET: 135
-    POST: 80
+    POST: 81
     PUT: 60
     PATCH: 7
     DELETE: 2
-  guestCallable: 53
+  guestCallable: 54
   offlineCapable: 11
   events: null
   ref: diagrams/lld/contracts/marketing-crm.yaml
@@ -44,6 +44,7 @@ contracts:
   guestCallable: 24
   offlineCapable: 10
   events:
+  - catalogue-channelIncidentRetryRequested
   - catalogue-priceExecuted
   - catalogue-productPublished
   - catalogue-productWithdrawn
@@ -101,17 +102,18 @@ contracts:
   - order-linkedToGuest
   - order-paid
   - order-refunded
+  - order-ticketsResent
   - payment-captured
   - paymentToken-stored
   - sync-rejectionRaised
   ref: diagrams/lld/contracts/orders.yaml
 - contract: subscription
   tier: satellite
-  operations: 156
+  operations: 157
   holds: null
   service: PlatformService
   verbs:
-    GET: 72
+    GET: 73
     POST: 46
     PUT: 34
     PATCH: 3
@@ -198,13 +200,13 @@ contracts:
   ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity
   tier: spine
-  operations: 104
+  operations: 105
   holds: null
   service: IdentityService
   verbs:
-    POST: 46
-    GET: 43
-    PUT: 8
+    POST: 47
+    GET: 42
+    PUT: 9
     DELETE: 4
     PATCH: 3
   guestCallable: 19
@@ -215,6 +217,7 @@ contracts:
   - identity-guestCodeIssued
   - identity-guestRegistered
   - identity-loginRecorded
+  - identity-mfaCodeIssued
   - identity-privacyRequestRaised
   ref: diagrams/lld/contracts/identity.yaml
 - contract: finance
@@ -301,13 +304,13 @@ contracts:
   ref: diagrams/lld/contracts/approvals.yaml
 - contract: tenancy
   tier: spine
-  operations: 58
+  operations: 57
   holds: null
   service: TenancyService
   verbs:
     GET: 28
     POST: 15
-    PUT: 12
+    PUT: 11
     PATCH: 2
     DELETE: 1
   guestCallable: 0
@@ -581,6 +584,16 @@ contracts:
   offlineCapable: 3
   events: null
   ref: diagrams/lld/contracts/cross-region.yaml
+- contract: ticket-printer
+  tier: devices
+  operations: 0
+  holds: null
+  service: —
+  verbs: {}
+  guestCallable: 0
+  offlineCapable: 0
+  events: null
+  ref: diagrams/lld/contracts/ticket-printer.yaml
 - contract: common
   tier: shared
   operations: 0

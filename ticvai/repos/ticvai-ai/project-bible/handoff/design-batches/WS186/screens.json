@@ -600,13 +600,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define how and when TICVAI automatically or manually creates a wallet.",
   "purposeNote": "The system creates wallets according to configurable business triggers, validation rules and authorization controls.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Wallet Creation & Provisioning Rules declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -1229,92 +1223,143 @@
       {
        "kind": "selectField",
        "label": "Cash Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `cash` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Refund Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `refund` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Bonus Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `bonus` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Promotional Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `promotional` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Gift Card Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `giftCard` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Membership Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `membership` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Loyalty Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `loyalty` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Ride Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `ride` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Attraction Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `attraction` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Redemption Ticket Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `redemption` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Meal Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `fnb` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Retail Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `retail` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Parking Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `parking` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Event Credit",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `event` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Custom Credit Type",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define",
+       "bindsTo": "CreditType.category",
+       "notes": "The `other` value of `CreditType.category`.",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Balance code",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure",
+       "bindsTo": "CreditType.code",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Display name",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure",
+       "bindsTo": "CreditType.name",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Monetary/non-monetary",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure",
+       "bindsTo": "CreditType.monetary",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
@@ -1324,12 +1369,16 @@
       {
        "kind": "selectField",
        "label": "Transferable",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure",
+       "bindsTo": "CreditType.transferable",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
        "label": "Refundable",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure",
+       "bindsTo": "CreditType.refundable",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
@@ -1344,7 +1393,9 @@
       {
        "kind": "selectField",
        "label": "Expirable",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure",
+       "bindsTo": "CreditType.expires",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
@@ -1364,7 +1415,9 @@
       {
        "kind": "selectField",
        "label": "Accounting classification",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure",
+       "bindsTo": "CreditType.ledgerAccountCode",
+       "operation": "listCreditTypes"
       },
       {
        "kind": "selectField",
@@ -1374,7 +1427,9 @@
       {
        "kind": "selectField",
        "label": "Consumption priority",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type configure",
+       "bindsTo": "CreditType.priority",
+       "operation": "listCreditTypes"
       }
      ]
     }
@@ -1421,6 +1476,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-1088",
    "workshopBoard": "wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1088"
   },
+  "notes": "**Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled for BO-1144). The fifteen credit kinds are the values of one property, `CreditType.category`; Balance code, Display name, Monetary, Transferable, Refundable, Expirable, Accounting classification and Consumption priority are `CreditType` properties. Currency applicable, Top-up allowed, Promotional, Redeemable channels, Applicable products, Applicable venues and Liability classification have no `CreditType` property, so nothing is sent for them (eligibility is `CreditEligibility`'s). **No control on the layout sends `createCreditType` or `updateCreditType`**: under the lead's rule of 28 October 2026 the developer adds them (Create credit type, Save) and logs a \"Design change:\" CR in ADAM; the package's own fix does not change the approved layout.",
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 8. 0 of 0 labels bound to a contract property; 31 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "params": [

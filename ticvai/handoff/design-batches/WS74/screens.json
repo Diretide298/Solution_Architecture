@@ -4,7 +4,7 @@
   "name": "Digital Asset Management Command Center",
   "module": "Media Library",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
@@ -95,13 +95,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Upload Assets, Browse Library, Create Collection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Upload Assets, Browse Library, Create Collection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 3 §Quick Actions"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Digital Asset Management DAM.pdf, page 3 §Display"
    },
    {
     "operation": "searchMedia",
@@ -287,13 +282,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved: File Size, Ticket Media, Preview, View Details, Download, Add to Collection, Move. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved: File Size, Ticket Media, Preview, View Details, Download, Add to Collection, Move. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 5 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Digital Asset Management DAM.pdf, page 5 §Each card should show"
    }
   ],
   "layout": {
@@ -524,7 +514,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Browse Files, Bulk Upload, Import from Approved Source. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 3 operations.** Unserved: Browse Files, Bulk Upload, Import from Approved Source. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 6 §Support"
    },
    {
@@ -699,7 +689,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved: Manual Collection, Dynamic Collection, Campaign Collection, Brand Collection, Event Collection, Create Folder, Create Collection, Move Assets …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 12 actions on this screen and the screen declares 2 operations.** Unserved: Manual Collection, Dynamic Collection, Campaign Collection, Brand Collection, Event Collection, Create Folder, Create Collection, Move Assets …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 8 §Support"
    },
    {
@@ -828,7 +818,7 @@
   "name": "Metadata & Taxonomy Management",
   "module": "Media Library",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
@@ -865,7 +855,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Asset Name, Asset Type, Venue, Campaign, Event, Attraction, Owner, Source …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved: Asset Name, Asset Type, Venue, Campaign, Event, Attraction, Owner, Source …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 9 §Support"
    },
    {
@@ -1170,7 +1160,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Asset Type, File Format, Venue, Collection, Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Asset Type, File Format, Venue, Collection, Owner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 12 §Support"
    },
    {
@@ -1330,13 +1320,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show; Display) and no metric row",
   "purpose": "Provide one authoritative record for every digital asset.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Digital Asset Management DAM.pdf, page 13 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1534,7 +1518,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Select Individual, Select Search Results, Select Collection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Select Individual, Select Search Results, Select Collection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 15 §Support"
    },
    {
@@ -1669,13 +1653,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Review Unclassified, Fix Metadata, Review Duplicate Candidates, Review Orphaned Assets, View Activity Log, Board 1 — Shared Configuration Requirements, Asset types, supported file formats. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Review Unclassified, Fix Metadata, Review Duplicate Candidates, Review Orphaned Assets, View Activity Log, Board 1 — Shared Configuration Requirements, Asset types, supported file formats. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Digital Asset Management DAM.pdf, page 16 §Actions"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Digital Asset Management DAM.pdf, page 16 §Display"
    }
   ],
   "layout": {

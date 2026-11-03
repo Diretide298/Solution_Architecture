@@ -43,7 +43,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 16 |
 | [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 1 | 11 |
 | [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 1 | 7 |
-| [CMS-010](#cms-010-media-library) | Media Library | White Label | 1 | 11 |
+| [CMS-010](#cms-010-media-library) | Media Library | White Label | 1 | 12 |
 | [CMS-011](#cms-011-translations) | Translations | White Label | 1 | 4 |
 | [CMS-012](#cms-012-rtl-preview) | RTL Preview | White Label | 1 | 2 |
 | [CMS-013](#cms-013-seo-metadata) | SEO & Metadata | White Label | 1 | 3 |
@@ -52,7 +52,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 1 | 5 |
 | [CMS-017](#cms-017-domain-certificate) | Domain & Certificate | White Label | 1 | 7 |
 | [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 1 | 8 |
-| [CMS-019](#cms-019-user-access) | User Access | White Label | 1 | 3 |
+| [CMS-019](#cms-019-user-access) | User Access | White Label | 1 | 5 |
 | [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 1 | 13 |
 | [CMS-102](#cms-102-site-builder) | Site Builder | White Label | 1 | 7 |
 | [CMS-103](#cms-103-booking-flows) | Booking Flows | White Label | 1 | 15 |
@@ -264,6 +264,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Parameter | From |
 |---|---|
 | tenantId | navigation |
+| cellId | navigation |
 
 **Operations**
 
@@ -797,6 +798,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `searchMedia` | [VenueOpsService](../backend/VenueOpsService.md#searchmedia) | onLoad | Search the asset library | `ASSET_LIBRARY_VIEW` |
+| `getMediaTaxonomy` | [VenueOpsService](../backend/VenueOpsService.md#getmediataxonomy) | onLoad | The tags the Tag filter offers (r13, CHG-RCR33-001) | `ASSET_LIBRARY_VIEW` |
 | `completeUpload` | [VenueOpsService](../backend/VenueOpsService.md#completeupload) | onAction | Confirm an upload and create the asset | `ASSET_LIBRARY_MANAGE` |
 | `createCollection` | [VenueOpsService](../backend/VenueOpsService.md#createcollection) | onAction | Create a collection | `ASSET_LIBRARY_MANAGE` |
 | `createUpload` | [VenueOpsService](../backend/VenueOpsService.md#createupload) | onAction | Request a signed upload URL | `ASSET_LIBRARY_MANAGE` |
@@ -1255,6 +1257,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Parameter | From |
 |---|---|
 | principalId | session |
+| delegatedAccessId | navigation |
 
 **Operations**
 
@@ -1262,7 +1265,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|---|---|---|
 | `listPrincipals` | [IdentityService](../backend/IdentityService.md#listprincipals) | onLoad | List principals | `USER_MANAGE` |
 | `listRoles` | [IdentityService](../backend/IdentityService.md#listroles) | onLoad | List roles | `ROLE_MANAGE` |
-| `updatePrincipal` | [IdentityService](../backend/IdentityService.md#updateprincipal) | onAction | Grant or remove a CMS role for the selected person | `USER_MANAGE` |
+| `createDelegatedAccess` | [IdentityService](../backend/IdentityService.md#createdelegatedaccess) | onAction | Give the selected person a role at a scope, for a validity (a grant; IDENTITY-C15, CHG-R8SPN-024) | `PERMISSION_GRANT` |
+| `deleteDelegatedAccess` | [IdentityService](../backend/IdentityService.md#deletedelegatedaccess) | onAction | Take a role away from the selected person (the grant RoleSummary.grantId names; IDENTITY-C15) | `PERMISSION_GRANT` |
+| `updatePrincipal` | [IdentityService](../backend/IdentityService.md#updateprincipal) | onAction | Change the selected person's display name, active flag or validity; never a role (IDENTITY-C15) | `USER_MANAGE` |
 
 **States**
 

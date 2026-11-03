@@ -139,8 +139,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `dashboardId` (navigation) |
 | Route | `/analytics/dashboard-library-anl-021` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The one catalogue of dashboards, inside the single permission-based reporting area (no copies of it inside each module). A login sees only the dashboards of modules it is entitled to, narrowed to its own scope; a module the tenant has not licensed never appears, not even as an empty filter. The thing to get right: the pack's Status, Version, Last Published and AI-generated columns have no source yet, so the library must not invent them; draw what exists (shared or private, archived, area, owner, refresh load) and show lifecycle as pending until ANL-029 has a contract.
 
 **Known correction pending (do not draw the wrong version)**
@@ -410,8 +408,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/dashboard-creation-wizard-anl-022` |
 
-**Known gaps.** **Dashboard Creation Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
-
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** A short wizard (Basics, Scope, Data areas, Starting point) that ends in the canvas. Nothing is saved until Finish, because a dashboard cannot be created without at least one tile: the Starting point step supplies the first tiles (a standard template, or "Blank - one KPI card"). The thing to get right is what the wizard must not ask: the tenant, a default currency and an owner are not choices.
 
 **Known correction pending (do not draw the wrong version)**
@@ -655,7 +651,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Width `tiles[].position.width` | number field | required | — | — | — | — | `updateDashboard` body |
 | Height `tiles[].position.height` | number field | required | — | — | — | — | `updateDashboard` body |
 
-Errors to draw in the form: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`.
+Errors to draw in the form: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`.
 
 **Form: Archive dashboard** (confirmDialog, opened by *Archive dashboard*; *Archive dashboard* calls `deleteDashboard`, *Cancel* sends nothing)
 
@@ -761,7 +757,7 @@ Errors to draw in the form: 400 The tiles' refreshes per minute exceed `VenueSet
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save dashboard (primary button) | `updateDashboard` PUT `/dashboards/{dashboardId}` | CreateDashboardRequest | Dashboard | 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not … | opens confirmDialog first |
+| Save dashboard (primary button) | `updateDashboard` PUT `/dashboards/{dashboardId}` | CreateDashboardRequest | Dashboard | 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 404 The resource does not exist, or is outside the … | opens confirmDialog first |
 | Undo (icon button) | navigation or local | — | — | — | — |
 | Redo (icon button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
@@ -903,8 +899,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/widget-visualization-library-anl-024` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The bounded catalogue of visuals the canvas drags from, as the client asked: an itemised list, like a bounded Power BI or Zoho canvas. Its contents are the contract's twenty marks, not a server collection. The thing to get right: nine of the twenty cannot bind data yet (no encoding role on report columns), and three things the client listed (slicer, narrative, cohort) are deliberately not marks.
 
@@ -1071,8 +1065,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/kpi-builder-anl-025` |
-
-**Known gaps.** **No update or retire operation for a KPI** (design-notes correction ANL-025). `createKpi` writes one; nothing corrects or retires it, so a mistake cannot be put right. Logged as a contract gap 2 …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Where an authorised business user defines a company-wide KPI once, so "revenue" means the same on every dashboard. The one thing to get right: the formula is written against the business catalogue, not tables, and the direction (higher or lower is better) is a single choice that decides every status colour.
 
@@ -1254,7 +1246,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `kpiId` (navigation) |
 | Route | `/analytics/targets-thresholds-kpi-status-rules-anl-026` |
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: If Critical → Generate Alert, Notify responsible user, Create operational task, Trigger AI analysis. Each … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: If Critical → Generate Alert, Notify responsible user, Create operational task, Trigger AI analysis. Each …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Where a KPI's target and its Warning and Critical bands are set, so every dashboard shows the same status for the same number. A target is per scope (tenant, region, venue) and per period. The thing to get right is direction: a band means "below" for revenue and "above" for refund rate or capacity, taken from the KPI's higher-is-better flag, and the bands must not leave a gap.
 
@@ -1606,7 +1598,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 409, 422).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 404, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-027?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1635,8 +1627,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `dashboardId` (navigation) |
 | Route | `/analytics/drill-down-interaction-designer-anl-028` |
-
-**Known gaps.** **Drill-Down & Interaction Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Configures how a viewer moves from a headline number to the transactions behind it: drill down and up a real hierarchy, drill through to a detail page that keeps the filters and has a visible Back, and how a click on one visual filters or highlights the others. The thing to get right: drill only where the data has a genuine hierarchy, and a drill that lands on 10,000 transactions must page, not freeze.
 
@@ -1771,7 +1761,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 409, 422).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 404, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-028?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1800,8 +1790,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `dashboardId` (navigation) |
 | Route | `/analytics/dashboard-access-publishing-versioning-anl-029` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Governs who sees a dashboard and how a change reaches production: draft, preview and validate, approval, publish, with versions and rollback. The client asked for an approval step before publishing. The thing to get right: none of this lifecycle exists in the contract today (a dashboard is saved live by a full replace), so the design is the specification and must be flagged as such; access today is area (module) entitlement plus Shared or Private.
 
@@ -1993,8 +1981,6 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 | Offline | online only |
 | Opens with | `dashboardId` (navigation) |
 | Route | `/analytics/dashboard-preview-validation-health-anl-030` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Two jobs: validate a dashboard before it is published, and show its health after. Validation stops a dashboard with a blocking problem from being submitted; health tells the owner whether viewers are seeing fresh, fast, complete data. The thing to get right: preview runs with the designer's own access, so it must say that viewers with less access will see less, and a preview must not count as a view.
 
@@ -2258,7 +2244,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "Aggregation": {"type":"string","enum":["none","count","countDistinct","sum","average","min","max"]},
-"CreateDashboardRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","module","tiles"],"properties":{"name":{"type":"string","maxLength":200},"module":{"$ref":"#/components/schemas/common::ModuleKey","description":"**Which module this dashboard belongs to, and therefore who may see it.** Added 22 September for the command centre: one shell that shows each login the dashboards of the modules it is entitled to. **A dashboard with no module could not be placed in that shell at all** — the field the whole design hangs on did not exist.\n**Required, and `core` is the answer for a dashboard that belongs to no optional module.** An empty field and *belongs everywhere* look identical, and only one of them is a decision — the rule `ModuleKey` already states for screens.\n**Creating one is gated twice**, by `REPORT_MANAGE` and by the module: a principal cannot build a dashboard for a module the tenant has not licensed or that the principal holds no permission in. The server refuses with `409`; a client that hides the option has not enforced anything.\n\n**The module rule, stated once here and used by `createDashboard`, `updateDashboard`, `listDashboards` and `getCommandCentre`** (ADAM CR-373, Chinmay, 31 October 2026; CHG-CR373-001). **Licensed**: the module is in the tenant's `LicencePosition.licensedModules`, read in process through `subscription#contractRecords`, `subscription#licenceAddOnRecords` and `subscription#planRecords`, exactly as `validateTenantConfig` and `getModuleEnablement` read it (ADAM CR-320); `core` is always licensed. **Permission held**: a module's permissions are the list under that `ModuleKey` in `x-ticvai-permission-modules` (contracts/shared/permissions.yaml); the caller holds the module when its session (`Session.permissionsByScope`) holds at least one of them at the dashboard's venue, or anywhere in its scope for a tenant-wide dashboard. No other query is asked. `createDashboard` and `updateDashboard` refuse `409 module-not-licensed` when the module is not licensed, else `409 module-permission-not-held`, and write nothing. `listDashboards` and `getCommandCentre` leave out every dashboard whose module fails either check, and a `module` filter naming such a module answers `200` with an empty list.\n"},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid","description":"Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. The same rule as `RunReportRequest.venueId`.\n"},"isShared":{"type":"boolean","default":false},"tiles":{"type":"array","minItems":1,"maxItems":24,"items":{"$ref":"#/components/schemas/DashboardTile"}}}},
+"CreateDashboardRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","module","tiles"],"properties":{"name":{"type":"string","maxLength":200},"module":{"$ref":"#/components/schemas/common::ModuleKey","description":"**Which module this dashboard belongs to, and therefore who may see it.** Added 22 September for the command centre: one shell that shows each login the dashboards of the modules it is entitled to. **A dashboard with no module could not be placed in that shell at all** — the field the whole design hangs on did not exist.\n**Required, and `core` is the answer for a dashboard that belongs to no optional module.** An empty field and *belongs everywhere* look identical, and only one of them is a decision — the rule `ModuleKey` already states for screens.\n**Creating one is gated twice**, by `REPORT_MANAGE` and by the module: a principal cannot build a dashboard for a module the tenant has not licensed or that the principal holds no permission in. The server refuses with `409`; a client that hides the option has not enforced anything.\n\n**The module rule, stated once here and used by `createDashboard`, `updateDashboard`, `listDashboards` and `getCommandCentre`** (ADAM CR-373, Chinmay, 31 October 2026; CHG-CR373-001). **Licensed**: the module is in the tenant's `LicencePosition.licensedModules`, read in process through `subscription#contractRecords`, `subscription#licenceAddOnRecords` and `subscription#planRecords`, exactly as `validateTenantConfig` and `getModuleEnablement` read it (ADAM CR-320), by the in-force contract rule `LicencePosition` states (ADAM CR-449); `core` is always licensed. **Permission held**: a module's permissions are the list under that `ModuleKey` in `x-ticvai-permission-modules` (contracts/shared/permissions.yaml); the caller holds the module when its session (`Session.permissionsByScope`) holds at least one of them at the dashboard's venue, or anywhere in its scope for a tenant-wide dashboard. No other query is asked. `createDashboard` and `updateDashboard` refuse `409 module-not-licensed` when the module is not licensed, else `409 module-permission-not-held`, and write nothing. `listDashboards` and `getCommandCentre` leave out every dashboard whose module fails either check, and a `module` filter naming such a module answers `200` with an empty list. `getDashboard` answers `404 not-found` for such a dashboard, exactly as if it did not exist (ADAM CR-450).\n"},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid","description":"Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. The same rule as `RunReportRequest.venueId`.\n"},"isShared":{"type":"boolean","default":false},"tiles":{"type":"array","minItems":1,"maxItems":24,"items":{"$ref":"#/components/schemas/DashboardTile"}}}},
 "CreateReportRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","category","dataSource","columns","requiredPermission"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"category":{"$ref":"#/components/schemas/ReportCategory"},"dataSource":{"$ref":"#/components/schemas/DataSource"},"columns":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/ReportColumn"}},"filters":{"type":"array","items":{"$ref":"#/components/schemas/ReportFilter"}},"groupBy":{"type":"array","items":{"type":"string"}},"parameters":{"type":"array","items":{"$ref":"#/components/schemas/ReportParameter"}},"requiredPermission":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission","description":"Permission needed to run this report, from the shared `Permission` vocabulary. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"},"maxDateRangeDays":{"type":"integer","nullable":true,"minimum":1,"default":366,"description":"Guards against a query spanning years of scan events. **When a report sets none, 366 days applies (decided 28 September, audit R158)**, so `runReport`'s date-range 400 always has a limit."}}},
 "Dashboard": {"x-ticvai-persistence":"reporting.dashboard + reporting.dashboard_tile","allOf":[{"$ref":"#/components/schemas/CreateDashboardRequest"},{"type":"object","required":["id","ownerPrincipalId","aggregateCost","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"ownerPrincipalId":{"type":"string","format":"uuid"},"aggregateCost":{"type":"string","enum":["low","medium","high"],"description":"**Combined refresh load of every tile, as a share of the refresh budget** (ADAM CR-372, Chinmay, 31 October 2026; CHG-CR372-001). The load is the sum over the tiles of 60 / `refreshSeconds` (refreshes per minute); a tile with no `refreshSeconds` adds 0. The share is the load divided by the budget `createDashboard` already checks: `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` for the dashboard's `venueId`, the tenant default when `venueId` is absent. `low` below 0.5, `medium` from 0.5 to below 0.8, `high` from 0.8; a share above 1 is still refused `400 refresh-budget-exceeded` before the band is worked out. `createDashboard` and `updateDashboard` work it out and store it in `reporting.dashboard.aggregate_cost` on every save; a later change to the budget does not rewrite stored dashboards. **The bands 0.5 and 0.8 are proposed defaults for the client to correct**, like the budget itself (configured-limits-proposal.md)."},"archivedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"},"createdAt":{"type":"string","format":"date-time"}}}]},
 "DashboardData": {"x-ticvai-persistence":"none — computed","allOf":[{"$ref":"#/components/schemas/Dashboard"},{"type":"object","properties":{"tileData":{"type":"array","items":{"type":"object","properties":{"tileId":{"type":"string","format":"uuid"},"result":{"$ref":"#/components/schemas/ReportResult"},"isCached":{"type":"boolean"},"error":{"type":"string","nullable":true}}}}}}]},

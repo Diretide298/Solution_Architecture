@@ -2336,7 +2336,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 2
+    reads: 3
     writes: 0
   - operation: getSignageQueueCalls
     verb: GET
@@ -2416,7 +2416,7 @@ operationsByContract:
     scope: venue
     permission: QUEUE_OVERRIDE
     offline: true
-    reads: 2
+    reads: 3
     writes: 3
   - operation: redeemWaitingGuest
     verb: POST
@@ -2424,7 +2424,7 @@ operationsByContract:
     scope: workstation
     permission: QUEUE_REDEEM
     offline: true
-    reads: 2
+    reads: 3
     writes: 3
   - operation: resolveCalledWaitingGuest
     verb: POST
@@ -3320,7 +3320,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: queue.entry
-  columns: 25
+  columns: 28
   store: postgres
   parent: null
   writtenBy:

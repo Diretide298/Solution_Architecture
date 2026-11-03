@@ -528,7 +528,6 @@ paths:
   /merchandise/lookup:
     get:
       operationId: lookupMerchandise
-      x-ticvai-names-for-context: [promotions.promotion_rule]
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
         - "P02 GST-026 Retail / Merchandise"
@@ -538,6 +537,7 @@ paths:
         - "P06 EMP-062 Store Stock & SKU Availability"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
+      x-ticvai-names-for-context: [promotions.promotion_rule]
       x-ticvai-reads:
       - table: retail.merchandise
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'

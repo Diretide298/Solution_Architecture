@@ -118,13 +118,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display dashboard cards/table containing; Dashboard Categories; Dashboard Types) and no metric row",
   "purpose": "Provide a centralized catalogue for all standard, custom, AI-generated and embedded TICVAI dashboards.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard cards/table containing"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -340,13 +334,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Select; Select one or multiple domains) and no display directory — it is settings, not a population",
   "purpose": "Guide users through creation of a new dashboard.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Dashboard Creation Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -907,13 +895,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§KPI Components) and no metric row",
   "purpose": "Provide reusable visual components for dashboard construction.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1058,13 +1040,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Define whether) and no display directory — it is settings, not a population",
   "purpose": "Allow authorized business users to create standardized enterprise KPIs.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**No update or retire operation for a KPI** (design-notes correction ANL-025). `createKpi` writes one; nothing corrects or retires it, so a mistake cannot be put right. Logged as a contract gap 2 October 2026 (CHG-SOT-016). The earlier gap (\"declares no operation that writes anything\") was stale: the screen declares `createKpi`.",
-    "source": "contracts/satellite/reporting.yaml#createKpi"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -1271,13 +1247,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: If Critical → Generate Alert, Notify responsible user, Create operational task, Trigger AI analysis. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: If Critical → Generate Alert, Notify responsible user, Create operational task, Trigger AI analysis. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each KPI"
    }
   ],
   "layout": {
@@ -1714,13 +1685,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population",
   "purpose": "Configure how users move from high-level KPIs into deeper analytics.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Drill-Down & Interaction Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -1885,13 +1850,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Govern who can access dashboards and how dashboard changes reach production.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -2055,13 +2014,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Validate dashboards before publication and monitor their technical/analytical health afterward.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

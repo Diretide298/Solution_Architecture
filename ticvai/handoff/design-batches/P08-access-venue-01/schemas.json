@@ -1665,6 +1665,28 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true
+   },
+   "callResolvedByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who recorded the called party's no-show or return to the queue** (`resolveCalledWaitingGuest`; r13 root R40, CHG-R13R40-001), with `callResolutionReason` and `callResolvedAt`. Null until it is resolved; a later resolution of the same entry replaces all three."
+   },
+   "callResolutionReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The operator's reason, as `resolveCalledWaitingGuest` took it."
+   },
+   "callResolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the no-show or return happened, the request's `recordedAt` (device time, offline-capable)."
    }
   }
  },

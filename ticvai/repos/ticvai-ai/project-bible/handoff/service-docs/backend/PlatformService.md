@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 21 of 234 |
+| Operations in the slice | 21 of 235 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -54,7 +54,9 @@ Nothing outside itself.
 **`POST /tenants/{tenantId}/licences/add-ons`**: License a module outside the plan
 
 A module or limit increase sold separately. Add-ons survive a plan change unless explicitly removed — a tenant who paid for something extra keeps it.
-**One add-on per tenant and module at a time** (R8 blocker APPROVALS-TENANCY-C14): an add-on for a `moduleKey` whose validity overlaps an add-on of the same tenant and module already in force is 409 `add-on-already-active` (change or remove that one instead); the check runs under a lock on the tenant's add-on rows, so two requests at once cannot both pass. A `moduleKey` that is not in the module listing is 400.
+**One add-on per tenant and module at a time** (R8 blocker APPROVALS-TENANCY-C14): an add-on for a `moduleKey` whose validity overlaps an add-on of the same tenant and module already in force is 409 `add-on-already-active` (change or remove that one instead); the check runs under a lock on the tenant's add-on rows, so two requests at once cannot both pass. A `moduleKey` that is not a licence module key (`ModuleKey`; `core` excluded) is 400.
+
+**Which keys can be sold** (ADAM CR-535, Chinmay, 3 November 2026; CHG-CR535-001): the shared module key list (`ModuleKey` in common.yaml), not the marketplace table `control.module_listing`, which this operation does not read. A `moduleKey` is accepted only if it is one of those values other than `core`, read from the generated `ModuleKey` type, not a copied list. Anything else (a white-label feature key such as `diningAndFnb`, an unknown key, or `core`, which is always licensed and cannot be sold) is refused 400 before the lock is taken or an add-on in force is looked for, and nothing is written. `poweredByRemoval` can be sold; selling it makes `LicencePosition.poweredByRemovable` true. The answer is the tenant's `LicencePosition` after it, built by the one combining method `LicencePosition` states (ADAM CR-531).
 
 |  |  |
 |---|---|
@@ -110,7 +112,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | planId | string (uuid) |  | (nullable) |
 | licensedModules | array of object | yes | Union of plan modules and add-ons. |
 | licensedModules[].moduleKey | string | yes |  |
-| licensedModules[].displayName | string |  |  |
+| licensedModules[].displayName | string |  | Left empty (ADAM CR-531); no approved screen shows it. |
 | licensedModules[].source | enum (plan, addOn) | yes |  |
 | licensedModules[].validTo | string (date) |  | (nullable) |
 | limits | array of EntitlementLimit | yes |  |
@@ -127,6 +129,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Added |
+| 400 |  | moduleKey is not a licence module key (ModuleKey; core excluded): a white-label feature key, an unknown key or core (ADAM CR-535). |
 | 409 |  | An add-on for this module is already in force for the tenant over an overlapping period (add-on-already-active). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -135,6 +138,8 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 **`GET /tenants/{tenantId}/licences`**: What a tenant is licensed to use
 
 **The authoritative source for module enablement.** The White Label Builder reads this and cannot enable what is not licensed here. Two places deciding what a tenant may use is one place too many.
+
+Answered by the one combining method `LicencePosition` states (ADAM CR-531, Chinmay, 3 November 2026).
 
 |  |  |
 |---|---|
@@ -145,7 +150,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `control.contract`, `control.licence_add_on`, `control.licence_add_on_limit`, `control.plan`, `control.tenant` |
+| Reads | `control.contract`, `control.licence_add_on`, `control.licence_add_on_limit`, `control.plan`, `control.plan_limit`, `control.plan_module`, `control.tenant` |
 | Writes | - |
 | Called by | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009, ADM-010, ADM-011, ADM-012, ADM-015, ADM-422, ADM-424, ADM-450 |
 
@@ -164,7 +169,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | planId | string (uuid) |  | (nullable) |
 | licensedModules | array of object | yes | Union of plan modules and add-ons. |
 | licensedModules[].moduleKey | string | yes |  |
-| licensedModules[].displayName | string |  |  |
+| licensedModules[].displayName | string |  | Left empty (ADAM CR-531); no approved screen shows it. |
 | licensedModules[].source | enum (plan, addOn) | yes |  |
 | licensedModules[].validTo | string (date) |  | (nullable) |
 | limits | array of EntitlementLimit | yes |  |
@@ -194,11 +199,13 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 A plan bundles licensed modules, entitlement limits and a cell tier. Plans are versioned: existing subscriptions stay on the version they were sold, so a price change never applies retroactively.
 **A plan is a package, and billing is per module (decided 29 September, Chinmay).** TICVAI sells three standard packages (`packageKind` `standard`) and may make custom ones (`custom`); every package is invoiced one line per licensed module at the price TICVAI configured for that module on the platform (`setModuleListing`), plus `basePrice` as the package's own fee where it has one (it may be zero). **A custom package can be private to one tenant** (`offeredToTenantId`): it is listed and sold to that tenant only. `offeredToTenantId` on a `standard` package is refused (422).
 
+**The first version, its currency and its duplicates** (ADAM CR-510, Chinmay, 3 November 2026; CHG-CR510-001). `createPlan` writes the plan's version `1`, with `isActive` true, `publishedAt` now and `subscriberCount` 0. **One currency per version**: `currencyCode` is stored when sent, else `basePrice.currency`; `basePrice.currency` and every `limits[].overageUnitPrice.currency` must equal it, else 400 `plan-currency-mismatch`. The same `licensedModules` entry twice is 400 `duplicate-plan-module`; the same `limits[].metric` twice is 400 `duplicate-limit-metric`. **One code per plan**: `control.plan` is unique on (`lower(code)`, `version`), and a violation of that index is answered 409 `duplicate-code`.
+
 |  |  |
 |---|---|
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.plan` non-empty |
+| Part of slice | setup, makes `control.plan`, `control.plan_limit`, `control.plan_module` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -217,7 +224,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | currencyCode | string |  | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
-| code | string | yes | (max length 64) |
+| code | string | yes | One code per plan (ADAM CR-510, Chinmay, 3 November 2026): every version of a plan has the plan's code, compared ignoring case (createPlanVersion refuses another, 400 plan-code-changed), and control.… (max length 64) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
 | cellTier | CellTier: enum (shared, dedicated, isolated, clientHosted) | yes |  |
@@ -264,7 +271,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | currencyCode | string |  | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
-| code | string | yes | (max length 64) |
+| code | string | yes | One code per plan (ADAM CR-510, Chinmay, 3 November 2026): every version of a plan has the plan's code, compared ignoring case (createPlanVersion refuses another, 400 plan-code-changed), and control.… (max length 64) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
 | cellTier | CellTier: enum (shared, dedicated, isolated, clientHosted) | yes |  |
@@ -307,7 +314,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 | id | string (uuid) | yes |  |
 | version | string | yes | Existing subscribers stay on the version they were sold. |
-| isActive | boolean | yes |  |
+| isActive | boolean | yes | Only the newest version is active (ADAM CR-510): createPlanVersion sets it false on every earlier version. |
 | subscriberCount | integer | yes |  |
 | publishedAt | string (date-time) |  |  |
 
@@ -316,6 +323,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 400 |  | basePrice or a limit's overageUnitPrice in another currency than the plan's (plan-currency-mismatch), a licensedModules entry twice (duplicate-plan-module) or a limits[].metric twice (duplicate-limit… |
 | 422 |  | offeredToTenantId on a standard package, or a tenant that does not exist |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -326,11 +334,13 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 
 Existing subscribers remain on their version until migrated deliberately. A pricing or entitlement change that silently applied to live tenants would be a contractual problem, not a feature.
 
+**How a version is numbered** (ADAM CR-510, Chinmay, 3 November 2026; CHG-CR510-001): plans are numbered 1, 2, 3 and so on, and only the newest version is active and current. An unknown `planId` is 404. Otherwise, in one transaction, it locks the plan's rows (`SELECT ... FROM control.plan WHERE id = $1 FOR UPDATE`), writes `version` = the highest existing version compared as an integer, plus 1, stored as a decimal string, with `isActive` true, `publishedAt` now and `subscriberCount` 0, and sets `isActive` false on every earlier version of the plan. **The current version** is the highest active one; `setSubscription`'s default `planVersion` uses it, and existing contracts keep the version they were sold. **Code**: the body's `code` must equal the plan's, compared ignoring case, else 400 `plan-code-changed`. **Currency and duplicates** are checked as `createPlan` checks them (400 `plan-currency-mismatch`, `duplicate-plan-module`, `duplicate-limit-metric`); a new version may use a different currency than earlier ones. `packageKind` and `offeredToTenantId` may change, with both 422 checks run again.
+
 |  |  |
 |---|---|
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.plan` non-empty |
+| Part of slice | setup, makes `control.plan`, `control.plan_limit`, `control.plan_module` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -350,7 +360,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | currencyCode | string |  | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
-| code | string | yes | (max length 64) |
+| code | string | yes | One code per plan (ADAM CR-510, Chinmay, 3 November 2026): every version of a plan has the plan's code, compared ignoring case (createPlanVersion refuses another, 400 plan-code-changed), and control.… (max length 64) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
 | cellTier | CellTier: enum (shared, dedicated, isolated, clientHosted) | yes |  |
@@ -397,7 +407,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | currencyCode | string |  | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
-| code | string | yes | (max length 64) |
+| code | string | yes | One code per plan (ADAM CR-510, Chinmay, 3 November 2026): every version of a plan has the plan's code, compared ignoring case (createPlanVersion refuses another, 400 plan-code-changed), and control.… (max length 64) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
 | cellTier | CellTier: enum (shared, dedicated, isolated, clientHosted) | yes |  |
@@ -440,7 +450,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | offeredToTenantId | string (uuid) |  | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… (nullable) |
 | id | string (uuid) | yes |  |
 | version | string | yes | Existing subscribers stay on the version they were sold. |
-| isActive | boolean | yes |  |
+| isActive | boolean | yes | Only the newest version is active (ADAM CR-510): createPlanVersion sets it false on every earlier version. |
 | subscriberCount | integer | yes |  |
 | publishedAt | string (date-time) |  |  |
 
@@ -449,6 +459,8 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | New version published |
+| 400 |  | code is not the plan's, compared ignoring case (plan-code-changed), basePrice or a limit's overageUnitPrice in another currency than the version's (plan-currency-mismatch), a licensedModules entry tw… |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | offeredToTenantId on a standard package, or a tenant that does not exist |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -1010,6 +1022,7 @@ identity tables; the portal signs a member in by the email.
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 409 |  | The body would not leave exactly one owner (developer-owner-required). |
 | 200 |  | Set |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1070,6 +1083,8 @@ identity tables; the portal signs a member in by the email.
 **`GET /module-catalogue`**: Modules, their dependencies and their commercial treatment
 
 Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells combinations that cannot be provisioned.** F&B needs inventory; seating needs the venue map; redemption needs wallet — and a customer who buys the first of each pair and not the second discovers it during go-live.
+
+**Who sees which listings** (ADAM CR-529, Chinmay, 3 November 2026; CHG-CR529-001). It stays a public read; the permission applies to staff callers, and non-staff callers see only listings a buyer can take. A call with no token, a guest token or a prospect token needs no permission and is answered only the `control.module_listing` rows whose `status` is `available` or `beta`; rows that are `deprecated`, `withdrawn` or have no status are left out. A call with a staff token is checked against `PLATFORM_PLAN_MANAGE`: without it the call gets 403, the same as every other guest-callable operation, where staff keep the permission; with it, the call gets every row with its status. Each row still carries its status.
 **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
@@ -1095,6 +1110,8 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 ### setModuleListing
 
 **`PUT /module-catalogue/{moduleCode}`**: Define a module's dependencies, incompatibilities and price
+
+**One listing per module code, written in one statement** (ADAM CR-530, option A, Chinmay, 3 November 2026; CHG-CR530-001; the unique index on `lower(module_code)`, CHG-R13R20-001). It inserts the listing with a new id or, on a conflict on `lower(module_code)`, updates every field the body carries and keeps the existing row's id; no advisory lock is taken. `module_code` is stored as the path sends it. A body `moduleCode` that is sent and is not equal to the path's is refused, as the path parameter says. The answer is the stored row as `ModuleListing`.
 
 |  |  |
 |---|---|
@@ -1175,6 +1192,8 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 
 Upgrades take effect immediately. **Downgrades are checked first**: if the target plan licenses fewer modules than the tenant currently has enabled, or lower limits than they are currently using, the change is refused and the conflicts are named.
 Silently switching off a module a venue is trading on is not an acceptable consequence of a billing change.
+
+**How the downgrade check works** (ADAM CR-541, Chinmay, 3 November 2026; CHG-CR541-001), the way `removeLicenceAddOn` checks, before anything is written. A change is a downgrade, and is checked, when the target plan version licenses fewer modules or a lower limit for any metric. **Modules**: what would be licensed after the change is the target plan version's modules, every in-force add-on (add-ons survive a plan change) and `core`, combined by the one method that builds `LicencePosition` (ADAM CR-531). The Control Plane asks the tenant's cell, at `Tenant.cellHost` with `serviceAuth` and `X-Tenant-Id`, for white-label `getModuleEnablement`; each row with `isEnabled` true whose licence module (the feature-to-module table on `ModuleKey` in common.yaml) is not in that set goes into `modulesInUse`, with `moduleKey` (the white-label feature key, as the cell returns it, so the tenant knows what to switch off), `displayName` and `isEnabled` as the cell returned them. A cell that does not answer refuses the call 503 and nothing changes; the check never decides on a guess. **Limits**: for each metric, `targetLimit` is the target plan's limit, plus every in-force add-on's limit, plus every unexpired capacity pack, null (unlimited) if any of them is null; `currentUsage` is worked out as `getEntitlementUsage` works out `current`. Where `targetLimit` is not null and `currentUsage` is above it, the metric goes into `limitsExceeded` with both figures. If either list has entries the answer is 409 `DowngradeConflictProblem` naming every conflict, and nothing is written; otherwise the downgrade is scheduled as above. `previewSubscriptionChange` returns the same conflicts from the same check.
 **When a change takes effect, and what is prorated** (decided 28 September, audit R214 (1)). **An upgrade takes effect immediately and is always prorated**: the tenant pays the difference for the rest of the current term. **A downgrade takes effect at the next renewal** (`renewsAt`), is not prorated, and until then is held on `Subscription.scheduledChange`. `effectiveFrom` is therefore set by the server, today for an upgrade and `renewsAt` for a downgrade; a request that sends any other date is refused with 422 `effective-date-not-allowed`.
 **A tenant's first plan starts `active`**, not in `trial`, with `startsAt` today and `renewsAt` one term (`billingPeriod`) after it (decided 28 September, audit R214 (2)). A trial is a separate, explicit choice.
 **A cancelled subscription is reactivated here, on the same record, only within its paid period** (decided 28 September, audit STATE-SUBSCRIPTION). After the period ends it is `expired` and this call refuses with 409 `subscription-expired`; the tenant needs a new subscription.
@@ -1187,7 +1206,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.contract`, `control.plan` |
+| Reads | `cache:idempotency`, `control.contract`, `control.licence_add_on`, `control.licence_add_on_limit`, `control.plan`, `control.plan_limit`, `control.plan_module`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.contract`, `control.tenant` |
 | Called by | ADM-008, ADM-410, ADM-417 |
 | State model | Tenant subscription ([states/subscription.yaml](../../../states/subscription.yaml)): moves `trial` -> `active`, `pastDue` -> `active`, `cancelled` -> `active` |
@@ -1204,7 +1223,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | planId | string (uuid) | yes |  |
-| planVersion | string |  | Defaults to the current version. |
+| planVersion | string |  | Defaults to the current version, the plan's highest active version (ADAM CR-510). |
 | effectiveFrom | string (date) |  | Optional, and set by the server if omitted. |
 | prorate | boolean |  | An upgrade is always prorated and a downgrade, which starts at renewal, never is (audit R214 (1)). (default True) |
 | note | string |  | (max length 500) |
@@ -1239,6 +1258,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 |---|---|---|
 | 200 |  | Applied |
 | 409 |  | Downgrade conflicts with current usage. |
+| 503 | ServiceUnavailable | The dependency is unavailable or its circuit breaker is open (system-design review SD-043, 29 September; ADR-0032). |
 | 422 |  | effectiveFrom was sent and is not the date the change must take effect: today for an upgrade, the next renewal for a downgrade (effective-date-not-allowed, audit R214 (1)). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1473,7 +1493,6 @@ balance refuses the termination with 409 `unsettledBalances`, naming the legal e
 | Reads | `cache:idempotency`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.tenant` |
 | Called by | ADM-005, ADM-006 |
-| State model | Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `onboarding` -> `active` |
 
 **Parameters**
 
@@ -1712,7 +1731,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | currency_code | text | no | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… |
-| code | text | yes |  |
+| code | text | yes | One code per plan (ADAM CR-510, Chinmay, 3 November 2026): every version of a plan has the plan's code, compared ignoring case (createPlanVersion refuses another, 400 plan-code-changed), and control.… |
 | name | text | yes |  |
 | description | text | no |  |
 | cell_tier | text | yes |  |
@@ -1725,7 +1744,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | offered_to_tenant_id | uuid | no | Private to one tenant (decided 29 September, Chinmay): a custom package offered only to this tenant; listPlans shows it to no other tenant and setSubscription refuses it for any other (422 plan-not-o… |
 | id | uuid | yes |  |
 | version | text | yes | Existing subscribers stay on the version they were sold. |
-| is_active | boolean | yes |  |
+| is_active | boolean | yes | Only the newest version is active (ADAM CR-510): createPlanVersion sets it false on every earlier version. |
 | subscriber_count | integer | yes |  |
 | published_at | timestamptz | no |  |
 
@@ -1800,7 +1819,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-213 operations, added to this service in later releases without changing any of the above.
+214 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1814,7 +1833,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | migration | `applyConfigPackage`, `applyMigration`, `diffConfigPackage`, `exportConfigPackage`, `getMigrationRun`, `getVersionSkew`, `listMigrations`, `planMigration`, `rollbackMigrationRun` |
 | notice | `listSupportNotices`, `listUpgradeSchedules`, `publishSupportNotice`, `scheduleTenantUpgrade` |
 | partner | `createPartnerQuote`, `listPartnerQuotes` |
-| plan | `getPlan`, `listPlans` |
+| plan | `getPlan`, `getTenantRequestLimits`, `listPlans` |
 | platform | `getScalingPolicy`, `listArchivalJobs`, `listBackupRuns`, `listWafRules`, `setScalingPolicy`, `setWafPolicy` |
 | platform-ops | `cancelOutboxRepublish`, `getOutboxRepublish`, `listDeadLetters`, `listOutboxRepublishes`, `replayDeadLetter`, `republishOutbox`, `skipRolloutCell` |
 | publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listDeveloperMembers`, `listIntegrationListings`, `listMarketplaceListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |

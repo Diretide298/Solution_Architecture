@@ -128,6 +128,11 @@ def main() -> int:
             if stored_as:
                 t, _, c = stored_as.rpartition(".")
                 reaches = t in writes and c in names.get(t, set())
+                # **The audit row is the kernel's** (ADAM CR-376; r13 integration, CHG-R13INT-022): a reason put on the
+                # request's audit context reaches platform.audit_record through the audit interceptor, not as the
+                # operation's own write, so the named column is enough unless the operation audits itself
+                if t == "platform.audit_record" and not op.get("x-ticvai-audits-itself"):
+                    reaches = c in {x.get("column") for x in cols.get(t, [])}
             else:
                 reaches = any(col in names[t] or any(str(x or "").startswith(col + "_") for x in names[t])
                               or leaf in sources[t] for t in writes)

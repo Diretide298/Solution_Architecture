@@ -1024,10 +1024,12 @@
      ],
      "properties": {
       "area": {
-       "type": "string"
+       "type": "string",
+       "description": "The top-level part of the snapshot, by its property name (ADAM CR-500): one of brand, appIcons, bookingFlow, bookingFlows, theme, fonts, footer, notificationBranding, enabledPaymentMethods, accessibility, header, navigation, homepage, modules, features, languages; entries are ordered by area in this order, then by path."
       },
       "path": {
-       "type": "string"
+       "type": "string",
+       "description": "The property names below the part joined with `.`; a keyed array item by its key in brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other arrays of objects by index ([0]); an array of plain values is one value. For bookingFlows, the flow key (ADAM CR-500)."
       },
       "changeKind": {
        "type": "string",
@@ -1039,11 +1041,13 @@
       },
       "before": {
        "type": "string",
-       "nullable": true
+       "nullable": true,
+       "description": "The value's compact JSON text (a string without its quotes); the whole item for a removed one; null when added (ADAM CR-500)."
       },
       "after": {
        "type": "string",
-       "nullable": true
+       "nullable": true,
+       "description": "The value's compact JSON text (a string without its quotes); the whole item for an added one; null when removed (ADAM CR-500)."
       },
       "changeScope": {
        "$ref": "#/components/schemas/ChangeScope"
@@ -1197,6 +1201,17 @@
     "format": "date-time",
     "nullable": true
    },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-backfill": {
+     "column": "published_at",
+     "where": "is_current"
+    },
+    "description": "**When this version became current** (the lead, 2 November 2026, posted for CR-154 and IDENTITY-C63; CHG-R13JOB-004): set whenever a version becomes current, by an immediate publishTenantConfig, by the approval consumer or by the scheduled-publish job; null while it has never been current. The rows already there take it from `publishedAt` on each tenant's current version (`x-ticvai-backfill`). The job reads it to supersede a scheduled version published before the current one became current."
+   },
    "activationFailedAt": {
     "type": "string",
     "format": "date-time",
@@ -1209,7 +1224,7 @@
     "maxLength": 2000,
     "nullable": true,
     "readOnly": true,
-    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63)."
+    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63), or `superseded: version N was published after this one was scheduled` where a newer version became current first (the lead, 2 November 2026, CR-154), or `Superseded by version N, which was due at the same time.` where another version due in the same run was made current (ADAM CR-501, 3 November 2026). Never retried."
    },
    "contentHash": {
     "type": "string",
@@ -1485,6 +1500,57 @@
    }
   }
  },
+ "CreateGrantRequest": {
+  "type": "object",
+  "description": "**A grant names exactly one of `permission` and `roleId`** (ADAM CR-158, option A, 18 October 2026; CHG-CRA-002): a single permission, or a role with its own and inherited permissions. Both, or neither, is refused 400 `validation`. `*` stays DENY-only.",
+  "required": [
+   "scopePath",
+   "effect"
+  ],
+  "oneOf": [
+   {
+    "required": [
+     "permission"
+    ]
+   },
+   {
+    "required": [
+     "roleId"
+    ]
+   }
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "permission": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "effect": {
+    "type": "string",
+    "enum": [
+     "ALLOW",
+     "DENY"
+    ]
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "CustomDomain": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.custom_domain",
@@ -1719,6 +1785,199 @@
       ]
      }
     }
+   }
+  }
+ },
+ "DelegatedAccess": {
+  "x-ticvai-persistence": "identity.delegated_access",
+  "x-ticvai-exactly-one-of": [
+   [
+    "permission",
+    "roleId"
+   ]
+  ],
+  "x-ticvai-rls": "scope-or-subject",
+  "x-ticvai-required-when": {
+   "grantedByPrincipalId": {
+    "grantedByKind": "principal"
+   },
+   "grantedBySubjectId": {
+    "grantedByKind": "subject"
+   },
+   "revokedBySubjectId": {
+    "revokedByKind": "subject"
+   }
+  },
+  "type": "object",
+  "required": [
+   "id",
+   "permission",
+   "scopePath",
+   "effect"
+  ],
+  "properties": {
+   "grantedByKind": {
+    "type": "string",
+    "enum": [
+     "principal",
+     "subject",
+     "system"
+    ],
+    "default": "principal",
+    "readOnly": true,
+    "description": "Who made the grant (CHG-R8MIG-021). `system` is the SSO callback's group-to-role grant."
+   },
+   "grantedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The staff member who made the grant; set when `grantedByKind` is `principal`."
+   },
+   "grantedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who made the grant (the account holder); set when `grantedByKind` is `subject`."
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The role this grant gives, with its own and inherited permissions. **Exactly one of `roleId` and `permission` is set** (ADAM CR-158; CHG-CRA-002): a role grant carries no permission."
+   },
+   "permission": {
+    "type": "string",
+    "nullable": true,
+    "description": "From the permission enum. `*` permitted on DENY only. **Null on a role grant** (ADAM CR-158, 18 October 2026; CHG-CRA-002): a grant names exactly one of a permission or a role (`roleId`), so a role grant stores `role_id` and no permission. Nullable in responses since then, a breaking change approved by the lead (BC-370)."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "CF-132, CL-05. **A grant held by a guest rather than a staff principal.**\nSection 5.5 asks for portfolios — a primary holder assigning entitlements, transfer between linked accounts, shared wallets with individual tracking — and it appears ten times across ten sections. **Every one of those reduces to the same question: who may act on whose behalf, over what, and until when.**\n**That is a grant, not a household table.** A primary holder assigning an entitlement is a grant. A group leader holding tickets for twelve is a grant. A corporate account enrolling members is a grant with a quota. **A shared wallet with individual tracking is a grant over a balance, and the transaction log already records who spent.**\n**A household table would answer one of those four.**\n"
+   },
+   "overSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Whose behalf. **Null for a staff grant, which is the existing behaviour** — every grant written before 18 August means exactly what it meant before.\n"
+   },
+   "overSubjectName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The display name of the guest acted for (`pii.subject.display_name`), read with the grant; null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). listDelegations reads it with `identity#subjectMinorStatus` (ADAM CR-362)."
+   },
+   "overSubjectIsMinor": {
+    "type": "boolean",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Whether the guest acted for is under the region's `RegionSettings.minorAgeThreshold` today, computed from their date of birth, which is never returned; null when no date of birth is held. Not stored (CHG-R8MIG-009)."
+   },
+   "overObjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n\n**Written as `<kind>:<id>`.** An entitlement share is `entitlement:<entitlementId>` (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004).\n"
+   },
+   "delegationKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "primaryHolder",
+     "familyMember",
+     "groupLeader",
+     "attendee",
+     "corporateAdmin",
+     "corporateMember",
+     "carer",
+     "sharedEntitlement"
+    ],
+    "description": "**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n\n**`sharedEntitlement` is the row an entitlement share is** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004). `shareEntitlement` writes exactly: `overObjectRef` `entitlement:<entitlementId>`, `subjectId` the recipient, `overSubjectId` the owner, `permission` `ENTITLEMENT_USE` with `roleId` null, `delegationKind` `sharedEntitlement`, `effect` ALLOW, `validTo` the request's `validUntil`, `grantedByKind` `subject` with `grantedBySubjectId` the owner. `revokeEntitlementShare` finds the row by the path's `shareId` and matches it to the path's `entitlementId` through `overObjectRef`; a row that does not match is 404. Orders' `EntitlementShare` is this row seen through the share.\n"
+   },
+   "quota": {
+    "type": "integer",
+    "nullable": true,
+    "description": "2.14.15 and 4.3.11. **How many the holder may assign.** A corporate account with fifty allocations and a family with four are the same structure with different numbers.\n"
+   },
+   "isRevocableBySubject": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether the person it is over can end it.** A guest who linked a family member should be able to unlink them; a corporate member should not be able to revoke their employer's oversight — and **a delegation nobody can end is a delegation somebody will regret.**\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "effect": {
+    "type": "string",
+    "enum": [
+     "ALLOW",
+     "DENY"
+    ]
+   },
+   "permissionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from `identity.user_access`, 20 September, when that table was collapsed into this one.** `permission` above is free text; this names a row in `identity.permission`, the catalogue wired the same day. A grant that names a catalogue row can be checked against the keys the contracts actually enforce — which is the whole point of a catalogue that reported *154 on operations, 35 in roles.yaml, 0 shared*.\nNullable because a role grant carries no permission at all.\n"
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so it could say who revoked a grant and not whether it was before or after the thing somebody is asking about.\n"
+   },
+   "revokedByKind": {
+    "type": "string",
+    "enum": [
+     "principal",
+     "subject",
+     "system"
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who revoked the grant** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): a staff member (`revoked_by_principal_id`), a guest (`revokedBySubjectId`, for example the owner taking back an entitlement share) or the system (an expiry sweep). Null while the grant is live."
+   },
+   "revokedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who revoked the grant; set when `revokedByKind` is `subject` (ADAM CR-209), since a guest is not a principal and cannot fill `revoked_by_principal_id`."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -2167,7 +2426,7 @@
          "filter": {
           "type": "object",
           "nullable": true,
-          "description": "**What this answer keeps in the list (decided 29 September, W4).** Every field set must hold; answers to different questions are combined with AND. Required with `behaviour` `filter`. The server applies it (catalogue `guidedAnswerIds`), so web, mobile and kiosk show the same list.\n",
+          "description": "**What this answer keeps in the list (decided 29 September, W4).** Every field set must hold; answers to different questions are combined with AND. Required with `behaviour` `filter`. The server applies it (catalogue `guidedAnswerIds`), so web, mobile and kiosk show the same list.\n\n**One shared filter** (ADAM CR-532, Chinmay, 3 November 2026): fields are ANDed within an answer and answers are ANDed with each other; an empty field narrows nothing. Its inputs are the product, its eligibility rule (no rule means every limit is empty) and the kinds of its consent questions. `productIds` keeps the products listed.\n",
           "properties": {
            "productIds": {
             "type": "array",
@@ -2178,6 +2437,7 @@
            },
            "productCategoryIds": {
             "type": "array",
+            "description": "Keeps products filed under a listed category or any category below it in the category tree, as `listProducts`' `categoryId` already does (ADAM CR-532).",
             "items": {
              "type": "string",
              "format": "uuid"
@@ -2185,7 +2445,7 @@
            },
            "segmentTags": {
             "type": "array",
-            "description": "Catalogue `Product.segmentTags`, e.g. a level tag.",
+            "description": "Catalogue `Product.segmentTags`, e.g. a level tag, matched as `listProducts`' `segmentTag` does (a tag matches itself and tags below it; ADAM CR-532).",
             "items": {
              "type": "string"
             }
@@ -2199,18 +2459,18 @@
             "type": "integer",
             "minimum": 0,
             "nullable": true,
-            "description": "With `minAgeYears`, checked against each product's age rule (catalogue `ProductEligibilityRule`)."
+            "description": "**Age** (ADAM CR-532): a product is kept when the answer's range [`minAgeYears`, `maxAgeYears`] and the product's own age limits [`minAgeYears`, `maxAgeYears`] (its eligibility rule) overlap; an empty bound on either side is open. So 'Kids 3-12' keeps a 6+ activity, and a product with no age limits is always kept. Each person's age is still checked at booking."
            },
            "requiresSwimmer": {
             "type": "boolean",
             "nullable": true,
-            "description": "False hides products whose eligibility needs a swimmer; true keeps only those."
+            "description": "**Swimmer** (ADAM CR-532): a product needs a swimmer when any of its consent questions (`Product.consentQuestionIds`) has kind `swim`, or its eligibility rule still has the old `swimAbility` `confident`. false leaves those out; true keeps only those; empty narrows nothing."
            },
            "certificationCode": {
             "type": "string",
             "nullable": true,
             "maxLength": 40,
-            "description": "Keeps products that need this certificate, or with `holdsCertification` false, hides them."
+            "description": "**Certification** (ADAM CR-532), with `holdsCertification`: false leaves out products whose `requiredCertificationCode` is this code; true or no flag keeps products needing this code or no certification."
            },
            "holdsCertification": {
             "type": "boolean",
@@ -3180,6 +3440,55 @@
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
    },
+   "isFeatured": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The plan card's Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured plan."
+   },
+   "compareAtPrice": {
+    "x-ticvai-column": "compare_at_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan card's saving. Stored on `catalogue.product` as `compare_at_amount` in the venue's trading currency, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a made-up value."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "**The card's highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every operation that answers Product, to every audience. WEB-005's card shows the value for the guest's language, falling back to the English value, as the pill on the card image in capitals; null shows no badge."
+   },
+   "rating": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "required": [
+     "average",
+     "count"
+    ],
+    "properties": {
+     "average": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "multipleOf": 0.1,
+      "description": "The average rating, 1.0 to 5.0, one decimal."
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many reviews the average is over."
+     }
+    },
+    "description": "**The card's rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is not null."
+   },
    "nameLocalised": {
     "allOf": [
      {
@@ -3900,7 +4209,7 @@
    "slug": {
     "type": "string",
     "nullable": true,
-    "description": "22.11.6. **Human-readable, and changing one is a redirect rather than an edit** — a slug that changes without a 301 is a page that was ranking and now is not.\n"
+    "description": "22.11.6. **Human-readable, and changing one is a redirect rather than an edit** — a slug that changes without a 301 is a page that was ranking and now is not. `setSeoMetadata` stores the new slug and writes no redirect; the 301 is `createUrlRedirect`, which CMS-013 calls when a live slug is edited (ADAM CR-474).\n"
    },
    "hreflang": {
     "type": "object",
@@ -3971,6 +4280,13 @@
     "type": "string",
     "nullable": true,
     "description": "Short-lived; present when `ready`."
+   },
+   "failureReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the build failed, set by exportSitePackage's job when it moves the package to `failed`; null otherwise (r13 root R40, CHG-R13R40-001: the job's \"with the reason\" had no column, so getSitePackage could not answer it)."
    },
    "expiresAt": {
     "type": "string",

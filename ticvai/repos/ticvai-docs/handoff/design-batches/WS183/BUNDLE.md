@@ -326,8 +326,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Customer Journey Map & Touchpoint Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Visual journey map with recommendation-enabled touchpoints.
 
 **Known correction pending (do not draw the wrong version)**
@@ -499,7 +497,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Current product, Basket value, Guest count, Guest type, Current venue, Selected date, Selected timeslot … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved: Current product, Basket value, Guest count, Guest type, Current venue, Selected date, Selected timeslot … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recommendation behaviour from current context (time, location, queue, weather).
 
@@ -654,8 +652,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Pre-Purchase & Booking Journey Recommendation Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recommendations before purchase completion.
 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only updateRecommendationStrategy and nothing that returns the current configuration. (CHG-WIR-025).
@@ -805,8 +801,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/commercial/post-purchase-pre-visit-recommendation-manager-adm-673` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** **Post-Purchase & Pre-Visit Recommendation Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recommendations after payment and before the visit, respecting what was bought.
 
@@ -1244,8 +1238,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/commercial/omnichannel-recommendation-synchronization-adm-676` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Consistent recommendations across channels.
 

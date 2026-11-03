@@ -303,8 +303,6 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | `creditTypeId` (navigation) |
 | Route | `/orders-money/credit-type-definition-studio-bo-1104` |
 
-**Known gaps.** **Credit Type Definition Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Create and maintain credit types (as BO-1088).
 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only createCreditType, updateCreditType and nothing that returns the current configuration. (CHG-WIR-025).
@@ -1243,8 +1241,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Credit lots are listed across the venue by expiry window (listCreditLots without walletId, expiringWithinDays), 4 October 2026; the pack-label tables left** (CHG-FXS-003)
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Credit approaching or reaching expiry: expire, extend or forfeit lots, with the accounting consequence stated, because expired credit stops being a liability and becomes breakage revenue on a date someone can defend. Extensions are recorded and never rewrite the original history.
 
 **Fixed on main** (the package already carries these; draw what it says): No list of lots near expiry; the customer-level view of balances and expiry dates the client asked for has no read operation on this screen. (CHG-WIR-025).
@@ -1399,7 +1395,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | — | `publishWalletConfiguration` body |
+| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | What the call does, not a fact about the version: `publish` writes the version and its snapshots, `validateOnly` writes nothing. | `publishWalletConfiguration` body |
 | Note `note` | text area | optional | — | — | — | — | `publishWalletConfiguration` body |
 
 #### Outputs: what the screen shows and produces

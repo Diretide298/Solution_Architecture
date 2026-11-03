@@ -672,6 +672,7 @@
   }
  },
  "GuestNote": {
+  "x-ticvai-rls": "grant-holder-write",
   "type": "object",
   "x-ticvai-persistence": "marketing.guest_note",
   "description": "A note on a guest, written by staff (`addGuestNote`). **Attributed and personal data**, and `isAllergy` keeps an allergy apart from every other kind so it surfaces on the order screen.\n",

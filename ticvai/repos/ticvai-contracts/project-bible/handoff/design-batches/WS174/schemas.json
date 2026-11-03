@@ -620,12 +620,12 @@
    "membershipId": {
     "type": "string",
     "nullable": true,
-    "description": "Membership, the catalogue.membership_programme the simulated customer holds; its membership pricing rules choose the rate at the contextualRateSelection step (ADAM CR-419)"
+    "description": "Membership, the catalogue.membership_programme the simulated customer holds; the one membership rule whose membershipProgramme condition lists it adjusts the rate at the contextualRateSelection step (ADAM CR-419, CR-439, CR-455)"
    },
    "promotionCode": {
     "type": "string",
     "nullable": true,
-    "description": "Promotion, evaluated by Promotions' evaluatePromotions in process without orderId, so nothing is stored (ADAM CR-419)"
+    "description": "Promotion. Until Promotions' evaluatePromotions is built, a request with a promotionCode answers 422 promotion-evaluation-unavailable and computes nothing (ADAM CR-439)"
    },
    "paymentMethod": {
     "type": "string",
@@ -759,11 +759,17 @@
        "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
       },
       "finalPayable": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "Absent (null) for a channel with no catalogue channel, `api` or `backOffice` (ADAM CR-537): no price list prices the variant there."
       },
       "difference": {
        "type": "string",
-       "description": "Why it differs, e.g. Call Center Booking Fee"
+       "description": "Why it differs, e.g. Call Center Booking Fee; for `api` or `backOffice`, that no price list prices this variant on that channel (ADAM CR-537)"
       }
      }
     },

@@ -141,7 +141,7 @@
    "releaseHeldLeases": {
     "type": "boolean",
     "default": true,
-    "description": "Return unsold inventory leases held by this workstation (ADR-0013 C103). Closing without releasing strands capacity until TTL expiry, which is visible at a gate during peak.\n"
+    "description": "**Accepted and does nothing** (ADAM CR-517, Chinmay, 3 November 2026; CHG-CR517-001): a till holds no standing lease (one inventory hold per sale, converted when the order is paid), so the close has nothing to give back and no path to Catalogue is added. A value that is not a boolean is `400 validation`. True, false and missing behave the same. If standing leases come later (ADR-0013 C103), returning a till's leases at close is Catalogue's job, triggered by the close's event, with its own ticket.\n"
    },
    "recordedAt": {
     "type": "string",
@@ -1036,7 +1036,7 @@
     "nullable": true,
     "writeOnly": true,
     "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code."
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code. **20 random bytes, base32 without padding** (ADAM CR-522, RFC 6238; CHG-CR522-001), stored field-encrypted."
    },
    "destination": {
     "type": "string",
@@ -1050,7 +1050,7 @@
     "format": "date-time",
     "nullable": true,
     "writeOnly": true,
-    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
+    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified. **10 minutes after `enrolMfaMethod`** (ADAM CR-522, CHG-CR522-001), the same time as `MfaEnrolment.expiresAt`."
    },
    "kind": {
     "$ref": "#/components/schemas/MfaKind"
@@ -1530,7 +1530,7 @@
    },
    "heldLeaseCount": {
     "type": "integer",
-    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
+    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned. **Left null** (ADAM CR-517; CHG-CR517-001): a till holds no standing lease, so nothing sets it.\n"
    },
    "openedAt": {
     "type": "string",
@@ -2679,7 +2679,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

@@ -2381,6 +2381,7 @@
     ]
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setQualityEvaluation saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "type": "string",
     "enum": [
      "draft",

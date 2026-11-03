@@ -1030,7 +1030,7 @@
  "setRolePermissions": {
   "method": "PUT",
   "path": "/roles/{roleId}/permissions",
-  "contract": "tenancy",
+  "contract": "identity",
   "summary": "What this role may do",
   "permission": "ROLE_MANAGE",
   "offlineCapable": false,

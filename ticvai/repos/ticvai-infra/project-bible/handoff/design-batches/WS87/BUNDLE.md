@@ -683,8 +683,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `cardCode` (navigation) |
 | Route | `/games-rides/customer-card-wallet-identification-bo-486` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Configures and previews the first step of the kiosk journey: the guest taps or scans their card, TICVAI identifies the wallet and checks the card, and a session opens only if it is valid. The one thing to get right: each failure (card not found, blocked, expired, replaced, wallet inactive) has its own guest message and next step, and the welcome never exposes more than a first name on a public screen.
 
 **Known correction pending (do not draw the wrong version)**
@@ -849,8 +847,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline | online only |
 | Opens with | `subjectId` (navigation), `walletId` (navigation) |
 | Route | `/games-rides/customer-wallet-balance-summary-bo-487` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The wallet balances a guest sees at a self-service kiosk, and the exit settlement.
 

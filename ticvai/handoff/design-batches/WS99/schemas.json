@@ -109,6 +109,11 @@
  "ModuleListing": {
   "type": "object",
   "x-ticvai-persistence": "control.module_listing",
+  "x-ticvai-unique-together": [
+   [
+    "moduleCode"
+   ]
+  ],
   "description": "Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n",
   "required": [
    "moduleCode"

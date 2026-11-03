@@ -29,7 +29,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-031 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-031 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -51,7 +51,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createQueue, updateQueue. **A handheld reads a queue and records a wait; it does not create one.** A queue is a venue configuration — bulk-attach residue, and `EMP-031` and `EMP-032` carried identical sets.",
+  "notes": "Definition derived from the wireframe board on 14 August. **Removed 24 August**: createQueue, updateQueue. **A handheld reads a queue and records a wait; it does not create one.** A queue is a venue configuration — bulk-attach residue, and `EMP-031` and `EMP-032` carried identical sets.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listQueues` reads the population and `getQueue` reads one of them — list, select, act",
@@ -387,7 +387,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-032 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-032 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -412,7 +412,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Cross-platform navigation removed 24 August**: BO-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Removed 24 August**: callNextParties, createQueue, setQueueStatus, updateQueue. **A handheld reads a queue and records a wait; it does not create one.** A queue is a venue configuration — bulk-attach residue, and `EMP-031` and `EMP-032` carried identical sets.",
+  "notes": "Definition derived from the wireframe board on 14 August. **Cross-platform navigation removed 24 August**: BO-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Removed 24 August**: callNextParties, createQueue, setQueueStatus, updateQueue. **A handheld reads a queue and records a wait; it does not create one.** A queue is a venue configuration — bulk-attach residue, and `EMP-031` and `EMP-032` carried identical sets.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act",
@@ -609,7 +609,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-033 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-033 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -623,7 +623,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
@@ -852,7 +852,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-034 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-034 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -867,7 +867,7 @@
     {
      "to": "EMP-036",
      "trigger": "Issue media",
-     "provenance": "derived — EMP-036 declares entryState.params mediaCode and EMP-034 holds none of them. The edge carries nothing: mediaCode only pre-selects (deep link or optional), and EMP-036 opens on its own"
+     "provenance": "derived — EMP-036 declares entryState.params mediaCode and EMP-034 holds none of them, so the edge carries nothing and EMP-036 opens cold"
     },
     {
      "to": "EMP-035",
@@ -879,7 +879,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createProduct, updateProduct. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
+  "notes": "Definition derived from the wireframe board on 14 August. **Removed 24 August**: createProduct, updateProduct. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getOrder` reads one of them — list, select, act",
@@ -1586,7 +1586,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-025 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-025 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1600,7 +1600,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: amendAttendance. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
+  "notes": "Definition derived from the wireframe board on 14 August. **Removed 24 August**: amendAttendance. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1813,7 +1813,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-026 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-026 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1839,7 +1839,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.\n\n**Who may open it, and the reporter's own list** (r8 walk fix, CHG-R8WFC-006). The screen is gated on `INCIDENT_REPORT`, which every member of staff holds (\"reportable by any member of staff\"), not on `INCIDENT_VIEW`, which only incident managers hold. Its list is `listIncidents` with `reportedBy=me`, which a reporter without `INCIDENT_VIEW` may call for their own reports only; `emptyFirstRun` (\"nothing reported yet by you today\") is that list empty for today. A caller who also holds `INCIDENT_VIEW` may drop the filter.\n\n**Photos and people before the report exists** (r8 walk fix, CHG-R8WFC-006). `uploadIncidentMedia` and `addIncidentPerson` act on an incident that exists. The form keeps each photo on the device as it is added (shown, and removable there, before sending) and the people involved in its own state; **Send** calls `reportIncident` (the client generates the incident id), then `uploadIncidentMedia` for each kept photo and `addIncidentPerson` for each person, the same order the offline capture already takes on reconnect. A photo removed before Send is never uploaded, so no remove-media operation is needed.",
+  "notes": "Definition derived from the wireframe board on 14 August.\n\n**Who may open it, and the reporter's own list** (r8 walk fix, CHG-R8WFC-006). The screen is gated on `INCIDENT_REPORT`, which every member of staff holds (\"reportable by any member of staff\"), not on `INCIDENT_VIEW`, which only incident managers hold. Its list is `listIncidents` with `reportedBy=me`, which a reporter without `INCIDENT_VIEW` may call for their own reports only; `emptyFirstRun` (\"nothing reported yet by you today\") is that list empty for today. A caller who also holds `INCIDENT_VIEW` may drop the filter.\n\n**Photos and people before the report exists** (r8 walk fix, CHG-R8WFC-006). `uploadIncidentMedia` and `addIncidentPerson` act on an incident that exists. The form keeps each photo on the device as it is added (shown, and removable there, before sending) and the people involved in its own state; **Send** calls `reportIncident` (the client generates the incident id), then `uploadIncidentMedia` for each kept photo and `addIncidentPerson` for each person, the same order the offline capture already takes on reconnect. A photo removed before Send is never uploaded, so no remove-media operation is needed.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listIncidents` reads the population and `getIncident` reads one of them — list, select, act",
@@ -2147,7 +2147,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-027 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-027 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2178,7 +2178,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: reportIncident. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.** **Removed 24 August**: recordAuthorityNotification. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**",
+  "notes": "Definition derived from the wireframe board on 14 August. **Removed 24 August**: reportIncident. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.** **Removed 24 August**: recordAuthorityNotification. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listIncidents` reads the population and `getIncident` reads one of them — list, select, act",
@@ -2437,7 +2437,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-028 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-028 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2451,7 +2451,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
@@ -2835,7 +2835,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-029 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-029 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2852,7 +2852,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
@@ -3402,7 +3402,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-030 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-030 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -3416,7 +3416,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Wired to the venue map 18 August (CF-123).** The published map with live state on it: 3.2.64 asks for access-control statistics drawn on a graphical map, and the same view carries wait times and closed rides. **The map changes monthly and the state changes every few seconds**, so they are separate calls. **Removed 24 August**: getRefundPolicy, setRefundPolicy. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.** **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4c`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "notes": "Definition derived from the wireframe board on 14 August. **Wired to the venue map 18 August (CF-123).** The published map with live state on it: 3.2.64 asks for access-control statistics drawn on a graphical map, and the same view carries wait times and closed rides. **The map changes monthly and the state changes every few seconds**, so they are separate calls. **Removed 24 August**: getRefundPolicy, setRefundPolicy. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.** **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4c`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
   "density": "comfortable",
   "boardFrames": [
    "Seat Board 4.dc.html#seat-4c"

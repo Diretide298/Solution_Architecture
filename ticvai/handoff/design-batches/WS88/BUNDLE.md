@@ -357,7 +357,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `productId` (navigation) |
 | Route | `/rentals/create-rental-product-wizard-bo-495` |
 
-**Known gaps.** **Create Rental Product Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Food, Beverage & Retail process.** A guided wizard that creates a rental product step by step (basics, category, tracking model, locations, duration, rules, customer requirements, then validation) and saves a draft at each step. The one thing to get right: the wizard is the same set of steps as BO-496 to BO-502, not a separate form, and the last step is the validation report of BO-503.
 
@@ -480,8 +480,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline | online only |
 | Opens with | `productId` (navigation) |
 | Route | `/rentals/rental-product-profile-bo-496` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Food, Beverage & Retail process.** One rental product's full configuration on one page, with each section (basics, inventory model, locations, duration, rules, customer requirements, pricing, deposit) summarised and editable. The one thing to get right: show which sections are complete and which block publication.
 
@@ -628,7 +626,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/rental-category-classification-setup-bo-497` |
 
-**Known gaps.** **Rental Category & Classification Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Food, Beverage & Retail process.** Reusable rental categories (Bikes, Water sports, Mobility, Beach) whose defaults products inherit, with the count of products under each. The one thing to get right: show what a product inherits from its category.
 

@@ -150,8 +150,7 @@ screens:
     - to: POS-001
       trigger: Begin Shift
       provenance: 'derived — POS-001 declares entryState.params shiftId and POS-000 holds none of them.
-        The edge carries nothing: shiftId only pre-selects (deep link or optional), and POS-001 opens
-        on its own'
+        The edge carries nothing: POS-001 finds shiftId (openShift) itself, and POS-001 opens on its own'
     - to: POS-025
       trigger: Till Home
       provenance: 'derived — POS-025 declares entryState.params  and POS-000 holds none of them. The edge
@@ -421,14 +420,14 @@ screens:
     - to: POS-011
       trigger: Returns, Refunds & Exchanges
       provenance: 'derived — POS-011 declares entryState.params invoiceId, orderId, outletId and POS-001
-        holds none of them. The edge carries nothing: orderId, outletId only pre-select (deep link or
-        optional); POS-011 opens on lookupRetailSale, and invoiceId has no source on POS-011 yet (a gap
-        in POS-011, not in this edge)'
+        holds none of them. The edge carries nothing: POS-011 finds orderId (lookupRetailSale), outletId
+        (lookupRetailSale) itself; POS-011 opens on lookupRetailSale, and invoiceId has no source on POS-011
+        yet (a gap in POS-011, not in this edge)'
     - to: POS-012
       trigger: Omnichannel Order & Fulfilment Center
       provenance: 'derived — POS-012 declares entryState.params dropId, orderId, outletId and POS-001
-        holds none of them. The edge carries nothing: orderId, outletId, dropId only pre-select (deep
-        link or optional), and POS-012 opens on its own'
+        holds none of them. The edge carries nothing: dropId only pre-selects (optional); POS-012 finds
+        orderId (lookupShopAndDrop), outletId (createFnbOrder) itself, and POS-012 opens on its own'
     - to: POS-014
       trigger: Sales Exceptions, Controls & Operational Actions
       carries:
@@ -444,8 +443,7 @@ screens:
     - to: POS-016
       trigger: Till Configuration
       provenance: 'derived — POS-016 declares entryState.params deviceId and POS-001 holds none of them.
-        The edge carries nothing: deviceId only pre-selects (deep link or optional), and POS-016 opens
-        on its own'
+        The edge carries nothing: deviceId only pre-selects (optional), and POS-016 opens on its own'
     - to: POS-017
       trigger: Cash In / Cash Out Operations
       carries:
@@ -955,8 +953,8 @@ screens:
     - to: POS-008
       trigger: Reports
       provenance: 'derived — POS-008 declares entryState.params conversationId, reportId and POS-002 holds
-        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
-        optional), and POS-008 opens on its own'
+        none of them. The edge carries nothing: conversationId, reportId only pre-select (optional), and
+        POS-008 opens on its own'
     - to: POS-030
       trigger: History
       provenance: 'decided 1 October 2026 (POS v2 decisions, POSV2-1): the cart''s History opens the Sales
@@ -2436,8 +2434,8 @@ screens:
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-004
-        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional);
-        POS-003 finds productId (listProducts) itself, and POS-003 opens on its own'
+        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (optional); POS-003
+        finds productId (listProducts) itself, and POS-003 opens on its own'
     - to: POS-006
       trigger: Held Orders
       carries:
@@ -3449,8 +3447,8 @@ screens:
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-006
-        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional);
-        POS-003 finds productId (listProducts) itself, and POS-003 opens on its own'
+        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (optional); POS-003
+        finds productId (listProducts) itself, and POS-003 opens on its own'
     - to: POS-004
       trigger: Sell — Seat Map
       carries:
@@ -5118,8 +5116,8 @@ screens:
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-010
-        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional);
-        POS-003 finds productId (listProducts) itself, and POS-003 opens on its own'
+        holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (optional); POS-003
+        finds productId (listProducts) itself, and POS-003 opens on its own'
     - to: POS-004
       trigger: Sell — Seat Map
       carries:
@@ -7578,8 +7576,9 @@ screens:
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-020 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId
-        only pre-select (deep link or optional), and POS-002 opens on its own'
+        and POS-020 holds none of them. The edge carries nothing: cardCode only pre-selects (optional);
+        POS-002 finds orderId (createOrder), productId (listProducts), promotionId (evaluatePromotions)
+        itself, and POS-002 opens on its own'
     - to: POS-007
       trigger: End of shift
       provenance: flow F32 step 8→9
@@ -8732,8 +8731,9 @@ screens:
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-024 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId
-        only pre-select (deep link or optional), and POS-002 opens on its own'
+        and POS-024 holds none of them. The edge carries nothing: cardCode only pre-selects (optional);
+        POS-002 finds orderId (createOrder), productId (listProducts), promotionId (evaluatePromotions)
+        itself, and POS-002 opens on its own'
   notes: '**Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and
     Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs into
     the same till a cashier uses and sees screens the cashier does not.**
@@ -9522,8 +9522,9 @@ screens:
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-027 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId
-        only pre-select (deep link or optional), and POS-002 opens on its own'
+        and POS-027 holds none of them. The edge carries nothing: cardCode only pre-selects (optional);
+        POS-002 finds orderId (createOrder), productId (listProducts), promotionId (evaluatePromotions)
+        itself, and POS-002 opens on its own'
   notes: '**`identifyGuest` was called from the catalogue and had no screen of its own**, so the model
     could attach a guest to a sale and could not say how the cashier found them. The prototype makes lookup
     a surface, which is also where the wallet and open reservations become visible before the sale rather
@@ -9707,13 +9708,12 @@ screens:
     - to: POS-005
       trigger: Payment
       provenance: 'derived — POS-005 declares entryState.params paymentId, saleId and POS-028 holds none
-        of them. The edge carries nothing: paymentId, saleId only pre-select (deep link or optional),
-        and POS-005 opens on its own'
+        of them. The edge carries nothing: saleId only pre-selects (optional); POS-005 finds paymentId
+        (createPayment) itself, and POS-005 opens on its own'
     - to: POS-021
       trigger: Sell — Food & Drink
       provenance: 'derived — POS-021 declares entryState.params itemId and POS-028 holds none of them.
-        The edge carries nothing: itemId only pre-selects (deep link or optional), and POS-021 opens on
-        its own'
+        The edge carries nothing: itemId only pre-selects (optional), and POS-021 opens on its own'
   notes: '**Nineteen table operations existed and not one was on a till screen.** The F&B pack drew table
     service on board 4 and the package put the operations in the contracts; the surface that uses them
     was never specified. A venue running table service had a kitchen display, a menu configuration screen

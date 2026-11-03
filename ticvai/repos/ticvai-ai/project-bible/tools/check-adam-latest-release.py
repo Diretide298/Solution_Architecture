@@ -27,15 +27,26 @@ and ADAM's server knows only the tags it fetched, so every pull served r4 while 
     LR-TAG-REMOTE  with --remotes only (it needs the network; the gate runs without it): the newest `r<N>` tag here
                    is missing from `origin` or `github` (git ls-remote). Run it after pushing, step 5 of the runbook.
 
+**The tag ADAM serves carries its own release bundle** (2 November 2026, r13 root R12, CHG-R13R12-001). ADAM shows a
+ticket's text from `handoff/service-docs/op-release.json` only when that bundle is the served tag's; otherwise it falls
+back to the plan row, which lacks the pointer's scope, repository and design lines. In the r12 rehearsal the candidate's
+committed bundle was r11's, and #27985 APP-SETUP-DEV-008 lost those lines. One more rule:
+
+    LR-BUNDLE      with --tag r<N> (the runbook's step 5 runs it before `git tag`), or when HEAD already carries an
+                   r<N> tag: the committed bundle's `release` is not r<N>. Rebuild it at r<N>
+                   (`python3 tools/op-release.py --release r<N>`) and commit it before the tag.
+
 What ADAM serves cannot be read offline; the runbook's closing adam_pull is the check on the server itself.
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
-    python3 tools/check-adam-latest-release.py [--all] [--remotes]
+    python3 tools/check-adam-latest-release.py [--all] [--remotes] [--tag r<N>] [--self-test]
 """
 from __future__ import annotations
 
+import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -49,7 +60,10 @@ RULES = {
     "LR-TAG-PUSH": "the runbook pushes the release tag by name to both remotes and ends with an adam_pull that "
                    "must say r<N> (P-20, CHG-GTE-006)",
     "LR-TAG-REMOTE": "with --remotes: the newest r<N> tag is on origin and github (P-20, CHG-GTE-006)",
+    "LR-BUNDLE": "the tag being cut carries its own release bundle: op-release.json's release is r<N> (R12, "
+                 "CHG-R13R12-001)",
 }
+BUNDLE = g.ROOT / "handoff" / "service-docs" / "op-release.json"
 REMOTES = ("origin", "github")
 VIEWER = g.ROOT.parent / "viewer"
 
@@ -144,10 +158,74 @@ def tag_rules(guard) -> None:
     guard.note(f"{newest} compared with {', '.join(REMOTES)}")
 
 
+def bundle_finding(bundle_release, tag):
+    """The LR-BUNDLE message for a bundle at `bundle_release` and a tag `tag`, or None when they agree."""
+    if not tag or bundle_release == tag:
+        return None
+    have = f"is {bundle_release}'s" if bundle_release else "is missing or names no release"
+    return (f"handoff/service-docs/op-release.json {have}, and the tag being cut is {tag}: ADAM would show each "
+            f"ticket's plan row instead of its pointer. Rebuild it (`python3 tools/op-release.py --release {tag}`) "
+            "and commit it before the tag")
+
+
+def tag_being_cut(argv):
+    """--tag r<N>, else an r<N> tag already on HEAD, else None."""
+    if "--tag" in argv:
+        i = argv.index("--tag")
+        return argv[i + 1] if i + 1 < len(argv) else ""
+    try:
+        out = subprocess.run(["git", "-C", str(g.ROOT.parent), "tag", "--points-at", "HEAD"],
+                             capture_output=True, text=True).stdout
+    except OSError:
+        return None
+    tags = sorted((t for t in out.split() if re.fullmatch(r"r\d+", t)), key=lambda t: int(t[1:]))
+    return tags[-1] if tags else None
+
+
+def bundle_rule(guard, argv) -> None:
+    tag = tag_being_cut(argv)
+    if tag is None:
+        guard.note("no tag being cut (pass --tag r<N> before `git tag`, the runbook's step 5): bundle not compared")
+        return
+    if not re.fullmatch(r"r\d+", tag or ""):
+        guard.add("LR-BUNDLE", f"tag:{tag or '?'}", f"--tag {tag or '(empty)'} is not r<N>")
+        return
+    try:
+        release = json.loads(BUNDLE.read_text(encoding="utf-8")).get("release")
+    except (OSError, ValueError):
+        release = None
+    msg = bundle_finding(release, tag)
+    if msg:
+        guard.add("LR-BUNDLE", f"bundle:{tag}", msg)
+    else:
+        guard.note(f"the bundle is {tag}'s, the tag being cut")
+
+
+def self_test() -> int:
+    fails = []
+    for got, want, name in (
+            (bundle_finding("r12", "r12"), None, "the bundle is the tag's"),
+            (bool(bundle_finding("r11", "r12")), True, "a bundle one release behind (the r12 rehearsal)"),
+            (bool(bundle_finding(None, "r13")), True, "no bundle"),
+            (bundle_finding("r12", None), None, "no tag being cut"),
+            ("op-release.py --release r13" in (bundle_finding("r12", "r13") or ""), True, "names the rebuild"),
+            (tag_being_cut(["--tag", "r13"]), "r13", "--tag names the tag"),
+            (tag_being_cut(["--tag"]), "", "--tag with nothing after it")):
+        if got != want:
+            fails.append(f"{name}: got {got!r}, expected {want!r}")
+    for f in fails:
+        print("  FAIL", f)
+    print(f"check-adam-latest-release self-test: {7 - len(fails)} of 7 passed")
+    return 1 if fails else 0
+
+
 def main() -> int:
     g.force_utf8()
+    if "--self-test" in sys.argv[1:]:
+        return self_test()
     guard = g.Guard("check-adam-latest-release", RULES)
     tag_rules(guard)
+    bundle_rule(guard, sys.argv[1:])
     if not VIEWER.exists():
         guard.note("viewer/ not found beside ticvai/: nothing compared")
         return guard.finish()

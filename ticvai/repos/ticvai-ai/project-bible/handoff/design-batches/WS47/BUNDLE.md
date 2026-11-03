@@ -496,8 +496,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Unique Code Generation & Batch Manager declares no operation that writes anything** — its only declared call is `listUniqueCodeGeneration`, a read. The name promises authoring and the contract …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Batches of unique codes: how many, length, prefix and suffix, character set, case sensitivity, expiry, uses, distribution owner, and generated, remaining and redeemed per batch. Generation is asynchronous, up to 50,000 a time, delivered as a file.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)

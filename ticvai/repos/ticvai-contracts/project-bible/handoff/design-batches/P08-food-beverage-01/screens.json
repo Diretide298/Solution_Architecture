@@ -1474,32 +1474,32 @@
     {
      "to": "BO-020",
      "trigger": "F&B Order Management",
-     "provenance": "derived — BO-020 declares entryState.params orderId, ticketId and BO-104 holds none of them. The edge carries nothing: orderId, ticketId only pre-select (deep link or optional), and BO-020 opens on its own"
+     "provenance": "derived — BO-020 declares entryState.params orderId, ticketId and BO-104 holds none of them. The edge carries nothing: ticketId only pre-selects (optional); BO-020 finds orderId (setKitchenTicketStatus) itself, and BO-020 opens on its own"
     },
     {
      "to": "BO-021",
      "trigger": "Order Search",
-     "provenance": "derived — BO-021 declares entryState.params orderId and BO-104 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional), and BO-021 opens on its own"
+     "provenance": "derived — BO-021 declares entryState.params orderId and BO-104 holds none of them. The edge carries nothing: BO-021 finds orderId (listFnbOrders) itself, and BO-021 opens on its own"
     },
     {
      "to": "BO-045",
      "trigger": "Menu Management",
-     "provenance": "derived — BO-045 declares entryState.params menuId, menuItemId and BO-104 holds none of them. The edge carries nothing: menuId, menuItemId only pre-select (deep link or optional), and BO-045 opens on its own"
+     "provenance": "derived — BO-045 declares entryState.params menuId, menuItemId and BO-104 holds none of them. The edge carries nothing: BO-045 finds menuId (listMenus), menuItemId (getMenu) itself, and BO-045 opens on its own"
     },
     {
      "to": "BO-046",
      "trigger": "Kitchen Display",
-     "provenance": "derived — BO-046 declares entryState.params ticketId and BO-104 holds none of them. The edge carries nothing: ticketId only pre-selects (deep link or optional), and BO-046 opens on its own"
+     "provenance": "derived — BO-046 declares entryState.params ticketId and BO-104 holds none of them. The edge carries nothing: ticketId only pre-selects (optional), and BO-046 opens on its own"
     },
     {
      "to": "BO-134",
      "trigger": "Kitchen & Preparation Stations",
-     "provenance": "derived — BO-134 declares entryState.params planId and BO-104 holds none of them. The edge carries nothing: planId only pre-selects (deep link or optional), and BO-134 opens on its own"
+     "provenance": "derived — BO-134 declares entryState.params planId and BO-104 holds none of them. The edge carries nothing: planId only pre-selects (optional), and BO-134 opens on its own"
     },
     {
      "to": "BO-135",
      "trigger": "Order Routing & KDS/Printer Rules",
-     "provenance": "derived — BO-135 declares entryState.params outletId and BO-104 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and BO-135 opens on its own"
+     "provenance": "derived — BO-135 declares entryState.params outletId and BO-104 holds none of them. The edge carries nothing: outletId only pre-selects (optional), and BO-135 opens on its own"
     },
     {
      "to": "BO-136",

@@ -560,13 +560,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Apply the correct technical enforcement behavior when licensed resources reach or exceed limits.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 113 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -715,13 +709,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
   "purpose": "Track the commercial consumption position against contractual minimum guarantees. This screen does not issue the invoice. It provides Board 10 with the reconciled consumption basis.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 114 §Forecast"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1246,13 +1234,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Ensure that the approved contract, subscription, license and actual metering configuration remain synchronized.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 119 §Track"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

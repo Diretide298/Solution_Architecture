@@ -223,13 +223,7 @@
    "workshopBoard": "wireframes/WS64 Game and Ride Board 7.dc.html#bo-454"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 64. 0 of 6 labels bound to a contract property; 14 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No staff-audience read of a game card (getGameCard is guest-only; used on BO-396, BO-454, BO-455, BO-457, BO-462, BO-486).",
-    "source": "contracts/satellite/games.yaml#getGameCard"
-   }
-  ],
+  "gaps": [],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -296,13 +290,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Card Information) and no metric row",
   "purpose": "Provide the master backend profile for an individual physical or digital game credential.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 65 §Card Information"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -840,11 +828,6 @@
   "purpose": "Show how TICVAI automatically handles a card tap when the credential is active or expired.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 68 §CARD VALID"
-   },
-   {
     "operation": "authoriseGameplay",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-001): authoriseGameplay decides a real tap now and charges for it; a back-office check uses simulateGameplayAuthorisation, which returns the decision and trace without consuming anything (design-notes correction venue-operations BO-459).",
@@ -1008,13 +991,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Blocked Card Tap) and no metric row",
   "purpose": "Allow authorized operators to disable a lost, suspicious or invalid card without affecting the underlying wallet record.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 69 §Blocked Card Tap"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1200,13 +1177,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Old Card) and no metric row",
   "purpose": "Allow a damaged, lost or replaced physical card to be substituted while retaining the customer's wallet and entitlements.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 70 §Old Card"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1358,13 +1329,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Card Information) and no metric row",
   "purpose": "Provide the backend configuration/view that supports balance-check readers, operator kiosks and self-service kiosks. The source requires a dedicated reader for checking customer balance and also requires wallet credits to be viewable at operator and self-service kiosks.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 71 §Card Information"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1505,13 +1470,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Card Issued; Card Blocked) and no metric row",
   "purpose": "Maintain full traceability of card lifecycle changes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 72 §Card Issued"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

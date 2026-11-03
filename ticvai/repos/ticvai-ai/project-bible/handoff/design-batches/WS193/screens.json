@@ -96,11 +96,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 89 §Display"
-   },
-   {
-    "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.",
     "source": "contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1153"
    }
@@ -772,13 +767,7 @@
   "patternReason": "the pack gives this screen a display directory (§Track; Detect) and no metric row",
   "purpose": "Detect compromised accounts, shared credentials and suspicious device behavior. Requirement 4.3.32 specifically includes detection of account sharing and unauthorized access patterns. Device Intelligence",
   "purposeNote": "customer's underlying balance.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 93 §Track"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1000,16 +989,6 @@
   "purpose": "Configure AI-driven detection of suspicious wallet behavior that fixed rules may not identify. Requirement 4.3.32 explicitly requires AI monitoring for unusual top-ups, abnormal spending, account sharing, rapid transfers, duplicate transactions and unauthorized access. AI Detection Categories",
   "purposeNote": "AI-generated alerts contain understandable contributing factors and are governed by configurable thresholds and human-review policies.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 94 §Every AI alert should show"
-   },
-   {
-    "operation": null,
-    "why": "**AI Fraud & Anomaly Detection Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.",
@@ -1347,13 +1326,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide security teams with a structured investigation workspace. Alert Queue",
   "purposeNote": "Every security alert can be investigated through a controlled case workflow with complete decision history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 96 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1788,13 +1761,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Govern how wallet security policies, fraud models and automated actions are changed and released.",
   "purposeNote": "No material wallet-security configuration can enter production without appropriate validation, permissions, versioning and approval, and all changes remain permanently auditable. Board 8 — Real-Time Risk Decision Flow We would specify the backend sequence clearly: Wallet Transaction Request → Identity / Credential Validation → Static Security Rules → Velocity Check → Device & Credential Risk → Customer Behavioural Profile → AI Anomaly Detection → Combined Risk Score → Decision Engine Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose carried the financial-control layer text of another board (liabilities, breakage, reconciliation); the operations are versioning, audit and risk-rule status, so the screen's own sentence is kept (design-notes correction ticketing-backoffice BO-1162)",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

@@ -77,55 +77,6 @@
   "requestBody": null,
   "responds": "UnifiedReconciliation"
  },
- "listCreditMemos": {
-  "method": "GET",
-  "path": "/credit-memos",
-  "contract": "finance",
-  "summary": "Credit memos issued, newest first",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "taxInvoiceId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "refundId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "legalEntityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "issuedFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "issuedTo",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listDashboards": {
   "method": "GET",
   "path": "/dashboards",
@@ -172,60 +123,6 @@
    },
    {
     "name": "documentId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listTaxInvoices": {
-  "method": "GET",
-  "path": "/tax-invoices",
-  "contract": "finance",
-  "summary": "Tax invoices issued, newest first",
-  "permission": "LEDGER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
-  "parameters": [
-   {
-    "name": "orderId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "legalEntityId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "invoiceType",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "issuedFrom",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "issuedTo",
     "in": "query",
     "required": null
    },

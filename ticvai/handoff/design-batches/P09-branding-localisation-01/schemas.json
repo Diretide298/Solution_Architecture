@@ -345,10 +345,12 @@
      ],
      "properties": {
       "area": {
-       "type": "string"
+       "type": "string",
+       "description": "The top-level part of the snapshot, by its property name (ADAM CR-500): one of brand, appIcons, bookingFlow, bookingFlows, theme, fonts, footer, notificationBranding, enabledPaymentMethods, accessibility, header, navigation, homepage, modules, features, languages; entries are ordered by area in this order, then by path."
       },
       "path": {
-       "type": "string"
+       "type": "string",
+       "description": "The property names below the part joined with `.`; a keyed array item by its key in brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other arrays of objects by index ([0]); an array of plain values is one value. For bookingFlows, the flow key (ADAM CR-500)."
       },
       "changeKind": {
        "type": "string",
@@ -360,11 +362,13 @@
       },
       "before": {
        "type": "string",
-       "nullable": true
+       "nullable": true,
+       "description": "The value's compact JSON text (a string without its quotes); the whole item for a removed one; null when added (ADAM CR-500)."
       },
       "after": {
        "type": "string",
-       "nullable": true
+       "nullable": true,
+       "description": "The value's compact JSON text (a string without its quotes); the whole item for an added one; null when removed (ADAM CR-500)."
       },
       "changeScope": {
        "$ref": "#/components/schemas/ChangeScope"
@@ -447,6 +451,17 @@
     "format": "date-time",
     "nullable": true
    },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-backfill": {
+     "column": "published_at",
+     "where": "is_current"
+    },
+    "description": "**When this version became current** (the lead, 2 November 2026, posted for CR-154 and IDENTITY-C63; CHG-R13JOB-004): set whenever a version becomes current, by an immediate publishTenantConfig, by the approval consumer or by the scheduled-publish job; null while it has never been current. The rows already there take it from `publishedAt` on each tenant's current version (`x-ticvai-backfill`). The job reads it to supersede a scheduled version published before the current one became current."
+   },
    "activationFailedAt": {
     "type": "string",
     "format": "date-time",
@@ -459,7 +474,7 @@
     "maxLength": 2000,
     "nullable": true,
     "readOnly": true,
-    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63)."
+    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63), or `superseded: version N was published after this one was scheduled` where a newer version became current first (the lead, 2 November 2026, CR-154), or `Superseded by version N, which was due at the same time.` where another version due in the same run was made current (ADAM CR-501, 3 November 2026). Never retried."
    },
    "contentHash": {
     "type": "string",
@@ -2091,6 +2106,13 @@
     "nullable": true,
     "description": "Short-lived; present when `ready`."
    },
+   "failureReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the build failed, set by exportSitePackage's job when it moves the package to `failed`; null otherwise (r13 root R40, CHG-R13R40-001: the job's \"with the reason\" had no column, so getSitePackage could not answer it)."
+   },
    "expiresAt": {
     "type": "string",
     "format": "date-time",
@@ -2833,6 +2855,7 @@
    "org_unit_id"
   ],
   "x-ticvai-guest-read": true,
+  "x-ticvai-tenant-row-read": true,
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -3181,8 +3204,9 @@
      60
     ],
     "nullable": true,
+    "default": 30,
     "x-ticvai-persistence-column": "integer",
-    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13). **The `default` is the proposed tenant default only** (ADAM CR-484, Chinmay, 3 November 2026; CHG-CR484-001), as every other configured limit carries its own: it is never written into a venue's row, and a venue's own null stays null when the venue's settings are read, as `cartLeaseSeconds` and the other limits behave. When the client corrects it, only this default changes."
    },
    "cartLeaseSeconds": {
     "type": "integer",
@@ -3605,7 +3629,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

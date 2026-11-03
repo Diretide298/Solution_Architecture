@@ -5,9 +5,9 @@
   "undeclaredFlag": "on"
  },
  "counts": {
-  "appModules": 304,
-  "operations": 2570,
-  "sharedOperations": 1398
+  "appModules": 305,
+  "operations": 2580,
+  "sharedOperations": 1407
  },
  "appModules": {
   "AM-ACCREDITATION-P08": {
@@ -1350,7 +1350,8 @@
   },
   "AM-DIGITAL-ASSETS-P13": {
    "screens": [
-    "CMS-010"
+    "CMS-010",
+    "CMS-061"
    ],
    "operations": [
     "ai#semanticSearch",
@@ -1360,6 +1361,8 @@
     "assets#deleteMediaAsset",
     "assets#getExpiringRights",
     "assets#getMediaAsset",
+    "assets#getMediaTaxonomy",
+    "assets#getMediaUsageAnalytics",
     "assets#listCollections",
     "assets#replaceMediaAsset",
     "assets#searchMedia",
@@ -1368,11 +1371,9 @@
   },
   "AM-DIGITAL-ASSETS-P13-2": {
    "screens": [
-    "CMS-061",
     "CMS-062",
     "CMS-063",
     "CMS-064",
-    "CMS-065",
     "CMS-066",
     "CMS-067",
     "CMS-068",
@@ -1385,7 +1386,9 @@
     "CMS-075",
     "CMS-076",
     "CMS-077",
-    "CMS-078"
+    "CMS-078",
+    "CMS-079",
+    "CMS-080"
    ],
    "operations": [
     "ai#semanticSearch",
@@ -1407,15 +1410,12 @@
     "assets#requestMediaRendition",
     "assets#searchMedia",
     "assets#setMediaAssetTags",
-    "assets#setMediaTaxonomy",
     "assets#updateMediaAsset",
     "tenancy#listOrgUnits"
    ]
   },
   "AM-DIGITAL-ASSETS-P13-3": {
    "screens": [
-    "CMS-079",
-    "CMS-080",
     "CMS-081",
     "CMS-082",
     "CMS-083",
@@ -1433,7 +1433,8 @@
     "CMS-096",
     "CMS-097",
     "CMS-098",
-    "CMS-099"
+    "CMS-099",
+    "CMS-100"
    ],
    "operations": [
     "assets#createMediaShare",
@@ -1448,24 +1449,10 @@
     "assets#setMediaDistributionChannels"
    ]
   },
-  "AM-DIGITAL-ASSETS-P13-4": {
-   "screens": [
-    "CMS-100"
-   ],
-   "operations": [
-    "assets#getMediaUsageAnalytics"
-   ]
-  },
   "AM-FINANCE-TAX-API-BLOCK-A-COMPLETION": {
    "screens": [],
    "operations": [
-    "finance#closeFiscalPeriod",
-    "finance#createRecognitionSchedule",
-    "finance#getDeferredRevenue",
-    "finance#getUnifiedReconciliation",
-    "finance#listFiscalPeriods",
-    "finance#listRecognitionSchedules",
-    "finance#runRecognition"
+    "finance#getUnifiedReconciliation"
    ]
   },
   "AM-FINANCE-TAX-P01": {
@@ -1529,7 +1516,6 @@
     "BO-076",
     "BO-089",
     "BO-090",
-    "BO-1081",
     "BO-1172"
    ],
    "operations": [
@@ -1546,14 +1532,11 @@
     "finance#getUnifiedReconciliation",
     "finance#getVatReturn",
     "finance#ingestSettlementFile",
-    "finance#listCreditMemos",
-    "finance#listEInvoiceTransmissions",
     "finance#listFiscalPeriods",
     "finance#listJournalEntries",
     "finance#listRecognitionSchedules",
     "finance#listSettlementExceptions",
     "finance#listSettlements",
-    "finance#listTaxInvoices",
     "finance#recordSettlement",
     "finance#rejectJournal",
     "finance#reopenPeriod",
@@ -1565,8 +1548,6 @@
     "orders#getChargebackAnalytics",
     "orders#recordChargeback",
     "orders#recordChargebackOutcome",
-    "reporting#getKpiValues",
-    "reporting#listDashboards",
     "wallet#getWalletLiability",
     "wallet#getWalletReconciliation"
    ]
@@ -1972,14 +1953,6 @@
     "fnb#setKitchenTicketStatus"
    ]
   },
-  "AM-FOUNDATION-API-PLATFORM": {
-   "screens": [],
-   "operations": [
-    "catalogue#enterWaitingRoom",
-    "catalogue#getWaitingRoomPosition",
-    "catalogue#setWaitingRoomSetting"
-   ]
-  },
   "AM-FOUNDATION-OFFLINE": {
    "screens": [],
    "operations": [
@@ -1989,6 +1962,8 @@
     "catalogue#acquireInventoryHold",
     "catalogue#getLatestBundle",
     "catalogue#reportBundleApplied",
+    "cross-region#recordSyncRejection",
+    "cross-region#recordSyncRejectionResolution",
     "fnb#createFnbOrder",
     "orders#createOrder",
     "orders#createPayment",
@@ -2000,40 +1975,72 @@
    "screens": [],
    "operations": [
     "access#issueOrderEntitlements",
+    "access#setAccessPointDirection",
+    "access#setTurnstileMode",
     "access#syncScans",
     "access#validateAccess",
+    "approvals#approveMatrixMultiLevel",
+    "approvals#approveRoleAuthorityDelegation",
+    "approvals#setApprovalExternalProvider",
     "catalogue#convertInventoryHold",
+    "catalogue#createProduct",
+    "catalogue#getAvailability",
+    "catalogue#listProducts",
+    "catalogue#setChannelConnectionConfiguration",
+    "catalogue#setSeatPricingRule",
+    "catalogue#testChannelConnection",
+    "catalogue#updateProduct",
+    "finance#recordEInvoiceTransmissionStatus",
+    "fnb#createFnbOrder",
     "identity#completeSsoAuthorization",
+    "identity#createPrincipal",
     "identity#endGuestDeviceSessions",
     "identity#enrolMfaMethod",
     "identity#getCurrentSession",
+    "identity#login",
     "identity#recordConsentIdentifier",
+    "identity#resetPrincipalCredential",
+    "identity#selectRole",
     "identity#startSsoAuthorization",
     "identity#updateGuestSubjectDetails",
     "identity#verifyMfaChallenge",
     "identity#verifyMfaEnrolment",
     "marketing-crm#registerGuestDevice",
+    "marketing-crm#revokeGuestDevice",
+    "marketing-crm#updateMyProfile",
+    "orders#capturePayment",
     "orders#createOrder",
     "orders#createPayment",
+    "orders#createRefund",
+    "orders#getOrder",
+    "orders#inquirePaymentStatus",
     "orders#syncOrders",
     "payments#receivePaymentProviderWebhook",
     "platform-ops#cancelOutboxRepublish",
     "platform-ops#getOutboxRepublish",
     "platform-ops#listOutboxRepublishes",
     "platform-ops#republishOutbox",
+    "public-api#getDeveloperAccount",
+    "public-api#verifyDeveloper",
     "subscription#getPlan",
     "tenancy#listCellEndpoints",
     "tenancy#requeueDeadLetter",
-    "white-label#recordStorefrontSessionEvents"
+    "white-label#getPublishedBookingFlow",
+    "white-label#recordStorefrontSessionEvents",
+    "white-label#setStoreAccounts"
    ]
   },
   "AM-FOUNDATION-SETUP": {
    "screens": [],
    "operations": [
+    "assets#createUpload",
     "identity#getCurrentSession",
+    "identity#getSubjectDataExport",
     "identity#login",
     "identity#logout",
-    "identity#refreshToken"
+    "identity#refreshToken",
+    "tenancy#resolveTenantHost",
+    "white-label#verifyCustomDomain"
    ]
   },
   "AM-GAMES-RIDES-P08": {
@@ -2592,6 +2599,8 @@
     "CMS-019"
    ],
    "operations": [
+    "identity#createDelegatedAccess",
+    "identity#deleteDelegatedAccess",
     "identity#listPrincipals",
     "identity#listRoles",
     "identity#updatePrincipal"
@@ -3453,7 +3462,8 @@
    "screens": [
     "CMS-013",
     "CMS-018",
-    "CMS-021"
+    "CMS-021",
+    "CMS-041"
    ],
    "operations": [
     "marketing-crm#createConsentQuestion",
@@ -3463,6 +3473,7 @@
     "marketing-crm#listConsentPurposes",
     "marketing-crm#listConsentQuestions",
     "marketing-crm#listPrivacyConsent",
+    "marketing-crm#listWaiverConsent",
     "marketing-crm#setConsentPurposes",
     "marketing-crm#setSeoMetadata",
     "marketing-crm#updateConsentQuestion",
@@ -3488,9 +3499,11 @@
     "CMS-038",
     "CMS-039",
     "CMS-040",
-    "CMS-041"
+    "CMS-042",
+    "CMS-043"
    ],
    "operations": [
+    "marketing-crm#createForm",
     "marketing-crm#listConsentEvidenceWithdrawal",
     "marketing-crm#listConsentPurposes",
     "marketing-crm#listCustomerPrivacyConsent",
@@ -3504,13 +3517,14 @@
     "marketing-crm#listPrivacyComplianceExceptions",
     "marketing-crm#listPrivacyEvidenceCompliance",
     "marketing-crm#listPrivacyNoticePolicy",
-    "marketing-crm#listWaiverConsent",
+    "marketing-crm#listWaiverTemplateMaster",
     "marketing-crm#runDataRetention",
     "marketing-crm#setCommunicationPreferenceMarketing",
     "marketing-crm#setConsentCapturePoint",
     "marketing-crm#setConsentPurposes",
     "marketing-crm#setDataDiscoveryAccess",
     "marketing-crm#setDataProcessingPurpose",
+    "marketing-crm#setDigitalWaiverForm",
     "marketing-crm#setLegalHold",
     "marketing-crm#setMinorGuardianAge",
     "marketing-crm#setPrivacyComplianceException",
@@ -3519,15 +3533,12 @@
   },
   "AM-MARKETING-CRM-P13-3": {
    "screens": [
-    "CMS-042",
-    "CMS-043",
     "CMS-044",
     "CMS-045",
     "CMS-046",
     "CMS-047",
     "CMS-048",
     "CMS-049",
-    "CMS-050",
     "CMS-051",
     "CMS-052",
     "CMS-053",
@@ -3540,8 +3551,6 @@
     "CMS-060"
    ],
    "operations": [
-    "marketing-crm#approveWaiverTesting",
-    "marketing-crm#createForm",
     "marketing-crm#getLocalizationBrandingCustomer",
     "marketing-crm#getSignatorySignatureGuardian",
     "marketing-crm#listComplianceEvidenceWaiver",
@@ -3556,10 +3565,8 @@
     "marketing-crm#listWaiver",
     "marketing-crm#listWaiverComplianceOperational",
     "marketing-crm#listWaiverComplianceRisk",
-    "marketing-crm#listWaiverTemplateMaster",
     "marketing-crm#listWaiverTriggerEligibility",
     "marketing-crm#listWaiverVerificationQueue",
-    "marketing-crm#setDigitalWaiverForm",
     "marketing-crm#setLocalizationBrandingCustomer",
     "marketing-crm#setSignatorySignatureGuardian",
     "marketing-crm#setWaiverVerificationValidation"
@@ -5273,7 +5280,6 @@
     "BO-1056",
     "BO-1059",
     "BO-1060",
-    "BO-1082",
     "BO-141",
     "BO-262",
     "BO-688",
@@ -5316,6 +5322,8 @@
   },
   "AM-REPORTING-P08-2": {
    "screens": [
+    "BO-1081",
+    "BO-1082",
     "BO-585",
     "BO-590",
     "BO-593",
@@ -5323,11 +5331,15 @@
     "BO-951"
    ],
    "operations": [
+    "finance#getUnifiedReconciliation",
+    "finance#listEInvoiceTransmissions",
     "reporting#askReportingQuestion",
     "reporting#getAnalyticsBenchmark",
     "reporting#getKpiValues",
     "reporting#listAlerts",
     "reporting#listAnalyticsPipelines",
+    "reporting#listDashboards",
+    "reporting#runReport",
     "reporting#setAlertRule",
     "workforce#getStaffingCoverage"
    ]
@@ -6173,8 +6185,8 @@
     "assets#completeUpload",
     "assets#createUpload",
     "assets#searchMedia",
-    "catalogue#listCatalogueBundles",
     "catalogue#listProducts",
+    "promotions#listBundles",
     "venue-map#acceptVenueLabelProposals",
     "venue-map#acceptWalkwayProposals",
     "venue-map#createVenueMap",
@@ -6400,7 +6412,6 @@
    ],
    "operations": [
     "accreditation#listAccreditationProgrammes",
-    "accreditation#updateAccreditationProgramme",
     "ai#decideAiInsight",
     "ai#getTranslationProposals",
     "ai#listMarketingRecommendations",
@@ -6462,7 +6473,6 @@
    ],
    "operations": [
     "accreditation#listAccreditationProgrammes",
-    "accreditation#updateAccreditationProgramme",
     "ai#decideAiInsight",
     "ai#getTranslationProposals",
     "ai#listMarketingRecommendations",
@@ -6547,10 +6557,13 @@
    "screens": [
     "CMS-025",
     "CMS-026",
-    "CMS-030"
+    "CMS-030",
+    "CMS-050"
    ],
    "operations": [
     "marketing-crm#approvePrivacyTesting",
+    "marketing-crm#approveWaiverTesting",
+    "marketing-crm#getWaiverTesting",
     "marketing-crm#listCookieBannerPreference",
     "marketing-crm#listCookieScanFindings",
     "marketing-crm#listCookieScanPolicies",
@@ -6570,10 +6583,13 @@
    "screens": [
     "CMS-025",
     "CMS-026",
-    "CMS-030"
+    "CMS-030",
+    "CMS-050"
    ],
    "operations": [
     "marketing-crm#approvePrivacyTesting",
+    "marketing-crm#approveWaiverTesting",
+    "marketing-crm#getWaiverTesting",
     "marketing-crm#listCookieBannerPreference",
     "marketing-crm#listCookieScanFindings",
     "marketing-crm#listCookieScanPolicies",
@@ -6976,12 +6992,14 @@
     "identity#setCapabilityTemplate",
     "identity#setGuestVerificationPolicy",
     "identity#setPasswordPolicy",
+    "identity#setRolePermissions",
     "identity#setSegregationRules",
     "identity#suggestRoleAssignment",
     "identity#updatePrincipal",
     "tenancy#createDeviceFirmware",
     "tenancy#createSaleBoard",
     "tenancy#deployConfigurationProfile",
+    "tenancy#getConfigurationProfile",
     "tenancy#getDeviceFirmware",
     "tenancy#getOrgUnit",
     "tenancy#getVenueSettings",
@@ -6993,7 +7011,6 @@
     "tenancy#rollbackDeviceFirmware",
     "tenancy#setConfigurationProfile",
     "tenancy#setDeviceFirmwareStatus",
-    "tenancy#setRolePermissions",
     "tenancy#setVenueSettings",
     "tenancy#setVenueSettingsDefaults",
     "tenancy#startDeviceFirmwareRollout",
@@ -7041,12 +7058,14 @@
     "identity#setCapabilityTemplate",
     "identity#setGuestVerificationPolicy",
     "identity#setPasswordPolicy",
+    "identity#setRolePermissions",
     "identity#setSegregationRules",
     "identity#suggestRoleAssignment",
     "identity#updatePrincipal",
     "tenancy#createDeviceFirmware",
     "tenancy#createSaleBoard",
     "tenancy#deployConfigurationProfile",
+    "tenancy#getConfigurationProfile",
     "tenancy#getDeviceFirmware",
     "tenancy#getOrgUnit",
     "tenancy#getVenueSettings",
@@ -7058,7 +7077,6 @@
     "tenancy#rollbackDeviceFirmware",
     "tenancy#setConfigurationProfile",
     "tenancy#setDeviceFirmwareStatus",
-    "tenancy#setRolePermissions",
     "tenancy#setVenueSettings",
     "tenancy#setVenueSettingsDefaults",
     "tenancy#startDeviceFirmwareRollout",
@@ -7141,6 +7159,24 @@
     "subscription#terminateTenant",
     "subscription#updateTenant",
     "tenancy#listOrgUnits"
+   ]
+  },
+  "AM-SETUP-PLATFORM-FOUNDATION-P13": {
+   "screens": [
+    "CMS-065"
+   ],
+   "operations": [
+    "assets#getMediaTaxonomy",
+    "assets#setMediaTaxonomy"
+   ]
+  },
+  "AM-SETUP-PLATFORM-FOUNDATION-P13-REST": {
+   "screens": [
+    "CMS-065"
+   ],
+   "operations": [
+    "assets#getMediaTaxonomy",
+    "assets#setMediaTaxonomy"
    ]
   },
   "AM-SETUP-PLATFORM-FOUNDATION-P14": {
@@ -7244,6 +7280,7 @@
     "BO-1188",
     "BO-1189",
     "BO-161",
+    "BO-288",
     "BO-291",
     "BO-344",
     "BO-696",
@@ -7277,6 +7314,7 @@
     "catalogue#createPerformances",
     "catalogue#createPriceList",
     "catalogue#createProduct",
+    "catalogue#getAvailability",
     "catalogue#getCatalogueImportJob",
     "catalogue#getChannelAllocations",
     "catalogue#getChannelAvailability",
@@ -7286,6 +7324,7 @@
     "catalogue#getLatestBundle",
     "catalogue#getPackagePricingDefinition",
     "catalogue#getPerformance",
+    "catalogue#getPlanBenefits",
     "catalogue#getPriceList",
     "catalogue#getProduct",
     "catalogue#getProductAttributes",
@@ -7300,6 +7339,7 @@
     "catalogue#listEntitlementTemplates",
     "catalogue#listEvents",
     "catalogue#listFeeSurcharge",
+    "catalogue#listMembershipBenefits",
     "catalogue#listPerformances",
     "catalogue#listPriceLists",
     "catalogue#listPrices",
@@ -7323,7 +7363,9 @@
     "catalogue#setEventLifecycleState",
     "catalogue#setFeeDefinition",
     "catalogue#setGroupPackageDefinition",
+    "catalogue#setMembershipBenefit",
     "catalogue#setPackagePricingDefinition",
+    "catalogue#setPlanBenefits",
     "catalogue#setPrices",
     "catalogue#setProductAttributes",
     "catalogue#setProductCatalogue",
@@ -7368,6 +7410,7 @@
     "promotions#getBundle",
     "promotions#getPromotion",
     "promotions#getPromotionUsage",
+    "promotions#listBundles",
     "promotions#listCommercialCampaigns",
     "promotions#listCouponCampaigns",
     "promotions#listCouponCodes",
@@ -7404,11 +7447,12 @@
     "seating#setAccessibleSeating",
     "seating#setSeatRecommendationRules",
     "seating#updateSeatCategory",
-    "seating#updateSeatMap",
     "subscription#listChannelListings",
+    "subscription#listMembershipAnnualPass",
     "subscription#listMembershipCommercialPricing",
     "subscription#setChannelListing",
     "subscription#setMembershipCommercialConfig",
+    "subscription#setMembershipEntitlementAdmission",
     "tenancy#listAuditRecords",
     "transport#applyTransportNetworkImport",
     "transport#createTransportPassType",
@@ -7501,6 +7545,7 @@
     "BO-1188",
     "BO-1189",
     "BO-161",
+    "BO-288",
     "BO-291",
     "BO-344",
     "BO-696",
@@ -7535,6 +7580,7 @@
     "catalogue#getGroupPackageDefinition",
     "catalogue#getLatestBundle",
     "catalogue#getPackagePricingDefinition",
+    "catalogue#getPlanBenefits",
     "catalogue#getPriceList",
     "catalogue#getProduct",
     "catalogue#getProductAttributes",
@@ -7548,6 +7594,7 @@
     "catalogue#listDynamicPriceRules",
     "catalogue#listEntitlementTemplates",
     "catalogue#listFeeSurcharge",
+    "catalogue#listMembershipBenefits",
     "catalogue#listPackageBundleAdd",
     "catalogue#listPriceLists",
     "catalogue#listPrices",
@@ -7568,7 +7615,9 @@
     "catalogue#setEventLifecycleState",
     "catalogue#setFeeDefinition",
     "catalogue#setGroupPackageDefinition",
+    "catalogue#setMembershipBenefit",
     "catalogue#setPackagePricingDefinition",
+    "catalogue#setPlanBenefits",
     "catalogue#setPrices",
     "catalogue#setProductAttributes",
     "catalogue#setProductEligibilityRule",
@@ -7642,11 +7691,12 @@
     "seating#setAccessibleSeating",
     "seating#setSeatRecommendationRules",
     "seating#updateSeatCategory",
-    "seating#updateSeatMap",
     "subscription#listChannelListings",
+    "subscription#listMembershipAnnualPass",
     "subscription#listMembershipCommercialPricing",
     "subscription#setChannelListing",
     "subscription#setMembershipCommercialConfig",
+    "subscription#setMembershipEntitlementAdmission",
     "tenancy#listAuditRecords",
     "transport#applyTransportNetworkImport",
     "transport#createTransportPassType",
@@ -7927,12 +7977,13 @@
   },
   "AM-SUBSCRIPTION-LICENSING-P08": {
    "screens": [
-    "BO-284",
     "BO-285",
     "BO-286",
     "BO-287",
     "BO-289",
     "BO-290",
+    "BO-292",
+    "BO-293",
     "BO-949",
     "PTR-026",
     "PTR-029",
@@ -7953,13 +8004,13 @@
     "subscription#actOnPartnerReconciliationException",
     "subscription#actOnPartnerSettlementBatch",
     "subscription#approveMembershipProductValidation",
+    "subscription#getMembershipProductValidation",
     "subscription#listCommercialAllocationQuota",
     "subscription#listCommissionCalculationSettlement",
     "subscription#listCommissionMarginIncentive",
     "subscription#listCreditLimitExposure",
     "subscription#listDepositGuaranteeFinancial",
     "subscription#listMemberExceptionOverride",
-    "subscription#listMembershipAnnualPass",
     "subscription#listMembershipUsageVisit",
     "subscription#listPartnerAccessRole",
     "subscription#listPartnerReconciliationException",
@@ -7974,13 +8025,12 @@
     "subscription#setPartnerCreditProfile",
     "subscription#setPartnerDistributionRights",
     "subscription#setPartnerSecurity",
+    "subscription#setRenewalAutoMembership",
     "subscription#setValidityActivationExpiry"
    ]
   },
   "AM-SUBSCRIPTION-LICENSING-P08-2": {
    "screens": [
-    "BO-292",
-    "BO-293",
     "BO-294",
     "BO-295",
     "BO-296",
@@ -7996,18 +8046,17 @@
     "BO-604",
     "BO-605",
     "BO-606",
-    "BO-607"
+    "BO-607",
+    "BO-608",
+    "BO-609",
+    "BO-610"
    ],
    "operations": [
-    "identity#createMfaChallenge",
     "identity#recordBenefitUsage",
-    "identity#verifyMfaChallenge",
     "orders#migrateMembership",
     "orders#renewMembership",
     "orders#resolveMembershipActivation",
-    "subscription#approveMembershipProductValidation",
     "subscription#getGoLiveReadiness",
-    "subscription#getMembershipProductValidation",
     "subscription#listMember",
     "subscription#listMemberLifecycleCase",
     "subscription#listMembershipActivationCredential",
@@ -8017,15 +8066,11 @@
     "subscription#listTenants",
     "subscription#listVisitAdmissionEntitlement",
     "subscription#runGoLiveValidation",
-    "subscription#setMemberMembershipAccount",
-    "subscription#setRenewalAutoMembership"
+    "subscription#setMemberMembershipAccount"
    ]
   },
   "AM-SUBSCRIPTION-LICENSING-P08-3": {
    "screens": [
-    "BO-608",
-    "BO-609",
-    "BO-610",
     "BO-611",
     "BO-612",
     "BO-613",
@@ -8034,6 +8079,17 @@
    "operations": [
     "subscription#getGoLiveReadiness",
     "subscription#runGoLiveValidation"
+   ]
+  },
+  "AM-SUBSCRIPTION-LICENSING-P08-BLOCK-A": {
+   "screens": [
+    "BO-284"
+   ],
+   "operations": [
+    "identity#createMfaChallenge",
+    "identity#verifyMfaChallenge",
+    "subscription#approveMembershipProductValidation",
+    "subscription#listMembershipAnnualPass"
    ]
   },
   "AM-SUBSCRIPTION-LICENSING-P09": {
@@ -8569,11 +8625,13 @@
     "catalogue#getAvailability",
     "catalogue#getMyMemberships",
     "catalogue#getPerformance",
+    "catalogue#getPlanBenefits",
     "catalogue#getProduct",
     "catalogue#getProductEligibilityRule",
     "catalogue#getWaitingRoomPosition",
     "catalogue#joinWaitlist",
     "catalogue#leaveWaitlist",
+    "catalogue#listMembershipBenefits",
     "catalogue#listPerformances",
     "catalogue#listProductCategories",
     "catalogue#listProductVariants",
@@ -8583,6 +8641,8 @@
     "orders#addCartLine",
     "orders#createCart",
     "orders#getCart",
+    "orders#removeCartLine",
+    "orders#updateCartLine",
     "promotions#evaluatePromotions",
     "queue#getWaitTimes",
     "resources#listProductStartTimes",
@@ -8969,7 +9029,6 @@
     "catalogue#listChannelAllocationRebalancing",
     "catalogue#listChannelExceptionIncident",
     "catalogue#listChannelSaleRule",
-    "catalogue#listChannelSaleSchedule",
     "catalogue#listCustomerEligibilityRule",
     "catalogue#listDynamicPricingPerformance",
     "catalogue#listInventoryCapacityChannel",
@@ -9000,11 +9059,12 @@
     "ADM-277",
     "ADM-365",
     "BO-1192",
-    "BO-288",
     "BO-298",
     "BO-301",
+    "BO-441",
     "BO-443",
     "BO-591",
+    "BO-694",
     "BO-913",
     "BO-914",
     "BO-915",
@@ -9029,30 +9089,28 @@
     "catalogue#listDemandBookingCurve",
     "catalogue#listDynamicPriceRules",
     "catalogue#listEntitlementTemplates",
+    "catalogue#listEvents",
     "catalogue#listGovernanceRiskMonitoring",
     "catalogue#listProducts",
+    "catalogue#listRulePriorityConflict",
     "catalogue#listSpaces",
     "catalogue#publishPricingEffectiveDate",
     "catalogue#reinstateEntitlement",
     "catalogue#setDynamicPriceRule",
     "catalogue#setEntitlementTemplateBlackoutDates",
     "catalogue#setEventResourcePlan",
-    "catalogue#setMembershipBenefit",
-    "catalogue#setPlanBenefits",
+    "catalogue#setRulePriorityConflict",
     "catalogue#suspendEntitlement",
     "catalogue#updateEntitlementTemplate",
     "orders#createMemberException",
     "promotions#listGovernanceRiskLaunch",
     "resources#bookResource",
     "subscription#listMemberExceptionOverride",
-    "subscription#listMembershipFreezeSuspension",
-    "subscription#setMembershipEntitlementAdmission"
+    "subscription#listMembershipFreezeSuspension"
    ]
   },
   "AM-TICKETING-P08-8": {
    "screens": [
-    "BO-441",
-    "BO-694",
     "BO-695",
     "BO-697",
     "BO-698",
@@ -9072,15 +9130,15 @@
     "BO-712",
     "BO-713",
     "BO-715",
-    "BO-717"
+    "BO-717",
+    "BO-719",
+    "BO-720"
    ],
    "operations": [
     "accreditation#listAccessProfiles",
     "catalogue#getEvent",
     "catalogue#getEventResourcePlan",
     "catalogue#listEventTypes",
-    "catalogue#listEvents",
-    "catalogue#listRulePriorityConflict",
     "catalogue#listSpaces",
     "catalogue#rescheduleEvent",
     "catalogue#setEventCapacityProfile",
@@ -9089,7 +9147,6 @@
     "catalogue#setEventResourcePlan",
     "catalogue#setEventSchedule",
     "catalogue#setEventType",
-    "catalogue#setRulePriorityConflict",
     "catalogue#setSpace",
     "workforce#listRotaAssignments"
    ]
@@ -9097,8 +9154,6 @@
   "AM-TICKETING-P08-9": {
    "screens": [
     "BO-601",
-    "BO-719",
-    "BO-720",
     "BO-721",
     "BO-722",
     "BO-723",
@@ -9108,13 +9163,11 @@
    ],
    "operations": [
     "catalogue#assignPerformanceMedia",
-    "catalogue#getEvent",
     "catalogue#getPerformance",
     "catalogue#listPerformanceTemplates",
     "catalogue#listPerformances",
     "catalogue#listPrices",
     "catalogue#publishChannelAvailability",
-    "catalogue#rescheduleEvent",
     "catalogue#setPerformanceTemplate",
     "catalogue#setPrepaidMinutePackage",
     "catalogue#setPrices",
@@ -9129,6 +9182,7 @@
     "catalogue#cancelPerformance",
     "catalogue#createEvent",
     "catalogue#createPerformances",
+    "catalogue#getAvailability",
     "catalogue#getEvent",
     "catalogue#getPerformance",
     "catalogue#listEvents",
@@ -9147,7 +9201,6 @@
    ],
    "operations": [
     "catalogue#listChannel",
-    "catalogue#listChannel2",
     "catalogue#listDynamicPricingStrategy",
     "catalogue#listRevenue",
     "catalogue#transitionDynamicPricingStrategy"

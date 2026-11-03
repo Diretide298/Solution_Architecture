@@ -94,6 +94,18 @@ OP_NAME = assign_sync.OP_NAME                   # plan name -> OpenProject name 
 _EXTRA = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
 # screen -> the decided sentence its tickets carry (block-a-extra-tasks.json `screenNotes`, CHG-RONEP-001, CHG-FXP-002)
 SCREEN_NOTES = (json.loads(_EXTRA.read_text(encoding="utf-8")).get("screenNotes") or {}) if _EXTRA.exists() else {}
+# **A ticket made on the server keeps what it was made with** (2 November 2026, CHG-R13PL-003): a hand-written task
+# with `made` (block-a-extra-tasks.json) records a ticket the lead made in OpenProject before the plan had it (the
+# twelve child tickets of ADAM CR-442 to CR-483, #37203 to #37215): its id is in pms-map.json, so it is never made
+# again, and its bundle row carries the parent, assignee, accountable, sprint, title and text it was made with, so
+# the push neither moves it under the plan's app-module, nor reassigns or re-sprints it, nor rewrites its text (its
+# pointer is its text as made, so the descriptions phase finds it the same). The plan still schedules it and orders
+# its waits. key -> made.
+# The plan's text of such a task may end in its done-when, which the ticket as made lacks ("**Done when (plan):**",
+# served by ADAM's pull): the pointer stops before it, so the ticket's text is not rewritten.
+MADE_DONE = "\n\n**Done when (plan):**"
+MADE = ({t["key"]: dict(t["made"], text=t["detail"].split(MADE_DONE)[0]) for t in json.loads(_EXTRA.read_text(encoding="utf-8")).get("tasks") or [] if t.get("made")}
+        if _EXTRA.exists() else {})
 
 
 def successors_op() -> dict:
@@ -302,11 +314,16 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release, held=None
             if design_:
                 head_, _, rest_ = design_.partition(": ")
                 carry.append(f"**{head_}:** {rest_}")
+        made = MADE.get(key) if key == base else None
+        if made:
+            parent, subject = made["parent"], made["subject"]
+            assignee = made.get("assignee") or None
+            n = made.get("sprint")
         tickets.append({
             "key": key, "type": typ, "type_id": push.TYPES[typ], "parent": parent or None,
             "subject": subject[:255], "priority_id": push.PRIORITY.get(r["wave"] or "2", 8),
             "sequence": int(r["sequence"]) if r["sequence"] else None,
-            "assignee": name(assignee), "responsible": name(accountable(r)),
+            "assignee": name(assignee), "responsible": name(made["accountable"] if made else accountable(r)),
             "sprint": n, "version_key": f"VERSION-S{n}" if n else None,
             "version": mp.get(f"VERSION-S{n}") if n else None, "set_version": task,
             "summary": summ, "builds": builds,
@@ -316,7 +333,7 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release, held=None
                                what=(r.get("description") or "") if (not builds or (typ != "Sub Task"
                                      and _done.listed_builds(r.get("description")))) else "",
                                done=done_when(r, part, builds) if typ != "Sub Task" or builds else "",
-                               carry=carry),
+                               carry=carry) if not made else made["text"],
             "hold": hold_note(held[base], release) if base in held else None})
 
     for r in rows:
@@ -550,8 +567,11 @@ def main() -> int:
     errors += op10_problems()
     errors += retire_note_errors(bundle["retire"], release, getattr(op_retire, "PER_RELEASE_NOTES", ()))
     # CHG-REL-003: every task a developer pulls says what finishes it
+    # a ticket made on the server keeps its text as made (CHG-R13PL-003): its done-when is the plan's, in ADAM's pull
+    row_desc = {r["key"]: r.get("description") or "" for r in rows}
     errors += [f"{t['key']}: its pointer has no done-when" for t in bundle["tickets"]
-               if t["type"] == "Task" and "**Done when:**" not in t["pointer"]]
+               if t["type"] == "Task" and "**Done when:**" not in t["pointer"]
+               and not (t["key"] in MADE and "Done when (plan):" in row_desc.get(t["key"], ""))]
     if not a.no_key_check:
         ks = _load("check_key_stability", "check-key-stability.py")
         if hasattr(ks, "retired_keys"):      # the 1C version (1 October): a rename of a pushed key blocks too

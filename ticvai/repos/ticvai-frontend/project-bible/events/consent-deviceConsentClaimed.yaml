@@ -7,6 +7,8 @@ publisher: marketing
 description: A browser's cookie decision was attached to the guest who signed in or registered on it, and the guest's consent became the narrower of the two per category.
 aggregate: deviceConsent
 emittedWhen: claimDeviceConsent succeeds for the first time for a key (a repeat claim by the same subject publishes nothing)
+emittedBy:
+- marketing-crm.claimDeviceConsent
 payload:
 - field: deviceConsentId
   type: uuid

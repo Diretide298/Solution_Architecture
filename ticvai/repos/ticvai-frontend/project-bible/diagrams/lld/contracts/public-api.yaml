@@ -233,8 +233,10 @@ operations:
   permission: DEVELOPER_VIEW
   audience:
   - staff
+  - partner
   offline: false
   reads:
+  - control.developer_account
   - control.developer_member
   writes: []
 - operation: listIntegrationListings
@@ -247,6 +249,7 @@ operations:
   - partner
   offline: false
   reads:
+  - control.developer_member
   - control.integration_listing
   writes: []
 - operation: listMarketplaceListings
@@ -270,6 +273,7 @@ operations:
   - partner
   offline: false
   reads:
+  - control.developer_member
   - control.production_access_request
   writes: []
 - operation: listSandboxes
@@ -362,6 +366,7 @@ operations:
   - cache:idempotency
   - control.api_client
   - control.developer_account
+  - control.developer_member
   - control.integration_listing
   - control.production_access_request
   writes:

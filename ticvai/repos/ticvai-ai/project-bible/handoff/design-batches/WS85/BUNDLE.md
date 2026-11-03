@@ -366,8 +366,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/live-gameplay-transaction-monitor-bo-465` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The live feed of every gameplay tap across the venue's readers, as it happens: who tapped which reader, what it cost, what paid for it, and whether it was approved. Supervisors watch it during peaks and open a single tap to investigate a complaint. The one thing to get right: a readable live feed (new rows arrive at the top without moving what the user is reading) with a detail drawer that shows the money before and after.
 
 **Known correction pending (do not draw the wrong version)**
@@ -909,8 +907,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/rejected-transaction-reason-analysis-bo-468` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Every refused tap in one place, and why: so operations can tell whether a spike comes from guests (balance, expired cards), from configuration (no price, game not in the package) or from technology (reader offline). The one thing to get right: reasons are grouped by origin (Guest, Configuration, Technical), because that grouping tells the user who has to act.
 

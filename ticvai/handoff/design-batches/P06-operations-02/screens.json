@@ -28,7 +28,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-014 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-014 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -42,7 +42,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
@@ -389,7 +389,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-015 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-015 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -399,11 +399,11 @@
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-015 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-015 holds none of them. The edge carries nothing: EMP-003 finds incidentId (listIncidents) itself, and EMP-003 opens on its own"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act",
@@ -755,7 +755,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-017 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-017 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -770,7 +770,7 @@
     {
      "to": "EMP-018",
      "trigger": "Offline package",
-     "provenance": "derived — EMP-018 declares entryState.params version and EMP-017 holds none of them. The edge carries nothing: version only pre-selects (deep link or optional), and EMP-018 opens on its own"
+     "provenance": "derived — EMP-018 declares entryState.params version and EMP-017 holds none of them. The edge carries nothing: version only pre-selects (optional), and EMP-018 opens on its own"
     },
     {
      "to": "EMP-009",
@@ -779,7 +779,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listSyncRejections` reads the population and `getOfflinePackage` reads one of them — list, select, act",
@@ -1148,7 +1148,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-018 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-018 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1158,11 +1158,11 @@
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-018 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-018 holds none of them. The edge carries nothing: EMP-003 finds incidentId (listIncidents) itself, and EMP-003 opens on its own"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: publishBundle. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
+  "notes": "Definition derived from the wireframe board on 14 August. **Removed 24 August**: publishBundle. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listCatalogueBundles` reads the population and `getLatestBundle` reads one of them — list, select, act",
@@ -1364,7 +1364,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-019 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-019 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1387,7 +1387,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. Pulled to Wave 1 (CF-101). CF-57: the client named AI configuration assistance as a Wave 1 priority, and F20 is Wave 1.",
+  "notes": "Definition derived from the wireframe board on 14 August. Pulled to Wave 1 (CF-101). CF-57: the client named AI configuration assistance as a Wave 1 priority, and F20 is Wave 1.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listAiConversations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1608,7 +1608,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-020 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-020 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1618,7 +1618,7 @@
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-020 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-020 holds none of them. The edge carries nothing: EMP-003 finds incidentId (listIncidents) itself, and EMP-003 opens on its own"
     },
     {
      "to": "BO-058",
@@ -1633,7 +1633,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. Pulled to Wave 1 (CF-101) with EMP-019 — **the question and the answer are one screen pair** and splitting them across waves ships half a feature. **Cross-platform navigation removed 24 August**: BO-058. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "notes": "Definition derived from the wireframe board on 14 August. Pulled to Wave 1 (CF-101) with EMP-019 — **the question and the answer are one screen pair** and splitting them across waves ships half a feature. **Cross-platform navigation removed 24 August**: BO-058. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listAiConversations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1885,7 +1885,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-021 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-021 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1908,7 +1908,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**",
+  "notes": "Definition derived from the wireframe board on 14 August. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -2119,7 +2119,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-022 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-022 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2142,7 +2142,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
+  "notes": "Definition derived from the wireframe board on 14 August. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listRotaAssignments` reads the population and `getCurrentShift` reads one of them — list, select, act",
@@ -2364,7 +2364,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-023 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-023 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2374,11 +2374,11 @@
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-023 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and EMP-003 opens on its own"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-023 holds none of them. The edge carries nothing: EMP-003 finds incidentId (listIncidents) itself, and EMP-003 opens on its own"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
+  "notes": "Definition derived from the wireframe board on 14 August. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -2604,7 +2604,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-024 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-024 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2626,7 +2626,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists",

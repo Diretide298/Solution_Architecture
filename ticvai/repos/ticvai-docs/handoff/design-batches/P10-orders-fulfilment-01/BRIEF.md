@@ -1,6 +1,6 @@
 # P10-orders-fulfilment-01 — P10 · Orders & Fulfilment
 
-**2 screens · 11 operations · 18 schemas · 6 permissions**
+**2 screens · 11 operations · 19 schemas · 6 permissions**
 
 Platform P10 Partner Web · ships as **partner-web** ·
 partner audience · web ·
@@ -94,8 +94,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-015` | Order History | C | 114 | 39 | 6 | 66 | 0 | 0 | — | notStarted (generated) |
-| `PTR-016` | Voucher / Ticket Download | C | 5 | 36 | 6 | 27 | 2 | 2 | — | notStarted (generated) |
+| `PTR-015` | Order History | C | 115 | 39 | 6 | 66 | 0 | 0 | — | notStarted (generated) |
+| `PTR-016` | Voucher / Ticket Download | C | 6 | 36 | 6 | 27 | 2 | 2 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

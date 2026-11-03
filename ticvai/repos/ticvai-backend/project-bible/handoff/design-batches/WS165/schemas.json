@@ -727,7 +727,7 @@
    "scopePath": {
     "type": "string",
     "readOnly": true,
-    "description": "**The region the template is saved at** (ADR-0005; ADAM CR-403). Row security is read-beneath, so the venues under that region read the template."
+    "description": "**The region the template is saved at** (ADR-0005; ADAM CR-403). Row security is read-beneath, so the venues under that region read the template. **NOT NULL** (ADAM CR-461, decided by Chinmay on 2 November 2026), with `structure`: see `structure` for the migration."
    },
    "sourceSeatMapId": {
     "type": "string",
@@ -735,14 +735,14 @@
     "readOnly": true,
     "nullable": true,
     "x-ticvai-references": "seating.seat_map",
-    "description": "The map the template was copied from, for lineage only (ADAM CR-403)."
+    "description": "The map the template was copied from, for lineage only (ADAM CR-403). Its foreign key takes no ON DELETE action (ADAM CR-461): no operation deletes a seat map, so SET NULL would never fire."
    },
    "structure": {
     "readOnly": true,
     "x-ticvai-persistence-column": "jsonb",
     "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
-    "description": "The copied structure (ADAM CR-403): the sections, each with its rows and their seats, as they were on the source map when the template was saved. View photos are not kept.",
+    "description": "The copied structure (ADAM CR-403): the sections, each with its rows and their seats, as they were on the source map when the template was saved. View photos are not kept.\n\n**`structure` jsonb and `scope_path` ltree are NOT NULL** (ADAM CR-461, decided by Chinmay on 2 November 2026: the contract requires both, and handoff/migration-review.md lists the NOT NULL for a person to write, because a derived forward file never adds one). No database holds a template yet, so the migration that first creates the table creates both columns NOT NULL. If that migration has already run without them, a guarded forward migration adds them: fill `scope_path` from `region_id` first, as migration-review.md gives, and stop with the row count if any row has no structure. A database check that reports these two columns NOT NULL against a nullable statement is the difference migration-review.md lists, not a fault.",
     "items": {
      "type": "object",
      "required": [
@@ -890,7 +890,7 @@
     "format": "uuid",
     "readOnly": true,
     "x-ticvai-references": "seating.seat_map",
-    "description": "**The map the section belongs to** (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into: createSeatMap, editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, and the imports when committed. A map's codes are unique on it, matched exactly (`section_seat_map_id_code_uniq`)."
+    "description": "**The map the section belongs to** (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into: createSeatMap, editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, and the imports when committed. A map's codes are unique on it, matched exactly (`section_seat_map_id_code_uniq`).\n\n**NOT NULL, in one guarded forward migration** (ADAM CR-470, decided by Chinmay on 2 November 2026, as CR-402 decided: the contract requires it and handoff/migration-review.md lists it; the derived file leaves it nullable only because a derived file never adds NOT NULL). In this order: (1) if the table holds any row, stop with an error giving the count and tell the lead; (2) `ADD COLUMN IF NOT EXISTS seat_map_id uuid`, then `SET NOT NULL`; (3) `section_seat_map_id_fkey` to `seating.seat_map(id)`; (4) the plain index `section_seat_map_id_idx` on (`seat_map_id`); (5) the unique index `section_seat_map_id_code_uniq` on (`seat_map_id`, `code`), the code matched exactly. Row security is unchanged. A database check that reports the column NOT NULL against the nullable statement is the difference migration-review.md lists, not a fault."
    },
    "code": {
     "type": "string",

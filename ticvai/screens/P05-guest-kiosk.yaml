@@ -100,9 +100,10 @@ screens:
       back: false
       carries:
       - kioskConfigId
-  notes: Definition derived from the wireframe board on 14 August. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it
-    — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
-    existed in the schema and five platforms used none, so every screen in them read as unreachable.
+  notes: Definition derived from the wireframe board on 14 August. **The attract loop is the entry.**
+    A kiosk has no login and nobody navigates to it — it is what the screen shows when nobody is standing
+    there. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none,
+    so every screen in them read as unreachable.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-001
@@ -223,8 +224,8 @@ screens:
     - to: KSK-004
       trigger: Choose tickets
       provenance: 'derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and KSK-004 opens
-        on its own'
+        The edge carries nothing: KSK-004 opens on getAvailability, and productId has no source on KSK-004
+        yet (a gap in KSK-004, not in this edge)'
   notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
@@ -336,14 +337,12 @@ screens:
       operation: listProducts
     - to: KSK-011
       trigger: Collect a booking
-      provenance: 'derived — KSK-011 declares entryState.params orderId and KSK-003 holds none of them.
-        The edge carries nothing: orderId only pre-selects (deep link or optional), and KSK-011 opens
-        on its own'
+      provenance: derived — KSK-011 declares entryState.params orderId and KSK-003 holds none of them,
+        so the edge carries nothing and KSK-011 opens cold
     - to: KSK-016
       trigger: Order Food
-      provenance: 'derived — KSK-016 declares entryState.params outletId and KSK-003 holds none of them.
-        The edge carries nothing: outletId only pre-selects (deep link or optional), and KSK-016 opens
-        on its own'
+      provenance: derived — KSK-016 declares entryState.params outletId and KSK-003 holds none of them,
+        so the edge carries nothing and KSK-016 opens cold
     - to: KSK-004
       trigger: Chooses tickets and quantities
       provenance: flow F07 step 3→4
@@ -784,12 +783,12 @@ screens:
       operation: createPayment
       carries:
       - orderId
-  notes: 'Definition derived from the wireframe board on 14 August. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
-    reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency
-    is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk
-    accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency
-    conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme''s
-    rather than ours.
+  notes: 'Definition derived from the wireframe board on 14 August. **Card only. No foreign cash** — a
+    kiosk accepting foreign notes needs a note reader and a per-currency float, and neither is specified.
+    A guest paying by card in a foreign currency is converted by their own issuer, which is not our rate.
+    **Card only. No foreign cash** — a kiosk accepting notes needs a note reader and a per-currency float,
+    and neither is specified. Dynamic currency conversion by the terminal is recorded as `fxRateSource:
+    cardScheme`, because that rate is the scheme''s rather than ours.
 
 
     **The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses
@@ -1397,10 +1396,10 @@ screens:
     inferred: true
     entryFrom:
     - KSK-009
-  notes: Definition derived from the wireframe board on 14 August. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk, not
-    by the guest — **the guest presses a button and the device raises the call**, which is why the operation
-    authenticates as a device and authorises nothing. A guest cannot end an assist session they did not
-    start.
+  notes: Definition derived from the wireframe board on 14 August. **Device audience on a guest surface.**
+    `endKioskAssist` is called by the kiosk, not by the guest — **the guest presses a button and the device
+    raises the call**, which is why the operation authenticates as a device and authorises nothing. A
+    guest cannot end an assist session they did not start.
   density: touchLarge
   audience: device
   boardFrames:

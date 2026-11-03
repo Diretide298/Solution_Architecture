@@ -32,7 +32,7 @@
 | [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 6 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 6 |
-| [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 7 |
+| [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 8 |
 | [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 12 |
 | [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 8 |
 | [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 1 | 5 |
@@ -49,7 +49,7 @@
 | [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 9 |
 | [WEB-020](#web-020-profile-preferences) | Profile & Preferences | Account & Self-Service | 1 | 7 |
 | [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 9 |
-| [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 1 | 3 |
+| [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 1 | 12 |
 | [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 1 | 6 |
 | [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 15 |
 | [WEB-025](#web-025-help-centre-faq) | Help Centre / FAQ | Engagement & Support | 1 | 5 |
@@ -346,6 +346,7 @@
 | Parameter | From |
 |---|---|
 | productId | WEB-004 |
+| performanceId | WEB-006 |
 | venueId | session |
 | cartId | navigation |
 
@@ -359,7 +360,8 @@
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The tickets of a category or level (`categoryId`, `segmentTag`) | `PRODUCT_VIEW` |
 | `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | The venue's published Help me choose (404 = none) | `None` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Continue adds the chosen tickets to the cart | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Continue adds the chosen tickets to the cart, each line with performanceId when the screen holds one | `None` |
+| `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | The performance picked on WEB-006, read on load when performanceId is present (guest token optional): the basket's Date of visit row; a 404, or a performance no longer on sale, drops the value and sends the guest back to WEB-006 (ADAM CR-503) | `PRODUCT_VIEW` |
 
 **States**
 
@@ -377,11 +379,12 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-006 | Change date or time (the dated flow picks them first) | eventId |  |
-| WEB-007 | Interactive Seat Selection | eventId, productId |  |
+| WEB-007 | Interactive Seat Selection | eventId, performanceId, productId |  |
 | WEB-008 | Add-ons & Upsell | bundleId |  |
 | WEB-010 | Shopping Cart | cartId, code, lineId, performanceId |  |
 | WEB-016 | Continue, when sign-in is asked after add-ons and this booking has no add-ons step | cartId |  |
 | WEB-006 | Workshop chosen, then date and time (product-first flow) | productId |  |
+| WEB-006 | The time picked is no longer available (getPerformance 404, or no longer on sale); pick another | eventId |  |
 
 ## WEB-006 Date & Performance Selection
 
@@ -510,7 +513,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-005 | Ticket Type Selection | productId |  |
+| WEB-005 | Ticket Type Selection | performanceId, productId |  |
 | WEB-008 | Add-ons & Upsell |  |  |
 | WEB-006 | Date & Performance Selection | eventId, performanceId, productId |  |
 | WEB-010 | Reviews the cart | holdId, holdIds, performanceId |  |
@@ -566,7 +569,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-005 | Ticket Type Selection | cartId |  |
+| WEB-005 | Ticket Type Selection | cartId, performanceId |  |
 | WEB-006 | Date & Performance Selection | cartId, performanceId |  |
 | WEB-010 | Shopping Cart | cartId, lineId, performanceId |  |
 | WEB-016 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
@@ -863,7 +866,7 @@
 | WEB-010 | Shopping Cart | lineId, performanceId |  |
 | WEB-011 | Guest Details & Attendee Forms |  |  |
 | WEB-012 | Checkout — Payment | orderId, paymentId |  |
-| WEB-018 | My Tickets | orderId |  |
+| WEB-018 | My Tickets | entitlementId, orderId |  |
 | WEB-014 | Pay for a Booking |  |  |
 
 ## WEB-014 Pay for a Booking
@@ -1326,7 +1329,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-022 | Membership Plans |  |  |
+| WEB-022 | Membership Plans | productId |  |
 | WEB-023 | Membership Management | orderId |  |
 | WEB-024 | Devices, Wishlist & Consent |  |  |
 
@@ -1354,14 +1357,27 @@
 | Parameter | From |
 |---|---|
 | productId | WEB-001 |
+| cartId | navigation |
+| lineId | navigation |
+| templateId | navigation |
+| venueId | session |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `getProduct` | [CatalogueService](../backend/CatalogueService.md#getproduct) | onLoad | Read a product | `PRODUCT_VIEW` |
-| `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `PRODUCT_VIEW` |
+| `getProduct` | [CatalogueService](../backend/CatalogueService.md#getproduct) | background | Arriving with productId selects that plan's card (ADAM CR-482). No component of its own: what it finds selects a card. | `PRODUCT_VIEW` |
+| `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)); marks a plan they already hold on its card (ADAM CR-482). | `PRODUCT_VIEW` |
+| `getPlanBenefits` | [CatalogueService](../backend/CatalogueService.md#getplanbenefits) | onLoad | What each plan on the page gives, by the product's entitlementTemplateId (ADAM CR-482) | `PRODUCT_VIEW` |
+| `listMembershipBenefits` | [CatalogueService](../backend/CatalogueService.md#listmembershipbenefits) | onLoad | The benefits' names in What you get (ADAM CR-482) | `PRODUCT_VIEW` |
+| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | background | The plan's variant, the one Choose adds (ADAM CR-482). No component of its own: the runtime reads it behind Choose. | `PRODUCT_VIEW` |
+| `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started the first time a plan is chosen when the guest has no cart, before the first addCartLine; never a button or a form (ADAM CR-482) | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Choose <plan> puts the plan's variant in the basket, quantity 1 (ADAM CR-482) | `None` |
+| `updateCartLine` | [OrderService](../backend/OrderService.md#updatecartline) | onAction | Choosing a plan already in the basket raises its quantity (ADAM CR-482) | `None` |
+| `removeCartLine` | [OrderService](../backend/OrderService.md#removecartline) | onAction | Takes a plan out of the basket (ADAM CR-482) | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | background | The basket in the right panel: membership lines, subtotal, VAT (taxTotal) and total (ADAM CR-482), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045); a visitor with no cart reads none and sees the empty basket | `None` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onAction | The venue's membership booking flow, for Continue: the step after the plan (ADAM CR-482) | `None` |
 
 **States**
 
@@ -1369,7 +1385,7 @@
 |---|---|---|
 | loading | The membership plans list. | the turnstile loader, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms) |
 | error | Could not load. Names which read failed and leaves the membership plans untouched. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
-| emptyFirstRun | No membership plans yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
+| emptyFirstRun | No membership plans on sale at this venue yet, said in words rather than empty cards; with nothing to choose, the basket stays empty and Continue stays off (ADAM CR-482). | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
 | emptyNoResults | Never shown: the plans are the venue's membership products, with no filter a guest sets. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
@@ -1378,6 +1394,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
+| WEB-011 | Continue |  | The basket holds at least one membership line (`getCart`); until then Continue stays off and the panel reads 'Add at least one membership to continue' |
 | WEB-021 | Wallet & Gift Cards |  |  |
 | WEB-023 | Membership Management |  |  |
 | WEB-024 | Devices, Wishlist & Consent |  |  |
@@ -2043,7 +2060,7 @@
 | Suggested location | `src/routes/MulticurrencyPricing.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Layout pattern | listDetail (structure only, not the look) |
 
-**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Discover → 'Prices in your currency'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-035`, which adam_pull writes into the ticket folder as `wireframe-web-035.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Discover → 'Prices in your currency' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-035`, which adam_pull writes into the ticket folder as `wireframe-web-035.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 

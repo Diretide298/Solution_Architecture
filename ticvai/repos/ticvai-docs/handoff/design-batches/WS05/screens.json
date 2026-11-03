@@ -629,13 +629,7 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-186"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 59. 0 of 0 labels bound to a contract property; 8 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the Face Pass enrolment configuration (setFacePassEnrollment has no get).",
-    "source": "contracts/spine/access.yaml#setFacePassEnrollment"
-   }
-  ],
+  "gaps": [],
   "overlays": [
    {
     "id": "formSetFacePassEnrollment",

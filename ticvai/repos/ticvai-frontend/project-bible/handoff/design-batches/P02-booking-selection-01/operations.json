@@ -353,6 +353,11 @@
     "name": "flowTypeKey",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -541,6 +546,11 @@
    },
    {
     "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
     "in": "query",
     "required": false
    },

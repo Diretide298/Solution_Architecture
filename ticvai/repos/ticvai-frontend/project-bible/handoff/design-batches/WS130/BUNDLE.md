@@ -639,8 +639,6 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Opens with | `eventId` (navigation) |
 | Route | `/sell/contractor-external-workforce-configuration-bo-713` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** External contractors and their staff an event relies on (security, AV, catering), recorded in the event's resource plan with what they supply.
 
 **Fixed on main** (the package already carries these; draw what it says): The purpose describes sponsors and sponsorship agreements, not contractors. (CHG-WIR-026); No read operation: the screen declares only setEventResourcePlan and nothing that returns the current configuration. (CHG-WIR-025).
@@ -781,8 +779,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `shiftTemplateId` (navigation) |
 | Route | `/sell/event-shift-roster-configuration-bo-714` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Event shift and roster configuration (Event Management board 6, screen 6): for one event and its occurrences, define the shifts the event needs (Setup, Pre-opening, Event, Closing), the roles and headcount each needs, and assign people, then see uncovered positions and overlapping shifts before the roster is published. The one thing to get right: it is a visual shift and roster schedule for an event (by role, person, location and time) built on the shared workforce rota, not a second staff master and not the AI event-creation screen its source currently points at.
 
@@ -1032,8 +1028,6 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Offline | online only |
 | Opens with | `eventId` (navigation) |
 | Route | `/sell/resource-location-deployment-configuration-bo-715` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Where each resource of an event is deployed (which space, gate or zone) and when, part of the event's resource plan.
 

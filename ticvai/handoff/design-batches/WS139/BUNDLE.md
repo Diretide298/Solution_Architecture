@@ -368,7 +368,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `journeyId` (navigation) |
 | Route | `/engagement-support/visual-journey-builder-bo-775` |
 
-**Known gaps.** **Visual Journey Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The visual canvas for multi-step journeys: trigger, audience, decision, wait, message, offer, case, task, webhook and goal nodes, with branches and validation. The canvas renders the journey graph the contract holds. A journey is a draft until activated, and pausing keeps guests where they are.
 

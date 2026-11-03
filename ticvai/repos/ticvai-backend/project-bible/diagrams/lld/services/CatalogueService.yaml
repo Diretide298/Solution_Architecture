@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 470 operations, 144 tables
+title: CatalogueService — 470 operations, 145 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -23,10 +23,10 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: catalogue
-  tables: 88
+  tables: 89
   stores:
   - postgres
-  largestTable: catalogue.channel_sales_rule
+  largestTable: catalogue.product
 - schema: pricing
   tables: 3
   stores:
@@ -108,8 +108,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 7
+    writes: 5
   - operation: bulkUpdateCatalogueProducts
     verb: POST
     path: /products/bulk-update
@@ -164,16 +164,16 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 4
-    writes: 4
+    reads: 5
+    writes: 5
   - operation: commitCatalogueImport
     verb: POST
     path: /products/import/{jobId}/commit
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 4
+    reads: 3
+    writes: 7
   - operation: convertInventoryHold
     verb: POST
     path: /inventory-holds/{inventoryHoldId}/convert
@@ -420,7 +420,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getPackagePricingDefinition
     verb: GET
@@ -516,7 +516,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: getWaitingRoomPosition
     verb: GET
@@ -541,7 +541,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: joinWaitlist
     verb: POST
     path: /waitlist-entries
@@ -900,7 +900,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 3
+    reads: 5
     writes: 0
   - operation: listInternalDemandBooking
     verb: GET
@@ -1156,7 +1156,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listProductAttentionItems
     verb: GET
@@ -1412,7 +1412,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listTimeslotPerformanceTime
     verb: GET
@@ -1572,7 +1572,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 6
+    reads: 8
     writes: 0
   - operation: setAlternativeCodes
     verb: PUT
@@ -2076,7 +2076,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 20
+    reads: 21
     writes: 1
   - operation: submitPricingChangeRequest
     verb: POST
@@ -4523,9 +4523,16 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.import_job
-  columns: 26
+  columns: 29
   store: postgres
   parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.import_job_row
+  columns: 11
+  store: postgres
+  parent: catalogue.import_job
   writtenBy:
   - catalogue
   foreignWriters: null
@@ -4617,6 +4624,7 @@ tables:
   store: postgres
   parent: null
   writtenBy:
+  - catalogue
   - inventory
   foreignWriters:
   - inventory
@@ -4726,7 +4734,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product
-  columns: 49
+  columns: 52
   store: postgres
   parent: null
   writtenBy:
@@ -4875,7 +4883,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.variant
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -5301,7 +5309,7 @@ readsFrom:
 - service: AccessService
   operations: 10
 - service: MarketingService
-  operations: 10
+  operations: 9
 - service: WhiteLabelService
   operations: 5
 - service: TenancyService

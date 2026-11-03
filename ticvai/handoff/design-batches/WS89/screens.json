@@ -1487,11 +1487,6 @@
   "purpose": "Use operational data and AI to improve rental inventory distribution and utilization. This is one of the areas where TICVAI should go beyond the original matrix.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Rental_Management.pdf, page 24 §Display"
-   },
-   {
     "operation": "getSuggestedRequisitions",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-008): Reorder suggestions buy stock; rebalancing moves rental units between stations (R254; design-notes correction fnb-retail BO-513).",

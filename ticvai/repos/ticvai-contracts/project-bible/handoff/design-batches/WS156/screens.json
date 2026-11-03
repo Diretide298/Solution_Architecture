@@ -1477,13 +1477,7 @@
   "patternReason": "the pack gives this screen a display directory (§The screen shall display) and no metric row",
   "purpose": "Allow operations teams to manage shared resources across multiple simultaneous events, experiences and operational activities.",
   "purposeNote": "Operations teams can understand resource demand across parallel events and identify shortages or allocation conflicts before operations begin.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 29 §The screen shall display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

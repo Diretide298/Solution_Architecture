@@ -145,8 +145,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Digital and alternative payment journeys: conversion and drop-off.
 
 **Known correction pending (do not draw the wrong version)**
@@ -326,7 +324,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods through … **Digital & Alternative Payment Method Manager\t71 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods through … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Digital payment methods available through TICVAI.
 
@@ -608,7 +606,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Payment Link Builder & Configuration\t73 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either … Contract gap recorded 2 October 2026 (CHG-WIR-027): No staff read of payment links (getPaymentLink is guest/anonymous by token; there is no list).
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No staff read of payment links (getPaymentLink is guest/anonymous by token; there is no list).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Generate a payment link for a booking taken without the guest present, with expiry and automatic release of unpaid bookings.
 
@@ -741,7 +739,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Payment Link Distribution & Customer Journey Manager\t74 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How a payment link is delivered and its life (sent, opened, paid, expired); a resend retires the old link.
 
@@ -907,7 +905,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Hosted checkout, External payment authorization. Each needs an operation, or needs removing from the … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the hosted checkout configuration (setHostedCheckoutConfiguration has no get).
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Hosted checkout, External payment authorization. Each needs an operation, or needs removing from the screen … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the hosted checkout configuration (setHostedCheckoutConfiguration has no get).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Hosted checkout, redirect and the journey back; the return leg is where it goes wrong.
 
@@ -1041,7 +1039,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment sessions and their state.
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment sessions and their state.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Digital payment sessions in real time and recovery of uncertain ones.
 
@@ -1195,7 +1193,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: 3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the payment authentication policy (setPaymentAuthenticationPolicy has no get).
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: 3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each needs an … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the payment authentication policy (setPaymentAuthenticationPolicy has no get).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** 3-D Secure, tokenisation and recurring mandates without TICVAI becoming a card vault.
 
@@ -1343,7 +1341,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment exceptions (failed, abandoned, expired sessions).
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment exceptions (failed, abandoned, expired sessions).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Incomplete or abnormal digital payments and their recovery.
 

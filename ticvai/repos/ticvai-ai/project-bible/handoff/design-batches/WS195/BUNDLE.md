@@ -163,7 +163,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `clientId` (navigation), `subscriptionId` (navigation) |
 | Route | `/orders-money/wallet-integration-command-center-bo-1173` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-021): createApiClient and setApiClientStatus on the tenant's wallet integration screen, as BO-067: API clients are issued and suspended in the developer programme, not … Removed 2 October 2026 (CHG-WIR-021): createApiClient and setApiClientStatus on the tenant's wallet integration screen, as BO-067: API clients are issued and suspended in the developer programme, not …
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-021): createApiClient and setApiClientStatus on the tenant's wallet integration screen, as BO-067: API clients are issued and suspended in the developer programme, not … Removed 2 October 2026 (CHG-WIR-021): createApiClient and setApiClientStatus on the tenant's wallet integration screen, as BO-067: API clients are issued and suspended in the developer programme, not …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** All wallet integrations and API activity with health per integration.
 
@@ -192,7 +192,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | — | `publishWalletConfiguration` body |
+| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | What the call does, not a fact about the version: `publish` writes the version and its snapshots, `validateOnly` writes nothing. | `publishWalletConfiguration` body |
 | Note `note` | text area | optional | — | — | — | — | `publishWalletConfiguration` body |
 
 **Sent by *Test Connection*** (`testWebhookSubscription`; no form is declared, so these are filled from the screen or collected inline)
@@ -1206,8 +1206,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `clientId` (navigation), `disputeId` (navigation), `subscriptionId` (navigation) |
 | Route | `/orders-money/integration-monitoring-exception-workbench-bo-1179` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Failed integrations worked to resolution: reprocess, replay events, pause a client, resolve the exception.
 
 **Known correction pending (do not draw the wrong version)**
@@ -1430,8 +1428,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-configuration-governance-version-control-bo-1180` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Governance of configuration changes across all wallet boards: versions, publication.
 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only publishWalletConfiguration and nothing that returns the current configuration. (CHG-WIR-025).
@@ -1442,7 +1438,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | — | `publishWalletConfiguration` body |
+| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | What the call does, not a fact about the version: `publish` writes the version and its snapshots, `validateOnly` writes nothing. | `publishWalletConfiguration` body |
 | Note `note` | text area | optional | — | — | — | — | `publishWalletConfiguration` body |
 
 #### Outputs: what the screen shows and produces
@@ -1619,7 +1615,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | — | `publishWalletConfiguration` body |
+| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | What the call does, not a fact about the version: `publish` writes the version and its snapshots, `validateOnly` writes nothing. | `publishWalletConfiguration` body |
 | Note `note` | text area | optional | — | — | — | — | `publishWalletConfiguration` body |
 
 #### Outputs: what the screen shows and produces
@@ -1782,8 +1778,6 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-platform-health-audit-administration-center-bo-1182` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The control tower for the wallet module: health, liability, open exceptions, configuration status.
 

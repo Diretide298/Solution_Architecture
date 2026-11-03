@@ -114,13 +114,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Each report shall display) and no metric row",
   "purpose": "Provide a centralized repository containing all TICVAI standard, custom, scheduled and AI-generated reports.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report shall display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -285,13 +279,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Select one or multiple domains) and no display directory — it is settings, not a population",
   "purpose": "Guide users through creation of a new report without requiring technical knowledge. Step 1 — Report Information",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Report Creation Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -444,13 +432,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow users to select approved TICVAI data sources for reporting.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 29 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -601,7 +583,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Reorder columns, Rename display labels, Set width, Configure formatting. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Reorder columns, Rename display labels, Set width, Configure formatting. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30 §Users can"
    },
    {
@@ -736,11 +718,6 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow report creators to define which records are included.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Filter & Parameter Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -888,13 +865,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Period-over-Period Change. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Period-over-Period Change. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 32 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**Grouping, Aggregation & Calculation Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    },
    {
     "operation": null,
@@ -1051,11 +1023,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**Cross-Domain Report Composer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 34"
    },
@@ -1198,13 +1165,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**Report Layout & Formatting Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    }
   ],
   "layout": {
@@ -1374,13 +1336,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow users to verify report accuracy before saving or publishing it.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 36 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1552,13 +1508,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display; Dashboard Designer Report Builder) and a per-row directory (§KPI cards/charts Rows, columns, matrices) — counts over a population, then the population",
   "purpose": "Provide the final operational interface for executing and consuming reports.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §KPI cards/charts Rows, columns, matrices"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [

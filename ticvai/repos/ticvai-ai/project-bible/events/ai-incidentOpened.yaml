@@ -7,6 +7,9 @@ publisher: ai
 description: An AI governance incident was opened.
 aggregate: aiIncident
 emittedWhen: AiIncident created in open (openAiIncident, or decideAiGovernanceAlert with openIncident)
+emittedBy:
+- ai.openAiIncident
+- ai.decideAiGovernanceAlert
 payload:
 - field: tenantId
   type: uuid
@@ -33,11 +36,6 @@ consumers:
   isCritical: true
 - context: platform-ops
   purpose: Link to the operational incident where both apply (AIC-250)
-  idempotencyKey: incidentId
-  onFailure: retry
-  isCritical: false
-- context: reporting
-  purpose: Governance analytics
   idempotencyKey: incidentId
   onFailure: retry
   isCritical: false

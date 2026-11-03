@@ -168,7 +168,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `subjectId` (navigation) |
 | Route | `/games-rides/wallet-credit-management-dashboard-bo-414` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A wallet operations dashboard read of aggregates across wallets (getWallet reads one guest wallet).
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A wallet operations dashboard read of aggregates across wallets (getWallet reads one guest wallet).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet balances, credit issuance, bonus use, free-game credits and top-ups across the games operation.
 

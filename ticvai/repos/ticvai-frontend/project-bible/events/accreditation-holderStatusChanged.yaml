@@ -67,11 +67,6 @@ consumers:
   idempotencyKey: holderId + changedAt
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Accreditation KPIs — active holders, suspensions, revocations and renewals by period (12.1.50)
-  idempotencyKey: holderId + changedAt
-  onFailure: retry
-  isCritical: false
 retention: 30 days after publication; the change itself is kept in accreditation.audit
 notes: '**Added 29 September (build pass, BL-180, 12.1.53).** The access consumer is why this is critical:
   `setAccreditationStatus` promises that revocation pushes to the gates, and this is the push. **A badge

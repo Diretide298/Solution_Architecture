@@ -549,6 +549,11 @@ def self_test() -> list:
     case("branch: detached HEAD refuses", bool(branch_refusal("HEAD")), True)
     case("branch: empty refuses", bool(branch_refusal("")), True)
 
+    # -- the tag carries its own bundle (R12) ---------------------------------------------------------------------
+    case("bundle: the tag's own bundle passes", bundle_refusal("r13", "r13"), None)
+    case("bundle: a bundle one release behind refuses", bool(bundle_refusal("r12", "r13")), True)
+    case("bundle: no bundle refuses", "missing" in (bundle_refusal(None, "r13") or ""), True)
+
     # -- the bash the gate runs ----------------------------------------------------------------------------------
     import shutil
     case("gate bash: a bash program, not a bare name Windows resolves in System32",
@@ -991,6 +996,25 @@ def gate_command(changed_file, json_out):
             [bash(), "tools/refresh-safe.sh", "--head-only", "--no-merge", "--parallel", "4"], None)
 
 
+def bundle_refusal(bundle_release, release):
+    """The tag carries its own release bundle (r13 root R12, CHG-R13R12-001): ADAM shows a ticket's text from
+    handoff/service-docs/op-release.json only when the bundle is the served tag's, and otherwise the plan row, which
+    lacks the pointer's scope, repository and design lines (#27985 in the r12 rehearsal). A light release changes no
+    plan ticket, but its tag still needs the bundle rebuilt at that tag."""
+    if bundle_release == release:
+        return None
+    return (f"handoff/service-docs/op-release.json is {bundle_release or 'missing'}'s, not {release}'s: rebuild it "
+            f"(`python3 tools/op-release.py --release {release}`), commit, and run check --apply again "
+            "(check-adam-latest-release LR-BUNDLE)")
+
+
+def committed_bundle_release():
+    try:
+        return json.loads((PKG / "handoff" / "service-docs" / "op-release.json").read_text(encoding="utf-8")).get("release")
+    except (OSError, ValueError):
+        return None
+
+
 def branch_refusal(branch):
     """A detached HEAD is refused; any named branch is fine, because HEAD must equal main on every remote anyway."""
     if branch in ("", "HEAD"):
@@ -1208,6 +1232,9 @@ def cmd_tag(args):
         refuse.append(f"{release} already exists ({', '.join(taken)})")
     if RELEASE_TAG.match(release) is None:
         refuse.append(f"{release} is not r<N>")
+    b = bundle_refusal(committed_bundle_release(), release)
+    if b:
+        refuse.append(b)
     chk = out / "check.json"
     c = json.loads(chk.read_text(encoding="utf-8")) if chk.is_file() else {}
     if not c:

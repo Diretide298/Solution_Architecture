@@ -73,7 +73,8 @@ properties:
         to: { type: string }
         operation:
           type: string
-          description: operationId that causes it. Absent where a job or timer does.
+          description: operationId that causes it. Absent where a job or timer does; then a job of the owning
+            contract's `x-ticvai-jobs` lists the transition in its `moves` (r13, CHG-R13JOB-001; tools/check-jobs.py).
         trigger:
           type: string
           enum: [operation, timer, job, externalEvent, cascade]

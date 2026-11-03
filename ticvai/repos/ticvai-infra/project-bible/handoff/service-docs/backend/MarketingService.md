@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 75 of 284 |
+| Operations in the slice | 76 of 285 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -37,6 +37,7 @@
 | campaign | [`stopCampaign`](#stopcampaign) | POST | `/campaigns/{campaignId}/stop` | setup | 1 |  |
 | campaign | [`updateCampaign`](#updatecampaign) | PATCH | `/campaigns/{campaignId}` | setup | 1 | BO-767, BO-768, BO-769, BO-772 |
 | consent | [`approvePrivacyTesting`](#approveprivacytesting) | PUT | `/privacy-testing` | setup | 1 | CMS-030 |
+| consent | [`approveWaiverTesting`](#approvewaivertesting) | PUT | `/waiver-testing` | setup | 1 | CMS-050 |
 | consent | [`claimDeviceConsent`](#claimdeviceconsent) | POST | `/guests/{subjectId}/consents/claim-device` | core | 1 | GST-042, WEB-016 |
 | consent | [`createConsentQuestion`](#createconsentquestion) | POST | `/consent-questions` | core | 1 | CMS-018 |
 | consent | [`getCookieConsentRuntime`](#getcookieconsentruntime) | GET | `/storefront/cookie-consent` | core | 1 | GST-001, WEB-001 |
@@ -619,7 +620,7 @@ the shapes `createCampaign` takes. While the campaign is a draft both may change
 |---|---|---|---|
 | changeSetId | string (uuid) | yes | (read-only) |
 | status | enum (draft, validated, submitted, approved, scheduled, published, rolledBack, rejected) | yes |  |
-| items | array of object |  |  |
+| items | array of object |  | The change set's contents, stored whole (ADAM CR-437, Chinmay, 1 November 2026; CHG-CR437-001). |
 | items[].configurationType | string |  |  |
 | items[].configurationId | string (uuid) |  |  |
 | items[].version | integer |  |  |
@@ -652,6 +653,115 @@ the shapes `createCampaign` takes. While the campaign is a draft both may change
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 | Conflict | Idempotency conflict or optimistic concurrency failure. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### approveWaiverTesting
+
+**`PUT /waiver-testing`**: Move a waiver version through review, approval and publication
+
+**One governance action on one waiver version.** The chain is the pack's: the business owner submits (`submitForReview`, with `changeReason`), operations reviews, legal/compliance reviews where the master record requires it (this sets `FormDefinition.legalReviewedBy` and `legalReviewedAt`), a final approver approves, then `publish`. The final approver must not be the submitter (422). `reject` returns the version to draft with the comment. **`publish` runs the pre-publication checklist and is refused on any critical failure** (422, listing them, e.g. a guardian signature required for minors with no guardian signature field). Publishing now moves the `FormDefinition` from `draft` to `published` and the previously published version to `superseded`; a scheduled publication does the same at `publishAt`; a rollout to selected venues or products keeps the previous version published elsewhere until the rollout covers every association. `suspend` (reason required) stops new signatures against a published version, and participants who need it are referred to staff until it is reinstated or replaced; `archive` retires it. Signatures already given are never touched. Every action is appended to `history`. (decided 29 September, readiness close-out)
+
+|  |  |
+|---|---|
+| Permission | `GUEST_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, changes rows of `marketing.waiver_version_control` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `marketing.waiver_version_control` |
+| Writes | `cache:idempotency`, `marketing.waiver_version_control` |
+| Called by | CMS-050 |
+| State model | Form definition ([states/form-definition.yaml](../../../states/form-definition.yaml)): moves `draft` -> `published`, `published` -> `superseded`, `published` -> `retired`, `superseded` -> `retired`, `draft` -> `retired` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `WaiverApprovalTestingPublicationWorkspaceInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| formId | string (uuid) | yes |  |
+| formVersion | integer | yes | (min 1) |
+| action | enum (submitForReview, completeOperationsReview, completeLegalReview, approve, reject, publish, suspend, reinstate, …) | yes |  |
+| comment | string |  | Required for reject and suspend. (max length 2000; nullable) |
+| changeReason | string |  | Required for submitForReview. (max length 1000; nullable) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveTo | string (date-time) |  | (nullable) |
+| resignRule | enum (noResign, resignAtNextBooking, resignBeforeNextVisit) |  | Required for submitForReview of a version after the first. |
+| publication | object |  | Required for publish. (nullable) |
+| publication.mode | enum (publishNow, schedule, selectedVenues, selectedProducts, controlledRollout) | yes |  |
+| publication.publishAt | string (date-time) |  | Required for schedule. (nullable) |
+| publication.venueIds | array of string (uuid) |  |  |
+| publication.productIds | array of string (uuid) |  |  |
+
+**Response**: `WaiverApprovalTestingPublicationWorkspaceView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| formId | string (uuid) | yes |  |
+| formVersion | integer | yes | (min 1) |
+| lifecycleStatus | enum (draft, review, pendingApproval, approved, scheduled, published, suspended, expired, …) | yes |  |
+| checklist | array of object | yes |  |
+| checklist[].check | enum (masterRecordComplete, requiredLegalTextPresent, requiredFieldsConfigured, conditionalRulesValid, signatureRulesConfigured, guardianThresholdSet, guardianSignatureFieldPresent, productsEventsAssigned, …) | yes |  |
+| checklist[].passed | boolean | yes |  |
+| checklist[].severity | enum (critical, warning) | yes |  |
+| checklist[].message | string |  |  |
+| simulation | object |  | Present when scenario parameters were given. (nullable) |
+| simulation.requiredWaivers | array of object |  |  |
+| simulation.requiredWaivers[].formId | string (uuid) |  |  |
+| simulation.requiredWaivers[].waiverName | string |  |  |
+| simulation.requiredWaivers[].version | integer |  |  |
+| simulation.requiredWaivers[].requirement | enum (mandatory, optional, conditional, informational) |  |  |
+| simulation.requiredWaivers[].applies | boolean |  |  |
+| simulation.requiredWaivers[].signatories | array of string |  | e.g. |
+| simulation.blockedAt | array of enum (ticketDownload, ticketActivation, checkIn, access) |  | What a missing signature would block, when missingSignature was set. |
+| aiFindings | array of object |  |  |
+| aiFindings[].severity | enum (info, warning) |  |  |
+| aiFindings[].message | string |  |  |
+| changeReason | string |  | (nullable) |
+| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveTo | string (date-time) |  | (nullable) |
+| resignRule | enum (noResign, resignAtNextBooking, resignBeforeNextVisit) |  | (nullable) |
+| publication | object |  | (nullable) |
+| publication.mode | enum (publishNow, schedule, selectedVenues, selectedProducts, controlledRollout) |  |  |
+| publication.publishAt | string (date-time) |  | (nullable) |
+| publication.venueIds | array of string (uuid) |  |  |
+| publication.productIds | array of string (uuid) |  |  |
+| suspended | boolean |  | (default False) |
+| suspensionReason | string |  | (nullable) |
+| audit | object |  | Who moved it through each stage, and when (pack Audit). |
+| audit.submittedByUserId | string (uuid) |  | (nullable) |
+| audit.submittedAt | string (date-time) |  | (nullable) |
+| audit.operationsReviewedByUserId | string (uuid) |  | (nullable) |
+| audit.operationsReviewedAt | string (date-time) |  | (nullable) |
+| audit.legalReviewedByUserId | string (uuid) |  | (nullable) |
+| audit.legalReviewedAt | string (date-time) |  | (nullable) |
+| audit.approvedByUserId | string (uuid) |  | (nullable) |
+| audit.approvedAt | string (date-time) |  | (nullable) |
+| audit.publishedByUserId | string (uuid) |  | (nullable) |
+| audit.publishedAt | string (date-time) |  | (nullable) |
+| history | array of object |  | Every action with its comment, oldest first. |
+| history[].action | string |  |  |
+| history[].byUserId | string (uuid) |  |  |
+| history[].at | string (date-time) |  |  |
+| history[].comment | string |  | (nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The version's governance record after the action |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The action does not apply to the version's current stage. |
+| 422 |  | A critical checklist failure, or the approver is the submitter. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### claimDeviceConsent
@@ -1159,6 +1269,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 201 |  | Recorded |
 | 400 |  | Notice version unknown, or the purpose is not configured |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -1966,6 +2077,7 @@ Here rather than in tenancy. `platform.device` is staff hardware bound to a work
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Devices |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2038,6 +2150,7 @@ Called on install and again whenever the provider rotates the token — which ha
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Registered, or an existing registration refreshed |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2443,6 +2556,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Badges held |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4356,7 +4470,7 @@ written by OrderService (`access.entitlement` with `invitationId`, CHG-FXC-007).
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| response | enum (accept, decline) | yes |  |
+| response | enum (accept, decline) | yes | Stored as the invitation's status, accepted or declined, with respondedAt (r13 gate, CHG-R13BO-002). |
 | plusOnes | integer |  | (default 0) |
 
 **Response**: `CampaignInvitation`
@@ -4621,6 +4735,10 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 **Generated by default and overridable**: a venue with 400 products will not write 400 meta descriptions, and one with an important landing page will not accept a generated one.
 **Written to `marketing.seo_metadata`, in the tenant's own database and transaction** (ADAM CR-317, option A, 29 October 2026): SEO metadata is the tenant's configuration about entities in its own database, so Marketing owns the table beside them, under the tenant's row-level security, and no write crosses a module or a database. It moved from the shared control database, which Platform owned and Marketing wrote with no declared route.
 
+**It reads nothing from Catalogue** (ADAM CR-474, Chinmay, 2 November 2026). It asks no Catalogue query and calls no service route. It stores the metadata for the `entityKind`, `entityId` and `locale` sent, creating or replacing the one record for that key within the caller's tenant, and does not check that the entity exists.
+
+**A changed slug is stored, and the redirect is a separate call** (ADAM CR-474). A PUT that changes `slug` stores the new slug; it does not refuse and does not write a redirect. The 301 from the old address to the new one is made by `createUrlRedirect` (POST /seo-redirects, #33242), which CMS-013 calls when a live slug is edited. That redirect lives in `control.url_redirect`, outside this tenant transaction. No grant or migration is needed.
+
 |  |  |
 |---|---|
 | Permission | `MARKETING_MANAGE` |
@@ -4629,7 +4747,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product`, `marketing.seo_metadata` |
+| Reads | `cache:idempotency`, `marketing.seo_metadata` |
 | Writes | `cache:idempotency`, `cache:resolution`, `marketing.seo_metadata` |
 | Called by | BO-842, CMS-013 |
 
@@ -4696,6 +4814,12 @@ Where the form has an expiry, a live acceptance means **a returning participant 
 
 **Who may submit, and what each outcome answers** (ADAM CR-318, option A, 29 October 2026). A guest submits for itself; a staff member with a grant at the venue records a guest's submission (the counter, the kiosk), as the guest could, and `marketing.form_submission` lets both write (`x-ticvai-rls: grant-holder-write`: any staff grant, or the guest's own subject). A form or form version that does not exist or is not published is `404 form-version-not-found`. Where a live acceptance already exists, the answer is `200` with the existing submission and no new row is written; a new acceptance is `201`.
 
+**It reads nothing from `pii.subject`** (ADAM CR-472, Chinmay, 2 November 2026). It asks no query of Identity and calls no service route: a guest submits for its own subject, and staff with a grant at the venue submit for any guest, both guarded by the grant-holder-write policy on `marketing.form_submission` (CR-318). It checks no one's age; where a form asks about age, the form's own fields carry it.
+
+**What a live acceptance is** (ADAM CR-472). Before writing, it looks for a `marketing.form_submission` row for the same form id, the same `subjectId` and the same `onBehalfOfSubjectId` (both null or both equal), with `expires_at` later than now; only versions with `validForMonths` set give a row an `expires_at`. The row counts when its `form_version` is the version being submitted. It also counts when it is an earlier version and `marketing.waiver_version_control.resign_rule` for the submitted form and version is `noResign` (Marketing's own data; no route is needed). When a row counts, the answer is `200` with that submission and nothing is written. Every other case is a new acceptance: there is no live row, or the submitted version's resign rule is `resignAtNextBooking` or `resignBeforeNextVisit`, or the version has no resign rule. It is written with its own `form_version`, `expires_at` set from that version's `validForMonths`, and answered `201`. No grant or migration is needed.
+
+**A form published above the caller's venue is found** (ADAM CR-496, option A, Chinmay, 3 November 2026; CHG-CR496-001), as for the published privacy policies and the other tenant-root reads. Before anything is written: (1) the caller's scope paths for this request are taken: a staff member's grants, or a guest's venue path from `guestAuth`. (2) Under the routed tenant's root grant (`ITenantRootGrant`), in one statement, the `marketing.form_definition` row for the submitted `formId` and `formVersion` with status `published` is read, and kept only when its `scope_path` is at or below one of the caller's paths or at or above one of them (`scope_path <@ ANY(paths) OR scope_path @> ANY(paths)`). If no row is left, the answer is `404 form-version-not-found` and nothing is written; a form published at another venue or another brand stays 404. (3) Under the same grant and the same scope filter, `marketing.waiver_version_control` is read for that `form_id` and `form_version`, and its `resign_rule` decides the earlier-version rule (`noResign`); no row means no resign rule applies. (4) The connection returns to the caller's own grant (`SET LOCAL` back) before `marketing.form_submission` is touched: the live-acceptance check (200) and the insert (201) stay under the grant-holder-write policy of CR-318, so a guest still reads and writes only its own submissions. (5) Nothing else is read under the root grant, and nothing from those two rows is returned beyond what the response already carries. No migration, no change to the request or the responses; the row security of `form_definition` and `waiver_version_control` stays as it is for every other operation. Tests: a form published at the tenant path is submitted by venue staff and by a guest at that venue (201, then 200 on a repeat); a form at another venue is 404; a draft or retired version is 404; a tenant-level `noResign` rule on an earlier version is applied; a guest cannot read another guest's submission.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_VIEW` |
@@ -4705,7 +4829,7 @@ Where the form has an expiry, a live acceptance means **a returning participant 
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.form_definition`, `marketing.form_submission`, `marketing.form_submission_sale_link`, `marketing.waiver_requirement`, `pii.subject` |
+| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.form_definition`, `marketing.form_submission`, `marketing.form_submission_sale_link`, `marketing.waiver_requirement`, `marketing.waiver_version_control` |
 | Writes | `cache:idempotency`, `marketing.consent_record`, `marketing.form_submission`, `marketing.form_submission_sale_link`, `marketing.waiver_requirement`, `marketing.waiver_requirement_event` |
 | Called by | GST-035, WEB-026 |
 | State model | Waiver requirement ([states/waiver-requirement.yaml](../../../states/waiver-requirement.yaml)): moves `assigned` -> `completed`, `sent` -> `completed`, `opened` -> `completed`, `inProgress` -> `completed` |
@@ -4918,6 +5042,8 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketing asset — it has a different retention clock, a different access rule and a different reason to exist, and **one careless query against a shared store returns both.**
 `retainUntil` is required. **A guest document with no deletion date is a guest document kept forever.** It is the end of the document's purpose plus the retention period client counsel sets, which is still open (audit R149).
 
+**The server issues and checks every key; a key the client makes up is never stored** (ADAM CR-521, option A, Chinmay, 3 November 2026; CHG-CR521-001). `storageRef` is accepted only when a `marketing.guest_document_upload` row exists for it with the same `subject_id` and `kind`, status `pending`, and the object exists in the guest-document store at no more than the issued size; otherwise the answer is `422 guest-document-upload-invalid` and nothing is written. In the same transaction it inserts `marketing.guest_document`, marks the upload row `attached`, and sets `id`, `uploaded_at` (now) and `uploaded_by_principal_id` (the staff principal, or null for a guest's own upload); any of these three sent by the client is ignored. The subject rules are those of `createGuestDocumentUpload`: a guest may send only its own session's `subjectId` (otherwise 403); staff may name any subject, checked through `identity#subjectRecords` (404 if unknown). `marketing.guest_document` takes the grant-holder subject policy (`x-ticvai-rls: grant-holder-write`, `platform.apply_grant_holder_subject_rls`), as `form_submission` has, so staff with a grant write for a guest and a guest only for itself.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_VIEW_PII` |
@@ -4927,8 +5053,8 @@ BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketin
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.guest_document`, `pii.subject` |
-| Writes | `cache:idempotency`, `marketing.guest_document` |
+| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.guest_document`, `marketing.guest_document_upload`, `pii.subject` |
+| Writes | `cache:idempotency`, `marketing.guest_document`, `marketing.guest_document_upload` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -4970,6 +5096,9 @@ BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketin
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Stored |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | The storageRef was not issued by createGuestDocumentUpload for this subject and kind, is no longer pending, or its object is missing from the store or larger than the issued size (ADAM CR-521); nothi… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -5792,6 +5921,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | uploaded_at | timestamptz | no |  |
 | uploaded_by_principal_id | uuid | no |  |
 
+### `marketing.guest_document_upload`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| storage_ref | text | yes | The key the server built from the subject and a random id. |
+| subject_id | uuid | yes |  |
+| kind | text | yes | The kind the key was issued for, one of GuestDocument.kind's values, as the request body's enum checks; uploadGuestDocument accepts the key only for the same kind. |
+| content_type | text | yes |  |
+| size_bytes | integer | yes | The issued size; the stored object may be no larger. |
+| issued_by_principal_id | uuid | no | The staff principal that asked for the key, or null for a guest's own upload. |
+| issued_at | timestamptz | yes |  |
+| expires_at | timestamptz | yes | When the signed upload URL stops working (15 minutes after issue). |
+| status | text | yes |  |
+
 ### `marketing.guest_preference`
 
 | Column | Type | Required | Notes |
@@ -5951,6 +6095,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | complained_at | timestamptz | no |  |
 | unsubscribed_at | timestamptz | no |  |
 | source_ref | text | no | The id of the record whose business event triggered the message (a performance id, a guest broadcast id), which listMessageDispatches filters on (ADAM CR-379; CHG-CR379-001). |
+| body | text | no | The resolved message as sent (ADAM CR-442, Chinmay, 1 November 2026; CHG-CR442-001), which Marketing's message sender sends; for a guest broadcast, messageLocalised in the guest's language, else mess… |
 
 ### `marketing.message_template`
 
@@ -6026,7 +6171,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | change_set_id | uuid | yes |  |
 | status | text | yes |  |
-| items | jsonb | no |  |
+| items | jsonb | no | The change set's contents, stored whole (ADAM CR-437, Chinmay, 1 November 2026; CHG-CR437-001). |
 | approval_request_id | text | no | The approvals-engine request, once submitted. |
 | publish_at | timestamptz | no |  |
 | published_at | timestamptz | no |  |
@@ -6250,6 +6395,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 | occurred_at | timestamptz | yes |  |
 | scope_path | text | no | The partition key (ADR-0005), the requirement's. |
 
+### `marketing.waiver_version_control`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| form_id | uuid | yes |  |
+| form_version | integer | yes |  |
+| lifecycle_status | text | yes |  |
+| simulation | jsonb | no | Present when scenario parameters were given. |
+| change_reason | text | no |  |
+| effective_from | timestamptz | no |  |
+| effective_to | timestamptz | no |  |
+| resign_rule | text | no |  |
+| publication | jsonb | no |  |
+| is_suspended | boolean | no |  |
+| suspension_reason | text | no |  |
+| audit | jsonb | no | Who moved it through each stage, and when (pack Audit). |
+| history | jsonb | no | Every action with its comment, oldest first. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `marketing.wishlist_item`
 
 | Column | Type | Required | Notes |
@@ -6275,12 +6441,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|
 | campaign | `getCampaign`, `getCampaignPerformance`, `listCampaigns`, `pauseCampaign`, `testSendCampaign`, `unscheduleCampaign` |
 | case | `addCaseMessage`, `createCase`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listCases`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
-| consent | `actOnWaiverRequirements`, `addSuppression`, `approveWaiverTesting`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyChangeSets`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyChangeSets`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | general | `getCustomerServiceCopilot` |
 | guest | `getGuestProfile`, `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `setBadge`, `setLoyaltyCampaign` |
-| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordSaleOwnerAnswers`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
+| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createGuestDocumentUpload`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordSaleOwnerAnswers`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
 | message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `notifyPerformanceHolders`, `sendGuestBroadcast`, `sendGuestOneTimeCode`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `listSegmentMembers`, `listSegments`, `previewSegment`, `previewSegmentDraft` |

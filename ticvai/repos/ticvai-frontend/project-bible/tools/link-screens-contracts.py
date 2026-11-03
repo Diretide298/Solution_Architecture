@@ -100,8 +100,12 @@ def main() -> int:
             # Windows defaults to cp1252, which happily encodes an em dash and a curly quote to
             # bytes no `encoding="utf-8"` reader can decode — the file is written, nothing fails,
             # and the next tool to open it dies pointing at the wrong culprit.
+            # **No blank first line** (r13 integration, CHG-R13INT-028): a screen file with no header comment
+            # was written with a leading empty line (head + newline, head empty); the
+            # next YAML writer dropped it, so the chain was no fixed point (check-regenerate-twice RT-CHAIN on P08 when
+            # CR-525 moved setRolePermissions from tenancy to identity and its screens' `contract` was written back).
             with f.open("w", encoding="utf-8") as out:
-                out.write(head + "\n")
+                out.write(head + "\n" if head else "")
                 # width 100, the derivers' form: at 98 it rewrapped long notes that the width-100 screen writers
                 # wrap back (check-regenerate-twice RT-CHAIN, r10 gate 2, CHG-R10GFP-003)
                 yaml.safe_dump(doc, out, sort_keys=False, allow_unicode=True, width=100)

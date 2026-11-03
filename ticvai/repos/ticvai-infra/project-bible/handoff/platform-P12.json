@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
@@ -555,6 +555,12 @@
     "summary": "Send, resend or correct participant waiver requirements, one or in bulk"
    },
    {
+    "operation": "createGuestDocumentUpload",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue the key and a signed upload URL for a guest document"
+   },
+   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -589,12 +595,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverTesting",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Checklist, rule simulation and approval record of a waiver version"
    },
    {
     "operation": "issueReward",

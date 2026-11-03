@@ -1453,7 +1453,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved: Event cancellation, Event postponement, Buyer refund, Payment chargeback, Failed ownership transfer, Failed credential issuance, Duplicate transaction, Ticket access issue …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 11 actions on this screen and the screen declares 3 operations.** Unserved: Event cancellation, Event postponement, Buyer refund, Payment chargeback, Failed ownership transfer, Failed credential issuance, Duplicate transaction, Ticket access issue …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
    },
    {

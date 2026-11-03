@@ -1,6 +1,6 @@
 # P05-sell-01 — P05 · Sell (1 of 2)
 
-**10 screens · 13 operations · 61 schemas · 4 permissions**
+**10 screens · 13 operations · 62 schemas · 4 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -130,8 +130,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `KSK-006` | Review | C | 10 | 31 | 5 | 11 | 1 | 0 | guest | notStarted (generated) |
 | `KSK-007` | Payment | C | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
 | `KSK-008` | Payment unresolved | C | 0 | 1 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-009` | Ticket issued | C | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-010` | Print failure | C | 6 | 1 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-009` | Ticket issued | C | 6 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-010` | Print failure | C | 7 | 1 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 

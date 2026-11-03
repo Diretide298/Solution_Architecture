@@ -174,7 +174,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Scheduled report imports. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **Reconciliation Source & Import Manager\t141 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved: Scheduled report imports. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Settlement and statement feeds and their import.
 
@@ -429,8 +429,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The queue of reconciliation exceptions that the automatic steps could not explain: each with what TICVAI recorded, what the provider reported, the difference and the likely cause, and a resolution that is recorded with who, when and why. Nothing is ever edited; resolving explains, it does not change the payment.
 
 **Known correction pending (do not draw the wrong version)**
@@ -590,7 +588,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home. **Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider's monthly file (DI-268) is matched day by day.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Settlement & Payout Manager\t144 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
+**Known gaps.** **Settlement & Payout Manager\t144 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Expected against actual settlement per provider, merchant account and day: gross sales, minus refunds, chargebacks, fees, adjustments and any reserve held back, gives net expected; net received is what reached the bank. The gap between them, and how long it has been open, is what this screen is for.
 
@@ -758,7 +756,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
 
-**Known gaps.** **The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Fixed transaction fee, Percentage fee, Authorization fee, Capture fee, Refund fee, Chargeback fee … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved: Fixed transaction fee, Percentage fee, Authorization fee, Capture fee, Refund fee, Chargeback fee …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Gross to net: fees, commission and FX deducted before settlement.
 
@@ -913,8 +911,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Merchant Account & Settlement Calendar Manager\t146 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Merchant accounts, which legal entity gets the money and when (settlement calendars).
 
 **Known correction pending (do not draw the wrong version)**
@@ -1063,7 +1059,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
 
-**Known gaps.** **Settlement Posting, Finance Handoff & Close Manager\t148 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The gate between reconciliation and the ledger: which reconciled settlements are ready to post, which are held by open exceptions, what was posted, and whether the period can close. Posting is append-only; a wrong posting is reversed, never edited.
 
@@ -1316,8 +1312,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/commercial/reconciliation-simulator-forecast-ai-operations-advisor--adm-628` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Forward look at settlement cash: expected settlement and cash receipt by date, after provider fees, refund and chargeback deductions and conversion, plus a what-if simulator. Every projected figure is labelled Forecast; with too little history the screen says so instead of drawing a line.
 

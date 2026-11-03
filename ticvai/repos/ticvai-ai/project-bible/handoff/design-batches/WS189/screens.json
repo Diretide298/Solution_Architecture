@@ -112,13 +112,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide administrators with a centralized operational view of all Family, Parent–Child and Corporate wallets. Backend Configuration & Monitoring",
   "purposeNote": "Authorized administrators can monitor shared-wallet structures and drill down from consolidated information to individual wallets, members, allocations and transactions.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 38 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

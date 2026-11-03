@@ -274,8 +274,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `eventId` (navigation) |
 | Route | `/sell/dynamic-performance-duration-configuration-bo-698` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Dynamic performance durations: a performance's length may vary within a maximum overrun, with turnaround protected so the venue never sells a slot it cannot reset.
 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setEventSchedule and nothing that returns the current configuration. (CHG-WIR-025); The purpose text is shared word for word with BO-715, BO-723 and does not describe this screen (Dynamic Performance Duration Configuration). (CHG-WIR-026).

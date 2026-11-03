@@ -78,7 +78,7 @@
     {
      "to": "CMS-008",
      "trigger": "Content Blocks",
-     "provenance": "derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001 holds none of them. The edge carries nothing: bannerId, promoBlockId, actionId only pre-select (deep link or optional), and CMS-008 opens on its own"
+     "provenance": "derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001 holds none of them. The edge carries nothing: bannerId, promoBlockId, actionId only pre-select (optional), and CMS-008 opens on its own"
     },
     {
      "to": "CMS-009",
@@ -88,7 +88,7 @@
     {
      "to": "CMS-010",
      "trigger": "Media Library",
-     "provenance": "derived — CMS-010 declares entryState.params mediaId, uploadId and CMS-001 holds none of them. The edge carries nothing: mediaId, uploadId only pre-select (deep link or optional), and CMS-010 opens on its own"
+     "provenance": "derived — CMS-010 declares entryState.params mediaId, uploadId and CMS-001 holds none of them. The edge carries nothing: mediaId, uploadId only pre-select (optional), and CMS-010 opens on its own"
     },
     {
      "to": "CMS-011",
@@ -150,7 +150,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **The tenant workspace.** Lands a tenant on what is live rather than on a form. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable. **Drawn 31 August** — `Marketing Board 7.dc.html` frame `crm-7f` (*Agent Workspace*), matched on title at 0.84 within this board’s platforms.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **The tenant workspace.** Lands a tenant on what is live rather than on a form. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable. **Drawn 31 August** — `Marketing Board 7.dc.html` frame `crm-7f` (*Agent Workspace*), matched on title at 0.84 within this board’s platforms.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.",
   "density": "compact",
   "boardFrames": [
    "Marketing Board 7.dc.html#crm-7f"
@@ -439,7 +439,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \n**This screen owns the marks and the logo variant** (logo, dark logo, variant, favicon); CMS-004 owns the app icons, the splash and the intro video, so the two never edit the same fields (CHG-SGU-022). `splashChangeScope` is read-only and shown, never sent.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \n**This screen owns the marks and the logo variant** (logo, dark logo, variant, favicon); CMS-004 owns the app icons, the splash and the intro video, so the two never edit the same fields (CHG-SGU-022). `splashChangeScope` is read-only and shown, never sent.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
@@ -619,12 +619,12 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-003 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-003 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-004",
      "trigger": "Logo & Assets",
-     "provenance": "derived — CMS-004 declares entryState.params uploadId and CMS-003 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-004 opens on its own"
+     "provenance": "derived — CMS-004 declares entryState.params uploadId and CMS-003 holds none of them. The edge carries nothing: uploadId only pre-selects (optional), and CMS-004 opens on its own"
     },
     {
      "to": "CMS-006",
@@ -633,7 +633,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it. Build note (r8, WHITE-C03): the generated first-run text \"Offers no create action\" is wrong. `setFonts` creates the part on first save: build the form empty with Save fonts when `getFonts` answers 404 not-configured.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it. Build note (r8, WHITE-C03): the generated first-run text \"Offers no create action\" is wrong. `setFonts` creates the part on first save: build the form empty with Save fonts when `getFonts` answers 404 not-configured.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getFonts` reads one record and nothing reads a population — the screen is about that one thing",
@@ -808,7 +808,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**This screen owns the app icons, the splash and the intro video**; the marks and the logo variant are CMS-002's (CHG-SGU-022).\n\n**Asset ids (the logo, icon source, splash and video) come from the media library (searchMedia) or an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003) Build note (r8, WHITE-C23): the first-run text \"Offers no create action\" is wrong. With no logo yet (`getBrandIdentity` returns none) show \"Set the logo on CMS-002 first\" and keep Save off; the form's Required `logoAssetRef` is gone because the logo is CMS-002's. The detail panel above still shows the marks read-only.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Rewired 23 September (L7).** The screen called the maintenance equipment register, guest CRM or subscription billing where its purpose names White Labelling. Its operations now match its purpose.\n\n**This screen owns the app icons, the splash and the intro video**; the marks and the logo variant are CMS-002's (CHG-SGU-022).\n\n**Asset ids (the logo, icon source, splash and video) come from the media library (searchMedia) or an upload (createUpload, completeUpload), bound 4 October 2026** (CHG-FXS-003) Build note (r8, WHITE-C23): the first-run text \"Offers no create action\" is wrong. With no logo yet (`getBrandIdentity` returns none) show \"Set the logo on CMS-002 first\" and keep Save off; the form's Required `logoAssetRef` is gone because the logo is CMS-002's. The detail panel above still shows the marks read-only.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1070,7 +1070,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-005 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-005 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -1080,11 +1080,11 @@
     {
      "to": "CMS-006",
      "trigger": "Component Preview",
-     "provenance": "derived — CMS-006 declares entryState.params productId and CMS-005 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and CMS-006 opens on its own"
+     "provenance": "derived — CMS-006 declares entryState.params productId and CMS-005 holds none of them. The edge carries nothing: productId only pre-selects (optional), and CMS-006 opens on its own"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A failing colour contrast is refused, not warned (decided 28 September, audit R139 (a)).** `setTheme` answers `400` with a `ContrastProblem` naming each failing pair (foreground, background, ratio, the ratio required, where it is used); the theme is not saved, and the editor keeps the entered colours and marks the failing pairs so they can be corrected. There is no save-anyway.\n\n**No dark or light mode (decided by Chinmay, 2 October 2026; DEC-150).** White label applies the venue's chosen theme; `Theme.darkMode` is deprecated and ignored (CHG-CSA-035), so the editor never draws it (CHG-SGU-007).",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A failing colour contrast is refused, not warned (decided 28 September, audit R139 (a)).** `setTheme` answers `400` with a `ContrastProblem` naming each failing pair (foreground, background, ratio, the ratio required, where it is used); the theme is not saved, and the editor keeps the entered colours and marks the failing pairs so they can be corrected. There is no save-anyway.\n\n**No dark or light mode (decided by Chinmay, 2 October 2026; DEC-150).** White label applies the venue's chosen theme; `Theme.darkMode` is deprecated and ignored (CHG-CSA-035), so the editor never draws it (CHG-SGU-007).",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTheme` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1255,7 +1255,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-006 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-006 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -1270,7 +1270,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **36 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **36 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listConfigVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1539,7 +1539,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-007 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-007 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -1548,7 +1548,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)).** The builder reads `getModuleEnablement` and applies the mapping on `HomepageSectionKind`: `tickets` needs `ticketsAndBooking`, `whatsOn` needs `events`, `attractions` needs `attractions`, `membership` needs `membership`, `dining` needs `diningAndFnb`, `shop` needs `shop`, `map` needs `map`; `heroBanner`, `quickActions`, `promotions`, `customContent` and `spacer` need none. A section whose module is off cannot be added or made visible, and says which module to switch on (on CMS-001). `setHomepageLayout` refuses such a section with 400 in any case.\n\n**The builder loads and edits existing blocks with listContentBlocks and updateContentBlock (agreed, ledger) 4 October 2026** (CHG-FXS-003)\n\n**Save block edits an existing block (updateContentBlock)** (CHG-FXS-003)",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**A section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)).** The builder reads `getModuleEnablement` and applies the mapping on `HomepageSectionKind`: `tickets` needs `ticketsAndBooking`, `whatsOn` needs `events`, `attractions` needs `attractions`, `membership` needs `membership`, `dining` needs `diningAndFnb`, `shop` needs `shop`, `map` needs `map`; `heroBanner`, `quickActions`, `promotions`, `customContent` and `spacer` need none. A section whose module is off cannot be added or made visible, and says which module to switch on (on CMS-001). `setHomepageLayout` refuses such a section with 400 in any case.\n\n**The builder loads and edits existing blocks with listContentBlocks and updateContentBlock (agreed, ledger) 4 October 2026** (CHG-FXS-003)\n\n**Save block edits an existing block (updateContentBlock)** (CHG-FXS-003)",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getHomepageLayout` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1666,6 +1666,12 @@
        "operation": "getPublishReviewPolicy",
        "notes": "Names the page and section the block shows in, from when, and for whom; says whether the venue's review step applies. Blocks go live on their own schedule, not with the site Publish. Whether review applies is read with `getPublishReviewPolicy` (r8, WHITE-C19); a block sent for review shows its `reviewStatus` (pending) in Blocks on this page until it is decided.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete content page",
+       "operation": "deleteContentPage",
+       "provenance": "contract white-label.yaml DELETE /tenant-config/pages/{pageId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       }
      ]
     }
@@ -1938,6 +1944,16 @@
      ]
     },
     "provenance": "contract white-label.yaml PATCH /content-blocks/{blockId} (4 October 2026, CHG-RFM-010)"
+   },
+   {
+    "id": "confirmDeleteContentPage",
+    "component": "confirmDialog",
+    "trigger": "Delete content page",
+    "body": "**Names what `deleteContentPage` removes**: the selected content page and its blocks leave the site; nothing else changes. Confirming deletes it; dismissing sends nothing.",
+    "provenance": "contract white-label.yaml DELETE /tenant-config/pages/{pageId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)",
+    "confirm": {
+     "operation": "deleteContentPage"
+    }
    }
   ],
   "_platform": {
@@ -1997,7 +2013,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-008 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-008 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -2006,7 +2022,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \n**Banners and promo blocks go live on their own schedule, not with Publish** (the contract header lists them outside the draft); the screen says so beside each (CHG-SGU-022).",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n \n**Banners and promo blocks go live on their own schedule, not with Publish** (the contract header lists them outside the draft); the screen says so beside each (CHG-SGU-022).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPromoBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -2438,7 +2454,7 @@
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
-     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-009 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens on its own"
+     "provenance": "derived — CMS-002 declares entryState.params uploadId and CMS-009 holds none of them. The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its own"
     },
     {
      "to": "CMS-003",
@@ -2447,7 +2463,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMenus` reads the population and `getMenu` reads one of them — list, select, act",
@@ -2794,7 +2810,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Archive and quarantine are reversible; deletion is the only end of an asset's life (decided 28 September, audit STATE-MEDIA).** An archived asset offers **Restore** (`updateMediaAsset` with `status: ready`); a quarantined one offers **Release**, which is the same call after a reviewer has cleared the scan flag (the state model marks that move as needing approval). **Delete media asset** (`deleteMediaAsset`) removes the asset for good and is refused while it is referenced.",
+  "notes": "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Archive and quarantine are reversible; deletion is the only end of an asset's life (decided 28 September, audit STATE-MEDIA).** An archived asset offers **Restore** (`updateMediaAsset` with `status: ready`); a quarantined one offers **Release**, which is the same call after a reviewer has cleared the scan flag (the state model marks that move as needing approval). **Delete media asset** (`deleteMediaAsset`) removes the asset for good and is refused while it is referenced.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`searchMedia` reads the population and `getMediaEntitlements` reads one of them — list, select, act",
@@ -2818,7 +2834,10 @@
        "kind": "multiSelect",
        "label": "Tag",
        "operation": "searchMedia",
-       "notes": "Tags picked from the taxonomy; sends `tag`.",
+       "reads": [
+        "getMediaTaxonomy"
+       ],
+       "notes": "Tags picked from the taxonomy `getMediaTaxonomy` answers; sends `tag` to `searchMedia` (r13, CHG-RCR33-001).",
        "provenance": "corrected 2 October 2026 (CHG-SGU-019, design-notes correction)",
        "bindsTo": "MediaAsset.tags"
       },
@@ -3159,6 +3178,12 @@
     "operationId": "searchMedia",
     "contract": "assets",
     "purpose": "Search the asset library",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getMediaTaxonomy",
+    "contract": "assets",
+    "purpose": "The tags the Tag filter offers (r13, CHG-RCR33-001)",
     "trigger": "onLoad"
    },
    {

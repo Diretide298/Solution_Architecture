@@ -1255,7 +1255,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `holderId` (navigation) |
 | Route | `/access-venue/holder-access-assignment-bo-660` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of HolderAccess (per holder or across holders); affects BO-660, BO-661, BO-668.
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of HolderAccess (per holder or across holders); affects BO-660, BO-661, BO-668.
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** One holder's access: their photo and accreditation, the profiles they inherit from their category, and any individual overrides on top. An accreditation officer uses it for "the Gulf Media Network cameraman also needs the tunnel". The one thing to get right: inherited access and individual overrides are visibly different, the resulting effective zones are shown, and the save replaces the holder's whole access record.
 

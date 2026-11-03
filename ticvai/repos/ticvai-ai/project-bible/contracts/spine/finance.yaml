@@ -186,8 +186,10 @@ x-ticvai-queries:
       lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Ledger's service route (serviceAuth).
-    served: [service]
+      from another deployable through Ledger's service route (serviceAuth), and in process within commerce, through
+      the C# query interface Ledger implements, by Catalogue's listTaxProfiles and getTaxProfileJurisdiction for a
+      tax profile's currency (ADAM CR-468; CHG-CR468-001).
+    served: [in-process, service]
   postingRecords:
     module: finance
     table: ledger.posting
@@ -298,6 +300,65 @@ x-ticvai-queries:
       with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
       deployable through Ledger's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  postings:
+    module: finance
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - inventory.purchaseOrderReceived
+    - order.refunded
+    - shift.closed
+    - stock.depleted
+    - wallet.creditExpired
+    - wallet.credited
+    - wallet.debited
+    moves:
+    - {model: variance-review, from: notRequired, to: pendingReview}
+    reads: [ledger.price_variance]
+    writes: [ledger.price_variance]
+    for: 'Ledger''s posting consumers: post the refund reversal, the shift''s cash position and variance, stored-value liability
+      on wallet top-up, capture and expiry (breakage), the goods-receipt accrual and price variance, and cost of sales on
+      a stock count.'
+    source:
+    - events/inventory-purchaseOrderReceived.yaml
+    - events/order-refunded.yaml
+    - events/shift-closed.yaml
+    - events/stock-depleted.yaml
+  revenueRecognition:
+    module: finance
+    host: workers
+    trigger: {kind: queue}
+    reads: [ledger.recognition_schedule]
+    writes: [ledger.journal_entry, ledger.journal_line]
+    reliesOn: [createRecognitionSchedule]
+    for: Ledger revenue recognition schedule job.
+    source: ['contracts/spine/finance.yaml']
+  settlementIngest:
+    module: finance
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    moves:
+    - {model: settlement, from: ingesting, to: parsing}
+    - {model: settlement, from: parsing, to: matching}
+    - {model: settlement, from: parsing, to: failed}
+    - {model: settlement, from: matching, to: matched}
+    - {model: settlement, from: matching, to: hasExceptions}
+    - {model: settlement, from: matched, to: resolved}
+    reads: [ledger.settlement]
+    writes: [ledger.settlement]
+    for: Ledger settlement file ingestion and matching job, and the nightly reconciliation.
+    source:
+    - contracts/satellite/payments.yaml
+    - contracts/spine/finance.yaml
+    - states/settlement.yaml:19
 paths:
   /internal/order-postings:
     post:
@@ -1222,7 +1283,7 @@ paths:
 
         
 
-        **Order.** Sorted by `creditAccountId` descending (a UUIDv7, so newest first).'
+        **Order.** By `eventType` ascending, then by `venueId` ascending with the region''s row (no `venueId`) first (NULLS FIRST) (r13 review, CHG-R13RVB-006: `creditAccountId` is the mapped account, not the mapping, so it never said which mapping is newest).'
       tags:
       - accounts
       parameters:
@@ -3520,7 +3581,7 @@ paths:
         - "P08 BO-090 Period Close"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
-      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
+      description: '**Order.** Newest first, by `startDate` descending, then by `id` (r13 review, CHG-R13RVB-006: a period has no `occurredAt`).'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4259,7 +4320,6 @@ paths:
         - "P02 GST-019 Order History"
         - "P04 POS-026 Receipt & Reprint"
         - "P08 BO-022 Order Detail"
-        - "P08 BO-1081 Finance Dashboard"
         - "P16 ANL-072 Finance Dashboard"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
@@ -4619,7 +4679,6 @@ paths:
         - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
         - "P08 BO-023 Refunds & Exchanges"
-        - "P08 BO-1081 Finance Dashboard"
         - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
@@ -6274,7 +6333,7 @@ components:
               actual:
                 $ref: ../shared/common.yaml#/components/schemas/Money
     Deposit:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by recordDeposit, settleDeposit
+      x-ticvai-rls: grant-holder-write   # r13 gate (CHG-R13BO-001): recordDeposit and settleDeposit at a venue, the rule CHG-R11FXC-003 settled for a guest's row with no scope; any staff grant reads and writes, the guest its own; was grant-holder-read (MOD audit, CHG-MOD-007)
       type: object
       x-ticvai-persistence: ledger.deposit
       description: '**Money taken before the sale is complete.** Not deferred revenue — that is a sold

@@ -34,11 +34,6 @@ consumers:
   idempotencyKey: assetId + workOrderId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Availability
-  idempotencyKey: assetId + workOrderId
-  onFailure: retry
-  isCritical: false
 retention: 30 days after publication
 notes: '**Two critical consumers, and they are why this event is separate from completion.** A ride
   verified and back in service whose queue never reopened is a closed attraction nobody closed.'

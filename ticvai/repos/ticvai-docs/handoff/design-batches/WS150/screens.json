@@ -93,13 +93,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Compare) — counts over a population, then the population",
   "purpose": "Provide centralized operational visibility across all digital and alternative payment journeys.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 70 §Compare"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -303,13 +297,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods through adapters. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods through adapters. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 70 §Support provider-enabled methods such as"
-   },
-   {
-    "operation": null,
-    "why": "**Digital & Alternative Payment Method Manager\\t71 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    },
    {
     "operation": null,
@@ -619,11 +608,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**Payment Link Builder & Configuration\\t73 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No staff read of payment links (getPaymentLink is guest/anonymous by token; there is no list).",
     "source": "contracts/spine/orders.yaml#createPaymentLink | screens/P08-venue-back-office.yaml#ADM-592"
    }
@@ -790,11 +774,6 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage how a generated payment request is delivered and how its lifecycle progresses.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Payment Link Distribution & Customer Journey Manager\\t74 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -994,7 +973,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Hosted checkout, External payment authorization. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Hosted checkout, External payment authorization. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 74 §Support"
    },
    {
@@ -1166,11 +1145,6 @@
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide operational teams with real-time visibility into digital payment sessions.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 75 §Show"
-   },
    {
     "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment sessions and their state.",
@@ -1384,13 +1358,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: 3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: 3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 77 §Support provider capabilities such as"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 77 §Display"
    },
    {
     "operation": null,
@@ -1568,11 +1537,6 @@
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Centralize operational handling of incomplete or abnormal digital-payment journeys.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 78 §Show"
-   },
    {
     "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment exceptions (failed, abandoned, expired sessions).",

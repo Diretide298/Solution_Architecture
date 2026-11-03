@@ -294,13 +294,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Compare) and no metric row",
   "purpose": "Determine which recommendation strategies, placements, channels and journey stages perform best.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 155 §Compare"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -461,13 +455,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Measure) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Allow TICVAI to scientifically test recommendation strategies rather than relying only on assumptions. Increase Family Meal cross-sell.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Recommendation Experiment & A/B Test Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -779,7 +767,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Recommendation tracking ID, Last recommendation, First recommendation, A/B experiment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Recommendation tracking ID, Last recommendation, First recommendation, A/B experiment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 159 §Support, where data permits"
    }
   ],
@@ -931,11 +919,6 @@
   "patternReason": "the pack gives this screen a display directory (§Show; Detect) and no metric row",
   "purpose": "Monitor whether recommendation and propensity models continue performing correctly after deployment. This screen is critical if TICVAI wants a serious AI architecture.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 161 §Show"
-   },
    {
     "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): An AI model performance and drift read (ai process); getRecommendationPerformance carries no model metrics.",
@@ -1101,13 +1084,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Channel rollout, Venue rollout. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved: Channel rollout, Venue rollout. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 162 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 162 §Monitor"
    }
   ],
   "layout": {
@@ -1274,7 +1252,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Disable model, Disable recommendation type, Disable specific relationship, Raise confidence threshold, Emergency suspend. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved: Disable model, Disable recommendation type, Disable specific relationship, Raise confidence threshold, Emergency suspend. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 164 §Allow"
    },
    {
@@ -1651,13 +1629,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Simulate, Create Experiment, Create Draft, Send for Approval, Dismiss, Snooze. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved: Simulate, Create Experiment, Create Draft, Send for Approval, Dismiss, Snooze. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 168 §Actions"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 168 §Track"
    }
   ],
   "layout": {

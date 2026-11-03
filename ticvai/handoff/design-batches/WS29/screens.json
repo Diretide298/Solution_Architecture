@@ -4,7 +4,7 @@
   "name": "Membership & Annual Pass Command Center",
   "module": "Sell",
   "requiresModule": "membership",
-  "wave": 3,
+  "wave": 1,
   "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
@@ -260,7 +260,7 @@
        "kind": "destructiveButton",
        "label": "Suspend membership product",
        "operation": "approveMembershipProductValidation",
-       "permission": "PLATFORM_CELL_MANAGE",
+       "permission": "MEMBERSHIP_MANAGE",
        "notes": "Quick action: sends `action: suspend` with a `reason`. Allowed only on an `active` version; selling stops on every channel at once and members already holding it keep their entitlements until their own expiry (decided 29 September, writers pass; DM4).",
        "provenance": "contract subscription.yaml PUT /membership-product-validation"
       },
@@ -268,7 +268,7 @@
        "kind": "secondaryButton",
        "label": "Reinstate membership product",
        "operation": "approveMembershipProductValidation",
-       "permission": "PLATFORM_CELL_MANAGE",
+       "permission": "MEMBERSHIP_MANAGE",
        "notes": "Quick action: sends `action: reinstate`, moving a `suspended` version back to `active`; refused once its `effectiveTo` has passed (decided 29 September, writers pass; DM4).",
        "provenance": "contract subscription.yaml PUT /membership-product-validation"
       },
@@ -987,7 +987,7 @@
   "name": "Membership Entitlement & Admission Benefit Builder",
   "module": "Sell",
   "requiresModule": "membership",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
@@ -1039,6 +1039,7 @@
       {
        "kind": "selectField",
        "label": "Attraction",
+       "operation": "listMembershipBenefits",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
@@ -1049,56 +1050,67 @@
       {
        "kind": "selectField",
        "label": "Admission Type",
+       "operation": "getPlanBenefits",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Number of Visits",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Period",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Days",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Times",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Timeslots",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Per Day",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Per Week",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Per Month",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Per Membership Year",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Lifetime of Membership",
+       "operation": "listMembershipAnnualPass",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure"
       }
      ]
@@ -1220,6 +1232,27 @@
     "purpose": "Create the entitlement template the screen's fields define, with expiryNoticeDays for the pre-expiry notice",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026; reached by Create entitlement template, r11 gate fix (CHG-R11FXS-002)"
+   },
+   {
+    "operationId": "listMembershipAnnualPass",
+    "contract": "subscription",
+    "purpose": "The memberships and their entitlement and admission settings as saved, which the builder opens on",
+    "trigger": "onLoad",
+    "provenance": "r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits"
+   },
+   {
+    "operationId": "listMembershipBenefits",
+    "contract": "catalogue",
+    "purpose": "The benefits as defined, which Define a benefit edits",
+    "trigger": "onLoad",
+    "provenance": "r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits"
+   },
+   {
+    "operationId": "getPlanBenefits",
+    "contract": "catalogue",
+    "purpose": "The benefits a plan grants as saved, which Replace the benefits edits",
+    "trigger": "onLoad",
+    "provenance": "r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits"
    }
   ],
   "wireframe": {
@@ -1347,7 +1380,7 @@
        "kind": "primaryButton",
        "label": "Save membership usage policy",
        "operation": "setMembershipUsagePolicy",
-       "permission": "PLATFORM_CELL_MANAGE",
+       "permission": "MEMBERSHIP_MANAGE",
        "notes": "The writer for the rules BO-289 shows through listMembershipUsageVisit: visit and admission limits, re-entry, reservations, no-show treatment, cancellations and guest usage for one membership product version, one row of subscription.membership_usage_policy per version (decided 29 September, writers pass; DM4).",
        "provenance": "contract subscription.yaml PUT /membership-usage-policy"
       }
@@ -1835,7 +1868,7 @@
        "kind": "primaryButton",
        "label": "Save membership commercial config",
        "operation": "setMembershipCommercialConfig",
-       "permission": "PLATFORM_CELL_MANAGE",
+       "permission": "MEMBERSHIP_MANAGE",
        "notes": "The writer for the commercial columns BO-291 shows through listMembershipCommercialPricing: `basePricingProfile`, `taxProfile`, `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms` and `salesPeriod` on subscription.membership_product (decided 29 September, writers pass; DM4).",
        "provenance": "contract subscription.yaml PUT /membership-commercial-config"
       }

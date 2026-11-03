@@ -112,13 +112,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide operations, finance and customer-service administrators with a centralized view of wallet operational activity and exceptions. Dashboard KPIs",
   "purposeNote": "Authorized users can monitor all wallet operational activity and trace every operation to the underlying wallet, transaction and administrator action.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 75 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1323,13 +1317,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Allow authorized personnel to perform governed wallet balance adjustments. Adjustment Types Credit Customer compensation Service recovery Promotional correction Migration adjustment Balance correction Manual award Debit Incorrect credit recovery Duplicate credit recovery Administrative correction Fraud recovery where authorized",
   "purposeNote": "No manual balance adjustment can occur without the required permissions, reason, approval and ledger record.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Administrative Balance Adjustment Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [

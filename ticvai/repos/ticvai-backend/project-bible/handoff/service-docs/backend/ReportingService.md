@@ -490,6 +490,7 @@ Definitions are versioned. Historic executions keep the version they ran against
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | New version published |
 | 409 |  | The report is a system report, which is clone-only (audit R096). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -587,6 +588,8 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 ### getDashboard
 
 **`GET /dashboards/{dashboardId}`**: Read a dashboard with tile data
+
+**A dashboard the caller may not see does not exist for it** (ADAM CR-450, Chinmay, 1 November 2026; CHG-CR450-001). A dashboard whose module fails the rule on `CreateDashboardRequest.module` (not licensed, or none of its module permissions held) answers `404 not-found`, exactly as if it did not exist, matching `listDashboards`, which leaves it out.
 
 |  |  |
 |---|---|
@@ -810,6 +813,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Updated |
 | 400 |  | The tiles' refreshes per minute exceed VenueSettings.reporting.dashboardRefreshBudgetPerMinute (proposed default 24, audit R094), as on createDashboard (CHG-RUL-008); or a tile id belongs to another… |
 | 409 |  | Moving a dashboard to a module the caller is not entitled to. |
@@ -1082,6 +1086,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 201 |  | Saved as a definition |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 

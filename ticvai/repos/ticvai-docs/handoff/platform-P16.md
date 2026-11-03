@@ -9,12 +9,12 @@
 | Contracts | 10 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 134 |
+| Operations with no screen | 130 |
 | Waves | wave1 4 · wave3 67 |
 
 ## Gaps
 
-### 134 operations with no screen here
+### 130 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -33,14 +33,12 @@
 | `checkProductSalePermission` | catalogue | POST | Would this seller, here, be allowed to sell these products |
 | `getBundleSigningKeys` | catalogue | GET | The public keys a till verifies catalogue bundles with |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
-| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getProductChannelTexts` | catalogue | GET | The product's texts per sales channel, in each of the tenant's languages |
 | `getProductDashboard` | catalogue | GET | The products dashboard's counts |
 | `getProductOwnerForms` | catalogue | GET | Which form a sale of this product asks the buyer, and which it asks each ticket owner |
 | `getProductSalePermissionRules` | catalogue | GET | Who can sell this product |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
-| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `listOwnerFormCandidates` | catalogue | GET | The forms a product can link for its reservation owner or ticket owner |
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
@@ -60,7 +58,9 @@
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
 | `setWaitingRoomSetting` | catalogue | PUT | Switch a performance's waiting room on or off, and set how fast it releases |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
-| … | | | 94 more |
+| `disputeObligation` | finance | POST | One entity disagrees with the amount |
+| `getForeignTenderReport` | finance | GET | What was taken in which currency |
+| … | | | 90 more |
 
 ### 1 modules split across waves
 

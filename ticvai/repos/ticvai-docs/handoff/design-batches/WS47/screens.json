@@ -544,13 +544,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Users define) and no display directory — it is settings, not a population",
   "purpose": "Generate and manage large quantities of secure unique promotional codes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Unique Code Generation & Batch Manager declares no operation that writes anything** — its only declared call is `listUniqueCodeGeneration`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [

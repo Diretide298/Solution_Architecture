@@ -74,7 +74,7 @@
     {
      "to": "SUP-008",
      "trigger": "Agent Performance & SLA View",
-     "provenance": "derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and SUP-008 opens on its own"
+     "provenance": "derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (optional), and SUP-008 opens on its own"
     },
     {
      "to": "SUP-007",

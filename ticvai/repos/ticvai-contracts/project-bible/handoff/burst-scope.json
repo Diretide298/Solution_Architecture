@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2862,
-  "tables": 67,
-  "ofTotalTables": 1171
+  "ofTotalOperations": 2864,
+  "tables": 68,
+  "ofTotalTables": 1173
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2830,
-    "tables": 1171,
+    "operations": 2832,
+    "tables": 1173,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 32,
-    "tables": 67,
+    "tables": 68,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -227,7 +227,7 @@
   {
    "table": "catalogue.product",
    "schema": "catalogue",
-   "columns": 49,
+   "columns": 52,
    "burstOperations": 6,
    "written": false,
    "contention": null,
@@ -282,7 +282,7 @@
   {
    "table": "access.entitlement",
    "schema": "access",
-   "columns": 34,
+   "columns": 36,
    "burstOperations": 4,
    "written": true,
    "contention": null,
@@ -459,6 +459,17 @@
    "note": "**The rules a ticket carries before anybody buys one** — validity, entries allowed, transferability, what a gate does with it. `access.entitlement` is the issued instance"
   },
   {
+   "table": "catalogue.price_list",
+   "schema": "catalogue",
+   "columns": 28,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A named set of prices for a region and channel.** Region-scoped, because currency is (ADR-0018)"
+  },
+  {
    "table": "catalogue.product_category",
    "schema": "catalogue",
    "columns": 12,
@@ -483,7 +494,7 @@
   {
    "table": "catalogue.variant",
    "schema": "catalogue",
-   "columns": 10,
+   "columns": 11,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -701,20 +712,20 @@
    "note": "**How much of a capacity each channel may sell.** Web cannot consume the counter’s share"
   },
   {
-   "table": "catalogue.price_list",
+   "table": "catalogue.price",
    "schema": "catalogue",
-   "columns": 28,
+   "columns": 5,
    "burstOperations": 1,
    "written": false,
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**A named set of prices for a region and channel.** Region-scoped, because currency is (ADR-0018)"
+   "note": "**What something costs on one price list.** A change here never rewrites what somebody already paid"
   },
   {
    "table": "identity.principal",
    "schema": "identity",
-   "columns": 11,
+   "columns": 12,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -736,7 +747,7 @@
   {
    "table": "identity.session",
    "schema": "identity",
-   "columns": 16,
+   "columns": 17,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -1524,6 +1535,8 @@
    "callsPerBuyer": 1,
    "reads": [
     "catalogue.event",
+    "catalogue.price",
+    "catalogue.price_list",
     "catalogue.product",
     "catalogue.product_eligibility_rule",
     "catalogue.product_media",

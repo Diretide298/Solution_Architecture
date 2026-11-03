@@ -111,10 +111,10 @@ screens:
         label: PIN
         notes: Goes into `LoginRequest.credential`; the PIN is always typed. A badge tap fills Employee
           number (`LoginRequest.username`) and sets `method` to `card` or `rfid`, which say how the username
-          was entered (IDENTITY-C36; r13, CHG-RCR31-001). The scanner sends its own `workstationId`
-          (CHG-DOOR-001), so every scan is attributable to a person at this gate. The keypad takes the
-          tenant's PIN length, exactly `WorkstationContext.pinLength` digits (`PasswordPolicy.pinLength`,
-          4, 6 or 8; CHG-CRD-002), kept from the scanner's last session.
+          was entered (IDENTITY-C36; r13, CHG-RCR31-001). The scanner sends its own `workstationId` (CHG-DOOR-001),
+          so every scan is attributable to a person at this gate. The keypad takes the tenant's PIN length,
+          exactly `WorkstationContext.pinLength` digits (`PasswordPolicy.pinLength`, 4, 6 or 8; CHG-CRD-002),
+          kept from the scanner's last session.
       - kind: primaryButton
         label: Sign in
         operation: login
@@ -274,28 +274,28 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-002 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-003
       trigger: Ready to scan
-      provenance: 'derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-002 holds none
-        of them. The edge carries nothing: mediaCode, rightId only pre-select (deep link or optional),
-        and SCN-003 opens on its own'
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-002 holds none
+        of them, so the edge carries nothing and SCN-003 opens cold
     - to: SCN-016
       trigger: Gate mode
       carries:
       - accessPointId
       provenance: derived — SCN-016 declares entryState.params accessPointId, changeId and SCN-002 holds
         accessPointId, so an edge into it carries them
-  notes: 'Definition derived from the wireframe board on 14 August. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
-    updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
-    is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine
-    the lane is a handheld that can admit anywhere. **`setTurnstileMode` belongs here and flow F06 is
-    why.** It was taken off on 4 September on the reasoning that this screen only reads — but F06 *guest
-    enters the venue* step 2 is ''confirms access point and direction''. **Since 28 September (audit R221)
-    confirming the direction is not setting the mode**: the direction is fixed per access point and shown
-    here read-only; what the operator sets is the operating mode (required), with the turnstile mode (freeRotation
-    or closed) as an optional narrowing under normal or podium only.'
+  notes: 'Definition derived from the wireframe board on 14 August. **Authoring operations removed 24
+    August**: createAccessPoint, setAccessPointGeofence, updateAccessPoint. **A scanner reads the gate
+    configuration; it does not write it.** An access point is created in the back office and a geofence
+    is a venue decision — a handheld at a lane that can redefine the lane is a handheld that can admit
+    anywhere. **`setTurnstileMode` belongs here and flow F06 is why.** It was taken off on 4 September
+    on the reasoning that this screen only reads — but F06 *guest enters the venue* step 2 is ''confirms
+    access point and direction''. **Since 28 September (audit R221) confirming the direction is not setting
+    the mode**: the direction is fixed per access point and shown here read-only; what the operator sets
+    is the operating mode (required), with the turnstile mode (freeRotation or closed) as an optional
+    narrowing under normal or podium only.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listAccessPoints` reads the population and `getAccessPoint` reads one of them — list,
@@ -478,8 +478,8 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-003 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -509,13 +509,14 @@ screens:
       trigger: A school party of forty arrives on one booking
       provenance: flow F61 step 4→5
       operation: validateAccess
-  notes: 'Definition derived from the wireframe board on 14 August. **Absorbed SCN-004, SCN-005, SCN-006, SCN-010, SCN-012 on 18 August.** A scanner
-    is one screen the device sits on all day, and an outcome is a state of it — **routing to `/access/admitted`
-    for something gone in 1.5 seconds is a page load per guest**, and at a gate doing 40 a minute that
-    is the whole problem. Every absorbed screen kept its copy as a named state. **Authoring operations
-    removed 24 August**: addBlacklistEntry, removeBlacklistEntry. **A scanner reads the gate configuration;
-    it does not write it.** An access point is created in the back office and a geofence is a venue decision
-    — a handheld at a lane that can redefine the lane is a handheld that can admit anywhere.'
+  notes: 'Definition derived from the wireframe board on 14 August. **Absorbed SCN-004, SCN-005, SCN-006,
+    SCN-010, SCN-012 on 18 August.** A scanner is one screen the device sits on all day, and an outcome
+    is a state of it — **routing to `/access/admitted` for something gone in 1.5 seconds is a page load
+    per guest**, and at a gate doing 40 a minute that is the whole problem. Every absorbed screen kept
+    its copy as a named state. **Authoring operations removed 24 August**: addBlacklistEntry, removeBlacklistEntry.
+    **A scanner reads the gate configuration; it does not write it.** An access point is created in the
+    back office and a geofence is a venue decision — a handheld at a lane that can redefine the lane is
+    a handheld that can admit anywhere.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listScans` reads the population and `getOfflinePackage` reads one of them — list, select,
@@ -756,8 +757,8 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-007 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -934,8 +935,8 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-008 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -1113,8 +1114,8 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-009 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -1314,12 +1315,12 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-011 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       provenance: 'derived — SCN-002 declares entryState.params accessPointId and SCN-011 holds none of
-        them. The edge carries nothing: accessPointId only pre-selects (deep link or optional), and SCN-002
+        them. The edge carries nothing: SCN-002 finds accessPointId (listAccessPoints) itself, and SCN-002
         opens on its own'
     - to: SCN-003
       trigger: Ready to scan
@@ -1444,8 +1445,8 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-013 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -1667,8 +1668,8 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-014 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -1688,9 +1689,10 @@ screens:
       operation: syncScans
       crossesDevice: true
       back: false
-  notes: 'Definition derived from the wireframe board on 14 August. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not navigate
-    to a back office and a guest app does not navigate to either** — those are device handovers, and a
-    flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
+  notes: 'Definition derived from the wireframe board on 14 August. **Cross-platform navigation removed
+    24 August**: ADM-003. **A till does not navigate to a back office and a guest app does not navigate
+    to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than
+    a screen pretending there is a link.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listSyncRejections` reads the population and `getOfflinePackage` reads one of them
@@ -1962,8 +1964,8 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-015 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -2113,8 +2115,8 @@ screens:
     - to: SCN-001
       trigger: Sign in
       provenance: 'derived — SCN-001 declares entryState.params challengeId and SCN-016 holds none of
-        them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001
-        opens on its own'
+        them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on
+        its own'
     - to: SCN-002
       trigger: Access point & direction
       carries:
@@ -2123,16 +2125,16 @@ screens:
         so an edge into it carries them
     - to: SCN-003
       trigger: Ready to scan
-      provenance: 'derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-016 holds none
-        of them. The edge carries nothing: mediaCode, rightId only pre-select (deep link or optional),
-        and SCN-003 opens on its own'
-  notes: 'Definition derived from the wireframe board on 14 August. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
-    updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
-    is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine
-    the lane is a handheld that can admit anywhere. **The podium sets the operating mode** (normal, freeFlow,
-    dropArm, closed, podium, maintenance), required on every save; the turnstile mode (freeRotation or
-    closed) is optional and offered only under normal or podium. **Direction is display-only here**: it
-    is fixed per access point and set in the back office (BO-064) (decided 28 September, audit R221).'
+      provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-016 holds none
+        of them, so the edge carries nothing and SCN-003 opens cold
+  notes: 'Definition derived from the wireframe board on 14 August. **Authoring operations removed 24
+    August**: createAccessPoint, setAccessPointGeofence, updateAccessPoint. **A scanner reads the gate
+    configuration; it does not write it.** An access point is created in the back office and a geofence
+    is a venue decision — a handheld at a lane that can redefine the lane is a handheld that can admit
+    anywhere. **The podium sets the operating mode** (normal, freeFlow, dropArm, closed, podium, maintenance),
+    required on every save; the turnstile mode (freeRotation or closed) is optional and offered only under
+    normal or podium. **Direction is display-only here**: it is fixed per access point and set in the
+    back office (BO-064) (decided 28 September, audit R221).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listAccessPoints` reads the population and `getAccessPoint` reads one of them — list,

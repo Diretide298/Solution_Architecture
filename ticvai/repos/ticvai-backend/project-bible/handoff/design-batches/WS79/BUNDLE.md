@@ -343,8 +343,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `readerId` (navigation) |
 | Route | `/games-rides/reader-directory-bo-405` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The registry of physical game readers: identity (reader ID, name, type, serial), place (venue, zone, attraction), firmware, connection and configuration status, last communication. A reader is a device in the one device register (tenancy) with a game configuration on it, so this list joins the two. The one thing to get right: Clone configuration - forty identical readers on a row of machines are configured once, and a clone is never deployed by itself.
 
 **Known correction pending (do not draw the wrong version)**
@@ -621,7 +619,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `deviceId` (navigation), `readerId` (navigation) |
 | Route | `/games-rides/reader-profile-device-setup-bo-406` |
 
-**Known gaps.** **Reader Profile & Device Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … Removed 2 October 2026 (CHG-WIR-001): setReaderProfile writes the shared display and retry profile, not one reader's identity and location; the per-reader write is setReaderConfiguration, with the …
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): setReaderProfile writes the shared display and retry profile, not one reader's identity and location; the per-reader write is setReaderConfiguration, with the …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The technical identity of one reader - device information, location, connectivity and operational settings - with Save, Test connection, Synchronize, Restart and Disable. Device identity (manufacturer, model, serial, MAC, firmware, IP, heartbeat) belongs to the one device register and is read-only here; what this screen sets is where the reader is deployed and how it operates. The one thing to get right: make it obvious which values the device reports and which the operator sets.
 
@@ -1753,7 +1751,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `readerProfileId` (navigation) |
 | Route | `/games-rides/real-time-tap-validation-reader-response-bo-412` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): Per-outcome responses (what the reader shows and does) live on ReaderProfile.displayBehaviour, written by setReaderProfile; the screen was bound to the …
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): Per-outcome responses (what the reader shows and does) live on ReaderProfile.displayBehaviour, written by setReaderProfile; the screen was bound to the …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Explains and configures what happens when a guest taps - Customer tap, Identify card / wallet, Check entitlement, Check bonus, Check paid balance, Apply pricing, Authorize / Reject, Deduct value, Start game - and what the reader shows on success ("PLAY AUTHORIZED - Game price AED 20 - Bonus used AED 10 - Wallet used AED 10 - Remaining AED 85"), for an entitlement ("INCLUDED IN YOUR PASS - Remaining plays 2") and for each rejection. The one thing to get right: each rejection reason is a plain guest message and a configured reader response, never "Declined".
 
@@ -1945,8 +1943,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `readerId` (navigation) |
 | Route | `/games-rides/balance-check-reader-device-test-console-bo-413` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Two jobs on one screen: configure dedicated balance-check readers (what a guest sees on tap - paid credit, bonus, free games, entitlements, bonus expiry, card expiry - without starting a game), and an administrator's test console that runs test taps against a deployed reader configuration and shows the validation result, deduction source, price, remaining balance, reader response and response time. The one thing to get right: a test never charges a real guest - it runs on a test card or a simulated balance and is labelled TEST everywhere.
 

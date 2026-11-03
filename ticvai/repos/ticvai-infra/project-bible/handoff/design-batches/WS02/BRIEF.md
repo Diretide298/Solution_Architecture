@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-154` | Access Rule Command Center | C | 0 | 2 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
+| `BO-154` | Access Rule Command Center | C | 47 | 2 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
 | `BO-155` | Visual Access Rule Builder | A | 15 | 4 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-156` | Entry, Exit & Re-entry Rules | C | 47 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
 | `BO-157` | Anti-Passback & Journey Sequence | C | 13 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |

@@ -96,6 +96,47 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through CrossRegion's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  entitlementReplication:
+    module: cross-region
+    host: workers
+    trigger: {kind: event}
+    consumes: [entitlement.issued]
+    reads: []
+    writes: []
+    for: 'Smaller module consumers: F&B pushes a new kitchen ticket to the station''s KDS screens (the KDS also polls listKitchenTickets;
+      POS-KDS-ROUTING builds routing only); the Queue releases a held virtual-queue slot on entry (''capacity leaks if this
+      is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
+      wallet.credited and re-enables a repair'
+    source:
+    - events/access-validated.yaml
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/fnb-kitchenTicketCreated.yaml
+  expiryAndDsar:
+    module: cross-region
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: cross-region-entitlement, from: active, to: expired}
+    - {model: dsar-request, from: inProgress, to: completed}
+    - {model: dsar-request, from: inProgress, to: partiallyFailed}
+    - {model: wallet-authorisation, from: held, to: expired}
+    - {model: wallet-authorisation, from: partiallyCaptured, to: expired}
+    reads: [sync.cross_region_entitlement, sync.dsar_request, sync.wallet_authorisation]
+    writes: [sync.cross_region_entitlement, sync.dsar_request, sync.wallet_authorisation]
+    for: Cross-region DSAR fan-out, wallet authorisation expiry and entitlement expiry.
+    source:
+    - states/cross-region-entitlement.yaml:26
+    - states/dsar-request.yaml:24
+    - states/wallet-authorisation.yaml:46
 paths:
   /guest-links:
     post:

@@ -19,8 +19,10 @@ payload:
   notes: The queue entry (queue.entry.id); with the event id, what makes a redelivery a duplicate
 - field: queueId
   type: uuid
+  notes: The entry's queue_id
 - field: venueId
   type: uuid
+  notes: The queue's venue_id (queue.queue, read by the emitting operation; ADAM CR-519)
 - field: entitlementId
   type: uuid
   notes: The entry's Fast Pass entitlement (access.entitlement.id). The event is written only when the entry carries one
@@ -30,8 +32,8 @@ payload:
   notes: The queue's access point (queue.queue.access_point_id); null where the queue names none
 - field: admittedCount
   type: integer
-  required: false
-  notes: The party admitted, which may be fewer than its size
+  notes: The party admitted, which may be fewer than its size; the value recorded on the entry, its party_size when the
+    request omitted it (ADAM CR-519)
 - field: recordedAt
   type: timestamp
   notes: When the device redeemed the entry. Differs from the time the server heard on an offline redemption
@@ -55,4 +57,9 @@ notes: '**Why an event and not a call** (ADAM CR-238, option B, 25 October 2026)
   a disconnected device writes the event when the device syncs. redeemWaitingGuest answers entitlementRemaining null.
 
 
-  **Critical, because a lost event is a Fast Pass used without its use taken.** Dead-lettered, it is replayed.'
+  **Critical, because a lost event is a Fast Pass used without its use taken.** Dead-lettered, it is replayed.
+
+
+  **Where the venue, access point and scope come from** (ADAM CR-519, Chinmay, 3 November 2026; CHG-CR519-001): the
+  emitting operation reads the entry''s queue (queue.queue: venue_id, access_point_id) and the venue''s scope path
+  (tenancy#scopeRecords, in process), the outbox envelope''s ScopePath, only when the entry carries an entitlement_id.'

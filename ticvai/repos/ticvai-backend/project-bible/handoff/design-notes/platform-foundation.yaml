@@ -1194,7 +1194,7 @@ screens:
       why: >-
         The purpose is "Give somebody the permissions their job needs"; setRolePermissions exists (used on BO-116)
         and is missing here, and no grant operation is declared.
-      source: screens/P08-venue-back-office.yaml#BO-054; contracts/spine/tenancy.yaml#setRolePermissions
+      source: screens/P08-venue-back-office.yaml#BO-054; contracts/spine/identity.yaml#setRolePermissions
       status: fixed
       by: CHG-WIR-021
     - what: entryState reads campaignId.
@@ -1208,7 +1208,7 @@ screens:
       why: >-
         Where a role is defined and where it is granted must be stated once; a venue-level role list with tenant-level
         permissions is ambiguous for a venue manager.
-      source: contracts/spine/tenancy.yaml#setRolePermissions; contracts/spine/identity.yaml#listRoles
+      source: contracts/spine/identity.yaml#setRolePermissions; contracts/spine/identity.yaml#listRoles
       status: fixed
       by: CHG-WIR-021
     - what: 'Tables show every schema field, plumbing included: ''Every role'' drop id, inheritsFromRoleId.'
@@ -1640,7 +1640,7 @@ screens:
       expected: >-
         Show it as something the person can act on, not a failure: **Breaches a segregation rule.** Names the rule
         and both permissions.
-      source: contracts/spine/tenancy.yaml#setRolePermissions
+      source: contracts/spine/identity.yaml#setRolePermissions
     - case: setVenueSettings answers 422
       expected: >-
         Show it as something the person can act on, not a failure: **An enable the venue cannot evidence.** Biometrics

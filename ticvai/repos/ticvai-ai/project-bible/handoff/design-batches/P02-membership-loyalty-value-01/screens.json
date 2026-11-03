@@ -536,7 +536,10 @@
     "trigger": "onAction",
     "invalidates": [
      "listDelegations"
-    ]
+    ],
+    "inputSources": {
+     "overSubjectId": "session.subjectId"
+    }
    },
    {
     "operationId": "listProducts",

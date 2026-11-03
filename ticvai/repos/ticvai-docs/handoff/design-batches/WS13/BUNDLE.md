@@ -133,8 +133,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/venue-operations/approval-command-center-dashboard-bo-364` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The approval board's hub: pending, awaiting me, approved and rejected today, escalated, SLA breached and high-risk counts, each opening the matching queue. Opens the board's other screens and they return here.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)
@@ -1444,8 +1442,6 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 | Offline | online only |
 | Opens with | `requestId` (navigation) |
 | Route | `/venue-operations/escalated-approval-center-bo-370` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Requests escalated by SLA breach, risk or unavailable approver: original and current approver, level, reason, time waiting. Escalation adds an approver; the original remains in the chain.
 

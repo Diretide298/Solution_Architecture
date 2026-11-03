@@ -27,11 +27,6 @@ payload:
 - field: capturedAt
   type: timestamp
 consumers:
-- context: reporting
-  purpose: Payment performance and tender mix read model
-  idempotencyKey: paymentId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Risk velocity and chargeback features on the guest, device and channel
   idempotencyKey: paymentId

@@ -8,6 +8,8 @@ description: A batch of browsing behaviour from one storefront or guest-app sess
   no personal data.
 aggregate: storefrontSession
 emittedWhen: recordStorefrontSessionEvents accepts a batch (one event per accepted batch)
+emittedBy:
+- white-label.recordStorefrontSessionEvents
 payload:
 - field: batchId
   type: uuid

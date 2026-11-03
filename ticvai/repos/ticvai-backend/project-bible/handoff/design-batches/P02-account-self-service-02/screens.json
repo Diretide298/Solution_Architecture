@@ -1073,7 +1073,7 @@
     "id": "formVerifyGuestEmail",
     "component": "modal",
     "trigger": "Verify guest email",
-    "body": "**Collects what `verifyGuestEmail` sends before it is called.** Required: `mode`. Optional: `token`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**The six-digit code path, as the approved screen draws it.** Opening the form sends `mode` `send`, which mails the code; the guest types the six digits and confirm sends `mode` `code` with `code` (`^[0-9]{6}$`). `token` is the emailed-link path, which this screen does not use. Dismissing sends nothing more; the screen behind is unchanged (r13, CHG-RCR33-001).",
     "confirm": {
      "label": "Verify guest email",
      "operation": "verifyGuestEmail"
@@ -1082,7 +1082,7 @@
      "label": "Cancel",
      "discards": [
       "mode",
-      "token"
+      "code"
      ]
     },
     "provenance": "client-verified"
@@ -1094,7 +1094,10 @@
     "body": "**Collects what `enrolMfaMethod` sends**, then asks for the first code (`verifyMfaEnrolment`). The guest is told the code will be asked only at venues that turned it on. Dismissing enrols nothing.",
     "confirm": {
      "label": "Turn on",
-     "operation": "verifyMfaEnrolment"
+     "operation": "verifyMfaEnrolment",
+     "alsoCalls": [
+      "enrolMfaMethod"
+     ]
     },
     "dismiss": {
      "label": "Cancel",

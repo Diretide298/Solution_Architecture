@@ -35,7 +35,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 2.dc.html#KSK-011"
@@ -159,7 +159,7 @@
    ],
    "notes": "**Reached from KSK-011** — a booking is found by the search that looked for it. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely."
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 2.dc.html#KSK-012"
@@ -282,7 +282,7 @@
     "KSK-009"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk, not by the guest — **the guest presses a button and the device raises the call**, which is why the operation authenticates as a device and authorises nothing. A guest cannot end an assist session they did not start.",
+  "notes": "Definition derived from the wireframe board on 14 August. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk, not by the guest — **the guest presses a button and the device raises the call**, which is why the operation authenticates as a device and authorises nothing. A guest cannot end an assist session they did not start.",
   "density": "touchLarge",
   "audience": "device",
   "boardFrames": [
@@ -457,7 +457,7 @@
    ],
    "notes": "**Reached from KSK-001** — the attract loop is what an out-of-service kiosk replaces. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely."
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 2.dc.html#KSK-014"

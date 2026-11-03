@@ -151,6 +151,9 @@ CHECKS = [
     # 14 October (Chinmay, CHG-ADM-004): a blocker is always a CR, the ticket goes On hold, and the agent takes the next
     # ticket no open blocking CR affects; every text an agent reads says so and ADAM answers it on the board and the pull.
     "check-adam-blocker-rule",
+    # 2 November (r13 root R13, CHG-R13R13-001): no README under repos/ is a copy of another package file (104 were the
+    # Active page); derive-mirrors writes each from its docs/repos/ source or as an index of its folder.
+    "check-repo-readmes",
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",
@@ -171,11 +174,17 @@ CHECKS = [
     # data is a view named for the reader inside one deployable, or a declared query (x-ticvai-read-via) by a route
     # the deployables allow; Identity reads nothing above it but a projection.
     "check-cross-module-reads",
+    # 2 November 2026 (r13, CHG-R13JOB-001): every job, timer and event consumer the package describes is declared in
+    # its contract's x-ticvai-jobs, and a task builds it; a reporting consumer keeps no separate read model (ADR-0016).
+    "check-jobs",
     # 14 October (ADAM CR-076, CHG-GEN-010): a table's row-level security lets in the scope its operations run at.
     "check-rls-scope-fit",
     # 12 October (CHG-R6-030): a screen is gated on a permission its operations require; the ticket media designers
     # take the product permission (BC-034..BC-037).
     "check-screen-permissions",
+    # 2 November (r13 root-cause lane u, CHG-RCR31-001, CHG-RCR32-001): a decision that names what a screen
+    # does is in that screen's record; role forms send the grant, role cards name the venue, a badge fills the username.
+    "check-screen-decisions",
     # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
     "check-promises-kept",
     # 14 October (ADAM CR-082, CHG-TEN-005): a configuration write's request field is on its persisted resource,

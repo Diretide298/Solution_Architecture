@@ -999,8 +999,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `readerId` (navigation) |
 | Route | `/games-rides/game-trigger-i-o-control-mapping-bo-479` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** How an approved tap physically starts a game or ride: which output the reader fires (relay pulse, digital output, a command), for how long, and which inputs tell TICVAI the game started, finished, paid out or faulted. Agreed with the client as a dry-contact start signal, like a turnstile. The one thing to get right: the output and input lines come from the reader model, and a test fires a real machine, so it must be confirmed.
 
 **Known correction pending (do not draw the wrong version)**

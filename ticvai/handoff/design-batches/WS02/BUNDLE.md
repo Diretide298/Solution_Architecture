@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-154` | Access Rule Command Center | C | 0 | 2 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
+| `BO-154` | Access Rule Command Center | C | 47 | 2 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
 | `BO-155` | Visual Access Rule Builder | A | 15 | 4 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-156` | Entry, Exit & Re-entry Rules | C | 47 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
 | `BO-157` | Anti-Passback & Journey Sequence | C | 13 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
@@ -192,7 +192,60 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Status | text field | — | — | `listAccessRule` ?status |
 | Date | text field | — | — | `listAccessRule` ?date |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Create admission rule** (modal, opened by *Create admission rule*; *Create admission rule* calls `createAdmissionRules`, *Cancel* sends nothing)
+
+**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Code `code` | text field | required | — | max length 64 | — | — | `createAdmissionRules` body |
+| Per product rules `perProductRules` | repeatable rows | optional | — | — | — | BL-059. Transaction rules were per profile and a ticket type could not state its own. | `createAdmissionRules` body |
+| Product `perProductRules[].productId` | picker: choose a product | optional | — | — | shows names, sends the id | — | `createAdmissionRules` body |
+| Entries per day `perProductRules[].entriesPerDay` | number field | optional | — | — | — | — | `createAdmissionRules` body |
+| Minimum gap minutes `perProductRules[].minimumGapMinutes` | number field (minutes) | optional | — | — | — | Anti-passback in minutes rather than a boolean. A guest leaving for lunch and returning in forty minutes is normal; the same scan twice in ten seconds is a card being passed back … | `createAdmissionRules` body |
+| Allowed access points `perProductRules[].allowedAccessPointIds` | multi-picker: choose allowed access points | optional | — | — | — | — | `createAdmissionRules` body |
+| Biometric policy `perProductRules[].biometricPolicy` | segmented control | optional | — | Disabled · Offered · Preferred | — | BL-105, 3.2.9. The biometric check is a property of the product, not of the venue — memberships checked, day tickets not. | `createAdmissionRules` body |
+| Max passes per biometric identity `perProductRules[].maxPassesPerBiometricIdentity` | number field | optional | — | min 1 | — | BL-096, 2.14.7. The annual-pass quota, keyed to biometric identity. | `createAdmissionRules` body |
+| Name `name` | text field | required | — | max length 200 | — | — | `createAdmissionRules` body |
+| Open minutes before `openMinutesBefore` | number field (minutes) | required | — | — | — | How long before a performance validation opens. | `createAdmissionRules` body |
+| Close minutes after `closeMinutesAfter` | number field (minutes) | required | — | — | — | — | `createAdmissionRules` body |
+| Max duration minutes `maxDurationMinutes` | number field (minutes) | optional | — | — | — | — | `createAdmissionRules` body |
+| Requires exit before reentry `requiresExitBeforeReentry` | toggle | optional | off | — | — | — | `createAdmissionRules` body |
+| Max reentries `maxReentries` | number field | optional | — | — | — | — | `createAdmissionRules` body |
+| Entry limit `entryLimit` | group | optional | — | — | — | How many times the credential may enter (decided 29 September, VM close-out). Pack 'Access Control Module' p.19 (BO-156, Entry, Exit & Re-entry Rules). | `createAdmissionRules` body |
+| Mode `entryLimit.mode` | radio group | required | Unlimited | Unlimited · Once · N times · N per day · N per period | — | — | `createAdmissionRules` body |
+| Count `entryLimit.count` | number field | optional | — | min 1 | — | N for nTimes, nPerDay and nPerPeriod; required for those modes (`422` without it) | `createAdmissionRules` body |
+| Period days `entryLimit.periodDays` | number field (days) | optional | — | min 1 | — | The period for nPerPeriod | `createAdmissionRules` body |
+| Exit scan `exitScan` | segmented control | optional | Optional | Required · Optional · None | — | (decided 29 September, VM close-out) `required`: re-entry needs a recorded exit. | `createAdmissionRules` body |
+| Max exits `maxExits` | number field | optional | — | min 0 | — | Null is unlimited (decided 29 September, VM close-out) | `createAdmissionRules` body |
+| Re entry window minutes `reEntryWindowMinutes` | number field (minutes) | optional | — | min 1 | — | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) | `createAdmissionRules` body |
+| Same day only `sameDayOnly` | toggle | optional | on | — | — | Re-entry only on the day of the exit (decided 29 September, VM close-out) | `createAdmissionRules` body |
+| Designated access points `designatedAccessPointIds` | multi-picker: choose designated access points | optional | — | — | — | Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out) | `createAdmissionRules` body |
+| Validity `validity` | group | optional | — | — | — | When the credential is valid (decided 29 September, VM close-out). Pack 'Access Control Module' p.21 (BO-158, Access Validity & Time Rules). | `createAdmissionRules` body |
+| Anchor `validity.anchor` | radio group | required | — | Fixed range · After sale · After activation · After first use | — | fixedRange uses from and to; the others count days from the event | `createAdmissionRules` body |
+| Days `validity.days` | number field | optional | — | min 1 | — | N days after the anchor; required unless the anchor is fixedRange | `createAdmissionRules` body |
+| From `validity.from` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createAdmissionRules` body |
+| To `validity.to` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | Inclusive. | `createAdmissionRules` body |
+| End of `validity.endOf` | radio group | optional | — | Day · Week · Month · Year | — | Validity runs to the end of the day, week, month or year the relative period ends in | `createAdmissionRules` body |
+| Days of week `validity.daysOfWeek` | multi-select chips | optional | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun | — | Empty is every day | `createAdmissionRules` body |
+| Day types `validity.dayTypes` | multi-select chips | optional | — | Peak dates · Off peak dates · Holidays · Seasons · Event dates | — | Calendar day types on which access is allowed; empty is every day type | `createAdmissionRules` body |
+| Blackout dates `validity.blackoutDates` | list of values (chips) | optional | — | — | — | Dates on which access is refused whatever else allows it | `createAdmissionRules` body |
+| Crossover `crossover` | group | optional | — | — | — | Crossover between parks (decided 29 September, VM close-out). Pack 'Access Control Module' p.23 (BO-160, Multi-Park & Crossover Rules); BO-220 uses the same block. | `createAdmissionRules` body |
+| Allowed park org units `crossover.allowedParkOrgUnitIds` | multi-picker: choose allowed park org units | required | — | at least 2 | — | — | `createAdmissionRules` body |
+| Park order `crossover.parkOrder` | multi-picker: choose park order | optional | — | — | — | Required order of parks, if any; empty is any order | `createAdmissionRules` body |
+| Same day only `crossover.sameDayOnly` | toggle | optional | on | — | — | — | `createAdmissionRules` body |
+| Different day access `crossover.differentDayAccess` | toggle | optional | off | — | — | — | `createAdmissionRules` body |
+| Day pattern `crossover.dayPattern` | segmented control | optional | Flexible within validity | Consecutive from first scan · Flexible within validity | — | — | `createAdmissionRules` body |
+| Max park entries `crossover.maxParkEntries` | number field | optional | — | min 1 | — | Null is unlimited | `createAdmissionRules` body |
+| Crossover quantity `crossover.crossoverQuantity` | number field | optional | — | min 1 | — | How many crossovers; null is unlimited | `createAdmissionRules` body |
+| Crossover after time `crossover.crossoverAfterTime` | time picker | optional | — | — | HH:mm, 24-hour | Earliest venue-local time HH:MM a crossover is allowed | `createAdmissionRules` body |
+| Prerequisite park org unit `crossover.prerequisiteParkOrgUnitId` | picker: choose a prerequisite park org unit | optional | — | — | shows names, sends the id | The park that must be entered first | `createAdmissionRules` body |
+| Re entry after crossover `crossover.reEntryAfterCrossover` | toggle | optional | off | — | — | — | `createAdmissionRules` body |
+| Allowed access points `allowedAccessPointIds` | multi-picker: choose allowed access points | optional | — | — | — | Empty means any access point in the venue. | `createAdmissionRules` body |
+| Re entry verification `reEntryVerification` | radio group | optional | Credential only | Credential only · Credential uv stamp · Credential face · Credential operator · Custom | — | What a re-entering guest must show besides the credential, as `listEntryTemporaryExit` returns it (added 29 September, data-model close-out DM1). | `createAdmissionRules` body |
+| … 2 more | | | | | | the rest are in `schemas.json` | `createAdmissionRules` body |
+
+Errors to draw in the form: 403 The session has no working venue, so the profile has no venue to be written under (`working-venue-required`; ADAM CR-400); or the caller lacks …; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 A count missing for an n* entry mode, days missing for a relative validity anchor, or validity.to before validity.from (ADAM CR-400, as updateAdmissionRules).
 
 #### Outputs: what the screen shows and produces
 
@@ -233,6 +286,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Shows | Format | Notes |
 |---|---|---|
 | Rule applies to location validity status | text | not in the schema: `Rule Applies To Location Validity Status` |
+
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Create admission rule (primary button) | `createAdmissionRules` POST `/admission-rules` | AdmissionRules | AdmissionRules | 403 The session has no working venue, so the profile has no venue to be written under (`working-venue-required`; ADAM CR-400); or the caller lacks …; 409 A business code the request names is already used within its … | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -350,7 +409,7 @@ Screen guard: `SCOPE_VIEW`
 
 #### Requirements it meets
 
-7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+9 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -361,6 +420,8 @@ Screen guard: `SCOPE_VIEW`
 | 7.4.22 | For special ticket, it can be restricted to particular group of people and have precondition ex: companion ticket | F&B POS | CONTRACTED | `listAdmissionRules` |
 | 7.4.25 | For each PLU, it is possible to manage Usage zone or attraction access control restriction | F&B POS | CONTRACTED | `listAdmissionRules` |
 | 1.1.51 | Admission entitlement management | Ticketing Catalogue | CONTRACTED | `createAdmissionRules` |
+| 1.5.5 | The system should allow specification of rules and conditions associated with a ticket. These rules and conditions will govern the usage of the ticket and any transactions associated with a ticket … | Ticketing Catalogue | CONTRACTED | data `AdmissionRules` |
+| 3.2.9 | The system should have the possibility to activate/deactivate the biometric check on some type of tickets. For example, membership passes, annual pass holder, multi day and multi attraction tickets. | Admission and Access | CONTRACTED | data `AdmissionRules` |
 
 #### Client meeting inputs
 
@@ -394,10 +455,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409, 422).
+- [ ] Every input above is drawn (47), with its required mark, default, format and its error state (403, 409, 422).
 - [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-154?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Create admission rule.
 - [ ] Every transition is wired: `BO-100`, `BO-155`, `BO-156`, `BO-158`, `BO-160`, `BO-162`, `BO-163`, `BO-157`, `BO-159`, `BO-161`.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.

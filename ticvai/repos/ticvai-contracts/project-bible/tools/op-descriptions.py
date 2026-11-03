@@ -202,6 +202,20 @@ def build(schedule, keys):
     slice_ops = set(json.loads((ROOT / "handoff" / "delivery-slice.json").read_text(encoding="utf-8"))["operations"])
     money = MoneyReach()
     emits = emits_index()
+    # **An operation whose ticket builds a query says so** (r13, 2 November 2026, CHG-R13PL-051): block-a-extra-tasks.json
+    # `readViaBuiltWith` names the operations a query is built with (query -> operations). A query class gets no task
+    # of its own from the operation formula, so the ticket it rides on names it: the lead put Access's
+    # access#mediaTemplateRecords (CR-447, XDR-067) on printTicketProof's ticket (#31680), and its text only said the
+    # operation reads it.
+    try:
+        built_with = json.loads((ROOT / "docs" / "active" / "block-a-extra-tasks.json").read_text(encoding="utf-8")) \
+            .get("readViaBuiltWith") or {}
+    except (OSError, ValueError):
+        built_with = {}
+    builds_query = collections.defaultdict(list)
+    for q_, ops_ in sorted(built_with.items()):
+        for o_ in ops_ or []:
+            builds_query[o_].append(q_)
     screens = {}
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
         sdoc = yaml.safe_load(f.read_text(encoding="utf-8"))
@@ -285,6 +299,10 @@ def build(schedule, keys):
         if ln.get("reads") or ln.get("writes"):
             out.append(f"- **Reads (from the lineage, at least):** {', '.join(ln.get('reads') or []) or 'nothing'}; "
                        f"**writes:** {', '.join(ln.get('writes') or []) or 'nothing'}")
+        if builds_query.get(op):
+            out.append("- **Builds the query, with this operation:** "
+                       + ", ".join(f"`{q_}`" for q_ in builds_query[op])
+                       + " (its `x-ticvai-queries` entry in its module's contract gives the inputs, returns and rule)")
         if money.reaches(ROOT / file, {"parameters": o.get("parameters"), "requestBody": o.get("requestBody"),
                                        "responses": o.get("responses")}):
             out.append(f"- **Money:** {MONEY_RULE}")

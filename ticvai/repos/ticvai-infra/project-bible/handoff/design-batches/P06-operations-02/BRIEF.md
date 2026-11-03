@@ -1,6 +1,6 @@
 # P06-operations-02 — P06 · Operations (2 of 5)
 
-**10 screens · 26 operations · 42 schemas · 10 permissions**
+**10 screens · 26 operations · 43 schemas · 10 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -143,7 +143,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-014` | Ticket lookup | C | 11 | 23 | 6 | 27 | 2 | 0 | — | notStarted (generated) |
+| `EMP-014` | Ticket lookup | C | 12 | 23 | 6 | 27 | 2 | 0 | — | notStarted (generated) |
 | `EMP-015` | Group scan | C | 37 | 12 | 6 | 60 | 1 | 0 | — | notStarted (generated) |
 | `EMP-017` | Sync & reconciliation | C | 35 | 16 | 6 | 60 | 2 | 0 | — | notStarted (generated) |
 | `EMP-018` | Offline package | B | 3 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |

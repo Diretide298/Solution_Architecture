@@ -1012,13 +1012,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Compare different ways of commercially packaging the same customer. This screen must consume the commercial models configured in Board 3.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 51 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1168,13 +1162,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide the complete package before customer acceptance or internal approval.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 53 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

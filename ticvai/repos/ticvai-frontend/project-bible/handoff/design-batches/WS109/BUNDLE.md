@@ -134,8 +134,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/accreditation-holder-directory-bo-625` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The directory of every accredited person, across programmes, events and venues: one row per person, not per application, because the holder profile is the single source of truth for that person. Staff search it to answer "is this person accredited, for what, and is it still valid". The one thing to get right: rows open the person's record with the holderId, and the record's board-2 screens open as tabs of that one record rather than as separate destinations from this list.
 
 **Known correction pending (do not draw the wrong version)**

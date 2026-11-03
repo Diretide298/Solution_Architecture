@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
-  "operationsWithNoScreen": 23
+  "operationsWithNoScreen": 22
  },
  "waves": {
   "wave1": 77
@@ -163,11 +163,11 @@
    "operations": 15
   },
   {
-   "contract": "transport",
+   "contract": "access",
    "operations": 12
   },
   {
-   "contract": "access",
+   "contract": "transport",
    "operations": 12
   },
   {
@@ -183,6 +183,10 @@
    "operations": 7
   },
   {
+   "contract": "wallet",
+   "operations": 6
+  },
+  {
    "contract": "resources",
    "operations": 6
   },
@@ -191,15 +195,11 @@
    "operations": 6
   },
   {
-   "contract": "wallet",
-   "operations": 6
-  },
-  {
    "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "seating",
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -207,7 +207,7 @@
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -917,22 +917,10 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "getPlanBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Which benefits a plan grants, and how much of each"
-   },
-   {
     "operation": "listGuestMemberships",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listMembershipBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Benefits a plan can grant"
    },
    {
     "operation": "listMembershipProgrammes",
@@ -969,6 +957,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Does this contact already have a profile here"
+   },
+   {
+    "operation": "createGuestDocumentUpload",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue the key and a signed upload URL for a guest document"
    },
    {
     "operation": "decideGuestCheckoutMatch",

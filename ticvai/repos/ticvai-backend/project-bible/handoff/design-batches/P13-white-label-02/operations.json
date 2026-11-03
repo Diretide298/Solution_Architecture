@@ -37,6 +37,25 @@
   "requestBody": "CreateConsentQuestionRequest",
   "responds": "ConsentQuestion"
  },
+ "createDelegatedAccess": {
+  "method": "POST",
+  "path": "/delegated-access",
+  "contract": "identity",
+  "summary": "Assign a grant",
+  "permission": "PERMISSION_GRANT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGrantRequest",
+  "responds": "DelegatedAccess"
+ },
  "createGuidedChoice": {
   "method": "POST",
   "path": "/venues/{venueId}/guided-choices",
@@ -93,6 +112,25 @@
   ],
   "requestBody": "UrlRedirect",
   "responds": "UrlRedirect"
+ },
+ "deleteDelegatedAccess": {
+  "method": "DELETE",
+  "path": "/delegated-access/{delegatedAccessId}",
+  "contract": "identity",
+  "summary": "Remove a grant",
+  "permission": "PERMISSION_GRANT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "deleteGuidedChoice": {
   "method": "DELETE",

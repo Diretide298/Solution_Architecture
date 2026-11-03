@@ -218,7 +218,10 @@ def apply_r10(new: dict, schemas: dict, contract: str, method: str, route, purpo
         out = {"x-ticvai-read-via": via, **out}
     extra = []
     if is_list:
-        extra.append(CS.order_sentence(view_props, []))
+        try:
+            extra.append(CS.order_sentence(view_props, []))
+        except ValueError as e:  # no field of the item's own to order on (CHG-R13RVB-006): C-PAGED-ORDER asks for one
+            print(f"  NEEDS AN ORDER RULING: {e}", file=sys.stderr)
     if out.get("x-ticvai-permission"):
         extra.append(CS.scope_sentence(out["x-ticvai-permission"], scope, is_list))
     if extra:

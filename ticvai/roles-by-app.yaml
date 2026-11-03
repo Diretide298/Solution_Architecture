@@ -11,7 +11,7 @@ theTwoVocabularies:
   rolesYamlMapsTo: 14
   shared: 12
   note: '**One vocabulary: the `Permission` enum in contracts/shared/permissions.yaml.** The contracts
-    require 176 of its values across 2663 operations; `roles.yaml`''s 45 POS action keys are presets,
+    require 176 of its values across 2664 operations; `roles.yaml`''s 45 POS action keys are presets,
     each mapped to the enum values it covers (14 values, 12 of them required by an operation). check-permission-vocabulary
     holds every place that names a permission to the enum.'
 tiers:
@@ -29,7 +29,7 @@ apps:
     - P02
     - P05
     screens: 144
-    operations: 226
+    operations: 228
     permissions: 23
     permissionSet:
     - AI_USE
@@ -350,7 +350,7 @@ apps:
     - P13
     - P16
     screens: 1866
-    operations: 2102
+    operations: 2110
     permissions: 151
     permissionSet:
     - ACCESS_DIRECTION_SET

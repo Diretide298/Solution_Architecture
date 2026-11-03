@@ -393,6 +393,19 @@
   "requestBody": null,
   "responds": "MediaAssetDetail"
  },
+ "getMediaTaxonomy": {
+  "method": "GET",
+  "path": "/media-taxonomy",
+  "contract": "assets",
+  "summary": "The categories, metadata fields and controlled vocabularies",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaTaxonomy"
+ },
  "getModuleEnablement": {
   "method": "GET",
   "path": "/tenant-config/modules",

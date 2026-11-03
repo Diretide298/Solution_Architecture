@@ -42,9 +42,4 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: false
-- context: reporting
-  purpose: Approval volume and time-to-decision analytics
-  idempotencyKey: requestId
-  onFailure: retry
-  isCritical: false
 retention: Retained with the request. This is an audit record, not an operational message

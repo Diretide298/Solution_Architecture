@@ -476,20 +476,25 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listCatalogueBundles": {
+ "listBundles": {
   "method": "GET",
-  "path": "/catalogue/bundles",
-  "contract": "catalogue",
-  "summary": "List published catalogue bundles",
+  "path": "/bundles",
+  "contract": "promotions",
+  "summary": "List bundles",
   "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "venueId",
+    "name": "kind",
     "in": "query",
-    "required": false
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
     "name": null,
@@ -498,7 +503,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "BundleSummary"
+  "responds": "Page"
  },
  "listIncidents": {
   "method": "GET",

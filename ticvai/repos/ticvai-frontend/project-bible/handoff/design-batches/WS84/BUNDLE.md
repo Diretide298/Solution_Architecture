@@ -134,8 +134,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `cardCode` (navigation) |
 | Route | `/games-rides/card-lifecycle-command-center-bo-454` |
 
-**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): No staff-audience read of a game card (getGameCard is guest-only; used on BO-396, BO-454, BO-455, BO-457, BO-462, BO-486).
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The landing screen of the card lifecycle board: how many game cards are active, used and recharged today, which are about to expire, which are expired, blocked or dormant, and how much value sits on them. Arcade operations and finance use it daily to watch card health and to jump to a single card. The one thing to get right: it is the shared command-centre pattern (KPI tiles, the lifecycle distribution, alerts, then a card search) and every tile opens the board screen behind it.
 
 **Known correction pending (do not draw the wrong version)**
@@ -348,8 +346,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `cardCode` (navigation) |
 | Route | `/games-rides/card-credential-profile-bo-455` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** One card's master record: which physical or digital credential it is, whose it is, which wallet it draws on, its lifecycle dates and every value attached to it. Arcade supervisors open it from a search, a complaint or a block. The one thing to get right: the card is the credential, not the value; show the card status and the wallet's balances as two distinct blocks so blocking a card visibly leaves the value intact.
 
@@ -1016,7 +1012,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/card-expiry-runtime-validation-bo-459` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): authoriseGameplay decides a real tap now and charges for it; a back-office check uses simulateGameplayAuthorisation, which returns the decision and trace without …
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): authoriseGameplay decides a real tap now and charges for it; a back-office check uses simulateGameplayAuthorisation, which returns the decision and trace without …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Shows, and lets an administrator test, how a tap is judged when the card is active or expired: the reader sends the credential, TICVAI checks status and calculated expiry, and answers Approve or Reject with a reason the reader displays. It exists so the development team and operators see that expiry is a backend decision. The one thing to get right: the architecture strip (Card, Reader, TICVAI, Approve or Reject, Reader display) is the hero, and testing a card here must never charge it.
 
@@ -1183,8 +1179,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `cardId` (navigation) |
 | Route | `/games-rides/card-block-suspend-reactivation-control-bo-460` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Where an authorised operator blocks a lost, stolen or suspicious card, suspends it, or reactivates it, always with a reason and always without touching the wallet. The one thing to get right: the confirmation says exactly what stops working and what is protected ("Card ****4321 stops working at every reader; AED 125.00 and 2,450 credits stay on the wallet") and when offline readers will learn of it.
 
@@ -1368,8 +1362,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `cardId` (navigation) |
 | Route | `/games-rides/card-replacement-wallet-relinking-bo-461` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Swaps a damaged, lost or faulty card for a new one while the guest keeps everything: paid balance, bonus, redemption credits, entitlements and history. The client's own wording (DI-538) is: identify the guest by phone or ID, find the original purchase, move the balance to the replacement. The one thing to get right: one guided flow with one final action, not three separate operations the operator has to chain.
 
 **Known correction pending (do not draw the wrong version)**
@@ -1539,8 +1531,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `cardCode` (navigation) |
 | Route | `/games-rides/customer-balance-credential-status-view-bo-462` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Defines what card and wallet information the backend presents on each guest-facing channel (balance reader, self-service kiosk, operator kiosk) and previews it. The pack is explicit that this is not another reader-configuration screen: board 2 configures the reader device; this configures the balance and status service the reader or kiosk asks for. The one thing to get right: a channel-by-data matrix plus a customer-view preview, not a reader form.
 
 **Known correction pending (do not draw the wrong version)**
@@ -1699,8 +1689,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/card-lifecycle-audit-history-bo-463` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The card's history: every lifecycle change with what caused it, who or what did it, and on which device. Used to answer complaints ("my card stopped working") and for audit. The one thing to get right: a single-card timeline of lifecycle events (issued, recharged, expiry recalculated, blocked, replaced), with the hundreds of plays collapsed so they do not bury the events that matter.
 

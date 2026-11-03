@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 81 of 299 |
+| Operations in the slice | 83 of 299 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -34,6 +34,8 @@
 | asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 1 | CMS-010, CMS-076 |
 | asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 1 | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-062 … |
 | asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075 |
+| assets | [`getMediaTaxonomy`](#getmediataxonomy) | GET | `/media-taxonomy` | core | 1 | CMS-010, CMS-065, CMS-066 |
+| assets | [`setMediaTaxonomy`](#setmediataxonomy) | PUT | `/media-taxonomy` | setup | 1 | CMS-065 |
 | card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 1 | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
 | collection | [`createCollection`](#createcollection) | POST | `/media/collections` | core | 1 | CMS-010, CMS-064 |
@@ -545,6 +547,133 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
+## Group: assets
+
+### getMediaTaxonomy
+
+**`GET /media-taxonomy`**: The categories, metadata fields and controlled vocabularies
+
+Boards 1.5 and 1.6. **A DAM without a taxonomy is a shared drive with a search box.** The board counts *unclassified assets* as a headline metric, which only means anything if classification is defined somewhere.
+Metadata fields are per asset type — an image has dimensions, a video has a duration, a contract has an expiry — so the field set is configuration rather than a fixed column list.
+
+|  |  |
+|---|---|
+| Permission | `ASSET_LIBRARY_VIEW` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Read routing | replica |
+| Reads | `assets.taxonomy` |
+| Writes | - |
+| Called by | CMS-010, CMS-065, CMS-066 |
+
+**Response**: `MediaTaxonomy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| categories | array of object |  |  |
+| categories[].id | string (uuid) |  |  |
+| categories[].code | string |  |  |
+| categories[].name | string |  |  |
+| categories[].parentCategoryId | string (uuid) |  | (nullable) |
+| categories[].applicableAssetTypes | array of string |  |  |
+| fields | array of object |  |  |
+| fields[].code | string |  |  |
+| fields[].label | string |  |  |
+| fields[].dataType | string |  |  |
+| fields[].applicableAssetTypes | array of string |  |  |
+| fields[].mandatory | boolean |  |  |
+| fields[].allowedValues | array of string |  |  |
+| keywordVocabularies | array of object |  |  |
+| keywordVocabularies[].code | string |  |  |
+| keywordVocabularies[].terms | array of string |  |  |
+| keywordVocabularies[].closed | boolean |  | A closed vocabulary refuses terms not in the list. (default False) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The taxonomy |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setMediaTaxonomy
+
+**`PUT /media-taxonomy`**: Define categories, fields and keyword vocabularies
+
+|  |  |
+|---|---|
+| Permission | `ASSET_LIBRARY_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `assets.taxonomy` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Reads | `assets.taxonomy`, `cache:idempotency` |
+| Writes | `assets.taxonomy`, `cache:idempotency` |
+| Called by | CMS-065 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `MediaTaxonomy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| categories | array of object |  |  |
+| categories[].id | string (uuid) |  |  |
+| categories[].code | string |  |  |
+| categories[].name | string |  |  |
+| categories[].parentCategoryId | string (uuid) |  | (nullable) |
+| categories[].applicableAssetTypes | array of string |  |  |
+| fields | array of object |  |  |
+| fields[].code | string |  |  |
+| fields[].label | string |  |  |
+| fields[].dataType | string |  |  |
+| fields[].applicableAssetTypes | array of string |  |  |
+| fields[].mandatory | boolean |  |  |
+| fields[].allowedValues | array of string |  |  |
+| keywordVocabularies | array of object |  |  |
+| keywordVocabularies[].code | string |  |  |
+| keywordVocabularies[].terms | array of string |  |  |
+| keywordVocabularies[].closed | boolean |  | A closed vocabulary refuses terms not in the list. (default False) |
+| scopePath | string |  |  |
+
+**Response**: `MediaTaxonomy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| categories | array of object |  |  |
+| categories[].id | string (uuid) |  |  |
+| categories[].code | string |  |  |
+| categories[].name | string |  |  |
+| categories[].parentCategoryId | string (uuid) |  | (nullable) |
+| categories[].applicableAssetTypes | array of string |  |  |
+| fields | array of object |  |  |
+| fields[].code | string |  |  |
+| fields[].label | string |  |  |
+| fields[].dataType | string |  |  |
+| fields[].applicableAssetTypes | array of string |  |  |
+| fields[].mandatory | boolean |  |  |
+| fields[].allowedValues | array of string |  |  |
+| keywordVocabularies | array of object |  |  |
+| keywordVocabularies[].code | string |  |  |
+| keywordVocabularies[].terms | array of string |  |  |
+| keywordVocabularies[].closed | boolean |  | A closed vocabulary refuses terms not in the list. (default False) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
 ## Group: card
 
 ### getGameCard
@@ -1012,6 +1141,9 @@ Position, parties ahead, estimated call time. Polled by the guest app, so it is 
 | overriddenByPrincipalId | string (uuid) |  | Who let the party past the queue (overrideWaitingGuest, 4 October 2026, CHG-FXC-003), with overrideReason and overriddenAt. (read-only; nullable) |
 | overrideReason | string |  | (read-only; nullable) |
 | overriddenAt | string (date-time) |  | (read-only; nullable) |
+| callResolvedByPrincipalId | string (uuid) |  | Who recorded the called party's no-show or return to the queue (resolveCalledWaitingGuest; r13 root R40, CHG-R13R40-001), with callResolutionReason and callResolvedAt. (read-only; nullable) |
+| callResolutionReason | string |  | The operator's reason, as resolveCalledWaitingGuest took it. (max length 500; read-only; nullable) |
+| callResolvedAt | string (date-time) |  | When the no-show or return happened, the request's recordedAt (device time, offline-capable). (read-only; nullable) |
 
 **Responses**
 
@@ -1093,6 +1225,9 @@ Where the party includes someone below the height requirement, the join is refus
 | overriddenByPrincipalId | string (uuid) |  | Who let the party past the queue (overrideWaitingGuest, 4 October 2026, CHG-FXC-003), with overrideReason and overriddenAt. (read-only; nullable) |
 | overrideReason | string |  | (read-only; nullable) |
 | overriddenAt | string (date-time) |  | (read-only; nullable) |
+| callResolvedByPrincipalId | string (uuid) |  | Who recorded the called party's no-show or return to the queue (resolveCalledWaitingGuest; r13 root R40, CHG-R13R40-001), with callResolutionReason and callResolvedAt. (read-only; nullable) |
+| callResolutionReason | string |  | The operator's reason, as resolveCalledWaitingGuest took it. (max length 500; read-only; nullable) |
+| callResolvedAt | string (date-time) |  | When the no-show or return happened, the request's recordedAt (device time, offline-capable). (read-only; nullable) |
 
 **Responses**
 
@@ -1130,6 +1265,7 @@ Where the party includes someone below the height requirement, the join is refus
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 204 |  | Left |
 | 409 |  | Already called or redeemed |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -3034,7 +3170,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 
 **A public read, like `listProducts` and `listProductVariants` beside it** (accepted 26 October 2026, Chinmay, ADAM CR-258 option A): `{}` is in its security, so a visitor sees start times with no session, and the read runs under the venue the request names (`X-Venue-Id`, ADAM CR-198's rule for every public guest read). The anonymous cart session still opens on the first add (`createCart`, CR-183).
 
-**The venue's step** (ADAM CR-253 option C): with no `stepMinutes` sent, the starts fall on the venue's own `VenueSettings.stepMinutes` (its tenant default where the venue sets none), read in process (`tenancy#venueSettingsRecords`, XDR-004).
+**The venue's step** (ADAM CR-253 option C): with no `stepMinutes` sent, the starts fall on the venue's own `VenueSettings.stepMinutes` (its tenant default where the venue sets none), read in process (`tenancy#venueSettingsRecords`, XDR-004). **An omitted `stepMinutes` is absent** (ADAM CR-484, Chinmay, 3 November 2026; CHG-CR484-001): the step is the venue's `stepMinutes`, else the tenant's saved `stepMinutes`, else 30, the same value `getVenueSettingsDefaults` answers; the parameter carries no default of its own to fill the value before the venue is asked. A sent 15, 30 or 60 wins.
 **Date, start and duration are checked together** (decided 29 September, W9 and W10). A start is offered only when a room is free for the whole of `startsAt` to `startsAt + durationMinutes`, plus its setup, teardown and `cleaningPolicy`: an `afterEveryBooking` buffer must fit after the window, and with `timesPerDay` every cleaning of the date must still be placeable once the window is taken. `freeCount` counts only rooms that pass all three.
 
 
@@ -6400,6 +6536,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | asset_id | uuid | no | The media asset this is a rendition of, from the path of requestMediaRendition. |
 
+### `assets.taxonomy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| categories | jsonb | no |  |
+| fields | jsonb | no |  |
+| keyword_vocabularies | jsonb | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `games.card`
 
 | Column | Type | Required | Notes |
@@ -6561,6 +6707,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | overridden_by_principal_id | uuid | no | Who let the party past the queue (overrideWaitingGuest, 4 October 2026, CHG-FXC-003), with overrideReason and overriddenAt. |
 | override_reason | text | no |  |
 | overridden_at | timestamptz | no |  |
+| call_resolved_by_principal_id | uuid | no | Who recorded the called party's no-show or return to the queue (resolveCalledWaitingGuest; r13 root R40, CHG-R13R40-001), with callResolutionReason and callResolvedAt. |
+| call_resolution_reason | text | no | The operator's reason, as resolveCalledWaitingGuest took it. |
+| call_resolved_at | timestamptz | no | When the no-show or return happened, the request's recordedAt (device time, offline-capable). |
 
 ### `queue.feed`
 
@@ -7150,12 +7299,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-218 operations, added to this service in later releases without changing any of the above.
+216 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | asset | `createAsset`, `getAsset`, `getAssetHistory`, `listAssets`, `lookupAsset`, `setAssetStatus`, `updateAsset` |
-| assets | `analyseMediaAsset`, `bulkUpdateMediaAssets`, `createMediaShare`, `findSimilarMediaAssets`, `getMediaDistribution`, `getMediaTaxonomy`, `getMediaUsageAnalytics`, `listMediaAssetAudit`, `listMediaAssetVersions`, `listMediaRenditions`, `requestMediaRendition`, `setMediaAssetApproval`, `setMediaAssetRights`, `setMediaAssetTags`, `setMediaDistributionChannels`, `setMediaTaxonomy` |
+| assets | `analyseMediaAsset`, `bulkUpdateMediaAssets`, `createMediaShare`, `findSimilarMediaAssets`, `getMediaDistribution`, `getMediaUsageAnalytics`, `listMediaAssetAudit`, `listMediaAssetVersions`, `listMediaRenditions`, `requestMediaRendition`, `setMediaAssetApproval`, `setMediaAssetRights`, `setMediaAssetTags`, `setMediaDistributionChannels` |
 | card | `transferGameCard` |
 | departure | `listTransportRouteDepartures` |
 | entry | `callNextParties`, `listMyWaitingGuests`, `listQueueEntries`, `overrideWaitingGuest`, `redeemWaitingGuest`, `resolveCalledWaitingGuest` |

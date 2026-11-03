@@ -448,8 +448,10 @@
    },
    "token": {
     "type": "string",
+    "nullable": true,
     "readOnly": true,
-    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n**Minted only for a cart created with no credential, and stored field-encrypted** (ADAM CR-486, Chinmay, 3 November 2026; CHG-CR486-001): 32 bytes from a cryptographic random generator, base64url without padding (43 characters); null on a signed-in guest's or a staff cart. Encrypted with the tenant's key, never plain at rest and never hashed, since the server reads it back for `getCart`, `claimCart`'s constant-time comparison and `cart.abandoned`'s recovery link; answered in clear to the cart's caller.\n"
    },
    "sessionId": {
     "type": "string",
@@ -2894,6 +2896,75 @@
    "expiresIn": {
     "type": "integer",
     "description": "Seconds until the access token expires: `PasswordPolicy.accessTokenMinutes` x 60, 900 by default (15 minutes; proposed, client to correct). The refresh token, its rotation and reuse detection, and the signing key are described once on `bearerAuth` in contracts/shared/common.yaml (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
+   }
+  }
+ },
+ "WalletPass": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.wallet_pass",
+  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "platform",
+   "serialNumber",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "apple",
+     "google"
+    ]
+   },
+   "serialNumber": {
+    "type": "string"
+   },
+   "passUrl": {
+    "type": "string",
+    "format": "uri",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the app adds to the wallet** (R8 blocker ORDERS-MONEY-C39, CHG-R8MIG-017): for `apple` a short-lived signed link to the `.pkpass` file (signed with the brand's Pass Type ID certificate), for `google` the \"Save to Google Wallet\" link (a signed JWT). Made when the pass is issued or read, never stored; valid for 15 minutes (proposed, client to confirm), after which a read of the pass gives a new one."
+   },
+   "authenticationToken": {
+    "x-ticvai-secret": "blind-index",
+    "x-ticvai-blind-index-of": "none",
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "updated",
+     "voided",
+     "expired"
+    ]
+   },
+   "lastPushedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deviceRegistrations": {
+    "type": "integer",
+    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  }

@@ -332,7 +332,7 @@
    "releaseHeldLeases": {
     "type": "boolean",
     "default": true,
-    "description": "Return unsold inventory leases held by this workstation (ADR-0013 C103). Closing without releasing strands capacity until TTL expiry, which is visible at a gate during peak.\n"
+    "description": "**Accepted and does nothing** (ADAM CR-517, Chinmay, 3 November 2026; CHG-CR517-001): a till holds no standing lease (one inventory hold per sale, converted when the order is paid), so the close has nothing to give back and no path to Catalogue is added. A value that is not a boolean is `400 validation`. True, false and missing behave the same. If standing leases come later (ADR-0013 C103), returning a till's leases at close is Catalogue's job, triggered by the close's event, with its own ticket.\n"
    },
    "recordedAt": {
     "type": "string",
@@ -789,7 +789,7 @@
    "id": {
     "type": "string",
     "format": "uuid",
-    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
+    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. In an offline replay through `syncOrders` the entry carries no header of its own: the batch POST takes a fresh UUIDv7 `Idempotency-Key` per batch, never an entry's id, and this id alone deduplicates the entry (r13 root R41).\n"
    },
    "venueId": {
     "type": "string",
@@ -2363,7 +2363,12 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "exchangeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Zero until the client sets a fee rule (ADAM CR-480); `waiveFee` changes nothing meanwhile."
    },
    "difference": {
     "allOf": [
@@ -2371,7 +2376,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round.\n"
+    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round. `incomingValue` + `exchangeFee` - `outgoingValue`, in the venue's currency: positive is the balance due on the order, collected by `createPayment`; negative is refunded by `createRefund` over the outgoing lines (ADAM CR-480).\n"
    },
    "newLineIds": {
     "type": "array",
@@ -3258,6 +3263,55 @@
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
    },
+   "isFeatured": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The plan card's Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured plan."
+   },
+   "compareAtPrice": {
+    "x-ticvai-column": "compare_at_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan card's saving. Stored on `catalogue.product` as `compare_at_amount` in the venue's trading currency, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a made-up value."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "**The card's highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every operation that answers Product, to every audience. WEB-005's card shows the value for the guest's language, falling back to the English value, as the pill on the card image in capitals; null shows no badge."
+   },
+   "rating": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "required": [
+     "average",
+     "count"
+    ],
+    "properties": {
+     "average": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "multipleOf": 0.1,
+      "description": "The average rating, 1.0 to 5.0, one decimal."
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many reviews the average is over."
+     }
+    },
+    "description": "**The card's rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is not null."
+   },
    "nameLocalised": {
     "allOf": [
      {
@@ -3863,6 +3917,12 @@
    "isActive": {
     "type": "boolean",
     "description": "False when retired. Retired variants are never deleted — orders reference them."
+   },
+   "priceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The variant's price category, a `catalogue.price_category` id (ADAM CR-455): the winning price assignment's category rate for it replaces the price (`catalogue#variantPriceRecords`); null for none. Set by `updateProductVariant`."
    },
    "description": {
     "allOf": [
@@ -5145,7 +5205,7 @@
    },
    "heldLeaseCount": {
     "type": "integer",
-    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
+    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned. **Left null** (ADAM CR-517; CHG-CR517-001): a till holds no standing lease, so nothing sets it.\n"
    },
    "openedAt": {
     "type": "string",
@@ -5559,6 +5619,7 @@
    "org_unit_id"
   ],
   "x-ticvai-guest-read": true,
+  "x-ticvai-tenant-row-read": true,
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -5907,8 +5968,9 @@
      60
     ],
     "nullable": true,
+    "default": 30,
     "x-ticvai-persistence-column": "integer",
-    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13). **The `default` is the proposed tenant default only** (ADAM CR-484, Chinmay, 3 November 2026; CHG-CR484-001), as every other configured limit carries its own: it is never written into a venue's row, and a venue's own null stays null when the venue's settings are read, as `cartLeaseSeconds` and the other limits behave. When the client corrects it, only this default changes."
    },
    "cartLeaseSeconds": {
     "type": "integer",
@@ -6269,6 +6331,75 @@
    "duplicate",
    "other"
   ]
+ },
+ "WalletPass": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.wallet_pass",
+  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "platform",
+   "serialNumber",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "apple",
+     "google"
+    ]
+   },
+   "serialNumber": {
+    "type": "string"
+   },
+   "passUrl": {
+    "type": "string",
+    "format": "uri",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the app adds to the wallet** (R8 blocker ORDERS-MONEY-C39, CHG-R8MIG-017): for `apple` a short-lived signed link to the `.pkpass` file (signed with the brand's Pass Type ID certificate), for `google` the \"Save to Google Wallet\" link (a signed JWT). Made when the pass is issued or read, never stored; valid for 15 minutes (proposed, client to confirm), after which a read of the pass gives a new one."
+   },
+   "authenticationToken": {
+    "x-ticvai-secret": "blind-index",
+    "x-ticvai-blind-index-of": "none",
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "updated",
+     "voided",
+     "expired"
+    ]
+   },
+   "lastPushedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deviceRegistrations": {
+    "type": "integer",
+    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
  },
  "WithdrawalReason": {
   "type": "string",

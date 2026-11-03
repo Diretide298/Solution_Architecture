@@ -554,7 +554,7 @@
   }
  },
  "Deposit": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "grant-holder-write",
   "type": "object",
   "x-ticvai-persistence": "ledger.deposit",
   "description": "**Money taken before the sale is complete.** Not deferred revenue — that is a sold entitlement not yet consumed, and the sale happened.\n",

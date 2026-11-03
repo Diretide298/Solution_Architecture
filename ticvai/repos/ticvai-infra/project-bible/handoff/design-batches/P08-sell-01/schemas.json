@@ -310,21 +310,28 @@
   "description": "2.9.9. Dry run or applied — the shape is the same, `applied` says which.",
   "required": [
    "applied",
-   "productsMatched"
+   "productsMatched",
+   "escalates"
   ],
   "properties": {
    "applied": {
     "type": "boolean"
    },
    "productsMatched": {
-    "type": "integer"
+    "type": "integer",
+    "description": "The products matched (ADAM CR-544)."
    },
    "pricesChanged": {
-    "type": "integer"
+    "type": "integer",
+    "description": "The price rows changed, or that would change (ADAM CR-544)."
+   },
+   "escalates": {
+    "type": "boolean",
+    "description": "**Whether the run escalates** (ADAM CR-544): true when any changed price moves by more than `catalogue.bulkPriceChangeEscalationPercent`, or `pricesChanged` exceeds `catalogue.bulkPriceChangeEscalationCount` (venue settings). The dry run answers it; a real run that escalates from a caller without `PRICE_CONFIGURE` is `403 price-escalation-required`."
    },
    "skipped": {
     "type": "array",
-    "description": "**Products the selection matched and the adjustment could not touch** — a fixed-price bundle, a partner net rate, a product in an open period. Named rather than counted, because whoever ran this will be asked why the total is short.\n",
+    "description": "**Products the selection matched and the adjustment could not touch** — a fixed-price bundle, a partner net rate, a product named in an open pricing change request. Named rather than counted, because whoever ran this will be asked why the total is short. One {productId, reason} per product and reason (ADAM CR-544).\n",
     "items": {
      "type": "object",
      "properties": {
@@ -333,7 +340,13 @@
        "format": "uuid"
       },
       "reason": {
-       "type": "string"
+       "type": "string",
+       "enum": [
+        "partnerNetRate",
+        "fixedPriceBundle",
+        "openChangeRequest"
+       ],
+       "description": "`partnerNetRate`: the price list's `price_list_type` is b2b, reseller or ota. `fixedPriceBundle`: the product has a `catalogue.package_pricing` row with `pricing_model` fixedPackagePrice, for that price list or with no price list. `openChangeRequest`: the product is named in a pricing change request whose status is not rejected, published or rolledBack (ADAM CR-544)."
       }
      }
     }
@@ -994,21 +1007,21 @@
     "minimum": 0,
     "maximum": 100,
     "nullable": true,
-    "description": "A `percentage` allocation's share of the capacity, 0 to 100 (ADAM CR-412; the column is envelope_percent, naming-and-style 3: Envelope, not Allocation, in DDL): required there, and `setChannelAllocations` sets `allocatedUnits` to the floor of capacity x percent / 100. Null for the other types."
+    "description": "A `percentage` allocation's share of the capacity, 0 to 100 (ADAM CR-412; the column is envelope_percent, naming-and-style 3: Envelope, not Allocation, in DDL): required there, and `setChannelAllocations` sets `allocatedUnits` to the floor of capacity x percent / 100. Null for the other types. The 0 to 100 rule is `setChannelAllocations`' `400 validation` from this minimum and maximum: the column is numeric(18,4), nullable, with no range check (ADAM CR-461, decided by Chinmay on 2 November 2026)."
    },
    "releasedUnits": {
     "type": "integer",
     "minimum": 0,
     "default": 0,
     "readOnly": true,
-    "description": "Units the allocation release job gave back to the general pool, added in the same transaction as each release (ADAM CR-412)."
+    "description": "Units the allocation release job gave back to the general pool, added in the same transaction as each release (ADAM CR-412). The column is integer DEFAULT 0 and nullable (ADAM CR-461): a reader takes a null count as 0."
    },
    "returnedUnits": {
     "type": "integer",
     "minimum": 0,
     "default": 0,
     "readOnly": true,
-    "description": "Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction as each release (ADAM CR-412)."
+    "description": "Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction as each release (ADAM CR-412). The column is integer DEFAULT 0 and nullable (ADAM CR-461): a reader takes a null count as 0."
    }
   }
  },
@@ -1160,6 +1173,7 @@
     "nullable": true
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setChannelListing saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "type": "string",
     "enum": [
      "draft",
@@ -2370,6 +2384,28 @@
    },
    "requiresTimeWindow": {
     "type": "boolean"
+   },
+   "isFeatured": {
+    "type": "boolean",
+    "description": "Marks the product featured, the plan card's Most popular badge (`Product.isFeatured`; ADAM CR-482)."
+   },
+   "compareAtPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "What the same visits cost bought singly, behind the plan card's saving (`Product.compareAtPrice`; ADAM CR-482)."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "The card's highlight badge per language, at most 20 characters each (longer is `400 validation`); null clears it (`Product.highlightBadge`; ADAM CR-504)."
    }
   }
  },
@@ -3272,8 +3308,20 @@
    "name": {
     "type": "string",
     "readOnly": true,
+    "nullable": true,
     "x-ticvai-persisted": false,
-    "description": "**Read from the package's product, not stored here** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): `catalogue.product.name`, in the caller's language."
+    "description": "**Read from the package's product, not stored here** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009; ADAM CR-499, CHG-CR499-001). `listGroupPackages` answers `catalogue.product.name`, beside `nameLocalised`: as on Product, a guest screen shows the entry for its guest's language and falls back to `name`; staff screens show `name`. `setGroupPackageDefinition` answers null and reads no product name."
+   },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The package product's `nameLocalised`, read-only, not stored on the package** (ADAM CR-499, CHG-CR499-001): `catalogue.product.name_localised`, answered by `listGroupPackages`. See `Product.nameLocalised`; `name` is the fallback."
    },
    "unitPrice": {
     "allOf": [
@@ -3282,8 +3330,9 @@
      }
     ],
     "readOnly": true,
+    "nullable": true,
     "x-ticvai-persisted": false,
-    "description": "The product's price per participant (`pricingBasis` perParticipant) or per package, read from the product's current price; not stored here."
+    "description": "**The package product's `fromPrice`, not stored here** (ADAM CR-499, CHG-CR499-001). `listGroupPackages` computes it as `listProducts` computes `Product.fromPrice`: the lowest list price among the product's sellable variants on the caller's channel now, by the same price-list function `listProductVariants` uses, `catalogue#variantPriceRecords` (ADAM CR-439; called, never copied); null where no price list prices it on that channel. `pricingBasis` says what the amount is per (participant or package); it never changes the amount. `setGroupPackageDefinition` answers null and reads no price."
    },
    "minimumSize": {
     "type": "integer",
@@ -4102,6 +4151,7 @@
     "default": "packageTotalOnly"
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setPackagePricingDefinition saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "allOf": [
      {
       "$ref": "#/components/schemas/CatalogueConfigStatus"
@@ -4220,6 +4270,90 @@
     "description": "**\"Minutes on screen\": how long after `startsAt` the slot is still sold** (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). A 10:00 slot with 10 stays on the till and the guest apps until 10:10 and then drops off; 0, the default, stops selling at the start time. Applies to every channel that sells the slot; the entry window is the admission rules' (`admissionRulesId`), not this.\n"
    }
   }
+ },
+ "PerformanceAvailability": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed on read from catalogue.channel_capacity and live leases",
+  "description": "Remaining capacity of one channel capacity of one performance (rev 3 REV3-1).",
+  "required": [
+   "channelCapacityId",
+   "performanceId",
+   "capacity",
+   "sold",
+   "leased",
+   "remaining"
+  ],
+  "properties": {
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The performance this channel capacity belongs to (`ChannelCapacity.performanceId`), so rows for several performances can be told apart."
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "The performance's start, so a time tile and its day part (morning, afternoon, evening, split at the venue's `BookingFlowConfig.dayPartBoundaries`) come from this one call (rev 3 REV3-1)."
+   },
+   "capacity": {
+    "type": "integer"
+   },
+   "sold": {
+    "type": "integer"
+   },
+   "leased": {
+    "type": "integer",
+    "description": "Held by terminals but not yet sold."
+   },
+   "remaining": {
+    "type": "integer"
+   },
+   "byChannel": {
+    "type": "array",
+    "description": "Per-channel position. A guest seeing sold out online while units remain at the counter is correct behaviour, not a defect.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "$ref": "#/components/schemas/Channel"
+      },
+      "allocated": {
+       "type": "integer"
+      },
+      "sold": {
+       "type": "integer"
+      },
+      "remaining": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PerformanceAvailabilityPage": {
+  "x-ticvai-persistence": "none — computed on read",
+  "description": "The `getAvailability` answer (named 29 September, rev 3 REV3-1).",
+  "allOf": [
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Page"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/PerformanceAvailability"
+      }
+     }
+    }
+   }
+  ]
  },
  "PerformanceCancellationResult": {
   "x-ticvai-persistence": "none — computed",
@@ -4652,7 +4786,8 @@
    },
    "type": {
     "type": "string",
-    "maxLength": 50
+    "maxLength": 50,
+    "description": "The condition's type. `membershipProgramme` makes the rule a membership rule (ADAM CR-439): its `ruleOperator` is `in` and its `valueJson` a JSON array of membership programme ids."
    },
    "ruleOperator": {
     "type": "string",
@@ -4894,6 +5029,55 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "isFeatured": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The plan card's Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured plan."
+   },
+   "compareAtPrice": {
+    "x-ticvai-column": "compare_at_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan card's saving. Stored on `catalogue.product` as `compare_at_amount` in the venue's trading currency, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a made-up value."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "**The card's highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every operation that answers Product, to every audience. WEB-005's card shows the value for the guest's language, falling back to the English value, as the pill on the card image in capitals; null shows no badge."
+   },
+   "rating": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "required": [
+     "average",
+     "count"
+    ],
+    "properties": {
+     "average": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "multipleOf": 0.1,
+      "description": "The average rating, 1.0 to 5.0, one decimal."
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many reviews the average is over."
+     }
+    },
+    "description": "**The card's rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is not null."
    },
    "nameLocalised": {
     "allOf": [
@@ -5430,6 +5614,12 @@
    "isActive": {
     "type": "boolean",
     "description": "False when retired. Retired variants are never deleted — orders reference them."
+   },
+   "priceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The variant's price category, a `catalogue.price_category` id (ADAM CR-455): the winning price assignment's category rate for it replaces the price (`catalogue#variantPriceRecords`); null for none. Set by `updateProductVariant`."
    },
    "description": {
     "allOf": [
@@ -6015,22 +6205,6 @@
    }
   }
  },
- "SalesChannel": {
-  "type": "string",
-  "description": "**Where a sale came from.** Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing.\n**Not interchangeable with the local `Channel` enums.** `catalogue.Channel` and `orders.Channel` are byte-identical duplicates of each other listing `pos, kiosk, web, mobile, b2b, ota, callCentre`; `orders.OrderChannel` lists `guestApp, guestWeb, partner, api, backOffice` on top. **Pointing the nine at a local enum would silently narrow them** — and the duplication between the two `Channel` enums is the reason a shared one existed in the first place.\n**This is the reporting dimension**: attribution, promotion eligibility and settlement all group by it, which is why it has to mean the same thing in `orders`, `catalogue`, `subscription` and `marketing-crm` rather than four things that nearly line up.\n",
-  "enum": [
-   "pos",
-   "kiosk",
-   "guestApp",
-   "guestWeb",
-   "callCentre",
-   "partner",
-   "api",
-   "backOffice",
-   "b2b",
-   "ota"
-  ]
- },
  "SeatAvailability": {
   "x-ticvai-persistence": "none — computed from seat, hold and block",
   "type": "object",
@@ -6540,6 +6714,28 @@
    },
    "requiresTimeWindow": {
     "type": "boolean"
+   },
+   "isFeatured": {
+    "type": "boolean",
+    "description": "Marks the product featured, the plan card's Most popular badge (`Product.isFeatured`; ADAM CR-482)."
+   },
+   "compareAtPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "What the same visits cost bought singly, behind the plan card's saving (`Product.compareAtPrice`; ADAM CR-482)."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "The card's highlight badge per language, at most 20 characters each (longer is `400 validation`); null clears it (`Product.highlightBadge`; ADAM CR-504)."
    }
   }
  },

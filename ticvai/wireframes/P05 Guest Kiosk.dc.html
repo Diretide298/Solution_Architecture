@@ -93,6 +93,12 @@ background:linear-gradient(90deg,var(--brand),var(--accent))}
 .side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
 .two{flex:1;display:flex;gap:12px;min-height:0}
 .grow{flex:1;min-width:0}
+.canvas.gen{overflow:auto}
+.gen .grow,.gen .side{display:flex;flex-direction:column;gap:10px}
+.region{display:flex;flex-direction:column;gap:8px}
+.region > .kind{margin-top:2px}
+.gen .row{grid-template-columns:1fr}
+.panel.btn{flex-direction:row;align-items:center;gap:10px}
 .strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
 background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
 letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
@@ -143,17 +149,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Pull somebody standing in a queue out of it.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Attract Loop</h2>
                 <small>Guest Kiosk &middot; wave 1 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>What&#x27;s on</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**The photo is the primary item&#x27;s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a publ</span></div><div class="panel"><b>Attract loop</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The screen saver the venue set up** in the white-label builder&#x27;s kiosk tab (CMS-105): the kiosk group&#x27;s video, photo and text slides in order, each for its se</span></div><div class="panel"><b>Touch to start</b><div class="chip cta">Touch to start</div><span class="why">The kiosk group&#x27;s &quot;Touch to start&quot; text in the current language, at its position and with its animation; a touch opens the language choice (KSK-002) and st</span></div></div><div class="side"><div class="panel"><b>Still there?</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">**The kiosk shell&#x27;s idle rule, read here at every return to the loop**: after `idleTimeoutSeconds` without a touch on any kiosk screen the shell asks &quot;Still the</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>What&#x27;s on</b><span class="kind">cardList</span><div class="rows"><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>name</span><span>media</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**The photo is the primary item&#x27;s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, r</span></div><div class="panel"><b>Attract loop</b><span class="kind">canvas</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The screen saver the venue set up** in the white-label builder&#x27;s kiosk tab (CMS-105): the kiosk group&#x27;s video, photo and text slides in order, each for its seconds, wit</span></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Touch to start</div></div><div class="panel"><b>Still there?</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The kiosk shell&#x27;s idle rule, read here at every return to the loop**: after `idleTimeoutSeconds` without a touch on any kiosk screen the shell asks &quot;Still there?&quot; (the </span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -173,17 +177,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Ask the only question that changes everything else.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Language Select</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Choose your language</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One large button per published language (`languages`), each in its own script; the right-to-left ones lay the kiosk out right to left. From the cached configuration when </span></div><div class="panel"><b>Closed for maintenance</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Only when `isInMaintenance`: the tenant&#x27;s message and expected-back time, and nothing can be bought.</span></div><div class="panel"><b>This kiosk&#x27;s languages</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The kiosk group&#x27;s `languageCodes` narrow the published languages to the ones this kiosk offers (all of them when empty); `defaultLanguageCode` is preselected and is </span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Choose your language</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One large button per published language (`languages`), each in its own script; the right-to-left ones lay the kiosk out right to left. From the cached configuration when </span></div><div class="panel"><b>Closed for maintenance</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Only when `isInMaintenance`: the tenant&#x27;s message and expected-back time, and nothing can be bought.</span></div><div class="panel"><b>This kiosk&#x27;s languages</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The kiosk group&#x27;s `languageCodes` narrow the published languages to the ones this kiosk offers (all of them when empty); `defaultLanguageCode` is preselected and is the l</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -203,17 +205,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Get to a product in one touch.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>What are you buying</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>What would you like?</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**The photo is the primary item&#x27;s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a publ</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>What would you like?</b><span class="kind">cardList</span><div class="rows"><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>name</span><span>description</span><span>media</span><span>displayTags</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(4,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**The photo is the primary item&#x27;s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, r</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -233,17 +233,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Choose the tickets first, then the date and time: quantities, with targets a gloved hand can hit.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Choose tickets</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Tickets</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Large counters per ticket type; inactive variants never shown. Was the generated table &#x27;Every product variant&#x27;; staff and plumbing columns removed (decided by C</span></div><div class="panel"><b>Availability</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`&#x27;s inline response. **The response has no na</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Tickets</b><span class="kind">cardList</span><div class="rows"><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>name</span><span>description</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Large counters per ticket type; inactive variants never shown. Was the generated table &#x27;Every product variant&#x27;; staff and plumbing columns removed (decided by Chinmay, fi</span></div><div class="panel"><b>Availability</b><span class="kind">dataTable</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div><span class="why">Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`&#x27;s inline response. **The response has no named s</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -263,17 +261,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Pick a time that still has room.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Choose a performance</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Availability</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`&#x27;s inline response. **The response has no na</span></div><div class="panel"><b>Times</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">A tap on a time adds the chosen tickets for it (`addCartLine`), which takes the hold; the guest never sees the word hold.</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Availability</b><span class="kind">dataTable</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div><span class="why">Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`&#x27;s inline response. **The response has no named s</span></div><div class="panel"><b>Times</b><span class="kind">cardList</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div><span class="why">A tap on a time adds the chosen tickets for it (`addCartLine`), which takes the hold; the guest never sees the word hold.</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -293,17 +289,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Show what is being bought before money moves.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Review</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>The cart</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Offers applied</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The offers the cart already carries (`Cart.discountTotal`): promotions apply on their own, nothing is pressed (CHG-R1S-022).</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>The cart</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Offers applied</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The offers the cart already carries (`Cart.discountTotal`): promotions apply on their own, nothing is pressed (CHG-R1S-022).</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Pay</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -323,17 +317,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Take a card, and nothing else.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Payment</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Tap, insert or scan to pay</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The amount due and the card terminal&#x27;s prompt. The kiosk and the terminal fill the payment (`createPayment`): order, tender, amount and device are never typed. Card </span></div><div class="panel"><b>Create payment</b><div class="chip cta">Create payment</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Tap, insert or scan to pay</b><span class="kind">paymentTerminal</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The amount due and the card terminal&#x27;s prompt. The kiosk and the terminal fill the payment (`createPayment`): order, tender, amount and device are never typed. Card only </span></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Create payment</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -353,17 +345,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Handle the state that has nobody standing next to it.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Payment unresolved</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Payment unresolved message</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.paymentUnresolved`); the platform&#x27;s standard words when the group set none.</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Check the payment again</div></div></div><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div><div class="panel"><b>Payment unresolved message</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.paymentUnresolved`); the platform&#x27;s standard words when the group set none.</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -383,17 +373,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Get the ticket into the guest’s hand.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Ticket issued</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>The order</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>The order</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Send to my phone</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -413,17 +401,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Recover when the paper runs out mid-sale.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Print failure</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Send to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `reason` `printerFault`: the sale stands and the tickets go to the guest&#x27;s phone.</span></div><div class="panel"><b>Printer failure message</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.printerFailure`); the platform&#x27;s standard words when the group set none.</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Send to my phone</div></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Send to</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `reason` `printerFault`: the sale stands and the tickets go to the guest&#x27;s phone.</span></div><div class="panel"><b>Printer failure message</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.printerFailure`); the platform&#x27;s standard words when the group set none.</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -443,17 +429,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Turn a reference into media.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Collect a booking</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>The order</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Scan your booking QR</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The booking&#x27;s QR carries the order; scanning it opens the booking. Shop-and-drop collection is staff-only and not here (CHG-R1S-022).</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>The order</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Scan your booking QR</b><span class="kind">scanTarget</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The booking&#x27;s QR carries the order; scanning it opens the booking. Shop-and-drop collection is staff-only and not here (CHG-R1S-022).</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel"><span class="kind">no components declared</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -473,17 +457,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Confirm it is the right booking, then print.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Booking found</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Send to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `delivery` `print`, or email or SMS: collecting is printing, not a transfer (DI-637).</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Print my tickets</div></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Send to</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `delivery` `print`, or email or SMS: collecting is printing, not a transfer (DI-637).</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -503,17 +485,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Get a human, without leaving the kiosk.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Call staff</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Call staff message</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.callStaff`); the platform&#x27;s standard words when the group set none.</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Call a member of staff</div></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">End the help session</div></div></div><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div><div class="panel"><b>Call staff message</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The kiosk group&#x27;s own words for this moment in the guest&#x27;s language (`messages.callStaff`); the platform&#x27;s standard words when the group set none.</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -533,17 +513,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Fail in a way that does not strand anybody.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Out of service</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
-            <div class="strip">offline capable · works from the local journal</div>
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Out of service</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Shown while the tenant&#x27;s app status or this kiosk&#x27;s own health (its heartbeat, recordDeviceHeartbeat) says it cannot sell; polled, and the attract loop returns </span></div><div class="panel"><b>Out of service, back at</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">**A kiosk group taken out of service on BO-485** (`setKioskOutOfService`): the group&#x27;s `messageOverride` or `messages.outOfService` in the guest&#x27;s language, wit</span></div></div></div>
+            
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Out of service</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Shown while the tenant&#x27;s app status or this kiosk&#x27;s own health (its heartbeat, recordDeviceHeartbeat) says it cannot sell; polled, and the attract loop returns when both </span></div><div class="panel"><b>Out of service, back at</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**A kiosk group taken out of service on BO-485** (`setKioskOutOfService`): the group&#x27;s `messageOverride` or `messages.outOfService` in the guest&#x27;s language, with `expecte</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -563,17 +541,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Order food from the kiosk and collect it.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Order Food</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
             
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>The guest menu</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Menu</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Says *contains* and *may contain* apart, from each item&#x27;s `allergenDetail` (`Allergen.contains`, `Allergen.mayContain`) (CHG-R1S-022).</span></div></div><div class="side"><div class="panel"><b>Add to order</b><div class="chip cta">Add to order</div></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>The guest menu</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Menu</b><span class="kind">cardList</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div><span class="why">Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**</span></div><div class="panel"><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Says *contains* and *may contain* apart, from each item&#x27;s `allergenDetail` (`Allergen.contains`, `Allergen.mayContain`) (CHG-R1S-022).</span></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Add to order</div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Pay</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -593,17 +569,15 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Buy merchandise at the kiosk in the same basket as tickets and food, or hold an item to pay for at the shop until the end of the visit day.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>Sell</span></div><nav class="nav"><i class="on">Sell</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Shop</h2>
                 <small>Guest Kiosk &middot; wave 2 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
             
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Shop</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Shops by name; sends `outletId`.</span></div><div class="panel"><b>Category</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Categories by name; sends `categoryId`.</span></div><div class="panel"><b>Merchandise</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The guest projection: name, photo, price and whether it can be bought; sold-out items stay visible. No sku, barcode, variant, stock or inventory ids.</span></div></div><div class="side"><div class="panel"><b>In stock only</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?inStockOnly=` to `listMerchandise`.</span></div><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">Sends `?search=` to `listMerchandise`.</span></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Shop</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Shops by name; sends `outletId`.</span></div><div class="panel"><b>Category</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Categories by name; sends `categoryId`.</span></div><div class="panel"><b>Merchandise</b><span class="kind">cardList</span><div class="rows"><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>name</span><span>description</span><span>price</span><span>isAvailable</span><span>imageAssetRef</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The guest projection: name, photo, price and whether it can be bought; sold-out items stay visible. No sku, barcode, variant, stock or inventory ids.</span></div><div class="panel"><b>In stock only</b><span class="kind">toggle</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?inStockOnly=` to `listMerchandise`.</span></div><div class="panel"><b>Search</b><span class="kind">searchField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?search=` to `listMerchandise`.</span></div><div class="panel"><b>Size</b><span class="kind">multiSelect</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Size buttons switch between sibling items (DEC-057).</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Hold to pay at the shop</div></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Add to my kiosk basket</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Lookup merchandise</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -623,24 +597,22 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="pur">Help a guest choose and pay, and nothing else.</div>
         </div>
         <div class="frame">
-          <aside class="rail"><div class="brand"><b>Guest</b><span>AI</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <aside class="rail"><div class="brand"><b>Guest Kiosk</b><span>AI</span></div><nav class="nav"><i class="on">AI</i></nav></aside>
           <div class="body">
             <div class="top">
               <div><h2>Assistant</h2>
                 <small>Guest Kiosk &middot; wave 1 &middot; touchLarge</small></div>
-              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
             
-            <div class="canvas">
-              
-              <div class="two"><div class="grow"><div class="panel"><b>Ask for help</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Voice or a constrained touch interface, no keyboard. Products appear as cards inside the conversation (from `listProducts`, guest projection: name, price, what it include</span></div><div class="panel"><b>Products Sahli suggests</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Cards inside the conversation with the price for today; tapping one returns the guest to the ticket step (KSK-004).</span></div><div class="panel"><b>Available today</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">On a suggested card: whether it can still be bought today.</span></div></div></div>
+            <div class="canvas gen">
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Ask for help</b><span class="kind">assistantPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Voice or a constrained touch interface, no keyboard. Products appear as cards inside the conversation (from `listProducts`, guest projection: name, price, what it include</span></div><div class="panel"><b>Products Sahli suggests</b><span class="kind">cardList</span><div class="rows"><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>name</span><span>description</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Cards inside the conversation with the price for today; tapping one returns the guest to the ticket step (KSK-004). **The cards are the answer&#x27;s sources of kind `product`</span></div><div class="panel"><b>Available today</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">On a suggested card: whether it can still be bought today, asked by the product&#x27;s `Product.eventId` for today. A product with no event (not dated) shows no banner (r13, C</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Talk to a person</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Add to basket</div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; sendAiMessage · listProducts · getAvailability · handoverToAgent +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation, cartId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, messageId&larr;navigation, cartId&larr;navigation, sessionId&larr;session, productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmHandover &middot; <i>Talk to a person</i> &middot; <b>Ask a person</b> &middot; Keep asking</div><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add to basket</i> &middot; <b>Add to basket</b> &middot; Back</div></div>

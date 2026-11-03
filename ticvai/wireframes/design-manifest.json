@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -39,7 +39,7 @@
    "drawn": 134,
    "locked": 25
   },
-  "fullyDrawableBatches": 64
+  "fullyDrawableBatches": 65
  },
  "batches": [
   {
@@ -2347,6 +2347,28 @@
    "status": "pending"
   },
   {
+   "id": "WS08",
+   "kind": "workshop",
+   "label": "Access Control board 8",
+   "platform": "P08",
+   "screens": [
+    "BO-214",
+    "BO-215",
+    "BO-216",
+    "BO-217",
+    "BO-218",
+    "BO-219",
+    "BO-220",
+    "BO-221",
+    "BO-222",
+    "BO-223"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS23",
    "kind": "workshop",
    "label": "B2B, Reseller & OTA Partner Management board 3",
@@ -2932,28 +2954,6 @@
     "EMP-042",
     "EMP-043",
     "EMP-044"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS08",
-   "kind": "workshop",
-   "label": "Access Control board 8",
-   "platform": "P08",
-   "screens": [
-    "BO-214",
-    "BO-215",
-    "BO-216",
-    "BO-217",
-    "BO-218",
-    "BO-219",
-    "BO-220",
-    "BO-221",
-    "BO-222",
-    "BO-223"
    ],
    "drawable": 6,
    "thin": 4,
@@ -4642,6 +4642,28 @@
    "status": "pending"
   },
   {
+   "id": "WS108",
+   "kind": "workshop",
+   "label": "ACCREDITATION board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-615",
+    "BO-616",
+    "BO-617",
+    "BO-618",
+    "BO-619",
+    "BO-620",
+    "BO-621",
+    "BO-622",
+    "BO-623",
+    "BO-624"
+   ],
+   "drawable": 3,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS112",
    "kind": "workshop",
    "label": "ACCREDITATION board 5",
@@ -4963,28 +4985,6 @@
     "ADM-456",
     "ADM-457",
     "ADM-458"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS108",
-   "kind": "workshop",
-   "label": "ACCREDITATION board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-615",
-    "BO-616",
-    "BO-617",
-    "BO-618",
-    "BO-619",
-    "BO-620",
-    "BO-621",
-    "BO-622",
-    "BO-623",
-    "BO-624"
    ],
    "drawable": 2,
    "thin": 8,
@@ -5611,6 +5611,23 @@
    "status": "drawn"
   },
   {
+   "id": "P01-membership-loyalty-value-01",
+   "kind": "module",
+   "label": "P01 · Membership, Loyalty & Value",
+   "platform": "P01",
+   "screens": [
+    "WEB-021",
+    "WEB-022",
+    "WEB-023",
+    "WEB-024",
+    "WEB-043"
+   ],
+   "drawable": 5,
+   "thin": 0,
+   "frames": 5,
+   "status": "drawn"
+  },
+  {
    "id": "P01-retail-01",
    "kind": "module",
    "label": "P01 · Retail",
@@ -5805,23 +5822,6 @@
    "drawable": 0,
    "thin": 1,
    "frames": 1,
-   "status": "drawn"
-  },
-  {
-   "id": "P01-membership-loyalty-value-01",
-   "kind": "module",
-   "label": "P01 · Membership, Loyalty & Value",
-   "platform": "P01",
-   "screens": [
-    "WEB-021",
-    "WEB-022",
-    "WEB-023",
-    "WEB-024",
-    "WEB-043"
-   ],
-   "drawable": 4,
-   "thin": 1,
-   "frames": 5,
    "status": "drawn"
   },
   {

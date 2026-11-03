@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 85 of 470 |
+| Operations in the slice | 89 of 470 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -21,7 +21,6 @@
 |---|---|
 | [AccessService](AccessService.md) | `access.entitlement` |
 | [FnbService](FnbService.md) | `fnb.menu_item` |
-| [MarketingService](MarketingService.md) | `marketing.loyalty_position` |
 | [TenancyService](TenancyService.md) | `platform.sale_board_for_catalogue`, `platform.sale_board_page_for_catalogue`, `platform.sale_board_tile_for_catalogue` |
 | [WhiteLabelService](WhiteLabelService.md) | `whitelabel.booking_flow`, `whitelabel.guided_choice_answer` |
 
@@ -35,18 +34,22 @@
 | bundle | [`getLatestBundle`](#getlatestbundle) | GET | `/catalogue/bundles/latest` | core | 1 | BO-011, BO-037, EMP-018, POS-002 |
 | bundle | [`publishBundle`](#publishbundle) | POST | `/catalogue/bundles` | setup | 1 | BO-013, BO-014, BO-037 |
 | bundle | [`updateBundle`](#updatebundle) | PATCH | `/bundles/{bundleId}` | setup | 1 | BO-011 |
-| capacity | [`getAvailability`](#getavailability) | GET | `/availability` | core | 1 | GST-004, GST-007, GST-050, KSK-004, KSK-005, KSK-015 … |
+| capacity | [`getAvailability`](#getavailability) | GET | `/availability` | core | 1 | BO-015, GST-004, GST-007, GST-050, KSK-004, KSK-005 … |
 | catalogue | [`bulkChangePrices`](#bulkchangeprices) | POST | `/products/bulk-price` | setup | 1 | BO-009 |
 | catalogue | [`cloneProduct`](#cloneproduct) | POST | `/products/{productId}/clone` | setup | 1 | BO-008 |
 | catalogue | [`commitCatalogueImport`](#commitcatalogueimport) | POST | `/products/import/{jobId}/commit` | setup | 1 | BO-117 |
 | catalogue | [`getMyMemberships`](#getmymemberships) | GET | `/guests/me/memberships` | core | 1 | GST-015, WEB-022, WEB-023 |
+| catalogue | [`getPlanBenefits`](#getplanbenefits) | GET | `/entitlement-templates/{templateId}/benefits` | core | 1 | BO-288, WEB-022 |
 | catalogue | [`joinWaitlist`](#joinwaitlist) | POST | `/waitlist-entries` | core | 1 | GST-007, WEB-006 |
 | catalogue | [`leaveWaitlist`](#leavewaitlist) | DELETE | `/waitlist-entries/{entryId}` | core | 1 | GST-007, WEB-006 |
+| catalogue | [`listMembershipBenefits`](#listmembershipbenefits) | GET | `/membership-benefits` | core | 1 | BO-288, WEB-022 |
 | catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002 … |
 | catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-002, GST-003, GST-063, WEB-001, WEB-002 … |
 | catalogue | [`setChannelConnectionConfiguration`](#setchannelconnectionconfiguration) | PUT | `/channel-connections/{connectionId}` | setup | 1 | ADM-269 |
 | catalogue | [`setChannelSalesRule`](#setchannelsalesrule) | PUT | `/channel-sales-rules/{ruleId}` | setup | 1 | ADM-263, ADM-264, ADM-265 |
 | catalogue | [`setFeeDefinition`](#setfeedefinition) | PUT | `/fees/{feeId}` | setup | 1 | ADM-071 |
+| catalogue | [`setMembershipBenefit`](#setmembershipbenefit) | PUT | `/membership-benefits/{benefitId}` | setup | 1 | BO-288 |
+| catalogue | [`setPlanBenefits`](#setplanbenefits) | PUT | `/entitlement-templates/{templateId}/benefits` | setup | 1 | BO-288, BO-289 |
 | catalogue | [`setProductCategories`](#setproductcategories) | PUT | `/product-categories` | core | 1 | BO-115, CMS-103 |
 | category | [`createSeatCategory`](#createseatcategory) | POST | `/seat-categories` | setup | 1 | BO-1045, BO-985 |
 | category | [`updateSeatCategory`](#updateseatcategory) | PATCH | `/seat-categories/{seatCategoryId}` | setup | 1 | BO-1045 |
@@ -712,7 +715,7 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 | Guest callable | True |
 | Reads | `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `catalogue.performance` |
 | Writes | - |
-| Called by | GST-004, GST-007, GST-050, KSK-004, KSK-005, KSK-015, POS-003, PTR-007, WEB-004, WEB-006 |
+| Called by | BO-015, GST-004, GST-007, GST-050, KSK-004, KSK-005, KSK-015, POS-003, PTR-007, WEB-004, WEB-006 |
 
 **Parameters**
 
@@ -766,16 +769,18 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 Repricing every adult admission before a season is routine and currently means one call per product. **Runs as a dry run first**, for the reason `assessProductChange` exists.
 **Escalates to `PRICE_CONFIGURE` above a value threshold** (decided 28 September, audit R197): a run that changes any price by more than the venue setting `catalogue.bulkPriceChangeEscalationPercent` (proposed 10%) or touches more than `catalogue.bulkPriceChangeEscalationCount` prices (proposed 50) needs `PRICE_CONFIGURE`; below both, `PRODUCT_CONFIGURE` is enough. Both are venue settings with a tenant default in `tenancy.VenueSettings`, proposed, client to correct. The dry run reports whether the run escalates; a real run that escalates without `PRICE_CONFIGURE` is a `403` (`price-escalation-required`).
 
+**What a run touches and what it leaves** (ADAM CR-544; Chinmay, 3 November 2026; CHG-CR544-001): it leaves untouched what its contract says it cannot touch, by rules on stored columns, and its result says whether the run escalates. **Selection:** `categoryId` (that exact category), `productKind` (the `ProductKind` enum), `priceListId` and `channel` combine with AND; with none given, every product of the venue is selected. `channel` is the catalogue `Channel` enum (pos, kiosk, web, mobile, b2b, ota, callCentre) and matches price lists whose `channels` contain it. A run changes `catalogue.price` (`Price.amount`) for the matched products' variants on the matched price lists, except these, which stay unchanged and are named in `skipped`: `partnerNetRate`, the price list's `price_list_type` is b2b, reseller or ota; `fixedPriceBundle`, the product has a `catalogue.package_pricing` row with `pricing_model` fixedPackagePrice, for that price list or with no price list; `openChangeRequest`, the product is named, by `change_request.product_id` or by a `change_request_line` with `object_type` product, in a pricing change request whose status is not rejected, published or rolledBack. `skipped` has one {productId, reason} per product and reason. `productsMatched` counts the products matched; `pricesChanged` counts the price rows changed, or that would change. **Adjustment:** `roundTo` rounds to the nearest multiple, half away from zero; without it, the result is rounded to the currency's scale. Any result below zero refuses the whole run with `400 validation` naming the price, and nothing changes. **Escalation:** `BulkPriceResult.escalates` is true when any changed price moves by more than `catalogue.bulkPriceChangeEscalationPercent`, or `pricesChanged` exceeds `catalogue.bulkPriceChangeEscalationCount` (venue settings). The dry run answers it. A real run that escalates, from a caller without `PRICE_CONFIGURE`, answers `403 price-escalation-required` and changes nothing. **effectiveFrom:** null, now or past applies now. A future `effectiveFrom` answers `400 validation` saying a future-dated change goes through a pricing change request, since `catalogue.price` stores no validity. Every changed price writes what `setPrices` writes: audit entry and versions.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `catalogue.price_list` non-empty |
+| Part of slice | setup, makes `catalogue.price`, `catalogue.price_list` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.price_list`, `catalogue.product` |
-| Writes | `cache:idempotency`, `catalogue.price_list`, `catalogue.product_version` |
+| Reads | `cache:idempotency`, `catalogue.change_request`, `catalogue.change_request_line`, `catalogue.package_pricing`, `catalogue.price`, `catalogue.price_list`, `catalogue.product` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price`, `catalogue.price_list`, `catalogue.product_version` |
 | Called by | BO-009 |
 
 **Parameters**
@@ -790,32 +795,35 @@ Repricing every adult admission before a season is routine and currently means o
 |---|---|---|---|
 | dryRun | boolean |  | (default True) |
 | selection | object | yes | A selection, not a list of ids. |
-| selection.categoryId | string (uuid) |  | (nullable) |
-| selection.productKind | string |  | (nullable) |
+| selection.categoryId | string (uuid) |  | That exact category (ADAM CR-544). (nullable) |
+| selection.productKind | object |  | The ProductKind enum (ADAM CR-544). (nullable) |
 | selection.priceListId | string (uuid) |  | (nullable) |
-| selection.channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  | Where a sale came from. |
+| selection.channel | object |  | The catalogue Channel (pos, kiosk, web, mobile, b2b, ota, callCentre), matching price lists whose channels contain it (ADAM CR-544). (nullable) |
 | adjustment | object | yes |  |
 | adjustment.mode | enum (percentage, absolute, setTo) | yes |  |
 | adjustment.value | string | yes | A decimal string, never a float (naming-and-style 5.1). (pattern ^-?\d+(\.\d{1,4})?$) |
 | adjustment.roundTo | string |  | An increment in the region's currency, as a decimal string (0.5, 5). (pattern ^\d+(\.\d{1,4})?$; nullable) |
-| effectiveFrom | string (date-time) |  | (nullable) |
+| effectiveFrom | string (date-time) |  | Null, now or past applies now. (nullable) |
 
 **Response**: `BulkPriceResult`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | applied | boolean | yes |  |
-| productsMatched | integer | yes |  |
-| pricesChanged | integer |  |  |
-| skipped | array of object |  | Products the selection matched and the adjustment could not touch — a fixed-price bundle, a partner net rate, a product in an open period. |
+| productsMatched | integer | yes | The products matched (ADAM CR-544). |
+| pricesChanged | integer |  | The price rows changed, or that would change (ADAM CR-544). |
+| escalates | boolean | yes | Whether the run escalates (ADAM CR-544): true when any changed price moves by more than catalogue.bulkPriceChangeEscalationPercent, or pricesChanged exceeds catalogue.bulkPriceChangeEscalationCount (… |
+| skipped | array of object |  | Products the selection matched and the adjustment could not touch — a fixed-price bundle, a partner net rate, a product named in an open pricing change request. |
 | skipped[].productId | string (uuid) |  |  |
-| skipped[].reason | string |  |  |
+| skipped[].reason | enum (partnerNetRate, fixedPriceBundle, openChangeRequest) |  | partnerNetRate: the price list's price_list_type is b2b, reseller or ota. |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 403 |  | The caller lacks the permission (forbidden), or a real run escalates (BulkPriceResult.escalates) and the caller holds no PRICE_CONFIGURE (price-escalation-required); nothing changes (ADAM CR-544). |
 | 200 |  | Impact, or the applied result |
+| 400 |  | An adjustment that takes any price below zero (naming the price), or a future effectiveFrom (a future-dated change goes through a pricing change request); the whole run is refused and nothing changes… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### cloneProduct
@@ -825,16 +833,20 @@ Repricing every adult admission before a season is routine and currently means o
 1.1.47 and 1.1.48. `copyPriceList` and `cloneSeatMap` are the precedents and **the product equivalent did not exist**, so a seasonal variant was built by hand each year.
 The clone starts as a draft with a new code. **Variants come with it; orders do not** — a clone has no history, which is the point of it being a clone rather than a version.
 
+**What it writes, and what it refuses** (r13 root R21, CHG-R13R21-001). The new `catalogue.product` row, its `catalogue.variant` rows (`includeVariants`) and `catalogue.product_media` rows, and, with `includePrices`, one `catalogue.price` row per source price, on the same price list, for the matching new variant. A `code` already used by a product of the tenant (`product_code_uniq`, compared case-insensitively) is `409 duplicate-code` and nothing is written. The clone's `familyKey` is null: the family key is unique per venue (`product_venue_id_family_key_uniq`), so the source's cannot be copied.
+
+**The same code rules as createProduct, a defined includePrices and a stated copy list** (ADAM CR-545; Chinmay, 3 November 2026; CHG-CR545-001). (1) The body's `code` is exactly as `CreateProductRequest.code`: maxLength 64, pattern `^[A-Za-z0-9_-]+$`, unique per tenant compared ignoring case. A code already used by any product in the tenant answers `409 duplicate-code` (the shared DuplicateCode response), taken from the unique index on insert, not from a read first. A code that breaks the length or pattern answers `400 validation`. `name` is maxLength 200, as `Product.name`. (2) `includePrices` (default false): when true, for each source variant copied, every `catalogue.price` row of that variant (`price_list_id`, `list_price`, `tax_code_id`) is copied to the clone's matching new variant, on the same price list, with a new id, in the same transaction as the clone; CatalogueService owns the table. `includePrices` true with `includeVariants` false is refused with `400 validation` and nothing is written. Prices on price lists the caller cannot see at this venue are not copied. (3) **What a clone copies:** kind, venue, description, descriptionLocalised, category, responsible department, segment tags, channels, entitlement template, isStockTracked, onSaleFrom, onSaleTo, validTo, media rows (`catalogue.product_media`, pointing to the same assets), and, unless `includeVariants` is false, the variants under new ids with sku, barcode, axis values and names as stored. (4) **What a clone sets fresh:** new id; `code` and `name` from the body; `nameLocalised` null (`name` is the fallback, so guests never see the source's name); `familyKey` null (unique per venue); lifecycle `draft`, so `isSellable` false; `createdByPrincipalId` the caller; `approvedByPrincipalId` null; `createdAt` now; no versions, bundles, orders or other history. (5) **What a clone leaves out:** variant dimensions and asset usage records (VenueOps keeps those); staff add them after the clone. `fromPrice` in the `201` answer stays null. (6) **Tests:** a code already used in the tenant in different letter case gives `409 duplicate-code`; a code with a space gives `400`; `includePrices` true copies each price row to the matching new variant; `includePrices` with `includeVariants` false gives `400` and writes nothing; the clone's `nameLocalised` is null, `familyKey` null, `isSellable` false. The screen's clone form does not change.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `catalogue.variant` non-empty |
+| Part of slice | setup, makes `catalogue.price`, `catalogue.variant` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
-| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
+| Reads | `cache:idempotency`, `catalogue.price`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
+| Writes | `cache:idempotency`, `catalogue.price`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
 | Called by | BO-008 |
 | State model | Product ([states/product.yaml](../../../states/product.yaml)): created as `draft` |
 
@@ -849,10 +861,10 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| code | string | yes |  |
-| name | string | yes |  |
+| code | string | yes | The clone's code, exactly as CreateProductRequest.code (ADAM CR-545) - unique per tenant compared ignoring case; a used code is 409 duplicate-code, from the unique index on insert. (max length 64; pattern ^[A-Za-z0-9_-]+$) |
+| name | string | yes | As Product.name (ADAM CR-545). (max length 200) |
 | includeVariants | boolean |  | (default True) |
-| includePrices | boolean |  | (default False) |
+| includePrices | boolean |  | When true, every catalogue.price row of each copied source variant is copied to the matching new variant, on the same price list (ADAM CR-545). (default False) |
 
 **Response**: `Product`
 
@@ -864,6 +876,15 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
+| isFeatured | boolean |  | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. (default False) |
+| compareAtPrice | object |  | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. (nullable) |
+| compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| compareAtPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| compareAtPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| highlightBadge | object |  | The card's highlight badge (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. (nullable) |
+| rating | object |  | The card's rating summary (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. (read-only; nullable) |
+| rating.average | number | yes | The average rating, 1.0 to 5.0, one decimal. (min 1.0; max 5.0) |
+| rating.count | integer | yes | How many reviews the average is over. (min 1) |
 | nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -928,6 +949,8 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Cloned as a draft |
+| 400 |  | A code that breaks the length or pattern, or includePrices true with includeVariants false; nothing is written (ADAM CR-545). |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### commitCatalogueImport
@@ -937,6 +960,8 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 1.4.2. The second phase. **An operator has seen the findings and accepted them** — two-phase exists so nobody commits 2,847 products sight-unseen.
 Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that applies nothing and reports success is the defect CF-122 fixed in `seating`**, and it is not being rebuilt here.
 
+**The parse stages what it found and the commit applies exactly that** (ADAM CR-542; Chinmay, 3 November 2026; CHG-CR542-001). It refuses these cases and changes nothing: a `jobKind` other than `productImport`, `409 catalogue-import-wrong-kind` (pricing jobs become change requests on ADM-080); status `parsing`, `committing` or `failed`, `409 catalogue-import-not-ready`; `committed`, `409 catalogue-import-already-committed`; `outcome` `nothingFound` or `unreadable`, or no row left to apply, `409 catalogue-import-found-nothing`; `replaceCategory` with live orders against the category, checked again, `409 category-has-live-orders`. Otherwise it moves the job to `committing` and applies the `pending` `catalogue.import_job_row` rows in `row_number` order, each in its own transaction, exactly as `createProduct` or `updateProduct` would, with their audit and product version. New products are `draft`; updated products keep their lifecycle state. Under `replaceCategory`, products of the category that are not in the file go from `live` to `withdrawn`, or from `draft` to `archived`. Each row ends `applied` (`product_id` set) or `failed` (`failure` set, plus a finding with its row, severity `error` and the message). At the end the job is `committed` if every row applied, and `failed` if any row failed (the partial application is recorded, never rolled back), with `applied_count`, `failed_count` and `completed_at` set. The answer is `200` with the job either way. The source file is never read again.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -945,8 +970,8 @@ Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.import_job` |
-| Writes | `cache:idempotency`, `catalogue.import_job`, `catalogue.product`, `catalogue.variant` |
+| Reads | `cache:idempotency`, `catalogue.import_job`, `catalogue.import_job_row` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.import_job`, `catalogue.import_job_row`, `catalogue.product`, `catalogue.product_version`, `catalogue.variant` |
 | Called by | BO-117 |
 | State model | Catalogue import job ([states/catalogue-import-job.yaml](../../../states/catalogue-import-job.yaml)): moves `previewReady` -> `committing` |
 
@@ -965,8 +990,11 @@ Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that
 | status | enum (parsing, previewReady, committing, committed, failed) | yes |  |
 | outcome | enum (parsed, parsedWithFindings, nothingFound, unreadable) |  |  |
 | parsedCount | integer | yes |  |
-| createCount | integer |  |  |
-| updateCount | integer |  |  |
+| createCount | integer |  | The staged rows with action create that are not excluded (ADAM CR-542). |
+| updateCount | integer |  | The staged rows with action update that are not excluded (ADAM CR-542). |
+| mode | enum (createOnly, upsert, replaceCategory) | yes | The mode importProductCatalogue was sent, stored on the job (catalogue.import_job.mode, text not null default createOnly; ADAM CR-542) so the commit applies the rows under it. (default createOnly; read-only) |
+| appliedCount | integer |  | The rows the commit applied; set when the commit ends (ADAM CR-542). (read-only; nullable) |
+| failedCount | integer |  | The rows the commit failed to apply; set when the commit ends (ADAM CR-542). (read-only; nullable) |
 | findings | array of object |  | What an operator sees before committing — missing prices, duplicate codes, unknown categories, codes that do not match the tenant's schema. |
 | findings[].row | integer |  |  |
 | findings[].severity | enum (error, warning) |  |  |
@@ -996,7 +1024,7 @@ Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Applied |
-| 409 |  | The job found nothing, or was already committed. |
+| 409 |  | The job found nothing or has no row left to apply (catalogue-import-found-nothing), was already committed (catalogue-import-already-committed), is not a productImport (catalogue-import-wrong-kind), i… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getMyMemberships
@@ -1006,6 +1034,10 @@ Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that
 19.2.26 to 19.2.28. **`membership` is a `ProductKind`, so purchase and renewal already ride the order path — and nothing returned a guest their own membership.** No active list, no tier benefits, no prior terms.
 Three requirements and one operation, because they are one screen: **what I have, what it gets me, and what I used to have.**
 Includes lapsed terms. **A guest deciding whether to renew is comparing against what they had**, and a membership that vanishes on expiry makes that impossible.
+
+**The guest's read** (ADAM CR-543): it stays the guest's read, as the 2 October decision binds it on WEB-022, WEB-023 and GST-015; `listGuestMemberships` stays for staff and builds `GuestMembership` with the same code and rules.
+
+**GuestMembership, field by field** (ADAM CR-543; Chinmay, 3 November 2026; CHG-CR543-001). Rows: the signed-in guest's `access.entitlement` rows (`subject_id` is the guest) whose product's kind is `membership`. A chain is the guest's entitlements of one product plus any linked by `supersedes_entitlement_id`; the newest in a chain is the row, and the earlier ones are its `previousTerms`. A surrendered entitlement (transferred away) is not shown. `includeLapsed=false` leaves out rows whose `status` is `expired` or `cancelled`; true (the default) keeps them. Order: `validFrom` ascending, then `entitlementId`. Benefits are read from `catalogue.plan_benefit` and `catalogue.membership_benefit`; Marketing is not called (`tier` is null). `GuestMembership` states each field's rule.
 
 |  |  |
 |---|---|
@@ -1017,7 +1049,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `access.entitlement`, `catalogue.product`, `marketing.loyalty_position` |
+| Reads | `access.entitlement`, `catalogue.membership_benefit`, `catalogue.plan_benefit`, `catalogue.product` |
 | Writes | - |
 | Called by | GST-015, WEB-022, WEB-023 |
 
@@ -1032,6 +1064,40 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Memberships |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getPlanBenefits
+
+**`GET /entitlement-templates/{templateId}/benefits`**: Which benefits a plan grants, and how much of each
+
+**Keyed by the entitlement template because that is the plan.** `plan_benefit` carries the usage limit and the period, which is the part a benefit definition cannot hold — four free coffees a month is the same benefit as one a year.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | `catalogue.plan_benefit` |
+| Writes | - |
+| Called by | BO-288, WEB-022 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| templateId | path | yes | string (uuid) |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
+| 200 |  | Benefits granted |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### joinWaitlist
@@ -1132,6 +1198,41 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | 204 |  | Left |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listMembershipBenefits
+
+**`GET /membership-benefits`**: Benefits a plan can grant
+
+Decision 9. **Benefits were columns on `entitlement_template`**, so adding one was a schema change — `can_share_media`, `can_claim_shop_and_drop`, `included_value`. Its 15 operations and 34 screens read 34 columns to get three.
+**Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | `catalogue.membership_benefit` |
+| Writes | - |
+| Called by | BO-288, WEB-022 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (R8 blocker fix, GPS-C01 and WHITE-C05). |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Benefits |
+| 400 |  | No venueId from a caller with no venue (venue-required), or one that is not a venue of the tenant (unknown-venue). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### listProductCategories
 
 **`GET /product-categories`**: The merchandise hierarchy — categories, brands, collections
@@ -1139,6 +1240,8 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 Retail Board 2. **`listSeatCategories` existed and a product category did not** — a seat category prices a seat; this groups a catalogue.
 **Returned as a tree, not a flat list with parent ids.** A merchandiser reading a hierarchy five levels deep should not have to reassemble it, and every caller that does will reassemble it differently.
 **Whose tree, and what a guest sees** (R8 blocker fix, GPS-C01 and WHITE-C05). The tree is the venue's: `venueId` names it for a caller with no venue (a visitor, an app before sign-in), as `listProducts` does, and is left out by a caller who acts at one. **A guest or visitor gets only active categories of `kind` `category`** (not `brand`, `collection`, `season` or `department`), at every depth, unless the screen asks for a kind: `kind` narrows the tree to that kind. Staff see every kind and the inactive ones, as before.
+
+**How the tree is built when a node is dropped** (ADAM CR-523; Chinmay, 3 November 2026; CHG-CR523-001): inactive nodes are pruned with their whole subtree; a node dropped only for its kind passes its kept descendants up. The answer is built in two passes over the venue's `catalogue.product_category` rows. **Pass 1, for a guest or visitor only:** drop every inactive node together with everything below it, whatever the kinds below, so a section a venue switches off hides all that is filed under it. Staff skip pass 1 and see inactive nodes. **Pass 2, for every caller:** the kind in force is the `kind` parameter; with no `kind` parameter it is `category` for a guest or visitor, and every kind for staff (so nothing is dropped). Remove each remaining node whose kind is not the one in force, and attach each kept child to the nearest kept ancestor, or make it a root when no ancestor is kept. Among the new siblings, order by `displayOrder` ascending, then by `id`. A node never appears under a node it is not filed beneath. Contract tests: a category under a department appears as a root for a guest; a brand under a category answers `kind=brand` with the brand as a root; an active category under an inactive one is absent for a guest and present for staff.
 
 |  |  |
 |---|---|
@@ -1179,6 +1282,8 @@ Distinct from `semanticSearch`, which is AI and retrieves from documents. This i
 Scoped to what is on sale at the venue and channel, so a guest never finds a product they cannot buy, **with one exception: information-only products** (decided 29 September, rev 3 REV3-14). A product with `guestListing: infoOnly` is returned whether or not it is on sale, flagged with its `guestListing` and `notBookableLabel`, so a guest finds it, reads it and is told it cannot be booked online; the result opens the product's details and never offers to add it to the basket. The old rule *a guest never finds what they cannot buy* still holds for `bookable` products and is superseded for `infoOnly` ones. A `hidden` product is never returned to a guest. When the venue's `BookingFlowConfig.showInfoOnly` is off, `infoOnly` products are left out as well.
 **Help me choose narrows the search too** (decided 29 September, W4): `guidedAnswerIds` applies the chosen answers' filters, exactly as on `listProducts`.
 
+**What it matches, answers and reads** (ADAM CR-533, option A; Chinmay, 3 November 2026; CHG-CR533-001). (1) `summary` is the product's description (`catalogue.product.description`); no summary column is added. Each result also carries `nameLocalised` and `summaryLocalised` (`catalogue.product.name_localised` and `description_localised`); the screen shows the guest's language and falls back to `name` and `summary`. (2) The optional `channel` sets both the on-sale scope and `fromPrice`. (3) `showInfoOnly` is read through `white-label#tenantLanguageRecords` (service) for the tenant's current published configuration version: `BookingFlowConfig` from its snapshot, with the venue's `venueOverrides` entry laid over field by field; when the setting is absent it is on. When it is off, `infoOnly` products are left out. (4) The swim rule: a product's questions are `catalogue.product.consent_question_ids`; `marketing-crm#consentQuestionRecords` (service) is asked once per page for the ids the candidate products name, and when an answer has `requiresSwimmer` false, any product with a question of kind `swim` is left out. (5) `fromPrice` calls the one price rule, `catalogue#variantPriceRecords` (ADAM CR-439, built once in Catalogue on #35288; called, never copied), reading `catalogue.price_list` and `catalogue.price`. `listProducts` declares the same reads for (3) and (4) and applies the same rules.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1188,7 +1293,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `catalogue.event`, `catalogue.product`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `catalogue.variant`, `whitelabel.guided_choice_answer` |
+| Reads | `catalogue.event`, `catalogue.price`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `catalogue.variant`, `whitelabel.guided_choice_answer` |
 | Writes | - |
 | Called by | GST-001, GST-002, GST-003, GST-063, WEB-001, WEB-002, WEB-003 |
 
@@ -1196,10 +1301,11 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| q | query | yes | string | Keywords matched case-insensitively against the product's name and summary, in the requested language and in English; every word must match. |
+| q | query | yes | string | Keywords matched case-insensitively against the product's name, description and every language value of name_localised and description_localised; every word must match somewhere in them (ADAM CR-533). |
 | venueId | query |  | string (uuid) |  |
 | kind | query |  | enum (product, event, attraction, bundle, membership, merchandise, menuItem) |  |
 | guidedAnswerIds | query |  | array of string (uuid) | Help me choose answers, as filters (decided 29 September, W4). |
+| channel | query |  | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | The channel the search is scoped and priced for, exactly as listProducts' channel (ADAM CR-533): it sets both the on-sale scope and fromPrice. |
 | pageSize | query |  | integer |  |
 | X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
@@ -1215,7 +1321,9 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 **`PUT /channel-connections/{connectionId}`**: Create or update a channel connection
 
-**How TICVAI reaches one channel, per environment** (29 September, writers pass). Creates or updates a `catalogue.channel_connection`, keyed by `salesChannelId`, `connectorName` and `environment`. **Credentials are never sent or stored here**: `credentialsReference` and `certificateReference` name secrets in the vault (`422` `secretNotReference` if a value looks like a secret). A new or changed connection is saved `notTested`; `testChannelConnection` moves it to `connected` or `degraded`/`offline`. `disabled` switches it off. An existing OTA adapter is enabled for a venue by naming its `adapterId`, with no rebuild (MoM 31 Aug 2026 §4.3). Written to `catalogue.audit_entry` (`domain: channel`).
+**How TICVAI reaches one channel, per environment** (29 September, writers pass). Creates or updates a `catalogue.channel_connection`, keyed by `salesChannelId`, `connectorName` and `environment`. **Credentials are never sent or stored here**: `credentialsReference` and `certificateReference` name secrets in the vault (`422` `secretNotReference` if a value is not a vault reference). A new or changed connection is saved `notTested`; `testChannelConnection` moves it to `connected` or `degraded`/`offline`. `disabled` switches it off. An existing OTA adapter is enabled for a venue by naming its `adapterId`, with no rebuild (MoM 31 Aug 2026 §4.3). Written to `catalogue.audit_entry` (`domain: channel`).
+
+**What a vault reference is** (ADAM CR-459, decided by Chinmay on 2 November 2026, option A: one format, checked in one place). `credentialsReference` and `certificateReference`, when not null, are checked with the kernel's shared vault-reference validator, which takes the caller's tenant id and the value: the value must be the name of a secret in the cell's Key Vault namespaced to the tenant, matching `^t-<tenantId>-[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?$`, `<tenantId>` the caller's tenant id as a lowercase uuid with dashes (at most 119 characters). Anything else is `422 secret-not-reference`: `errors[]` names the field, nothing is stored, and the refused value is never echoed in the problem, logged or written to `catalogue.audit_entry`, because it may be a secret. The save does not check that the secret exists, since it may be put in the vault later; `testChannelConnection`'s authentication test checks that it resolves. Reads keep returning the reference: it is a name, not a secret.
 
 |  |  |
 |---|---|
@@ -1254,7 +1362,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | apiVersion | string |  | (max length 40; nullable) |
 | authenticationType | enum (none, oauth, apiKey, clientCredentials, certificate, signedRequest) |  |  |
 | credentialsReference | string |  | A vault reference, never the secret. (max length 200; nullable) |
-| certificateReference | string |  | (max length 200; nullable) |
+| certificateReference | string |  | A vault reference for the certificate, under the same rule as credentialsReference (ADAM CR-459). (max length 200; nullable) |
 | certificateExpiresAt | string (date-time) |  | (nullable) |
 | timeoutMs | integer |  | (min 1; nullable) |
 | rateLimitPerMinute | integer |  | (min 1; nullable) |
@@ -1262,7 +1370,11 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | retryPolicy | object |  | {maxAttempts, backoffSeconds}. (nullable) |
 | adapterId | string |  | (max length 100; nullable) |
 | connectionStatus | enum (notTested, connected, degraded, offline, disabled) |  | (default notTested) |
-| lastTests | object |  | [{test, result, testedAt}], the latest result per test. (read-only) |
+| lastTests | array of object |  | The latest result per test (ADAM CR-458, decided by Chinmay on 2 November 2026): each run replaces that test's entry, and a test not run keeps its last one. (read-only) |
+| lastTests[].test | enum (connectivity, authentication, productSync, availability, pricing, orderCreation, cancellation, webhook) | yes |  |
+| lastTests[].result | enum (passed, failed, notSupported) | yes | The values ChannelConnectionIntegrationManagerView.lastTests already lists. |
+| lastTests[].testedAt | string (date-time) | yes |  |
+| lastTests[].detail | string |  | One plain sentence, never a secret and never a partner's response body. (nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 
@@ -1282,7 +1394,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | apiVersion | string |  | (max length 40; nullable) |
 | authenticationType | enum (none, oauth, apiKey, clientCredentials, certificate, signedRequest) |  |  |
 | credentialsReference | string |  | A vault reference, never the secret. (max length 200; nullable) |
-| certificateReference | string |  | (max length 200; nullable) |
+| certificateReference | string |  | A vault reference for the certificate, under the same rule as credentialsReference (ADAM CR-459). (max length 200; nullable) |
 | certificateExpiresAt | string (date-time) |  | (nullable) |
 | timeoutMs | integer |  | (min 1; nullable) |
 | rateLimitPerMinute | integer |  | (min 1; nullable) |
@@ -1290,7 +1402,11 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | retryPolicy | object |  | {maxAttempts, backoffSeconds}. (nullable) |
 | adapterId | string |  | (max length 100; nullable) |
 | connectionStatus | enum (notTested, connected, degraded, offline, disabled) |  | (default notTested) |
-| lastTests | object |  | [{test, result, testedAt}], the latest result per test. (read-only) |
+| lastTests | array of object |  | The latest result per test (ADAM CR-458, decided by Chinmay on 2 November 2026): each run replaces that test's entry, and a test not run keeps its last one. (read-only) |
+| lastTests[].test | enum (connectivity, authentication, productSync, availability, pricing, orderCreation, cancellation, webhook) | yes |  |
+| lastTests[].result | enum (passed, failed, notSupported) | yes | The values ChannelConnectionIntegrationManagerView.lastTests already lists. |
+| lastTests[].testedAt | string (date-time) | yes |  |
+| lastTests[].detail | string |  | One plain sentence, never a secret and never a partner's response body. (nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 
@@ -1300,7 +1416,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 |---|---|---|
 | 200 |  | Saved |
 | 409 |  | Refused, and nothing is stored. |
-| 422 |  | secretNotReference. |
+| 422 |  | secretNotReference: credentialsReference or certificateReference is not a vault reference under the CR-459 rule (errors[] names the field); nothing is stored and the refused value is never echoed, lo… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setChannelSalesRule
@@ -1310,6 +1426,8 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 **One rule on a channel** (29 September, writers pass). Creates or replaces a `catalogue.channel_sales_rule`: a sales window (`ruleKind: salesWindow`), a sales limit or restriction (`salesLimit`) or a customer eligibility rule (`eligibility`), for the whole channel or one product (`productId`), with an effective window. Only the fields of its `ruleKind` are kept; the others are cleared. A rule is switched off with `isActive: false`, never deleted, so what applied to a past sale can be shown. Written to `catalogue.audit_entry` (`domain: channel`).
 
 Rules: `effectiveTo` before `effectiveFrom`, or `minimumQuantity` above `maximumQuantity`, is refused (`422` `invalidRange`); an `eligibility` rule needs `eligibilityDimension`, `eligibilityOperator` and `eligibilityEffect` (`422` `eligibilityIncomplete`); a product-level rule on a product that already has one for the same `ruleKind` and window needs `overridesProductRule` (`409` `ruleConflict`).
+
+**When a save conflicts** (ADAM CR-466, decided by Chinmay on 2 November 2026: option A as built, with two corrections from earlier decisions). Saving an active rule (`isActive` true) that has a `productId` and `overridesProductRule` false is refused with `409 rule-conflict`, and nothing is stored, when another active `catalogue.channel_sales_rule` (not the one being replaced) has the same `sales_channel_id`, `product_id` and `rule_kind` and an overlapping effective window. `ruleLevel` plays no part: CR-411 already reads a product-level rule as a row with a product. Windows are instants: a null `effective_from` means from when that rule was saved (its `created_at`, or now for the rule being saved), not open to the past (CR-414); a null `effective_to` is open-ended; two windows overlap when each starts before the other ends. A save with `isActive` false never conflicts, so a rule can always be switched off, and `overridesProductRule` true lets the save through. Before the check the save takes a transaction lock on the sales channel, product and rule kind (`pg_advisory_xact_lock` on a hash of the three), so two saves at once cannot both pass. The problem's `detail` names the id of the rule it collides with. A rule with no `productId` never gets this 409; `listChannelSaleSchedule`'s conflicts count (CR-411) still shows a channel-wide rule overlapping a product rule.
 
 |  |  |
 |---|---|
@@ -1447,7 +1565,7 @@ Rules: `effectiveTo` before `effectiveFrom`, or `minimumQuantity` above `maximum
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Saved |
-| 409 |  | ruleConflict. |
+| 409 |  | ruleConflict: another active rule on the same channel, product and rule kind has an overlapping effective window, and overridesProductRule is false; detail names that rule's id and nothing is stored… |
 | 422 |  | invalidRange or eligibilityIncomplete. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1541,6 +1659,100 @@ Rules: `fixedAmount` needs `amount`, `percentage` needs `percentage`, `tiered` n
 | 200 |  | Saved |
 | 409 |  | changeRequestRequired. |
 | 422 |  | valueRequired. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setMembershipBenefit
+
+**`PUT /membership-benefits/{benefitId}`**: Define a benefit
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.membership_benefit` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Reads | `cache:idempotency`, `catalogue.membership_benefit` |
+| Writes | `cache:idempotency`, `catalogue.membership_benefit` |
+| Called by | BO-288 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| benefitId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `CatalogueMembershipBenefit`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| id | string (uuid) |  |  |
+| code | string | yes | (max length 100) |
+| name | string | yes | (max length 150) |
+| type | string | yes | (max length 30) |
+| description | string |  | (max length 500; nullable) |
+| value | number |  | (nullable) |
+| unit | string |  | (max length 30; nullable) |
+| entitlementTemplateId | string (uuid) |  | (nullable) |
+| isActive | boolean | yes |  |
+| createdAt | string (date-time) | yes | (read-only) |
+
+**Response**: `CatalogueMembershipBenefit`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| id | string (uuid) |  |  |
+| code | string | yes | (max length 100) |
+| name | string | yes | (max length 150) |
+| type | string | yes | (max length 30) |
+| description | string |  | (max length 500; nullable) |
+| value | number |  | (nullable) |
+| unit | string |  | (max length 30; nullable) |
+| entitlementTemplateId | string (uuid) |  | (nullable) |
+| isActive | boolean | yes |  |
+| createdAt | string (date-time) | yes | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setPlanBenefits
+
+**`PUT /entitlement-templates/{templateId}/benefits`**: Replace the benefits a plan grants
+
+**Set whole.** A plan losing one benefit and gaining another is one change to a guest, and applying it in two steps sells a plan that briefly has neither or both.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.plan_benefit` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Reads | `cache:idempotency`, `catalogue.plan_benefit` |
+| Writes | `cache:idempotency`, `catalogue.plan_benefit` |
+| Called by | BO-288, BO-289 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| templateId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setProductCategories
@@ -3226,7 +3438,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.performance` |
 | Writes | - |
-| Called by | BO-015, BO-019, BO-726, GST-006, GST-041, GST-049, POS-004, WEB-006, WEB-007, WEB-010 |
+| Called by | BO-015, BO-019, BO-726, GST-006, GST-041, GST-049, POS-004, WEB-005, WEB-006, WEB-007, WEB-010 |
 
 **Parameters**
 
@@ -3269,7 +3481,9 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 **Admitted, it carries the admission token** (`WaitingRoomAdmission`): short-lived and signed, naming the tenant, the performance, its expiry and a unique id; the signing key is a Key Vault secret. The client sends it as `X-Admission-Token` on `orders.addCartLine`, which forwards it to `acquireInventoryHold`; both refuse a missing or invalid token `403 admission-required` for a performance whose room is on. The admitted answer is never cached at the edge.
 
-**On the guest web the edge also sets the token as an HttpOnly, short-lived, per-performance cookie** on the admitted answer (ADR-0066 amendment of 25 October 2026, ADAM CR-216): the browser sends it with `addCartLine` and the page stores nothing, so a reload or a second tab stays admitted. **A `404` for a performance the caller knows means the entry is gone** (evicted, or the room restarted): the guest re-enters with `enterWaitingRoom`.
+**On the guest web the token is also an HttpOnly, short-lived, per-performance cookie** on the admitted answer (ADR-0066 amendment of 25 October 2026, ADAM CR-216): the browser sends it with `addCartLine` and the page stores nothing, so a reload or a second tab stays admitted. **The API itself sends the cookie** on the admitted answer (ADAM CR-524, Chinmay, 3 November 2026; ADR-0066 amendment of 3 November 2026): `Set-Cookie`, HttpOnly, Secure, scoped to the performance, expiring with the token. Front Door passes it through and never caches the admitted answer. **A `404` for a performance the caller knows means the entry is gone** (evicted, or the room restarted): the guest re-enters with `enterWaitingRoom`.
+
+**Built with the waiting room, on #29033** (ADAM CR-524, Chinmay, 3 November 2026; CHG-CR524-001), with `enterWaitingRoom`, the release controller and the token check, as that ticket lists; not on the catalogue event ticket. #29033 settles in its own design, before building, everything both operations and the cart check share: the per-performance Redis keys (the arrival counter and the admitted-up-to mark the controller advances), the per-entry record and its lifetime, the token (format, signing algorithm, Key Vault secret name, lifetime), the rules for `position`, `aheadOfYou`, `estimatedWaitSeconds` and `pollAfterSeconds`, and when an entry is expired or the room closed rather than `notRequired`.
 
 |  |  |
 |---|---|
@@ -4413,8 +4627,9 @@ Checks a party's declared ages and heights against every product in the booking 
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | productId | string |  | (read-only) |
-| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): catalogue.product.name, in the caller's language. (read-only) |
-| unitPrice | object |  | The product's price per participant (pricingBasis perParticipant) or per package, read from the product's current price; not stored here. (read-only) |
+| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009; ADAM CR-499, CHG-CR499-001). (read-only; nullable) |
+| nameLocalised | object |  | The package product's nameLocalised, read-only, not stored on the package (ADAM CR-499, CHG-CR499-001): catalogue.product.name_localised, answered by listGroupPackages. (read-only; nullable) |
+| unitPrice | object |  | The package product's fromPrice, not stored here (ADAM CR-499, CHG-CR499-001). (read-only; nullable) |
 | unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -4477,6 +4692,15 @@ Checks a party's declared ages and heights against every product in the booking 
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
+| isFeatured | boolean |  | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. (default False) |
+| compareAtPrice | object |  | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. (nullable) |
+| compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| compareAtPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| compareAtPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| highlightBadge | object |  | The card's highlight badge (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. (nullable) |
+| rating | object |  | The card's rating summary (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. (read-only; nullable) |
+| rating.average | number | yes | The average rating, 1.0 to 5.0, one decimal. (min 1.0; max 5.0) |
+| rating.count | integer | yes | How many reviews the average is over. (min 1) |
 | nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -4639,6 +4863,8 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 
 **`GET /group-packages`**: The school-trip formats or party packages on offer
 
+**Each package is named and priced the way the product listing does** (ADAM CR-499; Chinmay, 3 November 2026; CHG-CR499-001; built on #27870 with `listProducts`). `name` is `catalogue.product.name`, and each package also carries `nameLocalised` (`catalogue.product.name_localised`, read-only, not stored on the package): as on Product, a guest screen shows the entry for its guest's language and falls back to `name`; staff screens show `name`. `unitPrice` is the package product's `fromPrice`, computed as `listProducts` computes it: the lowest list price among the product's sellable variants on the caller's channel now, in the venue's trading currency, by the same price-list function `listProductVariants` uses, the one price rule `catalogue#variantPriceRecords` (ADAM CR-439; call it, do not copy it); null where no price list prices it on that channel. The channel is `listProducts'`: a credential names it, a visitor sends `web` or `mobile`, and with neither it is `web` (a staff caller may send one too). `pricingBasis` says what the amount is per (participant or package); it never changes the amount.
+
 **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
 
 |  |  |
@@ -4661,6 +4887,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 |---|---|---|---|---|
 | venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (R8 blocker fix, GPS-C01 and WHITE-C05). |
 | kind | query |  | enum (school, party) |  |
+| channel | query |  | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | The channel GroupPackageDefinition.unitPrice is priced for, exactly as listProducts' channel (ADAM CR-499, CHG-CR499-001). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 | X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
@@ -4672,8 +4899,9 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | items | array of GroupPackageDefinition | yes |  |
 | items[].id | string (uuid) |  | (read-only) |
 | items[].productId | string |  | (read-only) |
-| items[].name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): catalogue.product.name, in the caller's language. (read-only) |
-| items[].unitPrice | object |  | The product's price per participant (pricingBasis perParticipant) or per package, read from the product's current price; not stored here. (read-only) |
+| items[].name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009; ADAM CR-499, CHG-CR499-001). (read-only; nullable) |
+| items[].nameLocalised | object |  | The package product's nameLocalised, read-only, not stored on the package (ADAM CR-499, CHG-CR499-001): catalogue.product.name_localised, answered by listGroupPackages. (read-only; nullable) |
+| items[].unitPrice | object |  | The package product's fromPrice, not stored here (ADAM CR-499, CHG-CR499-001). (read-only; nullable) |
 | items[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -4720,7 +4948,7 @@ Where `name` is null the row sorts after the rows that have it (NULLS LAST), and
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.variant` |
 | Writes | - |
-| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-048, GST-050, GST-075, KSK-004, KSK-015, POS-002, POS-003, PTR-006, WEB-005, WEB-048 |
+| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-048, GST-050, GST-075, KSK-004, KSK-015, POS-002, POS-003, PTR-006, WEB-005, WEB-022, WEB-048 |
 
 **Parameters**
 
@@ -4748,6 +4976,7 @@ Where `name` is null the row sorts after the rows that have it (NULLS LAST), and
 | items[].barcode | string |  | Taken from their variant tables, 20 September. (max length 64; nullable) |
 | items[].isDefault | boolean |  | Taken from their variant tables. (default False) |
 | items[].isActive | boolean | yes | False when retired. |
+| items[].priceCategoryId | string (uuid) |  | The variant's price category, a catalogue.price_category id (ADAM CR-455): the winning price assignment's category rate for it replaces the price (catalogue#variantPriceRecords); null for none. (nullable) |
 | items[].description | object |  | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). (nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
@@ -4817,6 +5046,15 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].name | string | yes | (max length 200) |
 | items[].description | string |  |  |
 | items[].fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
+| items[].isFeatured | boolean |  | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. (default False) |
+| items[].compareAtPrice | object |  | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. (nullable) |
+| items[].compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].compareAtPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].compareAtPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].highlightBadge | object |  | The card's highlight badge (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. (nullable) |
+| items[].rating | object |  | The card's rating summary (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. (read-only; nullable) |
+| items[].rating.average | number | yes | The average rating, 1.0 to 5.0, one decimal. (min 1.0; max 5.0) |
+| items[].rating.count | integer | yes | How many reviews the average is over. (min 1) |
 | items[].nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | items[].descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | items[].kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -4930,6 +5168,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | barcode | string |  | Taken from their variant tables, 20 September. (max length 64; nullable) |
 | isDefault | boolean |  | Taken from their variant tables. (default False) |
 | isActive | boolean | yes | False when retired. |
+| priceCategoryId | string (uuid) |  | The variant's price category, a catalogue.price_category id (ADAM CR-455): the winning price assignment's category rate for it replaces the price (catalogue#variantPriceRecords); null for none. (nullable) |
 | description | object |  | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). (nullable) |
 
 **Responses**
@@ -4997,6 +5236,8 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 
 **Design gap, 23 September.** The kids club sells school trips (half-day, full-day, curriculum day, priced per pupil) and birthday parties (Explorer to Exclusive hire, priced per package, with hosts). The product carries the price; this carries what makes it a group package.
 
+**It answers what it stores** (ADAM CR-499, option C; Chinmay, 3 November 2026; CHG-CR499-001). It writes `catalogue.group_package` exactly as specified, one row per product, and answers `200` with the stored fields: `id`, `productId`, `kind`, `maxParticipants`, `durationMinutes`, `minimumSize`, `hostCount`, `pricingBasis`, `freeLeaderRatio`, `paymentMode`, `includes`, `scopePath`. It answers `name` and `unitPrice` as null and reads no price and no product name, so it does not ask the currency read (that read was only for `unitPrice`). `name` and `unitPrice` sent in the body are ignored, as readOnly fields are. BO-011 binds neither.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -5023,8 +5264,9 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | productId | string |  | (read-only) |
-| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): catalogue.product.name, in the caller's language. (read-only) |
-| unitPrice | object |  | The product's price per participant (pricingBasis perParticipant) or per package, read from the product's current price; not stored here. (read-only) |
+| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009; ADAM CR-499, CHG-CR499-001). (read-only; nullable) |
+| nameLocalised | object |  | The package product's nameLocalised, read-only, not stored on the package (ADAM CR-499, CHG-CR499-001): catalogue.product.name_localised, answered by listGroupPackages. (read-only; nullable) |
+| unitPrice | object |  | The package product's fromPrice, not stored here (ADAM CR-499, CHG-CR499-001). (read-only; nullable) |
 | unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -5045,8 +5287,9 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | productId | string |  | (read-only) |
-| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): catalogue.product.name, in the caller's language. (read-only) |
-| unitPrice | object |  | The product's price per participant (pricingBasis perParticipant) or per package, read from the product's current price; not stored here. (read-only) |
+| name | string |  | Read from the package's product, not stored here (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009; ADAM CR-499, CHG-CR499-001). (read-only; nullable) |
+| nameLocalised | object |  | The package product's nameLocalised, read-only, not stored on the package (ADAM CR-499, CHG-CR499-001): catalogue.product.name_localised, answered by listGroupPackages. (read-only; nullable) |
+| unitPrice | object |  | The package product's fromPrice, not stored here (ADAM CR-499, CHG-CR499-001). (read-only; nullable) |
 | unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -5425,6 +5668,12 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | consentQuestionIds | array of string (uuid) |  | (max items 10) |
 | addOnProductIds | array of string (uuid) |  | The kind addOn products of the same venue offered with this product, in display order (Product.addOnProductIds; ADAM CR-252). |
 | requiresTimeWindow | boolean |  |  |
+| isFeatured | boolean |  | Marks the product featured, the plan card's Most popular badge (Product.isFeatured; ADAM CR-482). |
+| compareAtPrice | object |  | What the same visits cost bought singly, behind the plan card's saving (Product.compareAtPrice; ADAM CR-482). (nullable) |
+| compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| compareAtPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| compareAtPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| highlightBadge | object |  | The card's highlight badge per language, at most 20 characters each (longer is 400 validation); null clears it (Product.highlightBadge; ADAM CR-504). (nullable) |
 
 **Response**: `Product`
 
@@ -5436,6 +5685,15 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
+| isFeatured | boolean |  | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. (default False) |
+| compareAtPrice | object |  | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. (nullable) |
+| compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| compareAtPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| compareAtPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| highlightBadge | object |  | The card's highlight badge (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. (nullable) |
+| rating | object |  | The card's rating summary (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. (read-only; nullable) |
+| rating.average | number | yes | The average rating, 1.0 to 5.0, one decimal. (min 1.0; max 5.0) |
+| rating.count | integer | yes | How many reviews the average is over. (min 1) |
 | nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -5511,7 +5769,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 
 **`PATCH /products/{productId}/variants/{variantId}`**: Describe a variant
 
-**Only the words and codes a person reads or scans.** A variant's combination of values (`axisValues`) and its `sku` come from `setProductAttributes` and are not edited here; this sets the `name`, the `description` a guest reads behind the (i) on a ticket-type row (decided 29 September, 23SEP-6), the `barcode`, which variant is the default, and the `referencePrice` a length's saving is measured against (ADAM CR-253; the answer's `savingPercent` is worked out from it).
+**Only the words and codes a person reads or scans.** A variant's combination of values (`axisValues`) and its `sku` come from `setProductAttributes` and are not edited here; this sets the `name`, the `description` a guest reads behind the (i) on a ticket-type row (decided 29 September, 23SEP-6), the `barcode`, which variant is the default, and the `referencePrice` a length's saving is measured against (ADAM CR-253; the answer's `savingPercent` is worked out from it), and the variant's `priceCategoryId` (ADAM CR-455; CHG-CR455-001), which `listProductVariants` answers.
 Setting `isDefault` true clears it on the product's other variants. A retired variant is not edited: `409`.
 
 |  |  |
@@ -5543,6 +5801,7 @@ Setting `isDefault` true clears it on the product's other variants. A retired va
 | barcode | string |  | (max length 64; nullable) |
 | isDefault | boolean |  |  |
 | referencePrice | Money |  | The price the variant's saving is measured against (ProductVariant.referencePrice; ADAM CR-253); null clears it. (nullable) |
+| priceCategoryId | string (uuid) |  | The variant's price category (ProductVariant.priceCategoryId; ADAM CR-455); null clears it. (nullable) |
 
 **Response**: `ProductVariant`
 
@@ -5559,6 +5818,7 @@ Setting `isDefault` true clears it on the product's other variants. A retired va
 | barcode | string |  | Taken from their variant tables, 20 September. (max length 64; nullable) |
 | isDefault | boolean |  | Taken from their variant tables. (default False) |
 | isActive | boolean | yes | False when retired. |
+| priceCategoryId | string (uuid) |  | The variant's price category, a catalogue.price_category id (ADAM CR-455): the winning price assignment's category rate for it replaces the price (catalogue#variantPriceRecords); null for none. (nullable) |
 | description | object |  | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). (nullable) |
 
 **Responses**
@@ -6767,6 +7027,62 @@ Every table this service owns that the slice reads or writes, with its columns a
 | device_metadata | jsonb | no | {ipAddress, userAgent, deviceId}. |
 | trace | jsonb | no | Channel transactions: the step trace [{step, at, result}]. |
 
+### `catalogue.change_request`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| subject | text | yes |  |
+| name | text | yes | The pricing changeName; for a product, a label the server composes from product and change type. |
+| change_type | text | yes | Product values for subject: product, pricing values for subject: pricing. |
+| product_id | uuid | no | Product requests. |
+| current_version | integer | no | Product requests: the catalogue.product_version being changed. |
+| proposed_version | integer | no | Product requests: the version publishing would create. |
+| price_list_id | uuid | no | Pricing requests confined to one list. |
+| business_reason | text | no |  |
+| reason_code | text | no |  |
+| priority | text | no |  |
+| risk_level | text | no | Computed at submit from the impact analysis. |
+| supporting_notes | text | no |  |
+| attachment_file_ids | text[] | no | Files held by assets. |
+| venue_id | uuid | no |  |
+| market_code | text | no |  |
+| legal_entity_id | uuid | no |  |
+| business_unit | text | no |  |
+| impacted_channels | text[] | no |  |
+| owner_principal_id | uuid | no |  |
+| requested_by_principal_id | uuid | yes | Server-set from the caller. |
+| requested_at | timestamptz | yes |  |
+| assigned_approver_principal_id | uuid | no | Set by reassign or delegate on approveReviewDecision. |
+| approval_policy_id | uuid | no | The catalogue.approval_policy that routed it, resolved at submit. |
+| approval_request_id | uuid | no | The approvals.ApprovalRequest opened at submit. |
+| effective_date | timestamptz | no | Never in the past at submit (422). |
+| expiry_date | timestamptz | no |  |
+| status | text | yes |  |
+| decided_at | timestamptz | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `catalogue.change_request_line`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| change_request_id | uuid | yes |  |
+| sequence | integer | yes |  |
+| object_type | text | no |  |
+| object_id | uuid | no |  |
+| configuration_area | text | no |  |
+| field | text | no |  |
+| venue_id | uuid | no |  |
+| market_code | text | no |  |
+| current_value | text | no |  |
+| proposed_value | text | no |  |
+| current_amount | numeric(18,4) | no |  |
+| proposed_amount | numeric(18,4) | no |  |
+| is_removal | boolean | no | The wire remove: the object is withdrawn rather than changed. |
+
 ### `catalogue.channel_capacity`
 
 | Column | Type | Required | Notes |
@@ -6800,7 +7116,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | api_version | text | no |  |
 | authentication_type | text | no |  |
 | credentials_reference | text | no | A vault reference, never the secret. |
-| certificate_reference | text | no |  |
+| certificate_reference | text | no | A vault reference for the certificate, under the same rule as credentialsReference (ADAM CR-459). |
 | certificate_expires_at | timestamptz | no |  |
 | timeout_ms | integer | no |  |
 | rate_limit_per_minute | integer | no |  |
@@ -6808,7 +7124,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | retry_policy | jsonb | no | {maxAttempts, backoffSeconds}. |
 | adapter_id | text | no |  |
 | connection_status | text | no |  |
-| last_tests | jsonb | no | [{test, result, testedAt}], the latest result per test. |
+| last_tests | jsonb | no | The latest result per test (ADAM CR-458, decided by Chinmay on 2 November 2026): each run replaces that test's entry, and a test not run keeps its last one. |
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
 
@@ -7052,8 +7368,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | yes |  |
 | outcome | text | no |  |
 | parsed_count | integer | yes |  |
-| create_count | integer | no |  |
-| update_count | integer | no |  |
+| create_count | integer | no | The staged rows with action create that are not excluded (ADAM CR-542). |
+| update_count | integer | no | The staged rows with action update that are not excluded (ADAM CR-542). |
+| mode | text | yes | The mode importProductCatalogue was sent, stored on the job (catalogue.import_job.mode, text not null default createOnly; ADAM CR-542) so the commit applies the rows under it. |
+| applied_count | integer | no | The rows the commit applied; set when the commit ends (ADAM CR-542). |
+| failed_count | integer | no | The rows the commit failed to apply; set when the commit ends (ADAM CR-542). |
 | findings | jsonb | no | What an operator sees before committing — missing prices, duplicate codes, unknown categories, codes that do not match the tenant's schema. |
 | scope_path | text | no | The partition key (ADR-0005). |
 | job_kind | text | no | One job table for every catalogue bulk operation (29 September, data model DM3): product import (the original use), environment transfer (ADM-124) and bulk pricing update or import (ADM-080). |
@@ -7074,6 +7393,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | requested_by_principal_id | uuid | no |  |
 | created_at | timestamptz | no |  |
 | completed_at | timestamptz | no |  |
+
+### `catalogue.import_job_row`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| import_job_id | uuid | yes | The job that parsed it. |
+| scope_path | text | yes | The partition key (ADR-0005): the job's, so row security follows the job. |
+| row_number | integer | yes | The row of the file; the commit applies rows in this order. |
+| action | text | no | create for a new code; update for an existing code under upsert or replaceCategory. |
+| target_product_id | uuid | no | The existing product an update row replaces. |
+| payload | jsonb | yes | The normalised product with its variants, shaped as createProduct takes it. |
+| is_excluded | boolean | yes | True for a row with a severity error finding; it is never applied. |
+| outcome | text | yes |  |
+| failure | text | no | Why the commit could not apply the row. |
+| product_id | uuid | no | The product the commit created or updated. |
 
 ### `catalogue.inventory_reservation`
 
@@ -7098,6 +7433,41 @@ Every table this service owns that the slice reads or writes, with its columns a
 | force_released_by_principal_id | uuid | no |  |
 | force_release_reason | text | no |  |
 
+### `catalogue.membership_benefit`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
+| id | uuid | yes |  |
+| code | text | yes |  |
+| name | text | yes |  |
+| type | text | yes |  |
+| description | text | no |  |
+| value | numeric | no |  |
+| unit | text | no |  |
+| entitlement_template_id | uuid | no |  |
+| is_active | boolean | yes |  |
+| created_at | timestamptz | yes |  |
+
+### `catalogue.package_pricing`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | The partition key (ADR-0005). |
+| product_id | uuid | yes |  |
+| record_kind | text | yes |  |
+| name | text | no |  |
+| price_list_id | uuid | no |  |
+| pricing_model | text | yes |  |
+| add_on_type | text | no |  |
+| package_price | numeric(18,4) | no |  |
+| components | jsonb | no | [{productId, quantity, role, componentPrice}]; componentPrice only for componentOverride. |
+| component_price_visibility | text | no |  |
+| status | text | yes |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
 ### `catalogue.performance`
 
 | Column | Type | Required | Notes |
@@ -7114,6 +7484,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | language | text | no | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). |
 | format | text | no | How it is presented, free text the venue chooses, e.g. |
 | minutes_on_screen | integer | no | "Minutes on screen": how long after startsAt the slot is still sold (agreed 7 August, DI-167 and DI-169; added 6 October 2026, CHG-R4-014). |
+
+### `catalogue.plan_benefit`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| entitlement_template_id | uuid | yes |  |
+| membership_benefit_id | uuid | yes |  |
+| usage_limit | numeric | no |  |
+| usage_period | text | no |  |
+| priority | integer | yes |  |
+| is_active | boolean | yes |  |
+| created_at | timestamptz | yes |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `catalogue.price`
 
@@ -7198,6 +7581,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | family_key | text | no | The same product at another location (decided 29 September, rev 3 REV3-18). |
 | name | text | yes |  |
 | description | text | no |  |
+| is_featured | boolean | no | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. |
+| compare_at_amount | numeric(18,4) | no | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. |
+| highlight_badge | jsonb | no | The card's highlight badge (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. |
 | name_localised | jsonb | no | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. |
 | description_localised | jsonb | no | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). |
 | kind | text | yes |  |
@@ -7470,6 +7856,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | barcode | text | no | Taken from their variant tables, 20 September. |
 | is_default | boolean | no | Taken from their variant tables. |
 | is_active | boolean | yes | False when retired. |
+| price_category_id | uuid | no | The variant's price category, a catalogue.price_category id (ADAM CR-455): the winning price assignment's category rate for it replaces the price (catalogue#variantPriceRecords); null for none. |
 | description | jsonb | no | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). |
 
 ### `catalogue.waitlist_entry`
@@ -7922,7 +8309,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-385 operations, added to this service in later releases without changing any of the above.
+381 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -7930,7 +8317,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | block | `allocateBlockedSeats`, `createSeatBlock`, `listSeatBlocks`, `relinquishSeatBlock` |
 | bundle | `getBundle`, `getBundleSigningKeys`, `listBundleCapacityPolicies`, `listBundlePartnerProductMappings`, `listBundles`, `listCatalogueBundles`, `reportBundleApplied`, `setBundleCapacityPolicy`, `setBundlePartnerProductMappings` |
 | capacity | `createChannelCapacity`, `getChannelAllocations`, `listChannelCapacities`, `relinquishChannelAllocation`, `setChannelAllocations`, `updateChannelCapacity` |
-| catalogue | `assessProductChange`, `bulkUpdateCatalogueProducts`, `cancelPricingRollback`, `createDonationCampaign`, `decideCatalogueAiFinding`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listGuestMemberships`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductCategoryUsage`, `listProductTags`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `requestPricingRollback`, `restoreProductVersion`, `retryChannelIncident`, `setChannelSyncSetting`, `setConfigurationTemplate`, `setCurrencyRoundingRule`, `setDemandSignalConfiguration`, `setDynamicPriceRule`, `setDynamicPricingGuardrailPolicy`, `setMarketPricingConfiguration`, `setMembershipBenefit`, `setMembershipProgramme`, `setPackagePricingDefinition`, `setPlanBenefits`, `setPriceCalculationPolicy`, `setPriceCategoryRateType`, `setPriceLadderMatrix`, `setProductLinks`, `setProductTagDefinition`, `setSignalRegistryPolicy`, `testChannelConnection`, `transitionDynamicPricingStrategy`, `updateChannelIncident`, `updateDonationCampaign` |
+| catalogue | `assessProductChange`, `bulkUpdateCatalogueProducts`, `cancelPricingRollback`, `createDonationCampaign`, `decideCatalogueAiFinding`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listGuestMemberships`, `listMembershipProgrammes`, `listProductCategoryUsage`, `listProductTags`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `requestPricingRollback`, `restoreProductVersion`, `retryChannelIncident`, `setChannelSyncSetting`, `setConfigurationTemplate`, `setCurrencyRoundingRule`, `setDemandSignalConfiguration`, `setDynamicPriceRule`, `setDynamicPricingGuardrailPolicy`, `setMarketPricingConfiguration`, `setMembershipProgramme`, `setPackagePricingDefinition`, `setPriceCalculationPolicy`, `setPriceCategoryRateType`, `setPriceLadderMatrix`, `setProductLinks`, `setProductTagDefinition`, `setSignalRegistryPolicy`, `testChannelConnection`, `transitionDynamicPricingStrategy`, `updateChannelIncident`, `updateDonationCampaign` |
 | category | `listSeatCategories` |
 | coupon | `assignCoupon`, `getCouponCode`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
 | drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `getChannelAvailability`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductApprovalWorkflows`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSeatPricingRules`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listTaxProfiles`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishPricingEffectiveDate`, `setBookingVelocityTime`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setDemandOccupancyAvailability`, `setDynamicPricingStrategy`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductContextOwnership`, `setPromotionStackingRule`, `setRulePriorityConflict`, `setRuleTestRecommendation`, `setSeatPricingRule`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |

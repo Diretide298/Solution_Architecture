@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 39 of 104 |
+| Operations in the slice | 43 of 105 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -25,12 +25,15 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
+| administration | [`createDelegatedAccess`](#createdelegatedaccess) | POST | `/delegated-access` | core | 1 | CMS-019, PTR-020 |
 | administration | [`createRole`](#createrole) | POST | `/roles` | setup | 1 | ADM-021, BO-054 |
+| administration | [`deleteDelegatedAccess`](#deletedelegatedaccess) | DELETE | `/delegated-access/{delegatedAccessId}` | core | 1 | CMS-019, PTR-020 |
 | administration | [`listOwnPlatformStaffGrants`](#listownplatformstaffgrants) | GET | `/platform-staff-grants/mine` | core | 1 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
 | administration | [`listPrincipals`](#listprincipals) | GET | `/principals` | core | 1 | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019 … |
 | administration | [`listRoles`](#listroles) | GET | `/roles` | core | 1 | ADM-021, BO-054, BO-106, CMS-019, CMS-086 |
 | administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 1 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
 | administration | [`setCapabilityTemplate`](#setcapabilitytemplate) | PUT | `/capability-templates/{capabilityTemplateId}` | setup | 1 | BO-054 |
+| administration | [`setPrincipalModuleAccess`](#setprincipalmoduleaccess) | PUT | `/principals/{principalId}/module-access` | setup | 1 |  |
 | administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | core | 1 | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
 | administration | [`updateRole`](#updaterole) | PATCH | `/roles/{roleId}` | setup | 1 |  |
 | guestAuth | [`deleteGuestAccount`](#deleteguestaccount) | DELETE | `/auth/guest/account` | core | 1 | GST-066, WEB-024 |
@@ -55,6 +58,7 @@
 | identity | [`refreshToken`](#refreshtoken) | POST | `/auth/refresh` | core | 1 | GST-042, WEB-016 |
 | identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001 … |
 | identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-422 |
+| identity | [`setRolePermissions`](#setrolepermissions) | PUT | `/roles/{roleId}/permissions` | setup | 1 | BO-054 |
 | identity | [`setSegregationRules`](#setsegregationrules) | PUT | `/segregation-rules` | setup | 1 | ADM-340 |
 | identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-010, GST-042, GST-073, WEB-013, WEB-016, WEB-020 |
 | mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053 … |
@@ -66,6 +70,84 @@
 | sso | [`setSsoConfig`](#setssoconfig) | PUT | `/tenants/sso-config` | setup | 1 | ADM-005 |
 
 ## Group: administration
+
+### createDelegatedAccess
+
+**`POST /delegated-access`**: Assign a grant
+
+Resolution is deny-overrides-allow. A DENY at any node suppresses the permission at that node and everything beneath it, and is never overridden by a more specific ALLOW — so a deny is a guarantee rather than a default.
+Wildcard is permitted on DENY only. A wildcard allow is an accident waiting to happen.
+
+**Segregation is checked when a grant is made** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). An ALLOW to a principal is evaluated against every `SegregationRule` with everything the principal would then hold: this grant (a single permission, or a role's own and inherited permissions), its other live grants and their roles, and its module access; a `scopeSensitive` rule conflicts only where the two scopes overlap (one path contains the other), any other rule wherever both are held. An ALLOW to a role is checked the same way for every principal holding the role. **Only `severity: block` refuses**, with `409 segregation-breach` naming the rule and both permissions, and nothing is written; `requireApproval` and `warn` are accepted and the pair appears in `listSegregationViolations` at once. A DENY is never refused: it can only remove a conflict. The 409 is additive: until r6 this grant declared no segregation answer.
+
+|  |  |
+|---|---|
+| Permission | `PERMISSION_GRANT` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.module_access`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
+| Writes | `cache:idempotency`, `cache:resolution`, `identity.delegated_access` |
+| Called by | CMS-019, PTR-020 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `CreateGrantRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| principalId | string (uuid) |  |  |
+| roleId | string (uuid) |  |  |
+| permission | string |  |  |
+| scopePath | string | yes |  |
+| effect | enum (ALLOW, DENY) | yes |  |
+| validFrom | string (date-time) |  |  |
+| validTo | string (date-time) |  |  |
+
+**Response**: `DelegatedAccess`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| grantedByKind | enum (principal, subject, system) |  | Who made the grant (CHG-R8MIG-021). (default principal; read-only) |
+| grantedByPrincipalId | string (uuid) |  | The staff member who made the grant; set when grantedByKind is principal. (read-only; nullable) |
+| grantedBySubjectId | string (uuid) |  | The guest who made the grant (the account holder); set when grantedByKind is subject. (read-only; nullable) |
+| id | string (uuid) | yes |  |
+| principalId | string (uuid) |  | (nullable) |
+| roleId | string (uuid) |  | The role this grant gives, with its own and inherited permissions. (nullable) |
+| permission | string | yes | From the permission enum. (nullable) |
+| subjectId | string (uuid) |  | CF-132, CL-05. (nullable) |
+| overSubjectId | string (uuid) |  | Whose behalf. (nullable) |
+| overSubjectName | string |  | The display name of the guest acted for (pii.subject.display_name), read with the grant; null for a staff grant. (read-only; nullable) |
+| overSubjectIsMinor | boolean |  | Whether the guest acted for is under the region's RegionSettings.minorAgeThreshold today, computed from their date of birth, which is never returned; null when no date of birth is held. (read-only; nullable) |
+| overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
+| delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer, sharedEntitlement) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
+| quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
+| isRevocableBySubject | boolean |  | Whether the person it is over can end it. (default True) |
+| scopePath | string | yes |  |
+| effect | enum (ALLOW, DENY) | yes |  |
+| permissionId | string (uuid) |  | Taken from identity.user_access, 20 September, when that table was collapsed into this one. (nullable) |
+| revokedAt | string (date-time) |  | Taken from identity.user_access. (read-only; nullable) |
+| revokedByKind | enum (principal, subject, system) |  | Who revoked the grant (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): a staff member (revoked_by_principal_id), a guest (revokedBySubjectId, for example the owner taking back… (read-only; nullable) |
+| revokedBySubjectId | string (uuid) |  | The guest who revoked the grant; set when revokedByKind is subject (ADAM CR-209), since a guest is not a principal and cannot fill revoked_by_principal_id. (read-only; nullable) |
+| validFrom | string (date-time) |  | (nullable) |
+| validTo | string (date-time) |  | (nullable) |
+| createdByPrincipalId | string (uuid) |  |  |
+| createdAt | string (date-time) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Granted. |
+| 400 |  | Wildcard on an ALLOW, or scope outside the caller's own grants, or a grant naming both a permission and a role, or neither (validation; ADAM CR-158) |
+| 409 |  | The ALLOW would leave a principal holding both permissions of a segregation rule whose severity is block (segregation-breach, naming the rule, both permissions and the principal). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createRole
 
@@ -130,6 +212,39 @@
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | The code is already used in the tenant, compared case-insensitively (duplicate-code), or the initial permission set breaches a segregation rule whose severity is block (segregation-breach, naming the… |
 | 422 |  | A preset code that does not exist (unknown-preset). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### deleteDelegatedAccess
+
+**`DELETE /delegated-access/{delegatedAccessId}`**: Remove a grant
+
+Removing an ALLOW takes effect at next login. Removing it from a principal with a live session invalidates that session, because a revocation that takes effect eventually is not a revocation.
+
+|  |  |
+|---|---|
+| Permission | `PERMISSION_GRANT` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `identity.delegated_access` |
+| Writes | `cache:idempotency`, `cache:resolution`, `identity.delegated_access` |
+| Called by | CMS-019, PTR-020 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| delegatedAccessId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Removed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listOwnPlatformStaffGrants
@@ -378,7 +493,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 |---|---|---|
 | 201 |  | Open. |
 | 400 | BadRequest | Validation failed |
-| 403 |  | forbidden as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (step-up-token-missing), or the newest one is older than 5 minutes (step-up-tok… |
+| 403 |  | forbidden as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read from the caller's Control Plane token, neve… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCapabilityTemplate
@@ -443,6 +558,50 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | 409 |  | The id is a platform preset's (isPreset true), which a tenant cannot overwrite (capability-template-is-preset, ADAM CR-176). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setPrincipalModuleAccess
+
+**`PUT /principals/{principalId}/module-access`**: Tick what they may do
+
+BL-110, 3.3.5. **The whole grant, replaced.** A partial update would make "everything else stays as it was" a claim the caller cannot verify, and access is the one setting where a silent survivor is a breach.
+**Segregation is checked here, while the person is deciding.** `SegregationRule` says which permissions one principal may not hold at once; a tick that would create a conflict is refused with 409 naming the rule and the other capability — rather than appearing in a violation report a month later, which is the same finding arriving too late to act on.
+**The grant-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003): every rule is evaluated against everything the principal would then hold — this grant, its other module access, and the permissions of every role its live grants attach (own and inherited) — and a `scopeSensitive` rule conflicts only where the two scopes overlap (one path contains the other). **Only `severity: block` refuses**, with `409 segregation-breach` (`common.yaml`), the one type and status every segregation check answers with. `requireApproval` and `warn` are accepted and surfaced: they appear in `listSegregationViolations` at once.
+**An `elevated` capability raises an approval rather than taking effect.** The response is 202 with the request id when any tick is elevated, 200 when none is. Routed through `approvals` so that 11.1.24 — *a requester may never approve their own request* — applies without being restated here.
+
+|  |  |
+|---|---|
+| Permission | `PERMISSION_GRANT` |
+| Scope level | venue |
+| Part of slice | setup, makes `identity.module_access` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.module_access`, `identity.role_permission`, `identity.segregation_rule` |
+| Writes | `cache:idempotency`, `identity.module_access` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| principalId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| approvalRequestId | string (uuid) |  |  |
+| elevatedCapabilities | array of string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Granted |
+| 202 |  | Raised for approval, because at least one capability is elevated. |
+| 409 |  | A tick would breach a segregation rule whose severity is block. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### updatePrincipal
 
 **`PATCH /principals/{principalId}`**: Update or deactivate a principal
@@ -450,6 +609,8 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 Deactivation invalidates any live session immediately. **A change to `validTo`, to `primaryRoleId` or to the principal's permissions ends every live session of the principal at once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh. A change to `displayName` alone ends nothing.
 
 **Every session and refresh token, at every venue, through one function** (accepted 21 October 2026, Chinmay, ADAM CR-180 option A; CHG-R10ID-006). The caller acts at a venue, but `identity.refresh_token` is its owner's alone (own-row; CHG-R11FXV-002) and `identity.session` venue-isolated, so ending them with the caller's own row security would revoke no token and leave sessions at other venues live while answering 200. So the operation ends them by calling `identity.end_principal_sessions(principal_id, ended_by, reason)`, a SECURITY DEFINER function in the same transaction as the update: it first checks the caller may update that principal (the principal's own write rule: the tenant root, or a grant over its home scope), then sets every `active` session of the principal `terminated` with `ended_at`, `ended_by_principal_id` and `end_reason`, and revokes every live refresh token (`revoked_at`, `revocation_reason`), whatever the venue. No grant or policy is widened. A refusal by the function fails the whole update. Any other operation that must end all of a principal's sessions calls the same function (`forceLogout` ends one session, at the caller's own venue, and does not need it).
+
+**The tenant root comes from what the check proved visible** (ADAM CR-483, Chinmay, 2 November 2026; option A with option C's guard; CHG-CR483-001). The function takes the root it switches to from the caller's own tenant path (a tenant-root caller) or else the first label of the principal's home scope path, read in the same statement as the check, never from `platform.scope`'s tenant row, which a venue grant cannot see. It confirms the root is the tenant node once granted and raises `P0001` when it finds none, so a venue manager's deactivation ends the person's sessions, and a gap can no longer answer 200 with nothing ended: a raised error is a 500 for the call and nothing it wrote stays. This operation and `resetPrincipalCredential` call it unchanged.
 
 **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15, option A; CHG-R8SPN-024). A role held at a scope is a grant: `createDelegatedAccess` gives one (role, scope, validity) and `deleteDelegatedAccess` takes one away. CMS-019's Change access calls those two for the roles it adds and removes, and this operation only for the display name, active flag and validity.
 
@@ -591,6 +752,8 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 
 **The same job erases the guest's AI index, and the tombstone keeps it owed until it is done** (CHG-R8ERA-002, which replaces the later-release catch-up of CHG-R8RES-003; ADR-0047, ADR-0049). After it tombstones the guest, the job calls `ai.eraseSubject` for the subject (cell-internal, `serviceAuth`), which deletes the guest's index rows and search points and answers with the counts removed and left. The AI erasure is done when a call answers `rowsLeft` 0 and `pointsLeft` 0. Until then the tombstone (`is_erased`, `erased_at`, `erasure_request_id`) is the record that it is owed: a failed call (`502 provider-connection-failed`, no answer, or anything left) undoes nothing, and **the retry** is the job's own: it calls `eraseSubject` again for that subject with backoff, and its daily sweep calls it for every tombstoned subject, so a retry lost with a stopped job is made by the next sweep. `eraseSubject` answers zeros for a subject with nothing left, so a retry or a sweep only repeats what is safe. Neither this request nor its `202` waits for the AI erasure.
 
+**The venue the request is raised at, by `exportSubjectData`'s rule** (ADAM CR-512, Chinmay, 3 November 2026; CHG-CR512-001). The call takes the shared `X-Venue-Id` header (`GuestVenue`): the venue must be one of the tenant's venues (`404` otherwise); with no header the guest is refused `400 venue-required` and nothing is raised. The venue's path (`tenancy#scopeRecords`) is the request's `scopePath`, and the `countryCode` of the region settings row at the nearest ancestor of that path (`tenancy#regionSettingsRecords`), both read in process, is `jurisdiction` on `identity.privacyRequestRaised`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -608,6 +771,7 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -622,6 +786,8 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 |---|---|---|
 | 202 |  | Erasure request raised. |
 | 409 |  | The guest still holds something a deletion would strand. |
+| 400 |  | No X-Venue-Id, so no venue to raise the request at (venue-required; ADAM CR-512). |
+| 404 |  | The X-Venue-Id is not one of the tenant's venues (ADAM CR-512). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestSession
@@ -1281,6 +1447,14 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 
 **An erased guest** (CR-101). A subject whose `pii.subject` row is tombstoned (`is_erased` true) is answered `410 subject-erased` and nothing is raised: there is nothing left to export, and the tombstone is the record that the erasure was done.
 
+**The venue the request is raised at** (ADAM CR-512, Chinmay, 3 November 2026; CHG-CR512-001). The call takes the shared `X-Venue-Id` header (`GuestVenue`). When it is sent, the venue must be one of the tenant's venues (`404` otherwise) and, for a staff caller, inside the scope where they hold `GUEST_VIEW_PII` (`403` otherwise). With no header, a staff caller's venue is their session's working venue. A guest with no header, or a staff caller with no working venue, is refused `400 venue-required` and nothing is raised. The venue's path is read through `tenancy#scopeRecords`, and the `countryCode` of the region settings row at the nearest ancestor of that path through `tenancy#regionSettingsRecords`, both in process. The request's `scopePath` is the venue's path; `jurisdiction` on `identity.privacyRequestRaised` is that `countryCode`.
+
+**One open export per guest** (CR-512). The call first looks in `identity.subject_data_export` for a row of this subject that is `awaitingApproval` or `running`. If there is one, it answers `202` with that row's id as `requestId` and its `format`, and writes and emits nothing. If Approvals answers `409 openRequestExists`, it answers the same way with the open request's id.
+
+**The call, in order** (CR-512). `404` and `410` as declared. Then the request is raised through `IApprovalRequests` (`createApprovalRequest`, in process): kind `configurationChange`, `subjectContract` `identity`, `subjectType` `subjectDataExport`, `subjectId` the guest's `pii.subject` id, `scopePath`, a one-line summary, and `requestedBySubjectId` for a guest or `requestedByPrincipalId` for staff. On `201` the row is written `awaitingApproval` with the request's id; on `422 no-approval-route` it is written `running` with a new UUIDv7 as its id. In the same transaction the call emits `identity.privacyRequestRaised` (`subjectId`, `approvalRequestId`, `requestType` `access`, `format`, `raisedByGuest`, `jurisdiction`, `raisedAt`) and answers `202 {requestId, format, estimatedCompletionAt: null}`.
+
+**The export job is not this operation's** (CR-512): the job, the storage write, the delete and signed link, and `createDsarRequest`, which the job calls, are the export job's (`x-ticvai-jobs.subjectExport`, its own ticket), which carries their rules.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_VIEW_PII` |
@@ -1290,7 +1464,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `identity.subject_holding`, `pii.subject` |
+| Reads | `cache:idempotency`, `identity.subject_data_export`, `identity.subject_holding`, `pii.subject` |
 | Writes | `approvals.request`, `cache:idempotency`, `identity.subject_data_export`, `platform.outbox` |
 | Called by | GST-066, WEB-024 |
 
@@ -1300,6 +1474,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Request body**
 
@@ -1320,7 +1495,9 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Export started, as an Approvals request (and, for a guest linked across cells, a cross-cell sync.dsar_request raised by createDsarRequest). |
-| 404 |  | No such guest, or a guest caller naming a subject that is not its own (never 403, which would confirm the subject exists). |
+| 400 |  | No venue to raise the request at (ADAM CR-512): a guest sent no X-Venue-Id, or a staff caller sent none and has no working venue (venue-required). |
+| 403 |  | A staff caller named an X-Venue-Id outside the scope where they hold GUEST_VIEW_PII (ADAM CR-512). |
+| 404 |  | No such guest, or a guest caller naming a subject that is not its own (never 403, which would confirm the subject exists); or an X-Venue-Id that is not one of the tenant's venues (ADAM CR-512). |
 | 410 |  | The guest was erased (pii.subject.is_erased true): there is no data left to export, and nothing is raised (subject-erased; ADAM CR-101, CHG-R10ID-016). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1379,6 +1556,8 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 **`GET /auth/session`**: Current session and effective permissions
 
 **A session that is not yet usable answers `409 session-pending`** (R8 blocker fix, IDENTITY-C04, lead answer A of 20 October 2026). While a role has not been chosen, a credential change is required, or a second factor is required, there is no `Session` to return (`roleId` and the permissions do not exist yet), so the answer is a `409` problem with `pending`, a list of the steps still to do, in order, from `credentialChange`, `mfa`, `roleSelection`. `Session.roleId` stays required: no schema change. EMP-002's context panel and POS-000's background read treat the `409` as "not yet" and render once `selectRole` returns its `Session`. `LoginResponse.session` is present only when no step is pending.
+
+**Answered from the session registry, filled once at sign-in** (ADAM CR-513, Chinmay, 3 November 2026; CHG-CR513-001). `scope`, `effectivePermissions` and `permissionsByScope` come from the session registry entry filled at sign-in or role selection; the read does not resolve grants again (docs/architecture/specs/permission-resolution.md, R7 and section 6.2). On a registry miss the entry is rebuilt from `identity.session.grant_id` (`SessionGrant`), the grant the session was opened through, with the same resolution, and stored. A revocation invalidates the session through its event, so the next read is `401`; a rebuild that finds the stored grant revoked or expired ends the session the same way and answers `401`. A session with `role_id` set and `grant_id` null (opened before the column existed) answers `409 session-pending` with `pending` `[roleSelection]`, so the client shows the role cards and the person picks again. `availableRoles` stays resolved on read. `WorkstationContext.cellName` is filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not. No wire shape changes.
 
 |  |  |
 |---|---|
@@ -1696,6 +1875,8 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 **The credential is checked against `identity.principal_credential`** (`PrincipalCredential`, 14 October 2026, CHG-CRD-001, ADAM CR-078): the row for the principal and `method`, its PHC hash (ADR-0071), and its lockout. A wrong password or PIN adds to `failedAttempts`; at `PasswordPolicy.lockoutAfterAttempts` (password) or `pinLockoutAfterAttempts` (PIN) the method is locked until `lockedUntil`, and a locked method is refused 429 `credential-locked` without the credential being checked. A PIN must be `PasswordPolicy.pinLength` digits. **A principal provisioned by single sign-on** (`Principal.ssoProviderId`) has no local password: a `password` sign-in, or a `pin` sign-in before `resetPrincipalCredential` has issued a PIN, is refused 401 `sso-sign-in-required`, and the door offers `startSsoAuthorization`. A temporary credential (`Principal.mustChangeCredential`) signs in with `LoginResponse.mustChangeCredential` true.
 **A device sign-in is recorded on the device** (ADAM CR-232, the lead's answer to r10 question 23, 25 October 2026; CHG-R10TEN-018). A successful sign-in that names a `workstationId` asks Tenancy's in-process API `tenancy#recordDeviceSignIn` in the same transaction as the session, so each device bound to that workstation gets a `tenancy.device_audit` row of kind `access`, action `signIn`, which `listDeviceAuditRecords` returns.
 
+**The session stores the grant it was opened through** (ADAM CR-513, Chinmay, 3 November 2026; CHG-CR513-001). When the call opens a usable session directly because the principal holds one grant, it writes that grant's id into `identity.session.grant_id` (`SessionGrant`) and the session registry entry carries it beside the resolved scope and permissions; `venue_id` and `working_venue_id` are written as now. Permissions stay resolved once, here or at `selectRole`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1819,6 +2000,8 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 
 **Idempotent on the export id and the owner**: a redelivered event finds the part recorded and returns it. Invoked by the event relay, never by a screen.
 
+**The two NOT NULL columns the body did not carry** (r13 root R40, CHG-R13R40-001): the part's `owner` is the module that published the event, `marketing-crm` (this operation consumes only `marketing.subjectDataPartWritten`), set by Identity, never sent; its `writtenAt` is the event's `writtenAt`, sent in the body.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1846,6 +2029,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | fileRef | string | yes | (max length 500) |
 | tables | array of string |  |  |
 | rowCount | integer | yes | (min 0) |
+| writtenAt | string (date-time) |  | The event's writtenAt, when the owner wrote its part; stored as the part's writtenAt (r13 root R40). |
 
 **Response**: `SubjectDataExportPart`
 
@@ -1925,6 +2109,8 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 **`Session.saleBoardId` is present only on a till session** (decided 2 October 2026, Chinmay; CHG-CSP-002, breaking change BC-001 to BC-005): a session opened from a browser or a handheld has no workstation and no board, and the field is absent rather than invented.
 
 **The venue is chosen with the role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C45, option A; CHG-R8SPN-032). A role is held through a grant, and the grant carries the scope: a steward at AquaCove Abu Dhabi and at AquaCove Dubai holds two grants of one role, and `availableRoles` lists one `RoleSummary` per grant, each naming its venue (`scope`). The client sends the chosen card's `grantId`; the session's venue (`identity.session.venue_id`) and scope are set from that grant's scope. `roleId` alone still works for a role held at one venue; for a role held at several, a body with no `grantId` is refused `422 grant-required`, and a `grantId` that is not the caller's, or not of `roleId`, is `403`.
+
+**The session stores the grant** (ADAM CR-513, Chinmay, 3 November 2026; CHG-CR513-001). The call writes the chosen `grantId`, or the role's only grant when the body sends `roleId` alone, into `identity.session.grant_id` (`SessionGrant`); `venue_id` and `working_venue_id` are written as now. The session registry entry carries `grantId` beside the resolved scope and permissions, which `getCurrentSession` answers from.
 
 |  |  |
 |---|---|
@@ -2100,6 +2286,63 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 | 200 |  | Set |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setRolePermissions
+
+**`PUT /roles/{roleId}/permissions`**: What this role may do
+
+POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found `identity.role_permission` with one column** — and nothing wrote it.
+A role that grants no permissions is not a role, and until now a venue could create one and never give it anything.
+**The whole set in one call.** A permission added one at a time leaves a role briefly holding a combination nobody intended, and **a segregation-of-duties rule evaluated against that intermediate state either fires wrongly or misses.**
+**Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two permissions in conflict — a venue told only *not allowed* will grant it another way.
+**The role-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). Every rule is evaluated against the role's own permissions (this body) united with those of `inheritsFromRoleId`, **whatever the rule's `scopeSensitive`**: a role's permissions are granted together at one scope, so a pair inside a role always overlaps. Only `severity: block` refuses, with `409 segregation-breach` (`common.yaml`), the one type and status every segregation check answers with; `requireApproval` and `warn` are accepted and surface when a grant attaches the role and in `listSegregationViolations`. **A parent role's edit re-checks every role that inherits from it** (its own set united with the new one); a breach there refuses this call too, naming the child role. Each change writes one `platform.audit_record` row in the same transaction.
+**No escalated permission** (decided 28 September, audit R197): a role's permission set has no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing. The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a permission ends the live sessions of every principal holding the role at once** (audit R126); an addition takes effect at their next sign-in.
+**The checklist a preset filled stays editable here** (decided 2 October 2026, Chinmay, pre-apply round: roles are preset permission configurations; DEC-007; CHG-CSP-003). A role started from the Viewer preset is given more ticks with this call like any other role; the preset is not consulted and not changed.
+**Built in the Identity module, beside `createRole` and `updateRole`** (ADAM CR-525, Chinmay, 3 November 2026; CHG-CR525-001). Its path, body, answers and errors do not change; `ROLE_MANAGE` at the tenant root, as now. (1) Its reads are Identity's own: the role, its permission rows, the segregation rules and the roles inheriting from it. (2) Permissions: the role's whole set is replaced (rows not sent go inactive, new rows are inserted); the segregation check runs on the role's own permissions together with its parent's, and on every role inheriting from it, answering `409 segregation-breach` as now. (3) `inheritsFromRoleId` is written to `identity.role.inherits_from_role_id` in the same transaction; null clears it. It answers `400 validation` naming `inheritsFromRoleId`, and writes nothing, when it is the role itself, is not a role of the tenant, names a role that itself inherits from another, or when roles already inherit from this one; the depth-of-one rule also rules out cycles. (4) Sessions: each affected role's permissions, own plus parent, are compared before and after the change; the affected roles are this role and every role inheriting from it, and a changed or cleared parent counts. Where any role lost a permission, every principal holding a live grant of that role (`identity.delegated_access` with that `role_id`, effect `ALLOW`, not revoked, `valid_to` empty or in the future) has its sessions ended by `identity.end_principal_sessions(principalId, the caller's principal id, 'role-permissions-changed')` in the same transaction, as `resetPrincipalCredential` does; if the function refuses, the whole call fails and nothing is written. A change that only adds permissions ends no session. (5) One `platform.audit_record` row per change, as now. (6) Its tables: `identity.role`, `identity.role_permission`, `identity.segregation_rule`, `identity.delegated_access` (read), `identity.session` and `identity.refresh_token` (through the function), and `platform.audit_record`. Tenancy no longer writes `identity.role_permission`.
+
+|  |  |
+|---|---|
+| Permission | `ROLE_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `identity.role`, `identity.role_permission` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
+| Writes | `cache:idempotency`, `cache:resolution`, `identity.refresh_token`, `identity.role`, `identity.role_permission`, `identity.session`, `platform.audit_record` |
+| Called by | BO-054 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| roleId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
+| inheritsFromRoleId | string (uuid) |  | (nullable) |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| roleId | string (uuid) | yes |  |
+| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
+| inheritsFromRoleId | string (uuid) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set. |
+| 400 |  | inheritsFromRoleId is the role itself, is not a role of the tenant, names a role that itself inherits from another, or roles already inherit from this one (validation, errors[] naming inheritsFromRol… |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Breaches a segregation rule whose severity is block, in this role or in a role inheriting it (segregation-breach). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setSegregationRules
 
 **`PUT /segregation-rules`**: Which permissions may not be held together
@@ -2219,6 +2462,8 @@ Issues a short-lived token proving a factor was presented just now. Consumed by 
 **For a guest only in a venue that enabled guest two-step verification** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167). The venue is `venueId` in the body: for `signIn` the venue the guest signed in from, for a step-up the venue of the booking, cart or ticket being acted on (the calling client or service passes it). Where that venue's `VenueSettings.identity.guestTwoStep.enabled` is on, an enrolled guest uses `action: signIn` after a guest sign-in answered `requiresMfa`, and a step-up before any action listed in that venue's `guestTwoStep.stepUpActions`; the token is bound to that venue. Where it is off (the default) a guest caller is refused 403 `guest-two-step-disabled`. **A guest who signed in with an email code cannot use `emailOtp` as the second factor**: the same inbox twice is one factor.
 A session that authenticated hours ago is not the same as a person present at the keyboard now, and for those actions the difference matters.
 
+**An `emailOtp` code, and how it reaches the person** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001). For a sign-in or step-up challenge on `emailOtp`, for staff, partners and guests: 6 random digits, valid 10 minutes (`mfa_challenge.expires_at`), stored as its PHC hash; five wrong codes void it, as now. The call writes `identity.mfaCodeIssued` v1 to the outbox in the same transaction as the `mfa_challenge` row (`challengeId`, `principalId` or `subjectId`, `action`, `locale`, `expiresAt`, and `destination` and `code` field-encrypted through `IFieldEncryption`, never in clear). Marketing sends it through the tenant's email provider; until that consumer is on dev, Identity's delivery seam records only that a code was issued, never the code. A `totp` challenge sends nothing (`enrolMfaMethod` states the authenticator values).
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -2228,7 +2473,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_method`, `identity.session` |
-| Writes | `cache:idempotency`, `identity.mfa_challenge` |
+| Writes | `cache:idempotency`, `identity.mfa_challenge`, `platform.outbox` |
 | Called by | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
@@ -2270,6 +2515,8 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 **Staff enrol an authenticator app (`totp`), with email (`emailOtp`) as the fallback** (decided 28 September, audit R126 (5)). A staff or partner principal asking for `smsOtp`, `biometric` or `hardwareToken` is refused `422`.
 **A guest may enrol only where at least one venue of the tenant enabled guest two-step verification** (`VenueSettings.identity.guestTwoStep.enabled`, decided 29 September, rev 3 GAP-B1, per venue): the same kinds as staff, `totp` with `emailOtp` as the fallback. The enrolment belongs to the guest account and is tenant-wide; it is used only in venues that have the setting on. Any other kind is refused `422`; enrolling while no venue has the setting on is refused `403` `guest-two-step-disabled`.
 
+**The MFA values** (ADAM CR-522, Chinmay, 3 November 2026: the MFA values follow the authenticator standard, and a code the server sends goes by an outbox event like the guest's; CHG-CR522-001). (1) Authenticator codes (`totp`), RFC 6238: HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose step is not later than the last step accepted for that method is refused (that step is kept in the distributed cache for two minutes), so each code works once. The secret is 20 random bytes, base32 without padding, returned once in `MfaEnrolment.secret` and stored field-encrypted in `mfa_method.secret`; `qrCodeUri` is `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`, where `issuer` is the tenant's display name and `account` the principal's username or the guest's email, each URL-encoded. (2) Recovery codes: ten, each 10 characters of Crockford base32, shown as five characters, a hyphen, five characters. Every `enrolMfaMethod` of any kind issues a new set and replaces the earlier one, as `MfaRecoveryCode` says; they are stored as PHC hashes. (3) A pending enrolment lapses 10 minutes after this call; `pendingExpiresAt` and `MfaEnrolment.expiresAt` are that time. (4) An `emailOtp` code (this enrol challenge, or a sign-in or step-up challenge, for staff, partners and guests) is 6 random digits, valid 10 minutes (`mfa_challenge.expires_at`), stored as its PHC hash; five wrong codes void it, as now. (5) The carrier: for `emailOtp` this call writes `identity.mfaCodeIssued` v1 to the outbox in the same transaction as the `mfa_challenge` row, with `destination` and `code` field-encrypted through `IFieldEncryption`, never in clear. Marketing sends it through the tenant's email provider; until that consumer is on dev, Identity's delivery seam records only that a code was issued, never the code.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -2279,7 +2526,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_recovery_code`, `identity.principal` |
-| Writes | `cache:idempotency`, `identity.mfa_method`, `identity.mfa_recovery_code` |
+| Writes | `cache:idempotency`, `identity.mfa_method`, `identity.mfa_recovery_code`, `platform.outbox` |
 | Called by | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 
 **Parameters**
@@ -2303,9 +2550,9 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | methodId | string (uuid) | yes |  |
 | kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
 | secret | string |  | TOTP shared secret. (nullable) |
-| qrCodeUri | string |  | (nullable) |
+| qrCodeUri | string |  | otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30, where issuer is the tenant's display name and account is the principal's username or the guest's e… (nullable) |
 | recoveryCodes | array of string |  | Returned once, in this enrolment response (enrolMfaMethod writes them, hashed, to identity.mfa_recovery_code). |
-| expiresAt | string (date-time) |  |  |
+| expiresAt | string (date-time) |  | When the pending enrolment lapses, 10 minutes after enrolMfaMethod (pendingExpiresAt; ADAM CR-522, CHG-CR522-001). |
 
 **Responses**
 
@@ -2351,7 +2598,9 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 
 **How an MFA step-up reaches the operation that demands it: the session** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-020). A successful step-up is also recorded against the caller's own session, bound to the challenge's `action` and to that session, for the token's short life. Every operation that declares `x-ticvai-step-up: mfa` declares `x-ticvai-step-up-carrier: session` and reads the step-up from the session that calls it: the client sends no token field and no header, and a step-up made on another session or for another action does not count. It is single-use: the operation that consumes it clears it. Without a fresh step-up the operation is refused 403, and the client runs `createMfaChallenge` and this operation, then retries. A call with no session (`{}`) cannot carry an MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`, CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1.
 
-**The action, the lifetime and the refusals, for every operation that declares `x-ticvai-step-up: mfa`** (ADAM CR-375, Chinmay, 31 October 2026; CHG-CR375-001). The step-up action is the operation's `operationId`: the client calls `createMfaChallenge` with that `action`, then this operation. A verified step-up counts for 5 minutes from `verifiedAt`, which is the `expiresAt` this operation returns. The operation looks on the caller's own session for an `identity.mfa_challenge` row with that action, status `verified` and no `consumedAt`, and sets `consumedAt` in its own transaction. With no such row it answers `403 step-up-token-missing`; when the newest one is older than 5 minutes it answers `403 step-up-token-expired`; nothing is written in either case.
+**The action, the lifetime and the refusals, for every operation that declares `x-ticvai-step-up: mfa`** (ADAM CR-375, Chinmay, 31 October 2026; CHG-CR375-001). The step-up action is the operation's `operationId`: the client calls `createMfaChallenge` with that `action`, then this operation. A verified step-up counts for 5 minutes from `verifiedAt`, which is the `expiresAt` this operation returns. The operation looks on the caller's own session for an `identity.mfa_challenge` row with that action, status `verified` and no `consumedAt`, and sets `consumedAt` in its own transaction. With no such row it answers `403 step-up-token-missing`; when the newest one is older than 5 minutes it answers `403 step-up-token-expired`; nothing is written in either case. **The look-up and the consume are Identity's in-process step-up check, `consumeMfaStepUp`** (ADAM CR-509, Chinmay, 3 November 2026; CHG-CR509-001): every operation that demands an MFA step-up on a tenant session uses the same check, called before any other write in its own transaction, so a later refusal rolls the consume back. A platform caller's step-up is still read from the Control Plane token, never from a tenant MFA challenge row (ADR-0072 point 4; CHG-R13ID-001).
+
+**Authenticator codes (`totp`) follow RFC 6238** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001): HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose step is not later than the last step accepted for that method is refused (that step is kept in the distributed cache for two minutes), so each code works once. An `emailOtp` code is 6 digits, valid 10 minutes (`mfa_challenge.expires_at`); five wrong codes void the challenge, as now. **A recovery code** (ten per enrolment, `MfaRecoveryCode`) is accepted case-insensitively, with or without its hyphen, and works once.
 
 |  |  |
 |---|---|
@@ -2427,6 +2676,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Verified. |
 | 401 |  | Missing, expired or superseded session (unauthenticated, session-superseded), as the shared answer says. |
 | 410 |  | The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the same purpose). |
@@ -2437,6 +2687,8 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 ### verifyMfaEnrolment
 
 **`POST /auth/mfa/methods/{methodId}`**: Complete enrolment
+
+**Authenticator codes (`totp`) follow RFC 6238** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001): HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose step is not later than the last step accepted for that method is refused (that step is kept in the distributed cache for two minutes), so each code works once. An `emailOtp` enrolment code is 6 digits, valid 10 minutes. The pending enrolment lapses 10 minutes after `enrolMfaMethod` (`pendingExpiresAt`); a code after that completes nothing.
 
 |  |  |
 |---|---|
@@ -2461,7 +2713,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| code | string | yes |  |
+| code | string | yes | The first code from the method being enrolled, compared with the pending method's secret (or the code sent to its destination) and never stored (r13 gate, CHG-R13BO-002). |
 
 **Response**: `MfaMethod`
 
@@ -2485,6 +2737,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Active. |
 | 401 |  | Code invalid |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -2768,6 +3021,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | used_at | timestamptz | no | Set when the code is used; a used code never works again. |
 | id | uuid | yes | Synthesised key. |
 
+### `identity.module_access`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| principal_id | uuid | no |  |
+| module | text | yes |  |
+| scope_path | text | yes | Where, and it is half the grant (ADR-0018). |
+| capabilities | text[] | yes | Permission keys, ticked. |
+| applied_template | text | no | Which saved tick-set this was copied from, for the record only. |
+| granted_by_principal_id | uuid | no |  |
+| granted_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `identity.otp_challenge`
 
 | Column | Type | Required | Notes |
@@ -2837,6 +3103,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_login_at | timestamptz | no |  |
 | must_change_credential | boolean | no | The principal must replace their credential before the session is usable (14 October 2026, CHG-CRD-001, ADAM CR-078; createPrincipal took it and nothing stored it). |
 | sso_provider_id | uuid | no | Set when single sign-on provisioned this principal (completeSsoAuthorization, from the tenant's identity.sso_provider; 14 October 2026, CHG-CRD-001). |
+| email | text | no | The principal's email, once verified; null until then. |
 | home_scope_id | uuid | no | Points at platform.org_unit. |
 
 ### `identity.principal_credential`
@@ -2942,6 +3209,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_mfa_satisfied | boolean | no |  |
 | started_at | timestamptz | yes |  |
 | last_seen_at | timestamptz | yes |  |
+| grant_id | uuid | no | The identity.delegated_access row the session's role was chosen through; null until a role is chosen, and on sessions opened before 3 November 2026. |
 | working_venue_id | uuid | no | The session's working venue; null while a session that may choose has not chosen. |
 | id | uuid | yes | Synthesised key. |
 
@@ -3086,11 +3354,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-65 operations, added to this service in later releases without changing any of the above.
+62 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
+| administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
 | guestAuth | `getMyIdentityVerification`, `submitGuestIdentityDocument` |
 | identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `listSubjectBiometricRecords`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
 | mfa | `removeMfaMethod` |

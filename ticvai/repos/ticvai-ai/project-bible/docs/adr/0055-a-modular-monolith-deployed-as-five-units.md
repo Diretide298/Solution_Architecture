@@ -8,6 +8,36 @@
 
 ---
 
+## Amended 2 November 2026: a host asks the modules it composes in process, and a served query has one path
+
+**Decided by Chinmay** (ADAM CR-475, CR-476, CR-477 and CR-478, 2 November 2026, "approve all as a recommended",
+settled for the whole class for r13 after CR-296, CR-383, CR-385, CR-394, CR-426 and CR-427 settled it case by case;
+ADAM CR-438, 1 November 2026; change entries CHG-R13INP-001 and CHG-CR438-001).
+
+1. **A host asks a module whose query classes it composes in process, never over the service route.** The hosts and
+   the modules they compose are the `composes` entries of `docs/active/cross-deployable-writes.yaml`: `operations`
+   composes Tenancy's, Catalogue's and Orders' query classes (XDR-073 to XDR-075, beside XDR-004, XDR-008, XDR-028 and
+   XDR-051), `access` Tenancy's and Catalogue's (XDR-076, XDR-077, beside XDR-003), `commerce` Access's (XDR-078,
+   beside XDR-001); `workers` composes every module (the amendment of 25 October), and a module in the reader's own
+   deployable is in process already (rule 2). The read runs through the owner's own query class, in the caller's
+   transaction under the caller's row-level security, with an additive SELECT grant for the host's role where it lacks
+   one, which `tools/derive-ddl.py` writes guarded into the next forward migration. A query the owner served on the
+   service route only is served in process as well. `tools/check-cross-module-reads.py` XR-INPROCESS-HOST refuses a
+   `service` read of such a query, and `tools/contract_shapes.py` `read_route` drafts it in process. **Not covered,
+   and left with the lead:** Identity (no host composes Identity's query classes; XDR-010 is `narrow`, its one
+   operation only, so the other Access reads of `pii.subject` stay on the service route as below), and an operation of
+   the Control Plane (its own rows in `control.*`, or platform or cell scope), which runs outside every cell
+   (ADR-0039) and asks a cell's data over the service route (CR-083).
+2. **A served query's service route is POST /queries/<the query's name in kebab case>** on the owning deployable,
+   with the query's declared inputs as the JSON body, answering `200` with a JSON array of its rows in camelCase,
+   `401` to any caller that is not a fellow deployable (serviceAuth), and `400 validation` when neither `ids` nor
+   `where` is given or `where` names a field the row lacks (ADAM CR-438). `identity#subjectBiometricRecords` is POST
+   /api/v1/queries/subject-biometric-records. This is the route of every `service` read that remains;
+   XR-SERVICE-PATH holds an operation declared as a query's service route to it. A rule question that names its own
+   operation (`identity#verifySupervisorStepUp`) keeps it.
+
+---
+
 ## Amended 25 October 2026: which hosts compose which modules' in-process queries
 
 **Decided by Chinmay** (ADAM CR-167, option A, accepted 18 October 2026; CR-234 and CR-240, option A, settled 25

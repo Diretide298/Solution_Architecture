@@ -122,13 +122,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Create New Configuration, Modify Existing Configuration, Extend Existing Configuration, Clone & Adapt Existing Setup. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 6 operations.** Unserved: Create New Configuration, Modify Existing Configuration, Extend Existing Configuration, Clone & Adapt Existing Setup. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Configuration_Assistant_Reference.pdf, page 4 §Allow"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 4 §Show intelligent cards such as"
    }
   ],
   "layout": {
@@ -427,13 +422,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Detected Setup; Likely Configuration Areas) and no display directory — it is settings, not a population",
   "purpose": "Understand what the administrator is actually trying to accomplish before asking detailed configuration questions. This is the first AI interview screen.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Setup Type & Business Intent Discovery declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -733,7 +722,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Confirm | Edit Understanding | Continue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved: Confirm | Edit Understanding | Continue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Actions"
    }
   ],
@@ -1620,7 +1609,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Confirm Operations | Add Requirement | Continue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved: Confirm Operations | Add Requirement | Continue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Configuration_Assistant_Reference.pdf, page 12 §Actions"
    },
    {

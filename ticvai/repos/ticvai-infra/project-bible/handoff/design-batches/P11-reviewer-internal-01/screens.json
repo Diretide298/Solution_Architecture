@@ -150,7 +150,7 @@
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
-     "provenance": "derived — ACC-008 declares entryState.params exportId and ACC-006 holds none of them. The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens on its own"
+     "provenance": "derived — ACC-008 declares entryState.params exportId and ACC-006 holds none of them. The edge carries nothing: exportId only pre-selects (optional), and ACC-008 opens on its own"
     }
    ]
   },
@@ -279,12 +279,12 @@
        "kind": "primaryButton",
        "label": "Approve",
        "operation": "decideAccreditationApplication",
-       "permission": "APPROVAL_DECIDE"
+       "permission": "ACCREDITATION_APPROVE"
       },
       {
        "kind": "destructiveButton",
        "label": "Refuse",
-       "permission": "APPROVAL_DECIDE"
+       "permission": "ACCREDITATION_APPROVE"
       }
      ]
     }
@@ -357,7 +357,7 @@
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
-     "provenance": "derived — ACC-008 declares entryState.params exportId and ACC-007 holds none of them. The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens on its own"
+     "provenance": "derived — ACC-008 declares entryState.params exportId and ACC-007 holds none of them. The edge carries nothing: exportId only pre-selects (optional), and ACC-008 opens on its own"
     },
     {
      "to": "ACC-005",

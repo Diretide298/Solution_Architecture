@@ -434,8 +434,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `performanceTemplateId` (navigation) |
 | Route | `/sell/peak-off-peak-super-prime-time-configuration-bo-723` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Peak, off-peak and super-prime time bands on the performance template, which price and capacity rules key on.
 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setPerformanceTemplate and nothing that returns the current configuration. (CHG-WIR-025); The purpose text is shared word for word with BO-698, BO-715 and does not describe this screen (Peak, Off-Peak & Super Prime Time … (CHG-WIR-026).

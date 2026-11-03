@@ -120,6 +120,25 @@
        "label": "Confirm",
        "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Tax invoices",
+       "bindsTo": "FinTaxInvoice",
+       "columns": [
+        "FinTaxInvoice.id",
+        "FinTaxInvoice.invoiceNumber",
+        "FinTaxInvoice.invoiceType",
+        "FinTaxInvoice.status",
+        "FinTaxInvoice.legalEntityId",
+        "FinTaxInvoice.templateId"
+       ],
+       "operation": "listTaxInvoices",
+       "provenance": "contract finance.yaml GET /tax-invoices; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)",
+       "reads": [
+        "getTaxInvoice",
+        "getTaxDocumentRendition"
+       ]
       }
      ]
     },
@@ -245,6 +264,12 @@
        "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Issue tax invoice",
+       "operation": "issueTaxInvoice",
+       "provenance": "contract finance.yaml POST /tax-invoices; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       }
      ]
     }
@@ -439,6 +464,29 @@
      ]
     },
     "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+   },
+   {
+    "id": "formIssueTaxInvoice",
+    "component": "modal",
+    "trigger": "Issue tax invoice",
+    "body": "**Collects what `issueTaxInvoice` sends before it is called.** Required: `invoiceType`, `orderIds`. Optional: `recipient`, `languages`, `supersedesInvoiceId`, `deliverToEmail`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "FinIssueTaxInvoiceRequest",
+    "confirm": {
+     "label": "Issue tax invoice",
+     "operation": "issueTaxInvoice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "invoiceType",
+      "orderIds",
+      "recipient",
+      "languages",
+      "supersedesInvoiceId",
+      "deliverToEmail"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /tax-invoices; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
    }
   ],
   "states": {
@@ -746,6 +794,24 @@
        "operation": "listMessageDispatches",
        "notes": "For a cancelled performance, the notices `notifyPerformanceHolders` sent (`sourceRef` = the performance id): delivered, failed and suppressed, guest by guest, so the refunds desk can confirm the guests were told before they travel (F09 step 5). Shown when the refunds are for a cancelled performance.",
        "provenance": "contract marketing-crm.yaml GET /message-dispatches (12 October 2026, CHG-R6-038)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Credit memos",
+       "bindsTo": "FinCreditMemo",
+       "columns": [
+        "FinCreditMemo.id",
+        "FinCreditMemo.creditMemoNumber",
+        "FinCreditMemo.taxInvoiceId",
+        "FinCreditMemo.taxInvoiceNumber",
+        "FinCreditMemo.kind",
+        "FinCreditMemo.reason"
+       ],
+       "operation": "listCreditMemos",
+       "provenance": "contract finance.yaml GET /credit-memos; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)",
+       "reads": [
+        "getTaxDocumentRendition"
+       ]
       }
      ]
     },
@@ -1220,11 +1286,6 @@
   "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation lists message dispatches (for F09 step 5, confirming guests of a cancelled performance were notified).",
-    "source": "F09 step 5 | contracts/satellite/marketing-crm.yaml#retryMessageDispatch"
-   },
-   {
     "operation": "createOrder",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-025): createOrder, holdOrder and resumeOrder are till operations at workstation scope; a refunds desk does not park sales or create orders, they belong to the POS (design-notes correction ticketing-backoffice BO-023)",
@@ -1289,7 +1350,7 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-024 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-024 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     },
     {
      "to": "PTR-014",
@@ -1563,7 +1624,7 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-025 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-025 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     },
     {
      "to": "BO-024",
@@ -2875,7 +2936,7 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-028 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-028 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     }
    ]
   },
@@ -3019,7 +3080,7 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-029 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-029 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     }
    ]
   },

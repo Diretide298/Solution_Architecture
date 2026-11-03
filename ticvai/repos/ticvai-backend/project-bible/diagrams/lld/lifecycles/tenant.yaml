@@ -16,9 +16,14 @@ terminal:
 transitions:
 - from: onboarding
   to: active
-  operation: updateTenant
-  trigger: operation
-  guard: Cell provisioned and licence issued
+  trigger: job
+  guard: '**Cell provisioned and licence issued**: Subscription''s provisioning job (subscription#tenantProvisioning,
+    a Control Plane job in the workers host) makes the tenant active when its cell is ready and writes
+    tenant.provisioned to control.outbox in the same transaction (the lead, 2 November 2026, "(Recommended)";
+    CHG-R13INT-012). No operation makes this move: updateTenant changes a tenant''s details, not its
+    status'
+  emits:
+  - tenant.provisioned
 - from: active
   to: suspended
   trigger: externalEvent

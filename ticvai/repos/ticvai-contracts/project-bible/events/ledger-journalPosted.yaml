@@ -31,12 +31,13 @@ payload:
 - field: postedAt
   type: timestamp
 consumers:
-- context: reporting
-  purpose: Update the financial read model
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking ledger.journalPosted, so a partner's finance system can follow
+    posted journals (the lead, 2 November 2026, CHG-R13INT-010)
   idempotencyKey: journalEntryId
   onFailure: retryThenDeadLetter
-  isCritical: true
+  isCritical: false
 retention: 30 days after publication
-notes: One consumer, and it is critical. Reporting reads the analytical replica (ADR-0016), so a journal
-  that never reaches it produces a trial balance that disagrees with the ledger — and the ledger is
-  right.
+notes: Kept as a webhook (the lead, 2 November 2026, on lane s's question; CHG-R13INT-010). Its reporting consumer
+  (Update the financial read model) was dropped with the other reporting read-model consumers (CHG-R13JOB-002);
+  reporting reads the analytical replica (ADR-0016).

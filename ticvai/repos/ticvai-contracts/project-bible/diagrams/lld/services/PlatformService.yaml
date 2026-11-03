@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 234 operations, 119 tables
+title: PlatformService — 235 operations, 119 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -14,7 +14,7 @@ why: '**Three contracts, two schemas, 119 tables.** Subscription, platform opera
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 234
+  operations: 235
   inAFlow: 80
   percent: 34%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -32,7 +32,7 @@ schemas:
   largestTable: subscription.membership_product
 operationsByContract:
 - contract: subscription
-  count: 156
+  count: 157
   operations:
   - operation: actOnPartnerApplicationReview
     verb: POST
@@ -392,7 +392,15 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: true
-    reads: 5
+    reads: 7
+    writes: 0
+  - operation: getTenantRequestLimits
+    verb: GET
+    path: /internal/tenant-request-limits
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
     writes: 0
   - operation: getUsageMetering
     verb: GET
@@ -928,7 +936,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_MANAGE
     offline: false
-    reads: 6
+    reads: 7
     writes: 2
   - operation: requestBurstEnvironment
     verb: POST
@@ -1192,7 +1200,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_MANAGE
     offline: false
-    reads: 3
+    reads: 8
     writes: 3
   - operation: setTrialConfiguration
     verb: PUT
@@ -1742,7 +1750,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listIntegrationListings
     verb: GET
@@ -1750,7 +1758,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listMarketplaceListings
     verb: GET
@@ -1766,7 +1774,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listSandboxes
     verb: GET
@@ -1822,7 +1830,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 5
+    reads: 6
     writes: 2
   - operation: resetSandbox
     verb: POST

@@ -170,9 +170,9 @@
     "description": "**The ISO 4217 currency of the plan's `basePrice` and every `overageUnitPrice` of its limits** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
    },
    "code": {
-    "x-ticvai-unique": "tenant",
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "description": "**One code per plan** (ADAM CR-510, Chinmay, 3 November 2026): every version of a plan has the plan's code, compared ignoring case (`createPlanVersion` refuses another, 400 `plan-code-changed`), and `control.plan` is unique on (`lower(code)`, `version`), so a code another plan holds collides at version `1` (409 `duplicate-code`)."
    },
    "name": {
     "type": "string",
@@ -188,6 +188,14 @@
    "licensedModules": {
     "type": "array",
     "minItems": 1,
+    "x-ticvai-unique-together": [
+     [
+      "plan_id",
+      "plan_version",
+      "licensed_module"
+     ]
+    ],
+    "x-ticvai-unique-compare": "exact",
     "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
     "items": {
      "$ref": "#/components/schemas/subscription::ModuleKey"
@@ -195,6 +203,14 @@
    },
    "limits": {
     "type": "array",
+    "x-ticvai-unique-together": [
+     [
+      "plan_id",
+      "plan_version",
+      "metric"
+     ]
+    ],
+    "x-ticvai-unique-compare": "exact",
     "items": {
      "$ref": "#/components/schemas/EntitlementLimit"
     }
@@ -496,6 +512,12 @@
    "id",
    "version"
   ],
+  "x-ticvai-unique-together": [
+   [
+    "code",
+    "version"
+   ]
+  ],
   "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `control.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
   "allOf": [
    {
@@ -516,10 +538,12 @@
      },
      "version": {
       "type": "string",
-      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
+      "x-ticvai-unique-compare": "exact",
+      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n**Numbered 1, 2, 3 and so on, stored as a decimal string** (ADAM CR-510, Chinmay, 3 November 2026): `createPlan` writes `1`, and `createPlanVersion` the highest existing version, compared as an integer, plus 1.\n"
      },
      "isActive": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "**Only the newest version is active** (ADAM CR-510): `createPlanVersion` sets it false on every earlier version. The current version is the highest active one."
      },
      "subscriberCount": {
       "type": "integer"
@@ -536,7 +560,7 @@
   "type": "object",
   "nullable": true,
   "x-ticvai-persistence": "none — embedded in control.plan as its request_limits jsonb column",
-  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
+  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default** (ADAM CR-490, Chinmay, 3 November 2026): one `PlanRequestLimits` held as per-cell configuration under the key `RequestLimits:Tenant:PlatformDefault`, not computed from a sizing tier; an audience, `replicaSharePercent` or `shareEnforcedAbovePercent` the plan leaves out takes the default's value, as `tenantRequestLimits` states. The figures go in when the lead sets them; recalibration after the benchmark and after four weeks of production changes configuration only. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
   "properties": {
    "guest": {
     "$ref": "#/components/schemas/RequestBudget"

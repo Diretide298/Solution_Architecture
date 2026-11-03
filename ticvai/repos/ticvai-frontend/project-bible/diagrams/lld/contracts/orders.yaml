@@ -776,6 +776,7 @@ operations:
   - cache:idempotency
   - orders.order_line
   - orders.refund
+  - orders.refund_line
   - orders.refund_policy
   - orders.sales_order
   writes:
@@ -2525,6 +2526,7 @@ operations:
   - orders.order_line_eligibility
   - orders.payment
   - orders.refund
+  - orders.refund_line
   - orders.refund_policy
   - orders.sales_order
   writes:
@@ -2533,6 +2535,7 @@ operations:
   - orders.order_line
   - orders.payment
   - orders.sales_order
+  - platform.outbox
 - operation: openGuestCreditAccount
   verb: POST
   path: /guest-credit-accounts
@@ -2826,11 +2829,15 @@ operations:
   - cache:idempotency
   - orders.order_line
   - orders.sales_order
+  - orders.ticket_template
+  - orders.wallet_pass
   writes:
   - cache:idempotency
   - orders.order_event
   - orders.order_line
   - orders.sales_order
+  - orders.wallet_pass
+  - platform.outbox
 - operation: requestGroupBooking
   verb: POST
   path: /group-booking-requests
@@ -2861,12 +2868,15 @@ operations:
   - cache:idempotency
   - orders.order_line
   - orders.refund
+  - orders.refund_line
   - orders.refund_policy
   - orders.sales_order
   writes:
   - cache:idempotency
   - orders.order_event
+  - orders.order_line
   - orders.sales_order
+  - platform.outbox
 - operation: resendPaymentLink
   verb: POST
   path: /payment-links/{linkId}/resend

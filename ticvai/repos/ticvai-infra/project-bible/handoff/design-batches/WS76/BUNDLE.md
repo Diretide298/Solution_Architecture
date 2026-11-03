@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/dam-governance-rights-command-center-cms-081` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Approval Queue, Rights Review, Expiring Assets, External Shares, Governance Issues. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Approval Queue, Rights Review, Expiring Assets, External Shares, Governance Issues. Each needs an operation …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Asset governance overview: pending approval, restricted, expired, blocked, external shares, alerts.
 
@@ -330,7 +330,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `mediaId` (navigation) |
 | Route | `/media-library/asset-ownership-responsibility-management-cms-082` |
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Business owner of each asset, separate from the uploader.
 
@@ -480,7 +480,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `assetId` (navigation) |
 | Route | `/media-library/rights-license-usage-policy-management-cms-083` |
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Commercial use permitted, Non-commercial only. Each needs an operation, or needs removing from the screen … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Commercial use permitted, Non-commercial only. Each needs an operation, or needs removing from the screen … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** How an asset may be used legally and commercially: licensor, territory, channels, dates, commercial or not.
 
@@ -590,7 +590,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **No Delegate button (CHG-SGU-023).** Delegation is configured ahead of time (`createApprovalDelegation` on the approvals screens), not chosen per decision.
 
-**Known gaps.** **The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Approve, Reject, Request Changes, Delegate, Add Comment, Rejection. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+**Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Approve, Reject, Request Changes, Delegate, Add Comment, Rejection. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Approval of assets before public use: approve, reject with reason, request changes, comment.
 
@@ -1024,7 +1024,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/secure-internal-external-sharing-cms-087` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Copy Secure Link, Extend, Change Permission, Revoke, View Activity. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Copy Secure Link, Extend, Change Permission, Revoke, View Activity. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Secure share links with expiry and permission instead of downloads; extend, change or revoke, with activity.
 
@@ -1144,7 +1144,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `assetId` (navigation) |
 | Route | `/media-library/rights-expiry-renewal-usage-impact-cms-088` |
 
-**Known gaps.** **The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Renew Rights, Upload Renewal Document, Change Expiry, Find Replacement, Notify Owner, Expiry Workflow. Each … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Renew Rights, Upload Renewal Document, Change Expiry, Find Replacement, Notify Owner, Expiry Workflow. Each …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Assets whose rights expire in 7, 30 or 60 days or have expired, with live usages and renewal or replacement.
 
@@ -1310,7 +1310,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `assetId` (navigation) |
 | Route | `/media-library/governance-audit-trail-compliance-evidence-cms-089` |
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Action. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen …
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Action. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Every governance action on assets (approval, rights change, share, delete) with who and when.
 
@@ -1416,8 +1416,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/governance-risk-compliance-ai-recommendations-cms-090` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Governance risks (no rights, expired in use, long-lived shares, missing evidence) with AI help.
 

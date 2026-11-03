@@ -86,7 +86,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 5
+    reads: 6
     writes: 3
   - operation: disposeShopAndDrop
     verb: POST

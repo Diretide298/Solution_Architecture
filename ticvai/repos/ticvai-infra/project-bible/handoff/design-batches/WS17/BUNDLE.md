@@ -345,7 +345,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Max percentage `maxPercentage` | number field | optional | — | — | — | A percentage cap beside `maxAmount` (the composite's `authorityPercentage`, CHG-FXC-005). | `createApprovalDelegation` body |
 | Required role `requiredRoleId` | picker: choose a required role | optional | — | — | shows names, sends the id | A role the delegate must hold for the delegation to act (the composite's `requiredRole`); checked when the delegate decides, refused with 409 at creation where the delegate does … | `createApprovalDelegation` body |
 
-Errors to draw in the form: 400 The delegation is malformed. `refusedReason` is `invalidWindow` where `to` is not after `from`, or `delegateIsDelegator` where both principals are the same … (DelegationRefusedProblem); 403 The delegation would hand over authority that is not there. `refusedReason` is `delegateLacksPermission` where the delegate does not hold the permission being … (DelegationRefusedProblem); 409 The delegate does not hold the role the delegation names in `requiredRoleId` (`delegateLacksRequiredRole`). (DelegationRefusedProblem)
+Errors to draw in the form: 400 The delegation is malformed. `refusedReason` is `invalidWindow` where `to` is not after `from`, or `delegateIsDelegator` where both principals are the same … (DelegationRefusedProblem); 403 The delegation would hand over authority that is not there. `refusedReason` is `delegateLacksPermission` where the delegate does not hold `APPROVAL_DECIDE` at … (DelegationRefusedProblem); 409 The delegate does not hold the role the delegation names in `requiredRoleId` (`delegateLacksRequiredRole`). (DelegationRefusedProblem)
 
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -1183,8 +1183,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/venue-operations/sla-escalation-performance-analytics-bo-392` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Where approval delays and escalations occur: slowest approvers, stages, workflows, venues, peak periods.
 

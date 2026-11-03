@@ -130,7 +130,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `startConfigurationSession` (AI_USE), `listConfigurationSessions` (AI_USE), `attachConfigurationSource` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Create New Configuration, Modify Existing Configuration, Extend Existing Configuration, Clone & Adapt … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 6 operations.** Unserved: Create New Configuration, Modify Existing Configuration, Extend Existing Configuration, Clone & Adapt …
 
 **From the AI & Intelligence process.** The configuration assistant's start: create, modify, extend or clone a setup by describing it, optionally seeded from documents (a brief, brochure, price list, spreadsheet), and resume earlier sessions. It needs no history and works fully from day one; it was the client's first AI priority. The one thing to get right: the promise on the page - "Describe what you want; the assistant asks what is missing and nothing is applied until you approve it."
 
@@ -168,7 +168,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 **Sent by *Create New Configuration*** (`startConfigurationSession`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -245,7 +245,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 | Create New Configuration (primary button) | `startConfigurationSession` POST `/configuration-sessions` | inline | AiConfigurationSession | — | — |
 | Modify Existing Configuration (secondary button) | navigation or local | — | — | — | — |
 | Extend Existing Configuration (secondary button) | navigation or local | — | — | — | — |
@@ -381,8 +381,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `startConfigurationSession` (AI_USE), `answerConfigurationQuestion` (AI_USE), `attachConfigurationSource` (AI_USE), `listConfigurationSources` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
-**Known gaps.** **Setup Type & Business Intent Discovery declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either …
-
 **From the AI & Intelligence process.** The first interview step: what is the administrator actually trying to do - create a venue, add products, change prices - for which organisation and location, and which configuration areas it will touch. The assistant restates its understanding for confirmation before asking details. The one thing to get right: the understanding is shown as editable chips (action, object, venue type, organisation, location, operation type, areas), each marked as said by the user or inferred - not as a confidence percentage.
 
 **Known correction pending (do not draw the wrong version)**
@@ -432,7 +430,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 #### Outputs: what the screen shows and produces
 
@@ -453,7 +451,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -574,7 +572,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `answerConfigurationQuestion` (AI_USE), `getConfigurationBlueprint` (AI_USE), `setAiVenueSettings` (AI_CONFIGURE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Confirm / Edit Understanding / Continue. Each needs an operation, or needs removing from the screen; this …
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved: Confirm / Edit Understanding / Continue. Each needs an operation, or needs removing from the screen; this …
 
 **From the AI & Intelligence process.** Venue and business model discovery: name, type, location, time zone, currency, permanent/seasonal/temporary, indoor/outdoor, locations and attractions, and which admission models apply (general, dated, open-dated, timeslot, assigned seating, multi-day, membership, pass, ride-based). Conditional branches follow (a theatre brings performances, seat map, sections, price categories). This is also where the venue AI profile is collected for the baselines. The one thing to get right: only the branches the answers make relevant are shown.
 
@@ -664,7 +662,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 **Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -690,7 +688,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 | Confirm / Edit Understanding / Continue (primary button) | navigation or local | — | — | — | — |
 | Save venue AI profile (secondary button) | `setAiVenueSettings` PUT `/venues/{venueId}/ai-settings` | AiVenueSettings | AiVenueSettings | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
 
@@ -841,7 +839,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 **Sent by **** (`answerConfigurationQuestion`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -899,7 +897,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | `answerConfigurationQuestion` POST `/configuration-sessions/{sessionId}/answers` | inline | AiConfigurationTurn | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer discovering (`session-not-open`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
@@ -1056,7 +1054,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 **Sent by **** (`answerConfigurationQuestion`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1110,7 +1108,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | `answerConfigurationQuestion` POST `/configuration-sessions/{sessionId}/answers` | inline | AiConfigurationTurn | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer discovering (`session-not-open`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
@@ -1225,7 +1223,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs outside every cell; `answerConfigurationQuestion` (AI_USE), `getConfigurationBlueprint` (AI_USE) are tenant operations, refused 403 to a platform token until a time-boxed, audited grant into the picked tenant is open. The tenant sees the grant and every action under it.
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Confirm Operations / Add Requirement / Continue. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved: Confirm Operations / Add Requirement / Continue. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the AI & Intelligence process.** Operational requirement discovery: opening hours, closures, capacity by area, timeslot lengths, access rules, staffing assumptions - the rules needed to deliver the products. The one thing to get right: operational answers that also feed the venue AI profile (hours, capacity, productivity) are marked as such.
 
@@ -1262,7 +1260,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 #### Outputs: what the screen shows and produces
 
@@ -1309,7 +1307,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Confirm Operations / Add Requirement / Continue (primary button) | navigation or local | — | — | — | — |
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -1449,7 +1447,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 **Sent by **** (`answerConfigurationQuestion`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1503,7 +1501,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | `answerConfigurationQuestion` POST `/configuration-sessions/{sessionId}/answers` | inline | AiConfigurationTurn | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer discovering (`session-not-open`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
@@ -1654,7 +1652,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 **Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -1679,7 +1677,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -1819,7 +1817,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 #### Outputs: what the screen shows and produces
 
@@ -1965,7 +1963,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -2108,7 +2106,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 #### Outputs: what the screen shows and produces
 
@@ -2154,7 +2152,7 @@ Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | `buildConfigurationPlan` POST `/configuration-sessions/{sessionId}/plan` | — | AiActionPlanDetail | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The blueprint is not ready: a required decision is open or deferred (AIC-115). | produces a document or message: Compile the blueprint into a plan |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 

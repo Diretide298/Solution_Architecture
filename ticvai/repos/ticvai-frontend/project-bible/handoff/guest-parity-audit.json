@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "screens": {
   "P01": 50,
   "P02": 77
@@ -12,8 +12,8 @@
   "appOnly": 6
  },
  "severity": {
-  "high": 28,
-  "medium": 170,
+  "high": 29,
+  "medium": 171,
   "low": 220,
   "info": 4
  },
@@ -134,6 +134,13 @@
    "severity": "high",
    "dimension": "operations",
    "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "the web calls getPlanBenefits, listMembershipBenefits and the app cannot call it anywhere",
+   "fix": ""
+  },
+  {
+   "severity": "high",
+   "dimension": "operations",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
    "detail": "the app calls grantDelegation and the web cannot call it anywhere",
    "fix": ""
   },
@@ -211,7 +218,7 @@
    "severity": "high",
    "dimension": "operations",
    "where": "web only",
-   "detail": "evaluatePromotions, extendSeatHold, getMyChallenges, getSeatHold, getWaiverStatus, listOwnGroupBookings, updateGuestPreferences",
+   "detail": "evaluatePromotions, extendSeatHold, getMyChallenges, getPlanBenefits, getSeatHold, getWaiverStatus, listMembershipBenefits, listOwnGroupBookings, updateGuestPreferences",
    "fix": ""
   },
   {
@@ -295,7 +302,7 @@
    "severity": "medium",
    "dimension": "bindings",
    "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "web shows — only, app shows ['DelegatedAccess'] only",
+   "detail": "web shows ['Cart', 'CataloguePlanBenefit'] only, app shows ['DelegatedAccess'] only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -358,7 +365,7 @@
    "severity": "medium",
    "dimension": "bindings",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "web shows ['PromotionEvaluation'] only, app shows ['Product'] only",
+   "detail": "web shows ['Performance', 'PromotionEvaluation'] only, app shows — only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -561,7 +568,7 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "web opens with ['cartId', 'entryId', 'eventId', 'performanceId', 'productId', 'venueId', 'waitingEntryId'], app with ['cartId', 'entryId', 'eventId', 'venueId', 'waitingEntryId'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'entryId', 'eventId', 'performanceId', 'productId', 'venueId', 'waitingEntryId'], app with ['cartId', 'entryId', 'eventId', 'productId', 'venueId', 'waitingEntryId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -610,7 +617,7 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "web opens with ['caseId', 'orderId', 'productId', 'statementId', 'subjectId'], app with ['caseId', 'guestLinkId', 'statementId', 'subjectId'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'caseId', 'lineId', 'orderId', 'productId', 'statementId', 'subjectId', 'templateId', 'venueId'], app with ['caseId', 'guestLinkId', 'statementId', 'subjectId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -667,13 +674,6 @@
    "dimension": "entry parameters",
    "where": "shop-and-drop (WEB-042 ↔ GST-062)",
    "detail": "web opens with ['cartId', 'outletId'], app with ['subjectId'] — one shared link cannot open both",
-   "fix": "one deep-link shape per capability"
-  },
-  {
-   "severity": "medium",
-   "dimension": "entry parameters",
-   "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "web opens with ['cartId', 'productId', 'venueId'], app with ['cartId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -827,14 +827,14 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
-   "detail": "the app calls getCart, listProductVariants here; the web calls getCart on WEB-006/WEB-010/WEB-011; listProductVariants on WEB-005/WEB-048",
+   "detail": "the app calls getCart, listProductVariants here; the web calls getCart on WEB-006/WEB-010/WEB-011/WEB-022; listProductVariants on WEB-005/WEB-022/WEB-048",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
    "severity": "medium",
    "dimension": "operations",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
-   "detail": "the app calls addCartLine, checkoutCart, createGuestFnbOrder, getCart, getGuestOrderStatus here; the web calls addCartLine on WEB-005/WEB-006/WEB-008/WEB-010/WEB-033/WEB-036/WEB-041/WEB-042/WEB-047/WEB-048/WEB-049; checkoutCart on WEB-010/WEB-012/WEB-033; createGuestFnbOrder on WEB-036; getCart on WEB-006/WEB-010/WEB-011; getGuestOrderStatus on WEB-036/WEB-038",
+   "detail": "the app calls addCartLine, checkoutCart, createGuestFnbOrder, getCart, getGuestOrderStatus here; the web calls addCartLine on WEB-005/WEB-006/WEB-008/WEB-010/WEB-022/WEB-033/WEB-036/WEB-041/WEB-042/WEB-047/WEB-048/WEB-049; checkoutCart on WEB-010/WEB-012/WEB-033; createGuestFnbOrder on WEB-036; getCart on WEB-006/WEB-010/WEB-011/WEB-022; getGuestOrderStatus on WEB-036/WEB-038",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -848,7 +848,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "the app calls claimCart, listProductVariants here; the web calls claimCart on WEB-016; listProductVariants on WEB-005/WEB-048",
+   "detail": "the app calls claimCart, listProductVariants here; the web calls claimCart on WEB-016; listProductVariants on WEB-005/WEB-022/WEB-048",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -883,7 +883,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "the app calls getGuestBundle, getPerformance, getVenueMap here; the web calls getGuestBundle on WEB-008; getPerformance on WEB-006/WEB-007/WEB-010; getVenueMap on WEB-039/WEB-047",
+   "detail": "the app calls getGuestBundle, getPerformance, getVenueMap here; the web calls getGuestBundle on WEB-008; getPerformance on WEB-005/WEB-006/WEB-007/WEB-010; getVenueMap on WEB-039/WEB-047",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -932,7 +932,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "the web calls getProduct here; the app calls getProduct on GST-004/GST-006",
+   "detail": "the web calls addCartLine, createCart, getCart, getProduct, getPublishedBookingFlow, listProductVariants, removeCartLine, updateCartLine here; the app calls addCartLine on GST-007/GST-008/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; createCart on GST-008/GST-041/GST-050/GST-075; getCart on GST-007/GST-009/GST-032/GST-041/GST-048; getProduct on GST-004/GST-006; getPublishedBookingFlow on GST-007/GST-008/GST-009/GST-041; listProductVariants on GST-008/GST-041/GST-048/GST-050/GST-075; removeCartLine on GST-041; updateCartLine on GST-041",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1037,7 +1037,14 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "the app calls createCart here; the web calls createCart on WEB-006/WEB-010/WEB-048",
+   "detail": "the web calls getPerformance here; the app calls getPerformance on GST-006/GST-041/GST-049",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "the app calls createCart here; the web calls createCart on WEB-006/WEB-010/WEB-022/WEB-048",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1346,6 +1353,13 @@
    "dimension": "unbound operations",
    "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
    "detail": "GST-054 declares createAiConversation, requestSuggestion and no component in its layout calls them; the twin binds or lacks createAiConversation, requestSuggestion",
+   "fix": "bind each to a component, or move it to the screen that calls it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "unbound operations",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "WEB-022 declares createCart, getProduct, listMembershipBenefits, listProductVariants and no component in its layout calls them; the twin binds or lacks createCart, getProduct, listMembershipBenefits, listProductVariants",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {
@@ -1793,7 +1807,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "web only —, app only ['primaryButton'] (10 vs 11 components)",
+   "detail": "web only ['banner', 'cartPanel'], app only — (15 vs 11 components)",
    "fix": ""
   },
   {
@@ -1877,7 +1891,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "web only ['iconButton', 'selectField'], app only — (11 vs 8 components)",
+   "detail": "web only ['detailPanel', 'iconButton', 'selectField'], app only — (13 vs 8 components)",
    "fix": ""
   },
   {
@@ -1918,7 +1932,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:1808",
+   "where": "contracts/spine/catalogue.yaml:2427",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },
@@ -2283,7 +2297,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "leads on to ['privacy-security-devices', 'wallet-and-payment-methods'] on the web only and ['browse'] on the app only",
+   "detail": "leads on to ['checkout-and-payment', 'privacy-security-devices', 'wallet-and-payment-methods'] on the web only and ['browse'] on the app only",
    "fix": ""
   },
   {

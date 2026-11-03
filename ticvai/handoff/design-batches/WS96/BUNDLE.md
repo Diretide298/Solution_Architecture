@@ -2053,8 +2053,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/maintenance-intelligence-predictive-ai-bo-583` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Maintenance intelligence for the rental fleet: a health dashboard (assets at risk, predicted failures, repeat failures, high-cost assets, downtime and its effect on availability, MTBF and MTTR) and a feed of AI recommendations - service this bike within 10 rental hours, move eight services from Saturday to Monday, review this brake supplier, replace rather than repair. The one thing to get right: every recommendation is advisory, shows its evidence, and only a person turns it into a scheduled job or a retirement case.
 
 **Known correction pending (do not draw the wrong version)**

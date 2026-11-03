@@ -584,6 +584,7 @@ operations:
   offline: false
   reads:
   - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
   - whitelabel.config_version
   - whitelabel.site_setup_progress
   - whitelabel.tenant_config
@@ -1020,6 +1021,7 @@ operations:
   offline: false
   reads: []
   writes:
+  - platform.idempotency_record
   - platform.outbox
 - operation: regenerateDomainToken
   verb: POST
@@ -1095,6 +1097,7 @@ operations:
   - cache:idempotency
   - cache:resolution
   - whitelabel.booking_flow
+  - whitelabel.content_page
   - whitelabel.feature_toggle
   - whitelabel.footer_config
   - whitelabel.homepage_layout

@@ -250,7 +250,8 @@
    },
    "type": {
     "type": "string",
-    "maxLength": 50
+    "maxLength": 50,
+    "description": "The condition's type. `membershipProgramme` makes the rule a membership rule (ADAM CR-439): its `ruleOperator` is `in` and its `valueJson` a JSON array of membership programme ids."
    },
    "ruleOperator": {
     "type": "string",

@@ -23,8 +23,6 @@ steps:
   operations:
   - getKpiValues
   - getUnifiedReconciliation
-  - listTaxInvoices
-  - listCreditMemos
   outcome: Finance Dashboard
 - step: 2
   screen: ANL-072

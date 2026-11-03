@@ -58,6 +58,23 @@ servers:
 - url: https://api.ticvai.com/v1
 security:
 - bearerAuth: []
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  quotePurge:
+    module: rental
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [rental.quote]
+    writes: [rental.quote]
+    reliesOn: [quoteRentalPrice]
+    for: Rental nightly quote purge.
+    source: ['contracts/satellite/rental.yaml']
 paths:
   /rental-products:
     get:
@@ -1670,10 +1687,9 @@ paths:
         - "P08 BO-553 Checkout Confirmation & Rental Activation"
         - "P08 BO-906 Resource Checkout Workspace"
       # The payment is read through orders#paymentRecords (x-ticvai-read-via), never raw (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
-      x-ticvai-names-for-context: [orders.payment]
       x-ticvai-read-via:
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'the card deposit''s payment: refused 409 deposit-not-authorised until it is authorised (ADAM CR-146)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1760,7 +1776,7 @@ paths:
         - "P08 BO-907 Guest & Resource Assignment"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the product the asset must be of (409 wrong-product) (CHG-MOD-003)'
       x-ticvai-conflict-policy: serverWins
       summary: Bind specific assets to the booking, by scan where required

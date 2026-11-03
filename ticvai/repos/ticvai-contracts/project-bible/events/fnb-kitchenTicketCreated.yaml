@@ -31,11 +31,6 @@ consumers:
   idempotencyKey: kitchenTicketId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Ticket times against the kitchen SLA
-  idempotencyKey: kitchenTicketId
-  onFailure: retry
-  isCritical: false
 retention: 7 days after publication
 notes: '**Critical because a ticket that never reaches the pass is a meal nobody cooks.** Offline, the till
   delivers the ticket to the KDS over the venue LAN and this event is written when the order replays (open ADR,

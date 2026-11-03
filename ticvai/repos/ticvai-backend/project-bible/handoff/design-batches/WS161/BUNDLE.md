@@ -191,8 +191,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `eventId` (navigation) |
 | Route | `/rentals/event-resource-planning-command-center-bo-913` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Resource readiness of upcoming events in one workspace for event and operations managers.
 
 #### Inputs: what the user enters or picks
@@ -352,8 +350,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `eventId` (navigation) |
 | Route | `/rentals/event-resource-requirement-builder-bo-914` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Event Resource Requirement Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Define every resource a specific event needs, by kind and quantity, as BO-711.
 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setEventResourcePlan and nothing that returns the current configuration. (CHG-WIR-025).
@@ -511,8 +507,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/venue-space-allocation-bo-915` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Assign spaces to an event and its parts, and book them so the space's calendar shows the event including set-up and tear-down.
 
@@ -1436,8 +1430,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `eventId` (navigation) |
 | Route | `/rentals/event-resource-cost-estimator-bo-920` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What an event's resource plan will cost, by kind, with the requirements that have no price yet listed so the total is not mistaken for complete.
 

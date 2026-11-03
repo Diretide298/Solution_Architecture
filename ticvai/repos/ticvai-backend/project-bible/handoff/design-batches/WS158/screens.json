@@ -217,11 +217,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 50 §Each candidate shall show"
-   },
-   {
-    "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns candidates for a rota position (skill, availability, suitability).",
     "source": "contracts/satellite/workforce.yaml#createRotaAssignment"
    },
@@ -923,13 +918,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide real-time visibility into whether scheduled employees actually reported and are available for operation.",
   "purposeNote": "Managers can monitor planned versus actual workforce attendance in real time and immediately understand operational impact.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 55 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1313,13 +1302,7 @@
   "patternReason": "the pack gives this screen a display directory (§Each issue shall display) and no metric row",
   "purpose": "Validate planned workforce schedules against legal, safety, certification, and organizational rules before roster publication or assignment.",
   "purposeNote": "No workforce roster is published without passing configured compliance validation or following an explicitly authorized exception workflow.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 58 §Each issue shall display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1462,13 +1445,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Give managers visibility into the financial impact of staffing decisions before and after roster publication.",
   "purposeNote": "Managers can understand staffing cost and budget impact before approving workforce plans and can analyze actual labor expenditure after operations.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

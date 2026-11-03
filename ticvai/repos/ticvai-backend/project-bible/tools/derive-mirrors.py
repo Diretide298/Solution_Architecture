@@ -155,6 +155,107 @@ def sync_openapi() -> tuple[int, int, int]:
     return added, updated, removed
 
 
+# **Every README under repos/ comes from its own source** (2 November 2026, r13 root R13, CHG-R13R13-001; the Block A
+# developer pull of 31 October: #27626 SETUP-CI, #27627 SETUP-ENV, #27633, #27634 and #27637 onboarding, #27640
+# SETUP-CLIENTS). 104 README.md files under repos/ were byte copies of docs/active/README.md (the Active page) from
+# the first commit on: the setup README every onboarding ticket links, each repository's own README and the infra
+# README SETUP-ENV extends. No tool wrote them, so nothing put them right. Now this writes all of them:
+#   - a repository's own README (and the cell module's) from its authored source in docs/repos/ (README_SOURCES);
+#   - every other README that is no mirror of a package file -- one in a folder of ticvai-docs/ or a project-bible/
+#     that is not a mirrored folder (setup/, the older documentation folders, the bible's root), or in INDEXED -- as
+#     an index of its own folder's files.
+# tools/check-repo-readmes.py fails when a README under repos/ is a copy of a package file other than its source.
+README_SOURCES = {
+    "README.md": "docs/repos/index.md",
+    "ticvai-ai/README.md": "docs/repos/ticvai-ai.md",
+    "ticvai-backend/README.md": "docs/repos/ticvai-backend.md",
+    "ticvai-contracts/README.md": "docs/repos/ticvai-contracts.md",
+    "ticvai-docs/README.md": "docs/repos/ticvai-docs.md",
+    "ticvai-frontend/README.md": "docs/repos/ticvai-frontend.md",
+    "ticvai-infra/README.md": "docs/repos/ticvai-infra.md",
+    "ticvai-infra/terraform/modules/cell/README.md": "docs/repos/ticvai-infra-cell.md",
+}
+INDEXED = ("ticvai-contracts/standards", "ticvai-backend/src/Ticvai.Migrations/Scripts")
+SOURCE_HEADER = "<!-- Written by tools/derive-mirrors.py from ticvai/{src}: edit that file, not this one. -->\n\n"
+INDEX_HEADER = ("<!-- Written by tools/derive-mirrors.py: the index of this folder's files. Edit the files, "
+                "not this index. -->\n\n")
+TITLES = {"setup": "Setup standards", "project-bible": "The project bible"}
+
+
+def first_heading(f: Path) -> str:
+    """A file's first '# ' heading, or its name."""
+    if f.suffix.lower() == ".md":
+        try:
+            for line in f.read_text(encoding="utf-8", errors="replace").splitlines()[:40]:
+                if line.startswith("# "):
+                    return line[2:].strip()
+        except OSError:
+            pass
+    return f.name
+
+
+def folder_index(folder: Path) -> str:
+    """The README of a folder that has no source: its files, each with its first heading, and its subfolders."""
+    title = TITLES.get(folder.name, f"{folder.name}/")
+    rel = folder.relative_to(REPOS).as_posix()
+    files = sorted((f for f in folder.iterdir() if f.is_file() and f.name != "README.md"
+                    and not f.name.startswith(".")), key=lambda f: f.name.lower())
+    subs = sorted((d for d in folder.iterdir() if d.is_dir() and not d.name.startswith(".")
+                   and d.name != "__pycache__"), key=lambda d: d.name.lower())
+    out = [INDEX_HEADER + f"# {title}", "", f"What `repos/{rel}/` holds.", ""]
+    if files:
+        out += ["| File | What it is |", "|---|---|"]
+        out += [f"| [{f.name}]({f.name.replace(' ', '%20')}) | {first_heading(f).replace('|', '/')} |" for f in files]
+        out.append("")
+    if subs:
+        out.append("Folders: " + ", ".join(
+            f"[{d.name}/]({d.name.replace(' ', '%20')}/{'README.md' if (d / 'README.md').is_file() else ''})"
+            for d in subs) + ".")
+        out.append("")
+    if not files and not subs:
+        out += ["Nothing else is in this folder yet.", ""]
+    return "\n".join(out)
+
+
+def readme_targets() -> dict:
+    """Every README under repos/ this tool writes: repos-relative path -> ("source", package path) or ("index", None)."""
+    want = {rel: ("source", src) for rel, src in README_SOURCES.items() if (ROOT / src).is_file()}
+    roots = [REPOS / "ticvai-docs"] + sorted(p for p in REPOS.glob("*/project-bible") if p.is_dir())
+    for root in roots:
+        if not root.is_dir():
+            continue
+        for f in sorted(root.rglob("README.md")):
+            inner = f.relative_to(root).parts
+            if inner[0] in MIRRORED:          # a mirror of a package file: sync() writes it
+                continue
+            want.setdefault(f.relative_to(REPOS).as_posix(), ("index", None))
+    for folder in INDEXED:
+        if (REPOS / folder).is_dir():
+            want.setdefault(f"{folder}/README.md", ("index", None))
+    return want
+
+
+def write_readmes() -> tuple[int, int]:
+    """Write every README of readme_targets(); returns (written, unchanged)."""
+    written = same = 0
+    for rel, (kind, src) in sorted(readme_targets().items()):
+        target = REPOS / rel
+        if not target.parent.is_dir():
+            continue
+        if kind == "source":
+            body = SOURCE_HEADER.format(src=src) + (ROOT / src).read_text(encoding="utf-8")
+        else:
+            body = folder_index(target.parent)
+        old = target.read_text(encoding="utf-8", errors="replace") if target.is_file() else None
+        if old == body:
+            same += 1
+            continue
+        with open(target, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(body)
+        written += 1
+    return written, same
+
+
 def main() -> int:
     if not REPOS.is_dir():
         print("  no repos/ — nothing to mirror")
@@ -184,6 +285,9 @@ def main() -> int:
         print(f"  {len(targets)} mirror(s) already current")
     else:
         print(f"  {len(targets)} mirror(s): {total[0]} added, {total[1]} updated, {total[2]} removed")
+    # After the mirrors: an index lists its folder's files as the sync left them.
+    w, s = write_readmes()
+    print(f"  repository READMEs: {w} written, {s} already current (docs/repos/ sources and folder indexes)")
     print("  → repos/")
     return 0
 

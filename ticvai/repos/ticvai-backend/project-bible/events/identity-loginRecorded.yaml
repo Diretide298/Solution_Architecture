@@ -10,6 +10,15 @@ aggregate: principal
 emittedWhen: Every call to login, guestPasswordLogin, verifyGuestOtp, guestSocialLogin, guestUaePassLogin,
   registerGuest (the first sign-in), completeSsoAuthorization or verifyMfaChallenge (action signIn),
   success or failure
+emittedBy:
+- identity.login
+- identity.guestPasswordLogin
+- identity.verifyGuestOtp
+- identity.guestSocialLogin
+- identity.guestUaePassLogin
+- identity.registerGuest
+- identity.completeSsoAuthorization
+- identity.verifyMfaChallenge
 payload:
 - field: loginEventId
   type: uuid

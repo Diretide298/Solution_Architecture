@@ -166,7 +166,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-security-risk-command-center-bo-1153` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet security at a glance: rules tripped, wallets frozen, risk scores.
 
@@ -716,8 +716,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/device-credential-account-security-bo-1157` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Compromised accounts, shared credentials and suspicious devices.
 
 **Known correction pending (do not draw the wrong version)**
@@ -904,7 +902,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/ai-fraud-anomaly-detection-studio-bo-1158` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **AI Fraud & Anomaly Detection Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk rules that setWalletRiskRules writes.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** AI detection of unusual top-ups, spending and sharing that fixed rules miss.
 
@@ -1157,8 +1155,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `alertId` (navigation), `caseId` (navigation) |
 | Route | `/orders-money/fraud-alert-investigation-case-management-bo-1160` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the AI & Intelligence process.** The venue's fraud and risk investigation workspace: an alert queue (wallet, payments, credentials), triage, and cases with evidence and outcome. Flagged transactions are never auto-approved or auto-declined; they wait for a person. The one thing to get right: risk score and AI score are distinguished - the deterministic rules triggered and the AI's composite score - and both are explained.
 
@@ -1516,8 +1512,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Applies to the whole tenant (design-note correction, 2 October 2026):** the wallet configuration is tenant-scoped, so the header says "Tenant-wide wallet security" and the screen opens only to a tenant administrator holding the wallet configuration right. **The risk rules are read with getWalletRiskRules (agreed, ledger) 4 October 2026, so the status actions have a ruleCode** (CHG-FXS-003)
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How wallet configuration and risk rules are changed and released: versions, a field-level diff, restore as a draft, publish with validation findings, and switching one risk rule off at once without republishing. A rollback is as deliberate as the change that caused it.
 
 **Fixed on main** (the package already carries these; draw what it says): The purpose text is the financial-control layer (liabilities, breakage, reconciliation), not security governance. (CHG-WIR-026); The operations are tenant-scoped while the screen sits in the venue back office. (CHG-SBO-010).
@@ -1530,7 +1524,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Reason `reason` | text area | required | — | min length 1; max length 500 | — | — | `restoreWalletConfigurationVersion` body |
+| Reason `reason` | text area | required | — | min length 1; max length 500 | — | Reason, recorded in the audit: the operation puts it on the request's audit context and the audit interceptor writes it to the audit row's `reason`, which `listAuditRecords` … | `restoreWalletConfigurationVersion` body |
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The working draft has unpublished changes that the restore would overwrite: the area tables differ from the snapshot of the latest published version at the …
 
@@ -1538,7 +1532,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | — | `publishWalletConfiguration` body |
+| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | What the call does, not a fact about the version: `publish` writes the version and its snapshots, `validateOnly` writes nothing. | `publishWalletConfiguration` body |
 | Note `note` | text area | optional | — | — | — | — | `publishWalletConfiguration` body |
 
 **Sent by *Emergency disable*** (`setWalletRiskRuleStatus`; no form is declared, so these are filled from the screen or collected inline)

@@ -139,8 +139,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/report-catalogue-library-anl-031` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The report library: the eight standard reports every venue starts with, plus the venue's own. It lists only reports the login may run; a report needing tenant-level access is absent for a venue user, not shown empty. The thing to get right: standard reports are copy-only (Make a copy, never Edit or Delete), and "scheduled" or "AI-generated" are properties of a report, not report types.
 
 **Known correction pending (do not draw the wrong version)**
@@ -359,8 +357,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/report-creation-wizard-anl-032` |
 
-**Known gaps.** **Report Creation Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
-
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Starts a report: Basics, Data area, Type, then the builder steps (fields, filters, grouping, layout, preview). A report can only be created once it has a data area, at least one column and the access level needed to run it, so the wizard keeps everything on the client until the first save. The thing to get right is the access level: an author can only give a report an access level they hold.
 
 **Known correction pending (do not draw the wrong version)**
@@ -514,8 +510,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/data-domain-dataset-selector-anl-033` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Picks the governed data a report is built from, in business words, with no database access. The catalogue shows each dataset's meaning, its grain (what one row is) and whether it holds personal data. The thing to get right: show grain prominently, because a report over the wrong grain is wrong in ways nobody can see; and only certified, published datasets are offered.
 
@@ -683,7 +677,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/field-column-selector-anl-034` |
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Reorder columns, Rename display labels, Set width, Configure formatting. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Reorder columns, Rename display labels, Set width, Configure formatting. Each needs an operation, or needs … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Chooses the report's columns from the data area's fields, in business names, and sets each column's label, order, sort and format. The thing to get right: what a field allows (group by, total, filter) decides what the user can do with it, and personal-data fields are marked because exporting them needs separate permission.
 
@@ -839,7 +833,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `reportId` (navigation) |
 | Route | `/analytics/filter-parameter-builder-anl-035` |
 
-**Known gaps.** **Filter & Parameter Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Defines which records the report includes, without SQL: fixed filters, and parameters the person running it is asked for. The thing to get right: parameters narrow, they never widen; a venue manager cannot widen a filter to another venue because the filter is not what constrains them.
 
@@ -955,7 +949,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-035?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -984,7 +978,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `reportId` (navigation) |
 | Route | `/analytics/grouping-aggregation-calculation-builder-anl-036` |
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Period-over-Period Change. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **Grouping, Aggregation & Calculation Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Period-over-Period Change. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Turns detail into management summaries: group by fields, choose totals, and (where it exists) derived measures. The thing to get right is what the contract can express today: grouping by fields and seven aggregations with server totals. Ratios, percent of total, running totals, ranking and period-over-period are not expressible in a report yet, so draw them as pending, not as working controls.
 
@@ -1110,7 +1104,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-036?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Period-over-Period Change.
@@ -1140,7 +1134,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `reportId` (navigation) |
 | Route | `/analytics/cross-domain-report-composer-anl-037` |
 
-**Known gaps.** **Cross-Domain Report Composer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The client calls cross-domain reporting one of the most important capabilities of the report builder: ticket sales with F&B spend per visitor, admissions with membership, and so on. The thing to get right: today a report reads exactly one data area, so nothing on this screen can be saved; the design is the specification, and it must keep relationships governed (declared joins only) and grain visible.
 
@@ -1250,7 +1244,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-037?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save report, Cancel.
@@ -1280,7 +1274,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `reportId` (navigation) |
 | Route | `/analytics/report-layout-formatting-designer-anl-038` |
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this is the Phase … **Report Layout & Formatting Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this is the Phase …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** How the finished report looks on screen, in Excel and in PDF, in English and in Arabic. The thing to get right is money and language: money keeps the currency's decimals (AED 2, BHD/KWD/OMR 3, never rounded away), exports carry numbers as numbers, and an Arabic PDF is laid out right to left.
 
@@ -1410,7 +1404,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-038?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: TICVAI branding, Report logo.
@@ -1438,8 +1432,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `executionId` (navigation), `reportId` (navigation) |
 | Route | `/analytics/report-preview-test-validation-anl-039` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Checks a report before it is saved or shared: run it, see what came back, how long it took, what constrained it, and whether totals look right. The thing to get right: there is no sample mode - a test run is a real run under the author's own access - so a large range may run in the background and must be cancellable.
 
@@ -1604,8 +1596,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `executionId` (navigation), `reportId` (navigation) |
 | Route | `/analytics/save-run-report-results-viewer-anl-040` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Runs a report and shows the result: prompts, the table with totals, and exports. The header states exactly what was run, so a figure can be reproduced months later. The thing to get right: large results run in the background and page, never freeze; exports are permission-gated and personal data needs a separate permission and a stated purpose.
 

@@ -45,8 +45,8 @@
 | cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | GST-008, GST-041, GST-050, GST-075, WEB-006, WEB-010 … |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
 | cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-048, KSK-006 … |
-| cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
-| cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
+| cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010, WEB-022 |
+| cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010, WEB-022 |
 | cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-041, BO-042, POS-017, POS-018 |
 | cash | [`listCashMovements`](#listcashmovements) | GET | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, EMP-008, EMP-009, POS-007 … |
 | drafted | [`listGroupArrivalCheck`](#listgrouparrivalcheck) | GET | `/group-arrival-check` | core | 1 | BO-280, POS-031 |
@@ -170,6 +170,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 204 |  | Abandoned and leases released |
 | 409 |  | The cart is not active or expiring (cartNotOpen) — an expired cart has nothing left to release, and a checked-out cart's leases already belong to its order, so releasing them here would release the o… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -205,7 +206,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `orders.cart`, `orders.cart_line`, `platform.idempotency_record` |
-| Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-015, KSK-017, POS-002, POS-021, POS-023, POS-027, POS-030, PTR-010, WEB-005, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
+| Called by | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-015, KSK-017, POS-002, POS-021, POS-023, POS-027, POS-030, PTR-010, WEB-005, WEB-006, WEB-008, WEB-010, WEB-022, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
 
 **Parameters**
@@ -254,7 +255,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
-| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
 | sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
 | workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
@@ -345,6 +346,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Added, and the cart re-priced |
 | 403 | AdmissionRequired | The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066). |
@@ -391,7 +393,7 @@ Applying a code the cart already holds returns the cart unchanged.
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
-| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
 | sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
 | workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
@@ -482,6 +484,7 @@ Applying a code the cart already holds returns the cart unchanged.
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Applied, and the cart re-priced |
 | 410 |  | Expired (cartExpired), as for getCart. |
@@ -704,6 +707,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | An order, pending payment |
 | 403 |  | The contact the tickets would go to is not proven — an unverified session (sessionNotVerified), or a guest checkout with no confirmed one-time code (contactNotConfirmed: the cart's anonymous guest se… |
@@ -721,6 +725,8 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 **The anonymous cart's `token` proves it** (R8 blocker IDENTITY-C49, the lead's answer A; CHG-R8MIG-021): the body's `cartToken` must equal the cart's `token` (403 otherwise), and the claim rotates the token, so a link shared before signing in does not reach the account after.
 
 **The anonymous session ends with the claim** (ADAM CR-183, option A; CHG-R9CR-002): in the same transaction, claimCart asks Identity's in-process API `identity#endAnonymousGuestSession` with the cart's id, so the anonymous token stops working; the cart is then the guest's by its `subject_id`.
+
+**Which grant reads the anonymous cart** (r13 root R28, CHG-R13R28-001; the pattern of ADAM CR-471 and of getOrder's token path). The anonymous cart has `subject_id` null, and `orders.cart`'s policy shows a session with a guest subject only the carts whose `subject_id` is that subject, so under the caller's own grant the claim finds no cart. Under the caller's grant, claimCart reads the guest's own open cart, if any. Then, for the path's `cartId` only, the connection switches to the routed tenant's root grant (ITenantRootGrant) inside the request's transaction: read that cart; a cart that does not exist is the shared `404`, as for any cart the caller cannot see; one that is not `open` is `409 cart-not-open`; one whose `subject_id` is set and is not the caller's is `409 cart-already-claimed`; a `cartToken` that is missing or does not equal the cart's `token` is `403 cart-token-mismatch`, and nothing has been written. Once every check has passed, and still under the root grant for exactly these statements: set the cart's `subject_id` to the session's subject and rotate its `token`, or, where the guest already has an open cart, the merge described above, which writes the anonymous cart and its lines; then the caller's grant is put back before anything else runs, `identity#endAnonymousGuestSession` included. Nothing else runs under the root grant. No migration.
 
 |  |  |
 |---|---|
@@ -754,7 +760,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart | Cart | yes |  |
 | cart.id | string (uuid) | yes |  |
 | cart.anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
-| cart.token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| cart.token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
 | cart.sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
 | cart.workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | cart.venueId | string (uuid) | yes |  |
@@ -835,6 +841,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | Code | Shape | Meaning |
 |---|---|---|
 | 409 |  | The cart is checkedOut or abandoned (cart-not-open), or already belongs to another guest (cart-already-claimed). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 403 |  | The cart's token was not sent, or does not match (R8 blocker IDENTITY-C49, the lead's answer A; CHG-R8MIG-021): only the device that built the anonymous cart holds its token, so it is the proof. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Claimed, and merged where the guest already had one |
@@ -857,6 +864,8 @@ Created against a guest subject where one is known, or an anonymous token where 
 
 **The new cart's window and cap** (ADAM CR-184, option A; CHG-R9CR-003). A new cart holds no lease, so its `expiresAt` is its own window: now plus `cartLeaseSeconds`, and its `maxExtensions` is `cartMaxExtensions`. Both are read with `tenancy#venueSettingsRecords`: the venue's row first, and where its value is null, the tenant's default, which is the tenant's own row of `platform.venue_settings` (the row with no venue that `setVenueSettingsDefaults` writes); where that is null too, the field's proposed default (900 seconds, 1 extension). `extensionsUsed` starts at 0.
 
+**The anonymous path, corrected** (ADAM CR-486, Chinmay, 3 November 2026: "#30682's anonymous path stands in shape, with three corrections: the venue check, the anonymous subjectId answer, and how the cart token is stored"; CHG-CR486-001). **Which grant writes the cart**: a signed-in guest's cart is written under its own subject; a staff or partner cart under the session's venue grant, as before. For a caller with no credential, after the venue check, the single insert of the `orders.cart` row runs under the routed tenant's root grant (ITenantRootGrant), and the request's read-only venue scope is back for every other statement: the same one-cart reach Identity's anonymous session gives that cart's later statements; then `identity#openAnonymousGuestSession` is called in the same transaction, as above. **The venue, for every caller**: `tenancy#activeVenues` is asked in process with `[body.venueId]`; absent (not this tenant's venue, or not active) is `404` and nothing is written. `tenancy#scopeRecords` is not used for this: it returns inactive venues too. **`body.subjectId`**: with no credential, any `subjectId` is `403`; a signed-in guest may omit it or send their own subject, anything else is `403`, and the cart takes the session's subject; a staff or partner caller may send one, looked up with `identity#subjectRecords`: unknown is `400 validation`, known is stored on `orders.cart.subject_id`. **`Cart.token`** is minted only for a cart created with no credential: 32 bytes from a cryptographic random generator, base64url without padding (43 characters); null on a signed-in guest's or a staff cart. It is stored field-encrypted with the tenant's key (never plain at rest and never hashed), because the server reads it back for `getCart`'s answer, `claimCart`'s comparison (constant-time) and the recovery link `cart.abandoned` carries. `createCart` and `getCart` answer it in clear to the cart's caller. `claimCart`'s rotation is `claimCart`'s.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -867,7 +876,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject`, `platform.scope` |
 | Writes | `cache:idempotency`, `orders.cart` |
-| Called by | GST-008, GST-041, GST-050, GST-075, WEB-006, WEB-010, WEB-048 |
+| Called by | GST-008, GST-041, GST-050, GST-075, WEB-006, WEB-010, WEB-022, WEB-048 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): created as `active` |
 
 **Parameters**
@@ -882,7 +891,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 |---|---|---|---|
 | venueId | string (uuid) | yes |  |
 | channel | SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) | yes | Where a sale came from. |
-| subjectId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | With no credential, refused 403. (nullable) |
 | locale | string |  |  |
 | deviceId | string (uuid) |  | The device the anonymous session is bound to (ADAM CR-183, option A; CHG-R9CR-002): a client UUIDv7 the app mints once per installation and keeps. (nullable) |
 
@@ -892,7 +901,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
-| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
 | sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
 | workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
@@ -984,6 +993,8 @@ Created against a guest subject where one is known, or an anonymous token where 
 | Code | Shape | Meaning |
 |---|---|---|
 | 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | Started |
 
@@ -1021,7 +1032,7 @@ Offered once, typically, and the interface should say it is the last extension r
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
-| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
 | sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
 | workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
@@ -1112,6 +1123,7 @@ Offered once, typically, and the interface should say it is the last extension r
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Extended |
 | 409 |  | Extension cap reached (extensionCapReached), or a lease could not be extended because the capacity has gone (noCapacity, naming the lines in lineIds). |
@@ -1136,7 +1148,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Read routing | primary |
 | Reads | `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
 | Writes | - |
-| Called by | GST-007, GST-009, GST-032, GST-041, GST-048, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
+| Called by | GST-007, GST-009, GST-032, GST-041, GST-048, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011, WEB-022 |
 
 **Parameters**
 
@@ -1151,7 +1163,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
-| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
 | sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
 | workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
@@ -1242,6 +1254,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | The cart |
 | 410 |  | Expired (cartExpired). |
@@ -1262,7 +1275,7 @@ Releases its lease immediately.
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_reservation`, `orders.cart_line` |
-| Called by | GST-041, PTR-010, WEB-010 |
+| Called by | GST-041, PTR-010, WEB-010, WEB-022 |
 
 **Parameters**
 
@@ -1278,7 +1291,7 @@ Releases its lease immediately.
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
-| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
 | sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
 | workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
@@ -1369,6 +1382,7 @@ Releases its lease immediately.
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Removed, and the cart re-priced |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1389,7 +1403,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.channel_capacity`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_reservation`, `orders.cart_line` |
-| Called by | GST-041, PTR-010, WEB-010 |
+| Called by | GST-041, PTR-010, WEB-010, WEB-022 |
 
 **Parameters**
 
@@ -1412,7 +1426,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
-| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only) |
+| token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
 | sessionId | string (uuid) |  | The staff or partner session that started the cart (a till's cart is its session's own); null for a guest's cart (R8 blocker IDENTITY-C49, CHG-R8MIG-021). (read-only; nullable) |
 | workstationId | string (uuid) |  | The workstation of that session; null for a guest's cart. (read-only; nullable) |
 | venueId | string (uuid) | yes |  |
@@ -1503,6 +1517,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Updated |
@@ -1845,6 +1860,7 @@ Charges the case's amount again, on a different saved card if one is given. **A 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | The case after the attempt |
 | 409 |  | The case is already resolved, or the decline is hard and no other card was given. |
 | 422 |  | The payment was declined again. |
@@ -2240,6 +2256,8 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 
 **`POST /ticket-transfers/{transferId}/claim`**: Claim transferred tickets
 
+**The recipient's claim** (ADAM CR-502, Chinmay, 3 November 2026; CHG-CR502-001). The transfer is found by its claim token's keyed hash. Once the token is verified, the update of that one row (`status` claimed, `to_subject_id` the caller) runs under the routed tenant's root grant (ITenantRootGrant), the one-row reach a verified token gives elsewhere, since no subject clause can admit the recipient before `to_subject_id` is set. Every other statement runs under the caller's own grant.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -2287,6 +2305,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Claimed. |
 | 410 |  | Offer expired (offerExpired), already claimed (alreadyClaimed), or withdrawn by the sender (offerCancelled). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -2542,6 +2561,12 @@ The replacement is held before the original is released, never the other way rou
 **The exchange window is a venue setting with a tenant default**, `exchangeCutoffHours`: an exchange is refused with `outsideExchangeWindow` once the original performance is fewer than that many hours away (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): 24 hours.**
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
+**The checks, in this order, refusing before anything is written** (ADAM CR-480, Chinmay, 2 November 2026: option A for the write, and option B built first; CHG-CR480-001). `400 validation` when an `outgoingLineIds` entry is not a line of the path's order, `incomingLines` is empty, or the body's `id` differs from the `Idempotency-Key`. `409 line-redeemed` (`refusedReason` `lineRedeemed`, `lineIds`) when `access#entitlementRecords` (in process, as `modifyOrder` asks it: the in-process reads class, CHG-R13INP-001) shows an outgoing line's entitlement redeemed. `409 outside-exchange-window` (`outsideExchangeWindow`, `lineIds`) when now is later than an outgoing line's performance start (`catalogue#performanceRecords`, in process) minus `exchangeCutoffHours` (`tenancy#venueSettingsRecords`; 24 when unset). `409 replacement-unavailable` (`replacementUnavailable`, `lineIds`) when an incoming line's `inventoryHoldId` is not an active hold (`catalogue#inventoryReservationRecords`): the client holds the replacement with `acquireInventoryHold` before calling, as POS-004 does before `createOrder`, which is how the replacement is held before the original is released. One problem type per reason, as CR-345 and CR-481 decided.
+
+**The quote.** `outgoingValue` is what the outgoing lines paid minus what earlier refunds took from them (their `orders.refund_line` rows, CR-208's `refundableAmount`). `incomingValue` prices the incoming lines with `catalogue#variantPriceRecords` at the order's venue and channel (CR-439's rule), quantity times the selected amount. `exchangeFee` is zero until the client sets a fee rule (`waiveFee` changes nothing meanwhile). `difference` = `incomingValue` + `exchangeFee` - `outgoingValue`, in the venue's currency. **Until the write half is in**, the operation answers `200 OrderExchangeResult` with these four values, `newLineIds`, `revokedEntitlementIds` and `issuedEntitlementIds` empty, and writes nothing: not an `order_event`, not a line.
+
+**The write**, after `createOrder` (#30977) and `createRefund` (#31924) are built, reusing their steps rather than copies. In one transaction: insert the incoming lines as `createOrder` writes lines (converting each `inventoryHoldId` as `createOrder` does), mark the outgoing lines exchanged, append `orders.order_event` rows, and write `order.exchanged` to `platform.outbox`. A positive `difference` is left as the balance due on the order and collected by `createPayment`; a negative one is refunded by `createRefund` over the outgoing lines, with `refund_line` rows. Entitlements and capacity move through `order.exchanged`'s consumers, not through calls from Orders.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_EXCHANGE` |
@@ -2550,7 +2575,7 @@ The replacement is held before the original is released, never the other way rou
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.refund`, `orders.refund_policy`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.refund`, `orders.refund_line`, `orders.refund_policy`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-315, EMP-034, POS-006, POS-010, POS-011, PTR-002, PTR-008, PTR-015 |
 
@@ -2613,7 +2638,7 @@ The replacement is held before the original is released, never the other way rou
 | incomingValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | incomingValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | incomingValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| exchangeFee | Money |  | On the wire this is three fields; in the database it is one column. |
+| exchangeFee | object |  | Zero until the client sets a fee rule (ADAM CR-480); waiveFee changes nothing meanwhile. |
 | exchangeFee.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | exchangeFee.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | exchangeFee.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -2629,7 +2654,8 @@ The replacement is held before the original is released, never the other way rou
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Exchanged |
+| 200 |  | Exchanged; until the write half is in, the quote alone, with nothing written (ADAM CR-480) |
+| 400 |  | An outgoingLineIds entry is not a line of this order, incomingLines is empty, or the body's id is not the Idempotency-Key (ADAM CR-480) |
 | 409 |  | Replacement unavailable (replacementUnavailable), outside the exchange window (outsideExchangeWindow), or the original is redeemed (lineRedeemed). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -3327,6 +3353,8 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 **`claimUrl` is null on a transfer the caller sent** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C26, option A; CHG-R8SPN-025): it carries the claim token, and the sender must not be able to claim on the recipient's behalf. It is returned only on the recipient's own rows.
 **Order.** Soonest first, by `expiresAt` ascending, then by `id`.
 
+**Admitted by subject, as `orders.cart` and `orders.sales_order` are** (ADAM CR-502, Chinmay, 3 November 2026: "orders.ticket_transfer admits a guest's own transfers by subject, as orders.cart and orders.sales_order already do. No wider grant, and no subject filter in code as the only safeguard"; CHG-CR502-001). It runs under the caller's own guest session. Rows: `from_subject_id` = the caller's subject (sent) or `to_subject_id` = the caller's subject (received; `to_subject_id` is set only on claim), a condition kept in the query as well as in the table's policy. `direction` `sent` narrows to `from_subject_id`, `received` to `to_subject_id`; `status` is an exact match; the cursor is (`expires_at`, `id`). Another guest's transfers are never shown.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -3384,6 +3412,12 @@ Adding a line charges the difference; removing one refunds it under the venue's 
 Lines whose entitlement has been redeemed cannot be removed. The guest has used it.
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
+**Settled as an exchange is** (the lead, 2 November 2026, "Yes to both", applying CR-480's posted decision to modifyOrder and rescheduleOrder; CHG-R13ORD-001). **The checks, refusing before anything is written:** `400 validation` when a `removeLineIds` entry is not a line of the path's order, the body has neither `addLines` nor `removeLineIds`, or its `id` differs from the `Idempotency-Key`; `409 order-voided` for a voided order; `409 line-redeemed` (`lineRedeemed`, `lineIds`) when `access#entitlementRecords` shows a removed line's entitlement redeemed; `409 hold-not-active` (`holdNotActive`, `lineIds`) when an added line's `inventoryHoldId` is not an active hold (`catalogue#inventoryReservationRecords`), as `createOrder` refuses it: the client holds the new capacity with `acquireInventoryHold` before calling. One problem type per reason.
+
+**The quote.** `removedValue` is what the removed lines paid minus what earlier refunds took from them (their `orders.refund_line` rows, CR-208's `refundableAmount`); `addedValue` prices the added lines with `catalogue#variantPriceRecords` at the order's venue and channel (CR-439's rule), quantity times the selected amount; `balanceDue` = `addedValue` - `removedValue`, in the venue's currency, with no fee (fees stay zero while the exchange-fee question is with the client). **Until the write half is in**, the operation answers `200` with these values, `refundId` null and the entitlement lists empty, and writes nothing.
+
+**The write**, after `createOrder` (#30977) and `createRefund` (#31924) are built, reusing their steps rather than copies, in one transaction: insert the added lines as `createOrder` writes lines (converting each `inventoryHoldId` as `createOrder` does), refund the removed lines through `createRefund` (with `refund_line` rows), append `orders.order_event` rows, and write `order.exchanged` (`kind` `modification`) to `platform.outbox`. A positive `balanceDue` is left due on the order and collected by `createPayment`; a negative one is the refund `createRefund` makes (`refundId`). Entitlements and capacity move through `order.exchanged`'s consumers (#37212), never written by Orders.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_MODIFY` |
@@ -3392,8 +3426,8 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.refund`, `orders.refund_policy`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.refund`, `orders.refund_line`, `orders.refund_policy`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315, EMP-034, POS-006, PTR-002, PTR-008, PTR-015 |
 
 **Parameters**
@@ -3567,8 +3601,9 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Modified, with the balance to settle |
-| 409 |  | A targeted line's entitlement has been redeemed (lineRedeemed, naming it in lineIds), or the order is voided (orderVoided). |
+| 200 |  | Modified, with the balance to settle; until the write half is in, the quote alone, with nothing written (CHG-R13ORD-001) |
+| 400 |  | A removeLineIds entry is not a line of this order, the body adds and removes nothing, or its id is not the Idempotency-Key (CHG-R13ORD-001) |
+| 409 |  | A targeted line's entitlement has been redeemed (lineRedeemed, naming it in lineIds), the order is voided (orderVoided), or an added line's inventory hold is not active (holdNotActive, naming it in l… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### reprintOrder
@@ -3581,6 +3616,12 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 **A kiosk reprints as a registered device** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004): the kiosk (P05) calls this with its device credential (`apiKeyAuth`, audience `device`) and holds no permission; it reprints only an order the guest at it has identified (KSK-012 booking found, KSK-009 ticket issued, KSK-010 print failure), and each reprint is recorded against the device.
 **`delivery` `wallet` is "Add to wallet"** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C29, option A; CHG-R8SPN-025): one call adds every ticket of the order (or the lines named) to the guest's phone wallet, which is what WEB-013's approved button does; no other operation is needed.
 
+**What delivery `wallet` answers** (r13 root R27, CHG-R13R27-001): `walletPasses`, one per ticket reissued, each issued and shaped as `issueWalletPass` issues and answers it (an `orders.wallet_pass` row per ticket, the one already issued for that ticket reissued rather than duplicated), so the browser and the app have the pass to add. Absent for the other deliveries.
+
+**A guest who checked out without an account** (r13 root R27; IDENTITY-C52 and getOrder's rule, ADAM CR-191, CR-432): with no session subject, the caller sends `X-Order-Access-Token` and `X-Device-Id`, checked exactly as `getOrder` checks them (signature, `exp`, `oid` the path's `orderId`, `tid` the routed tenant, `did` the device); any failure is the shared `404`, as an order that does not exist. A verified token resends or reprints that one order: its statements run under the routed tenant's root grant (ITenantRootGrant), as getOrder's token read does, and nothing else in the same transaction.
+
+**Who records what, and how a resend travels** (ADAM CR-506, Chinmay, 3 November 2026: "reprintOrder records a guest's resend as one order event, sends remote deliveries through Access as an event, and returns wallet passes in its answer"; CHG-CR506-001). **Staff and device printing**: `ORDER_REPRINT` for staff, the device credential for a kiosk. Delivery `print` increments `orders.order_line.reprint_count` for each line named (or all lines) and appends one `order_event` row; the answer carries `reprintCount`, `lines` and `reissuedTicketIds` (the lines' entitlement ids). Only `print` increments `reprint_count`. **Who else may call**: a guest whose subject is the order's subject, or a caller with a valid `X-Order-Access-Token` for this order, checked as `getOrder` checks it; any other order is `404`. A guest's delivery `print` is `400`: no guest screen sends it. **Email, SMS and WhatsApp** (any caller): in the same transaction, one `order_event` row with `event_type` `ticketsResent` is appended and `order.ticketsResent` is written to the outbox (`orderId`, `entitlementIds`, `channel`, `destination`, optional, null meaning the recipient already on each credential, `scopePath`, `tenantId`, `at`). Orders sends nothing itself: Access consumes the event and delivers each credential as `deliverCredential` does, one pending credential delivery row per entitlement (`sms` is `smsLink`), idempotent on the event id plus the entitlement id. **Wallet**: each ticket's pass is issued through `issueWalletPass`'s own step (same module) and answered in `walletPasses`, which WEB-013's Add to wallet expects; `walletPlatform` (`apple` or `google`) is required with `wallet`, and `400` otherwise; the `ticketsResent` row is appended as well. **Grants**: a signed-in guest writes the `ticketsResent` row under its own session, through `orders.order_event`'s insert-only branch for that event type on an order whose subject it is (`order_line`'s policy is unchanged); an order-access-token caller writes that one row under the routed tenant's root grant, the one-order reach the verified token gives; staff and devices write under their venue grant.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_REPRINT` |
@@ -3589,8 +3630,8 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.sales_order`, `orders.ticket_template`, `orders.wallet_pass` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.sales_order`, `orders.wallet_pass`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, KSK-009, KSK-010, KSK-012, POS-002, POS-006, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-013 |
 
 **Parameters**
@@ -3599,13 +3640,16 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 |---|---|---|---|---|
 | orderId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Order-Access-Token | header |  | string | Order.orderAccessToken from checkoutCart's answer, in place of a session, for a guest who checked out without an account (r13 root R27), checked as getOrder checks it; with X-Device-Id. |
+| X-Device-Id | header |  | string (uuid) | The device a guest app or browser is (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004): the client UUIDv7 the app mints once per installation and keeps, the same value it sends as create… |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | delivery | enum (print, email, sms, whatsapp, wallet) | yes |  |
-| destination | string |  |  |
+| destination | string |  | For email, sms or whatsapp: where to send; omitted or null means the recipient already on each credential (ADAM CR-506). (nullable) |
+| walletPlatform | enum (apple, google) |  | Required with delivery wallet, 400 otherwise: which wallet the passes are issued for, through issueWalletPass's step (ADAM CR-506). |
 | lineIds | array of string (uuid) |  | Omit to reprint every line. |
 | reason | enum (printerFault, guestRequest, lostTicket, notReceived, other) |  |  |
 | recordedAt | string (date-time) | yes | When the till reprinted — device time, as for every offline-capable write. |
@@ -3619,6 +3663,17 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 | lines[].lineId | string (uuid) | yes |  |
 | lines[].reprintCount | integer | yes |  |
 | reissuedTicketIds | array of string (uuid) |  | The entitlements reprinted. |
+| walletPasses | array of WalletPass |  | For delivery wallet only: one pass per ticket reissued, in issueWalletPass's shape (r13 root R27). |
+| walletPasses[].id | string (uuid) | yes |  |
+| walletPasses[].entitlementId | string (uuid) | yes |  |
+| walletPasses[].platform | enum (apple, google) | yes |  |
+| walletPasses[].serialNumber | string | yes |  |
+| walletPasses[].passUrl | string (uri) |  | What the app adds to the wallet (R8 blocker ORDERS-MONEY-C39, CHG-R8MIG-017): for apple a short-lived signed link to the .pkpass file (signed with the brand's Pass Type ID certificate), for google th… (read-only) |
+| walletPasses[].authenticationToken | string (password) |  | Write-only. |
+| walletPasses[].status | enum (issued, updated, voided, expired) | yes |  |
+| walletPasses[].lastPushedAt | string (date-time) |  | (nullable) |
+| walletPasses[].deviceRegistrations | integer |  | How many devices hold it. |
+| walletPasses[].scopePath | string |  | The partition key (ADR-0005). |
 
 **Responses**
 
@@ -3626,6 +3681,7 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 |---|---|---|
 | 200 |  | Reissued |
 | 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rescheduleOrder
@@ -3633,11 +3689,17 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 **`POST /orders/{orderId}/reschedule`**: Move an order to another performance
 
 The common case of an exchange, and worth its own operation because it is what a call centre agent does forty times a day. Same product, different date or time.
-Where the new performance is priced differently, the balance settles as for an exchange. Where the venue charges a rescheduling fee, it appears as a line.
+Where the new performance is priced differently, the balance settles as for an exchange. Where the venue charges a rescheduling fee, it appears as a line, once the client sets a fee rule; until then the fee is zero (CHG-R13ORD-001).
 **A transport trip moves to another departure of the same route** (decided 29 September, rev 3 REV3-21): the prototype's "Change your trip free up to two hours before departure" is the proposed value of a transport venue's `rescheduleCutoffHours` (2, with no rescheduling fee), client to correct.
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
 
 **And one `rescheduled` row per reschedule** (ADAM CR-199, option A, decided 21 October 2026; CHG-R9CR-006): `eventType` `rescheduled`, `relatedEntityType` `performance`, `relatedEntityId` the target performance, in the same transaction, even when the order's status does not change. `getOrderCalendarEvent` counts these rows as the calendar event's SEQUENCE.
+
+**Settled as an exchange is** (the lead, 2 November 2026, "Yes to both", applying CR-480's posted decision to modifyOrder and rescheduleOrder; CHG-R13ORD-001). **The checks, refusing before anything is written:** `400 validation` when a `lineIds` entry is not a line of the path's order; `409 line-redeemed` (`lineRedeemed`, `lineIds`) when `access#entitlementRecords` shows a moved line's entitlement redeemed; `409 outside-reschedule-window` when now is later than a moved line's performance start minus `rescheduleCutoffHours`; `409 target-unavailable` when the target performance cannot take the moved lines (`catalogue#performanceRecords`). One problem type per reason.
+
+**The quote** (`OrderExchangeResult`). `outgoingValue` is what the moved lines paid minus what earlier refunds took from them (`orders.refund_line`, CR-208's `refundableAmount`); `incomingValue` prices the same variants at the target performance with `catalogue#variantPriceRecords` at the order's venue and channel (CR-439's rule); `exchangeFee` is zero, and no rescheduling fee line is added, while the fee question is with the client (`waiveFee` changes nothing meanwhile); `difference` = `incomingValue` + `exchangeFee` - `outgoingValue`. **Until the write half is in**, the operation answers `200` with these values, the id lists empty, and writes nothing: not an `order_event`, not a line.
+
+**The write**, after `createOrder` (#30977) and `createRefund` (#31924) are built, reusing their steps, in one transaction: point the moved lines at the target performance, append the `orders.order_event` rows (the `rescheduled` row among them), and write `order.exchanged` (`kind` `reschedule`) to `platform.outbox`. A positive `difference` is left due on the order and collected by `createPayment`; a negative one is refunded by `createRefund` over the moved lines, with `refund_line` rows. Entitlements and capacity (the old performance's released, the new one's taken) move through `order.exchanged`'s consumers (#37212), never written by Orders.
 
 |  |  |
 |---|---|
@@ -3647,8 +3709,8 @@ Where the new performance is priced differently, the balance settles as for an e
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.refund`, `orders.refund_policy`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_event`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.refund`, `orders.refund_line`, `orders.refund_policy`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315, EMP-034, POS-006, PTR-002, PTR-008, PTR-015 |
 
 **Parameters**
@@ -3681,7 +3743,7 @@ Where the new performance is priced differently, the balance settles as for an e
 | incomingValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | incomingValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | incomingValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| exchangeFee | Money |  | On the wire this is three fields; in the database it is one column. |
+| exchangeFee | object |  | Zero until the client sets a fee rule (ADAM CR-480); waiveFee changes nothing meanwhile. |
 | exchangeFee.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | exchangeFee.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | exchangeFee.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -3697,7 +3759,8 @@ Where the new performance is priced differently, the balance settles as for an e
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Rescheduled |
+| 200 |  | Rescheduled; until the write half is in, the quote alone, with nothing written (CHG-R13ORD-001) |
+| 400 |  | A lineIds entry is not a line of this order (CHG-R13ORD-001) |
 | 409 |  | Target performance is unavailable (targetUnavailable) or outside the reschedule window (outsideRescheduleWindow). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -3927,6 +3990,8 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 Per-ticket, not whole-order — a family splitting tickets between two phones is the normal case.
 The recipient receives a claim link. **Ownership moves only when they claim it**, so a transfer to a mistyped address expires rather than stranding the ticket somewhere nobody can reach.
 
+**Written under the caller's own session** (ADAM CR-502, Chinmay, 3 November 2026; CHG-CR502-001): the transfer row is inserted with `from_subject_id` = the caller's subject, admitted by `orders.ticket_transfer`'s write branch for the guest who is the sender and the order's subject; no wider grant.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -3978,6 +4043,7 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 202 |  | Transfer offered, pending claim |
 | 409 |  | Ticket already redeemed (alreadyRedeemed), already offered (alreadyOffered), or the product forbids transfer (transferNotAllowed). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -4186,6 +4252,7 @@ Only before settlement and only within the same shift. After that it is a refund
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 403 |  | The caller holds no ORDER_VOID and sent no verified supervisor step-up (supervisor-step-up-refused), or is not permitted at this scope (forbidden). |
 | 200 |  | Voided |
 | 409 |  | Settled — a payment on the order has been captured, so the money has moved (alreadySettled) — or taken in a shift that is now closed (shiftClosed). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -4242,7 +4309,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | appliesToProductKinds | array of string |  |  |
 | appliesToChannels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  |  |
 | selectionPriority | integer |  | 2.16.x. (default 100) |
-| layoutRef | string |  |  |
+| layoutRef | string |  | Names the stored TicketLayout this template prints (ADAM CR-447). |
 | localeVariants | object |  |  |
 | isActive | boolean | yes |  |
 
@@ -4363,7 +4430,7 @@ Check the artwork with `printTicketProof` before activating.
 | appliesToProductKinds | array of string |  |  |
 | appliesToChannels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  |  |
 | selectionPriority | integer |  |  |
-| layoutRef | string |  | The artwork, as a media-asset reference. |
+| layoutRef | string |  | Names the stored TicketLayout this template prints (ADAM CR-447, Chinmay, 1 November 2026; CHG-CR447-001): the layout the ticket designer screen saves, the id of the Access media template (designer p… |
 | localeVariants | object |  |  |
 | isActive | boolean |  |  |
 
@@ -4380,7 +4447,7 @@ Check the artwork with `printTicketProof` before activating.
 | appliesToProductKinds | array of string |  |  |
 | appliesToChannels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  |  |
 | selectionPriority | integer |  | 2.16.x. (default 100) |
-| layoutRef | string |  |  |
+| layoutRef | string |  | Names the stored TicketLayout this template prints (ADAM CR-447). |
 | localeVariants | object |  |  |
 | isActive | boolean | yes |  |
 
@@ -4700,7 +4767,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | appliesToProductKinds | array of string |  |  |
 | appliesToChannels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  |  |
 | selectionPriority | integer |  | 2.16.x. (default 100) |
-| layoutRef | string |  |  |
+| layoutRef | string |  | Names the stored TicketLayout this template prints (ADAM CR-447). |
 | localeVariants | object |  |  |
 | isActive | boolean | yes |  |
 
@@ -5764,7 +5831,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | appliesToProductKinds | array of string |  |  |
 | appliesToChannels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  |  |
 | selectionPriority | integer |  |  |
-| layoutRef | string |  | The artwork, as a media-asset reference. |
+| layoutRef | string |  | Names the stored TicketLayout this template prints (ADAM CR-447, Chinmay, 1 November 2026; CHG-CR447-001): the layout the ticket designer screen saves, the id of the Access media template (designer p… |
 | localeVariants | object |  |  |
 | isActive | boolean |  |  |
 
@@ -5781,7 +5848,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | appliesToProductKinds | array of string |  |  |
 | appliesToChannels | array of SalesChannel: enum (pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice, …) |  |  |
 | selectionPriority | integer |  | 2.16.x. (default 100) |
-| layoutRef | string |  |  |
+| layoutRef | string |  | Names the stored TicketLayout this template prints (ADAM CR-447). |
 | localeVariants | object |  |  |
 | isActive | boolean | yes |  |
 
@@ -6827,6 +6894,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 204 |  | Cancelled |
 | 409 |  | Already converted (alreadyConverted), or no longer held — expired or already cancelled (reservationNotHeld). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -7758,6 +7826,9 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 **Online only** (F32, 26 September pull audit R257). Closing needs the server's total — a variance computed against a stale local journal is not a variance — and POS-007 and `states/shift.yaml` (`pendingClosure` is not offline-reachable) already said so.
 **The supervisor's close: on POS-007 with a supervisor PIN, at any till, and in the daily cash reconciliation** (decided 2 October 2026, Chinmay, pre-apply round: "closeShift is declared on POS-007 (supervisor PIN, any till) and in the daily cash reconciliation"; batch 3 #1 and batch 6 #174; DEC-059, DEC-173; CHG-CSP-012). A supervisor closes a cashier's shift at the till the cashier left (POS-007), at any other till of the venue, or from the daily cash reconciliation (BO-043), which lists every shift of the day and resolves them one by one: a shift still open is closed here, a counted shift waiting for review is accepted (`acceptShiftVariance`) or sent back for a recount (`rejectShiftVariance`). The supervisor presents their own PIN on the device in use; the cashier's own count stays `submitShiftCount`.
 **The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on `reopenShift` and `rejectShiftVariance`: `supervisorStepUp` carries the principal and PIN of the supervisor closing the shift, entered on the device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`).
+**The expected cash** (ADAM CR-518, Chinmay, 3 November 2026: "the expected cash is the package's own formula, in the venue's currency, and is the same figure for closeShift and submitShiftCount"; CHG-CR518-001): `submitShiftCount` states it once, and both write `orders.pos_shift.expected_cash_amount`.
+**Open orders** (ADAM CR-518): before the count is written, the close is refused `409 open-orders-remain` when an order whose `shift_id` is this shift is `pending`, `held` or `partiallyPaid`. `paid`, `completed`, `voided`, `refunded`, `partiallyRefunded` and `failed` do not block.
+**`releaseHeldLeases` changes nothing** (ADAM CR-517, Chinmay, 3 November 2026: "a till holds no standing lease, so the close has nothing to give back and no path to Catalogue is added"; CHG-CR517-001). Since 20 October a till takes one inventory hold per sale while it is online, the hold is converted when the order is paid, and the close already refuses while an unfinished order remains. The field is accepted as a boolean (default true) and a value that is not a boolean is `400 validation`; nothing else is done with it: no read or write of Catalogue's hold table, no Catalogue call, no new field on `shift.closed`, no new event, and `orders.pos_shift.held_lease_count` stays null. A close with true, with false and with the field missing behave the same. A stray hold left by an abandoned sale goes back when it expires, or the till returns it with `relinquishInventoryHold`, or a supervisor reclaims it on BO-018 with `forceReleaseInventoryHold`. If standing leases are brought in later, returning a till's leases at close is Catalogue's job, triggered by the close's event, with its own ticket.
 
 |  |  |
 |---|---|
@@ -7768,7 +7839,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Offline | no |
 | Conflict policy | append |
 | Step-up auth | pin |
-| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `orders.sales_order`, `orders.till_shift_policy`, `platform.venue_settings` |
+| Reads | `cache:idempotency`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `orders.refund`, `orders.refund_payment`, `orders.sales_order`, `orders.till_shift_policy`, `platform.venue_settings` |
 | Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
 | Called by | BO-040, BO-043, POS-007 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `pendingClosure`, `suspended` -> `pendingClosure` |
@@ -7799,7 +7870,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | nonCashDeclared[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | notes | string |  | The cashier's note on the count. (max length 1000) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). (nullable) |
-| releaseHeldLeases | boolean |  | Return unsold inventory leases held by this workstation (ADR-0013 C103). (default True) |
+| releaseHeldLeases | boolean |  | Accepted and does nothing (ADAM CR-517, Chinmay, 3 November 2026; CHG-CR517-001): a till holds no standing lease (one inventory hold per sale, converted when the order is paid), so the close has noth… (default True) |
 | recordedAt | string (date-time) | yes |  |
 | supervisorStepUp | object |  | The supervisor closing the shift, signing on this device (CHG-RUL-019). |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
@@ -7912,7 +7983,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | 200 |  | Closed, or held pending variance acceptance or approval |
 | 403 |  | The caller is the cashier whose shift it is and does not hold OVERSHORT_ACCEPT (problem type blind-count-required): their count goes through submitShiftCount, which never returns the expected figure… |
 | 400 | BadRequest | Validation failed |
-| 409 |  | Shift is not open or suspended — already closing or closed (problem type shift-not-open) — or open orders remain (open-orders-remain) |
+| 409 |  | Shift is not open or suspended — already closing or closed (problem type shift-not-open) — or open orders remain (open-orders-remain): an order whose shift_id is this shift is pending, held or partia… |
 | 422 |  | A counted line names an unknown or inactive denomination (unknown-denomination), repeats one (duplicate-denomination), or sends a total that disagrees with count times face value (count-total-mismatc… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -9198,6 +9269,9 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 `Shift.expectedCash` and `Shift.variance` stay null to the shift's own cashier on every read; they are returned to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.
 **A difference within the threshold closes only with a reason** (the client's policy, tracker answer T10.1 of 6 October 2026, `sources/client/2026-10-06-tracker-answers.md`: "Variances within the permitted threshold may be closed with mandatory reason capture"; CHG-R4-019). Where the count differs from the expected figure at all, by no more than `shiftVarianceThreshold`, and no `cashierReason` came with the count, the shift does not close: it is held in `pendingClosure`, the receipt's outcome is `awaitingCloseApproval` with `varianceReasonRequired: true`, and the till asks for a reason, which `giveShiftVarianceReason` records and which closes the shift. **The count is locked before the reason is asked**, so the close stays blind: the cashier learns only that a difference was found, never its amount or whether the drawer is over or short. A count that matches exactly closes with no reason; one beyond the threshold goes to the supervisor as before.
 Online only, as `closeShift`: the expected figure is the server's.
+**The expected cash, one formula** (ADAM CR-518, Chinmay, 3 November 2026: "the expected cash is the package's own formula, in the venue's currency, and is the same figure for closeShift and submitShiftCount (both write orders.pos_shift.expected_cash_amount)"; CHG-CR518-001): expected cash = A + B - C + D - E - F, rounded to the venue's currency scale. **A**, the opening float: `pos_shift.opening_float` (the `openingFloat` cash movement is not added as well). **B**, cash taken: cash payments (`tender` cash, `status` captured or refunded) on orders whose `shift_id` is this shift, with `tender_currency` empty or equal to the venue's currency; the same sum, and the same code, as the deposit box's expected cash (`listDepositBoxes`). **C**, change given: `change_amount` on every cash payment of the shift, foreign-currency ones included, since change is only given in the venue's currency. **D**, adds: `orders.cash_movement` kind `add` on the shift. **E**, lifts: `orders.cash_movement` kind `lift` on the shift; a deposit-box withdrawal is already one lift row, so `withdrawn_amount` is not subtracted as well. **F**, cash refunds paid out by this shift: `orders.refund_payment` rows against a cash payment, their `orders.refund` completed and settled to the original tender, that record this shift as the one that paid out; foreign cash refunds are paid in the venue's currency. The refund rows gain that shift on a separate ticket; until it lands F is zero, and an unrecorded refund shows as short, which the cashier's reason `unrecordedRefund` covers.
+**Foreign cash** (ADAM CR-518): count lines whose denomination is not in the venue's currency are stored as counted, but kept out of `countedCash`, `expectedCash` and `variance`, and do not affect `requiresAcceptance` or the shift's next state. The foreign figures are read where they already are (the deposit box's foreign holdings and the foreign tender report, at the payments' own rates). Neither this operation nor `closeShift` reads Ledger's FX rates (no `finance#fxRateRecords`). Response fields and screens are unchanged.
+**`releaseHeldLeases` changes nothing here either** (ADAM CR-517; CHG-CR517-001): accepted as a boolean (default true), a value that is not a boolean is `400 validation`, and nothing else is done with it, as `closeShift` says.
 
 |  |  |
 |---|---|
@@ -9207,7 +9281,7 @@ Online only, as `closeShift`: the expected figure is the server's.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `platform.venue_settings` |
+| Reads | `cache:idempotency`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `orders.refund`, `orders.refund_payment`, `orders.sales_order`, `platform.venue_settings` |
 | Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
 | Called by | EMP-009, POS-007 |
 | State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `pendingVariance` -> `closed`, `open` -> `pendingClosure`, `suspended` -> `pendingClosure` |
@@ -9238,7 +9312,7 @@ Online only, as `closeShift`: the expected figure is the server's.
 | nonCashDeclared[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | notes | string |  | The cashier's note on the count. (max length 1000) |
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). (nullable) |
-| releaseHeldLeases | boolean |  | Return unsold inventory leases held by this workstation (ADR-0013 C103). (default True) |
+| releaseHeldLeases | boolean |  | Accepted and does nothing (ADAM CR-517, Chinmay, 3 November 2026; CHG-CR517-001): a till holds no standing lease (one inventory hold per sale, converted when the order is paid), so the close has noth… (default True) |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `ShiftCountReceipt`
@@ -9257,6 +9331,7 @@ Online only, as `closeShift`: the expected figure is the server's.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Count recorded; the receipt says what happens next and nothing about the variance |
+| 400 | BadRequest | Validation failed |
 | 403 |  | The shift is not the caller's own (problem type not-shift-operator): a supervisor closing somebody else's shift uses closeShift (SHIFT_CLOSE_OTHER). |
 | 409 |  | The shift is neither open, suspended nor pendingVariance (problem type shift-not-countable). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -9380,7 +9455,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 
 5.8.8. **A mid-day skim, and it is not a variance.** Cash removed from a till for banking must reduce the expected close figure, or every busy cashier ends the day apparently short by the amount that was taken from them.
 Two people sign: the supervisor taking it and the cashier it came from.
-**The cashier signs as witness with their own PIN on the same device** (decided 2 October 2026, Chinmay, batch 6 #178, BO-042: "PIN on the same device"; DEC-178; CHG-CSP-015). Until then the witness was a name the supervisor typed (`witnessPrincipalId` with no credential). The step-up below is answered by the witness, not the caller: the PIN must be that of `witnessPrincipalId`, or the call is refused `403 witness-not-verified`, and the supervisor may not witness their own withdrawal (`403 witness-is-caller`).
+**The cashier signs as witness with their own PIN on the same device** (decided 2 October 2026, Chinmay, batch 6 #178, BO-042: "PIN on the same device"; DEC-178; CHG-CSP-015). Until then the witness was a name the supervisor typed (`witnessPrincipalId` with no credential). The step-up below is answered by the witness, not the caller: the PIN must be that of `witnessPrincipalId`, or the call is refused, and the supervisor may not witness their own withdrawal; both are the declared `403 supervisor-step-up-refused` (CHG-RUL-019, 3 October 2026, which carried the PIN in the body and named the refusal; nobody signs their own act, CHG-R8SPN-035).
 **Recorded as one `CashMovement` of kind `lift`** (F32 step 4: a safe drop "is recorded as a movement so the settlement adds up"; 26 September, pull audit R099/R104). The row carries this box's `depositBoxId` and `shiftId`, the caller as `authorisedByPrincipalId`, the witness, `withdrawalReason` from `reason`, and `note` as its `reason` text. It is the box-level form of the same lift `createCashMovement` records — **one withdrawal is one movement**, so the expected close figure falls once, and `withdrawnTotal` is the sum of the box's lifts.
 **`recordedAt` is the device's time** (offline-and-sync: offline data keeps both `recorded_at` and `synced_at`), and `id` is the client UUIDv7 that doubles as the idempotency key.
 **The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on `reopenShift` and `rejectShiftVariance`: `witnessStepUp` carries the principal and PIN of the cashier the cash came from (`witnessPrincipalId`), who countersigns, entered on the device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`). The step-up's principal must be `witnessPrincipalId`; it is the witness's PIN, not a supervisor's, so the field is named for the witness.
@@ -9566,6 +9641,7 @@ A rejection leaves this list's unresolved view when `resolveSyncRejection` recor
 **`POST /sync/orders`**: Replay orders recorded offline
 
 Ordered batch, processed in `sequence` order. An entry refused on its merits is quarantined in `sync.rejection` and the batch continues; only a transient failure stops it (SD-028, 29 September). A void must never be evaluated before the sale it voids.
+**Which key deduplicates what** (r13 root R41, CHG-R13R41-001). The `Idempotency-Key` header is a fresh UUIDv7 for each batch POST, never an entry's id: a batch retried from `stoppedAtSequence` is a new POST with a new key and the entries from there on. Each entry deduplicates on its own `OfflineOrder.id` (`CreateOrderRequest.id`): an entry already ingested is not ingested twice.
 Every line is re-priced on ingest. Variances are returned per order and posted to the variance account; the client surfaces nothing to the cashier.
 
 |  |  |
@@ -10315,7 +10391,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | media_type | text | yes |  |
 | applies_to_product_kinds | text[] | no |  |
 | selection_priority | integer | no | 2.16.x. |
-| layout_ref | text | no |  |
+| layout_ref | text | no | Names the stored TicketLayout this template prints (ADAM CR-447). |
 | locale_variants | jsonb | no |  |
 | is_active | boolean | yes |  |
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 80
+  x-ticvai-screen-count: 81
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -77,6 +77,34 @@ x-ticvai-queries:
       `supervisor-step-up-refused` and nothing is written by it.'
     served: [in-process, service]
     operation: verifySupervisorStepUp
+  # **The MFA step-up, checked and consumed for the operation that demands it** (ADAM CR-509, decided 3 November 2026;
+  # CHG-CR509-001). Modelled on the supervisor PIN query above. Identity owns the write to identity.mfa_challenge, so
+  # an asking module never sets consumed_at itself (ADR-0055 rule 3).
+  consumeMfaStepUp:
+    module: identity
+    table: identity.mfa_challenge
+    inputs:
+      sessionId: {type: string, format: uuid, description: 'The caller''s session (the token''s `sid`).'}
+      principalId: {type: string, format: uuid, description: 'The caller''s principal.'}
+      action: {type: string, description: 'The asking operation''s operationId, the action its step-up was verified for (ADAM CR-375).'}
+    returns:
+      type: object
+      required: [outcome]
+      properties:
+        outcome: {type: string, enum: [consumed, missing, expired], description: 'consumed: the step-up was there and is now used; missing: none (403 step-up-token-missing); expired: the newest is older than 5 minutes (403 step-up-token-expired).'}
+    rule: >-
+      ADAM CR-509 (Chinmay, 3 November 2026): Identity's in-process step-up check. It runs on the caller's connection
+      and transaction: it finds the newest identity.mfa_challenge row with that session_id and action, status
+      verified and consumed_at null. None: missing. verified_at more than 5 minutes ago: expired. Otherwise it sets
+      consumed_at to now and status to consumed, and returns consumed. Identity owns that write. The asking operation
+      calls it before any other write, in its own transaction: missing is its 403 step-up-token-missing, expired its
+      403 step-up-token-expired, and it writes nothing; a later refusal of the asking operation rolls the consume back,
+      so the step-up stays usable. Every operation that demands an MFA step-up on a tenant session uses the same
+      check (the rule in verifyMfaChallenge, ADAM CR-375). **Not a platform caller's**: a platform operator's
+      step-up is read from the Control Plane token (ticvai_step_up within 5 minutes, amr includes mfa), never from a
+      tenant session or a tenant MFA challenge row (ADR-0072 point 4; CHG-R13ID-001), and this check is never asked
+      for it. Until it lands, the asking operations' tests use a fake of it.
+    served: [in-process]
   # **The anonymous guest session, opened and ended for Orders** (ADAM CR-183, option A, decided 21 October 2026;
   # CHG-R9CR-002). Identity mints and keeps its own sessions; Orders only asks, in process within commerce (ADR-0055
   # rule 3: another module writes only through the owner's in-process API).
@@ -144,8 +172,40 @@ x-ticvai-queries:
       process by createRotaAssignment and updateRotaAssignment, which refuse 409 person-lacks-required-role when
       it is false, and by access setTurnstileMode from the access host (ADAM CR-396, decided 31 October 2026;
       CHG-CR396-001; XDR-035), once per role of the governing gate mode policy's whoCanActivate, which refuses
-      403 gate-mode-role-required when it is false for every one. Built inside the Identity module, behind its query interface, by the createRotaAssignment ticket
+      403 gate-mode-role-required when it is false for every one. It is asked in process by approvals
+      createApprovalDelegation and approveRoleAuthorityDelegation for the delegation-authority check: once per approver
+      role of the in-force matrix's rules for the delegator's limit, and for the delegate's requiredRoleId (ADAM CR-479,
+      Chinmay, 2 November 2026; CHG-CR479-001). Built inside the Identity module, behind its query interface, by the createRotaAssignment ticket
       (#32338, ADAM CR-344); no other ticket builds it.
+    served: [in-process]
+  # **Whether a person holds a permission at or above a venue, as a yes or no** (ADAM CR-479, decided 2 November 2026;
+  # CHG-CR479-001). The delegation-authority check needs the delegate's APPROVAL_DECIDE, which a grant above the caller's
+  # venue gives and the caller's row security hides.
+  principalHoldsPermissionAtVenue:
+    module: identity
+    table: identity.delegated_access
+    reads: [identity.delegated_access, identity.role_permission, identity.principal]
+    inputs:
+      principalId: {type: string, format: uuid, description: 'The person asked about: the delegate of approvals createApprovalDelegation or approveRoleAuthorityDelegation.'}
+      permission: {type: string, description: 'The permission key (contracts/shared/permissions.yaml), APPROVAL_DECIDE for the delegation-authority check.'}
+      venueScopePath: {type: string, description: 'The scope path of the delegation''s venue (its scopePath, the caller''s venue), which the asker holds.'}
+    returns:
+      type: object
+      required: [holds]
+      properties:
+        holds: {type: boolean, description: 'True when the person is active and holds the permission at the venue or at a scope above it, directly or through its role, and no live DENY of that permission or role at the venue or above it suppresses it. Which grant, where it was made and by whom are never returned.'}
+    rule: >-
+      A rule question (ADAM CR-479, Chinmay, 2 November 2026: "option A as you recommended for the rules, with the reads
+      asked as yes/no questions under the routed tenant's root grant, as CR-336 and CR-362 did"). True when the
+      principal is active and an identity.delegated_access row for it, effect `ALLOW`, revoked_at null, inside
+      valid_from and valid_to, with scope_path @> venueScopePath, grants the permission directly (its permission) or
+      through its role (an identity.role_permission row with is_active true for that role and permission), and no live
+      DENY of that permission or role at the venue or above it exists (deny wins, as principalHoldsRoleAtVenue).
+      Identity answers it with one statement under the routed tenant's root grant (ITenantRootGrant) and returns only
+      `holds`; the caller's grant is in force for every other statement of its transaction. It is asked in process by
+      approvals createApprovalDelegation and approveRoleAuthorityDelegation (403 delegate-lacks-permission when it is
+      false). Built inside the Identity module, behind its query interface, by the approveRoleAuthorityDelegation ticket
+      (#30847); no other ticket builds it.
     served: [in-process]
   # **Whether a guest is a minor, and its name, beyond the caller's own row** (ADAM CR-362, decided 30 October 2026;
   # CHG-CR362-001). grantDelegation and listDelegations read pii.subject under subject row security, which shows a
@@ -275,8 +335,10 @@ x-ticvai-queries:
       scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within commerce, through the C# query interface Identity implements.
-    served: [in-process]
+      process within commerce, through the C# query interface Identity implements. It is asked from another
+      deployable through Identity's service route (serviceAuth; POST /queries/role-permission-records, ADAM CR-438)
+      by white-label setPublishReviewPolicy, for the roles that grant TENANT_PUBLISH (ADAM CR-520, 3 November 2026).
+    served: [in-process, service]
   segregationRuleRecords:
     module: identity
     table: identity.segregation_rule
@@ -333,8 +395,9 @@ x-ticvai-queries:
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through Identity's service route (serviceAuth): `listSubjectBiometricRecords`,
-      GET /internal/subject-biometrics, which the access host's revokeFacePass asks for the enrolment it revokes
-      (ADAM CR-391, Chinmay, 31 October 2026). The access role has no grant on pii.subject_biometric; the route
+      POST /queries/subject-biometric-records with the declared inputs as the JSON body (ADAM CR-438, Chinmay, 1
+      November 2026, the rule for every served service query), which the access host's revokeFacePass asks for
+      the enrolment it revokes (ADAM CR-391, Chinmay, 31 October 2026). The access role has no grant on pii.subject_biometric; the route
       needs the kernel's service sign-in (#37051, ADAM CR-281).
     served: [service]
   subjectContactRecords:
@@ -400,6 +463,183 @@ x-ticvai-queries:
       getPublishedTenantConfig for guestSignIn, under the caller's connection and the table's row-level security
       (XDR-021).
     served: [in-process]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  personalDataRetention:
+    module: identity
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [tenancy.data_retention_setting, pii.subject, pii.subject_biometric, pii.subject_contact, pii.subject_document, pii.subject_identity]
+    writes: [pii.subject, pii.subject_biometric, pii.subject_contact, pii.subject_document, pii.subject_identity]
+    reliesOn: [setDataRetentionSetting]
+    for: "Identity's retention job: the guest's subject record and its biometrics. Every day it reads the tenant's period for guestProfile, facePassBiometric and faceTagBiometric from Tenancy's data retention settings (tenancy#dataRetentionSettingRecords; a class with no row takes the platform default, ADR-0047) and applies its onExpiry (archive, anonymise or delete) to its own rows past the period, counted from the class's anchor; another module's rows are that module's job (the lead, 2 November 2026, on lane s's question (\"(Recommended)\"): one retention job in each module that holds personal data, run by that module's retention setting (tenancy.data_retention_setting); CHG-R13INT-011)."
+    source: ['contracts/spine/tenancy.yaml']
+  accessReviewTimers:
+    module: identity
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: access-review-campaign, from: open, to: expired}
+    - {model: access-review-item, from: pending, to: notReviewed}
+    reads:
+    - identity.access_review_campaign
+    - identity.access_review_item
+    - identity.delegated_access
+    - identity.session
+    writes:
+    - identity.access_review_campaign
+    - identity.access_review_item
+    - identity.delegated_access
+    - identity.session
+    for: 'Identity''s access-review timers: campaign due date and recurrence.'
+    source:
+    - contracts/spine/identity.yaml
+    - states/access-review-campaign.yaml:27
+    - states/access-review-item.yaml:32
+  delegationExpiry:
+    module: identity
+    host: workers
+    trigger: {kind: queue}
+    reads: [identity.delegated_access]
+    writes: [identity.delegated_access]
+    reliesOn: [createDelegatedAccess, grantDelegation]
+    for: Identity delegated-access expiry sweep.
+    source: ['contracts/spine/identity.yaml']
+  guestErasure:
+    module: identity
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [identity.subject_data_export, pii.subject]
+    writes: [pii.subject, identity.subject_data_export]
+    reliesOn: [deleteGuestAccount, eraseSubject]
+    for: Identity's guest erasure job and its daily sweep.
+    source:
+    - contracts/satellite/ai.yaml
+    - contracts/spine/identity.yaml
+    - contracts/spine/identity.yaml
+  privacyApprovals:
+    module: identity
+    host: workers
+    trigger: {kind: event}
+    consumes: [approval.expired, approval.granted, approval.rejected, approval.withdrawn]
+    reads: [identity.subject_data_export]
+    writes: [identity.subject_data_export, pii.subject]
+    for: 'Identity''s privacy-request approval consumers (ADAM CR-101, CHG-R10ID-016): an approved subjectDataExport starts
+      the export job, a rejected, expired or withdrawn one closes identity.subject_data_export.'
+    source:
+    - events/approval-expired.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
+  riskCaseOutcome:
+    module: identity
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.riskCaseClosed]
+    reads: []
+    writes: []
+    for: 'AI''s recommendation and risk signal consumers beyond the five owner events AI-ENGINE-FRAUD-RISK-RULES names: recommendation
+      attribution, candidate availability, renewal moments, risk velocity and chargebacks, browsing signals, account-takeover
+      resets, staff leakage, device-health anomalies, and the risk-case outcome for Identity and Orders.'
+    source:
+    - events/ai-riskCaseClosed.yaml
+    - events/ai-riskCaseClosed.yaml
+    - events/cart-abandoned.yaml
+    - events/device-statusChanged.yaml
+  sessionTimeout:
+    module: identity
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: operator-session, from: active, to: expired}
+    reads: [identity.session]
+    writes: [identity.session]
+    for: 'Identity''s operator-session idle timeout: expire idle sessions and free the workstation.'
+    source: ['states/operator-session.yaml:33']
+  signInProjections:
+    module: identity
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - assets.guestUploadChanged
+    - biometric.enrolmentChanged
+    - shift.closed
+    - shift.opened
+    - whitelabel.customDomainChanged
+    reads:
+    - identity.guest_upload_ref
+    - identity.open_shift_marker
+    - identity.redirect_host
+    - pii.subject
+    - pii.subject_biometric
+    writes:
+    - identity.guest_upload_ref
+    - identity.open_shift_marker
+    - identity.redirect_host
+    - pii.subject
+    - pii.subject_biometric
+    for: 'Identity''s sign-in projections: the open-shift marker ActiveSession.hasOpenShift reads, the redirect hosts guestUaePassLogin
+      checks, and the biometric enrolment on pii.subject.'
+    source:
+    - events/biometric-enrolmentChanged.yaml
+    - events/shift-closed.yaml
+    - events/shift-opened.yaml
+    - events/whitelabel-customDomainChanged.yaml
+  subjectExport:
+    module: identity
+    host: workers
+    trigger: {kind: queue}
+    reads: [identity.subject_data_export, identity.subject_data_export_part, identity.subject_holding, pii.subject]
+    writes: [identity.subject_data_export]
+    reliesOn: [exportSubjectData, recordSubjectDataExportPart, writeSubjectDataExportPart]
+    for: 'Identity''s subject-data export job: assemble the parts, write the file, delete it after 7 days. **Its rules,
+      on a ticket of its own** (ADAM CR-512, Chinmay, 3 November 2026; CHG-CR512-001). It starts on approval.granted
+      for subjectDataExport, or at once for a row exportSubjectData wrote running. It waits for a part from every
+      module that writes one on identity.privacyRequestRaised (today Marketing alone); if a part is not recorded 72
+      hours after the start, it ends the row failed and names the missing owner in failureReason. It reads Identity''s
+      own subject tables and identity.subject_holding as they stand. Layouts: json is one object keyed by table, each
+      an array of rows; csv is a zip of one file per table with a header row; pdf is one section per table, each row
+      as label and value. It writes the file to the tenant''s private storage through a new server-side storage seam
+      (put, delete, signed download link) and sets the row ready. After 7 days it deletes the file and the parts''
+      objects and sets the row expired. For a guest linked across cells it calls createDsarRequest (kind access).'
+    source:
+    - contracts/spine/identity.yaml
+    - contracts/spine/identity.yaml
+    - contracts/spine/identity.yaml
+  subjectHolding:
+    module: identity
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - entitlement.issued
+    - entitlement.reissued
+    - entitlement.statusChanged
+    - entitlement.transferred
+    - entitlement.voided
+    - guest.merged
+    - order.cancelled
+    - order.completed
+    - order.created
+    - order.lapsed
+    - order.linkedToGuest
+    - order.paid
+    - order.refunded
+    reads: [identity.membership_history, identity.subject_holding, pii.subject]
+    writes: [identity.membership_history, identity.subject_holding, pii.subject]
+    for: 'Identity''s subject-holding projection (ADAM CR-084, CHG-GDL-001): keep identity.subject_holding in step with every
+      order and entitlement a guest holds, so deleteGuestAccount knows what still blocks a deletion and linkGuestCheckout
+      can match guest-checkout orders.'
+    source:
+    - events/entitlement-issued.yaml
+    - events/entitlement-reissued.yaml
+    - events/entitlement-statusChanged.yaml
+    - events/entitlement-transferred.yaml
 paths:
   /internal/step-up/verify:
     post:
@@ -459,9 +699,11 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /internal/subject-biometrics:
-    get:
+  /queries/subject-biometric-records:
+    post:
       operationId: listSubjectBiometricRecords
+      x-ticvai-idempotency-exempt: A served query (ADAM CR-438, POST /queries/<name>) that reads rows and writes nothing;
+        a replay answers the same rows.
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -479,6 +721,14 @@ paths:
         The route needs the kernel''s service sign-in (#37051, ADAM CR-281), and revokeFacePass connects to it when
         that is ready.
 
+
+        **Where a served query is asked from another deployable** (ADAM CR-438, Chinmay, 1 November 2026: the rule
+        for every served `service` query). A query served on the service route is POST /queries/<the query''s name
+        in kebab case> on the owning deployable, with the query''s declared inputs as the JSON body, answering `200`
+        with a JSON array of its rows in camelCase, `401` to any caller that is not a fellow deployable
+        (serviceAuth), and `400 validation` when neither `ids` nor `where` is given or `where` names a field the
+        row lacks. For this query that is POST /api/v1/queries/subject-biometric-records.
+
         '
       tags:
       - identity
@@ -486,32 +736,27 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      parameters:
-      - name: ids
-        in: query
-        required: false
-        description: The `pii.subject_biometric` rows asked for, by id. With `subjectId` or `kind`, the two narrow.
-        style: form
-        explode: false
-        schema:
-          type: array
-          maxItems: 50
-          items: { type: string, format: uuid }
-      - name: subjectId
-        in: query
-        required: false
-        description: Or the rows of this subject.
-        schema: { type: string, format: uuid }
-      - name: kind
-        in: query
-        required: false
-        description: Only `facePass` or only `faceTag` rows.
-        schema:
-          type: string
-          enum: [facePass, faceTag]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The query's declared inputs (identity#subjectBiometricRecords); at least one of the two.
+              properties:
+                ids:
+                  type: array
+                  maxItems: 50
+                  description: The `pii.subject_biometric` rows asked for, by id; with `where`, the two narrow.
+                  items: { type: string, format: uuid }
+                where:
+                  type: object
+                  additionalProperties: true
+                  description: Or the rows whose columns equal these values (a key the asker holds, such as
+                    `subjectId`, `entitlementId` or `kind`); a field the row lacks is `400 validation`.
       responses:
         '200':
-          description: The rows found; an id with no visible row is absent.
+          description: The rows found, in camelCase; an id with no visible row is absent.
           content:
             application/json:
               schema:
@@ -520,7 +765,14 @@ paths:
                 items:
                   $ref: ../spine/access.yaml#/components/schemas/FacePassEnrolment
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: Neither `ids` nor `where` is given, or `where` names a field the row lacks (`validation`;
+            ADAM CR-438).
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '401':
           description: The calling workload's token is missing or invalid (`unauthenticated`).
           x-ticvai-problem-types:
@@ -768,7 +1020,17 @@ paths:
         `tenancy#recordDeviceSignIn` in the same transaction as the session, so each device bound to that workstation
         gets a `tenancy.device_audit` row of kind `access`, action `signIn`, which `listDeviceAuditRecords` returns.
 
+
+        **The session stores the grant it was opened through** (ADAM CR-513, Chinmay, 3 November 2026; CHG-CR513-001).
+        When the call opens a usable session directly because the principal holds one grant, it writes that grant''s id
+        into `identity.session.grant_id` (`SessionGrant`) and the session registry entry carries it beside the resolved
+        scope and permissions; `venue_id` and `working_venue_id` are written as now. Permissions stay resolved once,
+        here or at `selectRole`.
+
         '
+      x-ticvai-writes:
+      - table: identity.session
+        for: 'grant_id, the one grant a direct sign-in opens the session through (ADAM CR-513)'
       security: []
       requestBody:
         required: true
@@ -1598,6 +1860,37 @@ paths:
         `410 subject-erased` and nothing is raised: there is nothing left to export, and the tombstone is the record
         that the erasure was done.
 
+
+        **The venue the request is raised at** (ADAM CR-512, Chinmay, 3 November 2026; CHG-CR512-001). The call takes
+        the shared `X-Venue-Id` header (`GuestVenue`). When it is sent, the venue must be one of the tenant''s venues
+        (`404` otherwise) and, for a staff caller, inside the scope where they hold `GUEST_VIEW_PII` (`403`
+        otherwise). With no header, a staff caller''s venue is their session''s working venue. A guest with no header,
+        or a staff caller with no working venue, is refused `400 venue-required` and nothing is raised. The venue''s
+        path is read through `tenancy#scopeRecords`, and the `countryCode` of the region settings row at the nearest
+        ancestor of that path through `tenancy#regionSettingsRecords`, both in process. The request''s `scopePath` is
+        the venue''s path; `jurisdiction` on `identity.privacyRequestRaised` is that `countryCode`.
+
+
+        **One open export per guest** (CR-512). The call first looks in `identity.subject_data_export` for a row of
+        this subject that is `awaitingApproval` or `running`. If there is one, it answers `202` with that row''s id as
+        `requestId` and its `format`, and writes and emits nothing. If Approvals answers `409 openRequestExists`, it
+        answers the same way with the open request''s id.
+
+
+        **The call, in order** (CR-512). `404` and `410` as declared. Then the request is raised through
+        `IApprovalRequests` (`createApprovalRequest`, in process): kind `configurationChange`, `subjectContract`
+        `identity`, `subjectType` `subjectDataExport`, `subjectId` the guest''s `pii.subject` id, `scopePath`, a
+        one-line summary, and `requestedBySubjectId` for a guest or `requestedByPrincipalId` for staff. On `201` the
+        row is written `awaitingApproval` with the request''s id; on `422 no-approval-route` it is written `running`
+        with a new UUIDv7 as its id. In the same transaction the call emits `identity.privacyRequestRaised`
+        (`subjectId`, `approvalRequestId`, `requestType` `access`, `format`, `raisedByGuest`, `jurisdiction`,
+        `raisedAt`) and answers `202 {requestId, format, estimatedCompletionAt: null}`.
+
+
+        **The export job is not this operation''s** (CR-512): the job, the storage write, the delete and signed link,
+        and `createDsarRequest`, which the job calls, are the export job''s (`x-ticvai-jobs.subjectExport`, its own
+        ticket), which carries their rules.
+
         '
       x-ticvai-read-via:
       - query: access#liveEntitlementsForSubject
@@ -1606,6 +1899,18 @@ paths:
       - query: orders#openOrdersForSubject
         route: projection
         for: which orders the export reports as open
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the venue the request is raised at (X-Venue-Id, or a staff caller''s working venue), the
+          request''s scopePath (ADAM CR-512)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the countryCode of the region settings row at the nearest ancestor of the venue''s path, the event''s
+          jurisdiction (ADAM CR-512)'
+      x-ticvai-reads:
+      - table: identity.subject_data_export
+        for: 'an export of this subject already awaitingApproval or running, answered instead of a second one (ADAM
+          CR-512)'
       x-ticvai-writes:
       - table: identity.subject_data_export
         for: 'the export''s row, status awaitingApproval where a request was raised, else running (no matrix means it
@@ -1624,6 +1929,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       requestBody:
         required: false
         content:
@@ -1646,7 +1952,9 @@ paths:
           description: 'Export started, as an Approvals request (and, for a guest linked across cells, a
             cross-cell sync.dsar_request raised by `createDsarRequest`). The same shape
             `deleteGuestAccount` returns for an erasure request, so a guest''s two privacy requests read
-            alike.
+            alike. **Or an export of this guest already open** (ADAM CR-512): an `identity.subject_data_export`
+            row `awaitingApproval` or `running`, or the open request Approvals named with `409 openRequestExists`,
+            answered with its id and format; nothing is written or emitted.
 
             '
           content:
@@ -1675,9 +1983,26 @@ paths:
                     description: Null until a response period reaches Identity, as for `deleteGuestAccount`
                       (the periods are marketing-crm `setPrivacyRequestTypes` `deadlines[].responseDays`, which
                       Identity does not read).
+        '400':
+          description: 'No venue to raise the request at (ADAM CR-512): a guest sent no `X-Venue-Id`, or a staff caller
+            sent none and has no working venue (`venue-required`). Nothing is raised.'
+          x-ticvai-problem-types: [venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A staff caller named an `X-Venue-Id` outside the scope where they hold `GUEST_VIEW_PII` (ADAM
+            CR-512). Nothing is raised.'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           description: 'No such guest, or a guest caller naming a subject that is not its own (never 403, which would
-            confirm the subject exists). Nothing is raised (ADAM CR-101; CHG-R10ID-016).'
+            confirm the subject exists); or an `X-Venue-Id` that is not one of the tenant''s venues (ADAM CR-512).
+            Nothing is raised (ADAM CR-101; CHG-R10ID-016).'
           x-ticvai-problem-types: [not-found]
           content:
             application/problem+json:
@@ -1713,7 +2038,13 @@ paths:
 
 
         **Idempotent on the export id and the owner**: a redelivered event finds the part recorded and returns it.
-        Invoked by the event relay, never by a screen.'
+        Invoked by the event relay, never by a screen.
+
+
+        **The two NOT NULL columns the body did not carry** (r13 root R40, CHG-R13R40-001): the part''s `owner` is
+        the module that published the event, `marketing-crm` (this operation consumes only
+        `marketing.subjectDataPartWritten`), set by Identity, never sent; its `writtenAt` is the event''s `writtenAt`,
+        sent in the body.'
       tags:
       - identity
       x-ticvai-permission: null
@@ -1754,6 +2085,13 @@ paths:
                 rowCount:
                   type: integer
                   minimum: 0
+                writtenAt:
+                  type: string
+                  format: date-time
+                  description: 'The event''s `writtenAt`, when the owner wrote its part; stored as the part''s
+                    `writtenAt` (r13 root R40). **Required in fact**: a body without it is refused `400 validation`;
+                    the schema leaves it optional only so a client built at r1 still validates.'
+                  x-ticvai-stored-as: identity.subject_data_export_part.written_at
       responses:
         '200':
           headers:
@@ -2145,7 +2483,16 @@ paths:
         alone still works for a role held at one venue; for a role held at several, a body with no `grantId` is
         refused `422 grant-required`, and a `grantId` that is not the caller''s, or not of `roleId`, is `403`.
 
+
+        **The session stores the grant** (ADAM CR-513, Chinmay, 3 November 2026; CHG-CR513-001). The call writes the
+        chosen `grantId`, or the role''s only grant when the body sends `roleId` alone, into `identity.session.grant_id`
+        (`SessionGrant`); `venue_id` and `working_venue_id` are written as now. The session registry entry carries
+        `grantId` beside the resolved scope and permissions, which `getCurrentSession` answers from.
+
         '
+      x-ticvai-writes:
+      - table: identity.session
+        for: 'grant_id, the grant chosen (ADAM CR-513), with venue_id and working_venue_id as now'
       requestBody:
         required: true
         content:
@@ -2405,8 +2752,9 @@ paths:
           description: 'One problem type per cause (14 October 2026, CHG-CRD-001, ADAM CR-078; common.yaml `Problem`):
             `current-credential-wrong`, `currentCredential` does not match the stored hash (a 422, not a 401, because
             the session is valid and stays signed in; the attempt counts towards the lockout);
-            `policy-not-met`, the new credential fails the policy (a password: `minLength`, the breach check; a PIN:
-            not exactly `PasswordPolicy.pinLength` digits), with `errors[]` naming the rule;
+            `policy-not-met`, the new credential fails the policy (a password: `minLength`, the breach check, by the
+            rule on `PasswordPolicy.requireBreachCheck`, ADAM CR-514; a PIN: not exactly `PasswordPolicy.pinLength`
+            digits), with `errors[]` naming the rule (`requireBreachCheck` for a breached password);
             `credential-reused`, it matches the current one or one the policy keeps (a password: the previous
             `PasswordPolicy.reusePreventionCount`, 5 unless the tenant sets another, audit R132; a PIN:
             `PasswordPolicy.pinReusePrevention`). The server keeps a hash of each replaced credential in
@@ -2616,6 +2964,10 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the session''s workstation fields: code, regionId and devices (ADAM CR-096)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'Session.saleBoardId where the workstation stores none (sale_board null, saleBoardSource outlet): its
+          outlet''s sale_board_id (r13 root R39)'
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'currency, currencyScale and timezone, from the workstation''s region (ADAM CR-096)'
@@ -2640,7 +2992,26 @@ paths:
         problem with `pending`, a list of the steps still to do, in order, from `credentialChange`, `mfa`, `roleSelection`.
         `Session.roleId` stays required: no schema change. EMP-002''s context panel and POS-000''s background read treat the
         `409` as "not yet" and render once `selectRole` returns its `Session`. `LoginResponse.session` is present only
-        when no step is pending.'
+        when no step is pending.
+
+
+        **Answered from the session registry, filled once at sign-in** (ADAM CR-513, Chinmay, 3 November 2026;
+        CHG-CR513-001). `scope`, `effectivePermissions` and `permissionsByScope` come from the session registry entry
+        filled at sign-in or role selection; the read does not resolve grants again (docs/architecture/specs/permission-resolution.md,
+        R7 and section 6.2). On a registry miss the entry is rebuilt from `identity.session.grant_id` (`SessionGrant`),
+        the grant the session was opened through, with the same resolution, and stored. A revocation invalidates the
+        session through its event, so the next read is `401`; a rebuild that finds the stored grant revoked or expired
+        ends the session the same way and answers `401`. A session with `role_id` set and `grant_id` null (opened
+        before the column existed) answers `409 session-pending` with `pending` `[roleSelection]`, so the client shows
+        the role cards and the person picks again. `availableRoles` stays resolved on read.
+        `WorkstationContext.cellName` is filled from the host''s configuration key `Cell:Name` when it is set, and left
+        out when it is not. No wire shape changes.'
+      x-ticvai-reads:
+      - table: identity.session
+        for: 'grant_id, the grant the session was opened through, to rebuild a session registry entry that is missing
+          (ADAM CR-513)'
+      - table: identity.delegated_access
+        for: 'the stored grant, re-resolved only on a registry miss (ADAM CR-513)'
       responses:
         '200':
           description: Active session
@@ -2777,7 +3148,17 @@ paths:
         created without one signs in only through the tenant''s single sign-on until `resetPrincipalCredential` issues
         a credential.
 
+
+        **`initialCredential` is held to `setPasswordPolicy`, the breach check included** (ADAM CR-514, Chinmay, 3
+        November 2026; CHG-CR514-001): the same check as `changeOwnCredential`, by the rule on
+        `PasswordPolicy.requireBreachCheck` (after the length check, only for a password, only when the tenant''s
+        `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` with
+        `errors[]` naming the rule, and nothing is written.
+
         '
+      x-ticvai-reads:
+      - table: identity.password_policy
+        for: 'the tenant''s password rules initialCredential is held to: minLength and requireBreachCheck (ADAM CR-514)'
       tags:
       - administration
       x-ticvai-permission: USER_MANAGE
@@ -2813,6 +3194,15 @@ paths:
           x-ticvai-problem-types:
           - username-taken
           - segregation-breach
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`initialCredential` fails the tenant''s password policy (`policy-not-met`): shorter than
+            `minLength`, or found in the breached-password corpus (`errors[]` names `requireBreachCheck`; ADAM CR-514).
+            Nothing is written.'
+          x-ticvai-problem-types: [policy-not-met]
           content:
             application/problem+json:
               schema:
@@ -2880,6 +3270,12 @@ paths:
         null, which also lifts a lockout; the replaced hash goes to `identity.principal_credential_history`; and
         `Principal.mustChangeCredential` is set to true. A PIN must be `PasswordPolicy.pinLength` digits.
 
+        **A `password` reset is held to `setPasswordPolicy`, the breach check included** (ADAM CR-514, Chinmay, 3
+        November 2026; CHG-CR514-001): `temporaryCredential` with method `password` gets the same check as
+        `changeOwnCredential`, by the rule on `PasswordPolicy.requireBreachCheck` (after the length check, only when the
+        tenant''s `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` with
+        `errors[]` naming the rule, and nothing is written.
+
         **Publishes `identity.credentialResetRequested`** (kind `staffReset`) in the same transaction
         (29 September, build pass, group G2; ADR-0033): a reset is the step an account takeover takes before
         the sign-in that looks ordinary, and the risk engine reads it beside `identity.loginRecorded` (8.3.34).
@@ -2919,6 +3315,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '422':
+          description: 'A `password` `temporaryCredential` fails the tenant''s password policy (`policy-not-met`):
+            shorter than `minLength`, or found in the breached-password corpus (`errors[]` names `requireBreachCheck`;
+            ADAM CR-514). Nothing is written.'
+          x-ticvai-problem-types: [policy-not-met]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}:
@@ -2975,6 +3380,7 @@ paths:
         - "P09 ADM-020 Platform User Directory"
         - "P10 PTR-003 Profile & Company Details"
         - "P13 CMS-019 User Access"
+      x-ticvai-names-for-context: [platform.scope]
       x-ticvai-audience:
       - staff
       - partner
@@ -2997,6 +3403,15 @@ paths:
         policy is widened. A refusal by the function fails the whole update. Any other operation that must end
         all of a principal''s sessions calls the same function (`forceLogout` ends one session, at the caller''s
         own venue, and does not need it).
+
+
+        **The tenant root comes from what the check proved visible** (ADAM CR-483, Chinmay, 2 November 2026; option A
+        with option C''s guard; CHG-CR483-001). The function takes the root it switches to from the caller''s own tenant
+        path (a tenant-root caller) or else the first label of the principal''s home scope path, read in the same
+        statement as the check, never from `platform.scope`''s tenant row, which a venue grant cannot see. It confirms
+        the root is the tenant node once granted and raises `P0001` when it finds none, so a venue manager''s
+        deactivation ends the person''s sessions, and a gap can no longer answer 200 with nothing ended: a raised error is
+        a 500 for the call and nothing it wrote stays. This operation and `resetPrincipalCredential` call it unchanged.
 
 
         **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15,
@@ -3305,6 +3720,150 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /roles/{roleId}/permissions:
+    parameters:
+      - name: roleId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setRolePermissions
+      x-ticvai-consumed-by:
+        - "P08 BO-054 Role Assignment"
+      x-ticvai-reads:
+      - table: identity.role
+        for: 'the role, its parent (inherits_from_role_id) and the roles inheriting from it, Identity''s own (ADAM CR-525)'
+      - table: identity.role_permission
+        for: 'the permission rows of the role, its parent and its children, before and after the change (ADAM CR-525)'
+      - table: identity.segregation_rule
+        for: 'the segregation check on the role and every role inheriting from it (ADAM CR-079, CR-525)'
+      - table: identity.delegated_access
+        for: 'the principals holding a live grant of a role that lost a permission: role_id, effect ALLOW, not revoked,
+          valid_to empty or in the future (ADAM CR-525)'
+      x-ticvai-writes:
+      - table: identity.role
+        for: 'inherits_from_role_id, set or cleared in the same transaction (ADAM CR-525)'
+      - table: identity.role_permission
+        for: 'the whole set replaced: rows not sent go inactive, new rows are inserted (ADAM CR-525)'
+      - table: identity.session
+        for: 'every live session of a holder of a role that lost a permission, ended through
+          identity.end_principal_sessions (ADAM CR-525)'
+      - table: identity.refresh_token
+        for: 'the same holders'' live refresh tokens, revoked through identity.end_principal_sessions (ADAM CR-525)'
+      summary: What this role may do
+      description: >
+        POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found
+        `identity.role_permission` with one column** — and nothing wrote it.
+
+        A role that grants no permissions is not a role, and until now a venue could create one and
+        never give it anything.
+
+        **The whole set in one call.** A permission added one at a time leaves a role briefly
+        holding a combination nobody intended, and **a segregation-of-duties rule evaluated against
+        that intermediate state either fires wrongly or misses.**
+
+        **Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two
+        permissions in conflict — a venue told only *not allowed* will grant it another way.
+
+        **The role-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). Every rule is evaluated
+        against the role's own permissions (this body) united with those of `inheritsFromRoleId`, **whatever
+        the rule's `scopeSensitive`**: a role's permissions are granted together at one scope, so a pair
+        inside a role always overlaps. Only `severity: block` refuses, with `409 segregation-breach`
+        (`common.yaml`), the one type and status every segregation check answers with; `requireApproval`
+        and `warn` are accepted and surface when a grant attaches the role and in `listSegregationViolations`.
+        **A parent role's edit re-checks every role that inherits from it** (its own set united with the new
+        one); a breach there refuses this call too, naming the child role. Each change writes one
+        `platform.audit_record` row in the same transaction.
+
+        **No escalated permission** (decided 28 September, audit R197): a role's permission set has
+        no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing.
+        The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a
+        permission ends the live sessions of every principal holding the role at once** (audit
+        R126); an addition takes effect at their next sign-in.
+
+        **The checklist a preset filled stays editable here** (decided 2 October 2026, Chinmay, pre-apply
+        round: roles are preset permission configurations; DEC-007; CHG-CSP-003). A role started from the
+        Viewer preset is given more ticks with this call like any other role; the preset is not consulted
+        and not changed.
+
+        **Built in the Identity module, beside `createRole` and `updateRole`** (ADAM CR-525, Chinmay, 3 November
+        2026; CHG-CR525-001). Its path, body, answers and errors do not change; `ROLE_MANAGE` at the tenant root, as
+        now. (1) Its reads are Identity's own: the role, its permission rows, the segregation rules and the roles
+        inheriting from it. (2) Permissions: the role's whole set is replaced (rows not sent go inactive, new rows are
+        inserted); the segregation check runs on the role's own permissions together with its parent's, and on every
+        role inheriting from it, answering `409 segregation-breach` as now. (3) `inheritsFromRoleId` is written to
+        `identity.role.inherits_from_role_id` in the same transaction; null clears it. It answers `400 validation`
+        naming `inheritsFromRoleId`, and writes nothing, when it is the role itself, is not a role of the tenant,
+        names a role that itself inherits from another, or when roles already inherit from this one; the depth-of-one
+        rule also rules out cycles. (4) Sessions: each affected role's permissions, own plus parent, are compared
+        before and after the change; the affected roles are this role and every role inheriting from it, and a changed
+        or cleared parent counts. Where any role lost a permission, every principal holding a live grant of that role
+        (`identity.delegated_access` with that `role_id`, effect `ALLOW`, not revoked, `valid_to` empty or in the
+        future) has its sessions ended by `identity.end_principal_sessions(principalId, the caller's principal id,
+        'role-permissions-changed')` in the same transaction, as `resetPrincipalCredential` does; if the function
+        refuses, the whole call fails and nothing is written. A change that only adds permissions ends no session.
+        (5) One `platform.audit_record` row per change, as now. (6) Its tables: `identity.role`,
+        `identity.role_permission`, `identity.segregation_rule`, `identity.delegated_access` (read), `identity.session`
+        and `identity.refresh_token` (through the function), and `platform.audit_record`. Tenancy no longer writes
+        `identity.role_permission`.
+      tags: [identity]
+      x-ticvai-permission: ROLE_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permissions]
+              properties:
+                permissions:
+                  type: array
+                  items: { $ref: '../shared/permissions.yaml#/components/schemas/Permission' }
+                inheritsFromRoleId: { type: string, format: uuid, nullable: true }
+      responses:
+        '200':
+          description: >
+            Set. The role's whole permission set as it now stands — the body echoed back after the
+            replace, so a screen can redraw the checklist without a second read.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [roleId, permissions]
+                properties:
+                  roleId: { type: string, format: uuid }
+                  permissions:
+                    type: array
+                    items: { $ref: '../shared/permissions.yaml#/components/schemas/Permission' }
+                  inheritsFromRoleId: { type: string, format: uuid, nullable: true }
+          headers:
+            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
+        '400':
+          description: >
+            `inheritsFromRoleId` is the role itself, is not a role of the tenant, names a role that itself inherits
+            from another, or roles already inherit from this one (`validation`, `errors[]` naming
+            `inheritsFromRoleId`; ADAM CR-525). Nothing is written.
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: >
+            **Breaches a segregation rule** whose severity is `block`, in this role or in a role inheriting
+            it (`segregation-breach`). Names the rule, both permissions and the role where they meet.
+          x-ticvai-problem-types: [segregation-breach]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delegated-access:
     get:
       operationId: listDelegatedAccess
@@ -3365,6 +3924,7 @@ paths:
       operationId: createDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+        - "P13 CMS-019 User Access"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
         route: in-process
@@ -3453,6 +4013,7 @@ paths:
       operationId: deleteDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+        - "P13 CMS-019 User Access"
       x-ticvai-audience:
       - staff
       - partner
@@ -4486,6 +5047,14 @@ paths:
         zeros for a subject with nothing left, so a retry or a sweep only repeats what is safe. Neither this
         request nor its `202` waits for the AI erasure.
 
+
+        **The venue the request is raised at, by `exportSubjectData`'s rule** (ADAM CR-512, Chinmay, 3 November 2026;
+        CHG-CR512-001). The call takes the shared `X-Venue-Id` header (`GuestVenue`): the venue must be one of the
+        tenant's venues (`404` otherwise); with no header the guest is refused `400 venue-required` and nothing is
+        raised. The venue's path (`tenancy#scopeRecords`) is the request's `scopePath`, and the `countryCode` of the
+        region settings row at the nearest ancestor of that path (`tenancy#regionSettingsRecords`), both read in
+        process, is `jurisdiction` on `identity.privacyRequestRaised`.
+
       x-ticvai-read-via:
       - query: access#liveEntitlementsForSubject
         route: projection
@@ -4493,6 +5062,13 @@ paths:
       - query: orders#openOrdersForSubject
         route: projection
         for: 409 open-orders-remain (and the erasure job's re-check)
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the X-Venue-Id venue, the erasure request''s scopePath (ADAM CR-512)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the countryCode of the region settings row at the nearest ancestor of the venue''s path, the event''s
+          jurisdiction (ADAM CR-512)'
       x-ticvai-writes:
       - table: identity.subject_data_export
         for: 'the erasure job deletes the guest''s data exports and their files (ADAM CR-101, CHG-R10ID-016)'
@@ -4509,6 +5085,7 @@ paths:
       - guestAuth: []
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '202':
           headers:
@@ -4548,6 +5125,21 @@ paths:
             `identity.subject_holding`, never from the orders or access tables; `detail` names the order or
             entitlement ids that block.
           x-ticvai-problem-types: [open-orders-remain, live-entitlement-remains]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '400':
+          description: 'No `X-Venue-Id`, so no venue to raise the request at (`venue-required`; ADAM CR-512). Nothing is
+            raised.'
+          x-ticvai-problem-types: [venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          description: 'The `X-Venue-Id` is not one of the tenant''s venues (ADAM CR-512). Nothing is raised.'
+          x-ticvai-problem-types: [not-found]
           content:
             application/problem+json:
               schema:
@@ -4974,7 +5566,30 @@ paths:
         other kind is refused `422`; enrolling while no venue has the setting on is refused `403`
         `guest-two-step-disabled`.
 
+
+        **The MFA values** (ADAM CR-522, Chinmay, 3 November 2026: the MFA values follow the authenticator standard,
+        and a code the server sends goes by an outbox event like the guest''s; CHG-CR522-001). (1) Authenticator codes (`totp`), RFC 6238:
+        HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose
+        step is not later than the last step accepted for that method is refused (that step is kept in the distributed
+        cache for two minutes), so each code works once. The
+        secret is 20 random bytes, base32 without padding, returned once in `MfaEnrolment.secret` and stored
+        field-encrypted in `mfa_method.secret`; `qrCodeUri` is
+        `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`, where
+        `issuer` is the tenant''s display name and `account` the principal''s username or the guest''s email, each
+        URL-encoded. (2) Recovery codes: ten, each 10 characters of Crockford base32, shown as five characters, a
+        hyphen, five characters. Every `enrolMfaMethod` of any kind issues a new set and replaces the earlier one, as
+        `MfaRecoveryCode` says; they are stored as PHC hashes. (3) A pending enrolment lapses 10 minutes after this
+        call; `pendingExpiresAt` and `MfaEnrolment.expiresAt` are that time. (4) An `emailOtp` code (this enrol
+        challenge, or a sign-in or step-up challenge, for staff, partners and guests) is 6 random digits, valid 10
+        minutes (`mfa_challenge.expires_at`), stored as its PHC hash; five wrong codes void it, as now. (5) The
+        carrier: for `emailOtp` this call writes `identity.mfaCodeIssued` v1 to the outbox in the same transaction as
+        the `mfa_challenge` row, with `destination` and `code` field-encrypted through `IFieldEncryption`, never in
+        clear. Marketing sends it through the tenant''s email provider; until that consumer is on dev, Identity''s
+        delivery seam records only that a code was issued, never the code.
+
         '
+      x-ticvai-emits:
+      - identity.mfaCodeIssued
       tags:
       - mfa
       x-ticvai-permission: null
@@ -5069,6 +5684,14 @@ paths:
 
         '
       summary: Complete enrolment
+      description: '**Authenticator codes (`totp`) follow RFC 6238** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001):
+        HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose
+        step is not later than the last step accepted for that method is refused (that step is kept in the distributed
+        cache for two minutes), so each code works once. An `emailOtp` enrolment code is 6 digits, valid 10 minutes. The
+        pending enrolment lapses 10 minutes after `enrolMfaMethod` (`pendingExpiresAt`); a code after that completes
+        nothing.
+
+        '
       tags:
       - mfa
       x-ticvai-permission: null
@@ -5089,7 +5712,12 @@ paths:
               properties:
                 code:
                   type: string
+                  x-ticvai-persisted: false
+                  description: The first code from the method being enrolled, compared with the pending method's
+                    secret (or the code sent to its destination) and never stored (r13 gate, CHG-R13BO-002).
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -5144,7 +5772,8 @@ paths:
       description: 'Refused where it is the only active method and the principal holds a permission listed
         in `PasswordPolicy.mfaRequiredForPermissions` (MFA is required by permission, not by role —
         decided 28 September, audit R135). Removing the last factor from an account that must have one is
-        not a choice the account holder gets to make.
+        not a choice the account holder gets to make. **The `409` keeps its declared type,
+        `last-required-mfa-method`** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001).
 
         '
       tags:
@@ -5157,6 +5786,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '204':
           headers:
             X-Consistency-Token:
@@ -5251,7 +5882,19 @@ paths:
         A session that authenticated hours ago is not the same as a person present at the keyboard now,
         and for those actions the difference matters.
 
+
+        **An `emailOtp` code, and how it reaches the person** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001).
+        For a sign-in or step-up challenge on `emailOtp`, for staff, partners and guests: 6 random digits, valid 10
+        minutes (`mfa_challenge.expires_at`), stored as its PHC hash; five wrong codes void it, as now. The call writes
+        `identity.mfaCodeIssued` v1 to the outbox in the same transaction as the `mfa_challenge` row (`challengeId`,
+        `principalId` or `subjectId`, `action`, `locale`, `expiresAt`, and `destination` and `code` field-encrypted
+        through `IFieldEncryption`, never in clear). Marketing sends it through the tenant''s email provider; until
+        that consumer is on dev, Identity''s delivery seam records only that a code was issued, never the code. A
+        `totp` challenge sends nothing (`enrolMfaMethod` states the authenticator values).
+
         '
+      x-ticvai-emits:
+      - identity.mfaCodeIssued
       tags:
       - mfa
       x-ticvai-permission: null
@@ -5422,7 +6065,19 @@ paths:
         operation looks on the caller''s own session for an `identity.mfa_challenge` row with that action, status
         `verified` and no `consumedAt`, and sets `consumedAt` in its own transaction. With no such row it answers
         `403 step-up-token-missing`; when the newest one is older than 5 minutes it answers `403
-        step-up-token-expired`; nothing is written in either case.
+        step-up-token-expired`; nothing is written in either case. **The look-up and the consume are Identity''s
+        in-process step-up check, `consumeMfaStepUp`** (ADAM CR-509, Chinmay, 3 November 2026; CHG-CR509-001): every
+        operation that demands an MFA step-up on a tenant session uses the same check, called before any other write
+        in its own transaction, so a later refusal rolls the consume back. A platform caller''s step-up is still read
+        from the Control Plane token, never from a tenant MFA challenge row (ADR-0072 point 4; CHG-R13ID-001).
+
+
+        **Authenticator codes (`totp`) follow RFC 6238** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001):
+        HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose
+        step is not later than the last step accepted for that method is refused (that step is kept in the distributed
+        cache for two minutes), so each code works once. An `emailOtp` code is 6 digits, valid 10 minutes (`mfa_challenge.expires_at`); five wrong codes
+        void the challenge, as now. **A recovery code** (ten per enrolment, `MfaRecoveryCode`) is accepted
+        case-insensitively, with or without its hyphen, and works once.
 
         '
       tags:
@@ -5446,6 +6101,8 @@ paths:
                 code:
                   type: string
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -6727,7 +7384,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
-          description: '`forbidden` as the shared answer says; or the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          description: '`forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read from the caller''s Control Plane token, never from a tenant session or a tenant MFA challenge row. `step-up-token-missing` when the token''s `ticvai_step_up` is absent, its `action` does not name this operation, or `amr` does not include `mfa`; `step-up-token-expired` when `ticvai_step_up.at` is more than 5 minutes old. Nothing is written.'
           x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
@@ -8353,7 +9010,7 @@ paths:
       operationId: getSessionVenue
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'the names of the venues the session may act at, and that each is active: platform.scope, Tenancy''s data'
       x-ticvai-self-service: true
       x-ticvai-audience:
@@ -8414,7 +9071,7 @@ paths:
       x-ticvai-singleton-note: 'One per session, the caller''s own: a PUT replaces it. There is no key in the path.'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'the chosen venue must be an active venue the session''s grants reach: platform.scope, Tenancy''s data'
       x-ticvai-self-service: true
       x-ticvai-audience:
@@ -10023,7 +10680,10 @@ components:
         returned after enrolment: `enrolMfaMethod` returns the codes once (`MfaEnrolment.recoveryCodes`) and writes
         their hashes here, replacing any earlier set; `verifyMfaChallenge` accepts one in place of a code, and sets its
         `usedAt`. A code that can be re-read is a second password (`handoff/schema-storage-only.md`). A guest''s codes
-        are stored the same way, against `subjectId` (R8 blocker IDENTITY-C12, CHG-R8MIG-007).'
+        are stored the same way, against `subjectId` (R8 blocker IDENTITY-C12, CHG-R8MIG-007). **Ten per enrolment,
+        each 10 characters of Crockford base32 shown as five, a hyphen, five; every `enrolMfaMethod` of any kind issues
+        a new set and replaces the earlier one; accepted case-insensitively, with or without the hyphen, once** (ADAM
+        CR-522, Chinmay, 3 November 2026; CHG-CR522-001).'
       x-ticvai-exactly-one-of: [[principalId, subjectId]]
       x-ticvai-rls: own-row
       required: [codeHash, issuedAt]
@@ -11050,6 +11710,25 @@ components:
             time. The client may still name a vendor under R117, which would be a second adapter behind the same
             interface (handoff/integration-register.md row 20).
 
+
+            **The corpus, the adapter and the check** (ADAM CR-514, Chinmay, 3 November 2026; CHG-CR514-001). The
+            corpus is the Pwned Passwords SHA-1 range dataset, read from a configured directory. (1) Layout: one text
+            file per five-character hex prefix, `00000.txt` to `FFFFF.txt`, upper case; each line is `SUFFIX:COUNT`,
+            where `SUFFIX` is the remaining 35 upper-case hex characters of the SHA-1, sorted. (2) Adapter:
+            `CheckPasswordBreachedAsync(prefix)` opens `{Identity:BreachCorpusPath}/{prefix}.txt` and returns its
+            (suffix, count) pairs; nothing else reads the files, and nothing leaves the host. (3) The check: take the
+            SHA-1 of the UTF-8 password as upper-case hex and split it into prefix and suffix; if the suffix is
+            present with any count, refuse `422 policy-not-met` with `errors[]` naming `requireBreachCheck`. It runs
+            only for a password, only when this is true (the default), after the length check. The password, its hash
+            and the prefix are never logged. (4) Startup: when `Identity:BreachCorpusPath` is unset, or the directory
+            does not hold `00000.txt` and `FFFFF.txt`, Identity''s host fails its readiness check and does not start;
+            there is no run-time bypass, because the check has no outage mode. Development and tests use a small
+            fixture directory in the same layout. (5) The same check runs in `createPrincipal` (`initialCredential`)
+            and `resetPrincipalCredential` (`temporaryCredential` with method `password`); both are held to
+            `setPasswordPolicy`. (6) The data ships separately: a setup task downloads the dataset for each release,
+            records its version and licence terms, checks that all 1,048,576 files are present, and mounts them
+            read-only at the configured path on Identity''s hosts in every region, as a volume, not inside the image.
+
             '
         maxAgeDays:
           type: integer
@@ -11937,7 +12616,8 @@ components:
           description: The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other
             kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for
             (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which
-            `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code.
+            `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code. **20 random bytes,
+            base32 without padding** (ADAM CR-522, RFC 6238; CHG-CR522-001), stored field-encrypted.
         destination:
           type: string
           nullable: true
@@ -11950,7 +12630,8 @@ components:
           format: date-time
           nullable: true
           writeOnly: true
-          description: While `isActive` is false, when the unconfirmed enrolment lapses; null once verified.
+          description: While `isActive` is false, when the unconfirmed enrolment lapses; null once verified. **10
+            minutes after `enrolMfaMethod`** (ADAM CR-522, CHG-CR522-001), the same time as `MfaEnrolment.expiresAt`.
         kind:
           $ref: '#/components/schemas/MfaKind'
         label:
@@ -11996,22 +12677,31 @@ components:
         secret:
           type: string
           nullable: true
-          description: TOTP shared secret. Returned once, at enrolment, and never again.
+          description: 'TOTP shared secret. Returned once, at enrolment, and never again. **20 random bytes, base32
+            without padding** (ADAM CR-522, RFC 6238; CHG-CR522-001), stored field-encrypted in `mfa_method.secret`.'
         qrCodeUri:
           type: string
           nullable: true
+          description: '`otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`,
+            where `issuer` is the tenant''s display name and `account` is the principal''s username or the guest''s
+            email, each URL-encoded (ADAM CR-522; CHG-CR522-001). Null for kinds other than `totp`.'
         recoveryCodes:
           type: array
           description: 'Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed,
             to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not
-            return them.
+            return them. **Ten codes, each 10 characters of Crockford base32, shown as five characters, a hyphen,
+            five characters** (ADAM CR-522; CHG-CR522-001); every `enrolMfaMethod` of any kind issues a new set and
+            replaces the earlier one.
 
             '
           items:
             type: string
+            pattern: '^[0-9A-HJKMNP-TV-Z]{5}-[0-9A-HJKMNP-TV-Z]{5}$'
         expiresAt:
           type: string
           format: date-time
+          description: When the pending enrolment lapses, 10 minutes after `enrolMfaMethod` (`pendingExpiresAt`; ADAM
+            CR-522, CHG-CR522-001).
     SessionStatus:
       type: string
       description: >
@@ -13058,7 +13748,9 @@ components:
           description: 'The cell this workstation''s region is served from, which is the cell the commerce host
             answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it
             from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for
-            diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.
+            diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the
+            host''s configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513,
+            CHG-CR513-001); optional, for diagnostics only.
 
             '
         deploymentProfile:
@@ -13080,6 +13772,45 @@ components:
             many digits; the device keeps it with the workstation context of the last session on it, so the door
             needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the
             server decides. Read from `identity.password_policy`, not stored on the workstation.'
+    PrincipalVerifiedEmail:
+      type: object
+      x-ticvai-persistence: identity.principal
+      description: >-
+        **A principal's verified email** (ADAM CR-536, Chinmay, 3 November 2026; CHG-CR536-001). One column of the
+        principal record, `email`: nullable, set only once verified, and never taken from `username`. public-api tells
+        a partner caller signed in through the tenant's login from tenant staff by it: the principal acts for the
+        developer account whose active `control.developer_member` has that email, and with no match it has no
+        developer account. **Never returned by any operation**.
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+          nullable: true
+          readOnly: true
+          x-ticvai-column: email
+          description: The principal's email, once verified; null until then. Never copied from `username`.
+    SessionGrant:
+      type: object
+      x-ticvai-persistence: identity.session
+      description: >-
+        **The grant a staff session was opened through** (ADAM CR-513, Chinmay, 3 November 2026; CHG-CR513-001). One
+        column of the session record, `grant_id`. **Never returned by any operation**: no wire shape changes. `login`
+        (#30674) writes it when it opens a usable session directly because the principal holds one grant;
+        `selectRole` (#30715) writes the chosen `grantId`, or the role's only grant when the body sends `roleId`
+        alone. The session registry entry carries the same `grantId` beside the resolved scope and permissions, and
+        `getCurrentSession` rebuilds a missing entry from it. Null on a session opened before the column existed,
+        which `getCurrentSession` answers `409 session-pending` with `pending` `[roleSelection]`.
+      properties:
+        grantId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-column: grant_id
+          x-ticvai-references: identity.delegated_access
+          description: The `identity.delegated_access` row the session's role was chosen through; null until a role is
+            chosen, and on sessions opened before 3 November 2026.
     SessionVenue:
       type: object
       x-ticvai-persistence: identity.session

@@ -1,5 +1,5 @@
 id: LLD-subscription
-title: subscription — 156 operations
+title: subscription — 157 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -735,7 +735,21 @@ operations:
   - control.licence_add_on
   - control.licence_add_on_limit
   - control.plan
+  - control.plan_limit
+  - control.plan_module
   - control.tenant
+  writes: []
+- operation: getTenantRequestLimits
+  verb: GET
+  path: /internal/tenant-request-limits
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - control.contract
+  - control.plan
   writes: []
 - operation: getUsageMetering
   verb: GET
@@ -1764,6 +1778,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.contract
   - control.licence_add_on
   - control.licence_add_on_limit
   - control.plan_limit
@@ -2326,7 +2341,12 @@ operations:
   reads:
   - cache:idempotency
   - control.contract
+  - control.licence_add_on
+  - control.licence_add_on_limit
   - control.plan
+  - control.plan_limit
+  - control.plan_module
+  - control.tenant
   writes:
   - cache:idempotency
   - control.contract

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1663 |
-| Operations | 1894 |
+| Operations | 1899 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
-| Operations with no screen | 212 |
-| Waves | wave1 148 · wave2 55 · wave3 1460 |
+| Operations with no screen | 208 |
+| Waves | wave1 150 · wave2 55 · wave3 1458 |
 
 ## Gaps
 
-### 212 operations with no screen here
+### 208 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -51,16 +51,16 @@
 | `checkProductSalePermission` | catalogue | POST | Would this seller, here, be allowed to sell these products |
 | `getBundleSigningKeys` | catalogue | GET | The public keys a till verifies catalogue bundles with |
 | `getEventChangeTreatmentPolicy` | catalogue | GET | What happens to tickets, reservations and guests when an event changes, by default |
-| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `getProductChannelTexts` | catalogue | GET | The product's texts per sales channel, in each of the tenant's languages |
 | `getProductDashboard` | catalogue | GET | The products dashboard's counts |
 | `getProductOwnerForms` | catalogue | GET | Which form a sale of this product asks the buyer, and which it asks each ticket owner |
 | `getProductSalePermissionRules` | catalogue | GET | Who can sell this product |
 | `getWaitingRoomStatus` | catalogue | GET | A performance's waiting room, its setting and how it is moving |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
-| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| … | | | 172 more |
+| `listOwnerFormCandidates` | catalogue | GET | The forms a product can link for its reservation owner or ticket owner |
+| `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
+| … | | | 168 more |
 
 ### 14 modules split across waves
 
@@ -328,7 +328,7 @@
 | `ADM-255` | Workflow Analytics & Process Performance | Platform | 3 | 1 | yes |
 | `ADM-256` | Process Optimization & Automation Opportunity Center | Platform | 3 | 1 | yes |
 | `ADM-257` | AI Workflow Intelligence & Autonomous Governance Center | Platform | 3 | 1 | yes |
-| `ADM-258` | Sales Channel Command Center | Commercial | 3 | 3 | yes |
+| `ADM-258` | Sales Channel Command Center | Commercial | 3 | 1 | yes |
 | `ADM-259` | Channel Creation & Profile Configuration | Commercial | 3 | 1 | yes |
 | `ADM-260` | Product & Catalogue Assignment | Commercial | 3 | 1 | yes |
 | `ADM-261` | Channel Pricing & Commercial Profile Assignment | Commercial | 3 | 1 | yes |
@@ -338,7 +338,7 @@
 | `ADM-265` | Channel Sales Rules, Limits & Restrictions | Commercial | 3 | 2 | yes |
 | `ADM-266` | Channel Fees, Payment & Fulfillment Configuration | Commercial | 3 | 1 | yes |
 | `ADM-267` | Channel Publication, Readiness & AI Validation | Commercial | 3 | 1 | yes |
-| `ADM-268` | Channel Operations Command Center | Commercial | 3 | 2 | yes |
+| `ADM-268` | Channel Operations Command Center | Commercial | 3 | 1 | yes |
 | `ADM-269` | Channel Connection & Integration Manager | Commercial | 3 | 3 | yes |
 | `ADM-270` | Product, Price & Availability Synchronization | Commercial | 3 | 2 | yes |
 | `ADM-271` | Real-Time Channel Availability & Inventory Monitor | Commercial | 3 | 2 | yes |
@@ -590,7 +590,7 @@
 | `BO-012` | Membership Products | Sell | 1 | 13 | yes |
 | `BO-013` | Channel & Distribution | Sell | 1 | 10 | yes |
 | `BO-014` | Catalogue Publishing | Sell | 1 | 5 | yes |
-| `BO-015` | Performance Calendar | Sell | 1 | 11 | yes |
+| `BO-015` | Performance Calendar | Sell | 1 | 12 | yes |
 | `BO-016` | Performance Template | Sell | 1 | 2 | yes |
 | `BO-017` | Capacity Management | Sell | 1 | 8 | yes |
 | `BO-018` | Allocation & Holds | Sell | 2 | 2 | yes |
@@ -765,7 +765,7 @@
 | `BO-1079` | Immutable Seat Audit Logs | Access & Venue | 3 | 1 | yes |
 | `BO-108` | Venue Operations | Venue Operations | 1 | 4 | yes |
 | `BO-1080` | Integration Approval & Compliance | Access & Venue | 3 | 1 | yes |
-| `BO-1081` | Finance Dashboard | Orders & Money | 3 | 6 | yes |
+| `BO-1081` | Finance Dashboard | Orders & Money | 3 | 4 | yes |
 | `BO-1082` | Admissions Revenue | Orders & Money | 3 | 2 | yes |
 | `BO-1083` | Wallet Command Center | Orders & Money | 3 | 2 | yes |
 | `BO-1084` | Wallet Type Library | Orders & Money | 3 | 2 | yes |
@@ -896,7 +896,7 @@
 | `BO-125` | Product & Category Button Configuration | Sell | 2 | 2 | yes |
 | `BO-126` | Deployment, Preview & Audit | Sell | 2 | 5 | yes |
 | `BO-128` | Live Workstation Health Monitor | Venue Operations | 2 | 2 | yes |
-| `BO-129` | Software, Configuration & Version Management | Venue Operations | 1 | 10 | yes |
+| `BO-129` | Software, Configuration & Version Management | Venue Operations | 1 | 11 | yes |
 | `BO-130` | Offline Policy & Rules Configuration | Venue Operations | 1 | 4 | yes |
 | `BO-131` | Connectivity & Auto-Switch Settings | Venue Operations | 2 | 1 | yes |
 | `BO-132` | Offline Transaction Monitor & Sync Queue | Venue Operations | 2 | 2 | yes |
@@ -1051,11 +1051,11 @@
 | `BO-281` | Group Amendments, Cancellation & Refund Operations | Sell | 3 | 4 | yes |
 | `BO-282` | Group Booking Reconciliation, Closure & Performance | Sell | 3 | 1 | yes |
 | `BO-283` | Group Sales Analytics & AI Intelligence Center | Sell | 3 | 2 | yes |
-| `BO-284` | Membership & Annual Pass Command Center | Sell | 3 | 4 | yes |
+| `BO-284` | Membership & Annual Pass Command Center | Sell | 1 | 4 | yes |
 | `BO-285` | Membership Product & Tier Builder | Sell | 3 | 2 | yes |
 | `BO-286` | Membership Eligibility & Qualification Rule Builder | Sell | 3 | 1 | yes |
 | `BO-287` | Validity, Activation & Expiry Configuration | Sell | 3 | 1 | yes |
-| `BO-288` | Membership Entitlement & Admission Benefit Builder | Sell | 3 | 5 | yes |
+| `BO-288` | Membership Entitlement & Admission Benefit Builder | Sell | 1 | 8 | yes |
 | `BO-289` | Membership Usage, Visit & Consumption Rules | Sell | 3 | 4 | yes |
 | `BO-290` | Family, Household & Dependent Membership Configuration | Sell | 3 | 1 | yes |
 | `BO-291` | Membership Commercial, Pricing & Channel Association | Sell | 3 | 7 | yes |
@@ -1383,7 +1383,7 @@
 | `BO-615` | Accreditation Command Center | Access & Venue | 3 | 5 | yes |
 | `BO-616` | Accreditation Application Directory | Access & Venue | 3 | 2 | yes |
 | `BO-617` | New Accreditation Application | Access & Venue | 3 | 3 | yes |
-| `BO-618` | Accreditation Form Builder | Access & Venue | 1 | 5 | yes |
+| `BO-618` | Accreditation Form Builder | Access & Venue | 1 | 4 | yes |
 | `BO-619` | Accreditation Category Management | Access & Venue | 3 | 2 | yes |
 | `BO-620` | Accreditation Program Setup | Access & Venue | 3 | 4 | yes |
 | `BO-621` | Applicant Type Configuration | Access & Venue | 3 | 1 | yes |
@@ -1718,7 +1718,7 @@
 | `BO-951` | Resource Integration & System Health Center | Rentals | 3 | 1 | yes |
 | `BO-952` | Executive Resource Intelligence & AI Improvement Center | Rentals | 3 | 1 | yes |
 | `BO-953` | Seat Map Command Center | Access & Venue | 3 | 2 | yes |
-| `BO-954` | Venue Canvas | Access & Venue | 3 | 4 | yes |
+| `BO-954` | Venue Canvas | Access & Venue | 3 | 3 | yes |
 | `BO-955` | Sections & Zones | Access & Venue | 3 | 5 | yes |
 | `BO-956` | Rows & Seats | Access & Venue | 3 | 3 | yes |
 | `BO-957` | Standing Zones | Access & Venue | 3 | 2 | yes |

@@ -292,8 +292,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Mixed Tender Rule & Combination Builder\t93 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which methods may combine in one transaction and in what order; stored value before card.
 
 **Known correction pending (do not draw the wrong version)**
@@ -432,7 +430,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Split Payment & Tender Allocation Manager\t94 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How an order total is split across tenders and in what sequence (stored value before card).
 
@@ -580,7 +578,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **B2B Credit Account & Limit Manager\t95 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either … Removed 29 October 2026 (CHG-R11FXU-004): the approved screen has no list, table or picker that shows the accounts (its body is seven pack select fields for the facility being opened), and the lead's …
+**Known gaps.** Removed 29 October 2026 (CHG-R11FXU-004): the approved screen has no list, table or picker that shows the accounts (its body is seven pack select fields for the facility being opened), and the lead's …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** On-account credit facilities for B2B customers: limits and exposure.
 
@@ -700,7 +698,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `accountId` (navigation) |
 | Route | `/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603` |
 
-**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. **Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with `setB2bPaymentTerms` for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout has no save control; until the client approves one (docs/active/approved-ui-changes.yaml), the save control is a pending client-approval item, and the ticket builds the bound fields and the call. `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment policy panel the pack names, which this layout does not draw (a gap, not built in Block A).
+**What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. **Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with `setB2bPaymentTerms` for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout has no save control. No client approval of one is pending: under the lead's rule of 28 October 2026 the developer adds a Save that sends `setB2bPaymentTerms` and logs a "Design change:" CR in ADAM (r13, CHG-RCR34-001). `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment policy panel the pack names, which this layout does not draw (a gap, not built in Block A).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How an approved B2B customer may buy without paying in full: credit limit, payment terms, billing cycle, purchase order, deposit (the client gave 20 to 30% upfront for schools and corporates), when the balance is due, and what happens at the limit. What happens at the limit is the decision, not the limit; most venues want "allow with override" behind an approval. The same screen holds which products may be paid in instalments.
 
@@ -990,7 +988,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Minimum card amount, Credit restriction, Voucher exclusivity. Each needs an operation, or needs removing … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Minimum card amount, Credit restriction, Voucher exclusivity. Each needs an operation, or needs removing …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Transaction-level payment rules beyond method availability: sequence and restrictions.
 
@@ -1133,8 +1131,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/commercial/partial-payment-failure-recovery-manager-t100-adm-606` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … **Partial Payment, Failure & Recovery Manager\t100 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When some tenders succeed and one fails; and recurring charges that fail (dunning), a different axis from gateway retry.
 
@@ -1393,7 +1389,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Require card for excess, Request approval, Reject B2B credit, Reduce credit allocation. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: Require card for excess, Request approval, Reject B2B credit, Reduce credit allocation. Each needs an …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Test tender combinations and see credit exposure before activating rules.
 

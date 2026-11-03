@@ -5677,7 +5677,7 @@ screens:
       why: >-
         Bulk-attach residue; role permissions are tenant identity administration and have nothing to do with maintenance
         plans.
-      source: screens/P08-venue-back-office.yaml#BO-071 | contracts/spine/tenancy.yaml#setRolePermissions
+      source: screens/P08-venue-back-office.yaml#BO-071 | contracts/spine/identity.yaml#setRolePermissions
       status: fixed
       by: CHG-WIR-001
     - what: Only createMaintenancePlan is bound; no edit or suspend

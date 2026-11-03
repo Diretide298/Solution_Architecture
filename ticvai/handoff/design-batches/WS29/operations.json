@@ -99,6 +99,30 @@
   "requestBody": null,
   "responds": "MembershipProductValidationApprovalPublicationVersioView"
  },
+ "getPlanBenefits": {
+  "method": "GET",
+  "path": "/entitlement-templates/{templateId}/benefits",
+  "contract": "catalogue",
+  "summary": "Which benefits a plan grants, and how much of each",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "templateId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CataloguePlanBenefit"
+ },
  "listEntitlementTemplates": {
   "method": "GET",
   "path": "/entitlement-templates",
@@ -165,6 +189,30 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listMembershipBenefits": {
+  "method": "GET",
+  "path": "/membership-benefits",
+  "contract": "catalogue",
+  "summary": "Benefits a plan can grant",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueMembershipBenefit"
  },
  "listMembershipCommercialPricing": {
   "method": "GET",

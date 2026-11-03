@@ -575,9 +575,9 @@
     "description": "**The ISO 4217 currency of the plan's `basePrice` and every `overageUnitPrice` of its limits** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
    },
    "code": {
-    "x-ticvai-unique": "tenant",
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "description": "**One code per plan** (ADAM CR-510, Chinmay, 3 November 2026): every version of a plan has the plan's code, compared ignoring case (`createPlanVersion` refuses another, 400 `plan-code-changed`), and `control.plan` is unique on (`lower(code)`, `version`), so a code another plan holds collides at version `1` (409 `duplicate-code`)."
    },
    "name": {
     "type": "string",
@@ -593,6 +593,14 @@
    "licensedModules": {
     "type": "array",
     "minItems": 1,
+    "x-ticvai-unique-together": [
+     [
+      "plan_id",
+      "plan_version",
+      "licensed_module"
+     ]
+    ],
+    "x-ticvai-unique-compare": "exact",
     "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
     "items": {
      "$ref": "#/components/schemas/subscription::ModuleKey"
@@ -600,6 +608,14 @@
    },
    "limits": {
     "type": "array",
+    "x-ticvai-unique-together": [
+     [
+      "plan_id",
+      "plan_version",
+      "metric"
+     ]
+    ],
+    "x-ticvai-unique-compare": "exact",
     "items": {
      "$ref": "#/components/schemas/EntitlementLimit"
     }
@@ -720,7 +736,7 @@
     "properties": {
      "modulesInUse": {
       "type": "array",
-      "description": "Enabled by the tenant but not licensed by the target plan.",
+      "description": "Enabled by the tenant but not licensed after the change: not by the target plan version, an in-force add-on or `core` (ADAM CR-541). `moduleKey` is the white-label feature key, as the tenant's cell returns it, so the tenant knows what to switch off; `displayName` and `isEnabled` are as the cell returned them.",
       "items": {
        "type": "object",
        "properties": {
@@ -738,6 +754,7 @@
      },
      "limitsExceeded": {
       "type": "array",
+      "description": "Each metric whose usage is above the limit after the change (ADAM CR-541): `targetLimit` is the target plan's limit plus every in-force add-on's plus every unexpired capacity pack (a null one makes it unlimited, and it is never listed); `currentUsage` is worked out as `getEntitlementUsage` works out `current`.",
       "items": {
        "type": "object",
        "properties": {
@@ -921,8 +938,9 @@
   }
  },
  "LicencePosition": {
-  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module, control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
+  "x-ticvai-persistence": "none — union of the modules of the plan versions on the tenant's in-force control.contract rows (control.contract.plan_id, plan_version -> control.plan_module; ADAM CR-449) and the add-ons in force (control.licence_add_on by tenant_id), core always; the limits of the current contract's plan version (control.plan_limit) and of the in-force add-ons (control.licence_add_on_limit; ADAM CR-531)",
   "type": "object",
+  "description": "**Which contract licenses what, stated once** (ADAM CR-449, Chinmay, 1 November 2026; CHG-CR449-001). A `control.contract` row counts (is in force) when its status is not `expired`, `startsAt` is on or before today, and `cancelledAt` is null or after today: `pastDue` keeps service, and a cancellation takes effect on its date. The licensed modules are the in-force contract's plan version's modules (`control.plan_module` by `plan_id` and `plan_version`) plus the add-ons in force, with `core` always licensed; not `control.tenant.plan_id`. One rule (Application/Common/Licensing), used by `createDashboard`, `listDashboards`, `validateTenantConfig` and `getModuleEnablement`.\n\n**How plan and add-on entries combine** (ADAM CR-531, Chinmay, 3 November 2026; CHG-CR531-001). One combining method in the platform service, the rule above (Application/Common/Licensing), builds `LicencePosition`, and `getTenantLicences`, `addLicenceAddOn` and `removeLicenceAddOn` all answer through it; any later change to this rule is a change to this one method and its tests. In force means: contracts as above, and an add-on when `removedAt` is empty and `validFrom` <= today <= `validTo`, or it has no `validTo`. **The current contract** is the in-force contract with the latest start date; on a tie, the greatest id. `planId` is that contract's plan, or null when no contract is in force. **`licensedModules`** has one entry per `moduleKey`, sorted by `moduleKey`. A module that any in-force contract's plan version licenses gets `source` `plan` and `validTo` null, even if an add-on also covers it. A module that only an add-on covers gets `source` `addOn` and that add-on's `validTo`. `core` is always listed with `source` `plan` and `validTo` null, even with no contract in force. A `poweredByRemoval` add-on is listed like any other add-on, and `poweredByRemovable` is true while it is in force. `displayName` is left empty. **`limits`** has one `EntitlementLimit` per metric, in the `UsageMetric` order, taken from the current contract's plan version (`control.plan_limit`) and every in-force add-on's `control.licence_add_on_limit` rows: `limit` is null if any of those rows is null (unlimited); otherwise the plan's figure, or 0 when the plan does not have the metric, plus every add-on's figure. `overageAllowed` and `overageUnitPrice` come from one row together: the plan's row when the plan has the metric; otherwise the row of the add-on with the latest `validFrom` (on a tie, the greatest id). The price carries that row's own currency (ADAM CR-202). Capacity packs are not part of `LicencePosition`; `getEntitlementUsage` adds them as it already says, so the two never disagree.",
   "required": [
    "tenantId",
    "licensedModules",
@@ -958,7 +976,8 @@
        "type": "string"
       },
       "displayName": {
-       "type": "string"
+       "type": "string",
+       "description": "Left empty (ADAM CR-531); no approved screen shows it."
       },
       "source": {
        "type": "string",
@@ -1270,6 +1289,12 @@
    "id",
    "version"
   ],
+  "x-ticvai-unique-together": [
+   [
+    "code",
+    "version"
+   ]
+  ],
   "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `control.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
   "allOf": [
    {
@@ -1290,10 +1315,12 @@
      },
      "version": {
       "type": "string",
-      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
+      "x-ticvai-unique-compare": "exact",
+      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n**Numbered 1, 2, 3 and so on, stored as a decimal string** (ADAM CR-510, Chinmay, 3 November 2026): `createPlan` writes `1`, and `createPlanVersion` the highest existing version, compared as an integer, plus 1.\n"
      },
      "isActive": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "**Only the newest version is active** (ADAM CR-510): `createPlanVersion` sets it false on every earlier version. The current version is the highest active one."
      },
      "subscriberCount": {
       "type": "integer"
@@ -1310,7 +1337,7 @@
   "type": "object",
   "nullable": true,
   "x-ticvai-persistence": "none — embedded in control.plan as its request_limits jsonb column",
-  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
+  "description": "**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default** (ADAM CR-490, Chinmay, 3 November 2026): one `PlanRequestLimits` held as per-cell configuration under the key `RequestLimits:Tenant:PlatformDefault`, not computed from a sizing tier; an audience, `replicaSharePercent` or `shareEnforcedAbovePercent` the plan leaves out takes the default's value, as `tenantRequestLimits` states. The figures go in when the lead sets them; recalibration after the benchmark and after four weeks of production changes configuration only. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.",
   "properties": {
    "guest": {
     "$ref": "#/components/schemas/RequestBudget"
@@ -1543,7 +1570,7 @@
    },
    "planVersion": {
     "type": "string",
-    "description": "Defaults to the current version."
+    "description": "Defaults to the current version, the plan's highest active version (ADAM CR-510)."
    },
    "effectiveFrom": {
     "type": "string",

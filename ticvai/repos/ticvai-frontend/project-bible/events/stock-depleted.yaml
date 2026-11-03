@@ -35,11 +35,6 @@ consumers:
   idempotencyKey: movementId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Stock position
-  idempotencyKey: movementId
-  onFailure: retry
-  isCritical: false
 - context: marketing
   purpose: Trigger a low-stock alert where configured
   idempotencyKey: movementId

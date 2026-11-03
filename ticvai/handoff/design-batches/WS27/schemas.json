@@ -1292,8 +1292,20 @@
    "name": {
     "type": "string",
     "readOnly": true,
+    "nullable": true,
     "x-ticvai-persisted": false,
-    "description": "**Read from the package's product, not stored here** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009): `catalogue.product.name`, in the caller's language."
+    "description": "**Read from the package's product, not stored here** (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009; ADAM CR-499, CHG-CR499-001). `listGroupPackages` answers `catalogue.product.name`, beside `nameLocalised`: as on Product, a guest screen shows the entry for its guest's language and falls back to `name`; staff screens show `name`. `setGroupPackageDefinition` answers null and reads no product name."
+   },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/catalogue::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The package product's `nameLocalised`, read-only, not stored on the package** (ADAM CR-499, CHG-CR499-001): `catalogue.product.name_localised`, answered by `listGroupPackages`. See `Product.nameLocalised`; `name` is the fallback."
    },
    "unitPrice": {
     "allOf": [
@@ -1302,8 +1314,9 @@
      }
     ],
     "readOnly": true,
+    "nullable": true,
     "x-ticvai-persisted": false,
-    "description": "The product's price per participant (`pricingBasis` perParticipant) or per package, read from the product's current price; not stored here."
+    "description": "**The package product's `fromPrice`, not stored here** (ADAM CR-499, CHG-CR499-001). `listGroupPackages` computes it as `listProducts` computes `Product.fromPrice`: the lowest list price among the product's sellable variants on the caller's channel now, by the same price-list function `listProductVariants` uses, `catalogue#variantPriceRecords` (ADAM CR-439; called, never copied); null where no price list prices it on that channel. `pricingBasis` says what the amount is per (participant or package); it never changes the amount. `setGroupPackageDefinition` answers null and reads no price."
    },
    "minimumSize": {
     "type": "integer",

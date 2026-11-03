@@ -257,13 +257,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Recommend next level only, Recommend multiple levels. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved: Recommend next level only, Recommend multiple levels. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 39 §Allow"
-   },
-   {
-    "operation": null,
-    "why": "**Upgrade Path & Product Ladder Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    },
    {
     "operation": null,
@@ -400,7 +395,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 10 actions on this screen and the screen declares 0 operations.** Unserved: Current product, Product variant, Customer type, Guest type, Membership, Channel, Venue, Timeslot …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 10 actions on this screen and the screen declares 2 operations.** Unserved: Current product, Product variant, Customer type, Guest type, Membership, Channel, Venue, Timeslot …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 41 §Support"
    },
    {
@@ -583,13 +578,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure benefits such as) and no display directory — it is settings, not a population",
   "purpose": "Configure how TICVAI calculates and communicates the commercial difference between the current product and the recommended upgrade. The Recommendation Engine should not become the authoritative pricing engine. It should consume the authoritative price difference from Pricing/Promotion services.",
   "division": "Shares `listProductRelationships`, `quoteUpgrade` with ADM-653, ADM-654; this screen is Upgrade Price Difference & Value Proposition Manager (pack Upsell,CrossSellEngine.pdf, board 2.4, page 42): configure how TICVAI calculates and communicates the commercial difference between the current product and the recommended upgrade. The Recommendation Engine should not become the authoritative pricing engine. It should consume the authoritative price difference from Pricing/Promotion services.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Upgrade Price Difference & Value Proposition Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -756,18 +745,7 @@
   "patternReason": "the pack gives this screen a display directory (§Track; Show) and no metric row",
   "purpose": "Configure detailed upsell relationships for ticketing and experience products.",
   "division": "Shares `listProductRelationships`, `quoteUpgrade` with ADM-652, ADM-654; this screen is Ticket, Experience & Bundle Upgrade Manager (pack Upsell,CrossSellEngine.pdf, board 2.5, page 44): configure detailed upsell relationships for ticketing and experience products.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 44 §Track"
-   },
-   {
-    "operation": null,
-    "why": "**Ticket, Experience & Bundle Upgrade Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1075,13 +1053,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control upselling during the active purchase journey.",
   "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Pre-Purchase, Cart & Checkout Upsell Manager (pack Upsell,CrossSellEngine.pdf, board 2.7, page 47): control upselling during the active purchase journey.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Pre-Purchase, Cart & Checkout Upsell Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -1235,13 +1207,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Support upgrades after the initial transaction where the product and operational rules permit them. This is explicitly important because upselling should not stop at checkout.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Post-Purchase & In-Journey Upgrade Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [

@@ -896,7 +896,7 @@
     {
      "to": "BO-001",
      "trigger": "Queue Directory",
-     "provenance": "derived — BO-001 declares entryState.params feedId, queueId and BO-103 holds none of them. The edge carries nothing: feedId, queueId only pre-select (deep link or optional), and BO-001 opens on its own"
+     "provenance": "derived — BO-001 declares entryState.params feedId, queueId and BO-103 holds none of them. The edge carries nothing: BO-001 finds feedId (listQueueFeeds), queueId (listQueues) itself, and BO-001 opens on its own"
     },
     {
      "to": "BO-002",
@@ -906,7 +906,7 @@
     {
      "to": "BO-003",
      "trigger": "Queue Integration Setup",
-     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-003 finds feedId (listQueueFeeds) itself, and BO-003 opens on its own"
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them. The edge carries nothing: orderId only pre-selects (optional); BO-003 finds feedId (listQueueFeeds) itself, and BO-003 opens on its own"
     },
     {
      "to": "BO-004",
@@ -921,17 +921,17 @@
     {
      "to": "BO-006",
      "trigger": "Parking Configuration",
-     "provenance": "derived — BO-006 declares entryState.params parkingFacilityId and BO-103 holds none of them. The edge carries nothing: parkingFacilityId only pre-selects (deep link or optional), and BO-006 opens on its own"
+     "provenance": "derived — BO-006 declares entryState.params parkingFacilityId and BO-103 holds none of them. The edge carries nothing: parkingFacilityId only pre-selects (optional), and BO-006 opens on its own"
     },
     {
      "to": "BO-030",
      "trigger": "Work Order Verification",
-     "provenance": "derived — BO-030 declares entryState.params workOrderId and BO-103 holds none of them. The edge carries nothing: workOrderId only pre-selects (deep link or optional), and BO-030 opens on its own"
+     "provenance": "derived — BO-030 declares entryState.params workOrderId and BO-103 holds none of them. The edge carries nothing: BO-030 finds workOrderId (listWorkOrders) itself, and BO-030 opens on its own"
     },
     {
      "to": "BO-032",
      "trigger": "Admission Profiles",
-     "provenance": "derived — BO-032 declares entryState.params profileId, ruleId and BO-103 holds none of them. The edge carries nothing: profileId, ruleId only pre-select (deep link or optional), and BO-032 opens on its own"
+     "provenance": "derived — BO-032 declares entryState.params profileId, ruleId and BO-103 holds none of them. The edge carries nothing: profileId, ruleId only pre-select (optional), and BO-032 opens on its own"
     },
     {
      "to": "BO-033",
@@ -944,32 +944,32 @@
     {
      "to": "BO-038",
      "trigger": "Reconciliation Queue",
-     "provenance": "derived — BO-038 declares entryState.params rejectionId and BO-103 holds none of them. The edge carries nothing: rejectionId only pre-selects (deep link or optional), and BO-038 opens on its own"
+     "provenance": "derived — BO-038 declares entryState.params rejectionId and BO-103 holds none of them. The edge carries nothing: rejectionId only pre-selects (optional), and BO-038 opens on its own"
     },
     {
      "to": "BO-069",
      "trigger": "Asset Register",
-     "provenance": "derived — BO-069 declares entryState.params assetId and BO-103 holds none of them. The edge carries nothing: assetId only pre-selects (deep link or optional), and BO-069 opens on its own"
+     "provenance": "derived — BO-069 declares entryState.params assetId and BO-103 holds none of them. The edge carries nothing: BO-069 finds assetId (listAssets) itself, and BO-069 opens on its own"
     },
     {
      "to": "BO-071",
      "trigger": "Planned Maintenance",
-     "provenance": "derived — BO-071 declares entryState.params planId and BO-103 holds none of them. The edge carries nothing: planId only pre-selects (deep link or optional), and BO-071 opens on its own"
+     "provenance": "derived — BO-071 declares entryState.params planId and BO-103 holds none of them. The edge carries nothing: planId only pre-selects (optional), and BO-071 opens on its own"
     },
     {
      "to": "BO-072",
      "trigger": "Incident Log",
-     "provenance": "derived — BO-072 declares entryState.params incidentId and BO-103 holds none of them. The edge carries nothing: incidentId only pre-selects (deep link or optional), and BO-072 opens on its own"
+     "provenance": "derived — BO-072 declares entryState.params incidentId and BO-103 holds none of them. The edge carries nothing: incidentId only pre-selects (optional), and BO-072 opens on its own"
     },
     {
      "to": "BO-093",
      "trigger": "Map Import & Labelling",
-     "provenance": "derived — BO-093 declares entryState.params actionId, jobId, mapId, uploadId and BO-103 holds none of them. The edge carries nothing: mapId, jobId, uploadId, actionId only pre-select (deep link or optional), and BO-093 opens on its own"
+     "provenance": "derived — BO-093 declares entryState.params actionId, jobId, mapId, uploadId and BO-103 holds none of them. The edge carries nothing: mapId, jobId, uploadId, actionId only pre-select (optional), and BO-093 opens on its own"
     },
     {
      "to": "BO-094",
      "trigger": "Map Editor & Publish",
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId, uploadId and BO-103 holds none of them. The edge carries nothing: mapId, pathId, uploadId only pre-select (deep link or optional), and BO-094 opens on its own"
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId, uploadId and BO-103 holds none of them. The edge carries nothing: pathId, uploadId only pre-select (optional); BO-094 opens on searchMedia, and mapId has no source on BO-094 yet (a gap in BO-094, not in this edge)"
     },
     {
      "to": "BO-096",
@@ -979,7 +979,7 @@
     {
      "to": "BO-097",
      "trigger": "Check Out & Check In",
-     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-103 holds none of them. The edge carries nothing: authorisationId, bookingId only pre-select (deep link or optional), and BO-097 opens on its own"
+     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId and BO-103 holds none of them. The edge carries nothing: BO-103 is the Access & Venue hub and this is its menu entry; BO-097 has no source yet for bookingId"
     },
     {
      "to": "BO-098",

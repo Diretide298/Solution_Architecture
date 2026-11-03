@@ -42,6 +42,15 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: white-label
+  purpose: 'A reviewed content block whose request was expired (`subjectId` a whitelabel.content_block row pending
+    review; ADAM CR-462, decided 2 November 2026; CHG-CR462-001): `reviewStatus` rejected, and the block keeps the
+    status and schedule it had (draft, scheduled or expired), as publishContentBlock states'
+  writes:
+  - whitelabel.content_block
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 - context: catalogue
   purpose: '**Catalogue''s approval consumer, by `subjectType`** (the consumer ADAM CR-415 adds for `pricingRecommendation`).
     For `subjectType` `dynamicPricingControl` (ADAM CR-425, CHG-CR425-001): the expired raise is dropped,

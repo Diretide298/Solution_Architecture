@@ -361,6 +361,7 @@ screens:
   - venueId<-session
   - entryId<-navigation
   - waitingEntryId<-GST-046
+  - productId<-GST-008
   goesTo:
   - GST-001
   - GST-002

@@ -322,7 +322,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Entire transaction, Selected items, Selected tickets, Selected quantities, Specific monetary amount. Each … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-025): The staff refund workspace raised refunds with createRefundRequest, the guest app's own request (guest audience, no permission; the order must belong to the …
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Entire transaction, Selected items, Selected tickets, Selected quantities, Specific monetary amount. Each … Removed 2 October 2026 (CHG-WIR-025): The staff refund workspace raised refunds with createRefundRequest, the guest app's own request (guest audience, no permission; the order must belong to the …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Create and validate a refund request against the refund policy.
 
@@ -733,7 +733,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Refund ✓, Void ✕, Reversal ✕. Each needs an operation, or needs removing from the screen; this is the Phase … **Void, Reversal & Cancellation Manager\t120 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Refund ✓, Void ✕, Reversal ✕. Each needs an operation, or needs removing from the screen; this is the Phase … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Voids and reversals kept distinct from refunds: release an authorisation before capture.
 
@@ -874,8 +874,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/commercial/refund-approval-exception-workflow-t121-adm-614` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Approval of sensitive refunds and the fraud rules evaluated before a charge.
 
@@ -1031,7 +1029,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists refunds across orders by provider status (same gap as BO-028).
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists refunds across orders by provider status (same gap as BO-028).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Refund execution through the provider and recovery of uncertain refunds.
 
@@ -1178,7 +1176,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **Payment Adjustment & Financial Correction Manager\t123 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Payment corrections that are not customer refunds, tightly controlled.
 
@@ -1327,8 +1325,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/commercial/refund-transaction-trace-audit-investigation-t124-adm-617` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Traceability from sale to refund, reversal and adjustment.
 

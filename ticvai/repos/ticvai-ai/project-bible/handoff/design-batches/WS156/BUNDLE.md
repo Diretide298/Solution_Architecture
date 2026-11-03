@@ -1399,8 +1399,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/multi-event-resource-planning-bo-871` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Several events and experiences that run at the same time, compared side by side for the resources they all need: required per event, total demand, available, and the gap ("Event A needs 10 security, Event B 8, only 14 qualified available - gap 4"), with event priority deciding who gets what. The one thing to get right: gaps are the headline, in red, per resource line and in total, before anyone allocates.
 
 **Known correction pending (do not draw the wrong version)**

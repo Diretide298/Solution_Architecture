@@ -593,7 +593,8 @@
    "configurationProfileId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "**The profile the device is provisioned with, accepted only on the move to `provisioned`**, where it stays optional (ADAM CR-485, Chinmay, 3 November 2026; CHG-CR485-001). With any other target state it is `400 validation` naming `configurationProfileId`. Stored as `configuration_profile_id` on that move only, and not changed by any later move.\n"
    },
    "reason": {
     "type": "string",
@@ -610,11 +611,14 @@
    "testResult": {
     "type": "object",
     "nullable": true,
-    "description": "**The acceptance test, recorded on the move to `provisioned`** (DEC-245; CHG-CSP-011). The caller is recorded as `RegisteredDevice.testedByPrincipalId` and may not approve the device.\n",
+    "description": "**The acceptance test, recorded on the move to `provisioned`** (DEC-245; CHG-CSP-011). The caller is recorded as `RegisteredDevice.testedByPrincipalId` and may not approve the device. **Required on the move to `provisioned`, refused on every other move** (ADAM CR-485, Chinmay, 3 November 2026; CHG-CR485-001): missing on that move is `400 validation` naming `testResult`, and sent with any other target state is the same `400` naming `testResult`.\n",
+    "required": [
+     "passed"
+    ],
     "properties": {
      "passed": {
       "type": "boolean",
-      "description": "Whether the device passed; always sent with `testResult` (422 otherwise)."
+      "description": "Whether the device passed; always sent with `testResult`: without it, `400 validation` naming `testResult.passed` (ADAM CR-485). A failed test (false) is recorded as sent and the move succeeds; the approver sees it and rejects."
      },
      "notes": {
       "type": "string",

@@ -260,13 +260,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Directory Columns) and no metric row",
   "purpose": "Maintain the master inventory of physical readers connected to TICVAI. The source requires the ability to define a minimum of three reader types.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 14 §Directory Columns"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -520,11 +514,6 @@
   "patternReason": "the pack gives this screen a configuration directory (§Operational Settings) and no display directory — it is settings, not a population",
   "purpose": "Configure the technical and operational identity of an individual reader.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Reader Profile & Device Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": "setReaderProfile",
     "removed": true,
@@ -1464,11 +1453,6 @@
   "purpose": "Define and visualize what occurs when a customer taps their card/device before gameplay. This screen directly addresses requirement 10.2.13: the system must validate the customer's credit/card balance, bonus and entitlements in real time before the game starts.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 20 §Identify Card / Wallet"
-   },
-   {
     "operation": "setReaderConfiguration",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-001): Per-outcome responses (what the reader shows and does) live on ReaderProfile.displayBehaviour, written by setReaderProfile; the screen was bound to the per-reader setReaderConfiguration as \"Theme and experience\" (design-notes correction venue-operations BO-412).",
@@ -1637,13 +1621,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Configure dedicated balance-check readers and provide administrators with a test environment for deployed reader configurations. Requirement 10.2.20 specifically requires a reader through which the customer can check their balance.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 21 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

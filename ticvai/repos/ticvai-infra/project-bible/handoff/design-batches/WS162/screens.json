@@ -93,13 +93,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide management with a centralized AI-generated overview of current and future resource conditions across the organization.",
   "purposeNote": "Authorized managers can immediately understand current and forecast resource conditions and see prioritized AI-generated actions from one command center.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 117 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -500,13 +494,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Predict future demand for resources before shortages occur.",
   "purposeNote": "or excess capacity before the operating date.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 121 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

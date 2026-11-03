@@ -168,7 +168,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read …
 
 **Form: Save AI provider** (modal, opened by *Save AI provider*; *Save AI provider* calls `setAiProvider`, *Cancel* sends nothing)
 
@@ -407,7 +407,7 @@ Errors to draw in the form: 403 No platform-staff grant into this tenant is open
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 |  (publish gate) | `publishPromptTemplate` POST `/prompt-templates/{templateKey}/versions` | inline | AiPromptTemplate | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or a step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 | Save AI provider (primary button) | `setAiProvider` PUT `/providers/{providerId}` | AiProvider | AiProvider | 403 The caller lacks `PLATFORM_TENANT_MANAGE` on their platform token, or has no platform-staff grant into this tenant open (`platform-grant-required`, audit R203).; 404 The resource does not exist, or is outside the … | opens modal first |
 | Save AI credential (secondary button) | `setAiCredential` PUT `/ai-providers/{providerId}/credential` | inline | AiProvider | 403 The caller is a tenant's own staff, or platform staff with no grant into this tenant open (`platform-grant-required`).; 409 The provider is TICVAI-managed; its key is provisioned by the platform … | opens modal first |
 | Test AI provider (secondary button) | `testAiProvider` POST `/ai-providers/{providerId}/test` | inline | inline | — | — |

@@ -294,13 +294,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
   "purpose": "Allow POS/rental operators to create a reservation through a guided workflow.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**New Rental Booking Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -915,13 +909,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Complete all mandatory customer acknowledgments before confirmation or checkout. This implements the digital rental agreement/waiver capability recommended in the source.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Rental_Management.pdf, page 55 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1319,11 +1307,6 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage the reservation after confirmation but before/during fulfillment.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Rental_Management.pdf, page 58 §Display"
-   },
    {
     "operation": "createRentalBooking",
     "removed": true,

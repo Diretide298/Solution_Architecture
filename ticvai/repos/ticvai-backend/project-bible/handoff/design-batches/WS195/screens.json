@@ -99,11 +99,6 @@
   "purposeNote": "Authorized administrators can monitor Wallet connectivity and identify failed, degraded or delayed integrations from a centralized workspace.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Each integration displays"
-   },
-   {
     "operation": "createApiClient",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-021): createApiClient and setApiClientStatus on the tenant's wallet integration screen, as BO-067: API clients are issued and suspended in the developer programme, not from a wallet screen (DI-927; design-notes correction platform-foundation BO-1173).",
@@ -1504,13 +1499,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Give technical and operational teams a dedicated workspace for failed integrations.",
   "purposeNote": "Every integration failure is traceable through a controlled exception workflow without modifying the original financial transaction.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1791,13 +1780,7 @@
   "purpose": "Provide centralized governance for configuration changes across all ten Wallet boards. This screen becomes the master configuration governance layer for the entire Wallet module.",
   "purposeNote": "Every material Wallet configuration change is version-controlled and historical configurations remain available for audit and investigation.",
   "division": "Shares `listWalletConfigurationVersions`, `publishWalletConfiguration` with BO-1092, BO-1132; this screen is Wallet Configuration Governance & Version Control (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 10.08, page 123): provide centralized governance for configuration changes across all ten Wallet boards. This screen becomes the master configuration governance layer for the entire Wallet module.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 123 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -2134,13 +2117,7 @@
   "patternReason": "the pack gives this screen both a metric directory (§Master Health KPIs) and a per-row directory (§Display) — counts over a population, then the population",
   "purpose": "Provide the final master-administration screen for the entire TICVAI Wallet ecosystem. This should become the control tower for all ten Wallet boards.",
   "purposeNote": "Authorized administrators can assess end-to-end Wallet health, trace material actions across the platform and navigate directly to affected configuration, transactions, integrations or exceptions. Board 10 — End-to-End Architecture The final integration architecture should look like: Customer / Employee / Corporate Account ↓ TICVAI Wallet Engine Wallet Foundation → Funding → Credit & Consumption → Family / Corporate → Gift Cards & Benefits → Channels & Wearables → Transfers & Refunds → Fraud & Risk → Finance & Liability ↓ Wallet API & Event Layer ↙︎ Ticketing ↙︎ Membership ↙︎ CRM ↙︎ Pricing &",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [

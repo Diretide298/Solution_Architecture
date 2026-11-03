@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
@@ -15,7 +15,7 @@
   "contracts": 7,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 14
+  "operationsWithNoScreen": 13
  },
  "waves": {
   "wave1": 2,
@@ -44,11 +44,11 @@
    "operations": 7
   },
   {
-   "contract": "catalogue",
+   "contract": "retail",
    "operations": 3
   },
   {
-   "contract": "retail",
+   "contract": "catalogue",
    "operations": 3
   },
   {
@@ -60,11 +60,11 @@
    "operations": 2
   },
   {
-   "contract": "marketing-crm",
+   "contract": "ai",
    "operations": 2
   },
   {
-   "contract": "ai",
+   "contract": "marketing-crm",
    "operations": 2
   }
  ],
@@ -226,22 +226,10 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "getPlanBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Which benefits a plan grants, and how much of each"
-   },
-   {
     "operation": "listGuestMemberships",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listMembershipBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Benefits a plan can grant"
    },
    {
     "operation": "listMembershipProgrammes",
@@ -260,6 +248,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Does this contact already have a profile here"
+   },
+   {
+    "operation": "createGuestDocumentUpload",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue the key and a signed upload URL for a guest document"
    },
    {
     "operation": "decideGuestCheckoutMatch",

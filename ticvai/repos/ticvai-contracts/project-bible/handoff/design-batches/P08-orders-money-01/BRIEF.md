@@ -1,6 +1,6 @@
 # P08-orders-money-01 — P08 · Orders & Money (1 of 3)
 
-**10 screens · 64 operations · 96 schemas · 22 permissions**
+**10 screens · 64 operations · 97 schemas · 22 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -163,11 +163,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-022` | Order Detail | C | 140 | 39 | 6 | 72 | 1 | 0 | — | notStarted (generated) |
-| `BO-023` | Refunds & Exchanges | A | 105 | 63 | 6 | 60 | 3 | 6 | — | notStarted (generated) |
+| `BO-022` | Order Detail | C | 152 | 45 | 6 | 73 | 1 | 0 | — | notStarted (generated) |
+| `BO-023` | Refunds & Exchanges | A | 106 | 69 | 6 | 60 | 3 | 6 | — | notStarted (generated) |
 | `BO-024` | Payment Exceptions | A | 21 | 18 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-025` | Chargebacks & Disputes | C | 10 | 27 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
-| `BO-026` | Group Bookings | C | 171 | 47 | 6 | 77 | 2 | 6 | — | notStarted (generated) |
+| `BO-026` | Group Bookings | C | 172 | 47 | 6 | 77 | 2 | 6 | — | notStarted (generated) |
 | `BO-027` | Reissue & Media Replacement | C | 13 | 22 | 6 | 22 | 0 | 0 | — | notStarted (generated) |
 | `BO-028` | Refund Approval Queue | C | 2 | 0 | 4 | 1 | 5 | 6 | — | notStarted (generated) |
 | `BO-029` | Report Builder | A | 76 | 13 | 6 | 88 | 1 | 0 | — | notStarted (generated) |

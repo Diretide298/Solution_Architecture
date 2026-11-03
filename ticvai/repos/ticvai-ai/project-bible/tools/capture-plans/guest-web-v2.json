@@ -129,7 +129,7 @@
 
   {"id": "WEB-034", "name": "Lost & Found", "view": "Account → 'Lost & found, reports'; Help → 'Your cases' → Raise a case → topic 'Lost property'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
 
-  {"id": "WEB-035", "name": "Multi-Currency & Pricing", "view": "Discover → 'Prices in your currency'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+  {"id": "WEB-035", "name": "Multi-Currency & Pricing", "view": "Discover → 'Prices in your currency'", "steps": [], "expect": [], "pending": "not captured: since ADAM CR-473 (2 November 2026) the frame wireframes/frames/web-035.html draws the guest-web build on #32309, not this view; a capture would overwrite it"},
 
   {"id": "WEB-037", "name": "Menu Item Detail", "view": "At the venue → Order food → tap a dish; Takeaway/Delivery → 'Add' opens the modifier side panel", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
 

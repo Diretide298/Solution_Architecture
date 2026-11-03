@@ -4,7 +4,7 @@
   "name": "Waiver & Consent Command Center",
   "module": "Policy",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
@@ -409,13 +409,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Create New, Duplicate Existing, Create From Approved Corporate Template. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Create New, Duplicate Existing, Create From Approved Corporate Template. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 8 §Allow"
-   },
-   {
-    "operation": null,
-    "why": "**Waiver Template Library & Master Setup declares no operation that writes anything** — its only declared call is `listWaiverTemplateMaster`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    }
   ],
   "layout": {
@@ -625,7 +620,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Information Box, Customer Details, Guardian Details. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Information Box, Customer Details, Guardian Details. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 9 §Support configurable blocks"
    },
    {
@@ -1020,7 +1015,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Holder, Rental Customer, Other Authorized Signatory, Customer + Authorized Representative. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: Ticket Holder, Rental Customer, Other Authorized Signatory, Customer + Authorized Representative. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Support"
    }
   ],
@@ -1732,7 +1727,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional languages as configured. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Additional languages as configured. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 19 §Support"
    }
   ],
@@ -1866,7 +1861,7 @@
   "name": "Waiver Approval, Testing & Publication Workspace",
   "module": "Policy",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
@@ -1898,7 +1893,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule Publication, Publish to Selected Venues, Publish to Selected Products. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: Publish Now, Schedule Publication, Publish to Selected Venues, Publish to Selected Products. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Support"
    }
   ],
@@ -1912,7 +1907,7 @@
       {
        "kind": "selectField",
        "label": "Required fields configured",
-       "operation": "approveWaiverTesting",
+       "operation": "getWaiverTesting",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Fields"
       },
       {
@@ -1975,6 +1970,13 @@
     "contract": "marketing-crm",
     "purpose": "Waiver Approval, Testing & Publication Workspace",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getWaiverTesting",
+    "contract": "marketing-crm",
+    "purpose": "The version's checklist, simulation and approval record, which the workspace shows",
+    "trigger": "onLoad",
+    "provenance": "r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits"
    }
   ],
   "wireframe": {

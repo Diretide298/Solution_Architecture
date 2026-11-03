@@ -558,7 +558,13 @@
  "OpenShift": {
   "type": "object",
   "x-ticvai-persistence": "workforce.open_shift",
-  "description": "Resource board 4.6. **How a gap gets filled at nine on a Friday without a manager ringing round.**\n",
+  "description": "Resource board 4.6. **How a gap gets filled at nine on a Friday without a manager ringing round.**\n\n**An open shift has a place and a time** (ADAM CR-441, Chinmay, 1 November 2026; CHG-CR441-001). `venueId`, `positionCode`, `from` and `to` are required on an open shift's create and update (`400 validation` when one is missing), with `from` before `to`. `workforce.open_shift`'s four columns become NOT NULL in a later forward migration, after the existing rows are checked: any row missing one is reported, not guessed. Until then `claimOpenShift` takes a missing value from the released assignment, otherwise it answers `409 open-shift-incomplete`.\n",
+  "required": [
+   "venueId",
+   "positionCode",
+   "from",
+   "to"
+  ],
   "properties": {
    "id": {
     "type": "string",

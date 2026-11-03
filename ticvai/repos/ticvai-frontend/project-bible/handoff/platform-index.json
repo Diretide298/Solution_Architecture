@@ -5,11 +5,11 @@
   "operator": "guest",
   "counts": {
    "screens": 50,
-   "operations": 206,
+   "operations": 208,
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 23
+   "operationsWithNoScreen": 22
   },
   "waves": {
    "wave1": 50
@@ -25,7 +25,7 @@
    "contracts": 19,
    "modules": 17,
    "undrawn": 0,
-   "operationsWithNoScreen": 23
+   "operationsWithNoScreen": 22
   },
   "waves": {
    "wave1": 77
@@ -41,7 +41,7 @@
    "contracts": 19,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 171
+   "operationsWithNoScreen": 167
   },
   "waves": {
    "wave1": 32
@@ -57,7 +57,7 @@
    "contracts": 7,
    "modules": 2,
    "undrawn": 0,
-   "operationsWithNoScreen": 14
+   "operationsWithNoScreen": 13
   },
   "waves": {
    "wave1": 2,
@@ -74,7 +74,7 @@
    "contracts": 19,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 158
+   "operationsWithNoScreen": 155
   },
   "waves": {
    "wave1": 30,
@@ -104,16 +104,16 @@
   "operator": "venue",
   "counts": {
    "screens": 1663,
-   "operations": 1894,
+   "operations": 1899,
    "contracts": 31,
    "modules": 19,
    "undrawn": 0,
-   "operationsWithNoScreen": 212
+   "operationsWithNoScreen": 208
   },
   "waves": {
-   "wave1": 148,
+   "wave1": 150,
    "wave2": 55,
-   "wave3": 1460
+   "wave3": 1458
   }
  },
  "P09": {
@@ -126,7 +126,7 @@
    "contracts": 15,
    "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 124
+   "operationsWithNoScreen": 121
   },
   "waves": {
    "wave1": 28,
@@ -191,15 +191,15 @@
   "operator": "venue",
   "counts": {
    "screens": 104,
-   "operations": 211,
+   "operations": 214,
    "contracts": 8,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 114
+   "operationsWithNoScreen": 111
   },
   "waves": {
-   "wave1": 28,
-   "wave3": 76
+   "wave1": 32,
+   "wave3": 72
   }
  },
  "P14": {
@@ -246,7 +246,7 @@
    "contracts": 10,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 134
+   "operationsWithNoScreen": 130
   },
   "waves": {
    "wave1": 4,

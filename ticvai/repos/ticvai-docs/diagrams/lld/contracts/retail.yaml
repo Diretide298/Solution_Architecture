@@ -135,6 +135,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - retail.merchandise
   - retail.sale
   - retail.sale_line
   - retail.shop_and_drop

@@ -133,15 +133,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-617` | New Accreditation Application | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 | `BO-618` | Accreditation Form Builder | A | 1 | 46 | 6 | 75 | 1 | 6 | — | notStarted (—) |
 | `BO-619` | Accreditation Category Management | D | 25 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-620` | Accreditation Program Setup | D | 0 | 0 | 6 | 4 | 1 | 6 | — | notStarted (—) |
+| `BO-620` | Accreditation Program Setup | D | 50 | 6 | 6 | 4 | 1 | 6 | — | notStarted (—) |
 | `BO-621` | Applicant Type Configuration | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `BO-622` | Application Requirements Matrix | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `BO-623` | Accreditation Intake Monitor | D | 0 | 29 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-624` | Registration Rules & Publication | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-624` | Registration Rules & Publication | D | 25 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
-**BO-616, BO-617, BO-619, BO-620, BO-621, BO-622, BO-623, BO-624 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-616, BO-617, BO-619, BO-621, BO-622, BO-623, BO-624 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -461,8 +461,6 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | `applicationId` (navigation) |
 | Route | `/access-venue/accreditation-application-directory-bo-616` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Every accreditation application, searchable and filterable, for the accreditation team and supervisors who answer "where is this person's application". Each row joins the application with its holder, its credential and its reviewer so the answer needs no second screen. The one thing to get right: the status chip distinguishes the application's state from the holder's (an approved application whose holder is now suspended), using the pack's nine status words.
 
@@ -829,14 +827,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `accreditation` module |
 | Block | Block A · ticket #28875 (APP-SETUP-BO-618) |
-| Who uses it | venue staff holding `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW` (2 configure, 3 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ACCREDITATION_VIEW`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW` (3 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Fields may be configured as) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | `programmeId` (navigation), `formId` (navigation) |
 | Route | `/access-venue/accreditation-form-builder-bo-618` |
-
-**Known gaps.** **Accreditation Form Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The back office builds the registration form an accreditation applicant fills in (media, corporate, individual), without development. The form is a marketing-crm form of kind registration, linked to the programme. The customer-marketing rule that matters: a published form version is immutable once anyone has submitted against it. A change makes a new version, and the old one stays readable forever.
 
@@ -952,7 +948,6 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 A template cannot be opened for applications (`programme-is-template`), or another programme of the tenant already holds the body's `code`, compared … |
 
 #### Consistency with other screens
 
@@ -975,7 +970,6 @@ fields:
 #### Permissions
 
 - `createForm` → `MARKETING_MANAGE` (configure) · staff
-- `updateAccreditationProgramme` → `ACCREDITATION_CONFIGURE` (configure) · staff
 - `listForms` → `MARKETING_VIEW` (read) · staff
 - `getForm` → `GUEST_VIEW` (read) · staff, guest
 - `listAccreditationProgrammes` → `ACCREDITATION_VIEW` (read) · staff
@@ -1030,12 +1024,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-618?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-615`.
-- [ ] Every gated control is gated: `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
+- [ ] Every gated control is gated: `ACCREDITATION_VIEW`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1289,7 +1283,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Opens with | `programmeId` (navigation) |
 | Route | `/access-venue/accreditation-program-setup-bo-620` |
 
-**Known gaps.** **Accreditation Program Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The administrator creates the programme that governs accreditation for an event, a venue, a season or a standing scheme: its name and code, the events and venues it covers, when applications open and close, the categories and applicant types allowed, the registration form, and the approval workflow. Most programmes start as a copy of last season's or of a template. The one thing to get right: the dates (application window, accreditation period, event dates) are shown together on one timeline so a window that closes after the event starts is obvious.
 
@@ -1313,7 +1307,73 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|
 | Is template | toggle | — | — | `listAccreditationProgrammes` ?isTemplate |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Create** (modal, opened by *Create*; *Create* calls `createAccreditationProgramme`, *Cancel* sends nothing)
+
+**Collects what `createAccreditationProgramme` sends before it is called.** Required: `code`, `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`, `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createAccreditationProgramme` body |
+| Code `code` | text field | required | — | — | — | — | `createAccreditationProgramme` body |
+| Name `name` | text field | required | — | — | — | — | `createAccreditationProgramme` body |
+| Venues `venueIds` | multi-picker: choose venues | optional | — | — | — | — | `createAccreditationProgramme` body |
+| Events `eventIds` | multi-picker: choose events | optional | — | — | — | — | `createAccreditationProgramme` body |
+| Categories `categories` | repeatable rows | optional | — | — | — | — | `createAccreditationProgramme` body |
+| Code `categories[].code` | text field | optional | — | — | — | — | `createAccreditationProgramme` body |
+| Name `categories[].name` | text field | optional | — | — | — | — | `createAccreditationProgramme` body |
+| Default access profile `categories[].defaultAccessProfileId` | picker: choose a default access profile | optional | — | — | shows names, sends the id | — | `createAccreditationProgramme` body |
+| Quota `categories[].quota` | number field | optional | — | — | — | A cap on how many may be accredited in this category. Without one, a category is a promise nobody counted. | `createAccreditationProgramme` body |
+| Badge template `categories[].badgeTemplateId` | picker: choose a badge template | optional | — | — | shows names, sends the id | The badge printed for this category; travels with the category when a programme is cloned | `createAccreditationProgramme` body |
+| Applicant types `applicantTypes` | list of values (chips) | optional | — | — | — | — | `createAccreditationProgramme` body |
+| Applications open at `applicationsOpenAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAccreditationProgramme` body |
+| Applications close at `applicationsCloseAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAccreditationProgramme` body |
+| Approval workflow `approvalWorkflowId` | picker: choose an approval workflow | optional | — | — | shows names, sends the id | — | `createAccreditationProgramme` body |
+| Form `formId` | picker: choose a form | optional | — | — | shows names, sends the id | 12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant fills in. | `createAccreditationProgramme` body |
+| Is template `isTemplate` | toggle | optional | off | — | — | 12.1.56. A reusable programme template: never opened for applications, and what `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules and … | `createAccreditationProgramme` body |
+| Status `status` | radio group | optional | — | Draft · Open · Closed · Archived | — | — | `createAccreditationProgramme` body |
+| Face matching `faceMatching` | group | optional | — | Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default (Chinmay, 2 October, workbook Q461; ADR-0063 …; Enabling needs `legalSignOffRef` (the venue's legal sign-off … | — | Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default (Chinmay, 2 October, workbook … | `createAccreditationProgramme` body |
+| Enabled `faceMatching.enabled` | toggle | optional | off | — | — | — | `createAccreditationProgramme` body |
+| Legal sign off ref `faceMatching.legalSignOffRef` | text field | optional | — | — | — | The venue's legal sign-off document (a stored file reference). | `createAccreditationProgramme` body |
+| Identity verification `identityVerification` | group | optional | — | — | — | UAE Pass and ICP verification, in release 1 (Chinmay, 2 October, workbook Q457; CHG-CSA-031). | `createAccreditationProgramme` body |
+| Methods `identityVerification.methods` | multi-select chips | optional | — | Uae pass · Icp · Manual review | — | — | `createAccreditationProgramme` body |
+| Required `identityVerification.required` | toggle | optional | off | — | — | Whether an application is blocked from approval until a listed check passes. | `createAccreditationProgramme` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `createAccreditationProgramme` body |
+
+Errors to draw in the form: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
+
+**Form: Edit programme** (modal, opened by *Edit programme*; *Edit programme* calls `updateAccreditationProgramme`, *Cancel* sends nothing)
+
+**Collects what `updateAccreditationProgramme` sends before it is called.** Required: `code`, `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`, `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `updateAccreditationProgramme` body |
+| Code `code` | text field | required | — | — | — | — | `updateAccreditationProgramme` body |
+| Name `name` | text field | required | — | — | — | — | `updateAccreditationProgramme` body |
+| Venues `venueIds` | multi-picker: choose venues | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Events `eventIds` | multi-picker: choose events | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Categories `categories` | repeatable rows | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Code `categories[].code` | text field | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Name `categories[].name` | text field | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Default access profile `categories[].defaultAccessProfileId` | picker: choose a default access profile | optional | — | — | shows names, sends the id | — | `updateAccreditationProgramme` body |
+| Quota `categories[].quota` | number field | optional | — | — | — | A cap on how many may be accredited in this category. Without one, a category is a promise nobody counted. | `updateAccreditationProgramme` body |
+| Badge template `categories[].badgeTemplateId` | picker: choose a badge template | optional | — | — | shows names, sends the id | The badge printed for this category; travels with the category when a programme is cloned | `updateAccreditationProgramme` body |
+| Applicant types `applicantTypes` | list of values (chips) | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Applications open at `applicationsOpenAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAccreditationProgramme` body |
+| Applications close at `applicationsCloseAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAccreditationProgramme` body |
+| Approval workflow `approvalWorkflowId` | picker: choose an approval workflow | optional | — | — | shows names, sends the id | — | `updateAccreditationProgramme` body |
+| Form `formId` | picker: choose a form | optional | — | — | shows names, sends the id | 12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant fills in. | `updateAccreditationProgramme` body |
+| Is template `isTemplate` | toggle | optional | off | — | — | 12.1.56. A reusable programme template: never opened for applications, and what `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules and … | `updateAccreditationProgramme` body |
+| Status `status` | radio group | optional | — | Draft · Open · Closed · Archived | — | — | `updateAccreditationProgramme` body |
+| Face matching `faceMatching` | group | optional | — | Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default (Chinmay, 2 October, workbook Q461; ADR-0063 …; Enabling needs `legalSignOffRef` (the venue's legal sign-off … | — | Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default (Chinmay, 2 October, workbook … | `updateAccreditationProgramme` body |
+| Enabled `faceMatching.enabled` | toggle | optional | off | — | — | — | `updateAccreditationProgramme` body |
+| Legal sign off ref `faceMatching.legalSignOffRef` | text field | optional | — | — | — | The venue's legal sign-off document (a stored file reference). | `updateAccreditationProgramme` body |
+| Identity verification `identityVerification` | group | optional | — | — | — | UAE Pass and ICP verification, in release 1 (Chinmay, 2 October, workbook Q457; CHG-CSA-031). | `updateAccreditationProgramme` body |
+| Methods `identityVerification.methods` | multi-select chips | optional | — | Uae pass · Icp · Manual review | — | — | `updateAccreditationProgramme` body |
+| Required `identityVerification.required` | toggle | optional | off | — | — | Whether an application is blocked from approval until a listed check passes. | `updateAccreditationProgramme` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `updateAccreditationProgramme` body |
+
+Errors to draw in the form: 409 A template cannot be opened for applications (`programme-is-template`), or another programme of the tenant already holds the body's `code`, compared …
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1327,12 +1387,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Every accreditation programme** (data table, from `listAccreditationProgrammes`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Venues | list or chips (count when long) | — |
+| Events | list or chips (count when long) | — |
+| Categories | list or chips (count when long) | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create (primary button) | navigation or local | — | — | — | — |
+| Create (primary button) | `createAccreditationProgramme` POST `/accreditation-programmes` | AccreditationProgramme | AccreditationProgramme | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | opens modal first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+| Edit programme (secondary button) | `updateAccreditationProgramme` PUT `/accreditation-programmes/{programmeId}` | AccreditationProgramme | AccreditationProgramme | 409 A template cannot be opened for applications (`programme-is-template`), or another programme of the tenant already holds the body's `code`, compared … | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1448,10 +1522,10 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (50), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-620?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create, Cancel.
+- [ ] Every action is wired with its success and its failure: Create, Cancel, Edit programme.
 - [ ] Every transition is wired: `BO-615`.
 - [ ] Every gated control is gated: `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1813,8 +1887,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/accreditation-intake-monitor-bo-623` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Operations' view of incoming demand: how many applications arrived today and this week, by category and organisation, how many are stuck (incomplete, waiting for documents, possible duplicates), and how the queue is ageing against its SLA. The one thing to get right: these are KPI tiles and charts with alerts, not columns of a table, and each opens the filtered applications.
 
 **Known correction pending (do not draw the wrong version)**
@@ -2043,7 +2115,39 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Save** (modal, opened by *Save*; *Save* calls `updateAccreditationProgramme`, *Cancel* sends nothing)
+
+**Collects what `updateAccreditationProgramme` sends before it is called.** Required: `code`, `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`, `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `updateAccreditationProgramme` body |
+| Code `code` | text field | required | — | — | — | — | `updateAccreditationProgramme` body |
+| Name `name` | text field | required | — | — | — | — | `updateAccreditationProgramme` body |
+| Venues `venueIds` | multi-picker: choose venues | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Events `eventIds` | multi-picker: choose events | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Categories `categories` | repeatable rows | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Code `categories[].code` | text field | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Name `categories[].name` | text field | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Default access profile `categories[].defaultAccessProfileId` | picker: choose a default access profile | optional | — | — | shows names, sends the id | — | `updateAccreditationProgramme` body |
+| Quota `categories[].quota` | number field | optional | — | — | — | A cap on how many may be accredited in this category. Without one, a category is a promise nobody counted. | `updateAccreditationProgramme` body |
+| Badge template `categories[].badgeTemplateId` | picker: choose a badge template | optional | — | — | shows names, sends the id | The badge printed for this category; travels with the category when a programme is cloned | `updateAccreditationProgramme` body |
+| Applicant types `applicantTypes` | list of values (chips) | optional | — | — | — | — | `updateAccreditationProgramme` body |
+| Applications open at `applicationsOpenAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAccreditationProgramme` body |
+| Applications close at `applicationsCloseAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAccreditationProgramme` body |
+| Approval workflow `approvalWorkflowId` | picker: choose an approval workflow | optional | — | — | shows names, sends the id | — | `updateAccreditationProgramme` body |
+| Form `formId` | picker: choose a form | optional | — | — | shows names, sends the id | 12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant fills in. | `updateAccreditationProgramme` body |
+| Is template `isTemplate` | toggle | optional | off | — | — | 12.1.56. A reusable programme template: never opened for applications, and what `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules and … | `updateAccreditationProgramme` body |
+| Status `status` | radio group | optional | — | Draft · Open · Closed · Archived | — | — | `updateAccreditationProgramme` body |
+| Face matching `faceMatching` | group | optional | — | Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default (Chinmay, 2 October, workbook Q461; ADR-0063 …; Enabling needs `legalSignOffRef` (the venue's legal sign-off … | — | Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default (Chinmay, 2 October, workbook … | `updateAccreditationProgramme` body |
+| Enabled `faceMatching.enabled` | toggle | optional | off | — | — | — | `updateAccreditationProgramme` body |
+| Legal sign off ref `faceMatching.legalSignOffRef` | text field | optional | — | — | — | The venue's legal sign-off document (a stored file reference). | `updateAccreditationProgramme` body |
+| Identity verification `identityVerification` | group | optional | — | — | — | UAE Pass and ICP verification, in release 1 (Chinmay, 2 October, workbook Q457; CHG-CSA-031). | `updateAccreditationProgramme` body |
+| Methods `identityVerification.methods` | multi-select chips | optional | — | Uae pass · Icp · Manual review | — | — | `updateAccreditationProgramme` body |
+| Required `identityVerification.required` | toggle | optional | off | — | — | Whether an application is blocked from approval until a listed check passes. | `updateAccreditationProgramme` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `updateAccreditationProgramme` body |
+
+Errors to draw in the form: 409 A template cannot be opened for applications (`programme-is-template`), or another programme of the tenant already holds the body's `code`, compared …
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -2056,7 +2160,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save (primary button) | navigation or local | — | — | — | — |
+| Save (primary button) | `updateAccreditationProgramme` PUT `/accreditation-programmes/{programmeId}` | AccreditationProgramme | AccreditationProgramme | 409 A template cannot be opened for applications (`programme-is-template`), or another programme of the tenant already holds the body's `code`, compared … | opens modal first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -2146,7 +2250,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-624?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.

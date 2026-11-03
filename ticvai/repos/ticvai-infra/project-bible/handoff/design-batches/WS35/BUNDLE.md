@@ -145,7 +145,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 13 actions on this screen and the screen declares 1 operation.** Unserved: Customer Segment, Membership, Channel, Quantity, Timeslot, Event, Create Rule, Duplicate …. Each needs an …
+**Known gaps.** **The pack names 13 actions on this screen and the screen declares 3 operations.** Unserved: Customer Segment, Membership, Channel, Quantity, Timeslot, Event, Create Rule, Duplicate …. Each needs an …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** All pricing rules (segment, membership, residency, channel, venue and event, quantity, date and season, time slot) with status and conflicts, and a Test Rule on a sample booking.
 

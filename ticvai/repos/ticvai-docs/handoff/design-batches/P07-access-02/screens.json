@@ -28,7 +28,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-016 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-016 holds none of them. The edge carries nothing: challengeId only pre-selects (optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -41,11 +41,11 @@
     {
      "to": "SCN-003",
      "trigger": "Ready to scan",
-     "provenance": "derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-016 holds none of them. The edge carries nothing: mediaCode, rightId only pre-select (deep link or optional), and SCN-003 opens on its own"
+     "provenance": "derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-016 holds none of them, so the edge carries nothing and SCN-003 opens cold"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence, updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine the lane is a handheld that can admit anywhere. **The podium sets the operating mode** (normal, freeFlow, dropArm, closed, podium, maintenance), required on every save; the turnstile mode (freeRotation or closed) is optional and offered only under normal or podium. **Direction is display-only here**: it is fixed per access point and set in the back office (BO-064) (decided 28 September, audit R221).",
+  "notes": "Definition derived from the wireframe board on 14 August. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence, updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine the lane is a handheld that can admit anywhere. **The podium sets the operating mode** (normal, freeFlow, dropArm, closed, podium, maintenance), required on every save; the turnstile mode (freeRotation or closed) is optional and offered only under normal or podium. **Direction is display-only here**: it is fixed per access point and set in the back office (BO-064) (decided 28 September, audit R221).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listAccessPoints` reads the population and `getAccessPoint` reads one of them — list, select, act",

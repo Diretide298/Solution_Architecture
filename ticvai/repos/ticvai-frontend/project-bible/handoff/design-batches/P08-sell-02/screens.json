@@ -26,12 +26,12 @@
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-017 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-017 holds none of them. The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-017 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-017 holds none of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId (listPriceLists) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -373,12 +373,12 @@
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-018 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-018 holds none of them. The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-018 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-018 holds none of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId (listPriceLists) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -603,12 +603,12 @@
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-019 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-019 holds none of them. The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-019 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-019 holds none of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId (listPriceLists) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -1124,12 +1124,12 @@
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-037 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-037 holds none of them. The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-037 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-037 holds none of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId (listPriceLists) itself, and BO-009 opens on its own"
     },
     {
      "to": "BO-128",
@@ -1526,12 +1526,12 @@
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-063 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-063 holds none of them. The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-063 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-063 holds none of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId (listPriceLists) itself, and BO-009 opens on its own"
     }
    ]
   },
@@ -1830,67 +1830,67 @@
     {
      "to": "BO-007",
      "trigger": "Product Directory",
-     "provenance": "derived — BO-007 declares entryState.params productId and BO-102 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-007 opens on its own"
+     "provenance": "derived — BO-007 declares entryState.params productId and BO-102 holds none of them. The edge carries nothing: BO-007 finds productId (listProducts) itself, and BO-007 opens on its own"
     },
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-102 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-102 holds none of them. The edge carries nothing: ruleId only pre-selects (optional); BO-009 finds priceListId (listPriceLists) itself, and BO-009 opens on its own"
     },
     {
      "to": "BO-010",
      "trigger": "Promotions & Coupons",
-     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, voucherId and BO-102 holds none of them. The edge carries nothing: campaignId, dashboardId, promotionId, reportId, code, voucherId only pre-select (deep link or optional), and BO-010 opens on its own"
+     "provenance": "derived — BO-010 declares entryState.params campaignId, code, dashboardId, promotionId, reportId, voucherId and BO-102 holds none of them. The edge carries nothing: dashboardId, voucherId only pre-select (optional); BO-010 finds campaignId (listPromotions), promotionId (listPromotions), reportId (getDashboard), code (listPromotions) itself, and BO-010 opens on its own"
     },
     {
      "to": "BO-011",
      "trigger": "Packages & Bundles",
-     "provenance": "derived — BO-011 declares entryState.params bundleId, comboId, productId, version and BO-102 holds none of them. The edge carries nothing: version, comboId only pre-select (deep link or optional); BO-011 finds productId (setPackagePricingDefinition), bundleId (createBundle) itself, and BO-011 opens on its own"
+     "provenance": "derived — BO-011 declares entryState.params bundleId, comboId, productId, version and BO-102 holds none of them. The edge carries nothing: comboId only pre-selects (optional); BO-011 finds version (listCatalogueBundles), productId (setPackagePricingDefinition), bundleId (createBundle) itself, and BO-011 opens on its own"
     },
     {
      "to": "BO-012",
      "trigger": "Membership Products",
-     "provenance": "derived — BO-012 declares entryState.params productId and BO-102 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and BO-012 opens on its own"
+     "provenance": "derived — BO-012 declares entryState.params productId and BO-102 holds none of them. The edge carries nothing: productId only pre-selects (optional), and BO-012 opens on its own"
     },
     {
      "to": "BO-013",
      "trigger": "Channel & Distribution",
-     "provenance": "derived — BO-013 declares entryState.params channelCapacityId, listingId and BO-102 holds none of them. The edge carries nothing: channelCapacityId, listingId only pre-select (deep link or optional), and BO-013 opens on its own"
+     "provenance": "derived — BO-013 declares entryState.params channelCapacityId, listingId and BO-102 holds none of them. The edge carries nothing: channelCapacityId, listingId only pre-select (optional), and BO-013 opens on its own"
     },
     {
      "to": "BO-014",
      "trigger": "Catalogue Publishing",
-     "provenance": "derived — BO-014 declares entryState.params itemId, priceListId, productId and BO-102 holds none of them. The edge carries nothing: itemId, priceListId, productId only pre-select (deep link or optional), and BO-014 opens on its own"
+     "provenance": "derived — BO-014 declares entryState.params itemId, priceListId, productId and BO-102 holds none of them. The edge carries nothing: itemId only pre-selects (optional); BO-014 finds productId (listProducts) itself; BO-014 opens on listProducts, and priceListId has no source on BO-014 yet (a gap in BO-014, not in this edge)"
     },
     {
      "to": "BO-015",
      "trigger": "Performance Calendar",
-     "provenance": "derived — BO-015 declares entryState.params eventId, performanceId and BO-102 holds none of them. The edge carries nothing: eventId, performanceId only pre-select (deep link or optional), and BO-015 opens on its own"
+     "provenance": "derived — BO-015 declares entryState.params eventId, performanceId and BO-102 holds none of them. The edge carries nothing: eventId only pre-selects (optional); BO-015 finds performanceId (getAvailability) itself, and BO-015 opens on its own"
     },
     {
      "to": "BO-016",
      "trigger": "Performance Template",
-     "provenance": "derived — BO-016 declares entryState.params performanceTemplateId and BO-102 holds none of them. The edge carries nothing: performanceTemplateId only pre-selects (deep link or optional), and BO-016 opens on its own"
+     "provenance": "derived — BO-016 declares entryState.params performanceTemplateId and BO-102 holds none of them. The edge carries nothing: performanceTemplateId only pre-selects (optional), and BO-016 opens on its own"
     },
     {
      "to": "BO-017",
      "trigger": "Capacity Management",
-     "provenance": "derived — BO-017 declares entryState.params channelCapacityId, entryId and BO-102 holds none of them. The edge carries nothing: channelCapacityId, entryId only pre-select (deep link or optional), and BO-017 opens on its own"
+     "provenance": "derived — BO-017 declares entryState.params channelCapacityId, entryId and BO-102 holds none of them. The edge carries nothing: channelCapacityId, entryId only pre-select (optional), and BO-017 opens on its own"
     },
     {
      "to": "BO-018",
      "trigger": "Allocation & Holds",
-     "provenance": "derived — BO-018 declares entryState.params inventoryHoldId and BO-102 holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional), and BO-018 opens on its own"
+     "provenance": "derived — BO-018 declares entryState.params inventoryHoldId and BO-102 holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (optional), and BO-018 opens on its own"
     },
     {
      "to": "BO-019",
      "trigger": "Closures & Blackouts",
-     "provenance": "derived — BO-019 declares entryState.params eventId, mapId, pathId, performanceId and BO-102 holds none of them. The edge carries nothing: eventId, performanceId, mapId, pathId only pre-select (deep link or optional), and BO-019 opens on its own"
+     "provenance": "derived — BO-019 declares entryState.params eventId, mapId, pathId, performanceId and BO-102 holds none of them. The edge carries nothing: eventId, performanceId, mapId, pathId only pre-select (optional), and BO-019 opens on its own"
     },
     {
      "to": "BO-037",
      "trigger": "Offline Package Status",
-     "provenance": "derived — BO-037 declares entryState.params version and BO-102 holds none of them. The edge carries nothing: version only pre-selects (deep link or optional), and BO-037 opens on its own"
+     "provenance": "derived — BO-037 declares entryState.params version and BO-102 holds none of them. The edge carries nothing: BO-037 finds version (listCatalogueBundles) itself, and BO-037 opens on its own"
     },
     {
      "to": "BO-063",
@@ -1900,7 +1900,7 @@
     {
      "to": "BO-109",
      "trigger": "Menu Builder & POS Layout Designer",
-     "provenance": "derived — BO-109 declares entryState.params menuId, saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId only pre-selects (deep link or optional); BO-109 opens on listSaleBoards, and menuId has no source on BO-109 yet (a gap in BO-109, not in this edge)"
+     "provenance": "derived — BO-109 declares entryState.params menuId, saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId only pre-selects (optional); BO-109 opens on listSaleBoards, and menuId has no source on BO-109 yet (a gap in BO-109, not in this edge)"
     },
     {
      "to": "BO-110",
@@ -1910,17 +1910,17 @@
     {
      "to": "BO-111",
      "trigger": "Ingredient Substitution, Allergen & Nutrition",
-     "provenance": "derived — BO-111 declares entryState.params menuId, menuItemId, recipeId and BO-102 holds none of them. The edge carries nothing: menuId, menuItemId, recipeId only pre-select (deep link or optional), and BO-111 opens on its own"
+     "provenance": "derived — BO-111 declares entryState.params menuId, menuItemId, recipeId and BO-102 holds none of them. The edge carries nothing: recipeId only pre-selects (optional); BO-111 finds menuItemId (setRecipe) itself; BO-111 opens on listRecipes, and menuId has no source on BO-111 yet (a gap in BO-111, not in this edge)"
     },
     {
      "to": "BO-112",
      "trigger": "Production Planning & Production Sheets",
-     "provenance": "derived — BO-112 declares entryState.params planId, runId and BO-102 holds none of them. The edge carries nothing: planId, runId only pre-select (deep link or optional), and BO-112 opens on its own"
+     "provenance": "derived — BO-112 declares entryState.params planId, runId and BO-102 holds none of them. The edge carries nothing: planId, runId only pre-select (optional), and BO-112 opens on its own"
     },
     {
      "to": "BO-113",
      "trigger": "Central Kitchen & Commissary Management",
-     "provenance": "derived — BO-113 declares entryState.params runId and BO-102 holds none of them. The edge carries nothing: runId only pre-selects (deep link or optional), and BO-113 opens on its own"
+     "provenance": "derived — BO-113 declares entryState.params runId and BO-102 holds none of them. The edge carries nothing: runId only pre-selects (optional), and BO-113 opens on its own"
     },
     {
      "to": "BO-114",
@@ -1935,17 +1935,17 @@
     {
      "to": "BO-116",
      "trigger": "Merchandising & Product Presentation",
-     "provenance": "derived — BO-116 declares entryState.params merchandiseId, saleBoardId and BO-102 holds none of them. The edge carries nothing: merchandiseId, saleBoardId only pre-select (deep link or optional), and BO-116 opens on its own"
+     "provenance": "derived — BO-116 declares entryState.params merchandiseId, saleBoardId and BO-102 holds none of them. The edge carries nothing: merchandiseId, saleBoardId only pre-select (optional), and BO-116 opens on its own"
     },
     {
      "to": "BO-117",
      "trigger": "Product Import, Governance & AI Configuration Assistant",
-     "provenance": "derived — BO-117 declares entryState.params jobId and BO-102 holds none of them. The edge carries nothing: jobId only pre-selects (deep link or optional), and BO-117 opens on its own"
+     "provenance": "derived — BO-117 declares entryState.params jobId and BO-102 holds none of them. The edge carries nothing: jobId only pre-selects (optional), and BO-117 opens on its own"
     },
     {
      "to": "BO-118",
      "trigger": "Campaign & Audience Management",
-     "provenance": "derived — BO-118 declares entryState.params executionId, reportId and BO-102 holds none of them. The edge carries nothing: reportId, executionId only pre-select (deep link or optional), and BO-118 opens on its own"
+     "provenance": "derived — BO-118 declares entryState.params executionId, reportId and BO-102 holds none of them. The edge carries nothing: reportId, executionId only pre-select (optional), and BO-118 opens on its own"
     },
     {
      "to": "BO-119",
@@ -1973,32 +1973,32 @@
     {
      "to": "BO-123",
      "trigger": "POS Profile Management",
-     "provenance": "derived — BO-123 declares entryState.params profileId and BO-102 holds none of them. The edge carries nothing: profileId only pre-selects (deep link or optional), and BO-123 opens on its own"
+     "provenance": "derived — BO-123 declares entryState.params profileId and BO-102 holds none of them. The edge carries nothing: profileId only pre-selects (optional), and BO-123 opens on its own"
     },
     {
      "to": "BO-124",
      "trigger": "Layout & Journey Builder",
-     "provenance": "derived — BO-124 declares entryState.params deviceId, profileId, saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId, deviceId, profileId only pre-select (deep link or optional), and BO-124 opens on its own"
+     "provenance": "derived — BO-124 declares entryState.params deviceId, profileId, saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId only pre-selects (optional); BO-124 finds deviceId (listDevices) itself; BO-124 opens on listDevices, and profileId has no source on BO-124 yet (a gap in BO-124, not in this edge)"
     },
     {
      "to": "BO-125",
      "trigger": "Product & Category Button Configuration",
-     "provenance": "derived — BO-125 declares entryState.params saleBoardId and BO-102 holds none of them. The edge carries nothing: saleBoardId only pre-selects (deep link or optional), and BO-125 opens on its own"
+     "provenance": "derived — BO-125 declares entryState.params saleBoardId and BO-102 holds none of them. The edge carries nothing: BO-125 opens on listProducts, and saleBoardId has no source on BO-125 yet (a gap in BO-125, not in this edge)"
     },
     {
      "to": "BO-126",
      "trigger": "Deployment, Preview & Audit",
-     "provenance": "derived — BO-126 declares entryState.params profileId, saleBoardId and BO-102 holds none of them. The edge carries nothing: profileId, saleBoardId only pre-select (deep link or optional), and BO-126 opens on its own"
+     "provenance": "derived — BO-126 declares entryState.params profileId, saleBoardId and BO-102 holds none of them. The edge carries nothing: BO-126 finds saleBoardId (listSaleBoards) itself; BO-126 opens on listAuditRecords, and profileId has no source on BO-126 yet (a gap in BO-126, not in this edge)"
     },
     {
      "to": "BO-142",
      "trigger": "Store Rules, Controls & Permissions",
-     "provenance": "derived — BO-142 declares entryState.params storeRuleId and BO-102 holds none of them. The edge carries nothing: storeRuleId only pre-selects (deep link or optional), and BO-142 opens on its own"
+     "provenance": "derived — BO-142 declares entryState.params storeRuleId and BO-102 holds none of them. The edge carries nothing: storeRuleId only pre-selects (optional), and BO-142 opens on its own"
     },
     {
      "to": "BO-143",
      "trigger": "Retail Global Settings & Controls",
-     "provenance": "derived — BO-143 declares entryState.params dropId and BO-102 holds none of them. The edge carries nothing: dropId only pre-selects (deep link or optional), and BO-143 opens on its own"
+     "provenance": "derived — BO-143 declares entryState.params dropId and BO-102 holds none of them. The edge carries nothing: dropId only pre-selects (optional), and BO-143 opens on its own"
     },
     {
      "to": "BO-1190",
@@ -3282,13 +3282,7 @@
     "provenance": "contract inventory.yaml POST /stock-transfers; wiring fix, 2 October 2026"
    }
   ],
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read of production plans (list or get).",
-    "source": "contracts/satellite/fnb.yaml#/components/schemas/ProductionPlan"
-   }
-  ],
+  "gaps": [],
   "_platform": {
    "code": "P08",
    "audience": "staff",

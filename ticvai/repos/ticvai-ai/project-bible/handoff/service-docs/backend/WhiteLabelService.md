@@ -666,7 +666,9 @@ Removed from the working draft; guests keep the published copy until the next pu
 
 **What the guest booking screens read to order their steps (decided 29 September, W12).** Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never the draft. Only enabled flows resolve: the snapshot holds the disabled ones too, and they are skipped (ADAM CR-324, A3; CHG-CR324-001). Returns only the enabled steps, in order, with their settings and the flow-level settings; `name` is left out of this view.
 
-**How a flow is resolved** (ADAM CR-427, decided 31 October 2026, Chinmay; CHG-CR427-001). Catalogue's `catalogue#productRecords` and `catalogue#productCategoryRecords` are asked in process from the operations host (XDR-051). Against the published snapshot's enabled flows of the path's venue, in this order: (1) with `productId`, the product's own `bookingFlowId`; the product is `productRecords` ids [`productId`] where {`venueId`}, and no such product is 404; (2) the category's `bookingFlowId`: the product's `categoryId`, or `productCategoryId` when no `productId` is sent; (3) with a product, the venue's enabled default flow whose type lists the product's `kind` in its `productKinds`; when several do, the type whose `productKinds` lists the kind earliest, then the type that comes first in `x-ticvai-system-catalogue`, so `admission` resolves to `datedDayPass` before `transport` or `multiLocation`, and `rental` to `meetingRoomHourly` before `cabanaMap` or `surfSession`; (4) with `flowTypeKey`, the venue's enabled default for that type. Then 404 `not-found`, and the guest screens use the type's default order. A step whose flow id names a missing or disabled flow falls through to the next step. With none of `productId`, `productCategoryId` and `flowTypeKey` the answer is 400 `validation`. A venue that wants a different flow for a product sets the product's or the category's `bookingFlowId`. The most recently updated flow decides nothing: editing a flow never changes which flow guests get.
+**How a flow is resolved** (ADAM CR-427, decided 31 October 2026, Chinmay; CHG-CR427-001). Catalogue's `catalogue#productRecords` and `catalogue#productCategoryRecords` are asked in process from the operations host (XDR-051). Against the published snapshot's enabled flows of the path's venue, in this order: (1) with `productId`, the product's own `bookingFlowId`; the product is `productRecords` ids [`productId`] where {`venueId`}, and no such product is 404; (2) the category's `bookingFlowId`: the product's `categoryId`, or `productCategoryId` when no `productId` is sent; (3) with a product, the venue's enabled default flow whose type lists the product's `kind` in its `productKinds`; when several do, the type whose `productKinds` lists the kind earliest, then the type that comes first in `x-ticvai-system-catalogue`, so `admission` resolves to `datedDayPass` before `transport` or `multiLocation`, and `rental` to `meetingRoomHourly` before `cabanaMap` or `surfSession`; (4) with `flowTypeKey`, the venue's enabled default for that type. Then 404 `not-found`, and the guest screens use the type's default order. A step whose flow id names a missing or disabled flow falls through to the next step. With none of `productId`, `productCategoryId`, `flowTypeKey` and `eventId` the answer is 400 `validation`. A venue that wants a different flow for a product sets the product's or the category's `bookingFlowId`. The most recently updated flow decides nothing: editing a flow never changes which flow guests get.
+
+**Resolved from an event** (ADAM CR-495, Chinmay, 3 November 2026; CHG-CR495-001). With `productId` sent, `eventId` is ignored and nothing above changes. With `eventId` and no `productId`, the venue's products that sell admission to that event (`Product.eventId`) and that a guest may see (published, on sale) are taken in `displayOrder`, then id: `catalogue#productRecords` where {`venueId`, `eventId`}, asked in process. Each in turn goes through the rule above: the product's own `bookingFlowId`, then its category's `bookingFlowId`, then the venue's enabled default for its `kind` by the same tie rule. The first product that resolves to an enabled flow wins. If none resolves, `flowTypeKey` is tried when sent, then the answer is 404 `not-found`. An `eventId` that is not an event of the venue (`catalogue#eventRecords` ids [`eventId`] where {`venueId`}, asked in process) is 404 `not-found`. GST-007 opened from an event sends `eventId`.
 
 |  |  |
 |---|---|
@@ -679,7 +681,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 | Read routing | replica |
 | Reads | `catalogue.product`, `catalogue.product_category`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version` |
 | Writes | - |
-| Called by | CMS-103, GST-007, GST-008, GST-009, GST-041, WEB-004, WEB-005, WEB-006, WEB-007, WEB-008, WEB-010, WEB-011, WEB-012 |
+| Called by | CMS-103, GST-007, GST-008, GST-009, GST-041, WEB-004, WEB-005, WEB-006, WEB-007, WEB-008, WEB-010, WEB-011, WEB-012, WEB-022 |
 
 **Parameters**
 
@@ -689,6 +691,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 | productId | query |  | string (uuid) |  |
 | productCategoryId | query |  | string (uuid) |  |
 | flowTypeKey | query |  | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) |  |
+| eventId | query |  | string (uuid) | The event the guest opened the booking from (ADAM CR-495): ignored when productId is sent; otherwise the flow is resolved from the venue's published, on-sale products for that event, in displayOrder… |
 
 **Response**: `BookingFlow`
 
@@ -1651,6 +1654,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 
 **Venue configuration (decided 29 September, rev 3 REV3-11).** Created as `draft` with `source` `manual`; guests see nothing until `publishGuidedChoice`. Every target must belong to this venue, or 400.
 **In this venue** (ADAM CR-394, Chinmay, 31 October 2026): a target is in the venue when it is a product or event whose `venue_id` is the choice's venue, or a category whose `scope_path` is the venue's or an ancestor of it, read in process from Catalogue (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033). Else `400 target-not-in-venue`, which names the failing target in `errors[]` by its pointer (`questions/i/answers/j/target`), because a new answer has no id yet.
+**Rows above the venue** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001): the category check reads the `catalogue.product_category` rows at the venue and at its ancestors (a `scope_path` that is the venue's or an ancestor of it), read under the routed tenant's root grant, filtered to the venue's scope_path and its ancestors (the lead, 2 November 2026, "yes for both"; as CR-336 and CR-362 did), in process, for this check only, so a brand-level category head office set up is found; every other read stays under the caller's grant.
 
 |  |  |
 |---|---|
@@ -2398,6 +2402,8 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 
 **The live preview of a draft set-up** (r8, WHITE-C26; the core lane made catalogue's listProducts say that drafts preview through this). The body is the draft's questions and answers as CMS-101 holds them, saved or not; the answer is, for every combination of answers a guest can give, how many of the venue's products it leaves and up to three of their ids, so the editor sees a combination that leaves nothing before publishing. Nothing is stored and nothing is published; the guest filter is the one listProducts applies, so the preview and the published behaviour cannot differ. A set-up with `behaviour` `recommend` is answered with each last answer's `target` instead of a count.
 
+**One guided-answer filter, written once as shared code** (ADAM CR-532; Chinmay, 3 November 2026; CHG-CR532-001; built on #36283). Catalogue's `listProducts` (and `searchCatalogue`'s `guidedAnswerIds`) call the same code when they are built, and this preview calls it now over the venue's published products. Its inputs: the product, its eligibility rule (no rule means every limit is empty) and the kinds of its consent questions. The rules are `GuidedChoice` `answer.filter`'s, field by field. It reads the product, its eligibility rule and the products' consent questions in Marketing (`consentQuestionRecords`, for the kind only), asked in process because Marketing runs in the operations host with WhiteLabel (CHG-R13INP-001). The preview's counts must equal what `listProducts` would return for the same answers. The filter is tested on its own with these cases: overlap at both edges, open bounds, subcategory depth, a swim consent question, a product with only the old swim rule, and a product with no rule.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -2450,6 +2456,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 **Where the AI's proposal lands (decided 29 September, rev 3 REV3-11).** After a venue's products are uploaded, the `ai` service analyses them and calls this once per proposed set-up. It is stored as `draft` with `source` `aiSuggested` and the proposing job in `suggestionRef`, and appears in `listGuidedChoices` for a person to review, edit, publish or delete. **A suggestion is never published by the system**: this operation cannot publish, and `publishGuidedChoice` refuses a service caller.
 **The caller is ai `suggestGuidedChoice`** (29 September, build; AI system design 3.11). `suggestionRef` is the id of its `AiGuidedChoiceSuggestion`, which the review screen passes to ai `getGuidedChoiceSuggestion` to show why each question, answer and target was proposed.
 **The same venue check as `createGuidedChoice`** (ADAM CR-394, Chinmay, 31 October 2026): a product or event target whose `venue_id` is not the choice's venue, or a category whose `scope_path` is neither the venue's nor an ancestor of it, is `400 target-not-in-venue`, named in `errors[]` by its pointer (`questions/i/answers/j/target`); Catalogue is read in process (XDR-033).
+**Rows above the venue** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001): the category check reads the `catalogue.product_category` rows at the venue and at its ancestors (a `scope_path` that is the venue's or an ancestor of it), read under the routed tenant's root grant, filtered to the venue's scope_path and its ancestors (the lead, 2 November 2026, "yes for both"; as CR-336 and CR-362 did), in process, for this check only, so a brand-level category head office set up is found; every other read stays under the caller's grant.
 
 |  |  |
 |---|---|
@@ -2553,7 +2560,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 
 **A person publishes, always (decided 29 September, rev 3 REV3-11).** Needs a staff session; a service caller is refused with 403, so an AI suggestion cannot publish itself. Every target is checked at this moment: a product or event not on sale, a category with no products on sale, or a module not enabled is refused with 422 naming the answer, and so is an answer without the `filter` (`behaviour` `filter`) or the last-question `target` (`recommend`) it needs (W4). **One published choice per venue**: publishing this one returns the venue's previously published choice to `draft` in the same transaction. Live at once; not part of `publishTenantConfig`.
 
-**The rule for each kind** (ADAM CR-394, Chinmay, 31 October 2026). Catalogue is asked in process from the operations host, through Catalogue's own query classes and under the caller's row security (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033). A target is on sale (else `422 answer-target-not-on-sale`) when it is: a product with `is_sellable` true, `guest_listing` `bookable`, and the current time inside `on_sale_from` and `on_sale_to` where they are set; a category with `is_active` true and at least one such product of this venue in it; an event with `is_active` true and `lifecycle_state` `onSale` or `live`. A module target must be enabled in the published configuration (`422 answer-target-not-enabled`), and a booking-flow target must be one of the venue's enabled flows. The `422` answers with `GuidedChoiceAnswerProblem`: `Problem` plus `questionId` and `answerId`.
+**The rule for each kind** (ADAM CR-394, Chinmay, 31 October 2026). Catalogue is asked in process from the operations host, through Catalogue's own query classes and under the caller's row security (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033), except that a category target is read at the venue and at its ancestors, for this check only, under the routed tenant's root grant filtered to the venue's scope_path and its ancestors (ADAM CR-443, Chinmay, 1 November 2026, and the lead's "yes for both" of 2 November 2026; CHG-CR443-001). Module enablement is read under the routed tenant's root grant, as `getPublishedKioskConfig` reads it (ADAM CR-443: confirmed as built). A target is on sale (else `422 answer-target-not-on-sale`) when it is: a product with `is_sellable` true, `guest_listing` `bookable`, and the current time inside `on_sale_from` and `on_sale_to` where they are set; a category with `is_active` true and at least one such product of this venue in it; an event with `is_active` true and `lifecycle_state` `onSale` or `live`. A module target must be enabled in the published configuration (`422 answer-target-not-enabled`), and a booking-flow target must be one of the venue's enabled flows. The `422` answers with `GuidedChoiceAnswerProblem`: `Problem` plus `questionId` and `answerId`.
 
 |  |  |
 |---|---|
@@ -2950,6 +2957,8 @@ Replaces the page's editable fields. `status` is taken only to archive the page 
 
 A partial update. Only a `draft` may be edited: a `published` choice is unpublished first, or 409, so guests never see a half-edited set of questions (decided 29 September, rev 3 REV3-11). Editing an AI suggestion keeps its `source`.
 
+**The same target check as `createGuidedChoice` and `proposeGuidedChoice`** (ADAM CR-444, Chinmay, 1 November 2026; CHG-CR444-001). When the body carries `questions`, every target must be in the choice's venue by the rule `createGuidedChoice` states: a product or event whose `venue_id` is the choice's venue, or a category whose `scope_path` is the venue's or an ancestor of it (read at the venue and at its ancestors, for this check only; ADAM CR-443), asked of Catalogue in process (XDR-033). Else `400 target-not-in-venue`, which names the failing target in `errors[]` by the same pointer (`questions/i/answers/j/target`), and nothing is stored, so a draft never holds another venue's product or event. `publishGuidedChoice`'s checks stay as decided.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -3020,7 +3029,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 400 | BadRequest | Validation failed |
+| 400 |  | The body is malformed (validation), or a target in questions is not in this venue (target-not-in-venue, named in errors[] by its pointer questions/i/answers/j/target; ADAM CR-444) |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The choice is published; unpublish it first |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -3310,7 +3319,7 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 **`GET /tenant-config/modules`**: Read module enablement
 
 Shows which modules the tenant has licensed and which are enabled. A module that is not licensed cannot be enabled, so the two are returned together.
-**`isLicensed` uses the map on `ModuleKey`** (common.yaml; R8 blocker fix, IDENTITY-C31): a feature here is licensed when its `x-ticvai-licence-module` is in the tenant's `LicencePosition.licensedModules`. **A platform operator sends `X-Tenant-Id`** (`TenantId`; APPROVALS-TENANCY-C44) to read a tenant's enablement from the cell that holds many tenants; the cell address is `Tenant.cellHost`.
+**`isLicensed` uses the map on `ModuleKey`** (common.yaml; R8 blocker fix, IDENTITY-C31): a feature here is licensed when its `x-ticvai-licence-module` is in the tenant's `LicencePosition.licensedModules`, by the in-force contract rule `LicencePosition` states (ADAM CR-449; CHG-CR449-001). **A platform operator sends `X-Tenant-Id`** (`TenantId`; APPROVALS-TENANCY-C44) to read a tenant's enablement from the cell that holds many tenants; the cell address is `Tenant.cellHost`.
 **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
@@ -4478,6 +4487,8 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 - **`batchEndedAt` is the time the server received the batch.**
 - **De-duplicated on `batchId`, with no `Idempotency-Key`.** A beacon cannot set headers, so the operation takes none; a batch whose `batchId` was already accepted is answered `202` and not published again.
 
+**Where the batch is recorded, the outbox row's key and the scope** (ADAM CR-511, Chinmay, 3 November 2026; CHG-CR511-001). (1) In the same transaction as the outbox row, the batch is recorded through the kernel's `IIdempotencyStore` in `platform.idempotency_record`: `idempotency_key` = `batchId`, `operation_id` `recordStorefrontSessionEvents`, `request_hash` = SHA-256 hex of the body, status `completed`, `response_status` 202, `principal_id` null, `scope_path` the tenant root, `expires_at` the store's usual expiry. If `batchId` was already recorded, the answer is 202 and nothing is written, whatever the body; a concurrent repeat that hits the unique key also answers 202 with nothing written. "The outbox row is the only write" reads as "the outbox row and its batch record". (2) The outbox row's `aggregate_id` is `batchId` and its sequence is 1. Sessions join on `sessionRef` and need no order. The counter row the outbox adds per aggregate is what any one-event aggregate adds; pruning it is not this operation's. (3) If `venueId` names an active venue of the tenant (`tenancy#activeVenues`, in process, as publishTenantConfig reads it), `scopePath` is that venue's path and `venueId` is carried. Otherwise, or if it is absent, `scopePath` is the tenant root and `venueId` is left out of the event; never refused. (4) Everything else stays as CR-107 and CR-283 settled it, including waiting on #37050's durable key store.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -4487,7 +4498,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | - |
-| Writes | `platform.outbox` |
+| Writes | `platform.idempotency_record`, `platform.outbox` |
 | Called by | GST-001, WEB-001 |
 
 **Request body**: `WhiteLabelStorefrontSessionBatch`
@@ -4716,6 +4727,10 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 
 **Rendered by the white-label jobs component, at a named route** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012). This call writes the cache entry and `preview.requested` to the outbox, and answers `201`. The jobs component, in the workers host, consumes it and renders the draft for the platform and language asked, with the `outputs` (the PDF ticket and the Wallet passes from the ticket and pass templates), writing their references into the same cache entry. `url` is the route `https://<the tenant's platform subdomain>/previews/{previewId}`, served by the guest web host from that entry until `expiresAt`; `getPreview` reads the entry back.
 
+**It reads nothing from Catalogue or Orders** (ADAM CR-476, Chinmay, 2 November 2026). It asks no query of either and calls no service route, and the operations role gets no grant on `orders.ticket_template`. It validates the body and writes `cache:preview:{tenantId}:{previewId}` with `expiresAt`; in the same transaction it writes `preview.requested` to the outbox (`previewId`, `platform`, `language`, `outputs`, `productId` as sent, `expiresAt`), then answers `201` with the Preview (CR-106). Rendering the app, the PDF ticket and the Wallet passes is the white-label jobs component's work in the workers host, triggered by `preview.requested`: like every consumer in the workers host it asks `catalogue#productRecords` (ids `[productId]`) and `orders#ticketTemplateRecords` in process, and Orders implements ticketTemplateRecords as an in-process query class. That renderer is its own ticket.
+
+**The address and the cache entry** (ADAM CR-507, Chinmay, 3 November 2026; CHG-CR507-001). createPreview takes the tenant's address exactly as getPlatformSubdomain does: it asks `platform-ops#tenantDomainRecords` and `subscription#cellRecords` in process, through the one WhiteLabel reader that answers the tenant's platform subdomain hostname (`<venue>.<cell>.ticvai.app`, `PlatformSubdomain.hostname`), which createPreview and getPlatformSubdomain both use. `url` is `https://<that hostname>/previews/{previewId}`, never a custom domain. Every tenant gets this address at provisioning; a missing one is a server error, not a contract case. The cache entry goes through the kernel's `IKeyedState` with the logical key `preview:{previewId}`, so the tenant appears once in the stored key: it is the entry this contract calls `cache:preview:{tenantId}:{previewId}`. createPreview writes it, getPreview reads it, and the renderer in the workers host reads and writes it the same way, after setting the tenant from the `preview.requested` event's `tenantId`. Its time to live is until `expiresAt`. Otherwise createPreview is unchanged: it validates, writes the entry and `preview.requested` to the outbox, and answers 201 Preview with `previewId`, `url` and `expiresAt`.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -4773,6 +4788,10 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 What a review step actually needs. A publish note saying "updated homepage" is not a review; a field-level diff is.
 **Changed booking flows and the products they reach** (r8 walk of ticket 28337). The publish gate on CMS-103 says which flows changed and which products are affected, and it reads both here. `changes` has an area `bookingFlows` with one entry per flow added, removed or modified (`path` is the flow key). `affectedProducts` lists, for the flows that differ, each product the flow serves, found by the rule `Product.bookingFlowId` already states: the product's own flow, else its category's, else the venue's default flow for the product's kind. The server applies that rule on read; nothing is stored.
 
+**Catalogue is asked in process** (ADAM CR-475, Chinmay, 2 November 2026). The operations host asks `catalogue#productRecords` and `catalogue#productCategoryRecords` through Catalogue's own query classes, already registered there for deleteBookingFlow (CR-426), under the caller's row-level security; no service route is called. `affectedProducts` lists, for each flow added, removed or modified between the two versions, every product that flow serves. A product's flow is found by the rule getPublishedBookingFlow applies (CR-427): the product's own `bookingFlowId`, else its category's `bookingFlowId`, else the venue's default flow whose type lists the product's kind. productRecords and productCategoryRecords are asked with where {bookingFlowId} or {venueId} as needed. Nothing is stored. No grant or migration is needed: V0118 already grants `catalogue.product` and `catalogue.product_category` (XDR-051).
+
+**One rule for the whole config** (ADAM CR-500, Chinmay, 3 November 2026; CHG-CR500-001). (1) Two snapshots are compared: a version's stored `snapshot`, and for the working draft the draft in getTenantConfig's shape without live state and venues. `fromVersion` is {version}; `toVersion` is `against`, or the draft's version label. (2) `area` is each top-level part of the snapshot by its property name: brand, appIcons, bookingFlow, bookingFlows, theme, fonts, footer, notificationBranding, enabledPaymentMethods, accessibility, header, navigation, homepage, modules, features, languages; never `tenantId`, `version`, `isDraft` or `updatedAt`. Inside a part, the properties the contract marks read-only (ids, `displayName`, `isLicensed`, `referencedBy`, `changeScope`, `uiStringCoverage`) are skipped: they are not edits. (3) `path` is the property names below the part joined with `.`: `brand.primaryColour` is area `brand`, path `primaryColour`. An array item with a key is named by it in brackets: navigation items and homepage sections by `id`, features by `featureKey`, modules by `moduleKey` (`features[guestCheckout].isEnabled`). Other arrays of objects are named by index (`[0]`). An array of plain values (`languages.languages`, `splashImageAssetRefs`, `customFontAssetRefs`, `enabledPaymentMethods`) is one value, compared whole with its order. `bookingFlows` keeps its rule: one entry per flow added, removed or modified, `path` the flow key. (4) One entry per changed value. `modified`: `before` and `after` are the value's compact JSON text, a string written without its quotes. A value or keyed item present on one side only is `added` (`before` null) or `removed` (`after` null), and its JSON text is the whole item. A property that is null counts as absent. Entries are ordered by area as listed above, then by `path`. (5) `changeScope` is `buildTime` exactly where the publish's `pendingBuildTimeChanges` says so: anything under `appIcons`; brand's `splashImageAssetRefs`, `splashDurationSeconds` and `splashBackgroundColour`; `fonts.customFontAssetRefs`; and `features[key].isEnabled` for a feature whose `changeScope` is `buildTime`. Everything else, `bookingFlows` included, is `runtime`. (6) A `version` or `against` that names no config_version of the tenant answers 404 `not-found`. `affectedProducts` is unchanged. The CMS-014, CMS-015, CMS-103 and ADM-016 screens do not change.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -4804,11 +4823,11 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | affectedProducts[].name | string | yes |  |
 | affectedProducts[].flowKey | string | yes | The changed flow that serves this product. |
 | changes | array of object | yes |  |
-| changes[].area | string | yes |  |
-| changes[].path | string | yes |  |
+| changes[].area | string | yes | The top-level part of the snapshot, by its property name (ADAM CR-500): one of brand, appIcons, bookingFlow, bookingFlows, theme, fonts, footer, notificationBranding, enabledPaymentMethods, accessibi… |
+| changes[].path | string | yes | The property names below the part joined with .; a keyed array item by its key in brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other arrays of objects by in… |
 | changes[].changeKind | enum (added, removed, modified) | yes |  |
-| changes[].before | string |  | (nullable) |
-| changes[].after | string |  | (nullable) |
+| changes[].before | string |  | The value's compact JSON text (a string without its quotes); the whole item for a removed one; null when added (ADAM CR-500). (nullable) |
+| changes[].after | string |  | The value's compact JSON text (a string without its quotes); the whole item for an added one; null when removed (ADAM CR-500). (nullable) |
 | changes[].changeScope | ChangeScope: enum (runtime, buildTime) |  | Whether a change reaches guests on publish or needs a store release. |
 
 **Responses**
@@ -4816,6 +4835,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Diff |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### exportSitePackage
@@ -4823,7 +4843,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 **`POST /site-package`**: Generate a site package (self-hosted)
 
 **For a tenant that hosts its own site** (Chinmay, 2 October, workbook Q144; CHG-CSA-038). Builds a downloadable package of the published configuration: the storefront build, its configuration snapshot and the hosting instructions. A job: answers 202, followed with `getSitePackage`. Only from a published version; the working draft never leaves.
-**The job** (R8 blocker IDENTITY-C63): it runs in the workers host, reads the version's `whitelabel.config_version` snapshot, builds the package and stores it in the assets store; the package moves `building` -> `ready` (with its download link, which expires 24 hours after it is issued) or `failed` (with the reason). Nothing else is stored.
+**The job** (R8 blocker IDENTITY-C63): it runs in the workers host, reads the version's `whitelabel.config_version` snapshot, builds the package and stores it in the assets store; the package moves `building` -> `ready` (with its download link, which expires 24 hours after it is issued) or `failed` (with the reason, `SitePackage.failureReason`; r13 root R40). Nothing else is stored.
 
 **Through an event, as an asset** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012): this call stores the `SitePackage` `building` and writes `sitePackage.requested` to the outbox in the same transaction; the job is the white-label jobs component's, which consumes it. The package is stored in the Assets library, named by `packageAssetRef`; `downloadUrl` is a short-lived link to it. A `version` that does not exist or is not published is refused `409` `version-not-published`.
 
@@ -4860,6 +4880,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | status | enum (building, ready, failed) | yes |  |
 | packageAssetRef | string (uuid) |  | The package in the assets library, set when ready (ADAM CR-106; CHG-R10TEN-012). (read-only; nullable) |
 | downloadUrl | string |  | Short-lived; present when ready. (nullable) |
+| failureReason | string |  | Why the build failed, set by exportSitePackage's job when it moves the package to failed; null otherwise (r13 root R40, CHG-R13R40-001: the job's "with the reason" had no column, so getSitePackage co… (max length 500; read-only; nullable) |
 | expiresAt | string (date-time) |  | (nullable) |
 | requestedByPrincipalId | string (uuid) |  | (read-only) |
 | platformStaffGrantId | string (uuid) |  | The platform-staff grant it was made under, where platform staff made it (R098). (read-only; nullable) |
@@ -4944,6 +4965,7 @@ The package job's status and, once `ready`, a short-lived download link (CHG-CSA
 | status | enum (building, ready, failed) | yes |  |
 | packageAssetRef | string (uuid) |  | The package in the assets library, set when ready (ADAM CR-106; CHG-R10TEN-012). (read-only; nullable) |
 | downloadUrl | string |  | Short-lived; present when ready. (nullable) |
+| failureReason | string |  | Why the build failed, set by exportSitePackage's job when it moves the package to failed; null otherwise (r13 root R40, CHG-R13R40-001: the job's "with the reason" had no column, so getSitePackage co… (max length 500; read-only; nullable) |
 | expiresAt | string (date-time) |  | (nullable) |
 | requestedByPrincipalId | string (uuid) |  | (read-only) |
 | platformStaffGrantId | string (uuid) |  | The platform-staff grant it was made under, where platform staff made it (R098). (read-only; nullable) |
@@ -4973,7 +4995,7 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `whitelabel.booking_flow`, `whitelabel.config_version`, `whitelabel.site_setup_progress`, `whitelabel.tenant_config` |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version`, `whitelabel.site_setup_progress`, `whitelabel.tenant_config` |
 | Writes | - |
 | Called by | CMS-001, CMS-102 |
 
@@ -5037,8 +5059,9 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 | items[].approvalRequestId | string (uuid) |  | (read-only; nullable) |
 | items[].isCurrent | boolean | yes |  |
 | items[].scheduledFor | string (date-time) |  | (nullable) |
+| items[].activatedAt | string (date-time) |  | When this version became current (the lead, 2 November 2026, posted for CR-154 and IDENTITY-C63; CHG-R13JOB-004): set whenever a version becomes current, by an immediate publishTenantConfig, by the a… (read-only; nullable) |
 | items[].activationFailedAt | string (date-time) |  | When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). (read-only; nullable) |
-| items[].activationFailure | string |  | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63). (max length 2000; read-only; nullable) |
+| items[].activationFailure | string |  | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63), or superseded: version N was published after this one was scheduled where a newer version became current firs… (max length 2000; read-only; nullable) |
 | items[].contentHash | string |  | The lowercase hex SHA-256 of the snapshot JSON as stored, the same rule as the kiosk snapshot's hash (ADAM CR-324, A1; CHG-CR324-001). |
 | items[].pendingBuildTimeChanges | array of object |  | Changes in this version that will not reach guests until the next store release. |
 | items[].pendingBuildTimeChanges[].area | string |  | appIcons, splash, fonts or features (ADAM CR-324, A1). |
@@ -5068,6 +5091,7 @@ The response names any build-time change in the draft that will **not** reach gu
 **The server names the version** (ADAM CR-154, 18 October 2026; CHG-CRA-004). In the publish transaction it takes the next integer for the tenant (`1`, `2`, ...), as kiosk versions are numbered; that is the version's `version`, and the draft's `tenant_config.version` becomes the next label: after publishing `N` it is the text of `N+1` (after `3`, the draft is `4`; ADAM CR-324, A3). `config_version` is unique on (`scope_path`, `version`) and has one current row per tenant (a partial unique index on `scope_path` where `is_current`), so a racing publish fails on the index and is retried with the next label.
 **The review path** (CR-154; CHG-CRA-004). The tenant's publish-review policy decides: off, the version is current at once (201) and `whitelabel.contentPublished` goes out in the same transaction; on, this calls approvals' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, subject `whiteLabelPublication`, `subjectId` the `config_version` id), records its `approvalRequestId` and answers 202 with `reviewStatus` `pending`. White-label's consumer of `approval.granted` makes the version current (`reviewStatus` `approved`) and then emits `contentPublished`; its consumer of `approval.rejected` sets `reviewStatus` `rejected` and the version never becomes current. A scheduled publish emits it when the job makes the version current. **The event goes out when a version becomes current, never before.**
 **What the 201 writes and answers** (ADAM CR-324, option A, A1 to A3, 29 October 2026; CHG-CR324-001). `pendingBuildTimeChanges` and `contentHash` follow the rules on `ConfigVersion`; the `contentPublished` payload follows `events/whitelabel-contentPublished.yaml`. **Refused:** a validation with any `error` finding is 409 `config-validation-failed`, whose findings take `ConfigValidationReport`'s shape: every finding is listed, warnings too, and only errors block. A `scheduledFor` that is not in the future is 400 `validation` on `scheduledFor`, and nothing is snapshotted.
+**When a version becomes current, `activatedAt` is set** (the lead, 2 November 2026, CR-154, IDENTITY-C63): at once on an immediate publish (in this transaction), when the approval consumer makes a reviewed version current, and when the scheduled-publish job does; the job compares it with a scheduled version's `publishedAt`, so a version published later wins over an earlier scheduled one.
 
 |  |  |
 |---|---|
@@ -5109,8 +5133,9 @@ The response names any build-time change in the draft that will **not** reach gu
 | approvalRequestId | string (uuid) |  | (read-only; nullable) |
 | isCurrent | boolean | yes |  |
 | scheduledFor | string (date-time) |  | (nullable) |
+| activatedAt | string (date-time) |  | When this version became current (the lead, 2 November 2026, posted for CR-154 and IDENTITY-C63; CHG-R13JOB-004): set whenever a version becomes current, by an immediate publishTenantConfig, by the a… (read-only; nullable) |
 | activationFailedAt | string (date-time) |  | When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). (read-only; nullable) |
-| activationFailure | string |  | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63). (max length 2000; read-only; nullable) |
+| activationFailure | string |  | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63), or superseded: version N was published after this one was scheduled where a newer version became current firs… (max length 2000; read-only; nullable) |
 | contentHash | string |  | The lowercase hex SHA-256 of the snapshot JSON as stored, the same rule as the kiosk snapshot's hash (ADAM CR-324, A1; CHG-CR324-001). |
 | pendingBuildTimeChanges | array of object |  | Changes in this version that will not reach guests until the next store release. |
 | pendingBuildTimeChanges[].area | string |  | appIcons, splash, fonts or features (ADAM CR-324, A1). |
@@ -5148,7 +5173,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Config scope | tenant |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
-| Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.booking_flow`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.booking_flow`, `whitelabel.content_page`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Called by | ADM-016, CMS-015 |
 | State model | White-label content ([states/content.yaml](../../../states/content.yaml)): moves `published` -> `draft` |
 
@@ -5413,6 +5438,8 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 **Switching it on creates the tenant's default approval matrix for `whiteLabelPublication`** (ADAM CR-154, 18 October 2026; CHG-CRA-004) through approvals' `setApprovalMatrix` (`x-ticvai-write-via`), where the tenant has none, so the policy and the matrix never disagree: a policy that is on always has a matrix to route the approval request by.
 **Switching it off** (r8 walk of ticket 27780; lead decision of 20 October 2026, option A): versions and content blocks already `pending` review **stay pending** until a reviewer decides; the switch affects new publishes only. The matrix is kept.
 
+**The default, and when it is made** (ADAM CR-520, Chinmay, 3 November 2026; CHG-CR520-001). (1) On switching `enabled` from false to true, the tenant's approval rules are read (`approvals#ruleRecords`, in process: the operations host composes Tenancy's query classes). If an active `configurationChange` rule at the tenant root has `subjectTypes` empty or containing `whiteLabelPublication`, nothing is created. (2) Otherwise the roles that grant `TENANT_PUBLISH` are read (`identity#rolePermissionRecords`, over Identity's service route) and approvals' `setApprovalMatrix` is called as an operation over Tenancy's service route, under service sign-in between deployables, with one rule: kind `configurationChange`, `subjectTypes` [`whiteLabelPublication`], `approverRoleIds` those roles, `approverScopeLevel` `tenant`, `levels` 1, `expiresAfterMinutes` null, `slaMinutes` null, no condition. The policy is saved after the matrix call succeeds; if the call fails, nothing is saved and its refusal is passed on. (3) `requiresReviewerOtherThanAuthor` is stored as given and needs no wiring: approvals never lets a requester approve their own request. (4) While `setApprovalMatrix` does not store matrices (#31185), switching on is refused `409 review-route-unavailable` and the policy is left as it was; switching off, and saving with the policy off, work now. When #31185 stores matrices the 409 goes away with no other change. (5) Switching off keeps the matrix.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_PUBLISH` |
@@ -5455,6 +5482,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Saved |
+| 409 |  | Switching on while approvals' setApprovalMatrix does not yet store matrices (#31185); the policy is left as it was (ADAM CR-520). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setSiteSetupProgress
@@ -5521,7 +5549,7 @@ Records the preset and which steps are done, skipped or in progress, so the buil
 Run before publishing. Reports missing translations, navigation pointing at disabled modules, unset required assets, contrast failures, and policies without a current version.
 **And the booking flows (decided 29 September, W12):** an enabled flow that fails `validateBookingFlow` is `bookingFlowInvalid`; a venue with bookable products and no flow serving their kind is `bookingFlowMissing`.
 **`bookingFlowMissing`, narrowed and asked in process** (ADAM CR-343, 30 October 2026; CHG-CR343-001): the rule is on `ConfigFindingKind`. Both of its reads are asked in process from the operations host, through the owning module's own query class and under the caller's row-level security (XDR-022): `catalogue#productRecords` where `{venueId}` for each active venue (the operations role's SELECT on Catalogue's product tables comes from V0118, as for `createFnbOrder` under XDR-008), and `tenancy#activeVenues` (`platform.scope` is a kernel table every host may read, as ADAM CR-296 ruled for Tenancy's other reads).
-**What each kind checks** (ADAM CR-320, option A, both parts, 29 October 2026; CHG-CR320-001): the rule of every kind is on `ConfigFindingKind`, and `publishTenantConfig` runs the same rules. To decide them this reads the draft's own tables (`x-ticvai-reads`) and asks, as `publishTenantConfig` and `getModuleEnablement` / `setModuleEnablement` ask them: `catalogue#productRecords` and `tenancy#activeVenues` (`bookingFlowMissing`), `assets#mediaAssetRecords` (`missingRequiredAsset`), and `subscription#contractRecords`, `subscription#licenceAddOnRecords` and `subscription#planRecords`, which give the tenant's `LicencePosition.licensedModules` (`unlicensedModuleEnabled`).
+**What each kind checks** (ADAM CR-320, option A, both parts, 29 October 2026; CHG-CR320-001): the rule of every kind is on `ConfigFindingKind`, and `publishTenantConfig` runs the same rules. To decide them this reads the draft's own tables (`x-ticvai-reads`) and asks, as `publishTenantConfig` and `getModuleEnablement` / `setModuleEnablement` ask them: `catalogue#productRecords` and `tenancy#activeVenues` (`bookingFlowMissing`), `assets#mediaAssetRecords` (`missingRequiredAsset`), and `subscription#contractRecords`, `subscription#licenceAddOnRecords` and `subscription#planRecords`, which give the tenant's `LicencePosition.licensedModules` (`unlicensedModuleEnabled`), by the in-force contract rule `LicencePosition` states (ADAM CR-449; CHG-CR449-001).
 
 |  |  |
 |---|---|
@@ -5928,6 +5956,8 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 **`GET /platform-subdomain`**: The tenant's platform subdomain
 
 The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-CSA-043). CMS-017 shows it as the default address above any custom domains.
+
+**One reader** (ADAM CR-507, Chinmay, 3 November 2026; CHG-CR507-001): the hostname is answered by one WhiteLabel reader over `platform-ops#tenantDomainRecords` and `subscription#cellRecords` (in process), which createPreview uses too for its preview `url`. Whichever of this operation's sub-task (#31078) and createPreview's ticket (#30767) lands first builds it, with Platform's query class for tenantDomainRecords; the other reuses it.
 
 |  |  |
 |---|---|
@@ -6394,7 +6424,9 @@ Where `position` is null the row sorts after the rows that have it (NULLS LAST),
 Approval is separate from authoring where the tenant requires it — **the approver may not be the author**, following the rule already enforced on products. **Whether it is required is the tenant's publish-review policy** (`getPublishReviewPolicy`; Chinmay, 2 October, workbook Q156; CHG-CSA-042), off by default: a single publish by a `TENANT_PUBLISH` holder.
 **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or 400. A scheduled job makes the publish and the expiry at those times (audit R163).
 **Which blocks it publishes** (ADAM CR-365, decided 30 October 2026, Chinmay: "as you recommended, with one rule added"; CHG-CR365-001; `states/content-block.yaml`). A `draft` block is published or scheduled as before. A `scheduled` block may be published now (no `publishAt`) or rescheduled (a new `publishAt`). An `expired` block may be published now or scheduled again. `published` and `archived` are still refused 409. **The block's `expireAt`, whether sent or already stored, must be after the moment it goes live**, or 400 on `expireAt`; to republish an expired block, send a later `expireAt`, or `expireAt` null to clear it.
-**The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the tenant's publish-review policy off, the block is published or scheduled at once (200). With it on, this calls approvals' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix subject `whiteLabelPublication`, `subjectId` the block id; the request points at the block, and the block keeps no link back), leaves `status` as it is and sets `reviewStatus` `pending`, and answers 202. White-label's consumer of `approval.granted` then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected` sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether review applies and shows `reviewStatus` on the block. **Until the request is approved the block keeps its current status and schedule** (ADAM CR-365). **When approvals refuses `422 no-approval-route`**, this call passes it on as 422 `no-approval-route`, leaves `status` and `reviewStatus` unchanged, and writes nothing.
+**The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the tenant's publish-review policy off, the block is published or scheduled at once (200). With it on, this calls approvals' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix subject `whiteLabelPublication`, `subjectId` the block id; the request points at the block, and the block keeps no link back), leaves `status` as it is and sets `reviewStatus` `pending`, and answers 202. White-label's consumer of `approval.granted` then publishes or schedules the block (`reviewStatus` `approved`); its consumers of `approval.rejected`, `approval.withdrawn` and `approval.expired` set `reviewStatus` `rejected` and the block keeps the status and schedule it had (ADAM CR-462). While `pending`, a second publish of the block is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether review applies and shows `reviewStatus` on the block. **Until the request is approved the block keeps its current status and schedule** (ADAM CR-365). **When approvals refuses `422 no-approval-route`**, this call passes it on as 422 `no-approval-route`, leaves `status` and `reviewStatus` unchanged, and writes nothing.
+
+**Where the asked-for schedule waits, and how the grant applies it** (ADAM CR-462, Chinmay, 2 November 2026; CHG-CR462-001). In the approval request's `attributes`, as a tenant suspension keeps its change; no column is added to the block. (1) With review on, the body is checked exactly as for a direct publish (a 400 raises nothing); then `createApprovalRequest` is called with `attributes` set to `publishAt` and `expireAt` exactly as sent: a field the publisher left out is left out, and a sent null is kept (a null `publishAt` means publish now, a null `expireAt` clears the expiry). The block keeps its `status`, `publishAt` and `expireAt`; only `reviewStatus` becomes `pending`, and the call answers 202. (2) White-label's `approval.granted` consumer takes events whose `subjectType` is `whiteLabelPublication`, keyed on `requestId`, reads the request through `approvals#requestRecords` (route `service`) and the block from `subjectId`. A block no longer `pending` review, or now `published` or `archived`, changes nothing. Otherwise the stored `publishAt` and `expireAt` are applied by the rules a direct publish uses at that moment: a missing, null or already-passed `publishAt` publishes now, a future one schedules, and a missing `expireAt` keeps the stored one. Status, schedule and `reviewStatus` `approved` are written in one transaction, and `whitelabel.contentPublished` is raised when the block publishes. If the `expireAt` is no longer after the moment the block would go live, nothing is published or scheduled and `reviewStatus` becomes `rejected`. (3) When the request is rejected, withdrawn or expires, `reviewStatus` becomes `rejected`; the block keeps the status and schedule it had (`draft`, `scheduled` or `expired`).
 
 |  |  |
 |---|---|
@@ -6712,8 +6744,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | approval_request_id | uuid | no |  |
 | is_current | boolean | yes |  |
 | scheduled_for | timestamptz | no |  |
+| activated_at | timestamptz | no | When this version became current (the lead, 2 November 2026, posted for CR-154 and IDENTITY-C63; CHG-R13JOB-004): set whenever a version becomes current, by an immediate publishTenantConfig, by the a… |
 | activation_failed_at | timestamptz | no | When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). |
-| activation_failure | text | no | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63). |
+| activation_failure | text | no | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63), or superseded: version N was published after this one was scheduled where a newer version became current firs… |
 | content_hash | text | no | The lowercase hex SHA-256 of the snapshot JSON as stored, the same rule as the kiosk snapshot's hash (ADAM CR-324, A1; CHG-CR324-001). |
 | pending_build_time_changes | jsonb | no | Changes in this version that will not reach guests until the next store release. |
 | snapshot | jsonb | no | What this version contained. |
@@ -7000,6 +7033,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | yes |  |
 | package_asset_ref | uuid | no | The package in the assets library, set when ready (ADAM CR-106; CHG-R10TEN-012). |
 | download_url | text | no | Short-lived; present when ready. |
+| failure_reason | text | no | Why the build failed, set by exportSitePackage's job when it moves the package to failed; null otherwise (r13 root R40, CHG-R13R40-001: the job's "with the reason" had no column, so getSitePackage co… |
 | expires_at | timestamptz | no |  |
 | requested_by_principal_id | uuid | no |  |
 | platform_staff_grant_id | uuid | no | The platform-staff grant it was made under, where platform staff made it (R098). |

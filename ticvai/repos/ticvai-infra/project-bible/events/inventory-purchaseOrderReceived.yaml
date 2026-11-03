@@ -32,11 +32,6 @@ consumers:
   idempotencyKey: purchaseOrderId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Supplier delivery performance
-  idempotencyKey: purchaseOrderId
-  onFailure: retry
-  isCritical: false
 retention: 30 days after publication
 notes: Emitted on full receipt only. A partial receipt moves stock and does not settle the order, so
   accruing on it would book a payable for goods still outstanding.

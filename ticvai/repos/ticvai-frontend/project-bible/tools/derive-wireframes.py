@@ -136,6 +136,12 @@ background:linear-gradient(90deg,var(--brand),var(--accent))}
 .side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
 .two{flex:1;display:flex;gap:12px;min-height:0}
 .grow{flex:1;min-width:0}
+.canvas.gen{overflow:auto}
+.gen .grow,.gen .side{display:flex;flex-direction:column;gap:10px}
+.region{display:flex;flex-direction:column;gap:8px}
+.region > .kind{margin-top:2px}
+.gen .row{grid-template-columns:1fr}
+.panel.btn{flex-direction:row;align-items:center;gap:10px}
 .strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
 background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
 letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
@@ -175,66 +181,53 @@ def esc(x) -> str:
     return html.escape(str(x or ""))
 
 
-KPI_BY_MODULE = {
-    "Sell": [("Today", "AED 48,210"), ("Orders", "312"), ("Avg basket", "AED 154"), ("Refunds", "4")],
-    "Orders & Money": [("Takings", "AED 62,480"), ("Settled", "18"), ("Variance", "AED 40"), ("Open", "3")],
-    "Stock & Supply": [("On hand", "AED 214k"), ("Below par", "17"), ("Expiring", "9"), ("Variance", "1.8%")],
-    "Kitchen": [("On the rail", "14"), ("Oldest", "6m 20s"), ("Breaching", "2"), ("86'd", "3")],
-    "Analytics": [("Revenue MTD", "AED 4.86M"), ("vs budget", "+3.1%"), ("Margin", "38.4%"), ("Alerts", "6")],
-}
-DEFAULT_KPIS = [("Total", "1,248"), ("Active", "978"), ("Attention", "142"), ("Offline", "12")]
+# **No chrome, KPI tiles or sample figures nobody declared** (2 November 2026, r13 root R10, CHG-R13R10-001). Until
+# r13 this held AUDIENCE_CHROME (a nav, a brand, header chips and four KPI tiles per audience: partner "Allocation
+# 2,400", staff "This venue", "Live", "Primary action") and KPI_BY_MODULE / DEFAULT_KPIS ("Total 1,248"), drawn on every
+# generated frame. ADAM's README told developers to build those frames exactly, so the invented parts became build
+# instructions (#27985 DEV-008 drew the partner portal on a staff screen). A generated frame now draws only the
+# screen and platform records; the words it adds of its own are these, and check-wireframes W-FIDELITY allows no
+# other.
+NO_COMPONENTS = "no components declared"
+NO_COLUMNS = "columns not declared"
+GENERATED_LABELS = (NO_COMPONENTS, NO_COLUMNS, "offline", "wave", "—")
 
-# **A guest storefront was rendering a staff dashboard.** `WEB-001 Home / Landing` showed
-# *TOTAL 1,248 · ACTIVE 978 · ATTENTION 142 · OFFLINE 12* above a nav reading Dashboard, Settings,
-# Reports, People — **none of which a guest ever sees**, and four counts a guest has no business
-# knowing.
-#
-# The generator had one chrome and applied it to 481 screens. **A wireframe that shows the wrong
-# furniture is worse than one that shows none**: a reviewer corrects the numbers instead of
-# questioning the screen.
-AUDIENCE_CHROME = {
-    "guest": {
-        "nav": ["What's on", "My tickets", "Food & drink", "Map", "Help"],
-        "kpis": None,          # a guest is shown their own things, never venue counts
-        "brand": "the tenant's brand, not TICVAI",
-        "actions": [("Sign in", ""), ("Basket", "cta")],
-    },
-    "partner": {
-        "nav": ["Allocations", "Bookings", "Statements", "Support"],
-        "kpis": [("Allocation", "2,400"), ("Sold", "1,860"), ("Credit", "AED 84k"),
-                 ("Due", "AED 12k")],
-        "brand": "TICVAI Partner",
-        "actions": [("This account", ""), ("New booking", "cta")],
-    },
-    "staff": {
-        "nav": None,           # falls through to the module nav below
-        "kpis": None,
-        "brand": "TICVAI",
-        "actions": [("This venue &#9662;", ""), ("Live", "live"), ("Primary action", "cta")],
-    },
-    # **The package declares five audiences and this held three.** The lookup fell through to
-    # `staff` silently, so `P09 TICVAI Web` — the console that provisions cells and ships releases
-    # — drew "This venue" and a venue nav, and `P11 Accreditation Web`, a public application form,
-    # drew "Live": furniture for an operator on shift. **45 screens showing chrome nobody chose
-    # for them**, and the silent `.get(aud, staff)` is why it survived a rebuild.
-    "platformAdmin": {
-        "nav": ["Tenants", "Cells", "Releases", "Health", "Audit"],
-        "kpis": [("Tenants", "184"), ("Cells", "3"), ("Incidents", "2"), ("Releases", "11")],
-        "brand": "TICVAI",
-        "actions": [("All tenants &#9662;", ""), ("Deploy", "cta")],
-    },
-    "public": {
-        "nav": ["Apply", "My application", "Help"],
-        "kpis": None,          # an applicant is shown their own application, never a venue count
-        "brand": "the tenant's brand",
-        "actions": [("Start application", "cta")],
-    },
-}
 
-# **An audience with no chrome must report itself, not be absorbed.** The fallback below is a
-# safety net and not a decision — a platform whose audience is missing here draws staff furniture,
-# which is exactly the defect this comment exists to stop recurring.
-UNCHROMED: set = set()
+def field_name(col) -> str:
+    """A declared column as its field: `ApiLicence.callAllowancePerMonth` -> `callAllowancePerMonth`."""
+    if isinstance(col, dict):
+        col = col.get("label") or col.get("field") or col.get("name") or ""
+    return str(col).rsplit(".", 1)[-1]
+
+
+def gen_panel(c: dict) -> str:
+    """One declared component of a generated frame: its label (or kind), a table's declared columns, never a value."""
+    kind = c.get("kind") or "panel"
+    label = c.get("label")
+    if kind in ("dataTable", "cardList", "treeNav"):
+        cols = [field_name(x) for x in (c.get("columns") or []) if field_name(x)]
+        if cols:
+            grid = f' style="grid-template-columns:repeat({len(cols)},minmax(0,1fr))"'
+            body = (f'<div class="rows"><div class="row"{grid}>' + "".join(f"<span>{esc(x)}</span>" for x in cols)
+                    + "</div>" + "".join(f'<div class="row"{grid}>' + "<span>&nbsp;</span>" * len(cols) + "</div>"
+                                         for _ in range(3)) + "</div>")
+        else:
+            body = f'<div class="rows"><div class="row nocol"><span>{NO_COLUMNS}</span></div></div>'
+    elif kind in ("chart", "sparkline"):
+        body = ('<div class="rows">' + "".join(f'<div class="bar"><i style="width:{w}%"></i></div>'
+                                               for w in (78, 54, 92, 36, 61)) + "</div>")
+    elif kind == "metricTile":
+        body = '<div class="kpi"><span>—</span></div>'
+    elif kind in ("primaryButton", "secondaryButton", "destructiveButton", "iconButton"):
+        body = f'<div class="chip{" cta" if kind == "primaryButton" else ""}">{esc(label or kind)}</div>'
+        return f'<div class="panel btn"><span class="kind">{esc(kind)}</span>{body}</div>'
+    else:
+        body = '<div class="rows"><div class="bar"><i style="width:64%"></i></div></div>'
+    note = c.get("notes")
+    why = f'<span class="why">{esc(clip(note, 170))}</span>' if note else ""
+    head = f'<b>{esc(label)}</b>' if label else ""
+    return f'<div class="panel">{head}<span class="kind">{esc(kind)}</span>{body}{why}</div>'
+
 
 # **The client packs this package knows about.** A board whose name starts with none of these and
 # is not `P## ` generated is a file nobody can account for — reported, never deleted, because this
@@ -243,60 +236,6 @@ PACK_PREFIXES = ("FnB", "Retail", "POS", "Inventory", "Marketing", "Seat", "Gues
                  "Kiosk", "Dashboards")
 WRITTEN: list = []
 COVERED: set = set()
-
-
-def kpis(module: str, chrome: dict | None = None) -> str:
-    """The strip, or nothing at all.
-
-    **A guest is shown their own things and never a venue count.** Returning an empty string is the
-    correct answer for a storefront — the alternative was four numbers a guest cannot act on
-    sitting above the thing they came to buy.
-    """
-    if chrome is not None:
-        if chrome.get("audience") == "guest":
-            return ""
-        if chrome.get("kpis"):
-            return '<div class="kpis">' + "".join(
-                f'<div class="kpi"><b>{esc(a)}</b><span>{esc(b)}</span></div>'
-                for a, b in chrome["kpis"]) + "</div>"
-    rows = KPI_BY_MODULE.get(module or "", DEFAULT_KPIS)
-    return '<div class="kpis">' + "".join(
-        f'<div class="kpi"><b>{esc(a)}</b><span>{esc(b)}</span></div>' for a, b in rows) + "</div>"
-
-
-def panel(kind: str, label: str, note: str, tall: bool = False) -> str:
-    """One component rendered as the thing it is, not as a dashed box.
-
-    **The packs render a real dashboard and the generated boards rendered dashed rectangles**, and
-    a client reviewing both reads the difference as *those screens are not done*. The information
-    was identical; the fidelity was what was being judged.
-
-    The note still shows. **It carries the reasoning and losing it to make the board prettier would
-    be the wrong trade** — a board that looks finished and says nothing about why is a board nobody
-    argues with.
-    """
-    body = ""
-    if kind in ("dataTable", "cardList", "treeNav"):
-        body = ('<div class="rows">'
-                '<div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div>'
-                + "".join('<div class="row"><span>&nbsp;</span><span>&nbsp;</span>'
-                          '<span>&nbsp;</span><span>&nbsp;</span></div>' for _ in range(4))
-                + "</div>")
-    elif kind in ("chart", "metricTile"):
-        body = ('<div class="rows">' + "".join(
-            f'<div class="bar"><i style="width:{w}%"></i></div>' for w in (78, 54, 92, 36, 61))
-            + "</div>")
-    elif kind in ("searchField", "textField", "multiSelect"):
-        body = '<div class="chip">' + esc(label or "Search") + "</div>"
-    elif kind in ("primaryButton", "secondaryButton"):
-        body = f'<div class="chip{" cta" if kind == "primaryButton" else ""}">{esc(label or kind)}</div>'
-    elif kind == "banner":
-        body = '<div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div>'
-    else:
-        body = '<div class="rows"><div class="bar"><i style="width:64%"></i></div></div>'
-    why = f'<span class="why">{clip(esc(note), 170)}</span>' if note else ""
-    head = f'<b>{esc(label)}</b>' if label else f'<span class="kind">{esc(kind)}</span>'
-    return f'<div class="panel">{head}{body}{why}</div>'
 
 
 # **Frames drawn by Claude Design, one file per screen id.** Built on first use rather than at
@@ -318,72 +257,40 @@ def drawn_frame(sid: str) -> str:
 
 
 def render_screen(s: dict, dark: bool, offline_platform: bool, plat: dict) -> str:
-    regions = {r.get("name"): r for r in ((s.get("layout") or {}).get("regions") or [])}
+    # **A generated frame draws the record and nothing else** (2 November 2026, r13 root R10, CHG-R13R10-001; the Block
+    # A developer pull of 31 October: #27985 DEV-008 drew the partner portal's nav and KPI tiles "Allocation 2,400, Sold
+    # 1,860, Credit AED 84k", #27755 EMP-002 a "This venue" picker the record says it does not have, and 149 of the 655
+    # frames pulled drew "Primary action"; every table was Name/Status/Value and every region after contentBody's fifth
+    # component was dropped). The rail names the platform and the module; the top bar names the screen; the canvas
+    # draws every region of layout.regions in order with every component, a table with its declared columns, and no
+    # value anywhere; the offline strip is the platform's banner. check-wireframes W-FIDELITY holds it: every text of
+    # a generated frame comes from the screen or platform record or GENERATED_LABELS.
+    layout_regions = [r for r in ((s.get("layout") or {}).get("regions") or []) if isinstance(r, dict)]
     states = s.get("states") or {}
-    comps = (regions.get("contentBody") or {}).get("components") or []
-
-    aud = plat.get("audience") or "staff"
-    if aud not in AUDIENCE_CHROME:
-        UNCHROMED.add(aud)
-    chrome = dict(AUDIENCE_CHROME.get(aud, AUDIENCE_CHROME["staff"]))
-    chrome["audience"] = aud
-    chrome["brandLabel"] = "TICVAI Partner" if aud == "partner" else (
-        plat.get("shortName", "TICVAI").split()[0] if aud == "guest" else "TICVAI")
-    acts = "".join(
-        f'<div class="chip{(" " + k) if k else ""}">{label}</div>'
-        for label, k in chrome["actions"])
-    nav_items = chrome["nav"] or ["Dashboard", esc(s.get("module") or "Section"), "Settings",
-                                  "Reports", "People"]
-    nav_items = [esc(x) for x in nav_items]
+    module = s.get("module") or ""
     rail = ('<aside class="rail"><div class="brand">'
-            f'<b>{esc(chrome.get("brandLabel") or "TICVAI")}</b>'
-            f'<span>{esc(s.get("module") or plat.get("shortName"))}</span></div>'
-            '<nav class="nav">'
-            + "".join(f'<i class="{"on" if n == 1 else ""}">{t}</i>'
-                      for n, t in enumerate(nav_items))
-            + "</nav></aside>")
+            f'<b>{esc(plat.get("shortName") or plat.get("name") or "")}</b>'
+            f'<span>{esc(module)}</span></div>'
+            '<nav class="nav">' + (f'<i class="on">{esc(module)}</i>' if module else "") + "</nav></aside>")
 
-    # **A board can only render what the screen declares, and 212 screens declare one component.**
-    # The fidelity ceiling is the screen model, not the styling — so where a screen is thin the
-    # frame shows the shape its template implies and says so, rather than rendering one lonely
-    # box in a 1280px dashboard and letting a reviewer conclude the screen is empty.
-    #
-    # **The inferred panels are labelled `implied by template`.** A reviewer must be able to tell
-    # what the screen actually says from what the board filled in, or the board becomes a source
-    # of requirements nobody wrote.
-    TEMPLATE_SHAPE = {
-        "list": ["searchField", "dataTable"],
-        "dashboard": ["chart", "dataTable"],
-        "detail": ["detailPanel", "dataTable"],
-        "form": ["textField", "primaryButton"],
-        "board": ["cardList", "metricTile"],
-        "wizard": ["textField", "primaryButton"],
-        "calendar": ["timeline", "datePicker"],
-    }
-    tmpl = (s.get("layout") or {}).get("template", "list")
-    rendered = [panel(c.get("kind", "panel"), c.get("label"), c.get("notes")) for c in comps[:3]]
-    if len(rendered) < 2:
-        for k in TEMPLATE_SHAPE.get(tmpl, ["dataTable"]):
-            if len(rendered) >= 2:
-                break
-            if any(c.get("kind") == k for c in comps):
-                continue
-            rendered.append(panel(k, None, "Implied by the {} template — not declared on the "
-                                           "screen.".format(tmpl)))
-    main = "".join(rendered) or panel("panel", None, None)
-    side = "".join(panel(c.get("kind", "panel"), c.get("label"), c.get("notes"))
-                   for c in comps[3:5])
+    def region_html(r: dict) -> str:
+        comps = [c for c in (r.get("components") or []) if isinstance(c, dict)]
+        body = "".join(gen_panel(c) for c in comps) or f'<div class="panel"><span class="kind">{NO_COMPONENTS}</span></div>'
+        return f'<div class="region"><span class="kind">{esc(r.get("name"))}</span>{body}</div>'
+
+    main_regions = [r for r in layout_regions if not str(r.get("name") or "").startswith("contextPanel")]
+    side_regions = [r for r in layout_regions if str(r.get("name") or "").startswith("contextPanel")]
+    main = "".join(region_html(r) for r in main_regions) or (
+        f'<div class="panel"><span class="kind">{NO_COMPONENTS}</span></div>')
+    side = "".join(region_html(r) for r in side_regions)
     side_html = f'<div class="side">{side}</div>' if side else ""
 
     off = "offline" in states
     # **The strip said "works from the local journal" on every screen with an offline state** —
-    # true of a till, false of a guest screen, and false twice over on the web. A platform that
-    # declares its banner shows the banner's words instead (guest web and app, 12 September).
+    # true of a till, false of a guest screen, and false twice over on the web. Only a platform that
+    # declares its banner draws one, in the banner's words (guest web and app, 12 September; R10).
     _banner = (plat.get("offlineBanner") or {}).get("message")
-    if off and _banner:
-        strip = f'<div class="strip">offline &middot; {esc(_banner)}</div>'
-    else:
-        strip = '<div class="strip">offline capable · works from the local journal</div>' if off else ""
+    strip = f'<div class="strip">offline &middot; {esc(_banner)}</div>' if off and _banner else ""
 
     ops = [a.get("operationId") for a in (s.get("apis") or []) if a.get("operationId")]
     ops_line = " · ".join(ops[:4]) + (f" +{len(ops) - 4}" if len(ops) > 4 else "")         if ops else "none declared"
@@ -416,7 +323,7 @@ def render_screen(s: dict, dark: bool, offline_platform: bool, plat: dict) -> st
                          f'archived: {esc(", ".join(gone))}</span>')
 
     ent = s.get("entryState") or {}
-    params = ", ".join(f'{p["name"]}&larr;{p["from"]}' for p in (ent.get("params") or [])[:3])
+    params = ", ".join(f'{p["name"]}&larr;{p["from"]}' for p in (ent.get("params") or []))
 
     # **Every exit is a link, and every one it has a transition for says how you make the move.**
     # This printed `exits[:5]` as text: a board that names a destination and cannot go there is a
@@ -496,13 +403,11 @@ def render_screen(s: dict, dark: bool, offline_platform: bool, plat: dict) -> st
     generated_frame = f"""{rail}
           <div class="body">
             <div class="top">
-              <div><h2>{clip(esc(s['name']), 44)}</h2>
+              <div><h2>{esc(clip(s['name'], 44))}</h2>
                 <small>{esc(plat.get('shortName'))} &middot; wave {esc(s.get('wave'))} &middot; {esc(s.get('density'))}</small></div>
-              <div class="acts">{acts}</div>
             </div>
             {strip}
-            <div class="canvas">
-              {kpis(s.get('module'), chrome)}
+            <div class="canvas gen">
               <div class="two"><div class="grow">{main}</div>{side_html}</div>
             </div>
           </div>"""
@@ -520,7 +425,7 @@ def render_screen(s: dict, dark: bool, offline_platform: bool, plat: dict) -> st
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; {esc(ops_line)}</div>
-          <div><b>STATES</b> &middot; <span class="{'warn' if off else ''}">{esc(' · '.join(state_names[:7]))}</span></div>
+          <div><b>STATES</b> &middot; <span class="{'warn' if off else ''}">{esc(' · '.join(state_names))}</span></div>
           {f'<div><b>ARRIVES WITH</b> &middot; {params}</div>' if params else ''}
           <div><b>GOES TO</b> &middot; {entry}{goes_html}</div>
           {mach_html}
@@ -1041,8 +946,6 @@ display:inline-block;padding:2px 7px;border-radius:4px}}
         if stale:
             print(f"  {len(stale)} stale board(s) deleted. A copy never deletes, so a rename "
                   "leaves a ghost unless the writer clears it.")
-        if UNCHROMED:
-            print(f"  WARN  audiences with no chrome, drawing staff furniture: {sorted(UNCHROMED)}")
 
     print(f"  {total} board(s) generated")
     return 0

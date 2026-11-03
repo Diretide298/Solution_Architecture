@@ -325,11 +325,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**Site, Brand & Domain Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 53"
    },
@@ -560,11 +555,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**Page & Landing Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 54"
    },
@@ -585,7 +575,9 @@
        "derived": true,
        "impliedBy": "createContentPage",
        "label": "Create content page",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "createContentPage",
+       "provenance": "contract white-label.yaml POST /tenant-config/pages; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       },
       {
        "kind": "dataTable",
@@ -634,6 +626,32 @@
    "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-837"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateContentPage",
+    "component": "modal",
+    "trigger": "Create content page",
+    "body": "**Collects what `createContentPage` sends before it is called.** Required: `slug`, `title`, `body`. Optional: `isEnabled`, `iconAssetRef`, `categoryCode`, `sortOrder`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ContentPage",
+    "confirm": {
+     "label": "Create content page",
+     "operation": "createContentPage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "slug",
+      "title",
+      "body",
+      "isEnabled",
+      "iconAssetRef",
+      "categoryCode",
+      "sortOrder"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/pages; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -829,7 +847,9 @@
        "derived": true,
        "impliedBy": "createContentBlock",
        "label": "Create content block",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "createContentBlock",
+       "provenance": "contract white-label.yaml POST /content-blocks; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       },
       {
        "kind": "secondaryButton",
@@ -864,6 +884,33 @@
    "workshopBoard": "wireframes/WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html#bo-839"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 54. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateContentBlock",
+    "component": "modal",
+    "trigger": "Create content block",
+    "body": "**Collects what `createContentBlock` sends before it is called.** Required: `kind`. Optional: `pageId`, `position`, `body`, `localeVariants`, `publishAt`, `expireAt`, `audienceSegmentId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ContentBlock",
+    "confirm": {
+     "label": "Create content block",
+     "operation": "createContentBlock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "pageId",
+      "position",
+      "body",
+      "localeVariants",
+      "publishAt",
+      "expireAt",
+      "audienceSegmentId"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /content-blocks; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

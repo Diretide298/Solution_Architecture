@@ -99,13 +99,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide administrators with a consolidated operational view of gift cards, vouchers and digital benefits across all tenants and venues. Dashboard KPIs",
   "purposeNote": "Authorized users can monitor all gift-card, voucher and digital-benefit programs and drill into their balances, issuance and redemption activity.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -386,11 +380,6 @@
   "purpose": "Create reusable gift-card products that can be sold or issued across TICVAI. The source specifically requires gift-card balances including activation, redemption, partial usage, expiry, balance inquiry and transaction history. Gift Card Types",
   "purposeNote": "Administrators can create and maintain gift-card products entirely through backend configuration.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §For each gift card define"
-   },
    {
     "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the gift card products that setGiftCardProduct writes.",
@@ -1110,13 +1099,7 @@
   "purpose": "Define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules",
   "purposeNote": "Every voucher redemption is validated in real time against the currently published eligibility and redemption policy.",
   "division": "Shares `createVoucherType`, `listVoucherTypes` with BO-1126; this screen is Voucher Eligibility & Redemption Rule Studio (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.05, page 54): define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Voucher Eligibility & Redemption Rule Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -1973,13 +1956,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Connect gift-card operations to financial liability management without duplicating the Finance module. The source explicitly requires Gift Card Liability Reporting and Gift Card Breakage & Revenue Recognition. Liability Dashboard",
   "purposeNote": "Outstanding gift-card balances can be reconciled to financial liability, and configured expiry/breakage events produce traceable finance integration events.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 58 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

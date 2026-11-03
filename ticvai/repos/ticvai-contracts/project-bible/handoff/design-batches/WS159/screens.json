@@ -99,13 +99,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define which operational resources are required for each attraction, experience, ticket product, session, or service.",
   "purposeNote": "Administrators can define all operational resource requirements for an experience and TICVAI can use those requirements during availability, sale, reservation, and assignment.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Experience Resource Requirement Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -479,13 +473,7 @@
   "purpose": "Allow experiences to require multiple resources in valid combinations.",
   "purposeNote": "Administrators can configure flexible multi-resource combinations and TICVAI can determine whether at least one valid combination exists before confirming availability.",
   "division": "Shares `createResourcePackage`, `listResourcePackages`, `updateResourcePackage` with BO-861, BO-918; this screen is Resource Combination Builder (pack Resource_Management_Configuration_Reference.pdf, board 5.03, page 67): allow experiences to require multiple resources in valid combinations.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Resource Combination Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [

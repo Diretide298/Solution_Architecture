@@ -181,7 +181,8 @@
       {
        "kind": "metricTile",
        "label": "Open Operational Incidents",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
+       "bindsTo": "ChannelOperationsCommandCenterSummary.openOperationalIncidents"
       }
      ]
     },
@@ -261,12 +262,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listChannel2",
-    "contract": "catalogue",
-    "purpose": "AI Channel Optimization & Intelligence Center",
-    "trigger": "onLoad"
-   },
    {
     "operationId": "listChannel",
     "contract": "catalogue",
@@ -1247,7 +1242,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Connection Failure, Product Sync Failure, Pricing Mismatch, Inventory Mismatch, Order Failure, Payment Error, Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: Connection Failure, Product Sync Failure, Pricing Mismatch, Inventory Mismatch, Order Failure, Payment Error, Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
    }
   ],
@@ -2044,7 +2039,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Revenue impact, Risk. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 3 operations.** Unserved: Revenue impact, Risk. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 33 §Allow management to ask"
    }
   ],

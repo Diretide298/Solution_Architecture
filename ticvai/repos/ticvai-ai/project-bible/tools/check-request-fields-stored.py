@@ -192,6 +192,12 @@ def main() -> int:
                     st, _, sc = sa.rpartition(".")
                     if sa and st in tables and sc in cols.get(st, set()):
                         continue
+                    # **The audit row is the kernel's** (ADAM CR-376; r13 integration, CHG-R13INT-022): a reason the
+                    # operation puts on the request's audit context is written to platform.audit_record by the audit
+                    # interceptor, not by the operation, so naming that column is enough; declaring the table as the
+                    # operation's write made check-write-lineage W-AUDIT read it as an operation writing its own row.
+                    if st == "platform.audit_record" and sc in cols.get(st, set()) and not op.get("x-ticvai-audits-itself"):
+                        continue
                     # a column that qualifies a field of two words or more: `expiresAt` as `credential_expires_at`
                     wp = words(p)
                     if len(wp) >= 2 and any(w[-len(wp):] == wp for w in twords):

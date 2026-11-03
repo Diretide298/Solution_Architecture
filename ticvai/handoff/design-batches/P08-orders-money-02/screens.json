@@ -492,7 +492,7 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-043 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-043 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     },
     {
      "to": "BO-074",
@@ -1919,7 +1919,7 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-059 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-059 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     }
    ]
   },
@@ -2339,7 +2339,7 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-061 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-061 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     },
     {
      "to": "BO-060",
@@ -2601,7 +2601,7 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-062 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-062 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     }
    ]
   },
@@ -3073,11 +3073,6 @@
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-008): listDiningOutlets (a guest read of outlets open now) and listDeliveryLocations are guest-audience reads, not venue configuration; outlets are configured on BO-044 (R254; design-notes correction fnb-retail BO-065).",
     "source": "R254 | contracts/satellite/fnb.yaml#listDiningOutlets"
-   },
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-audience read of delivery locations.",
-    "source": "contracts/satellite/fnb.yaml#listDeliveryLocations"
    }
   ],
   "_platform": {
@@ -3134,7 +3129,7 @@
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-074 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
+     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-074 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (optional), and BO-077 opens on its own"
     }
    ],
    "entryFrom": [

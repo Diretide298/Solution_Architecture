@@ -39,6 +39,7 @@ operations:
   - approvals.matrix
   - approvals.rule
   - cache:idempotency
+  - platform.venue_settings
   writes:
   - approvals.matrix
   - approvals.matrix_version
@@ -59,6 +60,7 @@ operations:
   - cache:idempotency
   - identity.delegated_access
   - identity.principal
+  - platform.venue_settings
   writes:
   - approvals.delegation
   - cache:idempotency

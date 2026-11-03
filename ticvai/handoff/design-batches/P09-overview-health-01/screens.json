@@ -361,12 +361,12 @@
     {
      "to": "ADM-022",
      "trigger": "Release & Version Management",
-     "provenance": "derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them. The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-022 opens on its own"
+     "provenance": "derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them. The edge carries nothing: releaseId only pre-selects (optional), and ADM-022 opens on its own"
     },
     {
      "to": "ADM-023",
      "trigger": "Staging Promotion & Approval",
-     "provenance": "derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them. The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-023 opens on its own"
+     "provenance": "derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them. The edge carries nothing: releaseId only pre-selects (optional), and ADM-023 opens on its own"
     },
     {
      "to": "ADM-026",
@@ -379,7 +379,7 @@
     {
      "to": "ADM-027",
      "trigger": "Database Migration Console",
-     "provenance": "derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them. The edge carries nothing: runId only pre-selects (deep link or optional), and ADM-027 opens on its own"
+     "provenance": "derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them. The edge carries nothing: ADM-027 finds runId (applyMigration) itself, and ADM-027 opens on its own"
     },
     {
      "to": "ADM-029",
@@ -408,7 +408,7 @@
     {
      "to": "ADM-032",
      "trigger": "WAF & Security Policy View",
-     "provenance": "derived — ADM-032 declares entryState.params cellId, wafRuleId and ADM-002 holds none of them. The edge carries nothing: cellId, wafRuleId only pre-select (deep link or optional), and ADM-032 opens on its own"
+     "provenance": "derived — ADM-032 declares entryState.params cellId, wafRuleId and ADM-002 holds none of them. The edge carries nothing: cellId, wafRuleId only pre-select (optional), and ADM-032 opens on its own"
     },
     {
      "to": "ADM-033",
@@ -421,7 +421,7 @@
     {
      "to": "ADM-034",
      "trigger": "Archival Job Monitor",
-     "provenance": "derived — ADM-034 declares entryState.params cellId and ADM-002 holds none of them. The edge carries nothing: cellId only pre-selects (deep link or optional), and ADM-034 opens on its own"
+     "provenance": "derived — ADM-034 declares entryState.params cellId and ADM-002 holds none of them. The edge carries nothing: cellId only pre-selects (optional), and ADM-034 opens on its own"
     },
     {
      "to": "ADM-037",
@@ -434,7 +434,7 @@
     {
      "to": "ADM-318",
      "trigger": "Dead Letters",
-     "provenance": "derived — ADM-318 declares entryState.params deadLetterId, republishId and ADM-002 holds none of them. The edge carries nothing: deadLetterId, republishId only pre-select (deep link or optional), and ADM-318 opens on its own"
+     "provenance": "derived — ADM-318 declares entryState.params deadLetterId, republishId and ADM-002 holds none of them. The edge carries nothing: deadLetterId, republishId only pre-select (optional), and ADM-318 opens on its own"
     },
     {
      "to": "ADM-024",
@@ -847,7 +847,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -857,7 +857,7 @@
     {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
-     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-003 holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (deep link or optional), and ADM-004 opens on its own"
+     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-003 holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (optional), and ADM-004 opens on its own"
     },
     {
      "to": "SCN-003",
@@ -1240,7 +1240,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1531,7 +1531,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1793,7 +1793,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",

@@ -31,7 +31,7 @@
     {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
-     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-001 holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (deep link or optional), and ADM-004 opens on its own"
+     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-001 holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (optional), and ADM-004 opens on its own"
     },
     {
      "to": "PTR-001",
@@ -350,7 +350,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-020 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-020 holds none of them. The edge carries nothing: providerId only pre-selects (optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -685,7 +685,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-021 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-021 holds none of them. The edge carries nothing: providerId only pre-selects (optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",

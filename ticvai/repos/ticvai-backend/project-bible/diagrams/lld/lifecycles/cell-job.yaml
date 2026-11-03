@@ -1,5 +1,5 @@
 id: LLD-Cell job
-title: Cell job — 5 transitions
+title: Cell job — 6 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/cell-job.yaml
@@ -20,6 +20,13 @@ transitions:
   to: running
   trigger: job
   guard: Picked up
+- from: queued
+  to: failed
+  trigger: job
+  guard: 'A tier change''s job whose cell is `suspended`, `decommissioning` or `failed` when it would
+    start (ADAM CR-489, Chinmay, 3 November 2026): the job fails, its `error` naming the cell''s status,
+    and the cell is left as it is. A cell `migrating` for another job leaves the job queued, tried again
+    later'
 - from: running
   to: completed
   trigger: job

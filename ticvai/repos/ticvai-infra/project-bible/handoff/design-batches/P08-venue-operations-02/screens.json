@@ -238,6 +238,12 @@
     ]
    },
    {
+    "operationId": "getConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "The profile's versions, for the deploy form's required version (r13, CHG-RCR33-001)",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "getWorkstationHealth",
     "contract": "tenancy",
     "purpose": "A score a manager can sort by, and what is dragging it down",
@@ -368,8 +374,11 @@
     "id": "formDeployConfigurationProfile",
     "component": "modal",
     "trigger": "Deploy configuration profile",
-    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the body is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. **Not asked:** is a client UUIDv7 generated silently; is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `completedAt`, `failedCount`, `failureReasons`, `id`, `profileId`, `startedAt`, `status`, `succeededCount` (3 October 2026, CHG-SPF-001).",
-    "bindsTo": "ProfileDeployment",
+    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `version`, the published version of the profile to deploy, picked from the profile's versions that `getConfigurationProfile` answers (a draft cannot be deployed: 409 `profile-version-draft`). Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. The body is `DeployConfigurationProfileRequest` (CHG-R8SPN-017); the answer is the ProfileDeployment the server records, whose identity, status, counts and times the server sets. Dismissing sends nothing; the screen behind is unchanged (r13, CHG-RCR33-001).",
+    "bindsTo": "DeployConfigurationProfileRequest",
+    "reads": [
+     "getConfigurationProfile"
+    ],
     "confirm": {
      "label": "Deploy configuration profile",
      "operation": "deployConfigurationProfile"
@@ -377,6 +386,7 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
+      "version",
       "targetWorkstationIds",
       "targetFilter",
       "strategy"

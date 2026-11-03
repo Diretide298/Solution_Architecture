@@ -514,8 +514,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/ticket-based-redemption-ticket-eater-integration-bo-446` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Configures the ticket-eater machines that count paper redemption tickets and post the count as digital redemption credits to the guest's card. Staff need the machine list, the conversion rule, and what happens when a machine jams, sees a fake ticket or cannot identify the card. The one thing to get right: the pack asks for this flow to be drawn visually and kept distinct from ticketless games: Physical tickets, then Ticket-eater, then TICVAI, then Wallet.
 
 **Known correction pending (do not draw the wrong version)**
@@ -683,8 +681,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/ticketless-redemption-game-integration-bo-447` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Configures the ticketless redemption games: after a game ends the machine sends its score or award to TICVAI, which validates it against the authorised play and credits the guest's card with no paper. The one thing to get right: a result is accepted only for a play TICVAI authorised (correct game, correct play id, not already credited), so the screen must show that validation chain, not just a game list.
 
@@ -1028,7 +1024,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | nothing: it opens on its own |
 | Route | `/games-rides/redemption-counter-prize-checkout-bo-449` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): A counter attendant does not change earn rules; the binding gave a till a configuration write (design-notes correction venue-operations BO-449).
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): A counter attendant does not change earn rules; the binding gave a till a configuration write (design-notes correction venue-operations BO-449).
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The prize counter: an attendant identifies the guest's card, builds a basket of prizes by scanning or searching, and completes the redemption, which deducts redemption credits and takes the prizes out of stock in one step. It is an operator till, used standing at a counter with children waiting, not a back-office table. The one thing to get right: nothing is handed over unless the server confirmed the deduction; the counter cannot complete offline.
 
@@ -1924,7 +1920,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `subjectId` (navigation) |
 | Route | `/games-rides/redemption-transaction-ledger-reconciliation-audit-bo-453` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): A ledger needs reads of plays with credits earned and of card movements; setPrizeCost is a configuration write, and the ledger is entered from the dashboard with … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists prize redemptions.
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): A ledger needs reads of plays with credits earned and of card movements; setPrizeCost is a configuration write, and the ledger is entered from the dashboard with … Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists prize redemptions.
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The redemption ledger: every credit earned (ticket-eater, ticketless game), every credit spent at the counter, every adjustment, with the stock movement it caused, and a reconciliation of what machines reported against what TICVAI posted. Finance and the arcade manager use it to answer "where did these credits come from" and "why do the numbers disagree". The one thing to get right: reconciliation is a comparison with a variance you can click, not one more table of columns.
 

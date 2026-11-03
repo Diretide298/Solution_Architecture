@@ -99,13 +99,7 @@
   "patternReason": "the pack gives this screen a display directory (§The screen shall display) and no metric row",
   "purpose": "Provide each employee with a personalized operational landing screen showing what requires their attention now and next.",
   "purposeNote": "Employees can immediately understand their current operational status and next required action without navigating through multiple screens.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 136 §The screen shall display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -264,13 +258,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide employees with a mobile view of their working schedule and operational assignments.",
   "purposeNote": "Employees can view their complete operational schedule and receive synchronized updates whenever assignments change.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 137 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -436,13 +424,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Give the employee all information required to execute a specific assignment.",
   "purposeNote": "Employees can access all permitted operational information needed to execute an assignment from one mobile screen.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -682,13 +664,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow employees to record attendance and assignment presence from the Employee App.",
   "purposeNote": "Employees can record shift and assignment attendance from the mobile application with configurable validation and full audit history.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 139 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1286,11 +1262,6 @@
   "purposeNote": "Authorized managers can review and action operational approvals from mobile with sufficient validation context to make an informed decision.",
   "division": "Shares `decideApprovalRequest`, `listApprovalRequests` with BO-374; this screen is Manager Mobile Approval Center (pack Resource_Management_Configuration_Reference.pdf, board 9.08, page 144): allow authorized supervisors and managers to approve operational requests without requiring access to the desktop backend.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Manager Mobile Approval Center declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",

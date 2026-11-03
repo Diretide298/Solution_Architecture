@@ -99,11 +99,6 @@
   "purposeNote": "Authorized users can understand the real-time operational state of all physical resources and immediately identify assets requiring operational action.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Display"
-   },
-   {
     "operation": "createResourceCost",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-001): A resource cost table and a primary \"Create resource cost\" button sat on the command centre; cost entry belongs on cost analytics (BO-945, which declares both) (design-notes correction venue-operations BO-903).",
@@ -872,13 +867,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Maintain a live relationship between every checked-out physical resource and the guest responsible for it.",
   "purposeNote": "Every checked-out tracked resource can be traced to the responsible guest, booking, transaction, and issuing employee.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 87 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1053,13 +1042,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Control rental periods and manage extensions, overdue items, and returns.",
   "purposeNote": "and final return.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 88 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1247,13 +1230,7 @@
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Configure and manage deposits associated with rental resources.",
   "purposeNote": "Deposits are collected, held, adjusted, and returned according to configurable rental policies with complete financial traceability.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 89 §Track"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1878,13 +1855,7 @@
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Manage the physical resource from acquisition through operational use to final retirement.",
   "purposeNote": "retirement, including operational history, maintenance, condition, value references, and governance. Board 6 Shared Digital Resource Journey A physical resource should have a complete digital operational history. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 7 introduction (\"Provide TICVAI with a centralized Event Resource Planning Engine ... The board shall manage event requirements across ...\") after the screen's own sentence.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Track"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

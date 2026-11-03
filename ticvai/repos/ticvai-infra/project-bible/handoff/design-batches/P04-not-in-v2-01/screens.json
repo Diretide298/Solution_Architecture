@@ -377,7 +377,7 @@
     {
      "to": "POS-003",
      "trigger": "Sell — Timed Entry",
-     "provenance": "derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-010 holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (deep link or optional); POS-003 finds productId (listProducts) itself, and POS-003 opens on its own"
+     "provenance": "derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-010 holds none of them. The edge carries nothing: inventoryHoldId only pre-selects (optional); POS-003 finds productId (listProducts) itself, and POS-003 opens on its own"
     },
     {
      "to": "POS-004",
@@ -1620,7 +1620,7 @@
     {
      "to": "POS-002",
      "trigger": "Sell — Ticket Catalogue",
-     "provenance": "derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-024 holds none of them. The edge carries nothing: cardCode, orderId, productId, promotionId only pre-select (deep link or optional), and POS-002 opens on its own"
+     "provenance": "derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-024 holds none of them. The edge carries nothing: cardCode only pre-selects (optional); POS-002 finds orderId (createOrder), productId (listProducts), promotionId (evaluatePromotions) itself, and POS-002 opens on its own"
     }
    ]
   },

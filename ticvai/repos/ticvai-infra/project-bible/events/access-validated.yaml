@@ -32,11 +32,6 @@ payload:
   type: timestamp
   notes: When the server heard. Differs from recordedAt on an offline scan
 consumers:
-- context: reporting
-  purpose: Occupancy and attendance
-  idempotencyKey: scanId
-  onFailure: retry
-  isCritical: false
 - context: marketing
   purpose: Attendance behaviour
   idempotencyKey: scanId

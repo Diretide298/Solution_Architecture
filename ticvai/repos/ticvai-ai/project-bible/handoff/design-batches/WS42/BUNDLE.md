@@ -982,7 +982,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `holdId` (navigation) |
 | Route | `/policy/data-retention-expiry-legal-hold-operations-cms-037` |
 
-**Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Review, Extend where authorized, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or …
+**Known gaps.** **The pack names 6 actions on this screen and the screen declares 3 operations.** Unserved: Review, Extend where authorized, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** What retention will do next, per policy, and the holds that stop it: review, extend where authorised, archive, delete, place and release legal holds.
 
@@ -1162,7 +1162,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `exceptionId` (navigation) |
 | Route | `/policy/privacy-compliance-exception-investigation-workspace-cms-038` |
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Security, Operations, Data Owner. Each needs an operation, or needs removing from the screen; this is the …
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Security, Operations, Data Owner. Each needs an operation, or needs removing from the screen; this is the …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Privacy exceptions (configuration and operational) investigated through detected, triaged, assigned, investigated, corrective action, reviewed and closed, with security, operations and data-owner involvement.
 

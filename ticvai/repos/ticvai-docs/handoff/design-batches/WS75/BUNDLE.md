@@ -158,7 +158,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/ai-asset-intelligence-command-center-cms-071` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Review AI Results, Duplicate Review, Version Activity, Rendition Queue, Processing Failures. Each needs an … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): The screen is about media files in the DAM (assets.yaml); maintenance listAssets returns rides, turnstiles and pumps from the physical asset register …
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Review AI Results, Duplicate Review, Version Activity, Rendition Queue, Processing Failures. Each needs an … Removed 2 October 2026 (CHG-WIR-001): The screen is about media files in the DAM (assets.yaml); maintenance listAssets returns rides, turnstiles and pumps from the physical asset register …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The Digital Asset Management board's AI command centre - media files (images, videos, documents), not physical assets: how many files AI has processed, what is pending, tags generated, duplicate candidates, version updates, renditions, processing failures and items needing review, with processing health and AI confidence distribution. It belongs to the media library (P13), not to maintenance and safety; it is in this chunk only because of the word "asset". The one thing to get right: draw it as the DAM command centre (KPI tiles, health and confidence charts, intelligence alerts, tiles into CMS-072 to CMS-080), and drop the maintenance binding.
 
@@ -597,7 +597,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `assetId` (navigation) |
 | Route | `/media-library/ai-auto-tagging-content-understanding-cms-072` |
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Accept, Reject, Edit, Accept All Above Threshold. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: Accept, Reject, Edit, Accept All Above Threshold. Each needs an operation, or needs removing from the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** AI-generated tags and descriptions for uploaded assets, accepted or rejected by a person; accept-all only above a confidence threshold.
 
@@ -721,8 +721,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/semantic-natural-language-asset-search-cms-073` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Search by meaning ("family on the lazy river at sunset"), with relevance and the reason it matched.
 
@@ -1029,7 +1027,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Archive and quarantine are reversible; deletion is the only end of an asset's life (decided 28 September, audit STATE-MEDIA).** Archive Duplicate archives the copy (`updateMediaAsset`, `status: archived`) and can be undone with Restore Archived Copy; Delete Duplicate (`deleteMediaAsset`) removes it for good.
 
-**Known gaps.** **The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved: Exact Duplicate, Near Duplicate, Keep Both, Mark Related, Create Version Relationship, Replace Duplicate … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 7 actions on this screen and the screen declares 3 operations.** Unserved: Exact Duplicate, Near Duplicate, Keep Both, Mark Related, Create Version Relationship, Replace Duplicate … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Exact and near duplicates with what to do: keep both, relate, version, replace, archive or delete. Deleting a duplicate in use is refused or warned with its usages.
 
@@ -1642,7 +1640,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `assetId` (navigation) |
 | Route | `/media-library/rendition-processing-delivery-readiness-cms-079` |
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Retry, Cancel, View Error, Regenerate. Each needs an operation, or needs removing from the screen; this is … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Retry, Cancel, View Error, Regenerate. Each needs an operation, or needs removing from the screen; this is … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Rendition jobs and whether required formats are ready before distribution; retry failures.
 
@@ -1763,7 +1761,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/ai-quality-intelligence-review-recommendations-cms-080` |
 
-**Known gaps.** **The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved: Accept Recommendation, Reject, Review Asset, Generate Rendition, Resolve Issue, Board 2 — Shared … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 12 actions on this screen and the screen declares 1 operation.** Unserved: Accept Recommendation, Reject, Review Asset, Generate Rendition, Resolve Issue, Board 2 — Shared …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Review AI results and content-quality issues with AI consumption and cost.
 

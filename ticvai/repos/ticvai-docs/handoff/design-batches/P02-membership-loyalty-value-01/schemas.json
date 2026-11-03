@@ -789,7 +789,7 @@
  },
  "GuestMembership": {
   "type": "object",
-  "description": "19.2.26 to 19.2.28. **A view, not a table** — assembled from the entitlement, the product that granted it and the order that bought it.\n",
+  "description": "19.2.26 to 19.2.28. **A view, not a table** — assembled from the entitlement, the product that granted it and the order that bought it.\n\n**Defined field by field** (ADAM CR-543; Chinmay, 3 November 2026; CHG-CR543-001): `getMyMemberships` and `listGuestMemberships` build it with the same code and rules. Rows: the guest's `access.entitlement` rows (`subject_id` is the guest) whose product's kind is `membership`. A chain is the guest's entitlements of one product plus any linked by `supersedes_entitlement_id`; the newest in a chain is the row, the earlier ones its `previousTerms`. A surrendered entitlement (transferred away) is not shown.\n",
   "required": [
    "entitlementId",
    "productId",
@@ -811,7 +811,8 @@
    },
    "tier": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "Null (ADAM CR-543) - nothing links a membership to a loyalty programme, so Marketing is not called."
    },
    "status": {
     "type": "string",
@@ -822,35 +823,40 @@
      "expired",
      "cancelled"
     ],
-    "description": "**Derived from the entitlement, not held here.** This schema is a view assembled from the entitlement, the product that granted it and the order that bought it — the lifecycle lives in `states/entitlement-status.yaml` and `frozen` is what `freezeEntitlement` sets.\nNo state model of its own, deliberately: **two models over one lifecycle drift.**\n"
+    "description": "**Derived from the entitlement, not held here.** This schema is a view assembled from the entitlement, the product that granted it and the order that bought it — the lifecycle lives in `states/entitlement-status.yaml` and `frozen` is what `freezeEntitlement` sets.\nNo state model of its own, deliberately: **two models over one lifecycle drift.**\n\n**The rule** (ADAM CR-543): `cancelled` becomes `cancelled`; `expired`, `fullyConsumed`, or `valid_to` before today becomes `expired`; `issued` or `partiallyConsumed` with `suspended_reason` set becomes `suspended`; otherwise, with a freeze covering today, `frozen`; otherwise `active`. A freeze covers today when `frozen_from` is on or before today and `frozen_until` is null or on or after today.\n"
    },
    "validFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "The entitlement's `valid_from`, as a date in the venue's time zone (ADAM CR-543)."
    },
    "validTo": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "The entitlement's `valid_to`, as a date in the venue's time zone (ADAM CR-543)."
    },
    "frozenDays": {
     "type": "integer",
-    "description": "Days lost to a freeze and added back to `validTo`. **Shown because a guest who paused a pass will check the maths**, and a validity date that moved without explanation is a support call.\n"
+    "description": "Days lost to a freeze and added back to `validTo`. **Shown because a guest who paused a pass will check the maths**, and a validity date that moved without explanation is a support call. As stored on the entitlement (ADAM CR-543).\n"
    },
    "benefits": {
     "type": "array",
-    "description": "5.4.31. From the product's entitlement template. **Traceable to what grants them**, so a gate can honour what the app promised.\n",
+    "description": "5.4.31. From the product's entitlement template. **Traceable to what grants them**, so a gate can honour what the app promised. **The rule** (ADAM CR-543): `entitlement.template_id` to `catalogue.plan_benefit` (`is_active`) to `catalogue.membership_benefit` (`is_active`), ordered by `plan_benefit.priority` then `code`.\n",
     "items": {
      "type": "object",
      "properties": {
       "code": {
-       "type": "string"
+       "type": "string",
+       "description": "`membership_benefit.code`."
       },
       "name": {
-       "type": "string"
+       "type": "string",
+       "description": "`membership_benefit.name`."
       },
       "value": {
        "type": "string",
-       "nullable": true
+       "nullable": true,
+       "description": "`membership_benefit.value` as a plain decimal string, followed by a space and the `unit` when `unit` is set (`10 percent`); null when `value` is null (ADAM CR-543)."
       }
      }
     }
@@ -858,11 +864,12 @@
    "renewsOn": {
     "type": "string",
     "format": "date",
-    "nullable": true
+    "nullable": true,
+    "description": "Null (ADAM CR-543) - nothing stores an automatic renewal."
    },
    "previousTerms": {
     "type": "array",
-    "description": "Prior terms, including lapsed ones.",
+    "description": "Prior terms, including lapsed ones: the chain's earlier entitlements, newest first (ADAM CR-543).",
     "items": {
      "type": "object",
      "properties": {
@@ -881,7 +888,8 @@
         "renewed",
         "cancelled",
         "upgraded"
-       ]
+       ],
+       "description": "`upgraded` when the next term is a different product; `cancelled` when the term was cancelled other than by being superseded; `renewed` when the next term starts no later than the day after this term's `validTo`; otherwise `expired` (ADAM CR-543)."
       }
      }
     }
@@ -1467,6 +1475,55 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "isFeatured": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The plan card's Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured plan."
+   },
+   "compareAtPrice": {
+    "x-ticvai-column": "compare_at_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan card's saving. Stored on `catalogue.product` as `compare_at_amount` in the venue's trading currency, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a made-up value."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "**The card's highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every operation that answers Product, to every audience. WEB-005's card shows the value for the guest's language, falling back to the English value, as the pill on the card image in capitals; null shows no badge."
+   },
+   "rating": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "required": [
+     "average",
+     "count"
+    ],
+    "properties": {
+     "average": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "multipleOf": 0.1,
+      "description": "The average rating, 1.0 to 5.0, one decimal."
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many reviews the average is over."
+     }
+    },
+    "description": "**The card's rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is not null."
    },
    "nameLocalised": {
     "allOf": [

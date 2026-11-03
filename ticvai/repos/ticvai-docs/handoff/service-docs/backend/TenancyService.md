@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
-| Operations in the slice | 39 of 215 |
+| Operations in the slice | 38 of 214 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -25,7 +25,7 @@
 |---|---|
 | [AccessService](AccessService.md) | `access.access_point` |
 | [CatalogueService](CatalogueService.md) | `catalogue.product`, `catalogue.variant` |
-| [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
+| [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal` |
 | [OrderService](OrderService.md) | `orders.pos_shift` |
 | [PlatformService](PlatformService.md) | `control.api_client` |
 
@@ -41,7 +41,6 @@
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, BO-732, POS-016 |
 | devices | [`setDeviceFirmwareStatus`](#setdevicefirmwarestatus) | POST | `/device-firmware/{firmwareId}/status` | setup | 1 | BO-129 |
 | general | [`getDeviceAssignment`](#getdeviceassignment) | GET | `/devices/{deviceId}/assignment` | core | 1 | POS-016 |
-| identity | [`setRolePermissions`](#setrolepermissions) | PUT | `/roles/{roleId}/permissions` | setup | 1 | BO-054 |
 | matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers/{externalProviderId}` | setup | 1 | ADM-354 |
 | matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices/{matrixId}` | setup | 1 | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334 … |
 | region | [`getRegionSettings`](#getregionsettings) | GET | `/regions/{regionId}/settings` | core | 1 | ADM-037, ADM-426, BO-044, BO-1064, BO-1065 |
@@ -94,19 +93,33 @@ in-flight requests keep theirs, R129):
 | Input | Stored as |
 |---|---|
 | `module` | **required by the server** (`400 validation` without it; optional in the schema only so an r1 client still validates). The matrix: `approvals.matrix.kind`, an `ApprovalKind` value (400 when it is not one); it selects which matrix the rule goes into |
-| `venue` | the matrix's scope (`scope_level` venue, its `scope_path`). **Only the caller's own scope node (audit R183):** absent, it is the venue the caller acts at, never the tenant's matrix; a venue that is not that node is `400 validation` (`errors[]` names `venue`). Nobody writes another level's matrix through this call |
+| `venue` | the matrix's scope (`scope_level` venue, its `scope_path`). **Only the caller's own scope node (audit R183):** absent, it is the venue the caller acts at, never the tenant's matrix; a venue that is not that node is `400 validation` (`errors[]` names `venue`). It is the venue's id, its `platform.scope` id (ADAM CR-509). Nobody writes another level's matrix through this call |
 | `code` | `approvals.rule.code`, the upsert key within the matrix |
 | `approvalMode` | `compositeMode`, and what the engine runs: `single` sequential with `levels` 1; `sequential` and `multiLevel` sequential with `levels` = `minimumApprovals`; `parallel` parallel; `anyOne` parallel with `minimumApprovals` 1; `allMustApprove` consensus; `conditional` sequential, applying only where `skipConditions` does not hold |
-| `amount`, `percentage` | `minAmount`, `minPercentage` |
+| `amount`, `percentage` | `minAmount`, `minPercentage`. `amount` is in the venue's currency and scale (its settings row, `platform.venue_settings`, read as on #30847); anything else is `400 validation` naming `amount` (ADAM CR-509) |
 | `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
-| `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
+| `minimumApprovals`, `rejectionBehavior` | the same-named rule fields. `minimumApprovals` is required for `sequential` and `multiLevel` (`400 validation` naming it; ADAM CR-509); `levels` is 1 where the `approvalMode` row sets none |
 | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
 | `skipConditions` | `condition`, negated: the rule is skipped where it holds (ADAM CR-102, CHG-R10ID-015). It is one or more clauses of the condition language (`ApprovalRule.condition`) joined by ` OR ` (skip when any holds); the stored `condition` is each clause negated (`=` and `!=`, `<` and `>=`, `>` and `<=`, `in` and `notIn` swap) joined by ` AND `. A clause that does not parse, or an ` AND ` inside `skipConditions` (its negation would need an OR), is `422 condition-invalid` and nothing is stored. As for any condition, a request missing the attribute does not match the rule |
-| `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
+| `requiredApproverRole` | `requiredApproverRoleId`, a role id (uuid; not a uuid is `400 validation` naming `requiredApproverRole`, and existence is not checked, as with the approver roles in `setApprovalMatrix`; ADAM CR-509), and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has, with `requiredApproverRole` added when it is not already in it (CR-509) |
 | (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
 The view reads the same row back in the input's shape. `setApprovalMatrix` stays the operation of record for whole
 matrices; both write the same rows, so neither overwrites the other's rules.
+
+**The step-up, the new version and the fields the input does not map** (ADAM CR-509, Chinmay, 3 November 2026:
+option A; CHG-CR509-001). (1) The MFA step-up is checked and consumed through Identity's in-process step-up
+check (`identity#consumeMfaStepUp`), called before any other write, in this operation's own transaction:
+missing is `403 step-up-token-missing`, expired is `403 step-up-token-expired`, nothing written; a later
+refusal rolls the consume back. Until that check lands, tests use a fake of it. (2) Every save stores a new
+version: every rule of the version in force is copied into it unchanged (codes, order and all fields), then the
+body is applied to the rule with its `code`, or appended last if the code is new. On the replaced rule, fields
+the input does not map keep their stored values (`approverScopeLevel`, `requiresMfa`, `requiresSignature`,
+`slaMinutes`, escalation and expiry, `subjectTypes`, `signatureMethods`, `externalProviderId`, `maxAmount`,
+`riskScoreAbove`, sort order). A mapped field left out becomes null, or its schema default where it has one.
+The approver role list is kept, with `requiredApproverRole` added when it is not already in it. The loosening
+and unreachable checks run on the whole new version. (3) The new version keeps the active flag of the version
+in force; version 1 is active.
 
 |  |  |
 |---|---|
@@ -118,7 +131,7 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Step-up auth | mfa |
-| Reads | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
+| Reads | `approvals.matrix`, `approvals.rule`, `cache:idempotency`, `platform.venue_settings` |
 | Writes | `approvals.matrix`, `approvals.matrix_version`, `approvals.rule`, `cache:idempotency` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
@@ -141,7 +154,7 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | percentage | number |  | Percentage |
 | module | string |  | Required by the server. |
 | product | string |  | Product |
-| venue | string |  | Venue. |
+| venue | string (uuid) |  | Venue. |
 | department | string |  | Department |
 | customerType | string |  | Customer Type |
 | risk | string |  | Risk |
@@ -153,7 +166,7 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | delegate | boolean |  | Approvers may delegate |
 | reassign | boolean |  | The request may be reassigned |
 | skipConditions | string |  | Skip Conditions |
-| requiredApproverRole | string |  | Role that must always approve, e.g. |
+| requiredApproverRole | string (uuid) |  | A role id (ADAM CR-509). |
 
 **Response**: `ApprovalMatrixMultiLevelApprovalConfigurationView`
 
@@ -188,7 +201,7 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 |---|---|---|
 | 200 |  | Approval Matrix & Multi-Level Approval Configuration. |
 | 201 |  | Created. |
-| 400 |  | Validation failed: module missing or not an ApprovalKind; venue not the venue the caller acts at (audit R183); or a new rule with no requiredApproverRole (approver-role-required). |
+| 400 |  | Validation failed: module missing or not an ApprovalKind; venue not the venue the caller acts at (audit R183); requiredApproverRole not a uuid, amount not in the venue's currency and scale, or minimu… |
 | 409 |  | Refused, and nothing is stored: the rule would loosen a rule set above (loosensParentRule) or can never match because an earlier rule always does (unreachableRule), as setApprovalMatrix refuses it. |
 | 422 |  | skipConditions cannot become the rule's condition (ADAM CR-102, CHG-R10ID-015): a clause does not parse in the condition language (ApprovalRule.condition), or it joins clauses with AND , whose negati… |
 | 403 |  | A step-up refusal: the caller's session has no verified, unconsumed MFA step-up for this operation (step-up-token-missing), or the newest one is older than 5 minutes (step-up-token-expired), by the r… |
@@ -211,14 +224,16 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 
 | Input | Stored as |
 |---|---|
-| `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
+| `delegator`, `delegate` (principal ids, uuids, else `400 validation` naming the field; ADAM CR-497) | `delegatorPrincipalId`, `delegatePrincipalId` |
 | `start`, `end`, `reason` | `from`, `to`, `reason` |
-| `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
-| `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
-| `scope`, `venue`, `region`, `department` | `scopePath`: the most specific scope node given |
+| `requestKind` | `kinds` = [it]: an `ApprovalKind` value, anything else `400 validation` naming `requestKind` (ADAM CR-497); absent, `kinds` null (every kind) |
+| `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage` (`max_amount`, `max_percentage`): the delegation's own cap. `authorityAmount` is in the venue's money, `currencyCode` and `currencyScale` read from the venue's settings row (`platform.venue_settings`); a different currency, or more decimal places than the scale, is `400 validation` naming `authorityAmount` (ADAM CR-497). `maxAmount` never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it); `maxPercentage` is not compared with the matrix, which stores no percentage ceiling (ADAM CR-479) |
+| `venue` | `scopePath` is **always the path of the venue the caller acts at** (ADAM CR-497): delegations are written at venue scope and are same role, same venue (agreed 29 September). `venue` is optional; when sent it must be that venue's id (its `platform.scope` id, a uuid), else `400 validation` with `errors[]` naming `venue` |
+| `scope`, `region`, `department` | **display only: not stored, never refused** (ADAM CR-497), like `businessUnit` and `legalEntity`; they never set `scopePath` |
 | `businessUnit`, `legalEntity` | **not a scope, and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): neither is a level of the scope tree, so neither sets `scopePath`. Kept in the schema so an r1 client still validates; a value sent is ignored |
 | `delegationType` | `delegationType` |
-| `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
+| `requiredRole` (and `role`, `position`) | `requiredRoleId`: a role id (uuid, else `400 validation` naming `requiredRole`; ADAM CR-497); the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
+| `user` | display only, echoed as sent; never the delegator, since `delegator` is required |
 
 Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of one delegation.
 
@@ -227,6 +242,33 @@ PUT is an upsert of the one active delegation between the body's `delegator` and
 venue (`x-ticvai-body-key-note`); no other delegation at the venue is touched. The `200` stays
 `RolesAuthorityDelegationApprovalLimitsView`, filled from the row written; it does not become
 `ApprovalDelegation`. The `400`, `403` and `409` and their problem types are unchanged.
+
+**The same delegation-authority check as `createApprovalDelegation`** (ADAM CR-479, Chinmay, 2 November 2026;
+CHG-CR479-001): one check in the Approvals module, called by both operations before anything is written, as
+`createApprovalDelegation` states it (the `400`s first, then the `403`s, then the `409`).
+
+**Ids, kinds, money, scope and the answer** (ADAM CR-497, Chinmay, 3 November 2026: option A for ids, kinds,
+money and the response; the delegation's scope is always the caller's venue; CHG-CR497-001). Finding the existing
+delegation stays as built (`is_active`, `valid_to` after now, `scope_path` at or under the caller's venue), and
+the delegate's authority is checked at that venue path or above. A `delegator`, `delegate`, `requiredRole` or
+`venue` that is not a uuid, a `requestKind` that is not an `ApprovalKind`, a `venue` that is not the caller's,
+and an `authorityAmount` not in the venue's currency and scale are the shared `400 validation` problem, with
+`errors[]` naming the field and no `refusedReason`, beside the existing `invalidWindow` and
+`delegateIsDelegator`. There is no new existence refusal: an id that names nobody fails the existing checks
+(`403 delegate-lacks-permission` or `exceeds-delegator-authority`, `409 delegate-lacks-required-role`). The
+currency is read from `platform.venue_settings`: Approvals is part of the Tenancy service, so it is its own
+module's read and needs no declared route to another module. The screen's picker sends the kind value; its
+labels do not change.
+
+**The `200`** (`RolesAuthorityDelegationApprovalLimitsView`, CR-497). From the row written: `delegator`,
+`delegate`, `start`, `end`, `reason`, `delegationType`, `requiredRole`, `requestKind` (the one kind; left out
+when every kind), `authorityAmount` (with the venue's currency and scale), `authorityPercentage`, `venue` (the
+caller's venue id). Echoed as sent: `user`, `role`, `position`, `department`, `region`, `scope`. Left out:
+`businessUnit`, `legalEntity`.
+
+**The MFA step-up is checked and consumed through Identity's in-process step-up check**
+(`identity#consumeMfaStepUp`, decided on #30846, ADAM CR-509; the same rule), called before any other write in
+this operation's own transaction; until that check lands, tests use a fake of it.
 
 |  |  |
 |---|---|
@@ -238,7 +280,7 @@ venue (`x-ticvai-body-key-note`); no other delegation at the venue is touched. T
 | Conflict policy | serverWins |
 | Read routing | primary |
 | Step-up auth | mfa |
-| Reads | `approvals.delegation`, `approvals.matrix`, `approvals.rule`, `cache:idempotency`, `identity.delegated_access`, `identity.principal` |
+| Reads | `approvals.delegation`, `approvals.matrix`, `approvals.rule`, `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `platform.venue_settings` |
 | Writes | `approvals.delegation`, `cache:idempotency` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
@@ -255,24 +297,24 @@ venue (`x-ticvai-body-key-note`); no other delegation at the venue is touched. T
 | user | string |  | User |
 | role | string |  | Role |
 | position | string |  | Position |
-| department | string |  | Department |
-| venue | string |  | Venue |
+| department | string |  | Department. |
+| venue | string (uuid) |  | Venue: the id of the venue the caller acts at (its platform.scope id). |
 | businessUnit | string |  | Business Unit. |
 | legalEntity | string |  | Legal Entity. |
-| region | string |  | Region |
-| delegator | string | yes | Delegator |
-| delegate | string | yes | Delegate |
-| scope | string |  | Scope |
+| region | string |  | Region. |
+| delegator | string (uuid) | yes | Delegator, a principal id (ADAM CR-497) |
+| delegate | string (uuid) | yes | Delegate, a principal id (ADAM CR-497) |
+| scope | string |  | Scope. |
 | start | string (date-time) | yes | Delegation start |
 | end | string (date-time) | yes | Delegation end |
 | reason | string |  | Reason |
 | delegationType | enum (leave, travel, vacancy, eventOperations) |  | Why temporary authority is granted |
-| requiredRole | string |  | Required role |
+| requiredRole | string (uuid) |  | Required role, a role id (ADAM CR-497) |
 | authorityAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | authorityAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | authorityAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | authorityAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| requestKind | string |  | What the authority limit covers, e.g. |
+| requestKind | ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) |  | 11.1.7 and 11.1.30–11.1.37. |
 | authorityPercentage | number |  | Percentage limit where the authority is a percentage, e.g. |
 
 **Response**: `RolesAuthorityDelegationApprovalLimitsView`
@@ -282,24 +324,24 @@ venue (`x-ticvai-body-key-note`); no other delegation at the venue is touched. T
 | user | string |  | User |
 | role | string |  | Role |
 | position | string |  | Position |
-| department | string |  | Department |
-| venue | string |  | Venue |
+| department | string |  | Department. |
+| venue | string (uuid) |  | Venue: the id of the venue the caller acts at (its platform.scope id). |
 | businessUnit | string |  | Business Unit |
 | legalEntity | string |  | Legal Entity |
-| region | string |  | Region |
-| delegator | string | yes | Delegator |
-| delegate | string | yes | Delegate |
-| scope | string |  | Scope |
+| region | string |  | Region. |
+| delegator | string (uuid) | yes | Delegator, a principal id (ADAM CR-497) |
+| delegate | string (uuid) | yes | Delegate, a principal id (ADAM CR-497) |
+| scope | string |  | Scope. |
 | start | string (date-time) | yes | Delegation start |
 | end | string (date-time) | yes | Delegation end |
 | reason | string |  | Reason |
 | delegationType | enum (leave, travel, vacancy, eventOperations) |  | Why temporary authority is granted |
-| requiredRole | string |  | Required role |
+| requiredRole | string (uuid) |  | Required role, a role id (ADAM CR-497) |
 | authorityAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | authorityAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | authorityAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | authorityAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| requestKind | string |  | What the authority limit covers, e.g. |
+| requestKind | ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) |  | 11.1.7 and 11.1.30–11.1.37. |
 | authorityPercentage | number |  | Percentage limit where the authority is a percentage, e.g. |
 
 **Responses**
@@ -307,7 +349,7 @@ venue (`x-ticvai-body-key-note`); no other delegation at the venue is touched. T
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Roles, Authority, Delegation & Approval Limits |
-| 400 |  | The delegation is malformed: invalidWindow (end not after start) or delegateIsDelegator. |
+| 400 |  | The delegation is malformed: invalidWindow (end not after start) or delegateIsDelegator, with refusedReason (DelegationRefusedProblem). |
 | 403 |  | The delegation would hand over authority that is not there: delegateLacksPermission or exceedsDelegatorAuthority, with the same status as createApprovalDelegation. |
 | 409 |  | The delegate does not hold the role the delegation names (delegateLacksRequiredRole). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -402,6 +444,11 @@ Standing in for an approver who is away
 
 11.1.9. **Always time-bounded.** An open-ended delegation is an approver who quietly stopped approving months ago and a delegate who does not know they still hold it.
 The delegate cannot exceed the delegator's own authority, and **cannot approve a request the delegator raised** — segregation of duties survives delegation, or delegation becomes the way around it.
+
+**The delegation-authority check** (ADAM CR-479, Chinmay, 2 November 2026, option A for the rules with the reads asked as yes/no questions under the routed tenant's root grant, as CR-336 and CR-362 did; CHG-CR479-001). One check in the Approvals module, called by `createApprovalDelegation` and `approveRoleAuthorityDelegation` alike, before anything is written. The `400`s (`invalidWindow`, `delegateIsDelegator`) are checked first, then the `403`s, then the `409`.
+1. `delegateLacksPermission` (`403 delegate-lacks-permission`): the delegate must hold `APPROVAL_DECIDE` at the delegation's `scopePath` (the caller's venue) or above, asked of `identity#principalHoldsPermissionAtVenue`.
+2. `exceedsDelegatorAuthority` (`403 exceeds-delegator-authority`): for each kind the delegation covers (its `kinds`, or, when `kinds` is absent, every kind of `approvals.matrix`), take the in-force matrix for that kind at the delegation's `scopePath`: the nearest node's matrix (venue, else region, else tenant), its highest version, passing to the next ancestor when that version is inactive (`ApprovalMatrix`). The delegator's limit for the kind is the highest `approvals.rule.max_amount` among that matrix's rules where `identity#principalHoldsRoleAtVenue(delegator, role, scopePath)` is true for at least one role in `approver_role_ids`; a matching rule with `max_amount` null makes the limit unlimited. Refuse when a named kind has no such rule; when `kinds` is absent, refuse only if no kind has one. Refuse when `maxAmount` (compared in the venue's currency, CR-102) exceeds the limit of any kind the delegation covers that has a finite limit. `maxPercentage` is the delegation's own cap and is not compared with the matrix, which stores no percentage ceiling.
+3. `delegateLacksRequiredRole` (`409 delegate-lacks-required-role`): when `requiredRoleId` is set, `identity#principalHoldsRoleAtVenue(delegate, requiredRoleId, scopePath)` must be true.
 
 |  |  |
 |---|---|
@@ -741,64 +788,6 @@ The artefact is an uploaded asset (`artefactAssetId`), **stored as sent and not 
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
-## Group: identity
-
-### setRolePermissions
-
-**`PUT /roles/{roleId}/permissions`**: What this role may do
-
-POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found `identity.role_permission` with one column** — and nothing wrote it.
-A role that grants no permissions is not a role, and until now a venue could create one and never give it anything.
-**The whole set in one call.** A permission added one at a time leaves a role briefly holding a combination nobody intended, and **a segregation-of-duties rule evaluated against that intermediate state either fires wrongly or misses.**
-**Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two permissions in conflict — a venue told only *not allowed* will grant it another way.
-**The role-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). Every rule is evaluated against the role's own permissions (this body) united with those of `inheritsFromRoleId`, **whatever the rule's `scopeSensitive`**: a role's permissions are granted together at one scope, so a pair inside a role always overlaps. Only `severity: block` refuses, with `409 segregation-breach` (`common.yaml`), the one type and status every segregation check answers with; `requireApproval` and `warn` are accepted and surface when a grant attaches the role and in `listSegregationViolations`. **A parent role's edit re-checks every role that inherits from it** (its own set united with the new one); a breach there refuses this call too, naming the child role. Each change writes one `platform.audit_record` row in the same transaction.
-**No escalated permission** (decided 28 September, audit R197): a role's permission set has no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing. The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a permission ends the live sessions of every principal holding the role at once** (audit R126); an addition takes effect at their next sign-in.
-**The checklist a preset filled stays editable here** (decided 2 October 2026, Chinmay, pre-apply round: roles are preset permission configurations; DEC-007; CHG-CSP-003). A role started from the Viewer preset is given more ticks with this call like any other role; the preset is not consulted and not changed.
-
-|  |  |
-|---|---|
-| Permission | `ROLE_MANAGE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `identity.role_permission` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
-| Writes | `cache:idempotency`, `cache:resolution`, `identity.role_permission`, `platform.audit_record` |
-| Called by | BO-054 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| roleId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
-| inheritsFromRoleId | string (uuid) |  | (nullable) |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| roleId | string (uuid) | yes |  |
-| permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
-| inheritsFromRoleId | string (uuid) |  | (nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Set. |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | Breaches a segregation rule whose severity is block, in this role or in a role inheriting it (segregation-breach). |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-
 ## Group: matrix
 
 What requires approval, and who grants it
@@ -968,7 +957,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | rules[].signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
-| rules[].code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005; enforced by a unique index on (matrix_id, code) since ADAM CR-102, CHG-R10ID-015, compared without case). (max length 64; nullable) |
+| rules[].code | string |  | A stable code for the rule, unique within one version of its matrix (4 October 2026, CHG-FXC-005; ADAM CR-102, CHG-R10ID-015). (max length 64; nullable) |
 | rules[].minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
 | rules[].requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
 | rules[].rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
@@ -1016,7 +1005,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | rules[].signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
-| rules[].code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005; enforced by a unique index on (matrix_id, code) since ADAM CR-102, CHG-R10ID-015, compared without case). (max length 64; nullable) |
+| rules[].code | string |  | A stable code for the rule, unique within one version of its matrix (4 October 2026, CHG-FXC-005; ADAM CR-102, CHG-R10ID-015). (max length 64; nullable) |
 | rules[].minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
 | rules[].requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
 | rules[].rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
@@ -1574,7 +1563,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | matchedRule.subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | matchedRule.signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | matchedRule.externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
-| matchedRule.code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005; enforced by a unique index on (matrix_id, code) since ADAM CR-102, CHG-R10ID-015, compared without case). (max length 64; nullable) |
+| matchedRule.code | string |  | A stable code for the rule, unique within one version of its matrix (4 October 2026, CHG-FXC-005; ADAM CR-102, CHG-R10ID-015). (max length 64; nullable) |
 | matchedRule.minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
 | matchedRule.requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
 | matchedRule.rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
@@ -2451,7 +2440,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
 | chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
-| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (nullable) |
+| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (default 30; nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -2590,7 +2579,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
 | chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
-| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (nullable) |
+| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (default 30; nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -2765,7 +2754,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
 | chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
-| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (nullable) |
+| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (default 30; nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -2904,7 +2893,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
 | chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
-| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (nullable) |
+| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (default 30; nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -2986,6 +2975,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 **Overlap.** `workforce#principalHasOverlappingAssignment` is asked too, and a true answer is `409 rota-assignment-overlap`.
 
+**An open shift missing a place or a time** (ADAM CR-441, Chinmay, 1 November 2026; CHG-CR441-001). Until `workforce.open_shift`'s `venue_id`, `position_code`, `valid_from` and `valid_to` are NOT NULL (a later forward migration, `OpenShift`), a missing value is taken from the released assignment (`rotaAssignmentId`); otherwise the claim answers `409 open-shift-incomplete` and writes nothing.
+
 **Effect, in one transaction under the row lock on the open shift.** When `rotaAssignmentId` is set, that assignment's `principalId` becomes the claimant and its `breachesWorkingHourLimit` is worked out again. Otherwise a rota assignment is created with the claimant, `venueId`, `position` = `positionCode`, `startsAt` = `from`, `endsAt` = `to` and status `published`, and `rotaAssignmentId` is set to it. The open shift ends `claimed`, with `claimedBy` and `claimedAt`. `pendingApproval` is not used until an approve operation exists.
 
 |  |  |
@@ -3018,10 +3009,10 @@ Support hours were an open conflict for eleven days and were never a design ques
 | id | string (uuid) |  |  |
 | rotaAssignmentId | string (uuid) |  | (nullable) |
 | shiftTemplateId | string (uuid) |  | (nullable) |
-| venueId | string (uuid) |  |  |
-| positionCode | string |  |  |
-| from | string (date-time) |  |  |
-| to | string (date-time) |  |  |
+| venueId | string (uuid) | yes |  |
+| positionCode | string | yes |  |
+| from | string (date-time) | yes |  |
+| to | string (date-time) | yes |  |
 | releasedBy | string (uuid) |  | (nullable) |
 | reason | string |  | (nullable) |
 | requiredQualifications | array of string |  | What a claimant must hold (ADAM CR-380, Chinmay, 31 October 2026; CHG-CR380-001). |
@@ -3037,7 +3028,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Claimed |
-| 409 |  | Already taken, not eligible, it would breach a working-hour rule, or it overlaps another assignment of the claimant at any venue of the tenant (ADAM CR-380) |
+| 409 |  | Already taken, not eligible, it would breach a working-hour rule, or it overlaps another assignment of the claimant at any venue of the tenant (ADAM CR-380); or the OpenShift lacks a venue, position… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setStaffingRules
@@ -4027,7 +4018,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | subject_types | text[] | no | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | signature_methods | text[] | no | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | external_provider_id | uuid | no | 11.1.65 (29 September). |
-| code | text | no | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005; enforced by a unique index on (matrix_id, code) since ADAM CR-102, CHG-R10ID-015, compared without case). |
+| code | text | no | A stable code for the rule, unique within one version of its matrix (4 October 2026, CHG-FXC-005; ADAM CR-102, CHG-R10ID-015). |
 | minimum_approvals | integer | no | N in N-of-M (CHG-FXC-005). |
 | required_approver_role_id | uuid | no | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). |
 | rejection_behavior | text | no | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). |
@@ -4046,8 +4037,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | principal_id | uuid | yes | Who read. |
 | subject_id | uuid | no | The guest whose PII was read; null for an audit-log read. |
-| read_at | timestamptz | yes | When the read happened. |
-| target | text | yes | What was read. |
+| read_at | timestamptz | no | When the read happened. |
+| target | text | no | What was read. |
 | filter | jsonb | no | The query parameters the read was made with (for auditRecord, the list''s filters and cursor). |
 | record_count | integer | no | How many rows the read returned. |
 | org_unit_id | uuid | no | The venue the reader's session acts at, else its region; null for a session at the tenant root (CHG-R10TEN-019). |
@@ -4449,10 +4440,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | rota_assignment_id | uuid | no |  |
 | shift_template_id | uuid | no |  |
-| venue_id | uuid | no |  |
-| position_code | text | no |  |
-| valid_from | timestamptz | no |  |
-| valid_to | timestamptz | no |  |
+| venue_id | uuid | yes |  |
+| position_code | text | yes |  |
+| valid_from | timestamptz | yes |  |
+| valid_to | timestamptz | yes |  |
 | released_by | uuid | no |  |
 | reason | text | no |  |
 | required_qualifications | text[] | no | What a claimant must hold (ADAM CR-380, Chinmay, 31 October 2026; CHG-CR380-001). |

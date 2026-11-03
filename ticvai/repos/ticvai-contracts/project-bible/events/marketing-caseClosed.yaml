@@ -31,11 +31,6 @@ consumers:
   idempotencyKey: caseId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Case metrics and SLA
-  idempotencyKey: caseId
-  onFailure: retry
-  isCritical: false
 - context: cache
   purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
     invalidates the answer** — a cached answer that outlives a price change has misled a guest on the

@@ -96,13 +96,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Display) — counts over a population, then the population",
   "purpose": "Provide real-time operational visibility across all payment gateways, PSPs and acquirers.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 25 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -516,13 +510,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: API endpoint reference, Webhook configuration, Callback configuration, Retry configuration. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 3 operations.** Unserved: API endpoint reference, Webhook configuration, Callback configuration, Retry configuration. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 27 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 27 §Display"
    }
   ],
   "layout": {
@@ -854,13 +843,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Venue, Legal entity, Channel, Payment method, Transaction amount, Transaction type, Customer type where appropriate, Weighted distribution. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved: Venue, Legal entity, Channel, Payment method, Transaction amount, Transaction type, Customer type where appropriate, Weighted distribution. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 29 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**Payment Routing Rule Builder\\t31 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    },
    {
     "operation": null,
@@ -1156,11 +1140,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**Failover, Retry & Resilience Manager\\t34 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the payment failover policy (setPaymentFailoverPolicy has no get).",
     "source": "contracts/satellite/payments.yaml#setPaymentFailoverPolicy | screens/P08-venue-back-office.yaml#ADM-575"
    }
@@ -1304,13 +1283,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Health Metrics) and a per-row directory (§Compare) — counts over a population, then the population",
   "purpose": "Monitor each provider's technical and transactional health.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 33 §Compare"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1623,13 +1596,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Credit Card can route through) and no metric row",
   "purpose": "Allow administrators to test exactly how a payment will be routed before deploying routing changes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 35 §Credit Card can route through"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

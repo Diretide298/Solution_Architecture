@@ -594,6 +594,11 @@
   "x-ticvai-index": [
    [
     "sourceRef"
+   ],
+   [
+    "sourceRef",
+    "subjectId",
+    "channel"
    ]
   ],
   "x-ticvai-persistence": "marketing.message_dispatch",
@@ -704,6 +709,11 @@
     "type": "string",
     "nullable": true,
     "description": "The id of the record whose business event triggered the message (a performance id, a guest broadcast id), which `listMessageDispatches` filters on (ADAM CR-379; CHG-CR379-001). Null for a campaign."
+   },
+   "body": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The resolved message as sent** (ADAM CR-442, Chinmay, 1 November 2026; CHG-CR442-001), which Marketing's message sender sends; for a guest broadcast, `messageLocalised` in the guest's language, else `message` (`sendGuestBroadcast`)."
    }
   }
  },
@@ -731,22 +741,25 @@
    "secret": {
     "type": "string",
     "nullable": true,
-    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again. **20 random bytes, base32 without padding** (ADAM CR-522, RFC 6238; CHG-CR522-001), stored field-encrypted in `mfa_method.secret`."
    },
    "qrCodeUri": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "`otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`, where `issuer` is the tenant's display name and `account` is the principal's username or the guest's email, each URL-encoded (ADAM CR-522; CHG-CR522-001). Null for kinds other than `totp`."
    },
    "recoveryCodes": {
     "type": "array",
-    "description": "Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed, to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not return them.\n",
+    "description": "Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed, to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not return them. **Ten codes, each 10 characters of Crockford base32, shown as five characters, a hyphen, five characters** (ADAM CR-522; CHG-CR522-001); every `enrolMfaMethod` of any kind issues a new set and replaces the earlier one.\n",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{5}-[0-9A-HJKMNP-TV-Z]{5}$"
     }
    },
    "expiresAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the pending enrolment lapses, 10 minutes after `enrolMfaMethod` (`pendingExpiresAt`; ADAM CR-522, CHG-CR522-001)."
    }
   }
  },
@@ -804,7 +817,7 @@
     "nullable": true,
     "writeOnly": true,
     "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code."
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code. **20 random bytes, base32 without padding** (ADAM CR-522, RFC 6238; CHG-CR522-001), stored field-encrypted."
    },
    "destination": {
     "type": "string",
@@ -818,7 +831,7 @@
     "format": "date-time",
     "nullable": true,
     "writeOnly": true,
-    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
+    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified. **10 minutes after `enrolMfaMethod`** (ADAM CR-522, CHG-CR522-001), the same time as `MfaEnrolment.expiresAt`."
    },
    "kind": {
     "$ref": "#/components/schemas/MfaKind"
@@ -1286,7 +1299,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

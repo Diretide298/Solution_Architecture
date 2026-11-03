@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2862,
+  "operations": 2864,
   "screens": 2453,
   "flows": 291
  },
@@ -231,6 +231,7 @@
     "pii.subject_contact",
     "pii.subject_document",
     "pii.subject_identity",
+    "platform.idempotency_record",
     "platform.outbox",
     "platform.scope",
     "whitelabel.analytics_provider",
@@ -256,7 +257,7 @@
     "screens": 0,
     "flows": 14,
     "contracts": 7,
-    "tables": 73
+    "tables": 74
    }
   },
   "device": {
@@ -335,6 +336,8 @@
     "orders.order_line",
     "orders.sales_order",
     "orders.stored_value_authorisation",
+    "orders.ticket_template",
+    "orders.wallet_pass",
     "pii.subject",
     "platform.device",
     "platform.outbox",
@@ -377,7 +380,7 @@
     "screens": 0,
     "flows": 13,
     "contracts": 6,
-    "tables": 61
+    "tables": 63
    }
   },
   "guest": {
@@ -410,6 +413,7 @@
     "createAiConversation",
     "createCart",
     "createCase",
+    "createGuestDocumentUpload",
     "createGuestFnbOrder",
     "createGuestUpload",
     "createInstalmentPlan",
@@ -1046,6 +1050,7 @@
     "marketing.form_submission_sale_link",
     "marketing.guest_device",
     "marketing.guest_document",
+    "marketing.guest_document_upload",
     "marketing.guest_match_decision",
     "marketing.guest_match_policy",
     "marketing.guest_preference",
@@ -1066,6 +1071,7 @@
     "marketing.tracking_technology",
     "marketing.waiver_requirement",
     "marketing.waiver_requirement_event",
+    "marketing.waiver_version_control",
     "marketing.wishlist_item",
     "orders.cart",
     "orders.cart_line",
@@ -1227,11 +1233,11 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 290,
+    "operations": 291,
     "screens": 144,
     "flows": 23,
     "contracts": 23,
-    "tables": 350
+    "tables": 352
    }
   },
   "partner": {
@@ -1322,6 +1328,7 @@
     "listCreditLimitExposure",
     "listDelegatedAccess",
     "listDepositGuaranteeFinancial",
+    "listDeveloperMembers",
     "listIntegrationListings",
     "listMfaMethods",
     "listOrderRefunds",
@@ -1608,6 +1615,8 @@
     "orders.refund_payment",
     "orders.refund_policy",
     "orders.sales_order",
+    "orders.ticket_template",
+    "orders.wallet_pass",
     "payments.payment_attempt",
     "payments.provider_connection",
     "payments.provider_cost",
@@ -1640,11 +1649,11 @@
     "whitelabel.guided_choice_answer"
    ],
    "counts": {
-    "operations": 170,
+    "operations": 171,
     "screens": 51,
     "flows": 10,
     "contracts": 11,
-    "tables": 148
+    "tables": 150
    }
   },
   "prospect": {
@@ -1796,6 +1805,7 @@
     "getDsarRequest",
     "getGuestLink",
     "getGuestLoyalty",
+    "getTenantRequestLimits",
     "getWalletPreCloseChecks",
     "holdWalletFunds",
     "ingestFxRates",
@@ -1914,6 +1924,8 @@
     "control.api_client",
     "control.api_client_secret",
     "control.api_licence",
+    "control.contract",
+    "control.plan",
     "control.tenant",
     "control.tenant_domain",
     "control.usage_record",
@@ -1997,6 +2009,7 @@
     "reporting.report_column",
     "reporting.report_filter",
     "reporting.semantic_model",
+    "retail.merchandise",
     "retail.sale",
     "retail.sale_line",
     "retail.shop_and_drop",
@@ -2021,11 +2034,11 @@
     "whitelabel.guided_choice_question"
    ],
    "counts": {
-    "operations": 71,
+    "operations": 72,
     "screens": 0,
     "flows": 5,
     "contracts": 18,
-    "tables": 139
+    "tables": 142
    }
   },
   "staff": {
@@ -2283,6 +2296,7 @@
     "createGroupBooking",
     "createGroupEnquiry",
     "createGroupSeatRequest",
+    "createGuestDocumentUpload",
     "createGuidedChoice",
     "createInspectionTemplate",
     "createInstalmentPlan",
@@ -7289,6 +7303,7 @@
     "catalogue.fee_rule",
     "catalogue.group_package",
     "catalogue.import_job",
+    "catalogue.import_job_row",
     "catalogue.inventory_reservation",
     "catalogue.lifecycle_action",
     "catalogue.lifecycle_workflow",
@@ -7669,6 +7684,7 @@
     "marketing.form_submission_sale_link",
     "marketing.guest_attribute_model",
     "marketing.guest_document",
+    "marketing.guest_document_upload",
     "marketing.guest_extra_field",
     "marketing.guest_extra_option",
     "marketing.guest_extra_value",
@@ -8172,11 +8188,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2648,
+    "operations": 2649,
     "screens": 2164,
     "flows": 138,
     "contracts": 33,
-    "tables": 1138
+    "tables": 1140
    }
   }
  }

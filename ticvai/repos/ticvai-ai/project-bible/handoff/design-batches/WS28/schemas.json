@@ -2220,7 +2220,12 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "exchangeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Zero until the client sets a fee rule (ADAM CR-480); `waiveFee` changes nothing meanwhile."
    },
    "difference": {
     "allOf": [
@@ -2228,7 +2233,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round.\n"
+    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round. `incomingValue` + `exchangeFee` - `outgoingValue`, in the venue's currency: positive is the balance due on the order, collected by `createPayment`; negative is refunded by `createRefund` over the outgoing lines (ADAM CR-480).\n"
    },
    "newLineIds": {
     "type": "array",

@@ -53,11 +53,6 @@ consumers:
   idempotencyKey: requestId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Approval analytics
-  idempotencyKey: requestId
-  onFailure: retry
-  isCritical: false
 - context: cache
   purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
     invalidates the answer** — a cached answer that outlives a price change has misled a guest on the
@@ -110,9 +105,26 @@ consumers:
 - context: white-label
   purpose: Make the approved white-label version current (`reviewStatus` approved, `isCurrent` true, the previous
     current version no longer current) and emit whitelabel.contentPublished, when `subjectType` is
-    `whiteLabelPublication` (ADAM CR-154, 18 October 2026; CHG-CRA-004)
+    `whiteLabelPublication` (ADAM CR-154, 18 October 2026; CHG-CRA-004). A scheduled version whose `scheduledFor` is
+    still in the future is left waiting, not current with `reviewStatus` approved, and the scheduled-publish job makes
+    it current when it falls due (ADAM CR-501, 3 November 2026; CHG-CR501-001)
   writes:
   - whitelabel.config_version
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: white-label
+  purpose: 'Publish or schedule a reviewed content block (`subjectType` `whiteLabelPublication`, `subjectId` a
+    whitelabel.content_block row; ADAM CR-462, decided 2 November 2026; CHG-CR462-001), as publishContentBlock
+    states. It reads the request by `requestId` through approvals#requestRecords (in process, CHG-R13INT-013) for the
+    `publishAt` and `expireAt` the publish stored in its `attributes`, and the block from `subjectId`. A block no
+    longer pending review, or now published or archived, changes nothing. Otherwise the stored schedule is applied
+    by a direct publish''s rules at that moment (a missing, null or passed `publishAt` publishes now, a future one
+    schedules, a missing `expireAt` keeps the stored one), with `reviewStatus` approved, in one transaction, and
+    whitelabel.contentPublished is raised when the block publishes; an `expireAt` no longer after the moment it would
+    go live publishes and schedules nothing and sets `reviewStatus` rejected'
+  writes:
+  - whitelabel.content_block
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true

@@ -7,7 +7,7 @@ sourceFiles:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 210 state models and 110 events
+title: 210 state models and 113 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -971,14 +971,14 @@ stateModels:
   owner: subscription
   service: null
   states: null
-  transitions: 5
+  transitions: 6
   initial:
   - queued
   terminal:
   - completed
   - rolledBack
   operations: []
-  guarded: 5
+  guarded: 6
   ref: diagrams/lld/lifecycles/cell-job.yaml
 - entity: Cell
   contract: subscription
@@ -996,7 +996,6 @@ stateModels:
   - decommissionCell
   - reactivateTenant
   - suspendTenant
-  - updateCellTier
   guarded: 10
   ref: diagrams/lld/lifecycles/cell.yaml
 - entity: Challenge
@@ -3069,7 +3068,6 @@ stateModels:
   - terminated
   operations:
   - terminateTenant
-  - updateTenant
   guarded: 8
   ref: diagrams/lld/lifecycles/tenant.yaml
 - entity: Ticket transfer
@@ -3490,6 +3488,9 @@ events:
   description: A Face Pass or Face Tag enrolment was made, re-enrolled after review, or removed.
 - event: cart-abandoned
   description: A cart lapsed without checking out.
+- event: catalogue-channelIncidentRetryRequested
+  description: A person asked for the failed channel call behind an incident to be sent again; the incident
+    is `retrying` and this is the retry its job carries out.
 - event: catalogue-priceExecuted
   description: A live dynamic price execution was recorded for a target (a product, narrowed to event
     and performance where sent) on its channels.
@@ -3560,6 +3561,9 @@ events:
 - event: identity-loginRecorded
   description: Somebody tried to sign in — a staff or partner principal, or a guest — and it succeeded,
     failed, or was asked for a second factor.
+- event: identity-mfaCodeIssued
+  description: An emailOtp code was issued for a sign-in, step-up or enrolment challenge, for Marketing
+    to send to the person by email (ADAM CR-522, Chinmay, 3 November 2026).
 - event: identity-privacyRequestRaised
   description: A guest's privacy request (a data export or an erasure) was raised, as an Approvals request.
 - event: inventory-purchaseOrderReceived
@@ -3606,6 +3610,9 @@ events:
     be issued.
 - event: order-refunded
   description: Value has been returned to a guest, in whole or in part.
+- event: order-ticketsResent
+  description: A guest or a member of staff asked for an order's tickets to be sent again by email,
+    SMS or WhatsApp; Access delivers each credential.
 - event: payment-attemptFailed
   description: A call to a payment provider was declined or errored. One event per failed attempt, whether
     or not a payment record ever existed.

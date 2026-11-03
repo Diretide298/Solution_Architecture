@@ -45,6 +45,18 @@ Rules:
                     over); a fact only in its response schema is the writer's rule (CHG-RTE-001's fix round 1, the
                     check's rule since CHG-R10GEN-001). The sentences the r10 dry run read as not reads (a contrast,
                     a cited shape, who writes it) are NOT_READ, or NOT_READ_FOR the operations they are not reads for.
+    XR-INPROCESS-HOST  a `service` read of a query the reader's host already asks in process (r13, 2 November 2026;
+                    ADAM CR-475 to CR-478 and the lead's ruling for the class; CHG-R13INP-001): the owner runs in the
+                    reader's deployable; the reader is an event consumer (workers composes every module); the lead
+                    granted the query to the reader's deployable (a `reads` entry, unless it is `narrow`, when only
+                    its own `operations` read in process); or the reader's host composes the owner module's query
+                    classes (a `reads` entry with `composes: <module>`). Ask it in process, the owner serving it so,
+                    with a `reads` grant for the host where it lacks one. Never baselined
+    XR-SERVICE-PATH an operation that is a query's `service` route (its description opens "The `service` route of
+                    the `<query>` query", or its path is under /queries/) that is not POST /queries/<the query's name
+                    in kebab case> under serviceAuth, taking the query's declared inputs as its JSON body, answering
+                    200 with an array, 400 `validation` and 401 (ADAM CR-438, Chinmay, 1 November 2026: the rule for
+                    every served `service` query; CHG-CR438-001). Never baselined
 
 **The class release, 25 October 2026** (r10 lane E, CHG-R10GEN-001; PROCESS-LOG P-30). The 720 XR-FACT findings of r9
 were baselined on 18 October and acknowledged on started tickets until a class release that never ran, and about 13
@@ -85,6 +97,11 @@ RULES = {
     "XR-LINEAGE": "the lineage's readVia differs from the contract's x-ticvai-read-via",
     "XR-FACT": "an operation's text names another module's table, field or fact (FACTS) and asks no query over that "
                "table (ADAM CR-096, CR-135; CHG-RTE-001)",
+    "XR-INPROCESS-HOST": "a service read of a query the reader's host already asks in process: same deployable, an "
+                         "event consumer, a granted query or a module the host composes (ADAM CR-475 to CR-478; "
+                         "CHG-R13INP-001)",
+    "XR-SERVICE-PATH": "a query's service route that is not POST /queries/<kebab name> under serviceAuth, with the "
+                       "declared inputs as body, 200 array, 400 and 401 (ADAM CR-438; CHG-CR438-001)",
 }
 ROUTES = ("in-process", "service", "projection")
 QUERY_FIELDS = ("module", "inputs", "returns", "rule", "served")
@@ -124,13 +141,141 @@ def contract_ops() -> dict:
     return {o: f["op"] for o, f in g.operations().items()}
 
 
-def granted_reads() -> set:
-    """(reader deployable, `<contract>#<query>`) the lead granted in process across deployables (ADAM CR-196,
-    CHG-R9CR-005): the `reads` of docs/active/cross-deployable-writes.yaml."""
+def read_grants() -> list:
+    """The `reads` entries of docs/active/cross-deployable-writes.yaml (ADAM CR-196, CHG-R9CR-005), as written."""
     import yaml
     p = g.ROOT / "docs" / "active" / "cross-deployable-writes.yaml"
     doc = yaml.safe_load(p.read_text(encoding="utf-8")) if p.exists() else {}
-    return {(str(r.get("reader")), str(q)) for r in (doc or {}).get("reads") or [] for q in r.get("queries") or []}
+    return [r for r in (doc or {}).get("reads") or [] if isinstance(r, dict)]
+
+
+def granted_reads(grants: list = None) -> set:
+    """(reader deployable, `<contract>#<query>`) the lead granted in process across deployables (ADAM CR-196,
+    CHG-R9CR-005): the `reads` of docs/active/cross-deployable-writes.yaml. A `narrow` entry (XDR-010: "No other
+    Access operation reads pii.subject in process under this entry") grants only its own operations, so it is not
+    here: see narrow_reads (CHG-R13INP-001)."""
+    grants = read_grants() if grants is None else grants
+    return {(str(r.get("reader")), str(q)) for r in grants if not r.get("narrow") for q in r.get("queries") or []}
+
+
+def narrow_reads(grants: list = None) -> dict:
+    """(reader deployable, query) -> the operations a `narrow` entry grants it to, and only those (CHG-R13INP-001)."""
+    out: dict = {}
+    for r in read_grants() if grants is None else grants:
+        if r.get("narrow"):
+            for q in r.get("queries") or []:
+                out.setdefault((str(r.get("reader")), str(q)), set()).update(str(o) for o in r.get("operations") or [])
+    return out
+
+
+def composed_modules(grants: list = None) -> dict:
+    """reader deployable -> {module (service name): [entry ids]} whose query classes the host composes: the `reads`
+    entries with `composes` (r13, CHG-R13INP-001; ADR-0055 as amended 2 November 2026). The lead, settling CR-475 to
+    CR-478 for the class: a host that composes a module's query classes asks that module's queries in process, with
+    an additive read grant where its role lacks one."""
+    out: dict = {}
+    for r in read_grants() if grants is None else grants:
+        if r.get("composes"):
+            out.setdefault(str(r.get("reader")), {}).setdefault(str(r["composes"]), []).append(str(r.get("id")))
+    return out
+
+
+def asked_in_process_by_host(o: str, rdep, owner, odep, key: str, consumer: bool, granted: set, narrow: dict,
+                             composes: dict):
+    """Why the reader's host already asks `key` in process, or None (XR-INPROCESS-HOST; CHG-R13INP-001)."""
+    if consumer:
+        return "it is an event consumer, run in workers, which composes every module (ADR-0055, CR-167)"
+    if owner and odep == rdep:
+        return f"{owner} runs in {rdep} too"
+    if (rdep, key) in granted:
+        return f"the lead granted {key} to {rdep} in process (docs/active/cross-deployable-writes.yaml reads)"
+    if o in narrow.get((rdep, key), set()):
+        return f"a narrow grant gives {o} {key} in process"
+    if owner in (composes.get(rdep) or {}):
+        return (f"{rdep} composes {owner}'s query classes ({', '.join(composes[rdep][owner])}); add {key} and its "
+                f"tables to a reads entry for {rdep} where the role lacks them")
+    return None
+
+
+def control_plane(entry: dict, op: dict) -> bool:
+    """An operation of the Control Plane: its lineage reads or writes a control.* table, or it acts at platform or cell
+    scope (ADR-0039: the Control Plane runs outside every cell; CHG-R13INP-001)."""
+    tabs = list((entry or {}).get("reads") or []) + list((entry or {}).get("writes") or [])
+    return any(str(t).startswith("control.") for t in tabs) or (op or {}).get("x-ticvai-scope-level") in ("platform",
+                                                                                                         "cell")
+
+
+SERVICE_ROUTE = re.compile(r"The `service` route of the `(\w+)` query")
+
+
+def kebab(name: str) -> str:
+    """`subjectBiometricRecords` -> `subject-biometric-records` (ADAM CR-438)."""
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "-", str(name)).lower()
+
+
+def camel(kebab_name: str) -> str:
+    parts = str(kebab_name).split("-")
+    return parts[0] + "".join(p[:1].upper() + p[1:] for p in parts[1:])
+
+
+def service_path_findings(ops: dict, queries: dict, docs: dict) -> list:
+    """[(key, message)] for every operation that is a query's service route and is not built to ADAM CR-438's rule:
+    POST /queries/<kebab name> on the owning deployable, serviceAuth, the query's declared inputs as the JSON body,
+    200 with an array of rows, 400 validation, 401. `ops`: g.operations(); `queries`: declared_queries();
+    `docs`: contract stem -> its document (to resolve a local $ref)."""
+    out = []
+
+    def resolve(node, stem):
+        node = node or {}
+        ref = str(node.get("$ref") or "")
+        if ref.startswith("#/"):
+            cur = docs.get(stem) or {}
+            for part in ref[2:].split("/"):
+                cur = (cur or {}).get(part) or {}
+            return cur
+        return node
+
+    for o, f in sorted(ops.items()):
+        op = f["op"]
+        m = SERVICE_ROUTE.search(" ".join(str(op.get("description") or "").split()))
+        parts = str(f["path"]).split("/")
+        under = len(parts) > 2 and parts[1] == "queries"
+        if not m and not under:
+            continue
+        name = m.group(1) if m else camel(parts[2])
+        key = f"{f['contract']}#{name}"
+        bad = []
+        q = (queries.get(key) or (None, None))[1]
+        # CR-438's rule is for a data read answering rows; a rule question answering one object that names its own
+        # `operation` (identity#verifySupervisorStepUp, POST /internal/step-up/verify) keeps that operation.
+        if q is not None and (q.get("returns") or {}).get("type") != "array" and q.get("operation") == o:
+            continue
+        if q is None or "service" not in (q.get("served") or []):
+            bad.append(f"names {key}, which its contract does not declare served on the service route")
+        want = f"/queries/{kebab(name)}"
+        if f["path"] != want or f["method"] != "post":
+            bad.append(f"is {f['method'].upper()} {f['path']}, not POST {want}")
+        if (op.get("security") or []) != [{"serviceAuth": []}]:
+            bad.append("is not under serviceAuth alone")
+        body = resolve((((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {})
+                       .get("schema"), f["contract"])
+        if q is not None and set((body or {}).get("properties") or {}) != set(q.get("inputs") or {}):
+            bad.append(f"takes {sorted((body or {}).get('properties') or {})} as its body, not the query's declared "
+                       f"inputs {sorted(q.get('inputs') or {})}")
+        resp = op.get("responses") or {}
+        ok = resolve((((resp.get("200") or {}).get("content") or {}).get("application/json") or {}).get("schema"),
+                     f["contract"])
+        if (ok or {}).get("type") != "array":
+            bad.append("does not answer 200 with a JSON array of the rows")
+        r400 = resp.get("400") or {}
+        if not (str(r400.get("$ref") or "").endswith("/responses/BadRequest")
+                or "validation" in (r400.get("x-ticvai-problem-types") or [])):
+            bad.append("declares no 400 validation (neither ids nor where, or where names a field the row lacks)")
+        if "401" not in {str(k) for k in resp}:
+            bad.append("declares no 401 for a caller that is not a fellow deployable")
+        if bad:
+            out.append((f"{o}:{key}", f"{o} is the service route of {key} and " + "; ".join(bad) + " (ADAM CR-438)"))
+    return out
 
 
 def declared_queries() -> dict:
@@ -335,6 +480,12 @@ NOT_READ: tuple = tuple(re.compile(p, re.I | re.S) for p in (
 # metrics reads those tables (getKpiValues, askReportingQuestion, runSemanticQuery), and one that defines, lists,
 # targets or acknowledges them does not.
 NOT_READ_FOR: tuple = tuple((re.compile(p, re.I | re.S), frozenset(o)) for p, o in (
+    # r13 (2 November 2026): the decisions that removed a read say what the operation does not read, and who does.
+    # submitForm reads nothing from pii.subject (ADAM CR-472); setSeoMetadata names where createUrlRedirect keeps the
+    # 301 (CR-474); createPreview names what the workers-host renderer reads, which it does not (CR-476).
+    (r"It\s+reads\s+nothing\s+from\s+`pii\.subject`", {"submitForm"}),
+    (r"That\s+redirect\s+lives\s+in\s+`control\.url_redirect`", {"setSeoMetadata"}),
+    (r"ticket\s+and\s+pass\s+templates|no\s+grant\s+on\s+`orders\.ticket_template`", {"createPreview"}),
     (r"\|\s*Metric\s*\|\s*Source\s*\|.*",
      {"acknowledgeAlert", "listAlerts", "setAlertRule", "setKpiTargets"}),
     (r"\|\s*Code\s*\|\s*Unit\s*\|\s*Source\s*\|.*", {"createKpi", "listSeededReports", "listKpis"}),
@@ -641,7 +792,10 @@ def main() -> int:
         return None
 
     queries = declared_queries()
-    granted = granted_reads()
+    grants = read_grants()
+    granted = granted_reads(grants)
+    narrow = narrow_reads(grants)
+    composes = composed_modules(grants)
     ops = contract_ops()
     if "--list-facts" in sys.argv[1:]:
         for row in fact_findings():
@@ -688,12 +842,24 @@ def main() -> int:
                 guard.add("XR-ROUTE", f"{o}:{key}", f"{o} asks {key} by {route}, which the query does not serve "
                           f"({', '.join(q.get('served') or []) or 'none'})")
             if route == "in-process" and owner and dep_of.get(owner) != rdep and (rdep, key) not in granted \
-                    and not consumer:
+                    and o not in narrow.get((rdep, key), set()) and not consumer:
                 guard.add("XR-ROUTE", f"{o}:{key}", f"{o} ({rdep}) asks {key} in-process, and {owner} is in "
                           f"{dep_of.get(owner)}: across deployables a query is a service call or a projection")
             if reader in FOUNDATION_STRICT and owner and tier_of.get(owner) != "foundation" and route != "projection":
                 guard.add("XR-FOUNDATION", f"{o}:{key}", f"{o} ({reader}, foundation) asks {key} of {owner} "
                           f"({tier_of.get(owner)}) by {route}: Identity reads nothing above it but a projection")
+            # XR-INPROCESS-HOST (r13, CHG-R13INP-001): a service call to a query the host already answers in process.
+            # An operation that keeps its own rows in the control database (control.*), or acts at platform or cell
+            # scope, is the Control Plane's, which runs outside every cell (ADR-0039, ADR-0048; planTenantMigration's
+            # CR-083 text): its reads of a tenant's data are not a cell host's to ask in process, and stay with the
+            # lead (CHG-R13INP-001 lists them).
+            if route == "service" and not control_plane(e, ops.get(o) or {}):
+                why = asked_in_process_by_host(o, rdep, owner, dep_of.get(owner), key, consumer, granted, narrow,
+                                               composes)
+                if why:
+                    guard.add("XR-INPROCESS-HOST", f"{o}:{key}", f"{o} ({reader}, {rdep}) asks {key} over the service "
+                              f"route, and {why}: ask it in process (ADAM CR-475 to CR-478; CHG-R13INP-001)",
+                              strict=True)
         cov_t, cov_o = covered_by(via, qtables)
         for t in e.get("reads") or []:
             if ":" in t or "." not in t or t in KERNEL_READ:
@@ -734,6 +900,10 @@ def main() -> int:
                   f"an x-ticvai-read-via to {owner}'s query for {t} (ADR-0055 rule 2; CR-096). Fixer: python "
                   "tools/fix-read-routes.py --apply, then python tools/derive-lineage.py --apply",
                   strict=(o, t) in MUST_FIX_FACTS)
+    # XR-SERVICE-PATH (ADAM CR-438, CHG-CR438-001): a query's service route is POST /queries/<kebab name>
+    docs = {stem: doc for stem, rel, doc in g.contracts()}
+    for k, msg in service_path_findings(g.operations(), queries, docs):
+        guard.add("XR-SERVICE-PATH", k, msg, strict=True)
     # XR-LINEAGE
     for o in sorted(set(ops) | {o for o, e in lin.items() if e.get("readVia")}):
         want = sorted(({k: str(r[k]) for k in ("query", "route", "for") if r.get(k)}

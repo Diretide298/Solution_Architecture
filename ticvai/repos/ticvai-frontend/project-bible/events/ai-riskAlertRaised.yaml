@@ -38,11 +38,6 @@ consumers:
   idempotencyKey: alertId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Risk alert analytics
-  idempotencyKey: alertId
-  onFailure: retry
-  isCritical: false
 retention: Two years, with the risk records
 notes: '**An alert is a signal, not a finding** (AIP-163). Restrictive actions never follow from the event;
   they go through a case and the action pipeline (AIP-136).

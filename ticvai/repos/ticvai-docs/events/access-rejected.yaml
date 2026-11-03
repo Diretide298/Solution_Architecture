@@ -8,6 +8,9 @@ description: Media was presented at an access point and refused, with the reason
 aggregate: accessPoint
 emittedWhen: validateAccess returns outcome denied, or syncScans accepts a replayed offline scan that was
   denied at the gate or that the server downgraded from admitted to denied
+emittedBy:
+- access.validateAccess
+- access.syncScans
 payload:
 - field: scanId
   type: uuid

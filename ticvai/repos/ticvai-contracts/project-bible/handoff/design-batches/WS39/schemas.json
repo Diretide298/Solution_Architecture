@@ -926,7 +926,7 @@
    "movementPercent": {
     "type": "number",
     "nullable": true,
-    "description": "Competitor Movement: change against the previous observation of the same mapping, date and timeslot, percent; null when there is none or the currency differs (ADAM CR-409)"
+    "description": "Competitor Movement: change against the previous observation of the same mapping, date and timeslot, percent to one decimal; null when there is none or the currency differs (ADAM CR-409, CR-446)"
    },
    "historicalCorrelation": {
     "type": "object",
@@ -1670,7 +1670,7 @@
    },
    "time": {
     "type": "string",
-    "description": "Time context of the curve: the non-null parts of day type, peak period, season and event proximity ('{from}-{to} days'), joined by ', ' in that order; absent when all are null (ADAM CR-406)"
+    "description": "Time context of the curve: the non-null parts of day type, peak period, season and event proximity ('{from}-{to} days', or 'up to {to} days' with no from and '{from}+ days' with no to; left out when both are null), joined by ', ' in that order; absent when all are null (ADAM CR-406, CR-446)"
    },
    "product": {
     "type": "string",

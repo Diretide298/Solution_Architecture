@@ -250,18 +250,7 @@
   "patternReason": "the pack gives this screen a display directory (§Card r t Credit; Card) and no metric row",
   "purpose": "Define which payment methods may be combined within a single transaction.",
   "division": "Shares `getMixedTenderRules`, `setMixedTenderRules` with ADM-605; this screen is Mixed Tender Rule & Combination Builder (pack Payment_Payment_Orchestration.pdf, board 5.2, page 92): define which payment methods may be combined within a single transaction.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 92 §Card r t Credit"
-   },
-   {
-    "operation": null,
-    "why": "**Mixed Tender Rule & Combination Builder\\t93 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -413,11 +402,6 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine how an order total is allocated across several payment methods.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Split Payment & Tender Allocation Manager\\t94 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -608,11 +592,6 @@
   "purpose": "Manage payment credit facilities granted to authorized B2B customers, resellers, corporate clients or partners. This is not the general B2B customer profile. The B2B/CRM module remains authoritative for the customer/account itself. Board 5 owns the payment-credit capability.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**B2B Credit Account & Limit Manager\\t95 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
     "operation": "listB2bCreditAccounts",
     "removed": true,
     "why": "Removed 29 October 2026 (CHG-R11FXU-004): the approved screen has no list, table or picker that shows the accounts (its body is seven pack select fields for the facility being opened), and the lead's ruling of 26 October 2026 (CHG-R10WIR-002, item 5) is that a read the approved screen has no element for leaves it. The accounts are listed and picked on ADM-603 (Customer/account) and ADM-608, where listB2bCreditAccounts stays declared and reached. The edge to ADM-603 carries the accountId createB2bCreditAccount returns; opened otherwise, ADM-603 picks the account itself. A CR brings the read back here with the list that shows it.",
@@ -750,7 +729,7 @@
     }
    ]
   },
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.\n\n**Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with `setB2bPaymentTerms` for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout has no save control; until the client approves one (docs/active/approved-ui-changes.yaml), the save control is a pending client-approval item, and the ticket builds the bound fields and the call. `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment policy panel the pack names, which this layout does not draw (a gap, not built in Block A).",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.\n\n**Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with `setB2bPaymentTerms` for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout has no save control. No client approval of one is pending: under the lead's rule of 28 October 2026 the developer adds a Save that sends `setB2bPaymentTerms` and logs a \"Design change:\" CR in ADAM (r13, CHG-RCR34-001). `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment policy panel the pack names, which this layout does not draw (a gap, not built in Block A).",
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population",
@@ -1147,13 +1126,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Minimum card amount, Credit restriction, Voucher exclusivity. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Minimum card amount, Credit restriction, Voucher exclusivity. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 97 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 97 §Gift Card second"
    }
   ],
   "layout": {
@@ -1322,18 +1296,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Gift Card; Card) and no metric row",
   "purpose": "Handle situations where some tenders succeed but another tender fails. This is one of the most important screens in Board 5.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card"
-   },
-   {
-    "operation": null,
-    "why": "**Partial Payment, Failure & Recovery Manager\\t100 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1654,13 +1617,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Require card for excess, Request approval, Reject B2B credit, Reduce credit allocation. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: Require card for excess, Request approval, Reject B2B credit, Reduce credit allocation. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 101 §Available actions according to policy"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Payment_Payment_Orchestration.pdf, page 101 §Gift Card"
    }
   ],
   "layout": {

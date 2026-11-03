@@ -150,7 +150,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `EMP-001` | Sign in | A | 15 | 43 | 9 | 5 | 3 | 0 | — | notStarted (generated) |
-| `EMP-002` | Select venue & role | A | 2 | 8 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
+| `EMP-002` | Select venue & role | A | 2 | 9 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
 | `EMP-003` | Home — on duty | A | 35 | 24 | 6 | 11 | 3 | 0 | — | notStarted (generated) |
 | `EMP-009` | End shift | C | 20 | 23 | 7 | 1 | 1 | 6 | — | notStarted (generated) |
 | `EMP-010` | Scan — ready | C | 17 | 0 | 6 | 45 | 1 | 0 | — | notStarted (generated) |

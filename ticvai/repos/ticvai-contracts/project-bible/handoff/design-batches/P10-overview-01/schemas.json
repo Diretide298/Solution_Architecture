@@ -144,7 +144,7 @@
    "id": {
     "type": "string",
     "format": "uuid",
-    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
+    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. In an offline replay through `syncOrders` the entry carries no header of its own: the batch POST takes a fresh UUIDv7 `Idempotency-Key` per batch, never an entry's id, and this id alone deduplicates the entry (r13 root R41).\n"
    },
    "venueId": {
     "type": "string",
@@ -613,7 +613,12 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "exchangeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Zero until the client sets a fee rule (ADAM CR-480); `waiveFee` changes nothing meanwhile."
    },
    "difference": {
     "allOf": [
@@ -621,7 +626,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round.\n"
+    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round. `incomingValue` + `exchangeFee` - `outgoingValue`, in the venue's currency: positive is the balance due on the order, collected by `createPayment`; negative is refunded by `createRefund` over the outgoing lines (ADAM CR-480).\n"
    },
    "newLineIds": {
     "type": "array",
@@ -1404,6 +1409,75 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "WalletPass": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.wallet_pass",
+  "description": "BL-029. **`appleWallet` and `googlePay` are feature toggles on the native apps** — there is no pass generation, no update push, no serial and no authentication token.\n**A wallet pass is a live object, not a download.** The value over a PDF is that it updates: a changed gate, a cancelled performance, a time that moved. **A pass that cannot be pushed to is a screenshot with better rounding.**\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "platform",
+   "serialNumber",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "apple",
+     "google"
+    ]
+   },
+   "serialNumber": {
+    "type": "string"
+   },
+   "passUrl": {
+    "type": "string",
+    "format": "uri",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the app adds to the wallet** (R8 blocker ORDERS-MONEY-C39, CHG-R8MIG-017): for `apple` a short-lived signed link to the `.pkpass` file (signed with the brand's Pass Type ID certificate), for `google` the \"Save to Google Wallet\" link (a signed JWT). Made when the pass is issued or read, never stored; valid for 15 minutes (proposed, client to confirm), after which a read of the pass gives a new one."
+   },
+   "authenticationToken": {
+    "x-ticvai-secret": "blind-index",
+    "x-ticvai-blind-index-of": "none",
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "updated",
+     "voided",
+     "expired"
+    ]
+   },
+   "lastPushedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deviceRegistrations": {
+    "type": "integer",
+    "description": "How many devices hold it. **A guest with the pass on a phone and a watch is one entitlement and two registrations**, and both need the update.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  }

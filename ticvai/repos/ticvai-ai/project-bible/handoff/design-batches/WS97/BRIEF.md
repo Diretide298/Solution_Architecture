@@ -195,7 +195,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-588` | Rental Duration, Extension & Return Analytics | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-589` | Damage, Loss, Deposit & Exception Analytics | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-590` | Location & Channel Performance | D | 3 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-591` | Rental Forecasting & Demand Intelligence | B | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-591` | Rental Forecasting & Demand Intelligence | B | 0 | 60 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-592` | Audit, Governance & Operational Control | D | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-593` | AI Rental Management Copilot & Action Center | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 

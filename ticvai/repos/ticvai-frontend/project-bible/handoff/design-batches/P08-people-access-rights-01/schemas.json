@@ -1128,7 +1128,7 @@
     "type": "string",
     "maxLength": 64,
     "nullable": true,
-    "description": "**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005; enforced by a unique index on (`matrix_id`, `code`) since ADAM CR-102, CHG-R10ID-015, compared without case). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do not collide. A body with two rules of one code is `400 validation`."
+    "description": "**A stable code for the rule, unique within one version of its matrix** (4 October 2026, CHG-FXC-005; ADAM CR-102, CHG-R10ID-015). Enforced by `rule_matrix_id_matrix_version_code_uniq` on (`matrix_id`, `matrix_version`, `lower(code)`), the only code key since ADAM CR-300 (CHG-CR300-001): codes compare without case, within one version, and null codes do not collide, so a new version repeats the codes of the one before. The old key on (`matrix_id`, `lower(code)`), `rule_matrix_id_code_uniq`, is dropped, guarded, by the names migration `backend/tenant/V0119__names_after_r1_20261029.sql` (ADAM CR-498, CHG-CR498-001). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do not collide. A body with two rules of one code is `400 validation`."
    },
    "minimumApprovals": {
     "type": "integer",
@@ -2769,7 +2769,7 @@
    },
    "heldLeaseCount": {
     "type": "integer",
-    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
+    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned. **Left null** (ADAM CR-517; CHG-CR517-001): a till holds no standing lease, so nothing sets it.\n"
    },
    "openedAt": {
     "type": "string",
@@ -3241,7 +3241,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

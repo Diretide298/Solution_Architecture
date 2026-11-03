@@ -901,8 +901,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `deviceId` (session) |
 | Route | `/operations/pos-device-assignment-bo-732` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Which till, printer and card terminal belong to which outlet and cashier in F&B. Assignment is per workstation.
 
 **Contract gap logged** (the fix needs an operation or field the contracts do not have yet; draw the corrected version and mark what waits on the contract, as the open change entry says)

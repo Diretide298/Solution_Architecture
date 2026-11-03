@@ -140,8 +140,8 @@ screens:
     - to: SUP-008
       trigger: Agent Performance & SLA View
       provenance: 'derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds
-        none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or
-        optional), and SUP-008 opens on its own'
+        none of them. The edge carries nothing: conversationId, reportId only pre-select (optional), and
+        SUP-008 opens on its own'
     - to: SUP-007
       trigger: Canned Response Management
       provenance: 'landing target (r8, IDENTITY-C07, the lead''s option A): not a control on the sign-in
@@ -2108,8 +2108,8 @@ screens:
     cases, tasks, SLAs, alerts and workload.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved: New
-      Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI Assistant.
+    why: '**The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved:
+      New Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI Assistant.
       Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
       from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 3 §Quick Actions
@@ -2672,9 +2672,9 @@ screens:
   purpose: Provide the primary workspace in which an agent investigates and resolves a case.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 6 operations.** Unserved: Action
-      history. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 6 operations.** Unserved:
+      Action history. Each needs an operation, or needs removing from the screen; this is the Phase 3
+      reconciliation seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 11 §Support
   layout:
     template: split
@@ -3425,9 +3425,9 @@ screens:
   purpose: Configure the agent copilot and the assistant profile it answers with.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Review
-      → Execute. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved:
+      Review → Execute. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 19 §Actions
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -3718,10 +3718,10 @@ screens:
   purpose: Configure and operate the queues through which customer-service cases are organized.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Payments,
-      Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or needs removing
-      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
-      side.'
+    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved:
+      Payments, Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or needs
+      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
+      the contract side.'
     source: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
   - operation: listQueues
     removed: true
@@ -4070,9 +4070,9 @@ screens:
   purpose: Define and monitor service-level commitments for different customer-service scenarios.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Venue
-      operating hours. Each needs an operation, or needs removing from the screen; this is the Phase 3
-      reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved:
+      Venue operating hours. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 29 §Support
   layout:
     template: form

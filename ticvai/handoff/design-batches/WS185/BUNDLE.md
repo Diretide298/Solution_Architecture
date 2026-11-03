@@ -341,8 +341,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which strategies, placements, channels and stages perform best.
 
 **Known correction pending (do not draw the wrong version)**
@@ -502,8 +500,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/commercial/recommendation-experiment-a-b-test-studio-adm-691` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. **Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761). Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts, excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred revenue are different numbers and never share a label; a tile takes its label from the seeded KPI it is bound to (`ReportingSystemKpi`).
-
-**Known gaps.** **Recommendation Experiment & A/B Test Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** A/B tests of recommendation strategies; allocation fixed at creation.
 
@@ -773,7 +769,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Recommendation tracking ID, Last recommendation, First recommendation, A/B experiment. Each needs an …
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Recommendation tracking ID, Last recommendation, First recommendation, A/B experiment. Each needs an …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Whether recommendations created extra value: attributed vs incremental.
 
@@ -911,7 +907,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): An AI model performance and drift read (ai process); getRecommendationPerformance carries no model metrics.
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): An AI model performance and drift read (ai process); getRecommendationPerformance carries no model metrics.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recommendation and propensity model performance and drift after deployment.
 
@@ -1072,7 +1068,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Channel rollout, Venue rollout. Each needs an operation, or needs removing from the screen; this is the … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved: Channel rollout, Venue rollout. Each needs an operation, or needs removing from the screen; this is the …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How strategies, rules and models move into production.
 
@@ -1210,7 +1206,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Disable model, Disable recommendation type, Disable specific relationship, Raise confidence threshold … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved: Disable model, Disable recommendation type, Disable specific relationship, Raise confidence threshold … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the AI & Intelligence process.** Risk, fairness and safety for recommendations: how decisions behave across customer groups and contexts, and the controls to disable a model, a recommendation type or a relationship, raise the confidence threshold or suspend. The one thing to get right: each control states its effect (e.g. "Disable model - the rules answer takes over"), and emergency suspend is the same kill switch as elsewhere.
 
@@ -1467,7 +1463,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Simulate, Create Experiment, Create Draft, Send for Approval, Dismiss, Snooze. Each needs an operation, or … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved: Simulate, Create Experiment, Create Draft, Send for Approval, Dismiss, Snooze. Each needs an operation, or …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Recommendation data turned into improvement opportunities.
 

@@ -531,6 +531,11 @@ def p3(pk: Package, sid: str, s: dict) -> list:
     if not named:
         return []
     _, lp, ap, act = screen_perms(pk, s)
+    # **An action gated on its own control says so there** (r13, CHG-RCR29-001): a component whose `permission` is the
+    # permission its operation needs is hidden from a caller without it (screens/_schema.yaml), as the screen's other
+    # reads "say so in their own panels"; the no-access state is the screen's refusal, not the control's.
+    act = act - {c.get("permission") for _, c in components(s)
+                 if c.get("permission") and c.get("operation") and c.get("permission") in pk.op_perms(c["operation"])}
     out = []
     wrong = sorted(named - ap)
     if wrong:

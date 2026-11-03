@@ -1086,6 +1086,7 @@
     "readOnly": true
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setTrackingTechnology saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "type": "string",
     "enum": [
      "detected",
@@ -1287,6 +1288,7 @@
     "nullable": true
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setDataProcessingPurpose saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "type": "string",
     "enum": [
      "draft",
@@ -1657,6 +1659,7 @@
     "x-ticvai-persistence-column": "jsonb",
     "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
+    "description": "**The change set's contents, stored whole** (ADAM CR-437, Chinmay, 1 November 2026; CHG-CR437-001). `marketing.privacy_change_set.items` (jsonb, nullable) holds this list exactly as this view returns it, written whole on each save.",
     "items": {
      "type": "object",
      "properties": {
@@ -1744,7 +1747,8 @@
    "approvalRequestId": {
     "type": "string",
     "nullable": true,
-    "description": "The approvals-engine request, once submitted."
+    "x-ticvai-references": "approvals.request",
+    "description": "The approvals-engine request, once submitted. A foreign key to `approvals.request(id)`, as `workforce.leave_request.approval_request_id` is (ADAM CR-437; CHG-CR437-001)."
    },
    "publishAt": {
     "type": "string",
@@ -1996,6 +2000,7 @@
     ]
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setPrivacyNoticePolicyGovernance saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "type": "string",
     "enum": [
      "draft",

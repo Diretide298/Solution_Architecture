@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 284 operations
+title: marketing-crm — 285 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -383,6 +383,20 @@ operations:
   - cache:idempotency
   - marketing.form_definition
   - marketing.form_definition_field
+- operation: createGuestDocumentUpload
+  verb: POST
+  path: /guest-documents/uploads
+  scope: venue
+  permission: GUEST_VIEW_PII
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - marketing.guest_document_upload
 - operation: createInvitationCampaign
   verb: POST
   path: /invitation-campaigns
@@ -2001,7 +2015,6 @@ operations:
   - marketing.communication_preference_type
   - marketing.consent_capture_point
   - marketing.consent_purpose
-  - marketing.consent_purpose_channel
   - marketing.cookie_banner_design
   - marketing.minor_privacy_rule
   - marketing.privacy_notice_governance
@@ -3646,7 +3659,6 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.product
   - marketing.seo_metadata
   writes:
   - cache:idempotency
@@ -3849,7 +3861,7 @@ operations:
   - marketing.form_submission
   - marketing.form_submission_sale_link
   - marketing.waiver_requirement
-  - pii.subject
+  - marketing.waiver_version_control
   writes:
   - cache:idempotency
   - marketing.consent_record
@@ -4064,10 +4076,12 @@ operations:
   - cache:idempotency
   - marketing.consent_record
   - marketing.guest_document
+  - marketing.guest_document_upload
   - pii.subject
   writes:
   - cache:idempotency
   - marketing.guest_document
+  - marketing.guest_document_upload
 - operation: writeSubjectDataExportPart
   verb: POST
   path: /subject-data-export-parts

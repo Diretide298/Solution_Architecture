@@ -321,8 +321,9 @@
   }
  },
  "LicencePosition": {
-  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> control.plan_module, control.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
+  "x-ticvai-persistence": "none — union of the modules of the plan versions on the tenant's in-force control.contract rows (control.contract.plan_id, plan_version -> control.plan_module; ADAM CR-449) and the add-ons in force (control.licence_add_on by tenant_id), core always; the limits of the current contract's plan version (control.plan_limit) and of the in-force add-ons (control.licence_add_on_limit; ADAM CR-531)",
   "type": "object",
+  "description": "**Which contract licenses what, stated once** (ADAM CR-449, Chinmay, 1 November 2026; CHG-CR449-001). A `control.contract` row counts (is in force) when its status is not `expired`, `startsAt` is on or before today, and `cancelledAt` is null or after today: `pastDue` keeps service, and a cancellation takes effect on its date. The licensed modules are the in-force contract's plan version's modules (`control.plan_module` by `plan_id` and `plan_version`) plus the add-ons in force, with `core` always licensed; not `control.tenant.plan_id`. One rule (Application/Common/Licensing), used by `createDashboard`, `listDashboards`, `validateTenantConfig` and `getModuleEnablement`.\n\n**How plan and add-on entries combine** (ADAM CR-531, Chinmay, 3 November 2026; CHG-CR531-001). One combining method in the platform service, the rule above (Application/Common/Licensing), builds `LicencePosition`, and `getTenantLicences`, `addLicenceAddOn` and `removeLicenceAddOn` all answer through it; any later change to this rule is a change to this one method and its tests. In force means: contracts as above, and an add-on when `removedAt` is empty and `validFrom` <= today <= `validTo`, or it has no `validTo`. **The current contract** is the in-force contract with the latest start date; on a tie, the greatest id. `planId` is that contract's plan, or null when no contract is in force. **`licensedModules`** has one entry per `moduleKey`, sorted by `moduleKey`. A module that any in-force contract's plan version licenses gets `source` `plan` and `validTo` null, even if an add-on also covers it. A module that only an add-on covers gets `source` `addOn` and that add-on's `validTo`. `core` is always listed with `source` `plan` and `validTo` null, even with no contract in force. A `poweredByRemoval` add-on is listed like any other add-on, and `poweredByRemovable` is true while it is in force. `displayName` is left empty. **`limits`** has one `EntitlementLimit` per metric, in the `UsageMetric` order, taken from the current contract's plan version (`control.plan_limit`) and every in-force add-on's `control.licence_add_on_limit` rows: `limit` is null if any of those rows is null (unlimited); otherwise the plan's figure, or 0 when the plan does not have the metric, plus every add-on's figure. `overageAllowed` and `overageUnitPrice` come from one row together: the plan's row when the plan has the metric; otherwise the row of the add-on with the latest `validFrom` (on a tie, the greatest id). The price carries that row's own currency (ADAM CR-202). Capacity packs are not part of `LicencePosition`; `getEntitlementUsage` adds them as it already says, so the two never disagree.",
   "required": [
    "tenantId",
    "licensedModules",
@@ -358,7 +359,8 @@
        "type": "string"
       },
       "displayName": {
-       "type": "string"
+       "type": "string",
+       "description": "Left empty (ADAM CR-531); no approved screen shows it."
       },
       "source": {
        "type": "string",
@@ -420,6 +422,11 @@
  "ModuleListing": {
   "type": "object",
   "x-ticvai-persistence": "control.module_listing",
+  "x-ticvai-unique-together": [
+   [
+    "moduleCode"
+   ]
+  ],
   "description": "Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n",
   "required": [
    "moduleCode"
@@ -614,7 +621,7 @@
    "requireBreachCheck": {
     "type": "boolean",
     "default": true,
-    "description": "**The single most effective rule.** Refusing a password known to be breached stops more account takeovers than every composition rule combined.\n\n**Where the breach list comes from** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C06, option B; CHG-R8SPN-019; audit R117). A local corpus file shipped with each release: the SHA-1 hashes of known breached passwords, sorted and indexed by their first five hex characters, held inside the region with the service and never sent anywhere, so no credential hash leaves the region and there is no outage mode. Identity reads it through one adapter, `checkPasswordBreached(passwordSha1Prefix)`, which returns the corpus's full hashes under that prefix with their counts; the service compares the full hash itself. A match refuses the password `422 policy-not-met` (`changeOwnCredential`, and any other operation that sets a password under this policy). The corpus is refreshed with the release, not at run time. The client may still name a vendor under R117, which would be a second adapter behind the same interface (handoff/integration-register.md row 20).\n"
+    "description": "**The single most effective rule.** Refusing a password known to be breached stops more account takeovers than every composition rule combined.\n\n**Where the breach list comes from** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C06, option B; CHG-R8SPN-019; audit R117). A local corpus file shipped with each release: the SHA-1 hashes of known breached passwords, sorted and indexed by their first five hex characters, held inside the region with the service and never sent anywhere, so no credential hash leaves the region and there is no outage mode. Identity reads it through one adapter, `checkPasswordBreached(passwordSha1Prefix)`, which returns the corpus's full hashes under that prefix with their counts; the service compares the full hash itself. A match refuses the password `422 policy-not-met` (`changeOwnCredential`, and any other operation that sets a password under this policy). The corpus is refreshed with the release, not at run time. The client may still name a vendor under R117, which would be a second adapter behind the same interface (handoff/integration-register.md row 20).\n\n**The corpus, the adapter and the check** (ADAM CR-514, Chinmay, 3 November 2026; CHG-CR514-001). The corpus is the Pwned Passwords SHA-1 range dataset, read from a configured directory. (1) Layout: one text file per five-character hex prefix, `00000.txt` to `FFFFF.txt`, upper case; each line is `SUFFIX:COUNT`, where `SUFFIX` is the remaining 35 upper-case hex characters of the SHA-1, sorted. (2) Adapter: `CheckPasswordBreachedAsync(prefix)` opens `{Identity:BreachCorpusPath}/{prefix}.txt` and returns its (suffix, count) pairs; nothing else reads the files, and nothing leaves the host. (3) The check: take the SHA-1 of the UTF-8 password as upper-case hex and split it into prefix and suffix; if the suffix is present with any count, refuse `422 policy-not-met` with `errors[]` naming `requireBreachCheck`. It runs only for a password, only when this is true (the default), after the length check. The password, its hash and the prefix are never logged. (4) Startup: when `Identity:BreachCorpusPath` is unset, or the directory does not hold `00000.txt` and `FFFFF.txt`, Identity's host fails its readiness check and does not start; there is no run-time bypass, because the check has no outage mode. Development and tests use a small fixture directory in the same layout. (5) The same check runs in `createPrincipal` (`initialCredential`) and `resetPrincipalCredential` (`temporaryCredential` with method `password`); both are held to `setPasswordPolicy`. (6) The data ships separately: a setup task downloads the dataset for each release, records its version and licence terms, checks that all 1,048,576 files are present, and mounts them read-only at the configured path on Identity's hosts in every region, as a volume, not inside the image.\n"
    },
    "maxAgeDays": {
     "type": "integer",
@@ -1597,6 +1604,7 @@
    "org_unit_id"
   ],
   "x-ticvai-guest-read": true,
+  "x-ticvai-tenant-row-read": true,
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -1945,8 +1953,9 @@
      60
     ],
     "nullable": true,
+    "default": 30,
     "x-ticvai-persistence-column": "integer",
-    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13). **The `default` is the proposed tenant default only** (ADAM CR-484, Chinmay, 3 November 2026; CHG-CR484-001), as every other configured limit carries its own: it is never written into a venue's row, and a venue's own null stays null when the venue's settings are read, as `cartLeaseSeconds` and the other limits behave. When the client corrects it, only this default changes."
    },
    "cartLeaseSeconds": {
     "type": "integer",

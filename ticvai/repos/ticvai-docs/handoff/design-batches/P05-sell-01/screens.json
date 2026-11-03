@@ -67,7 +67,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.",
+  "notes": "Definition derived from the wireframe board on 14 August. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-001"
@@ -221,11 +221,11 @@
     {
      "to": "KSK-004",
      "trigger": "Choose tickets",
-     "provenance": "derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional), and KSK-004 opens on its own"
+     "provenance": "derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them. The edge carries nothing: KSK-004 opens on getAvailability, and productId has no source on KSK-004 yet (a gap in KSK-004, not in this edge)"
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-002"
@@ -379,12 +379,12 @@
     {
      "to": "KSK-011",
      "trigger": "Collect a booking",
-     "provenance": "derived — KSK-011 declares entryState.params orderId and KSK-003 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional), and KSK-011 opens on its own"
+     "provenance": "derived — KSK-011 declares entryState.params orderId and KSK-003 holds none of them, so the edge carries nothing and KSK-011 opens cold"
     },
     {
      "to": "KSK-016",
      "trigger": "Order Food",
-     "provenance": "derived — KSK-016 declares entryState.params outletId and KSK-003 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and KSK-016 opens on its own"
+     "provenance": "derived — KSK-016 declares entryState.params outletId and KSK-003 holds none of them, so the edge carries nothing and KSK-016 opens cold"
     },
     {
      "to": "KSK-004",
@@ -397,7 +397,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-003"
@@ -527,7 +527,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.\n\n**Tickets first, then date and time (decided by Chinmay, 2 October 2026; DEC-170).** The kiosk differs from the web and the app, which pick the date and time first (REV3-2); REV3-2 is superseded for the kiosk only. The order is KSK-003, KSK-004 (tickets), KSK-005 (session), as F07 already walks it (CHG-SGU-015).",
+  "notes": "Definition derived from the wireframe board on 14 August.\n\n**Tickets first, then date and time (decided by Chinmay, 2 October 2026; DEC-170).** The kiosk differs from the web and the app, which pick the date and time first (REV3-2); REV3-2 is superseded for the kiosk only. The order is KSK-003, KSK-004 (tickets), KSK-005 (session), as F07 already walks it (CHG-SGU-015).",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-004"
@@ -664,7 +664,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-005"
@@ -813,7 +813,7 @@
     "KSK-003"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-006"
@@ -990,7 +990,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme's rather than ours.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **At the kiosk:** the guest may pick a chargeable currency before paying by card.",
+  "notes": "Definition derived from the wireframe board on 14 August. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme's rather than ours.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **At the kiosk:** the guest may pick a chargeable currency before paying by card.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-007"
@@ -1112,7 +1112,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-008"
@@ -1264,7 +1264,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 1.dc.html#KSK-009"
@@ -1437,7 +1437,7 @@
     }
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "notes": "Definition derived from the wireframe board on 14 August.",
   "density": "touchLarge",
   "boardFrames": [
    "Kiosk Board 2.dc.html#KSK-010"

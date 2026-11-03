@@ -260,6 +260,21 @@
      "slot": "fields",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "The staff member",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo"
+       ],
+       "operation": "getPrincipal",
+       "provenance": "contract identity.yaml GET /principals/{principalId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+      },
+      {
        "kind": "selectField",
        "label": "Resource priority",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure"
@@ -1658,30 +1673,35 @@
        "kind": "selectField",
        "label": "Maximum daily hours",
        "operation": "getStaffingRules",
+       "bindsTo": "StaffingRules.maximumHoursPerDay",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "selectField",
        "label": "Maximum weekly hours",
        "operation": "getStaffingRules",
+       "bindsTo": "StaffingRules.maximumHoursPerWeek",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "selectField",
        "label": "Minimum rest period",
        "operation": "getStaffingRules",
+       "bindsTo": "StaffingRules.minimumRestHours",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "textField",
        "label": "Maximum consecutive working days",
        "operation": "getStaffingRules",
+       "bindsTo": "StaffingRules.maximumConsecutiveDays",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "selectField",
        "label": "Overtime threshold",
        "operation": "getStaffingRules",
+       "bindsTo": "StaffingRules.overtime.afterHoursPerWeek",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       }
      ]
@@ -1693,7 +1713,9 @@
       {
        "kind": "primaryButton",
        "label": "Approval required",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Support"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Support",
+       "bindsTo": "StaffingRules.overtime.requiresApproval",
+       "notes": "A choice, `overtime.requiresApproval`, sent with the rules; not the save."
       }
      ]
     }
@@ -1732,6 +1754,7 @@
    "board": "wireframes/P08 Venue Management.dc.html#bo-881",
    "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-881"
   },
+  "notes": "**Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled for BO-1144). The limits are `StaffingRules` properties; Standard daily hours and Standard weekly hours have none, so nothing is sent for them. **No control on the layout sends `setStaffingRules`**: under the lead's rule of 28 October 2026 the developer adds a Save and logs a \"Design change:\" CR in ADAM. What the save sends for `minimumCover`, which this screen does not show, and whether it sends If-Match, wait on the lead (review question Q13); until then the save sends back the `minimumCover` that `getStaffingRules` answered, unchanged, so it cannot erase the venue's minimum staffing.",
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Approval required are choices sent by `setStaffingRules` (overtime.requiresApproval).",
   "_platform": {
    "code": "P08",
@@ -1797,11 +1820,6 @@
   "purpose": "Connect TICVAI Resource Management with external HR, workforce management, payroll, identity and employee systems where applicable.",
   "purposeNote": "clear field ownership, traceability and operational consistency. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board 4 introduction (\"Provide TICVAI with a centralized, intelligent Workforce Operations and Rostering Engine ... Board 4 shall enable managers to ...\") pasted after the screen's own sentence.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Display"
-   },
    {
     "operation": "listRotaAssignments",
     "removed": true,

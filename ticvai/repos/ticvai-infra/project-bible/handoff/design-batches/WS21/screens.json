@@ -1501,7 +1501,7 @@
        "label": "Approve",
        "operation": "approvePartnerStatuLifecycle",
        "provenance": "contract operation approvePartnerStatuLifecycle",
-       "permission": "Approve"
+       "permission": "PLATFORM_CELL_MANAGE"
       },
       {
        "kind": "banner",

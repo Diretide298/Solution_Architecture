@@ -404,6 +404,7 @@
     "default": false
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setConfigurationTemplate saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "allOf": [
      {
       "$ref": "#/components/schemas/CatalogueConfigStatus"
@@ -743,6 +744,7 @@
     "default": "packageTotalOnly"
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setPackagePricingDefinition saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "allOf": [
      {
       "$ref": "#/components/schemas/CatalogueConfigStatus"

@@ -1802,7 +1802,7 @@
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId, matrixId and BO-084 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional), and BO-087 opens on its own"
+     "provenance": "derived — BO-087 declares entryState.params delegationId, matrixId and BO-084 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (optional), and BO-087 opens on its own"
     },
     {
      "to": "BO-364",
@@ -2099,7 +2099,7 @@
     {
      "to": "BO-087",
      "trigger": "Approval Delegations",
-     "provenance": "derived — BO-087 declares entryState.params delegationId, matrixId and BO-085 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (deep link or optional), and BO-087 opens on its own"
+     "provenance": "derived — BO-087 declares entryState.params delegationId, matrixId and BO-085 holds none of them. The edge carries nothing: delegationId, matrixId only pre-select (optional), and BO-087 opens on its own"
     },
     {
      "to": "POS-005",
@@ -2364,12 +2364,12 @@
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-086 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional); BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-086 holds none of them. The edge carries nothing: BO-084 finds requestId (listApprovalRequests), approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "provenance": "derived — BO-085 declares entryState.params requestId and BO-086 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-086 holds none of them. The edge carries nothing: BO-085 finds requestId (listApprovalRequests) itself, and BO-085 opens on its own"
     },
     {
      "to": "BO-087",
@@ -2584,12 +2584,12 @@
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-087 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional); BO-084 finds approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-087 holds none of them. The edge carries nothing: BO-084 finds requestId (listApprovalRequests), approvalRequestId (listApprovalRequests) itself, and BO-084 opens on its own"
     },
     {
      "to": "BO-085",
      "trigger": "Approval Request",
-     "provenance": "derived — BO-085 declares entryState.params requestId and BO-087 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and BO-085 opens on its own"
+     "provenance": "derived — BO-085 declares entryState.params requestId and BO-087 holds none of them. The edge carries nothing: BO-085 finds requestId (listApprovalRequests) itself, and BO-085 opens on its own"
     },
     {
      "to": "ADM-238",

@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 215 operations, 111 tables
+title: TenancyService — 214 operations, 111 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -21,7 +21,7 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 215
+  operations: 214
   inAFlow: 50
   percent: 23%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -75,7 +75,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 4
   - operation: approveRoleAuthorityDelegation
     verb: PUT
@@ -83,7 +83,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 6
+    reads: 7
     writes: 2
   - operation: approveUnifiedDecision
     verb: PUT
@@ -534,7 +534,7 @@ operationsByContract:
     reads: 5
     writes: 4
 - contract: tenancy
-  count: 58
+  count: 57
   operations:
   - operation: approveDevice
     verb: POST
@@ -599,7 +599,7 @@ operationsByContract:
     permission: DEVICE_MANAGE
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: getConfigurationProfile
     verb: GET
     path: /configuration-profiles/{profileId}
@@ -928,14 +928,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
-  - operation: setRolePermissions
-    verb: PUT
-    path: /roles/{roleId}/permissions
-    scope: tenant
-    permission: ROLE_MANAGE
-    offline: false
-    reads: 4
-    writes: 4
   - operation: setTenantDomainMapping
     verb: PUT
     path: /tenant-domains/{hostname}
@@ -1890,7 +1882,6 @@ tables:
   - setLabourBudget
   - setLeaveType
   - setOfflinePolicy
-  - setRolePermissions
   - setShiftPattern
   - setShiftTemplate
   - setStaffingRules
@@ -2009,7 +2000,6 @@ tables:
   - setLabourBudget
   - setLeaveType
   - setOfflinePolicy
-  - setRolePermissions
   - setShiftPattern
   - setShiftTemplate
   - setStaffingRules
@@ -2072,17 +2062,9 @@ tables:
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    setRolePermissions:
-      role: evicts
-      resolvers: &id005
-      - permissions
-      key: res:{tenantId}:{resolver}:{scopePath}
-      bump: INCR resver:{tenantId}:{resolver}
-      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
-        its ancestors and every descendant that inherits from it re-resolve on their next read'
     setVenueSettings:
       role: evicts
-      resolvers: &id006
+      resolvers: &id005
       - platform.venue_settings
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
@@ -2090,7 +2072,7 @@ tables:
         its ancestors and every descendant that inherits from it re-resolve on their next read'
     updateOrgUnit:
       role: evicts
-      resolvers: &id007
+      resolvers: &id006
       - permissions
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
@@ -2098,7 +2080,7 @@ tables:
         its ancestors and every descendant that inherits from it re-resolve on their next read'
     updateRegionSettings:
       role: evicts
-      resolvers: &id008
+      resolvers: &id007
       - platform.region_settings
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
@@ -2122,7 +2104,6 @@ tables:
   - setConfigurationProfile
   - setConnectivityThresholds
   - setOfflinePolicy
-  - setRolePermissions
   - setVenueSettings
   - updateOrgUnit
   - updateRegionSettings
@@ -2181,30 +2162,23 @@ tables:
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    setRolePermissions:
+    setVenueSettings:
       role: evicts
       resolvers: *id005
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    setVenueSettings:
+    updateOrgUnit:
       role: evicts
       resolvers: *id006
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
-    updateOrgUnit:
-      role: evicts
-      resolvers: *id007
-      key: res:{tenantId}:{resolver}:{scopePath}
-      bump: INCR resver:{tenantId}:{resolver}
-      affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
-        its ancestors and every descendant that inherits from it re-resolve on their next read'
     updateRegionSettings:
       role: evicts
-      resolvers: *id008
+      resolvers: *id007
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
@@ -2587,7 +2561,6 @@ tables:
   - orders
   - payments
   - platform-ops
-  - tenancy
   foreignWriters:
   - finance
   - identity
@@ -2651,6 +2624,7 @@ tables:
   - orders
   - payments
   - wallet
+  - white-label
   foreignWriters:
   - access
   - finance
@@ -2659,6 +2633,7 @@ tables:
   - orders
   - payments
   - wallet
+  - white-label
 - table: platform.offline_policy
   columns: 8
   store: postgres
@@ -3068,7 +3043,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: IdentityService
-  operations: 19
+  operations: 18
 - service: PlatformService
   operations: 4
 - service: AccessService
@@ -3096,17 +3071,6 @@ writesOutside:
   - operation: setTenantDomainMapping
     tables:
     - control.tenant_domain
-- service: IdentityService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event IdentityService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: setRolePermissions
-    tables:
-    - identity.role_permission
 - service: MarketingService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3220,7 +3184,6 @@ screens:
 - P08:BO-045 Menu Management
 - P08:BO-048 Retail Products
 - P08:BO-053 Staff Directory
-- P08:BO-054 Role Assignment
 - P08:BO-055 Rota & Scheduling
 - P08:BO-056 Time & Attendance
 - P08:BO-057 Training & Certification

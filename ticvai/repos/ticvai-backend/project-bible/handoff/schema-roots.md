@@ -23,15 +23,15 @@ tables**, and the distribution is the honest shape of the package:
 
 | Terminal table | Tables that reach it |
 |---|---:|
-| `platform.scope` | 901 |
-| `identity.role` | 767 |
-| `control.partner` | 746 |
-| `approvals.matrix` | 363 |
-| `ledger.legal_entity` | 336 |
-| `access.admission_rules` | 241 |
+| `platform.scope` | 903 |
+| `identity.role` | 769 |
+| `control.partner` | 748 |
+| `approvals.matrix` | 366 |
+| `ledger.legal_entity` | 337 |
+| `access.admission_rules` | 242 |
 | `platform.configuration_profile` | 226 |
-| `pii.subject` | 211 |
-| `catalogue.variant` | 155 |
+| `pii.subject` | 212 |
+| `catalogue.price_category` | 202 |
 | `access.hardware_model` | 83 |
 
 `platform.scope` is reached by 289 of 353 — **the tenancy spine, and almost
@@ -41,7 +41,7 @@ everything hangs off it.** `identity.role` at 207 is the authorisation spine.
 tables reaching nothing, including `identity.role` itself, because `principal` points
 at `role` rather than the reverse. **The direction was the bug, not the data.**
 
-## `marketing` — 133 tables
+## `marketing` — 134 tables
 
 **Root: `marketing.guest_profile`**  ·  own 1 · reach 1 · out 5
 
@@ -49,7 +49,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 - **1 step from the root** — `guest_match_decision`
 
-- **Reaches the root through nothing** — `agent_availability`, `agent_service_profile`, `attribution_touch`, `audience_activation`, `audience_list`, `badge`, `booking_consent_record`, `business_event`, `campaign`, `campaign_target`, `campaign_variant`, `case`, `case_category`, `case_compensation_request`, `case_escalation`, `case_internal_request`, `case_linked_record`, `case_message`, `case_resolution`, `case_routing_rule`, `case_service_action`, `challenge`, `challenge_progress`, `communication_policy_decision`, `communication_preference_type`, `communication_provider`, `communication_routing_rule`, `consent_capture_point`, `consent_propagation`, `consent_purpose`, `consent_purpose_channel`, `consent_question`, `consent_question_version`, `consent_record`, `consent_record_channel`, `contact_automation`, `conversation`, `conversation_message`, `conversation_message_attachment`, `cookie_banner_design`, `cookie_scan_finding`, `cookie_scan_policy`, `cookie_scan_run`, `customer_badge`, `device_consent`, `device_consent_category`, `duplicate_candidate`, `feedback_classification`, `form_definition`, `form_definition_field`, `form_submission`, `form_submission_sale_link`, `guest_attribute_model`, `guest_device`, `guest_document`, `guest_extra_field`, `guest_extra_option`, `guest_extra_value`, `guest_match_policy`, `guest_note`, `guest_preference`, `guest_relationship`, `identity_rules`, `invitation`, `invitation_campaign`, `journey`, `journey_enrollment`, `journey_step`, `kiosk_assist_session`, `legal_hold`, `lost_item`, `loyalty_campaign`, `loyalty_points`, `loyalty_position`, `loyalty_programme`, `loyalty_rule`, `message_dispatch`, `message_dispatch_attempt`, `message_template`, `message_template_version`, `message_trigger`, `message_trigger_condition`, `minor_privacy_rule`, `points_earning_rule`, `points_redemption_rule`, `privacy_action`, `privacy_audit_event`, `privacy_change_set`, `privacy_exception`, `privacy_export_package`, `privacy_incident`, `privacy_notice_governance`, `privacy_request`, `privacy_request_deadline`, `privacy_request_type`, `processing_purpose`, `programme_tier`, `quality_evaluation`, `referral`, `retention_policy`, `retention_run`, `review`, `review_response`, `reward`, `reward_assignment`, `segment`, `segment_criterion`, `sender_identity`, `seo_metadata`, `service_copilot_config`, `service_queue`, `sla_policy`, `subscription`, `suppression`, `touch_point`, `tracking_technology`, `tracking_technology_catalogue`, `waiver_association`, `waiver_exception`, `waiver_field_rule`, `waiver_form_layout`, `waiver_localisation`, `waiver_master`, `waiver_requirement`, `waiver_requirement_event`, `waiver_signatory_rule`, `waiver_signature`, `waiver_trigger_rule`, `waiver_verification`, `waiver_version_control`, `wishlist_item`
+- **Reaches the root through nothing** — `agent_availability`, `agent_service_profile`, `attribution_touch`, `audience_activation`, `audience_list`, `badge`, `booking_consent_record`, `business_event`, `campaign`, `campaign_target`, `campaign_variant`, `case`, `case_category`, `case_compensation_request`, `case_escalation`, `case_internal_request`, `case_linked_record`, `case_message`, `case_resolution`, `case_routing_rule`, `case_service_action`, `challenge`, `challenge_progress`, `communication_policy_decision`, `communication_preference_type`, `communication_provider`, `communication_routing_rule`, `consent_capture_point`, `consent_propagation`, `consent_purpose`, `consent_purpose_channel`, `consent_question`, `consent_question_version`, `consent_record`, `consent_record_channel`, `contact_automation`, `conversation`, `conversation_message`, `conversation_message_attachment`, `cookie_banner_design`, `cookie_scan_finding`, `cookie_scan_policy`, `cookie_scan_run`, `customer_badge`, `device_consent`, `device_consent_category`, `duplicate_candidate`, `feedback_classification`, `form_definition`, `form_definition_field`, `form_submission`, `form_submission_sale_link`, `guest_attribute_model`, `guest_device`, `guest_document`, `guest_document_upload`, `guest_extra_field`, `guest_extra_option`, `guest_extra_value`, `guest_match_policy`, `guest_note`, `guest_preference`, `guest_relationship`, `identity_rules`, `invitation`, `invitation_campaign`, `journey`, `journey_enrollment`, `journey_step`, `kiosk_assist_session`, `legal_hold`, `lost_item`, `loyalty_campaign`, `loyalty_points`, `loyalty_position`, `loyalty_programme`, `loyalty_rule`, `message_dispatch`, `message_dispatch_attempt`, `message_template`, `message_template_version`, `message_trigger`, `message_trigger_condition`, `minor_privacy_rule`, `points_earning_rule`, `points_redemption_rule`, `privacy_action`, `privacy_audit_event`, `privacy_change_set`, `privacy_exception`, `privacy_export_package`, `privacy_incident`, `privacy_notice_governance`, `privacy_request`, `privacy_request_deadline`, `privacy_request_type`, `processing_purpose`, `programme_tier`, `quality_evaluation`, `referral`, `retention_policy`, `retention_run`, `review`, `review_response`, `reward`, `reward_assignment`, `segment`, `segment_criterion`, `sender_identity`, `seo_metadata`, `service_copilot_config`, `service_queue`, `sla_policy`, `subscription`, `suppression`, `touch_point`, `tracking_technology`, `tracking_technology_catalogue`, `waiver_association`, `waiver_exception`, `waiver_field_rule`, `waiver_form_layout`, `waiver_localisation`, `waiver_master`, `waiver_requirement`, `waiver_requirement_event`, `waiver_signatory_rule`, `waiver_signature`, `waiver_trigger_rule`, `waiver_verification`, `waiver_version_control`, `wishlist_item`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -66,11 +66,11 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `catalogue` — 88 tables
+## `catalogue` — 89 tables
 
-**Root: `catalogue.product`**  ·  own 33 · reach 56 · out 10
+**Root: `catalogue.product`**  ·  own 35 · reach 58 · out 10
 
-- **1 step from the root** — `ai_catalogue_session`, `ai_finding`, `alternative_code`, `audit_entry`, `change_request`, `channel_incident`, `channel_sales_rule`, `configuration_template`, `demand_forecast`, `demand_signal`, `dynamic_pricing_strategy`, `group_package`, `lifecycle_action`, `package_pricing`, `price_assignment`, `price_execution`, `pricing_experiment`, `pricing_recommendation`, `pricing_simulation`, `product_channel_assignment`, `product_channel_text`, `product_eligibility_rule`, `product_link`, `product_media`, `product_owner_form`, `product_sale_permission`, `product_version`, `rollback_action`, `tax_rule`, `variant`, `variant_dimension`
+- **1 step from the root** — `ai_catalogue_session`, `ai_finding`, `alternative_code`, `audit_entry`, `change_request`, `channel_incident`, `channel_sales_rule`, `configuration_template`, `demand_forecast`, `demand_signal`, `dynamic_pricing_strategy`, `group_package`, `import_job_row`, `lifecycle_action`, `package_pricing`, `price_assignment`, `price_execution`, `pricing_experiment`, `pricing_recommendation`, `pricing_simulation`, `product_channel_assignment`, `product_channel_text`, `product_eligibility_rule`, `product_link`, `product_media`, `product_owner_form`, `product_sale_permission`, `product_version`, `rollback_action`, `tax_rule`, `variant`, `variant_dimension`
 - **2 steps from the root** — `change_request_line`, `competitor_price_observation`, `entitlement_template`, `import_job`, `price`, `price_ladder`, `price_list_version`, `pricing_publication`, `pricing_recommendation_decision`, `waitlist_entry`
 - **3 steps from the root** — `membership_benefit`, `plan_benefit`, `pricing_publication_target`
 
@@ -133,7 +133,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `identity` — 42 tables
 
-**Root: `identity.principal`**  ·  own 25 · reach 394 · out 3
+**Root: `identity.principal`**  ·  own 25 · reach 396 · out 3
 
 - **1 step from the root** — `access_decision`, `access_override`, `access_review_campaign`, `access_review_item`, `authz_audit`, `delegated_access`, `guest_identity_verification`, `membership_history`, `mfa_challenge`, `mfa_method`, `mfa_recovery_code`, `module_access`, `principal_credential`, `principal_external_identity`, `refresh_token`, `role_permission`, `session`
 - **2 steps from the root** — `principal_credential_history`
@@ -391,7 +391,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `pii` — 6 tables
 
-**Root: `pii.subject`**  ·  own 5 · reach 116 · out 1
+**Root: `pii.subject`**  ·  own 5 · reach 117 · out 1
 
 - **1 step from the root** — `subject_biometric`, `subject_contact`, `subject_document`, `subject_identity`
 

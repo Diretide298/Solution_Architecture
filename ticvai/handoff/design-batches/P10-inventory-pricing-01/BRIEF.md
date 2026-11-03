@@ -1,6 +1,6 @@
 # P10-inventory-pricing-01 — P10 · Inventory & Pricing
 
-**3 screens · 17 operations · 28 schemas · 5 permissions**
+**3 screens · 17 operations · 29 schemas · 5 permissions**
 
 Platform P10 Partner Web · ships as **partner-web** ·
 partner audience · web ·
@@ -94,7 +94,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-005` | Inventory & Allocation View | C | 8 | 48 | 6 | 30 | 3 | 4 | — | notStarted (generated) |
+| `PTR-005` | Inventory & Allocation View | C | 9 | 48 | 6 | 30 | 3 | 4 | — | notStarted (generated) |
 | `PTR-006` | Product Catalog (B2B Pricing) | B | 3 | 48 | 6 | 24 | 2 | 0 | — | notStarted (generated) |
 | `PTR-007` | Availability Search | B | 0 | 15 | 5 | 5 | 0 | 0 | — | notStarted (generated) |
 

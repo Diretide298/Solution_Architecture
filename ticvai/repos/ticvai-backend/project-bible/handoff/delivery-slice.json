@@ -220,9 +220,9 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 519,
-  "setup": 264,
-  "allOperations": 2862
+  "core": 524,
+  "setup": 269,
+  "allOperations": 2864
  },
  "services": {
   "AccessService": {
@@ -236,8 +236,8 @@
    "total": 146
   },
   "CatalogueService": {
-   "core": 36,
-   "setup": 49,
+   "core": 38,
+   "setup": 51,
    "total": 470
   },
   "FnbService": {
@@ -246,9 +246,9 @@
    "total": 138
   },
   "IdentityService": {
-   "core": 33,
-   "setup": 6,
-   "total": 104
+   "core": 35,
+   "setup": 8,
+   "total": 105
   },
   "InventoryService": {
    "core": 1,
@@ -262,8 +262,8 @@
   },
   "MarketingService": {
    "core": 53,
-   "setup": 22,
-   "total": 284
+   "setup": 23,
+   "total": 285
   },
   "OrderService": {
    "core": 90,
@@ -273,7 +273,7 @@
   "PlatformService": {
    "core": 3,
    "setup": 18,
-   "total": 234
+   "total": 235
   },
   "ReportingService": {
    "core": 8,
@@ -287,12 +287,12 @@
   },
   "TenancyService": {
    "core": 17,
-   "setup": 22,
-   "total": 215
+   "setup": 21,
+   "total": 214
   },
   "VenueOpsService": {
-   "core": 45,
-   "setup": 36,
+   "core": 46,
+   "setup": 37,
    "total": 299
   },
   "WalletService": {
@@ -412,6 +412,7 @@
     "WEB-006",
     "WEB-008",
     "WEB-010",
+    "WEB-022",
     "WEB-033",
     "WEB-036",
     "WEB-041",
@@ -648,6 +649,21 @@
    ],
    "enables": []
   },
+  "approveWaiverTesting": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/waiver-testing",
+   "perm": "GUEST_MANAGE",
+   "platforms": [],
+   "screens": [
+    "CMS-050"
+   ],
+   "enables": [
+    "marketing.waiver_version_control"
+   ]
+  },
   "askReportingQuestion": {
    "part": "core",
    "service": "ReportingService",
@@ -782,6 +798,7 @@
     "BO-009"
    ],
    "enables": [
+    "catalogue.price",
     "catalogue.price_list"
    ]
   },
@@ -1084,6 +1101,7 @@
     "BO-008"
    ],
    "enables": [
+    "catalogue.price",
     "catalogue.variant"
    ]
   },
@@ -1535,6 +1553,7 @@
     "GST-075",
     "WEB-006",
     "WEB-010",
+    "WEB-022",
     "WEB-048"
    ],
    "enables": []
@@ -1701,6 +1720,22 @@
     "reporting.dashboard",
     "reporting.dashboard_tile"
    ]
+  },
+  "createDelegatedAccess": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/delegated-access",
+   "perm": "PERMISSION_GRANT",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-019",
+    "PTR-020"
+   ],
+   "enables": []
   },
   "createDeliveryLocation": {
    "part": "setup",
@@ -2209,7 +2244,9 @@
     "ADM-392"
    ],
    "enables": [
-    "control.plan"
+    "control.plan",
+    "control.plan_limit",
+    "control.plan_module"
    ]
   },
   "createPlanVersion": {
@@ -2225,7 +2262,9 @@
     "ADM-398"
    ],
    "enables": [
-    "control.plan"
+    "control.plan",
+    "control.plan_limit",
+    "control.plan_module"
    ]
   },
   "createPreview": {
@@ -3053,6 +3092,22 @@
     "reporting.dashboard"
    ]
   },
+  "deleteDelegatedAccess": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "DELETE",
+   "path": "/delegated-access/{delegatedAccessId}",
+   "perm": "PERMISSION_GRANT",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-019",
+    "PTR-020"
+   ],
+   "enables": []
+  },
   "deleteFavouriteRoute": {
    "part": "core",
    "service": "VenueOpsService",
@@ -3656,6 +3711,7 @@
     "WEB"
    ],
    "screens": [
+    "BO-015",
     "GST-004",
     "GST-007",
     "GST-050",
@@ -3775,7 +3831,8 @@
     "PTR-010",
     "WEB-006",
     "WEB-010",
-    "WEB-011"
+    "WEB-011",
+    "WEB-022"
    ],
    "enables": []
   },
@@ -4599,6 +4656,23 @@
    ],
    "enables": []
   },
+  "getMediaTaxonomy": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "GET",
+   "path": "/media-taxonomy",
+   "perm": "ASSET_LIBRARY_VIEW",
+   "platforms": [
+    "WL"
+   ],
+   "screens": [
+    "CMS-010",
+    "CMS-065",
+    "CMS-066"
+   ],
+   "enables": []
+  },
   "getModuleEnablement": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -4874,9 +4948,26 @@
     "GST-041",
     "GST-049",
     "POS-004",
+    "WEB-005",
     "WEB-006",
     "WEB-007",
     "WEB-010"
+   ],
+   "enables": []
+  },
+  "getPlanBenefits": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/entitlement-templates/{templateId}/benefits",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "WEB"
+   ],
+   "screens": [
+    "BO-288",
+    "WEB-022"
    ],
    "enables": []
   },
@@ -5025,7 +5116,8 @@
     "WEB-008",
     "WEB-010",
     "WEB-011",
-    "WEB-012"
+    "WEB-012",
+    "WEB-022"
    ],
    "enables": []
   },
@@ -6955,7 +7047,6 @@
    "screens": [
     "ANL-072",
     "BO-023",
-    "BO-1081",
     "GST-019",
     "WEB-019"
    ],
@@ -7392,6 +7483,22 @@
     "GST-036",
     "WEB-017",
     "WEB-043"
+   ],
+   "enables": []
+  },
+  "listMembershipBenefits": {
+   "part": "core",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "GET",
+   "path": "/membership-benefits",
+   "perm": "PRODUCT_VIEW",
+   "platforms": [
+    "WEB"
+   ],
+   "screens": [
+    "BO-288",
+    "WEB-022"
    ],
    "enables": []
   },
@@ -8064,6 +8171,7 @@
     "POS-003",
     "PTR-006",
     "WEB-005",
+    "WEB-022",
     "WEB-048"
    ],
    "enables": []
@@ -8545,7 +8653,6 @@
    "screens": [
     "ANL-072",
     "BO-022",
-    "BO-1081",
     "GST-019",
     "POS-026",
     "WEB-019"
@@ -10235,7 +10342,8 @@
    "screens": [
     "GST-041",
     "PTR-010",
-    "WEB-010"
+    "WEB-010",
+    "WEB-022"
    ],
    "enables": []
   },
@@ -12140,6 +12248,36 @@
    ],
    "enables": []
   },
+  "setMediaTaxonomy": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "assets",
+   "verb": "PUT",
+   "path": "/media-taxonomy",
+   "perm": "ASSET_LIBRARY_MANAGE",
+   "platforms": [],
+   "screens": [
+    "CMS-065"
+   ],
+   "enables": [
+    "assets.taxonomy"
+   ]
+  },
+  "setMembershipBenefit": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/membership-benefits/{benefitId}",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-288"
+   ],
+   "enables": [
+    "catalogue.membership_benefit"
+   ]
+  },
   "setMenuItemDailyCount": {
    "part": "setup",
    "service": "FnbService",
@@ -12277,6 +12415,22 @@
     "venuemap.placed_resource"
    ]
   },
+  "setPlanBenefits": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/entitlement-templates/{templateId}/benefits",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-288",
+    "BO-289"
+   ],
+   "enables": [
+    "catalogue.plan_benefit"
+   ]
+  },
   "setPolicy": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -12324,6 +12478,19 @@
     "CMS-017"
    ],
    "enables": []
+  },
+  "setPrincipalModuleAccess": {
+   "part": "setup",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "PUT",
+   "path": "/principals/{principalId}/module-access",
+   "perm": "PERMISSION_GRANT",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "identity.module_access"
+   ]
   },
   "setProductCatalogue": {
    "part": "setup",
@@ -12556,8 +12723,8 @@
   },
   "setRolePermissions": {
    "part": "setup",
-   "service": "TenancyService",
-   "contract": "tenancy",
+   "service": "IdentityService",
+   "contract": "identity",
    "verb": "PUT",
    "path": "/roles/{roleId}/permissions",
    "perm": "ROLE_MANAGE",
@@ -12566,6 +12733,7 @@
     "BO-054"
    ],
    "enables": [
+    "identity.role",
     "identity.role_permission"
    ]
   },
@@ -13496,7 +13664,8 @@
    "screens": [
     "GST-041",
     "PTR-010",
-    "WEB-010"
+    "WEB-010",
+    "WEB-022"
    ],
    "enables": []
   },
@@ -14478,6 +14647,19 @@
   }
  },
  "fedElsewhere": {
+  "catalogue.change_request": [
+   "approveReviewDecision",
+   "decidePricingChangeRequest",
+   "publishPricingEffectiveDate",
+   "setPricingChangeRequest",
+   "submitPricingChangeRequest"
+  ],
+  "catalogue.change_request_line": [
+   "setPricingChangeRequest"
+  ],
+  "catalogue.package_pricing": [
+   "setPackagePricingDefinition"
+  ],
   "games.credit_ledger": [
    "syncGamePlays"
   ],

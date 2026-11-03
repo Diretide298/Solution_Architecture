@@ -134,8 +134,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `experienceId` (navigation) |
 | Route | `/rentals/experience-resource-requirement-builder-bo-893` |
 
-**Known gaps.** **Experience Resource Requirement Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The landing screen of the experience board: for one experience (Private Ski Lesson, VIP Cabana Experience), the resources it needs before it can be sold - staff, space, equipment, optional extras - with quantity, whether each is assigned automatically or chosen, and a visual requirement map. This is what makes "guests buy products, not resources" work. The one thing to get right: a slot is sellable only when every mandatory requirement can be met, and the screen says so in its preview.
 
 **Known correction pending (do not draw the wrong version)**
@@ -529,8 +527,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `packageId` (navigation) |
 | Route | `/rentals/resource-combination-builder-bo-895` |
-
-**Known gaps.** **Resource Combination Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Valid ways to staff and equip an experience when there is more than one: "2 Level 2 instructors OR 1 Level 3 + 1 Level 1 instructor", "Meeting room AND AV package AND (1 technician OR 2 AV operators)", with conditions (participant count, ticket type, day, accessibility). Availability is confirmed when at least one combination can be met. The one thing to get right: draw the logic as readable options (Option A / Option B) with AND inside each, not as a free expression.
 

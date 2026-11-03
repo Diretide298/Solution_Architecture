@@ -425,6 +425,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Transferred. |
 | 409 |  | Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 would be wrong. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -672,7 +673,7 @@ The list grows to every check, each with its code, the area it reads, its severi
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| mode | enum (validateOnly, publish) |  | (default validateOnly) |
+| mode | enum (validateOnly, publish) |  | What the call does, not a fact about the version: publish writes the version and its snapshots, validateOnly writes nothing. (default validateOnly) |
 | note | string |  | (nullable) |
 
 **Response**: `WalletConfigurationVersion`
@@ -730,7 +731,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| reason | string | yes | (min length 1; max length 500) |
+| reason | string | yes | Reason, recorded in the audit: the operation puts it on the request's audit context and the audit interceptor writes it to the audit row's reason, which listAuditRecords returns (ADAM CR-376; CHG-CR3… (min length 1; max length 500) |
 
 **Response**: `WalletConfigurationVersion`
 
@@ -938,6 +939,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 
 Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question before it is a feature.** Limits, approval above a threshold, which credit types may move at all — promotional credit that can be transferred is promotional credit that can be sold — and whether both parties must be identified.
 `transferWalletBalance` performs the transfer; this decides whether it is allowed.
+**Its ETag is the row's `version`** (ADAM CR-332's rule for the wallet's If-Match PUTs, which getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): `wallet.transfer_rule.version` is 1 on create and bumped on every write, and is sent as `ETag` on `getWalletTransferRules` and here; an `If-Match` that is not the current version is `412` and nothing changes.
 
 |  |  |
 |---|---|
@@ -980,6 +982,7 @@ Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question bef
 | bothPartiesIdentified | boolean |  | (default True) |
 | withinSharedWalletOnly | boolean |  | (default False) |
 | scopePath | string |  |  |
+| version | integer | yes | The row's version, its ETag (ADAM CR-332's rule for the wallet's If-Match PUTs, the one getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): 1 on create and bumped on every write;… (min 1; default 1; read-only) |
 
 **Response**: `WalletTransferRules`
 
@@ -1002,6 +1005,7 @@ Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question bef
 | bothPartiesIdentified | boolean |  | (default True) |
 | withinSharedWalletOnly | boolean |  | (default False) |
 | scopePath | string |  |  |
+| version | integer | yes | The row's version, its ETag (ADAM CR-332's rule for the wallet's If-Match PUTs, the one getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): 1 on create and bumped on every write;… (min 1; default 1; read-only) |
 
 **Responses**
 
@@ -1020,6 +1024,12 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 **Only a paid top-up line becomes wallet credit, once.** The payment must be `captured` and of the line's order; the order must be for this wallet's subject (`subjectId`) and paid in full; the line must be a `walletTopUp` product line with `quantity` 1 and a `grossAmount` equal to `amount`. Anything else is refused `422 payment-not-for-top-up` and nothing is credited: a payment for tickets, goods or food cannot become wallet credit, because only a top-up line's own amount is ever credited. A payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined`. A line already credited is refused `409 payment-already-used`: the line's id is kept on the new credit lot (`order_line_id`, one lot per line; `source_kind` `topUp`, `source_reference` the payment's id). **The unique index `credit_lot_order_line_id_uniq` decides it** (ADAM CR-310, option A): a unique violation on that index when the lot is inserted is `409 payment-already-used`, so two tills crediting one line at the same moment cannot both succeed. `tender` stays the receipt's label.
 **Each lot's credit type** (ADAM CR-357, decided 30 October 2026). The paid lot takes the one active credit type of category `cash` (`wallet.credit_type`, `is_active` true; credit types are tenant configuration). None, or more than one, is a misconfiguration: the answer is 500, nothing is credited, and the tenant and venue are logged, as for a venue with no trading currency. The line stays uncredited, and the same call credits it once the configuration is fixed (`credit_lot_order_line_id_uniq` still allows it only once). The lot's `expires_at` (`issued_at` plus `validityDays`, where `expires` is true) and `terms_snapshot` come from that credit type.
 **The bonus is the venue's, never the caller's** (ADAM CR-357). It is taken from the venue's default funding rules (`wallet.funding_rule` with `walletTypeId` null, since a wallet carries no wallet type). Of the `bonusRules` in force on `recordedAt` (`validFrom` to `validTo`) whose `minimumAmount` `amount` reaches, the one with the highest `minimumAmount` applies; its bonus is its `bonusAmount`, or `bonusPercent` of `amount`. It is written as a second lot, in the same transaction, of that rule's `bonusCreditTypeId`, with `source_kind` `promotion`, `source_reference` the payment's id and `order_line_id` null. A body whose `bonusAmount` differs from the rule's bonus, or that sends one when no rule applies, is refused `422 bonus-not-applicable` and nothing is credited, so no caller, the guest app included, can credit a bonus the venue did not set. No migration.
+
+**Who may top up which wallet, and the order of the checks** (ADAM CR-471, Chinmay, 2 November 2026, option A with the outbox row added and the guest held to its own wallet; CHG-CR471-001). Under the caller's own grant, in this order: a guest caller (a session with a subject) tops up only its own wallet, so the path's `subjectId` must be the session's subject, else the shared `404`, as `getWallet` answers; a staff caller needs `WALLET_OPERATE`. Then the checks above: `orders#paymentRecords` (`402 payment-declined` unless captured), `orders#salesOrderRecords` (the order's `subject_id` is `subjectId` and it is paid in full, else `422 payment-not-for-top-up`), `orders#orderLineRecords` with `catalogue#variantRecords` and `catalogue#productRecords` (a `walletTopUp` line, quantity 1, `grossAmount` = `amount`, else `422 payment-not-for-top-up`), then the cash credit type and the bonus rule as CR-357 decided (500 on a misconfigured credit type, `422 bonus-not-applicable`).
+
+**The writes.** A staff caller writes under its own grant, as before. For a guest caller, once every check has passed, the connection switches to the routed tenant's root grant (ITenantRootGrant) for exactly these statements inside the request's transaction, and the caller's grant is put back before anything else runs: lock the wallet's `wallet.balance` row and apply the guarded update (the one balance writer); insert the paid `wallet.credit_lot` (`source_kind` `topUp`, `source_reference` the payment id, `order_line_id` the line); insert the bonus lot where CR-357's rule gives one (`source_kind` `promotion`, `order_line_id` null); insert one `wallet.wallet_transaction` per lot (kind `topUp`, and kind `bonus` for the bonus lot) with `subject_id` = `subjectId`, `order_id` the order, `venue_id` the order line's `venue_id` and `principal_id` null; update `wallet.wallet`'s `balance`, `bonus_balance` and `last_activity_at`; and write the `platform.outbox` row for `wallet.credited` with the same `scope_path` as the lot. Nothing else runs under the root grant. A unique violation on `credit_lot_order_line_id_uniq` is still `409 payment-already-used`.
+
+**Where the rows sit, for staff and guest alike.** Each lot's `scope_path` (the paid lot and the bonus lot) is the `platform.scope` path of the top-up line's venue (`orders.order_line.venue_id`), and each `wallet.wallet_transaction.venue_id` is that venue's id. No migration.
 
 |  |  |
 |---|---|
@@ -1103,6 +1113,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 |---|---|---|
 | 201 |  | Topped up |
 | 402 |  | Payment declined, failed or not captured (the body's paymentId) |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | The body's orderLineId and paymentId are not a paid top-up: the payment is not of the line's order, the order is for another subject or not paid in full, or the line is not a walletTopUp line of quan… |
 | 409 |  | The body's orderLineId has already been credited (r8 walk fix, CHG-R8WFC-003; one lot per line, CHG-R8RW-009), including a unique violation on credit_lot_order_line_id_uniq when two credits of one li… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -1413,6 +1424,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_both_parties_identified | boolean | no |  |
 | is_within_shared_wallet_only | boolean | no |  |
 | scope_path | text | no |  |
+| version | integer | yes | The row's version, its ETag (ADAM CR-332's rule for the wallet's If-Match PUTs, the one getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): 1 on create and bumped on every write;… |
 | id | uuid | yes | Synthesised key. |
 
 ### `wallet.wallet`

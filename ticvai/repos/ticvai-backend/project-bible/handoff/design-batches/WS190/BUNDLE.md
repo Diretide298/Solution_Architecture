@@ -143,8 +143,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `cardCode` (navigation), `giftCardProductId` (navigation) |
 | Route | `/orders-money/gift-card-digital-benefit-command-center-bo-1123` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Gift cards, vouchers and digital benefits: denominations, validity, activation, distribution; issue and check balance; outstanding liability.
 
 **Known correction pending (do not draw the wrong version)**
@@ -372,7 +370,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | `giftCardProductId` (navigation) |
 | Route | `/orders-money/gift-card-product-configuration-bo-1124` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the gift card products that setGiftCardProduct writes.
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the gift card products that setGiftCardProduct writes.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Gift card products: denominations (fixed or open), validity, activation, partial use, distribution.
 
@@ -861,8 +859,6 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/voucher-eligibility-redemption-rule-studio-bo-1127` |
-
-**Known gaps.** **Voucher Eligibility & Redemption Rule Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When, where and by whom a voucher may be redeemed.
 
@@ -1438,8 +1434,6 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/gift-card-balance-liability-breakage-control-bo-1131` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Gift card balances as a liability and breakage: outstanding, redeemed, expired, recognised.
 
 **Known correction pending (do not draw the wrong version)**
@@ -1599,7 +1593,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | — | `publishWalletConfiguration` body |
+| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | What the call does, not a fact about the version: `publish` writes the version and its snapshots, `validateOnly` writes nothing. | `publishWalletConfiguration` body |
 | Note `note` | text area | optional | — | — | — | — | `publishWalletConfiguration` body |
 
 #### Outputs: what the screen shows and produces

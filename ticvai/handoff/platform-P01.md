@@ -5,30 +5,29 @@
 | | |
 |---|---|
 | Screens | 50 |
-| Operations | 206 |
+| Operations | 208 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 23 |
+| Operations with no screen | 22 |
 | Waves | wave1 50 |
 
 ## Gaps
 
-### 23 operations with no screen here
+### 22 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
-| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `claimTableSession` | fnb | POST | Identify which table a guest is sitting at |
 | `getMyIdentityVerification` | identity | GET | The guest's own latest identity verification |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `submitGuestIdentityDocument` | identity | POST | Submit an identity document for verification |
 | `checkGuestCheckoutMatch` | marketing-crm | POST | Does this contact already have a profile here |
+| `createGuestDocumentUpload` | marketing-crm | POST | Issue the key and a signed upload URL for a guest document |
 | `decideGuestCheckoutMatch` | marketing-crm | POST | Use the existing profile or keep this booking separate |
 | `getDeviceConsentHistory` | marketing-crm | GET | A visitor's own cookie decisions, oldest first |
 | `listPublishedTrackingTechnologies` | marketing-crm | GET | The approved cookie registry, as the preference centre shows it |
@@ -71,7 +70,7 @@
 | `WEB-002` | Event & Attraction Listing | Discovery & Browse | 1 | 6 | yes |
 | `WEB-003` | Search Results | Discovery & Browse | 1 | 2 | yes |
 | `WEB-004` | Attraction Details | Discovery & Browse | 1 | 6 | yes |
-| `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 7 | yes |
+| `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 8 | yes |
 | `WEB-006` | Date & Performance Selection | Booking & Selection | 1 | 12 | yes |
 | `WEB-007` | Interactive Seat Selection | Booking & Selection | 1 | 8 | yes |
 | `WEB-008` | Add-ons & Upsell | Booking & Selection | 1 | 5 | yes |
@@ -88,7 +87,7 @@
 | `WEB-019` | Order History | Account & Self-Service | 1 | 9 | yes |
 | `WEB-020` | Profile & Preferences | Account & Self-Service | 1 | 7 | yes |
 | `WEB-021` | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 9 | yes |
-| `WEB-022` | Membership Plans | Membership, Loyalty & Value | 1 | 3 | yes |
+| `WEB-022` | Membership Plans | Membership, Loyalty & Value | 1 | 12 | yes |
 | `WEB-023` | Membership Management | Membership, Loyalty & Value | 1 | 6 | yes |
 | `WEB-024` | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 15 | yes |
 | `WEB-025` | Help Centre / FAQ | Engagement & Support | 1 | 5 | yes |

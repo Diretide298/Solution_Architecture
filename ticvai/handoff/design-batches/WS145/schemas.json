@@ -356,6 +356,17 @@
     "format": "date-time",
     "nullable": true
    },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-backfill": {
+     "column": "published_at",
+     "where": "is_current"
+    },
+    "description": "**When this version became current** (the lead, 2 November 2026, posted for CR-154 and IDENTITY-C63; CHG-R13JOB-004): set whenever a version becomes current, by an immediate publishTenantConfig, by the approval consumer or by the scheduled-publish job; null while it has never been current. The rows already there take it from `publishedAt` on each tenant's current version (`x-ticvai-backfill`). The job reads it to supersede a scheduled version published before the current one became current."
+   },
    "activationFailedAt": {
     "type": "string",
     "format": "date-time",
@@ -368,7 +379,7 @@
     "maxLength": 2000,
     "nullable": true,
     "readOnly": true,
-    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63)."
+    "description": "Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63), or `superseded: version N was published after this one was scheduled` where a newer version became current first (the lead, 2 November 2026, CR-154), or `Superseded by version N, which was due at the same time.` where another version due in the same run was made current (ADAM CR-501, 3 November 2026). Never retried."
    },
    "contentHash": {
     "type": "string",
@@ -1484,7 +1495,7 @@
    "slug": {
     "type": "string",
     "nullable": true,
-    "description": "22.11.6. **Human-readable, and changing one is a redirect rather than an edit** — a slug that changes without a 301 is a page that was ranking and now is not.\n"
+    "description": "22.11.6. **Human-readable, and changing one is a redirect rather than an edit** — a slug that changes without a 301 is a page that was ranking and now is not. `setSeoMetadata` stores the new slug and writes no redirect; the 301 is `createUrlRedirect`, which CMS-013 calls when a live slug is edited (ADAM CR-474).\n"
    },
    "hreflang": {
     "type": "object",

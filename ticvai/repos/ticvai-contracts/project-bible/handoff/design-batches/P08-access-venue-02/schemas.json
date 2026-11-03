@@ -383,56 +383,54 @@
    }
   }
  },
- "BundleSummary": {
-  "x-ticvai-persistence": "none — projection over bundle",
-  "type": "object",
-  "description": "One published catalogue bundle — the signed snapshot terminals pull (ADR-0013). Not `promotions.Bundle`, which is a sellable product made of other products.",
-  "required": [
-   "version",
-   "venueId",
-   "publishedAt",
-   "publishedBy",
-   "contentHash",
-   "staleAfter",
-   "sizeBytes"
-  ],
-  "properties": {
-   "version": {
-    "type": "string"
+ "Bundle": {
+  "x-ticvai-persistence": "promotions.bundle + promotions.bundle_component",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateBundleRequest"
    },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "publishedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "publishedBy": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "contentHash": {
-    "type": "string"
-   },
-   "signatureKeyId": {
-    "type": "string",
-    "description": "Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle.\n"
-   },
-   "staleAfter": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "sizeBytes": {
-    "type": "integer"
-   },
-   "note": {
-    "type": "string"
-   },
-   "appliedByWorkstations": {
-    "type": "integer"
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "savingsAmount",
+     "isActive",
+     "hasBeenSold"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "variantId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-references": "catalogue.variant",
+      "description": "**The catalogue variant a cart line of this bundle names** (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is published; `addCartLine` sends it as `variantId`, with the picks in `attributes.bundle`. Null until published.\n\n**It is the bundle's published mark** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002): not null is published, and `isActive` false is withdrawn. It is written once, by the publication step of `updateBundle` (the first `isActive: true` on a bundle with no variant), which creates the bundle's catalogue product, and is never cleared: withdrawing and putting the bundle back on sale keep the same product and variant."
+     },
+     "savingsAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Sum of component list prices less the bundle price: the `list_price` captured on each `promotions.allocation_component` when the bundle was created, not the variants' current prices (ADAM CR-110, option 1; CHG-R10CAT-010)."
+     },
+     "savingsPercentage": {
+      "type": "number"
+     },
+     "hasBeenSold": {
+      "type": "boolean",
+      "description": "True locks components and allocation against amendment."
+     },
+     "isActive": {
+      "type": "boolean"
+     }
+    }
    }
-  }
+  ]
  },
  "Channel": {
   "type": "string",
@@ -547,6 +545,129 @@
     "items": {
      "type": "string"
     }
+   }
+  }
+ },
+ "CreateBundleRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "venueId",
+   "kind",
+   "price",
+   "components",
+   "allocation"
+  ],
+  "properties": {
+   "code": {
+    "x-ticvai-unique": "tenant",
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/BundleKind"
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "components": {
+    "type": "array",
+    "minItems": 0,
+    "items": {
+     "$ref": "#/components/schemas/BundleComponent"
+    }
+   },
+   "choiceGroups": {
+    "type": "array",
+    "description": "Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at once — a family pass with fixed parking and two groups the guest chooses from. **The bundle price does not move with the choice** (ADR-0019).\n",
+    "items": {
+     "$ref": "#/components/schemas/BundleChoiceGroup"
+    }
+   },
+   "allocation": {
+    "type": "object",
+    "description": "Stored as `promotions.allocation_split` and `promotions.allocation_component`, the record of the split; `promotions.bundle.allocation` is a copy derived from them in the same transaction (ADAM CR-110, option 1; CHG-R10CAT-010).",
+    "required": [
+     "method",
+     "components"
+    ],
+    "properties": {
+     "method": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/AllocationMethod"
+       }
+      ],
+      "default": "proRataListPrice",
+      "description": "Proportional to list price by default. The rounding remainder in the currency's minor unit goes to the first component (decided 28 September, audit R101).\n"
+     },
+     "components": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/AllocationComponent"
+      }
+     }
+    }
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The commercial campaign (`promotions.campaign`) the bundle is sold under. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The bundle owner (Bundle Definition & Setup). (DM5, 29 September: data model for the agreed operations)"
+   },
+   "category": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The bundle category the setup screen files it under. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "isStandaloneProduct": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether the bundle appears as a product in its own right, or only as an offer on another product. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "isRecommendedAtCheckout": {
+    "type": "boolean",
+    "default": false,
+    "description": "Whether checkout recommends the bundle. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "requiredVariantIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Products that must already be in the basket for the bundle to be sold (the setup screen's \"requires another product\"). (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -1760,6 +1881,55 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "isFeatured": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The plan card's Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured plan."
+   },
+   "compareAtPrice": {
+    "x-ticvai-column": "compare_at_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan card's saving. Stored on `catalogue.product` as `compare_at_amount` in the venue's trading currency, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a made-up value."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "**The card's highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every operation that answers Product, to every audience. WEB-005's card shows the value for the guest's language, falling back to the English value, as the pill on the card image in capitals; null shows no badge."
+   },
+   "rating": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "required": [
+     "average",
+     "count"
+    ],
+    "properties": {
+     "average": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "multipleOf": 0.1,
+      "description": "The average rating, 1.0 to 5.0, one decimal."
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many reviews the average is over."
+     }
+    },
+    "description": "**The card's rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is not null."
    },
    "nameLocalised": {
     "allOf": [

@@ -57,11 +57,11 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 833
+  operationCalls: 832
 - service: VenueOpsService
   operationCalls: 532
 - service: TenancyService
-  operationCalls: 491
+  operationCalls: 490
 - service: OrderService
   operationCalls: 423
 - service: AccessService
@@ -73,17 +73,17 @@ servicesCalled:
 - service: AiService
   operationCalls: 119
 - service: PlatformService
-  operationCalls: 106
+  operationCalls: 107
 - service: FnbService
   operationCalls: 96
 - service: ReportingService
   operationCalls: 91
 - service: LedgerService
-  operationCalls: 91
+  operationCalls: 89
 - service: InventoryService
   operationCalls: 82
 - service: IdentityService
-  operationCalls: 66
+  operationCalls: 67
 - service: WhiteLabelService
   operationCalls: 23
 - service: RetailService
@@ -631,6 +631,7 @@ screens:
   - cancelPerformance
   - createEvent
   - createPerformances
+  - getAvailability
   - getEvent
   - getPerformance
   - getSeatAvailability
@@ -3101,7 +3102,7 @@ screens:
   - getVenueMap
   - getVenueMapGraph
   - getVenueNavigationFile
-  - listCatalogueBundles
+  - listBundles
   - listProducts
   - publishVenueMap
   - searchMedia
@@ -4384,6 +4385,7 @@ screens:
   operations:
   - createDeviceFirmware
   - deployConfigurationProfile
+  - getConfigurationProfile
   - getDeviceFirmware
   - getWorkstationHealth
   - listDeviceFirmware
@@ -8181,7 +8183,7 @@ screens:
   name: Membership & Annual Pass Command Center
   module: Sell
   requiresModule: membership
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - approveMembershipProductValidation
@@ -8282,11 +8284,14 @@ screens:
   name: Membership Entitlement & Admission Benefit Builder
   module: Sell
   requiresModule: membership
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createEntitlementTemplate
+  - getPlanBenefits
   - listEntitlementTemplates
+  - listMembershipAnnualPass
+  - listMembershipBenefits
   - setMembershipBenefit
   - setMembershipEntitlementAdmission
   - setPlanBenefits
@@ -16168,7 +16173,6 @@ screens:
   - getForm
   - listAccreditationProgrammes
   - listForms
-  - updateAccreditationProgramme
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -24421,7 +24425,6 @@ screens:
   - createSeatMap
   - editSeatMapStructure
   - getSeatMap
-  - updateSeatMap
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -27520,10 +27523,8 @@ screens:
   operations:
   - getKpiValues
   - getUnifiedReconciliation
-  - listCreditMemos
   - listDashboards
   - listEInvoiceTransmissions
-  - listTaxInvoices
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -35232,8 +35233,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listChannelSaleRule
-  - listChannelSaleSchedule
   - listSaleChannel
   states:
   - emptyFirstRun
@@ -35465,7 +35464,6 @@ screens:
   density: compact
   operations:
   - listChannel
-  - listChannel2
   states:
   - emptyFirstRun
   - emptyNoAccess

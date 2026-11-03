@@ -36,11 +36,6 @@ consumers:
   idempotencyKey: requestId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Rejection analytics
-  idempotencyKey: requestId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Close the action plan waiting on this approval, as rejected (AI system design section 3.2)
   idempotencyKey: requestId
@@ -71,6 +66,15 @@ consumers:
     `subjectType` is `whiteLabelPublication` (ADAM CR-154, 18 October 2026; CHG-CRA-004)
   writes:
   - whitelabel.config_version
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: white-label
+  purpose: 'Mark a reviewed content block rejected (`subjectId` a whitelabel.content_block row pending review; ADAM
+    CR-462, decided 2 November 2026; CHG-CR462-001): `reviewStatus` rejected, and the block keeps the status and
+    schedule it had (draft, scheduled or expired), as publishContentBlock states'
+  writes:
+  - whitelabel.content_block
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true

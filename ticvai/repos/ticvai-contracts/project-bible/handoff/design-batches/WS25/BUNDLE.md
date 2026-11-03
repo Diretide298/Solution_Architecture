@@ -163,7 +163,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/support/customer-service-command-center-sup-009` |
 
-**Known gaps.** **The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: New Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI Assistant. …
+**Known gaps.** **The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved: New Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI Assistant. …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The agent's personal workspace: their cases, tasks, SLAs, alerts and workload, with quick finds (customer, order, ticket, booking) and New Case.
 
@@ -868,7 +868,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `caseId` (navigation), `uploadId` (navigation) |
 | Route | `/support/case-investigation-resolution-workspace-sup-013` |
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Action history. Each needs an operation, or needs removing from the screen; this is the Phase 3 …
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 6 operations.** Unserved: Action history. Each needs an operation, or needs removing from the screen; this is the Phase 3 …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** Where the agent investigates and resolves a case: thread, activity, linked records (order, ticket, payment, refund, membership, wallet transaction), actions taken, and the AI summary of everything done.
 
@@ -1749,7 +1749,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `profileKey` (navigation) |
 | Route | `/support/ai-customer-service-copilot-knowledge-workspace-sup-018` |
 
-**Known gaps.** **The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Review → Execute. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Review → Execute. Each needs an operation, or needs removing from the screen; this is the Phase 3 … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the AI & Intelligence process.** Configuration of the customer-service copilot that works beside agents: which authorised data it may read (customer, orders, cases), which knowledge collections, which channels it may draft replies for, the brand tone, whether to reply in the customer's language, and whether anything may be sent without an agent (off by default). A venue can narrow the tenant's settings, never widen them. The one thing to get right: the copilot drafts and summarises (the case summariser compiles every action taken on the case); an agent sends.
 

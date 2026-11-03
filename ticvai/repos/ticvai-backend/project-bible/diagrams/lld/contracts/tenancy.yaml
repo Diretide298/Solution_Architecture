@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 58 operations
+title: tenancy — 57 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -138,6 +138,7 @@ operations:
   - cache:idempotency
   - platform.device
   - platform.outbox
+  - tenancy.device_audit
 - operation: getConfigurationProfile
   verb: GET
   path: /configuration-profiles/{profileId}
@@ -671,24 +672,6 @@ operations:
   - cache:idempotency
   - cache:resolution
   - platform.offline_policy
-- operation: setRolePermissions
-  verb: PUT
-  path: /roles/{roleId}/permissions
-  scope: tenant
-  permission: ROLE_MANAGE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - identity.role
-  - identity.role_permission
-  - identity.segregation_rule
-  writes:
-  - cache:idempotency
-  - cache:resolution
-  - identity.role_permission
-  - platform.audit_record
 - operation: setTenantDomainMapping
   verb: PUT
   path: /tenant-domains/{hostname}

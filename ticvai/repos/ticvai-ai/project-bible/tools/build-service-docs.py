@@ -59,6 +59,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ticket_done  # noqa: E402  (what finishes a ticket: shared with op-release.py, CHG-GTR-002)
 import sprint_plan as sp  # noqa: E402  (the calendar, app-modules and scheduler the plan generators share)
 import frontend_repos as fr  # noqa: E402  (the repository a screen is built in, CHG-R6-060)
+import ticvai_jobs as tj  # noqa: E402  (the declared jobs, timers and consumers: one task each, CHG-R13JOB-001)
 
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -1055,6 +1056,23 @@ def main() -> int:
     prior_files = {} if "--renumber-migrations" in sys.argv[1:] else prior_migration_files()
     sl = json.loads((HANDOFF / "delivery-slice.json").read_text(encoding="utf-8"))
     lineage = json.loads((HANDOFF / "api-data-lineage.json").read_text(encoding="utf-8"))
+    # **A read the lead decided before the contract states it** (2 November 2026, CHG-R13PL-001; ADAM CR-460):
+    # block-a-extra-tasks.json `decidedReads`, operation -> the tables a posted decision says it reads. The plan waits
+    # and pulls on the lineage's reads, so a read the contract does not declare yet leaves the operation's task free
+    # of the migration that creates the table: listProductApprovalWorkflows (#31816, Block A) reads
+    # catalogue.approval_policy, whose migration (#31608, MIG-CATALOGUE-3) the plan had put in Block B behind
+    # approveWorkflow only. Each read joins the operation's reads here, for the plan alone; once the contract declares
+    # it the entry is redundant (printed) and is removed. check-plan-closure C-TABLE refuses the gap either way.
+    for o_, x_ in sorted(((json.loads(EXTRA.read_text(encoding="utf-8")).get("decidedReads") or {})
+                          if EXTRA.exists() else {}).items()):
+        if o_ not in lineage:
+            raise SystemExit(f"block-a-extra-tasks.json decidedReads: {o_} is no operation of the lineage")
+        have_ = lineage[o_].setdefault("reads", [])
+        for t_ in x_.get("tables") or []:
+            if t_ in have_:
+                print(f"  decidedReads {o_}: {t_} is in the contract's reads now; remove the entry (CHG-R13PL-001)")
+            else:
+                have_.append(t_)
     decomp = json.loads((HANDOFF / "service-decomposition.json").read_text(encoding="utf-8"))
     ref = json.loads((HANDOFF / "schema-reference.json").read_text(encoding="utf-8"))
     cols = ref["cols"]
@@ -2257,7 +2275,11 @@ def main() -> int:
         if h:
             t_["assignee"] = h
             taken[h] += pts
-            t_["description"] += f" Helper task: {owner} owns the service and reviews."
+            # an AI server task goes to the AI engineers after the pins (team.json `aiServer`, CHG-R12PL-034), so its
+            # text names them, not the .NET service owner the balancing started from (CHG-R13INT-018)
+            t_["description"] += (" AI server task: the AI engineers build it and review it (team.json aiServer, "
+                                  "CHG-R12PL-034)." if ai_srv_t(t_) else
+                                  f" Helper task: {owner} owns the service and reviews.")
             load[h] += pts
             load[owner] -= pts
 
@@ -2375,6 +2397,13 @@ def main() -> int:
     # tables they reach that no earlier migration creates. Which app-module and block each lands in is decided
     # below (the sprint plan); the keys follow the same rules as Block A's, so a ticket keeps its key once pushed.
     kmap_early = json.loads((OUT / "pms-map.json").read_text(encoding="utf-8")) if (OUT / "pms-map.json").exists() else {}
+    # the tasks a migration waited on in the last release bundle (CHG-R13PL-002: a ticketed hand-written [DB] task keeps
+    # its waits as pushed, and gains none)
+    try:
+        mig_waited_ = {d for k, d in json.loads((OUT / "op-release.json").read_text(encoding="utf-8")).get("edges") or []
+                       if k.startswith(("MIG-", "VM-MIG-"))}
+    except (OSError, ValueError):
+        mig_waited_ = set()
     op_module = {o: sp.MODULE_OF_CONTRACT.get(x["contract"], "Platform Operations") for o, x in ops.items()}
 
     def screen_module(sid):
@@ -2831,8 +2860,14 @@ def main() -> int:
             # them wait for it, so Block A1's overtime went from 35 to 109 hours and the plan moved Venue Management's
             # completion work into A2. A table added by a CR after those migrations were planned is no earlier step of
             # them; one whose keys point into it still waits. A ticketed one (PRD-W1-DB) keeps its waits as pushed.
+            # **"As pushed" is the last release's waits, not "has a ticket"** (2 November 2026, CHG-R13PL-002): the r12
+            # apply made CR409's ticket (#37177), so the rule above stopped holding for it, every later catalogue
+            # forward migration waited on it again (MIG-CATALOGUE-10 too, which it waits on itself: a cycle that
+            # op-release.py refuses), and Block A1's overtime went back from 37 to 117 hours. A ticketed hand-written
+            # [DB] task is waited on by a forward migration only where the last release bundle had a migration waiting
+            # on it (PRD-W1-DB), or for a key into its tables.
             keys_into = {x for t in ts_all for x in ddl[t]["fks"]}
-            hand_late_ = {t for t, m in hand_db.items() if m not in kmap_early}
+            hand_late_ = {t for t, m in hand_db.items() if m not in kmap_early or m not in mig_waited_}
             prior = sorted({m for t, m in mig_of.items() if t.split(".")[0] == sch and m not in later_mig.values()
                             and (t not in fwd_kept or t in keys_into) and (t not in hand_late_ or t in keys_into)})
             for mk, ts in parts:
@@ -3139,7 +3174,12 @@ def main() -> int:
             k = dec_ or add_am(m_, pf, None, 1, variant="" if pf != "API" else "platform",
                                name=None if pf != "API" else f"{sp.MODULE_SHORT.get(m_, m_)} · platform (later blocks)")
             task(t_["key"], k, "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 3,
-                 pts=int(t_["points"]), area="backend", assignee=t_.get("assignee") or "", depends=t_.get("depends") or ())
+                 pts=int(t_["points"]), area=t_.get("area") or "backend", assignee=t_.get("assignee") or "",
+                 depends=t_.get("depends") or ())
+            # a front-end task of a decided app-module names its area (CHG-R13PL-006: CR-463's kiosk and POS printing
+            # under AM-DEVICES-BOCA), so it is a [FE] ticket in that stack's pool, as a Block A one is (CHG-R9UI-001)
+            if t_.get("notBefore"):
+                by_key[t_["key"]]["notBefore"] = float(sp.index_of(dt.date.fromisoformat(t_["notBefore"])))
             am_of[t_["key"]] = k
     later_keys = set(am_of) | set(later_op_task.values()) | set(later_mig.values())
     for t_ in tasks:
@@ -3149,6 +3189,121 @@ def main() -> int:
         am_of.setdefault(k, by_key[k]["parent"])
     for t, k in later_mig.items():
         am_of.setdefault(k, by_key[k]["parent"])
+
+    # **One task per declared job, timer and event consumer** (r13, 2 November 2026; CHG-R13JOB-001). The plan made
+    # a task per operation only, so 77 jobs and timers and 25 consumer groups of Block A had no task (the r13 job
+    # scan): a state model moved by a timer, or an event consumer with no `operation`, was built by nobody. Each
+    # contract now declares its background work in `x-ticvai-jobs` (tools/ticvai_jobs.py), and each declaration that
+    # no `builtBy` task or ticket already builds gets a task here, keyed JOB-/CONS-<contract>-<name>:
+    #   - its service is its contract's, and its waits are its tables' migrations, the kernel, the outbox where it
+    #     consumes or emits, and the workers host (SETUP-HOSTS) where it runs there;
+    #   - **the operations that rely on it** (tj.relies_on: the emitters of what it consumes, the operations of the
+    #     state models it moves, its `reliesOn`) give its block: their tasks wait on it (the waiting tickets follow
+    #     it), so it takes the app-module of the earliest of them, as a shared back-end task does; all of them in later
+    #     blocks, it is planned there, under the earliest one's app-module;
+    #   - its owner follows the plan's rules for a back-end task of its service (the service owner in Block A, the
+    #     AI server's pool for AiService, CHG-R12PL-034; the scheduler's choice in later blocks).
+    # A declaration nothing relies on stops the build: a job with no work handed to it is a declaration error.
+    jobs_decl = tj.load(ROOT)
+    states_ = tj.load_states(ROOT)
+    events_ = tj.load_events(ROOT)
+    svc_of_contract = {}
+    for o_, ln_ in sorted(lineage.items()):
+        svc_of_contract.setdefault(ln_.get("contract"), ln_.get("service"))
+    task_of_op_j = {**op_task, **vm_op_task, **later_op_task}
+    job_keys, job_bad, job_waiting = set(), [], {}
+    # a started ticket is never made to wait on a new task (started_plan_keys): its text names the job instead
+    started_j, told_j = started_plan_keys(), defaultdict(list)
+    for ref_, j_ in sorted(jobs_decl.items()):
+        if j_.get("builtBy") or j_.get("decision"):
+            continue
+        k_ = j_["key"]
+        if k_ in by_key:
+            job_bad.append(f"{ref_}: its key {k_} is already a plan task")
+            continue
+        svc_ = svc_of_contract.get(j_["contract"]) or ""
+        # **A job on the AI server is the AI server's** (the lead, 2 November 2026, on lane s's question, "(Recommended)":
+        # access#fraudDetection and catalogue#pricingEngine run on ticvai-ai and are the AI engineers'; CHG-R13INT-009).
+        # Its service is AiService whatever contract declares it, so the AI server's rule (team.json `aiServer`,
+        # CHG-R12PL-034) gives it to the AI engineers and the text says where it is built.
+        if j_.get("host") == "ticvai-ai":
+            svc_ = "AiService"
+        reads_, writes_ = list(j_.get("reads") or []), list(j_.get("writes") or [])
+        deps_ = {mig_of.get(t) for t in reads_ + writes_} - {None}
+        deps_.add("PLATFORM-KERNEL")
+        if j_.get("consumes") or j_.get("emits"):
+            deps_.add("PLATFORM-OUTBOX")
+        if j_.get("host") == "workers":
+            deps_.add("SETUP-HOSTS")
+        deps_ &= set(by_key)
+        rel_ = tj.relies_on(j_, states_, events_)
+        waiting_ = sorted({task_of_op_j[o] for o in rel_ if o in task_of_op_j and task_of_op_j[o] in by_key}
+                          - deps_ - {k_})
+        waiting_ = [w for w in waiting_ if not w.startswith(("PLATFORM-", "KERNEL-", "SETUP-", "MIG-"))]
+        if not waiting_:
+            job_bad.append(f"{ref_}: no planned operation relies on it ({', '.join(sorted(rel_)) or 'none named'})")
+            continue
+        trig_ = j_.get("trigger") or {}
+        moves_ = j_.get("moves") or []
+        word_ = "consumer" if trig_.get("kind") == "event" else "job"
+        what_ = " ".join(str(j_.get("for") or "").split())
+        later_ = all(w in later_keys for w in waiting_)
+        host_ = j_.get("host") or "workers"
+        adr_ = "ADR-0020" if host_ == "ticvai-ai" else "ADR-0055"
+        parts_ = [f"Builds: `adr {adr_}`. The {word_} `{ref_}` (`{j_['file']}`, `x-ticvai-jobs.{j_['name']}`), in the "
+                  f"{host_} host: {what_}"]
+        trig_txt = trig_.get("kind", "")
+        if trig_.get("every"):
+            trig_txt += f", every {trig_['every']}"
+        if trig_.get("on"):
+            trig_txt += f", on {trig_['on']}"
+        parts_.append(f"Trigger: {trig_txt}.")
+        if j_.get("consumes"):
+            parts_.append("Consumes: " + ", ".join(j_["consumes"]) + " (its consumer entry in events/, with that "
+                          "entry's idempotencyKey and onFailure).")
+        if moves_:
+            parts_.append("Moves: " + "; ".join(f"{m['model']} {m['from']} to {m['to']}" for m in moves_) + ".")
+        if reads_:
+            parts_.append("Reads: " + ", ".join(reads_) + ".")
+        if writes_:
+            parts_.append("Writes: " + ", ".join(writes_) + ".")
+        if j_.get("emits"):
+            parts_.append("Emits: " + ", ".join(j_["emits"]) + ".")
+        parts_.append("Waiting on it (they follow this task): " + ", ".join(waiting_) + ".")
+        parts_.append(f"Spec: the contract at the release tag, served by ADAM; {svc_}'s first-release owner "
+                      f"({svc_owner.get(svc_) or 'its owner'}) reviews.")
+        parts_.append("Done when: an integration test on seeded rows shows each move it makes (a due row moves once, a "
+                      "row not yet due does not), each event it consumes is handled once when delivered twice, a "
+                      "failure follows the consumer's onFailure, it reads and writes only the tables listed above, "
+                      "and a peer in the same stack has reviewed and tested it.")
+        task(k_, "", "Task", f"{svc_} {word_} {ref_}: {what_}"[:250], " ".join(parts_), 3, service=svc_,
+             pts=points_of(tj.points_raw(j_)), area="backend",
+             assignee="" if later_ else svc_owner.get(svc_, ""), depends=deps_)
+        job_keys.add(k_)
+        if later_:
+            am_ = min({am_of[w] for w in waiting_ if am_of.get(w)}, key=lambda a: am_info[a]["order"])
+            by_key[k_]["parent"] = am_
+            by_key[k_]["phase"] = 2
+            am_of[k_] = am_
+        job_waiting[k_] = waiting_
+        for w in waiting_:
+            if w in started_j:
+                told_j[w].append(f"{k_} ({ref_})")
+            else:
+                by_key[w]["dependsOn"] = " ".join(sorted(set(by_key[w]["dependsOn"].split()) | {k_}))
+    for w, ks_ in sorted(told_j.items()):
+        d_ = by_key[w]["description"].rstrip()
+        by_key[w]["description"] = (d_ + ("" if not d_ or d_[-1] in ".!?" else ".") + " Background work: "
+                                    + ", ".join(ks_) + (" builds" if len(ks_) == 1 else " build")
+                                    + " the job or consumer its operations hand work to; planned after this ticket "
+                                    "started (r13, CHG-R13JOB-001), so this ticket does not wait for it and its status "
+                                    "and sprint stay.")
+    if job_bad:
+        raise SystemExit("x-ticvai-jobs: " + "; ".join(job_bad))
+    print(f"tasks for declared jobs, timers and consumers (x-ticvai-jobs): {len(job_keys)} "
+          f"({sum(1 for j_ in jobs_decl.values() if j_.get('builtBy'))} more built by a named task or ticket, "
+          f"{sum(1 for j_ in jobs_decl.values() if j_.get('decision'))} open for the lead); started tickets told, "
+          f"not made to wait: {len(told_j)}")
 
     # **Services stand on the platform** (30 September). A service task used to wait only for its
     # migration, so the build order put 60-odd service tasks in front of the kernel they run on (tenant
@@ -3173,6 +3328,30 @@ def main() -> int:
             if "platform.outbox" in writes:
                 need.add("PLATFORM-OUTBOX")
             t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | need))
+    # **The AI server runs on its own kernel** (r13, 3 November 2026, CHG-R13PL-054): ticvai-ai is a separate Python
+    # deployable (ADR-0020, ADR-0055), so an AI server task (team.json `aiServer`) or an AI engine task cannot take its
+    # runtime from PLATFORM-KERNEL or PLATFORM-IDEMPOTENCY, which build the .NET kernel in ticvai-backend. It follows
+    # AI-SERVER-RUNTIME instead, unless its ticket has started (a started ticket is never made to wait on a new task;
+    # its waits stay as they are).
+    if "AI-SERVER-RUNTIME" in by_key:
+        dotnet_ = {"PLATFORM-KERNEL", "PLATFORM-IDEMPOTENCY"}
+        started_ai_ = started_plan_keys()
+        moved_ai_, kept_ai_ = [], []
+        for t_ in tasks:
+            if t_["type"] != "Task" or t_["key"] == "AI-SERVER-RUNTIME":
+                continue
+            if not (ai_srv_t(t_) or t_["key"].startswith("AI-ENGINE-") or t_.get("service") == "AiService"):
+                continue
+            deps_ = set(t_["dependsOn"].split())
+            if not deps_ & dotnet_:
+                continue
+            if t_["key"] in started_ai_:
+                kept_ai_.append(t_["key"])
+                continue
+            t_["dependsOn"] = " ".join(sorted((deps_ - dotnet_) | {"AI-SERVER-RUNTIME"}))
+            moved_ai_.append(t_["key"])
+        print(f"AI server tasks on AI-SERVER-RUNTIME instead of the .NET kernel (CHG-R13PL-054): {len(moved_ai_)}; "
+              f"started, left as they are: {len(kept_ai_)}" + (f" ({', '.join(sorted(kept_ai_))})" if kept_ai_ else ""))
 
     # **A report waits for the data it reports on** (30 September, Chinmay). A backend task whose
     # operations only read (reports, dashboards, analytics, exports) and read tables another task
@@ -3428,6 +3607,11 @@ def main() -> int:
                 moved = True
         if not moved:
             break
+    for k in sorted(job_keys):                             # a declared job: the earliest app-module waiting on it,
+        if k not in am_of:                                 # started or not, Venue Management too (CHG-R13JOB-001)
+            cand = {am_of[d] for d in job_waiting[k] if am_of.get(d) and am_of[d] != "AM-FOUNDATION-SETUP"}
+            if cand:
+                am_of[k] = min(cand, key=lambda x: am_info[x]["order"])
     for t_ in leaf:                                        # nothing waits on it: its module's first app-module
         k = t_["key"]
         if k in am_of:
@@ -3577,6 +3761,21 @@ def main() -> int:
     groups = defaultdict(list)
     for k in comp_ams:
         groups[am_info[k]["platform"] or "API"].append(k)
+    # **A completion app-module the last release pushed in A1 stays in A1** (2 November 2026, CHG-R13PL-002): the
+    # overtime test below decides where completion work first goes, but once its tickets are in OpenProject under
+    # Block A1 a later run must not move them because the load measured around them changed. After the r12 apply the
+    # 55 tickets it made kept the owners r12 gave them (stable owners, pms-map.json), the measured A1 overtime went from
+    # 37 to 117 hours, and P08's completion work (272 tasks, pushed under BLOCK-A) fell to A2 with no one deciding
+    # (check-plan-closure C-BOUND, C-CALLS, C-REACH). The rule CHG-R10GFP-001 gives the later blocks: moving pushed
+    # work out of A1 is a plan change, decided by the lead.
+    kept_a1 = set()
+    try:
+        _b1 = json.loads((OUT / "op-release.json").read_text(encoding="utf-8"))
+        _p1 = set(_b1.get("ids") or {})
+        kept_a1 = {t_["key"] for t_ in _b1.get("tickets") or [] if t_.get("type") == "Feature"
+                   and t_.get("key") in comp_ams and t_["key"] in _p1 and t_.get("parent") == "BLOCK-A"}
+    except (OSError, ValueError):            # no bundle yet: nothing has been pushed, nothing is kept
+        kept_a1 = set()
     base_ot = a1_overtime() if comp_ams else 0.0
     allow = max(base_ot, accepted) + 1.0
     a1_apps = []
@@ -3584,6 +3783,12 @@ def main() -> int:
         for k in groups[pf]:
             am_info[k]["block"] = "A"
         ot = a1_overtime()
+        if any(k in kept_a1 for k in groups[pf]):
+            a1_apps.append(pf)
+            base_ot = max(base_ot, ot)
+            print(f"  kept in A1: the completion work of {pf} ({', '.join(sorted(k for k in groups[pf] if k in kept_a1))}), "
+                  f"pushed there by release {_b1.get('release')} ({ot:.0f} h of overtime with it; CHG-R13PL-002)")
+            continue
         if ot <= allow:
             a1_apps.append(pf)
             base_ot = max(base_ot, ot)

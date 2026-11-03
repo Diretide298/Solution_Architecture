@@ -48,7 +48,7 @@ A destination param `from: session` is never carried: the session resolves it (v
 **An edge that carries nothing says why** (1 October, plan item 2.6: the same-module links left
 for review after R251). Its provenance names the reason, read off the screens and the contract:
 the way back to the screen the source was opened from; the destination's ids only pre-select
-(deep link or `optional`); the destination finds them itself (an operation returns them, or reads
+(`optional`: a required id is never a pre-select, whatever its `from`, r13 root R18); the destination finds them itself (an operation returns them, or reads
 or creates the collection `{id}` indexes); it opens on a list it can read unaided, and the id
 left over is a gap in the destination, not in the edge; or the source is a module hub and this is
 its menu entry. Only an edge with none of these still says the destination *opens cold* -- and a
@@ -394,7 +394,12 @@ def why_nothing(src: str, dst: str, screens: dict, contracts: Contracts) -> tupl
     for p in entry_params(d):
         if p.get("from") == SESSION:
             continue
-        if p.get("from") == "deepLink" or p.get("optional"):
+        # **Only an optional id pre-selects** (2 November 2026, r13 root R18, CHG-R13R18-001; #28195 BO-015,
+        # #28213 BO-094, #37014 BO-129, #37067 BO-134, #27985 DEV-008). This read every `from: deepLink` param as
+        # optional, so a menu edge into a screen whose id is required said "only pre-selects ... opens on its own"
+        # and the screen opened with nothing to load. A required id, whatever its `from`, is found by the screen
+        # itself, read off a list it opens on, or the edge is cold.
+        if p.get("optional"):
             deep.append(p["name"])
             continue
         op = reads_itself(d, p["name"], contracts)
@@ -406,7 +411,7 @@ def why_nothing(src: str, dst: str, screens: dict, contracts: Contracts) -> tupl
     parts = []
     if deep:
         parts.append(f"{', '.join(deep)} only pre-select{'s' if len(deep) == 1 else ''} "
-                     f"(deep link or optional)")
+                     f"(optional)")
     if own:
         parts.append(f"{dst} finds {', '.join(own)} itself")
     if not cold and not parts:

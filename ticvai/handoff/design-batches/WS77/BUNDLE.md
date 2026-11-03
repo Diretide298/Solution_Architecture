@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/asset-distribution-delivery-command-center-cms-091` |
 
-**Known gaps.** **The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Distribution Map, Channel Management, Delivery Monitor, Replacement Center, API & Integration, Analytics. … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Distribution Map, Channel Management, Delivery Monitor, Replacement Center, API & Integration, Analytics. …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Distribution of assets across channels: active references, delivery failures, assets needing replacement.
 
@@ -358,8 +358,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/asset-usage-distribution-map-cms-092` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Where one asset is used now (web, app, kiosk, campaigns, signage), with counts per channel and links.
 
@@ -643,7 +641,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `assetId` (navigation) |
 | Route | `/media-library/secure-delivery-url-cdn-rendition-delivery-cms-094` |
 
-**Known gaps.** **The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: tokenized access, configurable expiry, cache policy, revocation where applicable. Each needs an operation … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: tokenized access, configurable expiry, cache policy, revocation where applicable. Each needs an operation … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Tokenised delivery URLs with expiry and cache policy; private storage never exposed.
 
@@ -761,7 +759,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `mediaId` (navigation) |
 | Route | `/media-library/asset-replacement-propagation-management-cms-095` |
 
-**Known gaps.** **The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Replace Everywhere Eligible, Replace Selected Uses, Schedule Replacement, Keep Existing Version, Create … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Replace Everywhere Eligible, Replace Selected Uses, Schedule Replacement, Keep Existing Version, Create … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Replace an outdated asset everywhere eligible, in selected uses, or on a schedule, with fallback.
 
@@ -887,7 +885,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `code` (deepLink) |
 | Route | `/media-library/fallback-expiry-distribution-continuity-cms-096` |
 
-**Known gaps.** **The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved: Usage-Level Fallback, Asset archived, rights expired, approval revoked, rendition unavailable, asset …
+**Known gaps.** **The pack names 12 actions on this screen and the screen declares 1 operation.** Unserved: Usage-Level Fallback, Asset archived, rights expired, approval revoked, rendition unavailable, asset …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The fallback a channel shows when an asset becomes unavailable (archived, rights expired, approval revoked, rendition missing).
 
@@ -1008,7 +1006,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/dam-api-integration-hub-cms-097` |
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: API credentials, service accounts. Each needs an operation, or needs removing from the screen; this is the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: API credentials, service accounts. Each needs an operation, or needs removing from the screen; this is the … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** APIs and service accounts for modules and approved systems to consume DAM content.
 
@@ -1126,7 +1124,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/delivery-monitoring-integration-health-cms-098` |
 
-**Known gaps.** **The pack names 11 actions on this screen and the screen declares 0 operations.** Unserved: View Consumer, Assign Replacement, Retry, View Logs, Notify Owner, Alerting, high error rate, delivery …
+**Known gaps.** **The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved: View Consumer, Assign Replacement, Retry, View Logs, Notify Owner, Alerting, high error rate, delivery …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Delivery availability, response time, CDN cache hit and failures.
 
@@ -1320,8 +1318,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/asset-usage-performance-analytics-cms-099` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** How assets are consumed: impressions, requests, downloads, reuse.
 

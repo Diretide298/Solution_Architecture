@@ -282,13 +282,7 @@
   "purpose": "Create and maintain the individual value buckets that can exist inside a TICVAI wallet. The source explicitly requires support for different digital wallet credit types such as Cash Credit, Bonus Credit, Redemption Tickets Credit and Rides Credit, with configurable usage criteria.",
   "purposeNote": "Administrators can introduce and configure new stored-value or entitlement credit types without software development.",
   "division": "Shares `createCreditType`, `listCreditTypes`, `updateCreditType` with BO-1088; this screen is Credit Type Definition Studio (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.02, page 24): create and maintain the individual value buckets that can exist inside a TICVAI wallet. The source explicitly requires support for different digital wallet credit types such as Cash Credit, Bonus Credit, Redemption Tickets Credit and Rides Credit, with configurable usage criteria.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Credit Type Definition Studio declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -1593,13 +1587,7 @@
   "purpose": "Provide governed administrative management of credits approaching or reaching expiry.",
   "purposeNote": "Expiry-related administrative actions preserve the original credit history and create immutable audit entries.",
   "division": "Shares `expireCreditLots`, `listCreditLots` with BO-1130; this screen is Credit Expiry, Extension & Forfeiture Operations (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.09, page 31): provide governed administrative management of credits approaching or reaching expiry.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 31 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

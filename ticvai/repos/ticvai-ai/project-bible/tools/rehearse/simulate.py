@@ -12,7 +12,11 @@ rules, on the project as it is now:
                 op-created-r<N>.json (the file the apply writes), so the rehearsal merges and links them as
                 production does.
   priority      the build order on every plan ticket. New tickets are re-parented under the plan's parent first.
-  assign        On hold and planned again: back to New with one comment. A New ticket gets the plan's assignee,
+  assign        On hold with no assignee (a release deferred it) and planned again: back to New with one comment;
+                one On hold with an assignee is its developer's hold and is left. A ticket the lead holds (the
+                bundle's `hold`) is never reopened: a held New one goes On hold with that one comment and loses its
+                assignee and sprint, a held On hold one stays so, a started one is left; held tickets get no person,
+                sprint or plan-update comment, and keep their text and title. A New ticket gets the plan's assignee,
                 Accountable and sprint, and a field still on someone who left goes to the successor when the plan's
                 person has no account. A started, open ticket keeps its owners except a field on someone who left,
                 which goes to the plan's person, else the successor (P-25); otherwise it gets one comment.
@@ -234,14 +238,26 @@ def simulate(bundle, prev=None, pulls=None, snapshot=None) -> tuple:
         if t.get("sequence") is not None:
             state[i]["sequence"] = t["sequence"]
     # ---- assign
+    # op-release.rb's assign: a ticket the lead holds (the bundle's `hold`, CHG-R8DEC-004) is never reopened, and
+    # only a ticket a release deferred (On hold, no assignee) comes back; a developer's own hold is left.
+    held_keys = {t["key"] for t in bundle["tickets"] if t.get("hold")}
     reopen_marker = bundle.get("reopen_marker") or "Back in the plan"
     for t, i in tickets:
-        if state[i]["status"] == "On hold":
+        if state[i]["status"] == "On hold" and t["key"] not in held_keys and not state[i].get("assignee"):
             state[i]["status"] = "New"
             where = f"Sprint {t['sprint']}" if t.get("sprint") else "the plan"
             note(i, f"**{reopen_marker}** (release {release}): this work is planned again, in {where}; it was on hold.")
+    hold_marker = bundle.get("hold_marker") or "On hold in the plan"
+    for t, i in tickets:                      # held: a New one goes On hold and leaves the board; others are left
+        s = state[i]
+        if t["key"] in held_keys and s["status"] == "New":
+            s["status"], s["assignee"], s["version"] = "On hold", None, None
+            if not any(hold_marker in (c.get("text") or "") for c in comments.get(i, [])):
+                note(i, t["hold"])
     marker = f"Plan update (release {release})"
     for t, i in tickets:
+        if t["key"] in held_keys:             # held: no person, no sprint, no plan-update comment
+            continue
         s = state[i]
         a, r = find_user(name(t.get("assignee"))), find_user(name(t.get("responsible")))
         if s["status"] == "New":
@@ -291,6 +307,8 @@ def simulate(bundle, prev=None, pulls=None, snapshot=None) -> tuple:
         return "\n".join(l for l in str(x or "").replace("\r\n", "\n").split("\n")
                          if not l.startswith(markers["release"])).strip()
     for t, i in sorted(tickets, key=lambda x: (x[0].get("sequence") or 999999, x[0]["key"])):
+        if t["key"] in held_keys:             # a held ticket keeps its text and title while it is held
+            continue
         s = state[i]
         want = t["pointer"].replace("%ID%", str(i))
         if s["status"] == "New":
@@ -418,6 +436,7 @@ def self_test() -> list:
                 "responsible": responsible, "sequence": seq, "sprint": 1, "version": 77, "set_version": True,
                 "pointer": pointer.format(k=key)}
 
+    held_note = "**On hold in the plan** (release r7): the lead holds this screen for the client's sign-off."
     bundle = {"release": "r7", "project": 153, "field": "customField9", "author": "Chinmay Parab",
               "built_at": "2026-10-20T09:00:00Z", "aliases": {"Surendra": "Surendra Loke"},
               "successors": {"Tanmay Dukhande": "Narayan Gaonkar"},
@@ -426,10 +445,14 @@ def self_test() -> list:
               "comment": "The spec for this ticket lives in ADAM: `/ticket %ID%` (%KEY%).",
               "reopen_marker": "Back in the plan",
               "sprint_versions": [{"key": "VERSION-S1", "name": "Sprint 1", "id": 77}],
-              "ids": {"F-1": 100, "T-NEW": 101, "T-QA": 102, "T-QA2": 103, "T-HOLD": 104, "T-STARTED": 105},
+              "ids": {"F-1": 100, "T-NEW": 101, "T-QA": 102, "T-QA2": 103, "T-HOLD": 104, "T-STARTED": 105,
+                      "T-HELD": 108, "T-HELDNEW": 109, "T-DEVHOLD": 110, "T-HELDGO": 111},
+              "hold_marker": "On hold in the plan",
               "tickets": [tk("F-1", parent=None, typ="Feature", seq=1), tk("T-NEW", assignee="New full-stack developer 1"),
                           tk("T-QA"), tk("T-QA2", responsible="New full-stack developer 2"), tk("T-HOLD"),
-                          tk("T-STARTED", assignee="Surendra"), tk("T-MADE"), tk("T-SAME")],
+                          tk("T-STARTED", assignee="Surendra"), tk("T-MADE"), tk("T-SAME"),
+                          dict(tk("T-HELD"), hold=held_note), dict(tk("T-HELDNEW"), hold=held_note),
+                          tk("T-DEVHOLD"), dict(tk("T-HELDGO"), hold=held_note)],
               "create": ["T-MADE", "T-SAME"],
               "retire": [{"key": "T-OLD", "id": 106, "action": "merge", "note": "Merged into T-NEW."},
                          {"key": "T-OLD2", "id": 107, "action": "defer", "note": "Deferred."}]}
@@ -455,7 +478,11 @@ def self_test() -> list:
                                   hal(105, "In progress", "[BE] T-STARTED", "Pranay Shinde", "Hrushikant Patkar"),
                                   hal(106, "New", "[BE] T-OLD"),
                                   hal(107, "In progress", "[BE] T-OLD2", "Pranay Shinde"),
-                                  hal(200, "New", "[BE] T-SAME")]}
+                                  hal(200, "New", "[BE] T-SAME"),
+                                  hal(108, "On hold", "[BE] T-HELD"),
+                                  hal(109, "New", "[BE] T-HELDNEW", "Pranay Shinde", "Hrushikant Patkar"),
+                                  hal(110, "On hold", "[BE] T-DEVHOLD", "Pranay Shinde"),
+                                  hal(111, "In progress", "[BE] T-HELDGO", "Pranay Shinde")]}
     state, created = simulate(bundle, None, {}, snapshot)
     P = state["packages"]
 
@@ -485,6 +512,19 @@ def self_test() -> list:
     if (status(104) != "New" or not any("Back in the plan" in n for n in notes(104))
             or who(104, "assignee") != "Pranay Shinde" or "/ticket 104" not in P["104"]["description"]["raw"]):
         fails.append(f"On hold #104 planned again: {status(104)}, {notes(104)}, {who(104, 'assignee')}")
+    # a ticket the lead holds is never reopened (op-release.rb assign, CHG-R8DEC-004): held On hold stays On hold
+    # with no 'Back in the plan', no person and its text kept; a held New one goes On hold with the hold comment and
+    # loses its assignee and sprint; a held started one is left; an On hold one with an assignee is its developer's
+    if (status(108) != "On hold" or any("Back in the plan" in n for n in notes(108)) or who(108, "assignee")
+            or "/ticket 108" in P["108"]["description"]["raw"]):
+        fails.append(f"held On hold #108: {status(108)}, {notes(108)}, {who(108, 'assignee')}")
+    if (status(109) != "On hold" or notes(109) != [held_note] or who(109, "assignee")
+            or P["109"]["_links"].get("version")):
+        fails.append(f"held New #109: {status(109)}, {notes(109)}, {who(109, 'assignee')}")
+    if status(111) != "In progress" or notes(111) or who(111, "assignee") != "Pranay Shinde":
+        fails.append(f"held started #111: {status(111)}, {notes(111)}, {who(111, 'assignee')}")
+    if status(110) != "On hold" or any("Back in the plan" in n for n in notes(110)):
+        fails.append(f"On hold by its developer #110: {status(110)}, {notes(110)}")
     # created: a stand-in id from 990001 under its parent, its pointer naming the id; an existing ticket with the same
     # subject under the same parent and no key is taken
     if created != {"T-MADE": STAND_IN_FROM, "T-SAME": 200}:

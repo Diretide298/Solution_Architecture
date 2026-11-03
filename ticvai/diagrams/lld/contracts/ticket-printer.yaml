@@ -1,0 +1,7 @@
+id: LLD-ticket-printer
+title: ticket-printer — 0 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: devices
+service: —
+operations: []

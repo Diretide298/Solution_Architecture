@@ -93,13 +93,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each component shall show) — counts over a population, then the population",
   "purpose": "Provide administrators with one consolidated view of the health and governance of the TICVAI analytics platform.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each component shall show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -308,13 +302,7 @@
   "patternReason": "the pack gives this screen a display directory (§KPI Categories; KPI Status) and no metric row",
   "purpose": "Maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because every dashboard must use the same definition of a metric.",
   "division": "Shares `createKpi`, `listKpis` with ANL-025; this screen is Enterprise KPI Library (pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, board 10.10.2, page 124): maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because every dashboard must use the same definition of a metric.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -879,13 +867,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Maintain a centralized catalogue of data sources feeding the analytics platform.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1037,13 +1019,7 @@
   "pattern": "listDetail",
   "patternReason": "`getSemanticModel` reads the model as a tree; the selection is a domain, dataset or field (CHG-SOT-012).",
   "purpose": "Create the governed business layer between raw data and dashboards/AI. This is one of the most important technical screens in Board 10.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**No certification, owner, glossary or lineage on a dataset or field** (design-notes correction ANL-066). The client asks for certified badges with owner, glossary and lineage; the model holds none of them. Logged as a contract gap 2 October 2026 (CHG-SOT-016). The earlier gap (\"operations return no schema with described properties\") was stale: `SemanticModel` is fully described.",
-    "source": "contracts/satellite/reporting.yaml#/components/schemas/SemanticModel"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1232,13 +1208,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Monitor) — counts over a population, then the population",
   "purpose": "Monitor movement of information from operational systems into the analytics platform.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1461,6 +1431,7 @@
       {
        "kind": "selectField",
        "label": "Default Dashboard",
+       "operation": "listDashboards",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure"
       },
       {
@@ -1560,13 +1531,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Usage KPIs; Performance KPIs) and a per-row directory (§Identify) — counts over a population, then the population",
   "purpose": "Monitor BI adoption, system performance, capacity consumption and analytical operating costs.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1800,11 +1765,6 @@
   "patternReason": "the pack gives this screen a display directory (§Monitor; Show) and no metric row",
   "purpose": "Provide final governance over the entire BI and analytics environment.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 133 §Monitor"
-   },
    {
     "operation": "listSecurityDetectionGovernance",
     "removed": true,

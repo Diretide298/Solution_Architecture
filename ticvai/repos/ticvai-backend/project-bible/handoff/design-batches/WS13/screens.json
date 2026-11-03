@@ -108,13 +108,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a display directory (§Key Functions) and no metric row",
   "purpose": "Provide management and approvers with a real-time overview of approval activity.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 3 §Key Functions"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1034,13 +1028,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage requests that were escalated because of SLA breaches, risk conditions, unavailable approvers or configured escalation rules.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 8 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

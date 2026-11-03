@@ -8,6 +8,8 @@ description: An operational requirement derived from a forecast was accepted and
   that applies it.
 aggregate: aiOperationalRequirement
 emittedWhen: AiOperationalRequirement issued, accepted or modified to handedOver (decideOperationalRequirement)
+emittedBy:
+- ai.decideOperationalRequirement
 payload:
 - field: tenantId
   type: uuid

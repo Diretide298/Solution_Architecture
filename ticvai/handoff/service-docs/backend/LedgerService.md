@@ -36,8 +36,8 @@
 | tax | [`getTaxInvoice`](#gettaxinvoice) | GET | `/tax-invoices/{invoiceId}` | core | 1 | BO-022, GST-019, POS-026, WEB-019 |
 | tax | [`issueCreditMemo`](#issuecreditmemo) | POST | `/tax-invoices/{invoiceId}/credit-memos` | core | 1 | BO-022, BO-023, POS-011 |
 | tax | [`issueTaxInvoice`](#issuetaxinvoice) | POST | `/tax-invoices` | core | 1 | BO-022, GST-019, POS-026, POS-030, WEB-019 |
-| tax | [`listCreditMemos`](#listcreditmemos) | GET | `/credit-memos` | core | 1 | ANL-072, BO-023, BO-1081, GST-019, WEB-019 |
-| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ANL-072, BO-022, BO-1081, GST-019, POS-026, WEB-019 |
+| tax | [`listCreditMemos`](#listcreditmemos) | GET | `/credit-memos` | core | 1 | ANL-072, BO-023, GST-019, WEB-019 |
+| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ANL-072, BO-022, GST-019, POS-026, WEB-019 |
 | tax | [`setEInvoicingProvider`](#seteinvoicingprovider) | PUT | `/e-invoicing/providers/{providerId}` | setup | 1 | ADM-069 |
 | tax | [`transmitEInvoices`](#transmiteinvoices) | POST | `/e-invoicing/transmissions` | setup | 1 | ADM-077 |
 | tax | [`updateTaxCode`](#updatetaxcode) | PATCH | `/tax-codes/{taxCodeId}` | setup | 1 | BO-075 |
@@ -953,7 +953,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | Read routing | replica |
 | Reads | `ledger.credit_memo`, `ledger.credit_memo_line` |
 | Writes | - |
-| Called by | ANL-072, BO-023, BO-1081, GST-019, WEB-019 |
+| Called by | ANL-072, BO-023, GST-019, WEB-019 |
 
 **Parameters**
 
@@ -1058,7 +1058,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | Read routing | replica |
 | Reads | `ledger.tax_invoice`, `ledger.tax_invoice_line` |
 | Writes | - |
-| Called by | ANL-072, BO-022, BO-1081, GST-019, POS-026, WEB-019 |
+| Called by | ANL-072, BO-022, GST-019, POS-026, WEB-019 |
 
 **Parameters**
 

@@ -62,6 +62,40 @@ servers:
 - url: https://api.ticvai.com/v1
 security:
 - bearerAuth: []
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  forecastViews:
+    module: resources
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.forecastPublished, ai.operationalRequirementIssued]
+    reads: []
+    writes: []
+    for: 'Forecast-bound operational views: F&B prep and par, Inventory replenishment, Workforce rota (critical: shows the
+      requirement a manager applies), Resources demand, refreshed on a published forecast or an issued operational requirement.'
+    source:
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+  holdExpiry:
+    module: resources
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: resource-booking, from: checkedOut, to: overdue}
+    - {model: resource-booking, from: reserved, to: noShow}
+    - {model: resource-hold, from: held, to: expired}
+    reads: [resources.booking, resources.resource_reservation]
+    writes: [resources.booking, resources.resource_reservation]
+    for: Resources' hold expiry and booking timers.
+    source: ['states/resource-booking.yaml:30', 'states/resource-hold.yaml:33']
 paths:
   /resources:
     get:
@@ -2260,7 +2294,7 @@ paths:
         - "P08 BO-916 Equipment & Asset Allocation"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the experience product whose resource requirements it allocates (409, ResourceRequirement) (CHG-MOD-003)'
       summary: Fill a requirement from the pool, rotating rather than repeating
       description: '**The 26 August decision is the whole of this operation.** *"resource allocation
@@ -3137,7 +3171,7 @@ paths:
         - "P02 GST-075 Book a Space by the Hour"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'whether the product is sold by time window and the variant''s length (422) (CHG-MOD-003)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -3170,7 +3204,10 @@ paths:
 
         **The venue''s step** (ADAM CR-253 option C): with no `stepMinutes` sent, the starts fall on the venue''s
         own `VenueSettings.stepMinutes` (its tenant default where the venue sets none), read in process
-        (`tenancy#venueSettingsRecords`, XDR-004).
+        (`tenancy#venueSettingsRecords`, XDR-004). **An omitted `stepMinutes` is absent** (ADAM CR-484, Chinmay, 3
+        November 2026; CHG-CR484-001): the step is the venue''s `stepMinutes`, else the tenant''s saved
+        `stepMinutes`, else 30, the same value `getVenueSettingsDefaults` answers; the parameter carries no default
+        of its own to fill the value before the venue is asked. A sent 15, 30 or 60 wins.
 
         **Date, start and duration are checked together** (decided 29 September, W9 and W10). A start is
         offered only when a room is free for the whole of `startsAt` to `startsAt + durationMinutes`, plus
@@ -3218,15 +3255,16 @@ paths:
           format: date
       - name: stepMinutes
         in: query
-        description: Spacing of the offered start times. Omitted, the venue's `VenueSettings.stepMinutes` (ADAM
-          CR-253), itself proposed 30, client to correct (rev 3 REV3-13).
+        description: 'Spacing of the offered start times. A sent 15, 30 or 60 wins. Omitted, it is read as absent
+          (no default fills it before the venue is asked): the venue''s `VenueSettings.stepMinutes`, else the
+          tenant''s saved `stepMinutes`, else 30, the value `getVenueSettingsDefaults` answers (ADAM CR-253, CR-484),
+          itself proposed, client to correct (rev 3 REV3-13).'
         schema:
           type: integer
           enum:
           - 15
           - 30
           - 60
-          default: 30
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue

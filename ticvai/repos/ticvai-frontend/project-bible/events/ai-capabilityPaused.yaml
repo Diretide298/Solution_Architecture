@@ -39,11 +39,6 @@ consumers:
   idempotencyKey: capabilityKey+pausedAt
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Governance analytics
-  idempotencyKey: capabilityKey+pausedAt
-  onFailure: retry
-  isCritical: false
 retention: Two years, with the governance records
 notes: 'Surfaces that show the capability read its state from `listAiCapabilities`; this event lets them
   stop showing it at once rather than on their next load.

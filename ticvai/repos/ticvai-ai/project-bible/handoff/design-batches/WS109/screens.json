@@ -107,13 +107,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Each holder record shall display) and no metric row",
   "purpose": "Central searchable directory of all accreditation holders.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack ACCREDITATION.pdf, page 10 §Each holder record shall display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

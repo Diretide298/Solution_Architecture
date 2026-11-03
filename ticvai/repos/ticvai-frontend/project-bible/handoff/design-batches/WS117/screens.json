@@ -1100,11 +1100,6 @@
   "division": "Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-484, ADM-485, ADM-486; this screen is Pricing & Commercial Configuration (pack AI_Configuration_Assistant_Reference.pdf, board 2.5, page 30): convert commercial requirements into proposed pricing, tax, fee, and commercial rules using TICVAI's existing Pricing architecture.",
   "gaps": [
    {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 30 §Show"
-   },
-   {
     "operation": "setChannelPricingCommercial",
     "removed": true,
     "why": "Removed 2 October 2026 (CHG-WIR-012): The assistant only drafts (ADR-0020); pricing is written by the plan's executor after approval, through the owning API, so the direct write setChannelPricingCommercial comes off this screen (design-notes correction ai ADM-483).",
@@ -2083,7 +2078,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Link Existing, Configure Later, Ask AI. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 4 operations.** Unserved: Link Existing, Configure Later, Ask AI. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Configuration_Assistant_Reference.pdf, page 36 §Actions"
    }
   ],

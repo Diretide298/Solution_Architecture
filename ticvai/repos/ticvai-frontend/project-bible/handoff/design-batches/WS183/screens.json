@@ -252,13 +252,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§For each node configure) and no display directory — it is settings, not a population",
   "purpose": "Allow TICVAI administrators to visually configure the customer journey and recommendation-enabled touchpoints.",
   "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Customer Journey Map & Touchpoint Designer (pack Upsell,CrossSellEngine.pdf, board 4.2, page 95): allow TICVAI administrators to visually configure the customer journey and recommendation-enabled touchpoints.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Customer Journey Map & Touchpoint Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -443,7 +437,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Current product, Basket value, Guest count, Guest type, Current venue, Selected date, Selected timeslot, Current channel …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved: Current product, Basket value, Guest count, Guest type, Current venue, Selected date, Selected timeslot, Current channel …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 97 §Support"
    },
    {
@@ -626,13 +620,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage recommendation behavior before transaction completion.",
   "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Pre-Purchase & Booking Journey Recommendation Manager (pack Upsell,CrossSellEngine.pdf, board 4.4, page 99): manage recommendation behavior before transaction completion.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Pre-Purchase & Booking Journey Recommendation Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -787,13 +775,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Continue the commercial journey after payment while respecting the guest's existing purchase and visit plan.",
   "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Post-Purchase & Pre-Visit Recommendation Manager (pack Upsell,CrossSellEngine.pdf, board 4.5, page 101): continue the commercial journey after payment while respecting the guest's existing purchase and visit plan.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Post-Purchase & Pre-Visit Recommendation Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -1245,13 +1227,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Coordinate recommendations across channels so customers receive a consistent experience.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 106 §Track"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

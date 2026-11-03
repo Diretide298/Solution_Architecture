@@ -1112,8 +1112,7 @@
       {
        "kind": "primaryButton",
        "label": "POS Print",
-       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Support",
-       "permission": "Print"
+       "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Support"
       },
       {
        "kind": "secondaryButton",

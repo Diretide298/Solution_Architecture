@@ -929,7 +929,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.transfer_rule
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:

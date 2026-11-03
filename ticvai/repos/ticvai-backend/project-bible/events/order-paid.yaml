@@ -73,11 +73,6 @@ consumers:
   idempotencyKey: orderId
   onFailure: retry
   isCritical: false
-- context: reporting
-  purpose: Update the sales read model
-  idempotencyKey: orderId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Recommendation attribution through the order lines' recommendationId, risk velocity and
     entity risk on the guest, device and channel, and forecasting actuals (AI system design section

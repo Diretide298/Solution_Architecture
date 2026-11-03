@@ -241,7 +241,9 @@
        "derived": true,
        "impliedBy": "createSeatMap",
        "label": "Create seat map",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "createSeatMap",
+       "provenance": "contract seating.yaml POST /seat-maps; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       },
       {
        "kind": "secondaryButton",
@@ -281,16 +283,6 @@
     "purpose": "Start a new map",
     "trigger": "onAction",
     "invalidates": [
-     "listSeatMaps"
-    ]
-   },
-   {
-    "operationId": "updateSeatMap",
-    "contract": "seating",
-    "purpose": "Save the canvas",
-    "trigger": "onAction",
-    "invalidates": [
-     "getSeatMap",
      "listSeatMaps"
     ]
    },
@@ -342,6 +334,27 @@
      ]
     },
     "provenance": "contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (CHG-R6-035)"
+   },
+   {
+    "id": "formCreateSeatMap",
+    "component": "modal",
+    "trigger": "Create seat map",
+    "body": "**Collects what `createSeatMap` sends before it is called.** Required: `name`, `venueId`. Optional: `description`, `templateId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateSeatMapRequest",
+    "confirm": {
+     "label": "Create seat map",
+     "operation": "createSeatMap"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "venueId",
+      "description",
+      "templateId"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /seat-maps; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
    }
   ],
   "_platform": {

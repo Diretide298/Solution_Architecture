@@ -144,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-007` | Select Date & Time | A | 27 | 31 | 6 | 22 | 28 | 0 | guest | notStarted (client-verified) |
+| `GST-007` | Select Date & Time | A | 31 | 31 | 6 | 22 | 28 | 0 | guest | notStarted (client-verified) |
 | `GST-008` | Tickets & Add-ons | A | 27 | 66 | 6 | 30 | 25 | 0 | guest | notStarted (client-verified) |
 | `GST-048` | Upsell / Cross-Sell | A | 27 | 10 | 5 | 57 | 9 | 0 | guest | approved (client-verified) |
 | `GST-049` | Interactive Seat Selection | A | 8 | 39 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |

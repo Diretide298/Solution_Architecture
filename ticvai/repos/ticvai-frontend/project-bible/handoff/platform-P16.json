@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 71,
@@ -15,7 +15,7 @@
   "contracts": 10,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 134
+  "operationsWithNoScreen": 130
  },
  "waves": {
   "wave1": 4,
@@ -65,11 +65,11 @@
    "operations": 1
   },
   {
-   "contract": "catalogue",
+   "contract": "promotions",
    "operations": 1
   },
   {
-   "contract": "promotions",
+   "contract": "catalogue",
    "operations": 1
   }
  ],
@@ -795,12 +795,6 @@
     "summary": "What happens to tickets, reservations and guests when an event changes, by default"
    },
    {
-    "operation": "getPlanBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Which benefits a plan grants, and how much of each"
-   },
-   {
     "operation": "getProductChannelTexts",
     "contract": "catalogue",
     "verb": "GET",
@@ -835,12 +829,6 @@
     "contract": "catalogue",
     "verb": "GET",
     "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listMembershipBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Benefits a plan can grant"
    },
    {
     "operation": "listMembershipProgrammes",
@@ -1119,6 +1107,12 @@
     "summary": "Send, resend or correct participant waiver requirements, one or in bulk"
    },
    {
+    "operation": "createGuestDocumentUpload",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue the key and a signed upload URL for a guest document"
+   },
+   {
     "operation": "createInvitationCampaign",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -1153,12 +1147,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverTesting",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Checklist, rule simulation and approval record of a waiver version"
    },
    {
     "operation": "issueReward",
@@ -1449,12 +1437,6 @@
     "summary": "List allocation split definitions"
    },
    {
-    "operation": "listBundles",
-    "contract": "promotions",
-    "verb": "GET",
-    "summary": "List bundles"
-   },
-   {
     "operation": "previewAllocationSplit",
     "contract": "promotions",
     "verb": "POST",
@@ -1483,12 +1465,6 @@
     "contract": "reporting",
     "verb": "GET",
     "summary": "Thresholds being watched"
-   },
-   {
-    "operation": "getConfigurationProfile",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "One profile, at its latest version or at a named one"
    },
    {
     "operation": "getConnectivityPolicy",

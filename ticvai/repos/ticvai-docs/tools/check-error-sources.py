@@ -133,7 +133,10 @@ NOT_ENTITY = re.compile(r"\b(?:in order (?:to|for)|sort order|display order|orde
                         r"tile order|in one order|out-of-order|converted (?:to|for) (?:an|another) order|"
                         r"layout variants?|product kinds?|card or wallet|card payments?|wallet pass(?:es)?|"
                         r"(?:apple|google) wallet|wallet auto-reload|times a shift|needs-promotion|"
-                        r"on a registered workstation|taking payment)\b|`order`|`cart` hold"
+                        r"on a registered workstation|taking payment|"
+                        # a Workforce problem-type slug (ADAM CR-441's open-shift-incomplete; r13 integration,
+                        # CHG-R13INT-003): it names Workforce's open shift, not Orders' till shift
+                        r"open-shift-[a-z-]+)\b|`order`|`cart` hold"
                         # a backticked module key or product kind, a code and not the record (ADAM CR-385, r12
                         # integration, CHG-R12INT-004): the kiosk publish checks list White Label's modules
                         # (`membership` `membership`, `walletTopUp` `wallet`) and catalogue's product kinds

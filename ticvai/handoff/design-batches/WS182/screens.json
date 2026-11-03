@@ -93,13 +93,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population",
   "purpose": "Provide centralized visibility into cross-sell relationships, recommendation performance, attach rates and commercial opportunities.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 64 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -307,18 +301,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Experience Extension, Destination Extension, Service Add-On, Partner Product. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: Experience Extension, Destination Extension, Service Add-On, Partner Product. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 66 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 66 §Identify"
-   },
-   {
-    "operation": null,
-    "why": "**Cross-Sell Relationship Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    }
   ],
   "layout": {
@@ -629,13 +613,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Analyze transaction baskets to discover products commonly purchased together.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 70 §Analyze"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -783,11 +761,6 @@
   "purpose": "Manage recommendations across TICVAI's different commercial modules. This is especially important because TICVAI is not only a ticketing platform.",
   "division": "Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-650, ADM-660, ADM-664; this screen is Cross-Category Recommendation Manager (pack Upsell,CrossSellEngine.pdf, board 3.5, page 71): manage recommendations across TICVAI's different commercial modules. This is especially important because TICVAI is not only a ticketing platform.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Cross-Category Recommendation Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1466,13 +1439,7 @@
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Allow administrators to test cross-sell strategies and AI recommendations before activation. ↓",
   "division": "Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-648, ADM-658, ADM-688, ADM-698; this screen is Cross-Sell Simulator & AI Opportunity Advisor (pack Upsell,CrossSellEngine.pdf, board 3.10, page 79): allow administrators to test cross-sell strategies and AI recommendations before activation. ↓.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 79 §Track"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

@@ -188,8 +188,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/accreditation-executive-dashboard-bo-684` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The management view of the whole accreditation operation: how many holders, at which status, how many credentials issued and active, how many actually used (attended vs issued), with drill-down into the records. Per VO-R02 it is a dashboard of KPI tiles and charts, the landing page of the analytics board. The one thing to get right: utilisation (used over issued) is the headline the client asked for, and every tile drills to the underlying records.
 
 **Known correction pending (do not draw the wrong version)**
@@ -601,8 +599,6 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/access-venue/accreditation-utilization-analytics-bo-686` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Whether issued accreditations are actually used: issued, activated, used, never used, first and last use, number of access transactions, and utilisation by category, venue and event. DI-665's example is 1,000 passes issued and 700 scanned. The one thing to get right: the definitions are fixed and shown (Utilisation = used / issued; Never used = issued - used), and the figures come from Access Control scans, not a second validation logic.
 

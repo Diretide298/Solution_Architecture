@@ -230,3 +230,14 @@ def test_paren_and_shown_word_helpers():
     t = "The limit is set per country (`A.b`). One countdown: `C.d`."
     assert sv.in_parens(t, t.index("`A.b`")) and not sv.in_parens(t, t.index("`C.d`"))
     assert sv.shown(t, t.index("`C.d`")) and not sv.shown(t, t.index("`A.b`"))
+
+
+def test_r13_a_field_the_schema_no_longer_has():
+    """CHG-R13RVB-003: `BookingFlowConfig.quickTour` after W12 moved quickTour to BookingFlow.settings. Read even in a
+    sentence that cites a rule, where SV-FIELD's precision rules look away."""
+    s = screen("WEB-005", components=[{"kind": "iconButton", "label": "Quick tour",
+                                       "notes": "Replays the tour (when `Cart.quickTour` is on)."}],
+               apis=[("getSeats", "onLoad")])
+    assert ("SV-NO-SUCH-FIELD", "WEB-005:Cart.quickTour") in run(s)
+    s["layout"]["regions"][0]["components"][0]["notes"] = "Replays the tour (when `Cart.expiresAt` has passed)."
+    assert not {f for f in run(s) if f[0] == "SV-NO-SUCH-FIELD"}

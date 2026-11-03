@@ -792,6 +792,20 @@
     "maxLength": 500,
     "description": "The `note` the latest `freezeEntitlement` took, required there when `reason` is `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes has something to read."
    },
+   "frozenFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The freeze window's first day** (ADAM CR-543; Chinmay, 3 November 2026): written by `freezeEntitlement` from its `from`. A freeze covers today when `frozenFrom` is on or before today and `frozenUntil` is null or on or after today. Null when never frozen."
+   },
+   "frozenUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The freeze window's last day** (ADAM CR-543): written by `freezeEntitlement` from its `to`; null means open-ended."
+   },
    "isNameBound": {
     "type": "boolean",
     "default": false
@@ -1962,7 +1976,7 @@
   }
  },
  "MembershipActivationView": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "grant-holder-write",
   "type": "object",
   "x-ticvai-persistence": "orders.membership_activation_action",
   "description": "**One action taken on a membership in the activation queue.** Written by `resolveMembershipActivation` (decided 29 September, readiness close-out).\n",

@@ -161,7 +161,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/equipment-asset-command-center-bo-903` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-001): A resource cost table and a primary "Create resource cost" button sat on the command centre; cost entry belongs on cost analytics (BO-945, which declares both) … Removed 2 October 2026 (CHG-WIR-001): A resource cost table and a primary "Create resource cost" button sat on the command centre; cost entry belongs on cost analytics (BO-945, which declares both) …
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-001): A resource cost table and a primary "Create resource cost" button sat on the command centre; cost entry belongs on cost analytics (BO-945, which declares both) … Removed 2 October 2026 (CHG-WIR-001): A resource cost table and a primary "Create resource cost" button sat on the command centre; cost entry belongs on cost analytics (BO-945, which declares both) …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The physical estate at a glance for operations: how many items exist, how many are available, out with guests, due back, overdue, in maintenance, due inspection, damaged, lost or retired, what they are worth (for those allowed to see money), and the alerts that need someone now. The one thing to get right: every number is a tile that opens the filtered list, and the alerts name the item and the place ("Towel inventory at Waterpark Zone B below threshold").
 
@@ -751,8 +751,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `bookingId` (navigation) |
 | Route | `/rentals/guest-resource-assignment-bo-907` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Food, Beverage & Retail process.** Which guest holds which resource right now.
 
 **Known correction pending (do not draw the wrong version)**
@@ -904,8 +902,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `bookingId` (navigation) |
 | Route | `/rentals/rental-duration-extension-return-management-bo-908` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Food, Beverage & Retail process.** Extensions, overdue items and returns for resources, with usage-based charging at return (paid 1 h, used 3 h → 2 extra hours).
 
 #### Inputs: what the user enters or picks
@@ -1048,8 +1044,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/deposit-rental-financial-control-bo-909` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Food, Beverage & Retail process.** Deposit and fee policy for resources (see BO-529/BO-531, which write the same policies).
 
@@ -1656,8 +1650,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `assetId` (navigation), `resourceId` (navigation) |
 | Route | `/rentals/asset-lifecycle-depreciation-retirement-bo-912` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The life of a physical item from order to disposal: lifecycle timeline, acquisition and warranty facts, depreciation reference (method, useful life, accumulated, net book value), maintenance and utilisation history, a retirement assessment with a replacement recommendation, and the retirement workflow with approvals and disposal details. The one thing to get right: Finance owns the accounting; this screen holds operational references and makes sure a retired item never appears available again.
 

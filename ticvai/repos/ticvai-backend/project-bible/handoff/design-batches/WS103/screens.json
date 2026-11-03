@@ -80,7 +80,8 @@
      "trigger": "Module Activation & Dependency Validation",
      "provenance": "structural — pack board 6 wiring, 11 September 2026",
      "carries": [
-      "tenantId"
+      "tenantId",
+      "cellId"
      ]
     },
     {
@@ -1396,6 +1397,12 @@
      "name": "tenantId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "cellId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Held only to carry back: ADM-419 needs it, ADM-419 opens this screen with it, and nothing this screen reads has a cell id (`Tenant` has `cellHost`) (r13, CHG-RCR33-001)."
     }
    ]
   },

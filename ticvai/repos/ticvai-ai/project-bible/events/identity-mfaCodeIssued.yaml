@@ -1,0 +1,59 @@
+# identity.mfaCodeIssued v1 — published by identity
+# Checked by tools/check-states.py against states/ and the contracts.
+# Restored 3 November 2026 (CHG-R13INT-019): the r13 lane w4 commit (eb4a3e65) wrote this file empty. Every line
+# below is read from the committed contracts: identity.yaml enrolMfaMethod and createMfaChallenge (ADAM CR-522) and
+# marketing-crm.yaml x-ticvai-jobs.mfaCodeSender.
+
+name: identity.mfaCodeIssued
+version: 1
+publisher: identity
+description: An emailOtp code was issued for a sign-in, step-up or enrolment challenge, for Marketing to send to the
+  person by email (ADAM CR-522, Chinmay, 3 November 2026).
+aggregate: principal
+emittedWhen: 'createMfaChallenge or enrolMfaMethod issues an emailOtp code: written to the outbox in the same
+  transaction as the mfa_challenge row. A totp challenge sends nothing'
+emittedBy:
+- identity.createMfaChallenge
+- identity.enrolMfaMethod
+payload:
+- field: challengeId
+  type: uuid
+  notes: The mfa_challenge row. The idempotency key of the consumer
+- field: principalId
+  type: uuid
+  required: false
+  notes: The staff or partner principal the code is for; one of principalId and subjectId is set
+- field: subjectId
+  type: uuid
+  required: false
+  notes: The guest the code is for
+- field: action
+  type: string
+  notes: What the code proves (sign-in, step-up or enrolment)
+- field: locale
+  type: string
+  notes: The person's language, which the email is sent in
+- field: expiresAt
+  type: timestamp
+  notes: mfa_challenge.expires_at, ten minutes after issue; the consumer retries until then
+- field: destination
+  type: string
+  notes: The email address, field-encrypted through IFieldEncryption, never in clear
+- field: code
+  type: string
+  notes: The 6 random digits, field-encrypted through IFieldEncryption, never in clear; Identity stores only its PHC
+    hash
+consumers:
+- context: marketing
+  purpose: 'Send the code by email through the tenant''s configured email provider, in the person''s language
+    (x-ticvai-jobs mfaCodeSender): destination and code are decrypted at send time, and a transactional
+    marketing.message_dispatch row is recorded without the code'
+  writes:
+  - marketing.message_dispatch
+  idempotencyKey: challengeId
+  onFailure: retry
+  isCritical: true
+retention: until expiresAt
+notes: 'Retried until expiresAt and never dead-lettered (marketing-crm.yaml mfaCodeSender). Until the consumer is on
+  dev, Identity''s delivery seam records only that a code was issued, never the code. **Not offered to webhooks**: it
+  carries a one-time code.'

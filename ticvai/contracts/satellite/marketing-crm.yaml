@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 234
+  x-ticvai-screen-count: 235
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -1955,10 +1955,10 @@ paths:
   /form-submissions:
     post:
       operationId: submitForm
-      x-ticvai-names-for-context: [pii.subject]
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
+      x-ticvai-names-for-context: [pii.subject]
       x-ticvai-reads:
       - table: marketing.waiver_version_control
         for: 'the submitted form version''s resign rule, whether an earlier version''s live acceptance counts (Marketing''s
@@ -2646,10 +2646,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSeoMetadata
-      x-ticvai-names-for-context: [control.url_redirect]
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
+      x-ticvai-names-for-context: [control.url_redirect]
       x-ticvai-body-key: [entityId]
       x-ticvai-body-key-note: 'Keyed by the body''s `entityId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per entity and locale within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Titles, descriptions, canonicals and hreflang

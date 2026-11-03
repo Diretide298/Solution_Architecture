@@ -102,7 +102,11 @@ it refuses the ports 4173, 8787 and 8798 (a local ADAM another session may be ru
 
 ## 5. Tag
 Once everything is green, the rehearsal pull included (section 4):
-1. Commit.
+1. Commit. The commit carries its own release bundle: `python3 tools/check-adam-latest-release.py --tag r<N>` fails
+   unless `handoff/service-docs/op-release.json` says `r<N>` (rule LR-BUNDLE). ADAM shows a ticket's text from that
+   bundle only when it is the served tag's, and otherwise falls back to the plan row, which lacks the pointer's scope,
+   repository and design lines: the r12 rehearsal's candidate still had r11's bundle, and #27985 lost them (r13 root
+   R12, CHG-R13R12-001). Rebuild it with `python3 tools/op-release.py --release r<N>` and commit it first.
 2. `git tag r<N>` on the package **and** the six mirror repos.
 3. Push the branch **and the tag by name** to both remotes: `git push origin main r<N>`, then
    `git push github main r<N>`; the same push of its branch and `r<N>` in each of the six mirror repos. A bare

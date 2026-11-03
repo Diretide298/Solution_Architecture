@@ -35,7 +35,7 @@
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-049 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-049 holds none of them. The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its own"
     },
     {
      "to": "BO-080",
@@ -1144,7 +1144,7 @@
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-078 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-078 holds none of them. The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its own"
     },
     {
      "to": "BO-081",
@@ -1536,12 +1536,12 @@
     {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-079 holds none of them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078 opens on its own"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-079 holds none of them. The edge carries nothing: BO-078 finds requisitionId (listRequisitions) itself, and BO-078 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-079 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-079 holds none of them. The edge carries nothing: BO-080 finds transferId (listStockTransfers) itself, and BO-080 opens on its own"
     },
     {
      "to": "BO-081",
@@ -2001,12 +2001,12 @@
     {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-080 holds none of them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078 opens on its own"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-080 holds none of them. The edge carries nothing: BO-078 finds requisitionId (listRequisitions) itself, and BO-078 opens on its own"
     },
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-080 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-080 holds none of them. The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its own"
     },
     {
      "to": "BO-081",
@@ -2306,12 +2306,12 @@
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-081 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-081 holds none of them. The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-081 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-081 holds none of them. The edge carries nothing: BO-080 finds transferId (listStockTransfers) itself, and BO-080 opens on its own"
     }
    ]
   },
@@ -2680,12 +2680,12 @@
     {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-082 holds none of them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078 opens on its own"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-082 holds none of them. The edge carries nothing: BO-078 finds requisitionId (listRequisitions) itself, and BO-078 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-082 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-082 holds none of them. The edge carries nothing: BO-080 finds transferId (listStockTransfers) itself, and BO-080 opens on its own"
     }
    ]
   },

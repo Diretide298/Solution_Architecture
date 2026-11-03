@@ -35,11 +35,6 @@ consumers:
   idempotencyKey: requestId + completedLevel
   onFailure: retryThenDeadLetter
   isCritical: false
-- context: reporting
-  purpose: Per-level processing time
-  idempotencyKey: requestId + completedLevel
-  onFailure: retry
-  isCritical: false
 retention: Retained with the request. This is an audit record, not an operational message
 notes: '**Added 29 September (build pass, group RD).** A level approved on a pending request that stays pending is
   not a status change, so states/approval-request.yaml credits this on escalated to pending and the operation emits

@@ -83,8 +83,8 @@ screens:
     - to: ADM-004
       trigger: Platform Audit Log
       provenance: 'derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-001
-        holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (deep
-        link or optional), and ADM-004 opens on its own'
+        holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (optional),
+        and ADM-004 opens on its own'
     - to: PTR-001
       trigger: A partner user signs in through the same door
       provenance: flow F104 step 3→4
@@ -606,13 +606,11 @@ screens:
     - to: ADM-022
       trigger: Release & Version Management
       provenance: 'derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them.
-        The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-022 opens
-        on its own'
+        The edge carries nothing: releaseId only pre-selects (optional), and ADM-022 opens on its own'
     - to: ADM-023
       trigger: Staging Promotion & Approval
       provenance: 'derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them.
-        The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-023 opens
-        on its own'
+        The edge carries nothing: releaseId only pre-selects (optional), and ADM-023 opens on its own'
     - to: ADM-026
       trigger: End-of-Support Notice Management
       carries:
@@ -622,8 +620,8 @@ screens:
     - to: ADM-027
       trigger: Database Migration Console
       provenance: 'derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them.
-        The edge carries nothing: runId only pre-selects (deep link or optional), and ADM-027 opens on
-        its own'
+        The edge carries nothing: ADM-027 finds runId (applyMigration) itself, and ADM-027 opens on its
+        own'
     - to: ADM-029
       trigger: Deployment Monitor
       carries:
@@ -645,8 +643,8 @@ screens:
     - to: ADM-032
       trigger: WAF & Security Policy View
       provenance: 'derived — ADM-032 declares entryState.params cellId, wafRuleId and ADM-002 holds none
-        of them. The edge carries nothing: cellId, wafRuleId only pre-select (deep link or optional),
-        and ADM-032 opens on its own'
+        of them. The edge carries nothing: cellId, wafRuleId only pre-select (optional), and ADM-032 opens
+        on its own'
     - to: ADM-033
       trigger: Backup & DR Status
       carries:
@@ -656,8 +654,7 @@ screens:
     - to: ADM-034
       trigger: Archival Job Monitor
       provenance: 'derived — ADM-034 declares entryState.params cellId and ADM-002 holds none of them.
-        The edge carries nothing: cellId only pre-selects (deep link or optional), and ADM-034 opens on
-        its own'
+        The edge carries nothing: cellId only pre-selects (optional), and ADM-034 opens on its own'
     - to: ADM-037
       trigger: AI Provider & Credentials
       carries:
@@ -667,8 +664,8 @@ screens:
     - to: ADM-318
       trigger: Dead Letters
       provenance: 'derived — ADM-318 declares entryState.params deadLetterId, republishId and ADM-002
-        holds none of them. The edge carries nothing: deadLetterId, republishId only pre-select (deep
-        link or optional), and ADM-318 opens on its own'
+        holds none of them. The edge carries nothing: deadLetterId, republishId only pre-select (optional),
+        and ADM-318 opens on its own'
     - to: ADM-024
       trigger: Release Notification Composer
       provenance: structural — ADM-002 is P09's home screen and its exits are its launcher
@@ -985,9 +982,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-003 holds none of them. The edge
@@ -996,8 +993,8 @@ screens:
     - to: ADM-004
       trigger: Platform Audit Log
       provenance: 'derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-003
-        holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (deep
-        link or optional), and ADM-004 opens on its own'
+        holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (optional),
+        and ADM-004 opens on its own'
     - to: SCN-003
       trigger: Guest scans at the other venue
       provenance: flow F19 step 2→3
@@ -1306,9 +1303,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-004 holds none of them. The edge
@@ -1544,9 +1541,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-005 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-005 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-005 holds none of them. The edge
@@ -2056,9 +2053,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-006 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-006 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-006 holds none of them. The edge
@@ -2417,9 +2414,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-007 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-007 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-007 holds none of them. The edge
@@ -2709,9 +2706,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-008 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-008 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-008 holds none of them. The edge
@@ -3146,9 +3143,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-009 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-009 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-009 holds none of them. The edge
@@ -3396,9 +3393,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-010 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-010 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-010 holds none of them. The edge
@@ -3601,9 +3598,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-011 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-011 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-011 holds none of them. The edge
@@ -3915,9 +3912,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-012 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-012 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-012 holds none of them. The edge
@@ -4172,9 +4169,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-013 holds none of them. The edge
@@ -4370,9 +4367,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-014 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-014 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-014 holds none of them. The edge
@@ -4581,9 +4578,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-015 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-015 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-015 holds none of them. The edge
@@ -5020,9 +5017,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-016 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-016 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-016 holds none of them. The edge
@@ -5528,9 +5525,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-017 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-017 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-017 holds none of them. The edge
@@ -6078,9 +6075,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-019 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-019 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-019 holds none of them. The edge
@@ -6330,9 +6327,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-020 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-020 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-020 holds none of them. The edge
@@ -6600,9 +6597,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-021 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-021 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-021 holds none of them. The edge
@@ -7123,9 +7120,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-022 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-022 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-022 holds none of them. The edge
@@ -7395,9 +7392,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-023 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-023 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-023 holds none of them. The edge
@@ -7629,9 +7626,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-024 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-024 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-024 holds none of them. The edge
@@ -7810,9 +7807,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-025 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-025 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-025 holds none of them. The edge
@@ -7951,9 +7948,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-026 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-026 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-026 holds none of them. The edge
@@ -8228,9 +8225,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-027 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-027 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-027 holds none of them. The edge
@@ -8463,9 +8460,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-028 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-028 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-028 holds none of them. The edge
@@ -8836,9 +8833,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-029 holds none of them. The edge
@@ -9148,9 +9145,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-030 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-030 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-030 holds none of them. The edge
@@ -9338,9 +9335,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-031 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-031 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-031 holds none of them. The edge
@@ -9630,9 +9627,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-032 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-032 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-032 holds none of them. The edge
@@ -9821,9 +9818,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-033 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-033 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-033 holds none of them. The edge
@@ -9992,9 +9989,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-034 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-034 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-034 holds none of them. The edge
@@ -10138,9 +10135,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-035 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-035 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-035 holds none of them. The edge
@@ -10296,9 +10293,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-036 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-036 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-036 holds none of them. The edge
@@ -11008,10 +11005,10 @@ screens:
     configuration.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 4 operations.** Unserved: Create
-      Tax Profile, Create Fee, Create Calculation Profile, Run Simulation, Validate Configuration, View
-      Dependencies. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 4 operations.** Unserved:
+      Create Tax Profile, Create Fee, Create Calculation Profile, Run Simulation, Validate Configuration,
+      View Dependencies. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions
   layout:
     template: split
@@ -11295,9 +11292,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-318 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-318 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
   notes: 'Added 4 September. **47 consumers declare `retryThenDeadLetter` and all 47 are marked `isCritical`,
     and until this screen existed nothing in the package read the table they land in.** Deliberately not
     DEV-005 Webhooks: `replayEvents` is partner-facing redelivery of a customer''s own integration, and
@@ -14987,10 +14984,10 @@ screens:
   purpose: Govern changes to all commercial, VSI, licensing, billable-unit and pricing rules.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved:
-      Revised Board 3 — Critical Architecture, 1. Operational Classification. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Revised
+      Board 3 — Critical Architecture, 1. Operational Classification. Each needs an operation, or needs
+      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
+      the contract side.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -17221,10 +17218,10 @@ screens:
     template after subscription/trial activation.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved:
-      Retry / Investigate / Assign / Escalate, Revised Board 5 — Commercial Model Behavior. Each needs
-      an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
-      screen side rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Retry
+      / Investigate / Assign / Escalate, Revised Board 5 — Commercial Model Behavior. Each needs an operation,
+      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
+      rather than the contract side.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Actions
   layout:
     template: split
@@ -20931,10 +20928,9 @@ screens:
   purpose: Finalize renewal and synchronize the approved future commercial agreement across TICVAI.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
-      Revised Board 10 — Commercial Model Calculation. Each needs an operation, or needs removing from
-      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
-      side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Revised
+      Board 10 — Commercial Model Calculation. Each needs an operation, or needs removing from the screen;
+      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 133 §Actions
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,

@@ -2753,7 +2753,7 @@ Board 3. **`getKitchenSla` was drawn on the board and nothing set the target.** 
 **`PUT /substitution-rules`**: What may replace what
 
 Board 2L. **A kitchen substitutes constantly and the package could not say which swaps are allowed.**
-**`requiresApproval` defaults true wherever the swap changes an allergen.** A chef may substitute freely within a claim; changing the claim is somebody else's decision.
+**`requiresApproval` defaults true wherever the swap changes an allergen.** A chef may substitute freely within a claim; changing the claim is somebody else's decision. The rule, on the field (r13 root R41): a rule sent without `requiresApproval` whose `allergensAdded` or `allergensRemoved` is not empty is stored with `requiresApproval` true; without either, false (the schema default).
 **A rule belongs to a recipe** (decided 28 September, audit R125 (10)): each rule names its `recipeId`, not a menu item and not the whole venue, because a swap that is safe in one dish is not safe in another. A rule whose recipe does not exist is refused `400`.
 **Saving re-runs `verifyAllergens`** for every menu item whose recipe the rules touch (audit R241).
 
@@ -3150,6 +3150,7 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Updated |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -3867,6 +3868,7 @@ Computed from the outlet's `FnbDeliveryPolicy` and its current load: ASAP plus f
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Open slots |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |

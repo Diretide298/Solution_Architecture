@@ -737,3 +737,232 @@ changes:
     rule''s fields setDynamicPriceRule takes: name, dimension, that dimension''s channel, segment or location, the
     adjustment range, protection, dynamic pricing on or off, priority and active.'
   change: CHG-CR410-001
+- screen: WEB-022
+  field: 'navigation'
+  to: 53ee00c7d3efbd6e
+  approval: 'The lead''s own design decision on ADAM CR-482 (raised by Chitrangi Mestry on #31742, settled 2 November 2026 by
+    Chinmay, not as recommended): "The page keeps the client-verified frame, basket included, because the package does not
+    change approved UI and every part of the frame except two already has an operation ... WEB-022''s screen record, its
+    approved-UI entry and its page info are brought in line with the frame at the next release." The client-verified rev 3
+    frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws Continue into the membership booking flow (WEB-011); the record is
+    brought in line with it, and what the client sees does not change.'
+  change: CHG-CR482-001
+- screen: WEB-022
+  field: 'region:collection'
+  to: c7550e2a2510e2da
+  approval: 'The lead''s own design decision on ADAM CR-482 (raised by Chitrangi Mestry on #31742, settled 2 November 2026 by
+    Chinmay, not as recommended): "The page keeps the client-verified frame, basket included, because the package does not
+    change approved UI and every part of the frame except two already has an operation ... WEB-022''s screen record, its
+    approved-UI entry and its page info are brought in line with the frame at the next release." The client-verified rev 3
+    frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws each plan card''s price, term line, badge, saving, What you get list and Choose button, and the decision
+    adds the mark on a plan the guest already holds (getMyMemberships); the record is
+    brought in line with it, and what the client sees does not change.'
+  change: CHG-CR482-001
+- screen: WEB-022
+  field: 'region:selection'
+  to: 5dc2710f3e867bb1
+  approval: 'The lead''s own design decision on ADAM CR-482 (raised by Chitrangi Mestry on #31742, settled 2 November 2026 by
+    Chinmay, not as recommended): "The page keeps the client-verified frame, basket included, because the package does not
+    change approved UI and every part of the frame except two already has an operation ... WEB-022''s screen record, its
+    approved-UI entry and its page info are brought in line with the frame at the next release." The client-verified rev 3
+    frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws the right panel as the basket: Your membership, subtotal, VAT, total, Continue; the record is
+    brought in line with it, and what the client sees does not change.'
+  change: CHG-CR482-001
+- screen: WEB-022
+  field: 'state:emptyFirstRun'
+  to: a06731d485d846c0
+  approval: 'The lead''s own design decision on ADAM CR-482 (raised by Chitrangi Mestry on #31742, settled 2 November 2026 by
+    Chinmay, not as recommended): "The page keeps the client-verified frame, basket included, because the package does not
+    change approved UI and every part of the frame except two already has an operation ... WEB-022''s screen record, its
+    approved-UI entry and its page info are brought in line with the frame at the next release." The client-verified rev 3
+    frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws a page with nothing to choose leaving the basket empty and Continue off; the record is
+    brought in line with it, and what the client sees does not change.'
+  change: CHG-CR482-001
+- screen: EMP-002
+  field: 'region:collection'
+  to: ac43a2f7dc55c2e2
+  approval: 'The lead''s decision of 20 October 2026 on R8 blocker cause IDENTITY-C45 (CHG-R8SPN-032; "take the
+    recommendation, option A: chosen; a role held at two venues shows two cards"), whose entry says "the card gains the
+    venue name" and left that to the surface: each role card shows its grant''s venue (RoleSummary.scope.name) beside
+    the role''s name; nothing else on the card or the screen changes.'
+  change: CHG-RCR31-001
+- screen: GST-007
+  field: 'overlay:consentQuestions'
+  to: 82faa311cd19cace
+  approval: 'ADAM CR-493 (raised by Chitrangi Mestry on #31784; settled 3 November 2026 by Chinmay, accepted as built in
+    22143c6 with one condition): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design
+    on their own and log it in ADAM, after which the lead updates the screen''s UI (frontend starter, 28eb978d); this CR
+    is that log. The consent pop-up asks one question at a time and Yes and No answer it (recordConsentAnswers after the
+    last question); the condition: a close (x) in the pop-up''s top corner on every platform discards the answers given
+    so far and records nothing.'
+  change: CHG-CR493-001
+- screen: GST-007
+  field: 'overlay:monthCalendar'
+  to: bb8d04a18497480d
+  approval: 'ADAM CR-493 (raised by Chitrangi Mestry on #31784; settled 3 November 2026 by Chinmay, accepted as built in
+    22143c6), under the lead''s rule of 28 October 2026 (frontend starter, 28eb978d): More dates, the last tile of the
+    day strip, opens the in-app month calendar with Cancel / OK pills; OK picks the date as a strip tile does, Cancel
+    keeps the date the guest had.'
+  change: CHG-CR493-001
+- screen: GST-007
+  field: 'overlay:quickTour'
+  to: 3ec187c9ad2ca375
+  approval: 'ADAM CR-493 (raised by Chitrangi Mestry on #31784; settled 3 November 2026 by Chinmay, accepted as built in
+    22143c6), under the lead''s rule of 28 October 2026 (frontend starter, 28eb978d): the quick tour opens on the first
+    booking visit on this device or from Quick tour, only when the flow''s quickTour is on; its four coach marks are
+    cards with an arrow, End tour unchanged.'
+  change: CHG-CR493-001
+- screen: WEB-005
+  field: 'navigation'
+  to: 5c0d24d7f01e5d5f
+  approval: 'The lead''s decision on ADAM CR-503 (raised by Chinmay Patkar on #31739, settled 3 November 2026 by Chinmay):
+    "If getPerformance answers 404, or the performance is no longer on sale, drop the value and send the guest back to
+    WEB-006 with eventId to pick another time, saying that time is no longer available." A way back the client-verified
+    rev 3 flow already has (Change date or time), for a time that has gone; nothing else the client sees changes.'
+  change: CHG-CR503-001
+- screen: WEB-005
+  field: 'region:collection'
+  to: 2eed2289ad3e1c96
+  approval: 'The client-verified rev 3 frame (wireframes/frames/web-005.html, img/web-005.jpg, Theme park -> Multi-park
+    combo -> Book -> Fri) draws the basket''s Date of visit row; the lead''s decision on ADAM CR-503 (raised by Chinmay
+    Patkar on #31739, settled 3 November 2026 by Chinmay) gives it getPerformance''s Performance.startsAt. The record is
+    brought in line with the approved frame; what the client sees does not change.'
+  change: CHG-CR503-001
+- screen: WEB-005
+  field: 'region:collection'
+  to: fa1fe1ad0593ecc8
+  approval: 'ADAM CR-504 (raised by Chinmay Patkar on #31739, settled 3 November 2026 by Chinmay, the lead''s instruction
+    "Close the CRs and respond to devs"): "the WEB-005 cards stay as the client approved them; Product gains a highlight
+    badge and a rating summary ... WEB-005 (#31739) binds both: highlightBadge is the pill on the card image, shown in
+    capitals as drawn; rating is the star line under the display tags ... Nothing else on the card changes." The
+    client-verified frame (wireframes/P01 Guest Web.dc.html#web-005) draws the POPULAR / BEST VALUE pill and the star
+    line on each ticket card; the record binds the two fields to them, and what the client sees does not change.'
+  change: CHG-CR504-001
+- screen: WEB-005
+  field: 'region:collection'
+  to: 09b4696c39017154
+  approval: 'The two approvals above together, as merged into r13 (3 November 2026): ADAM CR-503''s Date of visit row
+    from getPerformance and ADAM CR-504''s highlight badge and rating on the ticket cards, both settled 3 November 2026
+    by Chinmay on #31739; each entry approved its own change against the earlier content, and this is the content
+    with both. What the client sees is the client-verified frame (wireframes/frames/web-005.html).'
+  change: CHG-R13INT-024
+- screen: ANL-053
+  field: 'overlay:formCreateDashboard'
+  to: 0dbe87e077bdd148
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Create dashboard button needs (createDashboard).'
+  change: CHG-R13INT-029
+- screen: BO-022
+  field: 'overlay:formIssueTaxInvoice'
+  to: 769e4a270d5a4c1f
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the tax invoices of the order: their list, opening one, its PDF, and Issue tax invoice with its form.'
+  change: CHG-R13INT-029
+- screen: BO-022
+  field: 'region:collection'
+  to: 3e8dfb057e672dde
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the tax invoices of the order: their list, opening one, its PDF, and Issue tax invoice with its form.'
+  change: CHG-R13INT-029
+- screen: BO-022
+  field: 'region:rowActions'
+  to: e36f9b6ecfa440e4
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the tax invoices of the order: their list, opening one, its PDF, and Issue tax invoice with its form.'
+  change: CHG-R13INT-029
+- screen: BO-023
+  field: 'region:collection'
+  to: b2c6e974c8f3a164
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the credit memos of the refunds and their PDF.'
+  change: CHG-R13INT-029
+- screen: BO-140
+  field: 'overlay:formSetTemperatureCheckpoint'
+  to: ed35d1bd3961b2fb
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): an Edit action for the Checkpoints table (setTemperatureCheckpoint) with its form.'
+  change: CHG-R13INT-029
+- screen: BO-140
+  field: 'region:rowActions'
+  to: 991e595efead6346
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): an Edit action for the Checkpoints table (setTemperatureCheckpoint) with its form.'
+  change: CHG-R13INT-029
+- screen: BO-154
+  field: 'layout'
+  to: 63f4d57ef268fc76
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-154
+  field: 'overlay:formCreateAdmissionRules'
+  to: 0949c935659e9f15
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-154
+  field: 'region:rowActions'
+  to: 923ca631364ccc25
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-222
+  field: 'overlay:formCreateAdmissionRules'
+  to: 0949c935659e9f15
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-222
+  field: 'region:rowActions'
+  to: e53a980a7c97a846
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-620
+  field: 'overlay:formCreateAccreditationProgramme'
+  to: d9409f50f4150e50
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the forms Create and Edit programme need, and the programmes list.'
+  change: CHG-R13INT-029
+- screen: BO-620
+  field: 'overlay:formUpdateAccreditationProgramme'
+  to: e626ffb3c7cc68e7
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the forms Create and Edit programme need, and the programmes list.'
+  change: CHG-R13INT-029
+- screen: BO-620
+  field: 'region:-'
+  to: 86e0d1b5b66bca9c
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the forms Create and Edit programme need, and the programmes list.'
+  change: CHG-R13INT-029
+- screen: BO-624
+  field: 'overlay:formUpdateAccreditationProgramme'
+  to: 58d2ae5cf5c15042
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Save button needs (updateAccreditationProgramme).'
+  change: CHG-R13INT-029
+- screen: BO-837
+  field: 'overlay:formCreateContentPage'
+  to: c994f789955f4890
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Create content page button needs.'
+  change: CHG-R13INT-029
+- screen: BO-839
+  field: 'overlay:formCreateContentBlock'
+  to: 68629700703f711b
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Create content block button needs.'
+  change: CHG-R13INT-029
+- screen: BO-874
+  field: 'region:fields'
+  to: 756b995c974fd279
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the staff member the fields belong to (getPrincipal).'
+  change: CHG-R13INT-029
+- screen: BO-954
+  field: 'overlay:formCreateSeatMap'
+  to: 0308f11ab87a1111
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Create seat map button needs.'
+  change: CHG-R13INT-029
+- screen: CMS-007
+  field: 'overlay:confirmDeleteContentPage'
+  to: 778eb56ba077d2cc
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): a Delete content page action with its confirmation.'
+  change: CHG-R13INT-029
+- screen: CMS-007
+  field: 'region:rowActions'
+  to: ee2d64b1ad72dc51
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): a Delete content page action with its confirmation.'
+  change: CHG-R13INT-029
+- screen: POS-026
+  field: 'overlay:formIssueTaxInvoice'
+  to: 769e4a270d5a4c1f
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Issue tax invoice with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: POS-026
+  field: 'region:detail'
+  to: 5c200503a5dfb84f
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Issue tax invoice with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029

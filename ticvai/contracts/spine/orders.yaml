@@ -9242,12 +9242,12 @@ paths:
   /ticket-transfers:
     get:
       operationId: listTicketTransfers
-      x-ticvai-names-for-context: [orders.cart, orders.sales_order]
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-045 Ticket Delivery & Sharing"
+      x-ticvai-names-for-context: [orders.cart, orders.sales_order]
       x-ticvai-audience:
       - guest
       summary: The ticket transfers this guest sent or received

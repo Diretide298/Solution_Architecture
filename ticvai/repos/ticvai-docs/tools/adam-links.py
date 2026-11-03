@@ -10,6 +10,8 @@ them from the package:
   database task / sub-task   its tables
   frontend task / sub-task   its screen and the operations the screen calls
   app-module feature         what its Builds list: its screens and the operations they call (CHG-TKT-004)
+  test task                  what its Builds list, and nothing more: never the screens that call its operations
+                             (CHG-R13RVA-001)
   a task building none       the files its description names and, for setup work, the setup standards (CHG-TKT-005)
   service epic or feature    its service
 
@@ -358,6 +360,12 @@ def _touches_from(rows, lineage, screen_ops, known=None):
                 done = listed(REST_OF, r["description"]) or []
                 ops = [o for o in ops if o not in done]
             return [("screen", sid)] + [("operation", op_id(op)) for op in ops]
+        if r["type"] == "Task" and r["track"] == "Test":
+            # **A test task links what its Builds list** (3 November 2026, the r13 candidate review, class
+            # test-ticket-linked-as-build-task, CHG-R13RVA-001). It went through backend() like a back-end task, so
+            # it linked every screen in the plan that calls one of its operations (#27887: 80 screens beyond its
+            # Builds), and ADAM told the tester to build each. tools/check-ticket-links.py TL-TEST-SCOPE holds it.
+            return [tuple(b.split(" ", 1)) for b in ticket_done.builds_of(r, part, lineage) if " " in b]
         if r["type"] == "Feature":
             # an app-module links what its Builds list: its screens and the operations they call, or for an API-only
             # one its operations and tables (CHG-TKT-004): before, it linked nothing, and an agent read the back-end

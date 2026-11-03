@@ -133,10 +133,16 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.change_request
+  - catalogue.change_request_line
+  - catalogue.package_pricing
+  - catalogue.price
   - catalogue.price_list
   - catalogue.product
   writes:
   - cache:idempotency
+  - catalogue.audit_entry
+  - catalogue.price
   - catalogue.price_list
   - catalogue.product_version
 - operation: bulkUpdateCatalogueProducts
@@ -246,11 +252,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.price
   - catalogue.product
   - catalogue.product_media
   - catalogue.variant
   writes:
   - cache:idempotency
+  - catalogue.price
   - catalogue.product
   - catalogue.product_media
   - catalogue.variant
@@ -265,10 +273,14 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.import_job
+  - catalogue.import_job_row
   writes:
   - cache:idempotency
+  - catalogue.audit_entry
   - catalogue.import_job
+  - catalogue.import_job_row
   - catalogue.product
+  - catalogue.product_version
   - catalogue.variant
 - operation: convertInventoryHold
   verb: POST
@@ -702,8 +714,9 @@ operations:
   offline: false
   reads:
   - access.entitlement
+  - catalogue.membership_benefit
+  - catalogue.plan_benefit
   - catalogue.product
-  - marketing.loyalty_position
   writes: []
 - operation: getPackagePricingDefinition
   verb: GET
@@ -841,7 +854,9 @@ operations:
   - staff
   offline: false
   reads:
+  - catalogue.product
   - catalogue.tax_profile
+  - catalogue.tax_rule
   writes: []
 - operation: getWaitingRoomPosition
   verb: GET
@@ -880,6 +895,7 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.import_job
+  - catalogue.import_job_row
 - operation: joinWaitlist
   verb: POST
   path: /waitlist-entries
@@ -1497,6 +1513,8 @@ operations:
   offline: false
   reads:
   - catalogue.entitlement_template
+  - catalogue.membership_benefit
+  - catalogue.plan_benefit
   - catalogue.product
   - orders.sales_order
   writes: []
@@ -1937,7 +1955,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - catalogue.approval_policy
   writes: []
 - operation: listProductAttentionItems
   verb: GET
@@ -2378,7 +2397,9 @@ operations:
   - staff
   offline: false
   reads:
+  - catalogue.product
   - catalogue.tax_profile
+  - catalogue.tax_rule
   writes: []
 - operation: listTimeslotPerformanceTime
   verb: GET
@@ -2708,6 +2729,8 @@ operations:
   offline: true
   reads:
   - catalogue.event
+  - catalogue.price
+  - catalogue.price_list
   - catalogue.product
   - catalogue.product_eligibility_rule
   - catalogue.product_media
@@ -3746,6 +3769,7 @@ operations:
   - catalogue.product
   - catalogue.rate
   - catalogue.rounding_profile
+  - catalogue.sales_channel
   - catalogue.tax_profile
   - catalogue.tax_rule
   - catalogue.variant

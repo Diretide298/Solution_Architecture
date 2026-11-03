@@ -19,6 +19,11 @@ the next batch. This compares every screen in screens/P*.yaml with the approved 
                  transition's target and trigger, the exits); a step machine's steps
     AU-APPROVAL  an entry in docs/active/approved-ui-changes.yaml with no client approval reference, no `to` hash, or
                  a screen or field that is not in the package or the snapshot
+    AU-CAPTION   a capture plan (tools/capture-plans/*.json) captions its frames "not client-approved" (or "not
+                 client-verified") while a screen whose frame it captures is approved from that prototype
+                 (`wireframe.status: approved`, `prototype.file` the plan's prototype): the P04 board said "POS v2
+                 build, ours, not client-approved" on sixteen frames the client approved on 19 October 2026
+                 (r13, CHG-RCR34-001; review finding 2.27767.6)
 
 A difference passes only when docs/active/approved-ui-changes.yaml lists it (screen, field, the client approval
 reference, and `to`: the hash of the approved content as this check prints it, or `removed`), so an approval
@@ -42,6 +47,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -58,7 +64,27 @@ RULES = {
     "AU-SCREEN": "a client-approved screen was removed, or a screen was added, with no recorded client approval",
     "AU-FIELD": "a visible field of a client-approved screen changed with no recorded client approval",
     "AU-APPROVAL": "an approved-ui-changes.yaml entry lacks its approval reference or `to`, or names nothing",
+    "AU-CAPTION": "a capture plan captions an approved screen's frames as not client-approved",
 }
+PLANS = g.ROOT / "tools" / "capture-plans"
+NOT_APPROVED = re.compile(r"not\s+client[- ](approved|verified)", re.I)
+
+
+def captions(plans: dict, screens: list) -> list:
+    """AU-CAPTION over {plan name: plan} and [(stem, screen)]: (rule, key, message)."""
+    out = []
+    for name, plan in sorted(plans.items()):
+        cap, proto = str(plan.get("caption") or ""), str(plan.get("prototype") or "")
+        if not NOT_APPROVED.search(cap) or not proto:
+            continue
+        hit = sorted(s["id"] for _, s in screens
+                     if (s.get("wireframe") or {}).get("status") == "approved"
+                     and str(((s.get("wireframe") or {}).get("prototype") or {}).get("file") or "") == proto)
+        if hit:
+            out.append(("AU-CAPTION", name, f"{name} captions its frames {cap!r}, and {len(hit)} screen(s) are approved "
+                                            f"from {proto} ({', '.join(hit[:6])}{' ...' if len(hit) > 6 else ''})"))
+    return out
+
 
 
 # ------------------------------------------------------------------------------------------------- visible content
@@ -384,6 +410,14 @@ def self_test() -> list:
         fails.append(f"an added screen gave {got}")
     if stale_approvals(approved, approved, [{"screen": "BO-1", "field": "name"}]) != ["BO-1 name"]:
         fails.append("an approval the snapshot already holds was not noted")
+    # AU-CAPTION
+    appr = with_(wireframe={"status": "approved", "prototype": {"file": "p.html"}})
+    if [r for r, _, _ in captions({"x.json": {"caption": "ours, not client-approved", "prototype": "p.html"}},
+                                  [("P04", appr)])] != ["AU-CAPTION"]:
+        fails.append("a 'not client-approved' caption over an approved screen passed")
+    if captions({"x.json": {"caption": "client-approved 19 Oct", "prototype": "p.html"}}, [("P04", appr)]) or \
+            captions({"x.json": {"caption": "ours, not client-approved", "prototype": "q.html"}}, [("P04", appr)]):
+        fails.append("an approved caption, or one over no approved screen, was reported")
     return fails
 
 
@@ -410,8 +444,11 @@ def main() -> int:
     approvals = []
     if APPROVALS.exists():
         approvals = (yaml.safe_load(APPROVALS.read_text(encoding="utf-8")) or {}).get("changes") or []
-    now = snapshot_of(g.screens())
+    all_screens = g.screens()
+    now = snapshot_of(all_screens)
     found = compare(snap["screens"], now, approvals)
+    plans = {f.name: json.loads(f.read_text(encoding="utf-8")) for f in sorted(PLANS.glob("*.json"))}
+    found += captions(plans, all_screens)
     for rule, key, msg in found:
         guard.add(rule, key, msg, strict=True)
     if guard.show_all:

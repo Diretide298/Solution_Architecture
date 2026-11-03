@@ -224,6 +224,18 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 17 §Each rule displays"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create admission rule",
+       "operation": "createAdmissionRules",
+       "provenance": "contract access.yaml POST /admission-rules; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+      }
+     ]
     }
    ]
   },
@@ -267,6 +279,45 @@
    "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-154"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 17. 12 of 13 labels bound to a contract property; 13 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateAdmissionRules",
+    "component": "modal",
+    "trigger": "Create admission rule",
+    "body": "**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AdmissionRules",
+    "confirm": {
+     "label": "Create admission rule",
+     "operation": "createAdmissionRules"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "openMinutesBefore",
+      "closeMinutesAfter",
+      "perProductRules",
+      "maxDurationMinutes",
+      "requiresExitBeforeReentry",
+      "maxReentries",
+      "entryLimit",
+      "exitScan",
+      "maxExits",
+      "reEntryWindowMinutes",
+      "sameDayOnly",
+      "designatedAccessPointIds",
+      "validity",
+      "crossover",
+      "allowedAccessPointIds",
+      "reEntryVerification",
+      "ruleConditions",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract access.yaml POST /admission-rules; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -605,7 +656,14 @@
     "provenance": "decided 29 September, VM close-out (venue management and configuration)",
     "invalidates": [
      "listAdmissionRules"
-    ]
+    ],
+    "inputSources": {
+     "id": "listAdmissionRules.id",
+     "code": "listAdmissionRules.code",
+     "name": "listAdmissionRules.name",
+     "openMinutesBefore": "listAdmissionRules.openMinutesBefore",
+     "closeMinutesAfter": "listAdmissionRules.closeMinutesAfter"
+    }
    }
   ],
   "entryState": {
@@ -1336,7 +1394,14 @@
     "invalidates": [
      "listMultiParkCrossover2",
      "listAdmissionRules"
-    ]
+    ],
+    "inputSources": {
+     "id": "listAdmissionRules.id",
+     "code": "listAdmissionRules.code",
+     "name": "listAdmissionRules.name",
+     "openMinutesBefore": "listAdmissionRules.openMinutesBefore",
+     "closeMinutesAfter": "listAdmissionRules.closeMinutesAfter"
+    }
    }
   ],
   "wireframe": {

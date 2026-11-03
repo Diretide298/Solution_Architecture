@@ -28,10 +28,11 @@ transitions:
   guard: Schema migration in flight
 - from: active
   to: migrating
-  operation: updateCellTier
-  trigger: operation
-  guard: 'A tier change (r8, APPROVALS-TENANCY-C19): the cell job moves the cell''s tenants to the target tier''s
-    instance; the cell stays readable meanwhile and returns to active at the cutover'
+  trigger: job
+  guard: 'A tier change''s `tierMigration` job starts (ADAM CR-489, Chinmay, 3 November 2026; r8,
+    APPROVALS-TENANCY-C19): `updateCellTier` only queues the job and leaves the cell active; the cell job runner
+    moves it to migrating when the job starts, once its `scheduledFor` has passed. The job moves the cell''s tenants
+    to the target tier''s instance; the cell stays readable meanwhile and returns to active at the cutover'
 - from: migrating
   to: active
   trigger: job

@@ -526,7 +526,7 @@
     "properties": {
      "modulesInUse": {
       "type": "array",
-      "description": "Enabled by the tenant but not licensed by the target plan.",
+      "description": "Enabled by the tenant but not licensed after the change: not by the target plan version, an in-force add-on or `core` (ADAM CR-541). `moduleKey` is the white-label feature key, as the tenant's cell returns it, so the tenant knows what to switch off; `displayName` and `isEnabled` are as the cell returned them.",
       "items": {
        "type": "object",
        "properties": {
@@ -544,6 +544,7 @@
      },
      "limitsExceeded": {
       "type": "array",
+      "description": "Each metric whose usage is above the limit after the change (ADAM CR-541): `targetLimit` is the target plan's limit plus every in-force add-on's plus every unexpired capacity pack (a null one makes it unlimited, and it is never listed); `currentUsage` is worked out as `getEntitlementUsage` works out `current`.",
       "items": {
        "type": "object",
        "properties": {
@@ -886,7 +887,7 @@
    },
    "planVersion": {
     "type": "string",
-    "description": "Defaults to the current version."
+    "description": "Defaults to the current version, the plan's highest active version (ADAM CR-510)."
    },
    "effectiveFrom": {
     "type": "string",

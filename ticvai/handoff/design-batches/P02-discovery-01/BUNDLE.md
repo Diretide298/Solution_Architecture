@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-063` | Explore – Search Results | A | 2 | 16 | 5 | 3 | 0 | 0 | guest | notStarted (client-verified) |
+| `GST-063` | Explore – Search Results | A | 2 | 18 | 5 | 3 | 0 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
@@ -150,8 +150,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | ID | the name it points at, never the id | — |
 | Kind | text | — |
 | Name | text | — |
-| Summary | text | — |
-| From price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Name localised | in the reader's language | `catalogue.product.name_localised` (ADAM CR-533); the screen shows the guest's language and falls back to `name`. |
+| Summary | text | The product's description, `catalogue.product.description` (ADAM CR-533); no summary column exists. |
+| Summary localised | in the reader's language | `catalogue.product.description_localised` (ADAM CR-533); the screen shows the guest's language and falls back to `summary`. |
+| From price | AED 1,234.50 | The lowest price `catalogue#variantPriceRecords` gives the product's sellable variants at the venue on the caller's channel now (ADAM … |
 | Guest listing | chip: Bookable, Info only, Hidden | How a product appears to a guest (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to … |
 | Not bookable label | in the reader's language | The product's label, for an `infoOnly` result; null otherwise (decided 29 September, rev 3 REV3-14). |
 | Primary media | grouped details | The product's `isPrimary` media item, so each result in a listing shows its own photo (decided 29 September, 23SEP-4). |
@@ -249,7 +251,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-063?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-002`, `GST-004`.
@@ -456,7 +458,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"searchCatalogue": {"method":"GET","path":"/search","contract":"catalogue","summary":"Find something by name","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"q","in":"query","required":true},{"name":"venueId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"guidedAnswerIds","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null}
+"searchCatalogue": {"method":"GET","path":"/search","contract":"catalogue","summary":"Find something by name","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"q","in":"query","required":true},{"name":"venueId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"guidedAnswerIds","in":"query","required":null},{"name":"channel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null}
 }
 ```
 

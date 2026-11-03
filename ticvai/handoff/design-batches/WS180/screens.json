@@ -114,13 +114,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide the central operational dashboard for the complete TICVAI Recommendation Engine. This becomes the entry point for Marketing, Commercial, Revenue, CRM and authorized operational users.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Upsell,CrossSellEngine.pdf, page 7 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -302,11 +296,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**Recommendation Strategy Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 9"
    },
@@ -465,7 +454,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Revenue, Incremental revenue, Membership conversion, Capacity utilization, Inventory movement. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Revenue, Incremental revenue, Membership conversion, Capacity utilization, Inventory movement. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 11 §Support"
    }
   ],
@@ -654,13 +643,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved: Ticket → Ticket, Ticket → Bundle, Ticket → F&B, Ticket → Retail, Ticket → Parking, Ticket → Locker, Ticket → Photo, Ticket → Rental …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 12 actions on this screen and the screen declares 2 operations.** Unserved: Ticket → Ticket, Ticket → Bundle, Ticket → F&B, Ticket → Retail, Ticket → Parking, Ticket → Locker, Ticket → Photo, Ticket → Rental …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 13 §Support relationships between"
-   },
-   {
-    "operation": null,
-    "why": "**Recommendation Type & Product Relationship Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
    },
    {
     "operation": null,
@@ -827,11 +811,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**Recommendation Placement & Touchpoint Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 15"
    },
@@ -979,11 +958,6 @@
   "purpose": "Control recommendation behavior across TICVAI's omnichannel environment.",
   "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Channel & Journey Strategy Manager (pack Upsell,CrossSellEngine.pdf, board 1.6, page 17): control recommendation behavior across TICVAI's omnichannel environment.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**Channel & Journey Strategy Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1134,7 +1108,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved: Revenue potential, Product affinity, Customer propensity, Inventory, Capacity, Commercial priority, Campaign priority. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 3 operations.** Unserved: Revenue potential, Product affinity, Customer propensity, Inventory, Capacity, Commercial priority, Campaign priority. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Upsell,CrossSellEngine.pdf, page 19 §Support"
    },
    {

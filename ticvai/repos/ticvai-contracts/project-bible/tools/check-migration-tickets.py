@@ -25,6 +25,8 @@ the ticket, `V0007__access.sql` in the document; neither exists, and MIG-RETAIL 
                     "Tables no migration creates"; or listed there although an operation reads or writes it
   M-REVIEW-ROW      a handoff/migration-review.md row whose table no migration ticket creates, or whose
                     ticket does not list it (CHG-R8MIG-013)
+  M-RECORD-FILE     a table's record (the schema reference's Migration column, which ADAM's adam_table serves)
+                    names its migration ticket but not the file that ticket's subject names (ADAM CR-440)
 
 **Exempt, with the reason:** MIG-PARTITIONS is a job in the workers host that creates and detaches monthly
 partitions (ADR-0056), not a migration file. The baseline tables in 000-002 are MIG-BASELINE's.
@@ -52,6 +54,8 @@ RULES = {
     "M-TABLE-ASSIGNED": "a table in no migration and not listed with its reason (CHG-TBF-003)",
     "M-REVIEW-ROW": "a handoff/migration-review.md row whose table no migration ticket creates, or whose ticket "
                     "does not list it (CHG-R8MIG-013)",
+    "M-RECORD-FILE": "a table's record (the schema reference's Migration column, ADAM's adam_table) names its "
+                     "migration ticket but not the file the ticket names (ADAM CR-440, CHG-CR440-001)",
 }
 EXEMPT = {"MIG-PARTITIONS": "a job in the workers host (ADR-0056), not a migration file"}
 FILE = re.compile(r"\b(V(\d{4})[a-z]?__[\w.-]+\.sql)\b")
@@ -70,6 +74,27 @@ def _renames() -> list:
         if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "RENAMES" for t in node.targets):
             return ast.literal_eval(node.value)
     return []
+
+
+def record_migrations() -> dict:
+    """{table: Migration cell} from the schema reference's Tables sheet (handoff/TICVAI_Schema_Reference.xlsx), the
+    record ADAM's adam_table serves; empty when the workbook or openpyxl is missing."""
+    wb = g.ROOT / "handoff" / "TICVAI_Schema_Reference.xlsx"
+    try:
+        import openpyxl
+        ws = openpyxl.load_workbook(wb, read_only=True, data_only=True)["Tables"]
+    except Exception:  # noqa: BLE001 - no workbook yet: nothing to hold
+        return {}
+    out, hdr = {}, None
+    for row in ws.iter_rows(values_only=True):
+        if hdr is None:
+            if row and "Table" in row and "Migration" in row:
+                hdr = (row.index("Table"), row.index("Migration"))
+            continue
+        t, m = (row[hdr[0]] if len(row) > hdr[0] else None), (row[hdr[1]] if len(row) > hdr[1] else None)
+        if t and m:
+            out[str(t)] = str(m)
+    return out
 
 
 def main() -> int:
@@ -202,6 +227,14 @@ def main() -> int:
     if unplanned:
         guard.note(f"{len(unplanned)} migration-review row(s) on tables no migration ticket creates yet (created as "
                    f"they are now when planned): {'; '.join(unplanned[:6])}")
+    # M-RECORD-FILE (ADAM CR-440, 1 November 2026; CHG-CR440-001): build-schema-workbook.py reads each ticket's file from
+    # its subject, and matched "Migration V..." only, so the 137 "[DB] Forward migration V1228__..." tickets left their
+    # tables' records with the key alone and ADAM's adam_table showed marketing.processing_purpose with no file.
+    for t, cell in sorted(record_migrations().items()):
+        k = cell.strip()
+        if k in file_of and file_of[k] not in cell:
+            guard.add("M-RECORD-FILE", t, f"{t}: its record names {k} but not {file_of[k]}, the file {k}'s subject "
+                                          "names (tools/build-schema-workbook.py MIG_OF)")
     guard.note(f"{len(file_of)} migration ticket(s) named, {len(tables)} table(s) in backend/, "
                f"{len(tables & on_ticket)} in a migration, {len(listed_storage)} listed as storage only")
     return guard.finish()

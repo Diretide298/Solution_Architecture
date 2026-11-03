@@ -1861,9 +1861,11 @@
    "enum": "TenantStatus",
    "foreignContract": true,
    "reachedVia": [
+    "tenant.provisioned",
     "tenant.suspended"
    ],
    "emits": [
+    "tenant.provisioned",
     "tenant.suspended"
    ]
   },
@@ -2096,7 +2098,7 @@
    "name": "order.exchanged",
    "publisher": "orders",
    "role": "consumes",
-   "critical": false
+   "critical": true
   },
   {
    "name": "order.paid",

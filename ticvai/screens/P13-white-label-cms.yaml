@@ -125,7 +125,7 @@ screens:
       trigger: Content Blocks
       provenance: 'derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001
         holds none of them. The edge carries nothing: bannerId, promoBlockId, actionId only pre-select
-        (deep link or optional), and CMS-008 opens on its own'
+        (optional), and CMS-008 opens on its own'
     - to: CMS-009
       trigger: Navigation & Menus
       provenance: 'derived — CMS-009 declares entryState.params  and CMS-001 holds none of them. The edge
@@ -133,8 +133,8 @@ screens:
     - to: CMS-010
       trigger: Media Library
       provenance: 'derived — CMS-010 declares entryState.params mediaId, uploadId and CMS-001 holds none
-        of them. The edge carries nothing: mediaId, uploadId only pre-select (deep link or optional),
-        and CMS-010 opens on its own'
+        of them. The edge carries nothing: mediaId, uploadId only pre-select (optional), and CMS-010 opens
+        on its own'
     - to: CMS-011
       trigger: Translations
       provenance: structural — CMS-001 is P13's home screen and its exits are its launcher
@@ -546,13 +546,12 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-003 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-004
       trigger: Logo & Assets
       provenance: 'derived — CMS-004 declares entryState.params uploadId and CMS-003 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-004 opens
-        on its own'
+        The edge carries nothing: uploadId only pre-selects (optional), and CMS-004 opens on its own'
     - to: CMS-006
       trigger: Component Preview
       provenance: flow F102 step 2→3
@@ -903,8 +902,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-005 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-005 holds none of them. The edge
@@ -912,8 +911,7 @@ screens:
     - to: CMS-006
       trigger: Component Preview
       provenance: 'derived — CMS-006 declares entryState.params productId and CMS-005 holds none of them.
-        The edge carries nothing: productId only pre-selects (deep link or optional), and CMS-006 opens
-        on its own'
+        The edge carries nothing: productId only pre-selects (optional), and CMS-006 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern
     on 17 August, not individually considered — sound for a list, a form or a money screen, and worth
     revisiting where this screen is unusual.
@@ -1056,8 +1054,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-006 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-006 holds none of them. The edge
@@ -1278,8 +1276,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-007 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-007 holds none of them. The edge
@@ -1678,8 +1676,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-008 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-008 holds none of them. The edge
@@ -2016,8 +2014,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-009 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-009 holds none of them. The edge
@@ -2740,8 +2738,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-013 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-013 holds none of them. The edge
@@ -2893,8 +2891,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-011 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-011 holds none of them. The edge
@@ -3029,8 +3027,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-012 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-012 holds none of them. The edge
@@ -3121,8 +3119,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-014 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-014 holds none of them. The edge
@@ -3390,8 +3388,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-015 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-015 holds none of them. The edge
@@ -3570,8 +3568,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-016 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-016 holds none of them. The edge
@@ -3579,13 +3577,12 @@ screens:
     - to: CMS-017
       trigger: Domain & Certificate
       provenance: 'derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them.
-        The edge carries nothing: domainId only pre-selects (deep link or optional), and CMS-017 opens
-        on its own'
+        The edge carries nothing: domainId only pre-selects (optional), and CMS-017 opens on its own'
     - to: CMS-018
       trigger: Consent & Legal
       provenance: 'derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds
-        none of them. The edge carries nothing: policyKind, questionId only pre-select (deep link or optional),
-        and CMS-018 opens on its own'
+        none of them. The edge carries nothing: policyKind, questionId only pre-select (optional), and
+        CMS-018 opens on its own'
     - to: CMS-103
       trigger: Booking flows
       provenance: authored 29 September, W12 (flow-level settings and step order moved to CMS-103)
@@ -3805,8 +3802,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-017 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-017 holds none of them. The edge
@@ -4028,8 +4025,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-018 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-018 holds none of them. The edge
@@ -4371,8 +4368,8 @@ screens:
     - to: CMS-002
       trigger: Brand Kit
       provenance: 'derived — CMS-002 declares entryState.params uploadId and CMS-019 holds none of them.
-        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-002 opens
-        on its own'
+        The edge carries nothing: CMS-002 finds uploadId (createUpload) itself, and CMS-002 opens on its
+        own'
     - to: CMS-003
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-019 holds none of them. The edge

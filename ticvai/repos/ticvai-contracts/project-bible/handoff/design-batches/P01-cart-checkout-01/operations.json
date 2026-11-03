@@ -316,6 +316,11 @@
     "name": "flowTypeKey",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -501,6 +506,16 @@
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
+   },
    {
     "name": null,
     "in": null,

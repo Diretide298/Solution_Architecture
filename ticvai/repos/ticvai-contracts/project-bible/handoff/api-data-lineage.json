@@ -39,6 +39,7 @@
     "channels",
     "code",
     "code_schema",
+    "compare_at_amount",
     "consent_question_ids",
     "created_at",
     "created_by_principal_id",
@@ -51,8 +52,10 @@
     "family_key",
     "guest_listing",
     "has_variants",
+    "highlight_badge",
     "id",
     "is_blocked_offline",
+    "is_featured",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -96,6 +99,11 @@
     "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)"
    },
    {
+    "query": "marketing-crm#consentQuestionRecords",
+    "route": "service",
+    "for": "the swim rule of the shared guided-answer filter: the kinds of the consent questions the candidate products name (catalogue.product.consent_question_ids), asked once per page, for the kind only (ADAM CR-532, CR-533)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Product.fromPrice (ADAM CR-358, option (a); CHG-CR358-001; ADR-0018)"
@@ -109,6 +117,11 @@
     "query": "white-label#guidedChoiceRecords",
     "route": "service",
     "for": "what its text calls \"GuidedChoice\": whitelabel.guided_choice, WhiteLabel's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "white-label#tenantLanguageRecords",
+    "route": "service",
+    "for": "BookingFlowConfig.showInfoOnly: the tenant's current published configuration version, its snapshot's BookingFlowConfig with the venue's venueOverrides entry laid over field by field, on when absent (ADAM CR-533, the rule searchCatalogue states)"
    }
   ],
   "readsInProcess": [
@@ -158,6 +171,7 @@
     "channels",
     "code",
     "code_schema",
+    "compare_at_amount",
     "consent_question_ids",
     "created_at",
     "created_by_principal_id",
@@ -170,8 +184,10 @@
     "family_key",
     "guest_listing",
     "has_variants",
+    "highlight_badge",
     "id",
     "is_blocked_offline",
+    "is_featured",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -211,7 +227,7 @@
   "readVia": [
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
@@ -226,6 +242,7 @@
    }
   ],
   "readsInProcess": [
+   "assets.media_asset",
    "platform.venue_settings"
   ]
  },
@@ -265,6 +282,7 @@
     "channels",
     "code",
     "code_schema",
+    "compare_at_amount",
     "consent_question_ids",
     "created_at",
     "created_by_principal_id",
@@ -277,8 +295,10 @@
     "family_key",
     "guest_listing",
     "has_variants",
+    "highlight_badge",
     "id",
     "is_blocked_offline",
+    "is_featured",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -378,6 +398,7 @@
     "channels",
     "code",
     "code_schema",
+    "compare_at_amount",
     "consent_question_ids",
     "created_at",
     "created_by_principal_id",
@@ -390,8 +411,10 @@
     "family_key",
     "guest_listing",
     "has_variants",
+    "highlight_badge",
     "id",
     "is_blocked_offline",
+    "is_featured",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -431,7 +454,7 @@
   "readVia": [
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
@@ -446,6 +469,7 @@
    }
   ],
   "readsInProcess": [
+   "assets.media_asset",
    "platform.venue_settings"
   ]
  },
@@ -518,6 +542,7 @@
     "is_active",
     "is_default",
     "name",
+    "price_category_id",
     "product_id",
     "reference_price",
     "sku"
@@ -1554,6 +1579,7 @@
     "channels",
     "code",
     "code_schema",
+    "compare_at_amount",
     "consent_question_ids",
     "created_at",
     "created_by_principal_id",
@@ -1566,8 +1592,10 @@
     "family_key",
     "guest_listing",
     "has_variants",
+    "highlight_badge",
     "id",
     "is_blocked_offline",
+    "is_featured",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -1607,12 +1635,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
@@ -1622,6 +1650,8 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
+   "assets.media_asset",
    "platform.venue_settings"
   ]
  },
@@ -1730,6 +1760,7 @@
     "is_active",
     "is_default",
     "name",
+    "price_category_id",
     "product_id",
     "reference_price",
     "sku"
@@ -2114,7 +2145,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"access.entitlement\": access.entitlement, Access's data (CHG-R10GEN-001)"
    },
    {
@@ -2129,6 +2160,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "platform.venue_settings"
   ]
  },
@@ -2361,9 +2393,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listOrgUnits": {
@@ -5377,6 +5412,7 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -5385,7 +5421,8 @@
    "orders.order_event",
    "orders.order_line",
    "orders.payment",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -5503,16 +5540,28 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "whether a targeted line's entitlement is redeemed (409 line-redeemed) (CHG-MOD-003)"
+   },
+   {
+    "query": "catalogue#inventoryReservationRecords",
+    "route": "in-process",
+    "for": "each added line's inventoryHoldId, which must be an active hold (409 hold-not-active), as createOrder checks it (CHG-R13ORD-001)"
    },
    {
     "query": "catalogue#productRecords",
     "route": "in-process",
     "for": "what its text calls \"catalogue.Product.requiresTimeWindow\": catalogue.product, Catalogue's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "catalogue#variantPriceRecords",
+    "route": "in-process",
+    "for": "the added lines' prices at the order's venue and channel, CR-439's rule (addedValue; CHG-R13ORD-001)"
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
+   "catalogue.inventory_reservation",
    "catalogue.product"
   ]
  },
@@ -5721,7 +5770,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -5731,6 +5780,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.product"
   ]
  },
@@ -5742,6 +5792,7 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.refund",
+   "orders.refund_line",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -5770,9 +5821,29 @@
   "lineageNote": "emits order.exchanged",
   "readVia": [
    {
+    "query": "access#entitlementRecords",
+    "route": "in-process",
+    "for": "whether an outgoing line's entitlement is redeemed (409 line-redeemed), as modifyOrder asks it, in process (ADAM CR-480; CHG-R13INP-001, CHG-R13INT-013)"
+   },
+   {
+    "query": "catalogue#inventoryReservationRecords",
+    "route": "in-process",
+    "for": "each incoming line's inventoryHoldId, which must be an active hold (409 replacement-unavailable; ADAM CR-480)"
+   },
+   {
+    "query": "catalogue#performanceRecords",
+    "route": "in-process",
+    "for": "each outgoing line's performance start, for the exchange window (409 outside-exchange-window; ADAM CR-480)"
+   },
+   {
     "query": "catalogue#productRecords",
     "route": "in-process",
     "for": "what its text calls \"catalogue.Product.requiresTimeWindow\": catalogue.product, Catalogue's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "catalogue#variantPriceRecords",
+    "route": "in-process",
+    "for": "the incoming lines' prices at the order's venue and channel, CR-439's rule (incomingValue; ADAM CR-480)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
@@ -5781,6 +5852,9 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
+   "catalogue.inventory_reservation",
+   "catalogue.performance",
    "catalogue.product",
    "platform.venue_settings"
   ]
@@ -5793,13 +5867,16 @@
    "cache:idempotency",
    "orders.order_line",
    "orders.refund",
+   "orders.refund_line",
    "orders.refund_policy",
    "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
    "orders.order_event",
-   "orders.sales_order"
+   "orders.order_line",
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -5819,9 +5896,19 @@
   "lineageNote": "order_event writer (29 September: writers pass; DM5 open item)",
   "readVia": [
    {
+    "query": "access#entitlementRecords",
+    "route": "in-process",
+    "for": "whether a moved line's entitlement is redeemed (409 line-redeemed), as modifyOrder asks it (CHG-R13ORD-001)"
+   },
+   {
     "query": "catalogue#performanceRecords",
     "route": "in-process",
-    "for": "the target performance (409 target-unavailable) (CHG-MOD-003)"
+    "for": "the target performance (409 target-unavailable), and each moved line's performance start, for the reschedule window (409 outside-reschedule-window) (CHG-MOD-003; CHG-R13ORD-001)"
+   },
+   {
+    "query": "catalogue#variantPriceRecords",
+    "route": "in-process",
+    "for": "the moved lines' prices at the target performance, the order's venue and channel, CR-439's rule (incomingValue; CHG-R13ORD-001)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
@@ -5830,6 +5917,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.performance",
    "platform.venue_settings"
   ]
@@ -5841,13 +5929,17 @@
   "reads": [
    "cache:idempotency",
    "orders.order_line",
-   "orders.sales_order"
+   "orders.sales_order",
+   "orders.ticket_template",
+   "orders.wallet_pass"
   ],
   "writes": [
    "cache:idempotency",
    "orders.order_event",
    "orders.order_line",
-   "orders.sales_order"
+   "orders.sales_order",
+   "orders.wallet_pass",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -5865,7 +5957,35 @@
    "guest",
    "partner",
    "device"
-  ]
+  ],
+  "readVia": [
+   {
+    "query": "access#entitlementRecords",
+    "route": "in-process",
+    "for": "the order's tickets, for delivery wallet, as issueWalletPass reads them (r13 root R27)"
+   },
+   {
+    "query": "white-label#storeAccountRecords",
+    "route": "service",
+    "for": "the store account's pass certificate, for delivery wallet, as issueWalletPass reads it (r13 root R27)"
+   }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
+  ],
+  "readColumns": {
+   "orders.wallet_pass": [
+    "authentication_token",
+    "device_registrations",
+    "entitlement_id",
+    "id",
+    "last_pushed_at",
+    "platform",
+    "scope_path",
+    "serial_number",
+    "status"
+   ]
+  }
  },
  "transferOrderTickets": {
   "contract": "orders",
@@ -5921,7 +6041,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -5931,6 +6051,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.product"
   ]
  },
@@ -5989,9 +6110,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "getOrderStatement": {
@@ -7213,7 +7337,7 @@
   "readVia": [
    {
     "query": "tenancy#regionSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"RegionSettings.minorAgeThreshold\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    },
    {
@@ -7223,12 +7347,14 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.biometrics\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
   ],
   "readsInProcess": [
-   "platform.scope"
+   "platform.region_settings",
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "updateAdmissionRules": {
@@ -7287,14 +7413,18 @@
   "readVia": [
    {
     "query": "tenancy#regionSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"RegionSettings.minorAgeThreshold\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.biometrics\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "listBlacklist": {
@@ -7377,7 +7507,7 @@
   "readVia": [
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"approvals.request\": approvals.request, Tenancy's data (CHG-R10GEN-001)"
    }
   ],
@@ -7386,6 +7516,9 @@
     "table": "approvals.request",
     "operation": "createApprovalRequest"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request"
   ]
  },
  "removeBlacklistEntry": {
@@ -7455,12 +7588,13 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the group entitlement's productName and imageUrl, from catalogue.product and its catalogue.product_media, Catalogue's data (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)"
    }
   ],
   "readsInProcess": [
-   "catalogue.entitlement_template"
+   "catalogue.entitlement_template",
+   "catalogue.product"
   ]
  },
  "setAccessPointGeofence": {
@@ -7705,8 +7839,8 @@
    },
    {
     "query": "tenancy#deviceRecords",
-    "route": "service",
-    "for": "its read of the registered device, Tenancy's data, through Tenancy's service route, the only one the query serves (CHG-MOD-001; R8 lineage request; CHG-R8INT-005)"
+    "route": "in-process",
+    "for": "its read of the registered device, Tenancy's data, in process within commerce through Tenancy's query class (CHG-MOD-001; R8 lineage request; CHG-R8INT-005; in process since CHG-R13INP-001)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
@@ -7722,6 +7856,7 @@
   "readsInProcess": [
    "identity.principal",
    "platform.denomination",
+   "platform.device",
    "platform.venue_settings",
    "platform.workstation"
   ]
@@ -8291,13 +8426,14 @@
   "path": "/shifts/{shiftId}/close",
   "reads": [
    "cache:idempotency",
-   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.payment",
    "orders.pos_shift",
    "orders.pos_shift_approval",
    "orders.pos_shift_incident",
+   "orders.refund",
+   "orders.refund_payment",
    "orders.sales_order",
    "orders.till_shift_policy",
    "platform.venue_settings"
@@ -8324,11 +8460,6 @@
    "staff"
   ],
   "readVia": [
-   {
-    "query": "finance#fxRateRecords",
-    "route": "in-process",
-    "for": "its read of ledger.fx_rate, Ledger's data (CHG-MOD-001)"
-   },
    {
     "query": "identity#verifySupervisorStepUp",
     "route": "in-process",
@@ -8397,7 +8528,6 @@
    ]
   },
   "readsInProcess": [
-   "ledger.fx_rate",
    "platform.denomination",
    "platform.venue_settings"
   ]
@@ -9564,6 +9694,11 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "Session.saleBoardId where the workstation stores none (sale_board null, saleBoardSource outlet): its outlet's sale_board_id (r13 root R39)"
+   },
+   {
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "currency, currencyScale and timezone, from the workstation's region (ADAM CR-096)"
@@ -9575,6 +9710,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.region_settings",
    "platform.workstation"
   ]
@@ -10557,7 +10693,21 @@
     "query": "orders#openOrdersForSubject",
     "route": "projection",
     "for": "409 open-orders-remain (and the erasure job's re-check)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the countryCode of the region settings row at the nearest ancestor of the venue's path, the event's jurisdiction (ADAM CR-512)"
+   },
+   {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "the path of the X-Venue-Id venue, the erasure request's scopePath (ADAM CR-512)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.scope"
   ]
  },
  "listSsoProviders": {
@@ -10873,7 +11023,8 @@
   "writes": [
    "cache:idempotency",
    "identity.mfa_method",
-   "identity.mfa_recovery_code"
+   "identity.mfa_recovery_code",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -11009,7 +11160,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.mfa_challenge"
+   "identity.mfa_challenge",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -14196,7 +14348,12 @@
   "reads": [
    "cache:idempotency",
    "control.contract",
-   "control.plan"
+   "control.licence_add_on",
+   "control.licence_add_on_limit",
+   "control.plan",
+   "control.plan_limit",
+   "control.plan_module",
+   "control.tenant"
   ],
   "writes": [
    "cache:idempotency",
@@ -14290,6 +14447,8 @@
    "control.licence_add_on",
    "control.licence_add_on_limit",
    "control.plan",
+   "control.plan_limit",
+   "control.plan_module",
    "control.tenant"
   ],
   "writes": [],
@@ -14307,11 +14466,20 @@
    "staff"
   ],
   "readColumns": {
+   "control.contract": [
+    "id",
+    "plan_id",
+    "tenant_id"
+   ],
    "control.licence_add_on": [
     "id",
     "tenant_id"
    ],
-   "control.tenant": [
+   "control.plan_limit": [
+    "id",
+    "plan_id"
+   ],
+   "control.plan_module": [
     "id",
     "plan_id"
    ]
@@ -14351,10 +14519,6 @@
    "control.licence_add_on": [
     "id",
     "tenant_id"
-   ],
-   "control.tenant": [
-    "id",
-    "plan_id"
    ]
   }
  },
@@ -14364,6 +14528,7 @@
   "path": "/tenants/{tenantId}/licences/add-ons",
   "reads": [
    "cache:idempotency",
+   "control.contract",
    "control.licence_add_on",
    "control.licence_add_on_limit",
    "control.plan_limit",
@@ -14389,6 +14554,11 @@
    "staff"
   ],
   "readColumns": {
+   "control.contract": [
+    "id",
+    "plan_id",
+    "tenant_id"
+   ],
    "control.licence_add_on": [
     "id",
     "tenant_id"
@@ -14398,10 +14568,6 @@
     "plan_id"
    ],
    "control.plan_module": [
-    "id",
-    "plan_id"
-   ],
-   "control.tenant": [
     "id",
     "plan_id"
    ]
@@ -15633,7 +15799,7 @@
    },
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the order's payment (402 payment-required, payment-declined) (CHG-MOD-003)"
    },
    {
@@ -15649,6 +15815,7 @@
   ],
   "readsInProcess": [
    "inventory.movement",
+   "orders.payment",
    "platform.outlet",
    "platform.venue_settings"
   ]
@@ -15709,7 +15876,7 @@
   "readVia": [
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.payment, Orders's data (CHG-MOD-001)"
    },
    {
@@ -15719,6 +15886,7 @@
    }
   ],
   "readsInProcess": [
+   "orders.payment",
    "platform.venue_settings"
   ]
  },
@@ -17668,7 +17836,7 @@
   "readVia": [
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.payment, Orders's data (CHG-MOD-001)"
    },
    {
@@ -17678,6 +17846,7 @@
    }
   ],
   "readsInProcess": [
+   "orders.payment",
    "platform.venue_settings"
   ]
  },
@@ -17866,7 +18035,7 @@
   "readVia": [
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)"
    },
    {
@@ -17881,6 +18050,7 @@
    }
   ],
   "readsInProcess": [
+   "orders.payment",
    "platform.outlet",
    "platform.venue_settings"
   ]
@@ -18207,9 +18377,12 @@
   "readVia": [
    {
     "query": "tenancy#workstationRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the display workstations it assigns (400 workstation-on-two-stations) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
   ]
  },
  "listRecipes": {
@@ -22307,8 +22480,8 @@
   "readVia": [
    {
     "query": "promotions#liveEffectivePrice",
-    "route": "service",
-    "for": "the price after any live promotion (ADAM CR-096)"
+    "route": "in-process",
+    "for": "the price after any live promotion, PriceCheck.effectivePrice: venueId, the caller's channel and one item per merchandise (itemRef the merchandise id, unitPrice its list price) (ADAM CR-096; in process since ADAM CR-478, XDR-072)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
@@ -22317,12 +22490,14 @@
    },
    {
     "query": "tenancy#workstationRecords",
-    "route": "service",
-    "for": "the caller's workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003)"
+    "route": "in-process",
+    "for": "the caller's workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003; in process since ADAM CR-478, as assignKiosk under CR-384)"
    }
   ],
   "readsInProcess": [
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "platform.workstation",
+   "promotions.promotion"
   ]
  },
  "listRetailSales": {
@@ -22475,12 +22650,12 @@
    },
    {
     "query": "orders#orderLineDiscountRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the discounts Orders applied to those lines, summed onto each sale line (r8 re-walk, CHG-R8RW-004)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the order lines the sale lines name (orderLineId): unit price, tax, net and gross as Orders priced them (422 order-line-mismatch) (r8 re-walk, CHG-R8RW-004)"
    },
    {
@@ -22492,6 +22667,8 @@
   "readsInProcess": [
    "inventory.kit_component",
    "inventory.movement",
+   "orders.order_line",
+   "orders.order_line_discount",
    "platform.venue_settings"
   ]
  },
@@ -23389,6 +23566,7 @@
   "path": "/shop-and-drop",
   "reads": [
    "cache:idempotency",
+   "retail.merchandise",
    "retail.sale",
    "retail.sale_line",
    "retail.shop_and_drop",
@@ -23450,16 +23628,41 @@
    {
     "query": "fnb#deliveryLocationRecords",
     "route": "in-process",
-    "for": "collectionPointClosed: the collection point and its serving outlets (ADAM CR-096; the hours rule is CR-104)"
+    "for": "collectionPointClosed and the collectBy default: the collection point's own opensAt and closesAt (ADAM CR-096; the lead's answer of 25 October 2026 to the r10 question 16 kept these over CR-104's serving-outlet hours, so no outlet hours are read; r13 root R41); and, by ADAM CR-508, that it exists, is of kind collectionPoint and belongs to the drop's venue, its label (collectionPointName) and its servingOutletIds"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
-    "for": "the retail lines lineIds names on the orderId path (ADAM CR-096)"
+    "route": "in-process",
+    "for": "the retail lines lineIds names on the orderId path, where {orderId} (ADAM CR-096; in process since ADAM CR-477, XDR-071)"
+   },
+   {
+    "query": "orders#salesOrderRecords",
+    "route": "in-process",
+    "for": "the order on the orderId path (ADAM CR-508): its venueId (the drop's venue) and its subjectId; asked as orders#orderLineRecords is, in process from the operations host (XDR-075)"
+   },
+   {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the drop's venue on the till path (the venue of the sale's outlet) and, on the orderId path, the outlets of the order's venue whose retail.merchandise carries a line's variant (ADAM CR-508; XDR-004)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the Region's time zone, in which opensAt, closesAt and recordedAt's local day are read (ADAM CR-508; XDR-004)"
+   },
+   {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "the dropReference prefix (ADAM CR-508): platform.scope.code of the drop venue's scope row (XDR-004)"
    }
   ],
   "readsInProcess": [
-   "fnb.delivery_location"
+   "fnb.delivery_location",
+   "orders.order_line",
+   "orders.sales_order",
+   "platform.outlet",
+   "platform.region_settings",
+   "platform.scope"
   ]
  },
  "lookupShopAndDrop": {
@@ -23664,11 +23867,29 @@
     "query": "inventory#stockEarmarkRecords",
     "route": "in-process",
     "for": "its read of inventory.stock_earmark, Inventory's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the stock location each line's earmark is made at: its merchandise's outlet's stock_location_id (r13 root R39)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the region's time zone, in which that close is a wall-clock time (r13 root R39)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's opening hours (opening_hours, ADAM CR-338), whose close today ends the operating day that bounds and defaults expiresAt (r13 root R39)"
    }
   ],
   "readsInProcess": [
    "inventory.movement",
-   "inventory.stock_earmark"
+   "inventory.stock_earmark",
+   "platform.outlet",
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "listAssets": {
@@ -25719,9 +25940,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "deleteMediaAsset": {
@@ -27079,7 +27303,29 @@
     "title",
     "visualisation"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "subscription#contractRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373, CR-450), as getModuleEnablement reads control.contract, Platform's data"
+   },
+   {
+    "query": "subscription#licenceAddOnRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373, CR-450), as getModuleEnablement reads control.licence_add_on, Platform's data"
+   },
+   {
+    "query": "subscription#planRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373, CR-450), as getModuleEnablement reads control.plan, Platform's data"
+   }
+  ],
+  "readsInProcess": [
+   "control.contract",
+   "control.licence_add_on",
+   "control.plan"
+  ]
  },
  "updateDashboard": {
   "contract": "reporting",
@@ -27239,17 +27485,17 @@
   "readVia": [
    {
     "query": "accreditation#applicationRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"accreditation.application\": accreditation.application, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "accreditation#credentialRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"accreditation.credential\": accreditation.credential, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "accreditation#holderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"accreditation.holder\": accreditation.holder, Tenancy's data (CHG-R10GEN-001)"
    },
    {
@@ -27262,6 +27508,11 @@
     "route": "service",
     "for": "its read of ai.provider, AI's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "accreditation.application",
+   "accreditation.credential",
+   "accreditation.holder"
   ]
  },
  "saveNaturalLanguageQuery": {
@@ -31333,9 +31584,12 @@
   "readVia": [
    {
     "query": "promotions#promotionRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"live promotion\": promotions.promotion, Catalogue's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "promotions.promotion"
   ]
  },
  "getQueue": {
@@ -31489,9 +31743,12 @@
   "readVia": [
    {
     "query": "promotions#promotionRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"live promotion\": promotions.promotion, Catalogue's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "promotions.promotion"
   ]
  },
  "setQueueStatus": {
@@ -31571,9 +31828,12 @@
   "readVia": [
    {
     "query": "promotions#promotionRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"live promotion\": promotions.promotion, Catalogue's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "promotions.promotion"
   ]
  },
  "joinQueue": {
@@ -31609,6 +31869,9 @@
   "readColumns": {
    "queue.entry": [
     "admitted_count",
+    "call_resolution_reason",
+    "call_resolved_at",
+    "call_resolved_by_principal_id",
     "called_at",
     "entitlement_id",
     "estimated_call_at",
@@ -31643,7 +31906,7 @@
    },
    {
     "query": "promotions#promotionRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of promotions.promotion, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -31654,7 +31917,8 @@
   ],
   "readsInProcess": [
    "marketing.loyalty_position",
-   "platform.venue_settings"
+   "platform.venue_settings",
+   "promotions.promotion"
   ]
  },
  "getWaitingGuest": {
@@ -31681,6 +31945,9 @@
   "readColumns": {
    "queue.entry": [
     "admitted_count",
+    "call_resolution_reason",
+    "call_resolved_at",
+    "call_resolved_by_principal_id",
     "called_at",
     "entitlement_id",
     "estimated_call_at",
@@ -31741,7 +32008,8 @@
   "path": "/waiting-guests/{entryId}/redeem",
   "reads": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.entry",
+   "queue.queue"
   ],
   "writes": [
    "cache:idempotency",
@@ -31761,6 +32029,16 @@
   ],
   "audience": [
    "staff"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "the venue's scope path (platform.scope, by the queue's venue_id), the outbox envelope's ScopePath for queueEntry.redeemed, through Tenancy's query class, never its SQL; read only when the entry carries an entitlement_id (ADAM CR-519)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.scope"
   ]
  },
  "overrideWaitingGuest": {
@@ -31769,7 +32047,8 @@
   "path": "/waiting-guests/{entryId}/override",
   "reads": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.entry",
+   "queue.queue"
   ],
   "writes": [
    "cache:idempotency",
@@ -31789,6 +32068,16 @@
   ],
   "audience": [
    "staff"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "the venue's scope path (platform.scope, by the queue's venue_id), the outbox envelope's ScopePath for queueEntry.redeemed, through Tenancy's query class, never its SQL; read only when the entry carries an entitlement_id (ADAM CR-519)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.scope"
   ]
  },
  "callNextParties": {
@@ -31845,6 +32134,9 @@
   "readColumns": {
    "queue.entry": [
     "admitted_count",
+    "call_resolution_reason",
+    "call_resolved_at",
+    "call_resolved_by_principal_id",
     "called_at",
     "entitlement_id",
     "estimated_call_at",
@@ -31906,9 +32198,12 @@
   "readVia": [
    {
     "query": "catalogue#productCategoryRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"ProductCategory\": catalogue.product_category, Catalogue's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product_category"
   ]
  },
  "setWaitTime": {
@@ -32042,7 +32337,17 @@
   "audience": [
    "device"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): the feed names the queue"
+  "fixNote": "4 October 2026 (CHG-FXC-004): the feed names the queue",
+  "readVia": [
+   {
+    "query": "tenancy#deviceForApiKey",
+    "route": "in-process",
+    "for": "the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM CR-451; XDR-068)"
+   }
+  ],
+  "readsInProcess": [
+   "tenancy.device_credential"
+  ]
  },
  "testQueueFeed": {
   "contract": "queue",
@@ -32109,6 +32414,7 @@
   "verb": "GET",
   "path": "/signage/queue-board",
   "reads": [
+   "queue.feed",
    "queue.queue",
    "queue.reading"
   ],
@@ -32125,6 +32431,16 @@
   ],
   "audience": [
    "device"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#deviceForApiKey",
+    "route": "in-process",
+    "for": "the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM CR-451; XDR-068)"
+   }
+  ],
+  "readsInProcess": [
+   "tenancy.device_credential"
   ]
  },
  "getSignageQueueCalls": {
@@ -32147,6 +32463,16 @@
   ],
   "audience": [
    "device"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#deviceForApiKey",
+    "route": "in-process",
+    "for": "the device-key sign-in: which live apiKey credential and device the X-Api-Key names, and its venue (ADAM CR-451; XDR-068)"
+   }
+  ],
+  "readsInProcess": [
+   "tenancy.device_credential"
   ]
  },
  "issueGameCard": {
@@ -32927,9 +33253,12 @@
   "readVia": [
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
+    "route": "in-process",
     "for": "the venues whose overrides it returns: platform.scope, Tenancy's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope"
   ]
  },
  "getTenantAppStatus": {
@@ -34457,15 +34786,19 @@
   ],
   "readVia": [
    {
-    "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "productId: the product whose own ticket is rendered (ADAM CR-096)"
+    "query": "platform-ops#tenantDomainRecords",
+    "route": "in-process",
+    "for": "the tenant's platform subdomain row, for url, read by the one WhiteLabel reader getPlatformSubdomain uses (ADAM CR-507)"
    },
    {
-    "query": "orders#ticketTemplateRecords",
-    "route": "service",
-    "for": "the ticket and pass templates the PDF ticket and Wallet passes are rendered from (ADAM CR-096)"
+    "query": "subscription#cellRecords",
+    "route": "in-process",
+    "for": "the tenant's cell, whose name the platform subdomain carries, by the same reader (ADAM CR-507)"
    }
+  ],
+  "readsInProcess": [
+   "control.cell",
+   "control.tenant_domain"
   ]
  },
  "validateTenantConfig": {
@@ -34591,6 +34924,7 @@
   "note": "Now snapshots booking flows.",
   "readColumns": {
    "whitelabel.config_version": [
+    "activated_at",
     "activation_failed_at",
     "activation_failure",
     "approval_request_id",
@@ -34627,7 +34961,7 @@
    },
    {
     "query": "orders#venueChargeCurrencies",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.PaymentProvider.supportedMethods\": payments.provider, Order's data (CHG-R10GEN-001)"
    },
    {
@@ -34665,6 +34999,7 @@
    "control.licence_add_on",
    "control.plan",
    "marketing.guest_match_policy",
+   "payments.provider",
    "platform.scope"
   ]
  },
@@ -34691,6 +35026,7 @@
   ],
   "readColumns": {
    "whitelabel.config_version": [
+    "activated_at",
     "activation_failed_at",
     "activation_failure",
     "approval_request_id",
@@ -34734,6 +35070,7 @@
    "cache:idempotency",
    "cache:resolution",
    "whitelabel.booking_flow",
+   "whitelabel.content_page",
    "whitelabel.feature_toggle",
    "whitelabel.footer_config",
    "whitelabel.homepage_layout",
@@ -34902,7 +35239,7 @@
    },
    {
     "query": "orders#venueChargeCurrencies",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.PaymentProvider.supportedMethods\": payments.provider, Order's data (CHG-R10GEN-001)"
    },
    {
@@ -34914,6 +35251,7 @@
   "readsInProcess": [
    "assets.media_asset",
    "marketing.guest_match_policy",
+   "payments.provider",
    "platform.scope"
   ]
  },
@@ -34941,10 +35279,19 @@
   ],
   "readVia": [
    {
+    "query": "catalogue#productCategoryRecords",
+    "route": "in-process",
+    "for": "the category's bookingFlowId, the second step of the flow rule (catalogue.product_category; ADAM CR-475; XDR-051)"
+   },
+   {
     "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "its read of catalogue.product, Catalogue's data (ADR-0055), to name the products a changed flow reaches"
+    "route": "in-process",
+    "for": "its read of catalogue.product, Catalogue's data (ADR-0055), to name the products a changed flow reaches: where {bookingFlowId} or {venueId} (in process since ADAM CR-475; XDR-051)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "catalogue.product_category"
   ]
  },
  "listIndexSources": {
@@ -36340,6 +36687,16 @@
     "for": "its read of identity.delegated_access, Identity's data (CHG-MOD-001)"
    },
    {
+    "query": "identity#principalHoldsPermissionAtVenue",
+    "route": "in-process",
+    "for": "the delegation-authority check (ADAM CR-479): whether the delegate holds APPROVAL_DECIDE at the delegation's scope or above (403 delegateLacksPermission), as a yes or no under the routed tenant's root grant"
+   },
+   {
+    "query": "identity#principalHoldsRoleAtVenue",
+    "route": "in-process",
+    "for": "the delegation-authority check (ADAM CR-479): whether the delegator holds an approver role of the in-force matrix's rules at the delegation's scope (its limit, 403 exceedsDelegatorAuthority), and whether the delegate holds requiredRoleId (409 delegateLacksRequiredRole), as a yes or no under the routed tenant's root grant"
+   },
+   {
     "query": "identity#principalRecords",
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
@@ -37193,9 +37550,12 @@
   "readVia": [
    {
     "query": "access#accessPointRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.access_point, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.access_point"
   ]
  },
  "amendAttendance": {
@@ -37545,6 +37905,11 @@
     "for": "its read of marketing.consent_question_version, Marketing's data (CHG-MOD-001)"
    },
    {
+    "query": "tenancy#activeVenues",
+    "route": "in-process",
+    "for": "whether body.venueId is an active venue of this tenant, for every caller (404 when absent; ADAM CR-486): platform.scope, which every host's role may read, so no grant is added"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the new cart's window and cap: cartLeaseSeconds and cartMaxExtensions of the venue's row, else of the tenant's own row of platform.venue_settings (ADAM CR-184, option A; CHG-R9CR-003)"
@@ -37557,6 +37922,7 @@
   ],
   "readsInProcess": [
    "catalogue.product",
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -39066,12 +39432,12 @@
   "readVia": [
    {
     "query": "orders#depositPolicyRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.DepositPolicy.dining\": orders.deposit_policy, Order's data (CHG-R10GEN-001)"
    },
    {
     "query": "orders#depositRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.deposit\": orders.deposit, Order's data (CHG-R10GEN-001)"
    },
    {
@@ -39086,6 +39452,8 @@
    }
   ],
   "readsInProcess": [
+   "orders.deposit",
+   "orders.deposit_policy",
    "platform.outlet",
    "platform.venue_settings"
   ]
@@ -39155,7 +39523,7 @@
   "readVia": [
    {
     "query": "orders#depositPolicyRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"DepositPolicy.dining\": orders.deposit_policy, Order's data (CHG-R10GEN-001)"
    },
    {
@@ -39165,6 +39533,7 @@
    }
   ],
   "readsInProcess": [
+   "orders.deposit_policy",
    "platform.venue_settings"
   ]
  },
@@ -39859,6 +40228,8 @@
   "path": "/search",
   "reads": [
    "catalogue.event",
+   "catalogue.price",
+   "catalogue.price_list",
    "catalogue.product",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
@@ -39897,6 +40268,11 @@
     "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)"
    },
    {
+    "query": "marketing-crm#consentQuestionRecords",
+    "route": "service",
+    "for": "the swim rule: the kinds of the consent questions the candidate products name (catalogue.product.consent_question_ids), asked once per page, for the kind only (ADAM CR-533, CR-532)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: body.fromPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
@@ -39910,6 +40286,11 @@
     "query": "white-label#guidedChoiceRecords",
     "route": "service",
     "for": "what its text calls \"GuidedChoice\": whitelabel.guided_choice, WhiteLabel's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "white-label#tenantLanguageRecords",
+    "route": "service",
+    "for": "BookingFlowConfig.showInfoOnly: the tenant's current published configuration version, its snapshot's BookingFlowConfig with the venue's venueOverrides entry laid over field by field (ADAM CR-533)"
    }
   ],
   "readsInProcess": [
@@ -41489,14 +41870,18 @@
    },
    {
     "query": "tenancy#regionSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"tenancy.RegionSettings.minorAgeThreshold\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.biometrics\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "getFacePassEnrolment": {
@@ -41594,7 +41979,7 @@
    {
     "query": "identity#subjectBiometricRecords",
     "route": "service",
-    "for": "the enrolment it revokes (pii.subject_biometric, Identity's data; CHG-MOD-001), on Identity's service route listSubjectBiometricRecords, connected when the kernel's service sign-in (#37051) is ready (ADAM CR-391)"
+    "for": "the enrolment it revokes (pii.subject_biometric, Identity's data; CHG-MOD-001), on Identity's service route listSubjectBiometricRecords (POST /queries/subject-biometric-records, ADAM CR-438), connected when the kernel's service sign-in (#37051) is ready (ADAM CR-391)"
    }
   ]
  },
@@ -41642,6 +42027,8 @@
     "freeze_note",
     "freeze_reason",
     "frozen_days",
+    "frozen_from",
+    "frozen_until",
     "holder_name",
     "id",
     "invitation_id",
@@ -41672,9 +42059,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "freezeEntitlement": {
@@ -41724,6 +42114,8 @@
     "freeze_note",
     "freeze_reason",
     "frozen_days",
+    "frozen_from",
+    "frozen_until",
     "holder_name",
     "id",
     "invitation_id",
@@ -41754,9 +42146,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "cloneProduct": {
@@ -41765,12 +42160,14 @@
   "path": "/products/{productId}/clone",
   "reads": [
    "cache:idempotency",
+   "catalogue.price",
    "catalogue.product",
    "catalogue.product_media",
    "catalogue.variant"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.price",
    "catalogue.product",
    "catalogue.product_media",
    "catalogue.variant"
@@ -41801,6 +42198,7 @@
     "channels",
     "code",
     "code_schema",
+    "compare_at_amount",
     "consent_question_ids",
     "created_at",
     "created_by_principal_id",
@@ -41813,8 +42211,10 @@
     "family_key",
     "guest_listing",
     "has_variants",
+    "highlight_badge",
     "id",
     "is_blocked_offline",
+    "is_featured",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -41854,7 +42254,7 @@
   "readVia": [
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
@@ -41864,6 +42264,7 @@
    }
   ],
   "readsInProcess": [
+   "assets.media_asset",
    "platform.venue_settings"
   ]
  },
@@ -42088,6 +42489,7 @@
     "channels",
     "code",
     "code_schema",
+    "compare_at_amount",
     "consent_question_ids",
     "created_at",
     "created_by_principal_id",
@@ -42100,8 +42502,10 @@
     "family_key",
     "guest_listing",
     "has_variants",
+    "highlight_badge",
     "id",
     "is_blocked_offline",
+    "is_featured",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -42141,7 +42545,7 @@
   "readVia": [
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
@@ -42151,6 +42555,7 @@
    }
   ],
   "readsInProcess": [
+   "assets.media_asset",
    "platform.venue_settings"
   ]
  },
@@ -42185,7 +42590,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -42200,6 +42605,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "orders.cart",
    "orders.sales_order"
   ]
@@ -42210,11 +42616,17 @@
   "path": "/products/bulk-price",
   "reads": [
    "cache:idempotency",
+   "catalogue.change_request",
+   "catalogue.change_request_line",
+   "catalogue.package_pricing",
+   "catalogue.price",
    "catalogue.price_list",
    "catalogue.product"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.audit_entry",
+   "catalogue.price",
    "catalogue.price_list",
    "catalogue.product_version"
   ],
@@ -42249,6 +42661,8 @@
   "path": "/guest/memberships",
   "reads": [
    "catalogue.entitlement_template",
+   "catalogue.membership_benefit",
+   "catalogue.plan_benefit",
    "catalogue.product",
    "orders.sales_order"
   ],
@@ -42270,12 +42684,18 @@
   "guestCallable": true,
   "readVia": [
    {
+    "query": "access#entitlementRecords",
+    "route": "in-process",
+    "for": "the guest's membership entitlements, their chains, freeze window and status, by getMyMemberships' code (ADAM CR-543)"
+   },
+   {
     "query": "orders#salesOrderRecords",
     "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "orders.sales_order"
   ]
  },
@@ -42285,8 +42705,9 @@
   "path": "/guests/me/memberships",
   "reads": [
    "access.entitlement",
-   "catalogue.product",
-   "marketing.loyalty_position"
+   "catalogue.membership_benefit",
+   "catalogue.plan_benefit",
+   "catalogue.product"
   ],
   "writes": [],
   "routing": "replica",
@@ -42307,14 +42728,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
-    "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
-   },
-   {
-    "query": "marketing-crm#loyaltyPositionRecords",
-    "route": "service",
-    "for": "its read of marketing.loyalty_position, Marketing's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "its read of access.entitlement, Access's data (CHG-MOD-001): the guest's membership entitlements, their chains, freeze window and status (ADAM CR-543)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "importProductCatalogue": {
@@ -42328,7 +42747,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.import_job"
+   "catalogue.import_job",
+   "catalogue.import_job_row"
   ],
   "routing": "",
   "scope": "venue",
@@ -42346,6 +42766,7 @@
   ],
   "readColumns": {
    "catalogue.import_job": [
+    "applied_count",
     "change_request_id",
     "column_mappings",
     "completed_at",
@@ -42354,11 +42775,13 @@
     "created_at",
     "direction",
     "error_count",
+    "failed_count",
     "file_id",
     "findings",
     "id",
     "job_kind",
     "missing_references",
+    "mode",
     "outcome",
     "parameters",
     "parsed_count",
@@ -42391,12 +42814,16 @@
   "path": "/products/import/{jobId}/commit",
   "reads": [
    "cache:idempotency",
-   "catalogue.import_job"
+   "catalogue.import_job",
+   "catalogue.import_job_row"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.audit_entry",
    "catalogue.import_job",
+   "catalogue.import_job_row",
    "catalogue.product",
+   "catalogue.product_version",
    "catalogue.variant"
   ],
   "routing": "",
@@ -42415,6 +42842,7 @@
   ],
   "readColumns": {
    "catalogue.import_job": [
+    "applied_count",
     "change_request_id",
     "column_mappings",
     "completed_at",
@@ -42423,11 +42851,13 @@
     "created_at",
     "direction",
     "error_count",
+    "failed_count",
     "file_id",
     "findings",
     "id",
     "job_kind",
     "missing_references",
+    "mode",
     "outcome",
     "parameters",
     "parsed_count",
@@ -42442,7 +42872,17 @@
     "update_count",
     "warning_count"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "orders#salesOrderRecords",
+    "route": "in-process",
+    "for": "replaceCategory: live orders against the category, checked again at commit (409 category-has-live-orders; ADAM CR-542)"
+   }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
+  ]
  },
  "issueInvitation": {
   "contract": "orders",
@@ -42929,12 +43369,12 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "promotions#bundleRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of promotions.bundle, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -42944,7 +43384,9 @@
    }
   ],
   "readsInProcess": [
-   "platform.outlet"
+   "catalogue.product",
+   "platform.outlet",
+   "promotions.bundle"
   ]
  },
  "publishVenueMap": {
@@ -43485,7 +43927,7 @@
   "readVia": [
    {
     "query": "access#accessPointRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.access_point, Access's data (CHG-MOD-001)"
    },
    {
@@ -43500,6 +43942,7 @@
    }
   ],
   "readsInProcess": [
+   "access.access_point",
    "ledger.fx_rate",
    "payments.provider"
   ]
@@ -44565,9 +45008,12 @@
   "readVia": [
    {
     "query": "access#scanEventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.scan_event, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.scan_event"
   ]
  },
  "listPartnerUsers": {
@@ -45661,7 +46107,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -45676,6 +46122,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.entitlement_template",
    "platform.venue_settings"
   ]
@@ -45714,7 +46161,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -45729,6 +46176,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.price",
    "catalogue.product"
   ]
@@ -45762,12 +46210,18 @@
   "pure": "renders a document from data already stored; nothing is written",
   "readVia": [
    {
+    "query": "access#mediaTemplateRecords",
+    "route": "in-process",
+    "for": "the stored TicketLayout layoutRef names: the design's layout of that access.media_template (designer pdfPrintablePos), Access's data (ADAM CR-447; XDR-067)"
+   },
+   {
     "query": "catalogue#productRecords",
     "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
   ],
   "readsInProcess": [
+   "access.media_template",
    "catalogue.product"
   ]
  },
@@ -45812,9 +46266,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "createContentBlock": {
@@ -45915,6 +46372,11 @@
   },
   "readVia": [
    {
+    "query": "approvals#requestRecords",
+    "route": "in-process",
+    "for": "white-label's approval.granted consumer of a content block: the approval request by requestId, for the publishAt and expireAt the publish stored in its attributes (approvals.request, Approvals' data; ADAM CR-462, CHG-CR462-001)"
+   },
+   {
     "query": "identity#principalRecords",
     "route": "service",
     "for": "approvedByPrincipalId: the publisher on a single publish, the approver from approval.granted (identity.principal, Identity's data; CHG-MOD-001; ADAM CR-365, CHG-CR365-001)"
@@ -45942,7 +46404,10 @@
     "scope_path",
     "status"
    ]
-  }
+  },
+  "readsInProcess": [
+   "approvals.request"
+  ]
  },
  "submitOnboardingApplication": {
   "contract": "subscription",
@@ -46135,7 +46600,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -46143,6 +46608,9 @@
     "route": "service",
     "for": "what its text calls \"StoreAccount.passCertificateExpiresAt\": whitelabel.store_account, WhiteLabel's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "pushWalletPassUpdate": {
@@ -46189,9 +46657,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listDelegations": {
@@ -46449,6 +46920,7 @@
   "path": "/guests/{subjectId}/data-export",
   "reads": [
    "cache:idempotency",
+   "identity.subject_data_export",
    "identity.subject_holding",
    "pii.subject"
   ],
@@ -46485,13 +46957,27 @@
     "query": "orders#openOrdersForSubject",
     "route": "projection",
     "for": "which orders the export reports as open"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the countryCode of the region settings row at the nearest ancestor of the venue's path, the event's jurisdiction (ADAM CR-512)"
+   },
+   {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "the path of the venue the request is raised at (X-Venue-Id, or a staff caller's working venue), the request's scopePath (ADAM CR-512)"
    }
   ],
   "readColumns": {
    "pii.subject": [
     "id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.scope"
+  ]
  },
  "simulatePromotion": {
   "contract": "promotions",
@@ -46703,7 +47189,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -46713,6 +47199,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.product"
   ]
  },
@@ -46757,7 +47244,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -46772,6 +47259,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.entitlement_template",
    "identity.delegated_access"
   ]
@@ -47476,6 +47964,7 @@
   "verb": "GET",
   "path": "/listings",
   "reads": [
+   "control.developer_member",
    "control.integration_listing"
   ],
   "writes": [],
@@ -48013,6 +48502,11 @@
   "lineageNote": "The messageTemplates scope reads every channel's template.",
   "readVia": [
    {
+    "query": "catalogue#productRecords",
+    "route": "service",
+    "for": "scope productNames: the products' name and nameLocalised, the source text and the languages already held (r13 root R39)"
+   },
+   {
     "query": "marketing-crm#messageTemplateRecords",
     "route": "service",
     "for": "its read of marketing.message_template, Marketing's data (CHG-MOD-001)"
@@ -48203,6 +48697,8 @@
     "freeze_note",
     "freeze_reason",
     "frozen_days",
+    "frozen_from",
+    "frozen_until",
     "holder_name",
     "id",
     "invitation_id",
@@ -48242,7 +48738,7 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -48252,7 +48748,8 @@
    }
   ],
   "readsInProcess": [
-   "catalogue.entitlement_template"
+   "catalogue.entitlement_template",
+   "catalogue.product"
   ]
  },
  "getEntitlement": {
@@ -48291,6 +48788,8 @@
     "freeze_note",
     "freeze_reason",
     "frozen_days",
+    "frozen_from",
+    "frozen_until",
     "holder_name",
     "id",
     "invitation_id",
@@ -48326,7 +48825,7 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "productName, imageUrl and guestCategory of each entitlement, Catalogue's data (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)"
    },
    {
@@ -48336,7 +48835,8 @@
    }
   ],
   "readsInProcess": [
-   "catalogue.entitlement_template"
+   "catalogue.entitlement_template",
+   "catalogue.product"
   ]
  },
  "getEntitlementCredential": {
@@ -49767,7 +50267,7 @@
   "readVia": [
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    },
    {
@@ -49777,6 +50277,7 @@
    }
   ],
   "readsInProcess": [
+   "orders.order_line",
    "platform.venue_settings"
   ]
  },
@@ -51428,7 +51929,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -51438,6 +51939,7 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.product",
    "platform.region_settings"
   ]
  },
@@ -51797,7 +52299,7 @@
   "readVia": [
    {
     "query": "catalogue#priceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.price, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -51817,6 +52319,7 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.price",
    "platform.outlet",
    "platform.venue_settings"
   ]
@@ -52075,12 +52578,12 @@
   "readVia": [
    {
     "query": "catalogue#priceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.price, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -52088,6 +52591,10 @@
     "route": "service",
     "for": "what its text calls \"tax code\": ledger.tax_code, Ledger's data (CHG-RTE-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price",
+   "catalogue.product"
   ]
  },
  "sendBookingConfirmation": {
@@ -52569,11 +53076,12 @@
   ]
  },
  "setRolePermissions": {
-  "contract": "tenancy",
+  "contract": "identity",
   "verb": "PUT",
   "path": "/roles/{roleId}/permissions",
   "reads": [
    "cache:idempotency",
+   "identity.delegated_access",
    "identity.role",
    "identity.role_permission",
    "identity.segregation_rule"
@@ -52581,7 +53089,10 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.refresh_token",
+   "identity.role",
    "identity.role_permission",
+   "identity.session",
    "platform.audit_record"
   ],
   "routing": "",
@@ -52590,7 +53101,7 @@
   "offline": false,
   "summary": "What this role may do",
   "source": "hand-mapped",
-  "service": "TenancyService",
+  "service": "IdentityService",
   "stores": [
    "postgres",
    "redis"
@@ -52607,29 +53118,7 @@
    "key": "res:{tenantId}:{resolver}:{scopePath}",
    "bump": "INCR resver:{tenantId}:{resolver}",
    "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
-  },
-  "readVia": [
-   {
-    "query": "identity#rolePermissionRecords",
-    "route": "in-process",
-    "for": "its read of identity.role_permission, Identity's data (CHG-MOD-001)"
-   },
-   {
-    "query": "identity#roleRecords",
-    "route": "in-process",
-    "for": "its read of identity.role, Identity's data (CHG-MOD-001)"
-   },
-   {
-    "query": "identity#segregationRuleRecords",
-    "route": "in-process",
-    "for": "its read of identity.segregation_rule, Identity's data (CHG-MOD-001)"
-   }
-  ],
-  "readsInProcess": [
-   "identity.role",
-   "identity.role_permission",
-   "identity.segregation_rule"
-  ]
+  }
  },
  "updateSupplier": {
   "contract": "inventory",
@@ -53096,6 +53585,8 @@
     "freeze_note",
     "freeze_reason",
     "frozen_days",
+    "frozen_from",
+    "frozen_until",
     "holder_name",
     "id",
     "invitation_id",
@@ -53130,9 +53621,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "recordCorrectiveAction": {
@@ -53407,9 +53901,12 @@
   "readVia": [
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of assets.media_asset, VenueOps's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "assets.media_asset"
   ]
  },
  "getSeatMapImport": {
@@ -53866,9 +54363,12 @@
   "readVia": [
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.sales_order"
   ]
  },
  "decommissionBurstEnvironment": {
@@ -54549,9 +55049,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listBulkGroupAssisted": {
@@ -54586,7 +55089,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -54596,6 +55099,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.price"
   ]
  },
@@ -54710,7 +55214,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -54720,6 +55224,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.product"
   ]
  },
@@ -54828,9 +55333,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "setProRataResidual": {
@@ -55205,7 +55713,8 @@
   "reads": [
    "approvals.matrix",
    "approvals.rule",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.venue_settings"
   ],
   "writes": [
    "approvals.matrix",
@@ -55227,7 +55736,17 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Agreed note: duplicates setApprovalMatrix, which stays the operation of record; lineage copied from that neighbour (matrix + rule, N-of-M via minimumApprovals/requiredApproverRole)."
+  "lineageNote": "Agreed note: duplicates setApprovalMatrix, which stays the operation of record; lineage copied from that neighbour (matrix + rule, N-of-M via minimumApprovals/requiredApproverRole).",
+  "readVia": [
+   {
+    "query": "identity#consumeMfaStepUp",
+    "route": "in-process",
+    "for": "the MFA step-up, checked and consumed before any other write in this operation's own transaction: missing is 403 step-up-token-missing, expired is 403 step-up-token-expired, nothing written; a later refusal rolls the consume back (ADAM CR-509)"
+   }
+  ],
+  "readsInProcess": [
+   "identity.mfa_challenge"
+  ]
  },
  "approveMembershipProductValidation": {
   "contract": "subscription",
@@ -55281,14 +55800,18 @@
    },
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of approvals.request, Tenancy's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request",
+   "catalogue.product"
   ]
  },
  "approveMultiMediaPreview": {
@@ -55465,7 +55988,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -55480,6 +56003,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "orders.cart",
    "orders.sales_order"
   ]
@@ -55494,7 +56018,8 @@
    "approvals.rule",
    "cache:idempotency",
    "identity.delegated_access",
-   "identity.principal"
+   "identity.principal",
+   "platform.venue_settings"
   ],
   "writes": [
    "approvals.delegation",
@@ -55523,9 +56048,24 @@
   },
   "readVia": [
    {
+    "query": "identity#consumeMfaStepUp",
+    "route": "in-process",
+    "for": "the MFA step-up, checked and consumed in this operation's own transaction before any other write: missing is 403 step-up-token-missing, expired is 403 step-up-token-expired (ADAM CR-509, CR-497)"
+   },
+   {
     "query": "identity#delegatedAccessRecords",
     "route": "in-process",
     "for": "its read of identity.delegated_access, Identity's data (CHG-MOD-001)"
+   },
+   {
+    "query": "identity#principalHoldsPermissionAtVenue",
+    "route": "in-process",
+    "for": "the delegation-authority check (ADAM CR-479): whether the delegate holds APPROVAL_DECIDE at the delegation's scope or above (403 delegateLacksPermission), as a yes or no under the routed tenant's root grant"
+   },
+   {
+    "query": "identity#principalHoldsRoleAtVenue",
+    "route": "in-process",
+    "for": "the delegation-authority check (ADAM CR-479): whether the delegator holds an approver role of the in-force matrix's rules at the delegation's scope (its limit, 403 exceedsDelegatorAuthority), and whether the delegate holds requiredRoleId (409 delegateLacksRequiredRole), as a yes or no under the routed tenant's root grant"
    },
    {
     "query": "identity#principalRecords",
@@ -55535,6 +56075,7 @@
   ],
   "readsInProcess": [
    "identity.delegated_access",
+   "identity.mfa_challenge",
    "identity.principal"
   ]
  },
@@ -55774,12 +56315,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
     "query": "access#scanEventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.scan_event, Access's data (CHG-MOD-001)"
    },
    {
@@ -55789,6 +56330,8 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
+   "access.scan_event",
    "catalogue.entitlement_template"
   ]
  },
@@ -56323,7 +56866,7 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -56333,7 +56876,8 @@
    }
   ],
   "readsInProcess": [
-   "catalogue.entitlement_template"
+   "catalogue.entitlement_template",
+   "catalogue.product"
   ]
  },
  "listAudienceDiscoveryTargeting": {
@@ -56697,14 +57241,18 @@
   "readVia": [
    {
     "query": "tenancy#regionSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"tenancy.RegionSettings.minorAgeThreshold\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"tenancy.VenueSettings.biometrics\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "listBiometricIdentityIntegrity": {
@@ -56774,9 +57322,12 @@
   "readVia": [
    {
     "query": "tenancy#dataRetentionSettingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of tenancy.data_retention_setting, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "tenancy.data_retention_setting"
   ]
  },
  "listBiometricValidationGate": {
@@ -57581,7 +58132,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -57591,6 +58142,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.channel_capacity"
   ]
  },
@@ -57724,7 +58276,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -57739,6 +58291,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "orders.cart",
    "orders.sales_order"
   ]
@@ -58986,7 +59539,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -58994,6 +59547,9 @@
     "route": "service",
     "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listCredentialActivationDisplay": {
@@ -59123,7 +59679,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -59131,6 +59687,9 @@
     "route": "service",
     "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listCredentialIdentityToken": {
@@ -59236,9 +59795,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listCredentialSecurity": {
@@ -60594,9 +61156,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listEntryExitRule": {
@@ -61377,14 +61942,18 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
     "query": "access#scanEventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.scan_event, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement",
+   "access.scan_event"
   ]
  },
  "listGroupAttendancePartial": {
@@ -61468,9 +62037,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listGroupBookingReconciliation": {
@@ -61506,14 +62078,18 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
     "query": "access#scanEventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.scan_event, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement",
+   "access.scan_event"
   ]
  },
  "listGroupCustomerOrganization": {
@@ -61599,7 +62175,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -61607,6 +62183,9 @@
     "route": "service",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listGroupPaymentDeposit": {
@@ -61734,9 +62313,12 @@
   "readVia": [
    {
     "query": "access#scanEventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.scan_event, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.scan_event"
   ]
  },
  "listGroupTicketFulfillment": {
@@ -61769,7 +62351,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -61777,6 +62359,9 @@
     "route": "service",
     "for": "its read of marketing.message_dispatch, Marketing's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listGroupTicketSeat": {
@@ -61810,9 +62395,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listGuestCompanionEligibility": {
@@ -62606,14 +63194,18 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "orders.sales_order"
   ]
  },
  "listMemberExceptionOverride": {
@@ -62698,7 +63290,7 @@
    },
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of approvals.request, Tenancy's data (CHG-MOD-001)"
    },
    {
@@ -62708,19 +63300,25 @@
    },
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.payment, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#refundRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.refund, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request",
+   "orders.payment",
+   "orders.refund",
+   "orders.sales_order"
   ]
  },
  "listMembershipActivationCredential": {
@@ -62759,19 +63357,24 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "listMembershipAnnualPass": {
@@ -62813,14 +63416,18 @@
    },
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of approvals.request, Tenancy's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request",
+   "catalogue.product"
   ]
  },
  "listMembershipCommercialPricing": {
@@ -62853,19 +63460,24 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.channel_capacity, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#priceListRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.price_list, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity",
+   "catalogue.price_list",
+   "catalogue.product"
   ]
  },
  "listMembershipFreezeSuspension": {
@@ -62902,9 +63514,12 @@
    },
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of approvals.request, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request"
   ]
  },
  "listMembershipLoyaltyGuest": {
@@ -63031,24 +63646,30 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#refundRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.refund, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "orders.order_line",
+   "orders.refund",
+   "orders.sales_order"
   ]
  },
  "listMembershipUpgradeDowngrade": {
@@ -63087,19 +63708,24 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.payment, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "orders.payment",
+   "orders.sales_order"
   ]
  },
  "listMembershipUsageVisit": {
@@ -63131,9 +63757,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listMultiBuyQuantity": {
@@ -63353,7 +63982,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -63368,6 +63997,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.performance",
    "catalogue.product"
   ]
@@ -63639,7 +64269,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -63654,6 +64284,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.performance",
    "catalogue.product"
   ]
@@ -63865,9 +64496,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listPartner2": {
@@ -65204,17 +65838,30 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
+   },
+   {
+    "query": "orders#orderLineRecords",
+    "route": "in-process",
+    "for": "futureReservations, currentRevenue, projectedRevenue, customerExposure and transactionVolume: the order lines on affected variants (ADAM CR-456; CHG-CR456-001)"
    },
    {
     "query": "orders#salesOrderRecords",
     "route": "in-process",
-    "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
+    "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001): the status and created_at of the orders the counted order lines belong to (ADAM CR-456)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's trading currency for currentRevenue, projectedRevenue and revenueImpact (ADAM CR-456)"
    }
   ],
   "readsInProcess": [
-   "orders.sales_order"
+   "access.entitlement",
+   "orders.order_line",
+   "orders.sales_order",
+   "platform.venue_settings"
   ]
  },
  "listPricingCompliance": {
@@ -66699,19 +67346,24 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.payment, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "orders.payment",
+   "orders.sales_order"
   ]
  },
  "listResale2": {
@@ -66788,9 +67440,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listResaleEligibilityTicket": {
@@ -66825,12 +67480,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
     "query": "access#scanEventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.scan_event, Access's data (CHG-MOD-001)"
    },
    {
@@ -66840,6 +67495,8 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
+   "access.scan_event",
    "catalogue.performance"
   ]
  },
@@ -66913,14 +67570,18 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
     "query": "access#scanEventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.scan_event, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement",
+   "access.scan_event"
   ]
  },
  "listResaleInventoryAvailability": {
@@ -66958,7 +67619,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -66968,6 +67629,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.performance"
   ]
  },
@@ -67006,7 +67668,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -67026,6 +67688,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.performance",
    "platform.scope",
    "platform.venue_settings"
@@ -67063,7 +67726,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -67073,6 +67736,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.performance"
   ]
  },
@@ -67107,9 +67771,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listResalePolicyMarketplace": {
@@ -67222,7 +67889,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -67237,6 +67904,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.performance",
    "catalogue.product"
   ]
@@ -67788,9 +68456,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SecurityAnalyticsAiDetectionGovernanceView.estimatedFraudPrevented, SecurityAnalyticsAiDetectionGovernanceView.financialExposure (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listSellerSettlementPayout": {
@@ -68478,9 +69149,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listTicketReissueFulfillment": {
@@ -68513,9 +69187,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "listTicketResaleMarketplace": {
@@ -68548,7 +69225,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -68558,6 +69235,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.performance"
   ]
  },
@@ -68828,7 +69506,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -68836,6 +69514,9 @@
     "route": "service",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listValidityDateTime": {
@@ -68994,7 +69675,7 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -69009,7 +69690,8 @@
    }
   ],
   "readsInProcess": [
-   "catalogue.entitlement_template"
+   "catalogue.entitlement_template",
+   "catalogue.product"
   ]
  },
  "listVirtualTicketArchitecture": {
@@ -69117,9 +69799,12 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "listVoidReversalSame": {
@@ -69498,9 +70183,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "publishChannelReadinessValidation": {
@@ -69710,9 +70398,12 @@
   "readVia": [
    {
     "query": "approvals#ruleRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"ApprovalRule.subjectTypes\": approvals.rule, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.rule"
   ]
  },
  "setAccessAreaZone": {
@@ -70812,7 +71503,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -70827,6 +71518,7 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.product",
    "platform.scope",
    "platform.venue_settings"
   ]
@@ -71296,19 +71988,24 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "orders.order_line",
+   "orders.sales_order"
   ]
  },
  "setMembershipEligibilityQualification": {
@@ -71345,9 +72042,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "setMembershipEntitlementAdmission": {
@@ -71390,14 +72090,18 @@
   "readVia": [
    {
     "query": "catalogue#priceListRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.price_list, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price_list",
+   "catalogue.product"
   ]
  },
  "setMembershipProductTier": {
@@ -71433,9 +72137,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "setMultiPaymentSplit": {
@@ -71543,7 +72250,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -71558,6 +72265,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "catalogue.channel_capacity",
    "catalogue.inventory_reservation"
   ]
@@ -71624,7 +72332,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -71632,6 +72340,9 @@
     "route": "in-process",
     "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "setOrderReservationStatus": {
@@ -72371,9 +73082,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "setResaleEligibilityRule": {
@@ -72539,9 +73253,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RfidNfcCardWristbandMediaDesignerInput.depositReferenceWhereApplicable, RfidNfcCardWristbandMediaDesignerView.depositReferenceWhereApplicable (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setRuleTestRecommendation": {
@@ -72835,9 +73552,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "setVirtualTicketCredential": {
@@ -72888,7 +73608,7 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -72903,7 +73623,8 @@
    }
   ],
   "readsInProcess": [
-   "catalogue.entitlement_template"
+   "catalogue.entitlement_template",
+   "catalogue.product"
   ]
  },
  "setVirtualTicketIdentity": {
@@ -73210,9 +73931,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "simulatePriceBreakdownCalculation": {
@@ -73234,6 +73958,7 @@
    "catalogue.product",
    "catalogue.rate",
    "catalogue.rounding_profile",
+   "catalogue.sales_channel",
    "catalogue.tax_profile",
    "catalogue.tax_rule",
    "catalogue.variant",
@@ -73741,9 +74466,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "relinquishCustomDomain": {
@@ -74281,9 +75009,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the experience product whose resource requirements it allocates (409, ResourceRequirement) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "analyseMediaAsset": {
@@ -74421,9 +75152,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the product the asset must be of (409 wrong-product) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "authoriseGameplay": {
@@ -74631,7 +75365,7 @@
   "readVia": [
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the card deposit's payment: refused 409 deposit-not-authorised until it is authorised (ADAM CR-146)"
    },
    {
@@ -74641,6 +75375,7 @@
    }
   ],
   "readsInProcess": [
+   "orders.payment",
    "platform.venue_settings"
   ]
  },
@@ -76518,7 +77253,8 @@
   "writes": [
    "cache:idempotency",
    "platform.device",
-   "platform.outbox"
+   "platform.outbox",
+   "tenancy.device_audit"
   ],
   "routing": null,
   "scope": "venue",
@@ -77597,22 +78333,22 @@
    },
    {
     "query": "accreditation#applicationRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of accreditation.application, Tenancy's data (CHG-MOD-001)"
    },
    {
     "query": "accreditation#credentialRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of accreditation.credential, Tenancy's data (CHG-MOD-001)"
    },
    {
     "query": "accreditation#holderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of accreditation.holder, Tenancy's data (CHG-MOD-001)"
    },
    {
     "query": "accreditation#validityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of accreditation.validity, Tenancy's data (CHG-MOD-001)"
    },
    {
@@ -77647,22 +78383,22 @@
    },
    {
     "query": "orders#orderLineDiscountRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "grossSales and discounts: the discounts applied to the order lines of the period (orders.order_line_discount) (r8 re-walk, CHG-R8RW-005)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "grossSales, discounts, netRevenue and taxCollected, split by the dimensions order lines carry (orders.order_line)"
    },
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "takings: the money taken in the period, by tender, workstation and shift (orders.payment)"
    },
    {
     "query": "orders#refundRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "takings and refunds: the money paid back in the period (orders.refund)"
    },
    {
@@ -77672,10 +78408,18 @@
    }
   ],
   "readsInProcess": [
+   "accreditation.application",
+   "accreditation.credential",
+   "accreditation.holder",
+   "accreditation.validity",
    "fnb.table_reservation",
    "fnb.table_visit",
    "fnb.waitlist_entry",
    "marketing.loyalty_position",
+   "orders.order_line",
+   "orders.order_line_discount",
+   "orders.payment",
+   "orders.refund",
    "platform.venue_settings"
   ]
  },
@@ -83791,7 +84535,17 @@
     "scope_path",
     "warranty_expires_at"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "identity#principalRecords",
+    "route": "in-process",
+    "for": "custodianPrincipalId must name a principal, else 422 unknown-reference (r13 root R39)"
+   }
+  ],
+  "readsInProcess": [
+   "identity.principal"
+  ]
  },
  "setEventCapacityProfile": {
   "contract": "catalogue",
@@ -86996,7 +87750,8 @@
     "maximum_per_day",
     "maximum_per_transfer",
     "scope_path",
-    "transferable_credit_type_ids"
+    "transferable_credit_type_ids",
+    "version"
    ]
   },
   "readVia": [
@@ -91546,9 +92301,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.biometrics\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getBillingStatement": {
@@ -92499,7 +93257,17 @@
     "requires_corrective_action_on_breach",
     "scope_path"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the venue's outlets (platform.outlet, Tenancy's data), so an outletId that is not one of them is refused 400 (ADAM CR-453; XDR-004)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
+  ]
  },
  "getCommandCentre": {
   "contract": "reporting",
@@ -93898,7 +94666,7 @@
    {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for GroupPackageDefinition.unitPrice, should this operation fill it; it answers unitPrice null (ADAM CR-499; check-money-currency, ADR-0018), so the read is not asked until it does"
    }
   ],
   "readsInProcess": [
@@ -94068,6 +94836,7 @@
   ],
   "readColumns": {
    "catalogue.import_job": [
+    "applied_count",
     "change_request_id",
     "column_mappings",
     "completed_at",
@@ -94076,11 +94845,13 @@
     "created_at",
     "direction",
     "error_count",
+    "failed_count",
     "file_id",
     "findings",
     "id",
     "job_kind",
     "missing_references",
+    "mode",
     "outcome",
     "parameters",
     "parsed_count",
@@ -94628,6 +95399,9 @@
   "readColumns": {
    "queue.entry": [
     "admitted_count",
+    "call_resolution_reason",
+    "call_resolved_at",
+    "call_resolved_by_principal_id",
     "called_at",
     "entitlement_id",
     "estimated_call_at",
@@ -94837,7 +95611,7 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    },
    {
@@ -94847,6 +95621,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "identity.delegated_access"
   ]
  },
@@ -96133,7 +96908,7 @@
    {
     "query": "catalogue#productCategoryRecords",
     "route": "in-process",
-    "for": "a category target's scope_path (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)"
+    "for": "a category target's scope_path (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants); the rows at the venue and at its ancestors, read for this check only (ADAM CR-443)"
    },
    {
     "query": "catalogue#productRecords",
@@ -96903,7 +97678,7 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.channel_capacity, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -96913,6 +97688,7 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.channel_capacity",
    "platform.venue_settings"
   ]
  },
@@ -97608,7 +98384,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "whether the product is sold by time window and the variant's length (422) (CHG-MOD-003)"
    },
    {
@@ -97618,6 +98394,7 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.product",
    "platform.venue_settings"
   ]
  },
@@ -98129,7 +98906,7 @@
    {
     "query": "catalogue#productCategoryRecords",
     "route": "in-process",
-    "for": "a category target's scope_path (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)"
+    "for": "a category target's scope_path (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants); the rows at the venue and at its ancestors, read for this check only (ADAM CR-443)"
    },
    {
     "query": "catalogue#productRecords",
@@ -98220,7 +98997,7 @@
    {
     "query": "catalogue#productCategoryRecords",
     "route": "in-process",
-    "for": "a category target's scope_path, is_active, and its products on sale (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)"
+    "for": "a category target's scope_path, is_active, and its products on sale (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants); the rows at the venue and at its ancestors, read for this check only (ADAM CR-443)"
    },
    {
     "query": "catalogue#productRecords",
@@ -98334,9 +99111,12 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "seats sold on a superseded timetable's departures (409 timetable-overlaps-sold-departures) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity"
   ]
  },
  "quoteTransportFare": {
@@ -98921,7 +99701,7 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.channel_capacity, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -98931,6 +99711,7 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.channel_capacity",
    "platform.venue_settings"
   ]
  },
@@ -99055,9 +99836,12 @@
   "readVia": [
    {
     "query": "tenancy#dataRetentionSettingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of tenancy.data_retention_setting, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "tenancy.data_retention_setting"
   ]
  },
  "setBrandingLocalizationTemplate": {
@@ -99249,7 +100033,7 @@
    {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "the venue's biometrics settings, consentFormId for the fallback and templatesHeldByTicvai for the view: platform.venue_settings, Tenancy's data, asked in process through Tenancy's own query class under the caller's row security (ADAM CR-390; XDR-032)"
+    "for": "the venue's biometrics settings, consentFormId for the fallback and templatesHeldByTicvai for the view: platform.venue_settings, Tenancy's data, asked in process through Tenancy's own query class under the caller's row security (ADAM CR-390; XDR-032); then the tenant default (the settings row with venue_id null), read under the routed tenant's root grant, when the venue's row names no consent form (ADAM CR-445)"
    }
   ],
   "readsInProcess": [
@@ -99586,9 +100370,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the product replacementFeeReference names (422 unknown-product) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "setMediaTypeTechnology": {
@@ -100085,9 +100872,12 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "seats sold on a departure still on sale (409 route-has-sold-departures) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity"
   ]
  },
  "setWalletAuthenticationPolicy": {
@@ -100598,7 +101388,29 @@
     "sort_order",
     "title"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "catalogue#eventRecords",
+    "route": "in-process",
+    "for": "an event target's venue_id (catalogue.event, Catalogue's data), in process (ADAM CR-444; XDR-033)"
+   },
+   {
+    "query": "catalogue#productCategoryRecords",
+    "route": "in-process",
+    "for": "a category target's scope_path (catalogue.product_category, Catalogue's data), in process, the rows at the venue and at its ancestors, read for this check only (ADAM CR-444, CR-443; XDR-033)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "in-process",
+    "for": "a product target's venue_id (catalogue.product, Catalogue's data), in process, as createGuidedChoice asks it (ADAM CR-444; XDR-033)"
+   }
+  ],
+  "readsInProcess": [
+   "catalogue.event",
+   "catalogue.product",
+   "catalogue.product_category"
+  ]
  },
  "updateProductVariant": {
   "contract": "catalogue",
@@ -100636,6 +101448,7 @@
     "is_active",
     "is_default",
     "name",
+    "price_category_id",
     "product_id",
     "reference_price",
     "sku"
@@ -100696,9 +101509,12 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "seats sold on the departure (422 capacity-below-sold) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity"
   ]
  },
  "updateTransportPassType": {
@@ -101040,6 +101856,8 @@
     "freeze_note",
     "freeze_reason",
     "frozen_days",
+    "frozen_from",
+    "frozen_until",
     "holder_name",
     "id",
     "invitation_id",
@@ -101070,9 +101888,12 @@
   "readVia": [
    {
     "query": "access#entitlementRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
   ]
  },
  "withdrawTransportTimetable": {
@@ -101128,9 +101949,12 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "seats sold on a future departure (409 timetable-overlaps-sold-departures) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity"
   ]
  },
  "withdrawWalletDispute": {
@@ -102962,9 +103786,12 @@
   "readVia": [
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"approvals.request\": approvals.request, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request"
   ]
  },
  "mergeOrders": {
@@ -103315,9 +104142,12 @@
   "readVia": [
    {
     "query": "tenancy#deviceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"platform.device\": platform.device, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.device"
   ]
  },
  "releaseCredentialDevice": {
@@ -103420,9 +104250,12 @@
   "readVia": [
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"approvals.request\": approvals.request, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request"
   ]
  },
  "releaseResaleSettlementHold": {
@@ -105044,24 +105877,30 @@
   "readVia": [
    {
     "query": "catalogue#priceListRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.price_list, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#taxProfileRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "that `taxProfile` names an active catalogue.tax_profile row (422 unknown-profile) (r8, GPS-C34)"
    },
    {
     "query": "payments#instalmentPolicyRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "whether payments supports instalments for the product (422 instalments-not-supported) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.tax_profile",
+   "payments.instalment_policy"
   ]
  },
  "setMembershipUsagePolicy": {
@@ -105098,9 +105937,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the membership product's catalogue product (404, 409) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "setOperatingCalendarEntry": {
@@ -106544,9 +107386,12 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product"
   ]
  },
  "startPodiumShift": {
@@ -106764,9 +107609,12 @@
   "readVia": [
    {
     "query": "tenancy#deviceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"platform.device\": platform.device, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.device"
   ]
  },
  "updateChannelIncident": {
@@ -108183,7 +109031,7 @@
   "readVia": [
    {
     "query": "seating#seatRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the seat a `seat` location names (422 seat-id-required) (CHG-MOD-003)"
    },
    {
@@ -108193,7 +109041,8 @@
    }
   ],
   "readsInProcess": [
-   "platform.outlet"
+   "platform.outlet",
+   "seating.seat"
   ]
  },
  "createDeviceFirmware": {
@@ -114468,6 +115317,7 @@
   "path": "/storefront/session-events",
   "reads": [],
   "writes": [
+   "platform.idempotency_record",
    "platform.outbox"
   ],
   "routing": null,
@@ -114485,7 +115335,17 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "nothing stored but the outbox row (storefront.sessionEvent)"
+  "lineageNote": "nothing stored but the outbox row (storefront.sessionEvent)",
+  "readVia": [
+   {
+    "query": "tenancy#activeVenues",
+    "route": "in-process",
+    "for": "whether venueId names an active venue of the tenant, whose path is the event's scopePath (ADAM CR-511), platform.scope, Tenancy's data, asked in process as publishTenantConfig reads it (XDR-022)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.scope"
+  ]
  },
  "renewAccreditation": {
   "contract": "accreditation",
@@ -115255,19 +116115,24 @@
   "readVia": [
    {
     "query": "accreditation#applicationRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"accreditation.application\": accreditation.application, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "accreditation#credentialRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"accreditation.credential\": accreditation.credential, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "accreditation#holderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"accreditation.holder\": accreditation.holder, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "accreditation.application",
+   "accreditation.credential",
+   "accreditation.holder"
   ]
  },
  "scoreApprovalRequest": {
@@ -117261,39 +118126,48 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.channel_capacity, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#performanceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#variantRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.variant, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "orders#cartLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.cart_line, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#cartRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.cart, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "promotions#bundleRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of promotions.bundle, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.channel_capacity",
+   "catalogue.performance",
+   "catalogue.product",
+   "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line",
+   "promotions.bundle"
   ]
  },
  "captureWalletHold": {
@@ -117750,27 +118624,27 @@
   "readVia": [
    {
     "query": "catalogue#performanceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productEligibilityRuleRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product_eligibility_rule, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#variantRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.variant, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
    },
    {
@@ -117780,6 +118654,11 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.performance",
+   "catalogue.product",
+   "catalogue.product_eligibility_rule",
+   "catalogue.variant",
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -117978,6 +118857,11 @@
   },
   "readVia": [
    {
+    "query": "catalogue#eventRecords",
+    "route": "in-process",
+    "for": "whether an eventId is an event of the venue (ids [eventId] where {venueId}), catalogue.event, Catalogue's data, asked in process from the operations host (ADAM CR-495; XDR-110; CHG-CR495-001)"
+   },
+   {
     "query": "catalogue#productCategoryRecords",
     "route": "in-process",
     "for": "the category's bookingFlowId (the product's categoryId, or productCategoryId), catalogue.product_category, Catalogue's data, asked in process from the operations host (ADAM CR-427; XDR-051; CHG-CR427-001)"
@@ -117985,10 +118869,11 @@
    {
     "query": "catalogue#productRecords",
     "route": "in-process",
-    "for": "the product's bookingFlowId, categoryId and kind (ids [productId] where {venueId}), catalogue.product, Catalogue's data, asked in process from the operations host (ADAM CR-427; XDR-051; CHG-CR427-001)"
+    "for": "the product's bookingFlowId, categoryId and kind (ids [productId] where {venueId}; or, for an eventId with no productId, where {venueId, eventId}, ADAM CR-495), catalogue.product, Catalogue's data, asked in process from the operations host (ADAM CR-427; XDR-051; CHG-CR427-001)"
    }
   ],
   "readsInProcess": [
+   "catalogue.event",
    "catalogue.product",
    "catalogue.product_category"
   ]
@@ -117999,6 +118884,7 @@
   "path": "/tenant-config/site-setup",
   "reads": [
    "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
    "whitelabel.config_version",
    "whitelabel.site_setup_progress",
    "whitelabel.tenant_config"
@@ -118395,6 +119281,8 @@
     "freeze_note",
     "freeze_reason",
     "frozen_days",
+    "frozen_from",
+    "frozen_until",
     "holder_name",
     "id",
     "invitation_id",
@@ -118773,6 +119661,7 @@
   "verb": "GET",
   "path": "/production-access-requests",
   "reads": [
+   "control.developer_member",
    "control.production_access_request"
   ],
   "writes": [],
@@ -118942,19 +119831,24 @@
   "readVia": [
    {
     "query": "catalogue#performanceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productEligibilityRuleRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product_eligibility_rule, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.performance",
+   "catalogue.product",
+   "catalogue.product_eligibility_rule"
   ]
  },
  "postOrderRevenue": {
@@ -119261,6 +120155,7 @@
    "cache:idempotency",
    "control.api_client",
    "control.developer_account",
+   "control.developer_member",
    "control.integration_listing",
    "control.production_access_request"
   ],
@@ -119684,9 +120579,12 @@
   "readVia": [
    {
     "query": "workforce#shiftRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of workforce.shift, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "workforce.shift"
   ]
  },
  "updateBookingFlowDefinition": {
@@ -119884,17 +120782,17 @@
   "readVia": [
    {
     "query": "catalogue#performanceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productEligibilityRuleRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product_eligibility_rule, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
    },
    {
@@ -119904,6 +120802,9 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.performance",
+   "catalogue.product_eligibility_rule",
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -120254,13 +121155,15 @@
   "path": "/shifts/{shiftId}/count",
   "reads": [
    "cache:idempotency",
-   "ledger.fx_rate",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.payment",
    "orders.pos_shift",
    "orders.pos_shift_approval",
    "orders.pos_shift_incident",
+   "orders.refund",
+   "orders.refund_payment",
+   "orders.sales_order",
    "platform.venue_settings"
   ],
   "writes": [
@@ -120286,11 +121189,6 @@
   "note": "CHG-FIN-003 (2 October 2026): the cashier-facing blind close; reads and writes as closeShift, returns no expected figure",
   "readVia": [
    {
-    "query": "finance#fxRateRecords",
-    "route": "in-process",
-    "for": "its read of ledger.fx_rate, Ledger's data (CHG-MOD-001)"
-   },
-   {
     "query": "tenancy#denominationRecords",
     "route": "in-process",
     "for": "what its text calls \"platform.denomination\": platform.denomination, Tenancy's data (CHG-R10GEN-001)"
@@ -120302,7 +121200,6 @@
    }
   ],
   "readsInProcess": [
-   "ledger.fx_rate",
    "platform.denomination",
    "platform.venue_settings"
   ]
@@ -120539,13 +121436,14 @@
    },
    {
     "query": "payments#providerConnectionRecords",
-    "route": "service",
-    "for": "its read of payments.provider_connection, for `paymentTokenisation`, through the service route: White-label runs in operations, Payments in commerce (lineage request, r8; CHG-R8INT-005)"
+    "route": "in-process",
+    "for": "its read of payments.provider_connection, for `paymentTokenisation`, in process: the operations host composes Orders' query classes, Payments among them (lineage request, r8; CHG-R8INT-005; in process since CHG-R13INP-001, XDR-075)"
    }
   ],
   "readsInProcess": [
    "assets.media_asset",
-   "identity.sso_provider"
+   "identity.sso_provider",
+   "payments.provider_connection"
   ]
  },
  "listPublishedContentPages": {
@@ -121092,7 +121990,7 @@
   "readVia": [
    {
     "query": "orders#depositPolicyRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.DepositPolicy.dining\": orders.deposit_policy, Order's data (CHG-R10GEN-001)"
    },
    {
@@ -121102,6 +122000,7 @@
    }
   ],
   "readsInProcess": [
+   "orders.deposit_policy",
    "platform.venue_settings"
   ]
  },
@@ -121264,6 +122163,7 @@
     "created_at",
     "download_url",
     "expires_at",
+    "failure_reason",
     "id",
     "package_asset_ref",
     "platform_staff_grant_id",
@@ -121890,6 +122790,7 @@
     "created_at",
     "download_url",
     "expires_at",
+    "failure_reason",
     "id",
     "package_asset_ref",
     "platform_staff_grant_id",
@@ -122213,7 +123114,9 @@
   "contract": "catalogue",
   "verb": "GET",
   "path": "/product-approval-workflows",
-  "reads": [],
+  "reads": [
+   "catalogue.approval_policy"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -123229,6 +124132,21 @@
     "table": "approvals.matrix",
     "operation": "setApprovalMatrix"
    }
+  ],
+  "readVia": [
+   {
+    "query": "approvals#ruleRecords",
+    "route": "in-process",
+    "for": "on switching on, whether an active configurationChange rule at the tenant root covers whiteLabelPublication (subjectTypes empty or containing it), approvals.rule, Tenancy's data, asked in process because the operations host composes Tenancy's query classes (XDR-073, XDR-111; ADAM CR-520)"
+   },
+   {
+    "query": "identity#rolePermissionRecords",
+    "route": "service",
+    "for": "the roles that grant TENANT_PUBLISH, the default rule's approverRoleIds, identity.role_permission, Identity's data in commerce, over Identity's service route (ADAM CR-520)"
+   }
+  ],
+  "readsInProcess": [
+   "approvals.rule"
   ]
  },
  "setSeatPricingRule": {
@@ -124091,7 +125009,9 @@
   "verb": "GET",
   "path": "/tax-profile-jurisdiction",
   "reads": [
-   "catalogue.tax_profile"
+   "catalogue.product",
+   "catalogue.tax_profile",
+   "catalogue.tax_rule"
   ],
   "writes": [],
   "routing": "replica",
@@ -124115,7 +125035,29 @@
     "id",
     "name"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "finance#legalEntityRecords",
+    "route": "in-process",
+    "for": "currency: ledger.legal_entity.currency of the profile's legal_entity_id, Ledger's data (ADAM CR-468; CHG-CR468-001)"
+   },
+   {
+    "query": "finance#taxCodeRecords",
+    "route": "in-process",
+    "for": "ratePercent and country: ledger.tax_code.rate and country_code for the profile's tax_code_id, Ledger's data (ADAM CR-468; CHG-CR468-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "currency when the profile has no legal entity: the trading currency of the venue its scope_path names (ADAM CR-468; CHG-CR468-001)"
+   }
+  ],
+  "readsInProcess": [
+   "ledger.legal_entity",
+   "ledger.tax_code",
+   "platform.venue_settings"
+  ]
  },
  "getTransportDeparture": {
   "contract": "transport",
@@ -124157,7 +125099,7 @@
   "readVia": [
    {
     "query": "catalogue#channelCapacityRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.channel_capacity, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -124167,6 +125109,7 @@
    }
   ],
   "readsInProcess": [
+   "catalogue.channel_capacity",
    "platform.venue_settings"
   ]
  },
@@ -124512,14 +125455,18 @@
   "readVia": [
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of approvals.request, Tenancy's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request",
+   "catalogue.product"
   ]
  },
  "getWalletRefundPolicy": {
@@ -124588,7 +125535,9 @@
   "verb": "GET",
   "path": "/tax-profiles",
   "reads": [
-   "catalogue.tax_profile"
+   "catalogue.product",
+   "catalogue.tax_profile",
+   "catalogue.tax_rule"
   ],
   "writes": [],
   "routing": "replica",
@@ -124614,7 +125563,29 @@
     "name",
     "status"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "finance#legalEntityRecords",
+    "route": "in-process",
+    "for": "currency: ledger.legal_entity.currency of the profile's legal_entity_id, Ledger's data (ADAM CR-468; CHG-CR468-001)"
+   },
+   {
+    "query": "finance#taxCodeRecords",
+    "route": "in-process",
+    "for": "ratePercent and country: ledger.tax_code.rate and country_code for the profile's tax_code_id, Ledger's data (ADAM CR-468; CHG-CR468-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "currency when the profile has no legal entity: the trading currency of the venue its scope_path names (ADAM CR-468; CHG-CR468-001)"
+   }
+  ],
+  "readsInProcess": [
+   "ledger.legal_entity",
+   "ledger.tax_code",
+   "platform.venue_settings"
+  ]
  },
  "getAccreditationValidity": {
   "contract": "accreditation",
@@ -124999,6 +125970,7 @@
   "verb": "GET",
   "path": "/developers/{developerId}/members",
   "reads": [
+   "control.developer_account",
    "control.developer_member"
   ],
   "writes": [],
@@ -125009,7 +125981,8 @@
   "summary": "Who is in a developer organisation",
   "source": "derived",
   "audience": [
-   "staff"
+   "staff",
+   "partner"
   ],
   "service": "PlatformService",
   "stores": [
@@ -125585,9 +126558,12 @@
   "readVia": [
    {
     "query": "tenancy#workstationRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "whether the workstation is in this venue (404 not-found) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
   ]
  },
  "listKioskAssignments": {
@@ -126660,7 +127636,7 @@
   "readVia": [
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
+    "route": "in-process",
     "for": "what its plans call \"active venues\" (VisitPlan.availableAtVenueIds): platform.scope, Tenancy's data (r8 integration, CHG-R8INT-014)"
    },
    {
@@ -126670,6 +127646,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -127077,7 +128054,7 @@
   "readVia": [
    {
     "query": "promotions#bundleRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's published Fast Track bundles, Promotions' data (R8 blocker GPS-C21)"
    }
   ],
@@ -127110,7 +128087,10 @@
     "sort_order",
     "updated_at"
    ]
-  }
+  },
+  "readsInProcess": [
+   "promotions.bundle"
+  ]
  },
  "listVisitPlanPresets": {
   "contract": "venue-map",
@@ -127242,16 +128222,26 @@
   "readVia": [
    {
     "query": "catalogue#productEligibilityRuleRecords",
-    "route": "service",
-    "for": "the age and height limits an age or level answer filters on (r8, WHITE-C26)"
+    "route": "in-process",
+    "for": "the age and height limits an age or level answer filters on (r8, WHITE-C26), the old swimAbility and the requiredCertificationCode (ADAM CR-532)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the products each combination of answers leaves, by the same answer filter listProducts applies for a guest (r8, WHITE-C26)"
+   },
+   {
+    "query": "marketing-crm#consentQuestionRecords",
+    "route": "in-process",
+    "for": "the kinds of the products' consent questions (Product.consentQuestionIds), for the kind only: a product needs a swimmer when one has kind swim (ADAM CR-532, the shared guided-answer filter); in process, since Marketing runs in the operations host with WhiteLabel (CHG-R13INP-001)"
    }
   ],
-  "pure": "a preview computed in process from the draft answers: nothing is stored and nothing is published (its contract)"
+  "pure": "a preview computed in process from the draft answers: nothing is stored and nothing is published (its contract)",
+  "readsInProcess": [
+   "catalogue.product",
+   "catalogue.product_eligibility_rule",
+   "marketing.consent_question"
+  ]
  },
  "getBundleSigningKeys": {
   "contract": "catalogue",
@@ -127750,7 +128740,7 @@
    },
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
+    "route": "in-process",
     "for": "a `venue` rule's target must be an active venue the caller's grants reach: platform.scope, Tenancy's data"
    },
    {
@@ -127774,6 +128764,7 @@
    "identity.delegated_access",
    "identity.principal",
    "identity.role",
+   "platform.scope",
    "platform.workstation"
   ]
  },
@@ -127840,7 +128831,7 @@
    },
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
+    "route": "in-process",
     "for": "the venues a `venue` rule can name: platform.scope, Tenancy's data"
    },
    {
@@ -127853,6 +128844,7 @@
    "identity.delegated_access",
    "identity.principal",
    "identity.role",
+   "platform.scope",
    "platform.workstation"
   ],
   "readColumns": {
@@ -127951,7 +128943,7 @@
   "readVia": [
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
+    "route": "in-process",
     "for": "the names of the venues the session may act at, and that each is active: platform.scope, Tenancy's data"
    }
   ],
@@ -127960,7 +128952,10 @@
     "id",
     "working_venue_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "platform.scope"
+  ]
  },
  "setSessionVenue": {
   "contract": "identity",
@@ -127991,7 +128986,7 @@
   "readVia": [
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
+    "route": "in-process",
     "for": "the chosen venue must be an active venue the session's grants reach: platform.scope, Tenancy's data"
    }
   ],
@@ -128000,7 +128995,10 @@
     "id",
     "working_venue_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "platform.scope"
+  ]
  },
  "listMyCases": {
   "contract": "marketing-crm",
@@ -128408,11 +129406,14 @@
   "readVia": [
    {
     "query": "orders#cartRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.cart, Orders's data (CHG-MOD-001)"
    }
   ],
-  "pure": "a lookup: resolves and returns, nothing is created or merged"
+  "pure": "a lookup: resolves and returns, nothing is created or merged",
+  "readsInProcess": [
+   "orders.cart"
+  ]
  },
  "decideGuestCheckoutMatch": {
   "contract": "marketing-crm",
@@ -128451,7 +129452,7 @@
   "readVia": [
    {
     "query": "orders#cartRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.cart, Orders's data (CHG-MOD-001)"
    }
   ],
@@ -128465,7 +129466,10 @@
     "matched_profile_id",
     "scope_path"
    ]
-  }
+  },
+  "readsInProcess": [
+   "orders.cart"
+  ]
  },
  "matchGuest": {
   "contract": "marketing-crm",
@@ -128666,12 +129670,12 @@
   "readVia": [
    {
     "query": "catalogue#eventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.event, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
   ],
@@ -128689,7 +129693,11 @@
     "scope_path",
     "status"
    ]
-  }
+  },
+  "readsInProcess": [
+   "catalogue.event",
+   "catalogue.product"
+  ]
  },
  "respondToInvitation": {
   "contract": "marketing-crm",
@@ -128722,7 +129730,7 @@
   "readVia": [
    {
     "query": "orders#invitationRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.invitation, Orders's data (CHG-MOD-001)"
    }
   ],
@@ -128740,7 +129748,10 @@
     "token"
    ]
   },
-  "guestCallable": true
+  "guestCallable": true,
+  "readsInProcess": [
+   "orders.invitation"
+  ]
  },
  "recordPrivacyIncident": {
   "contract": "marketing-crm",
@@ -128883,7 +129894,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
   ],
@@ -128920,7 +129931,10 @@
     "show_when",
     "type"
    ]
-  }
+  },
+  "readsInProcess": [
+   "catalogue.product"
+  ]
  },
  "getForm": {
   "contract": "marketing-crm",
@@ -128991,7 +130005,7 @@
    "marketing.form_submission",
    "marketing.form_submission_sale_link",
    "marketing.waiver_requirement",
-   "pii.subject"
+   "marketing.waiver_version_control"
   ],
   "writes": [
    "cache:idempotency",
@@ -129014,13 +130028,6 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ],
-  "readVia": [
-   {
-    "query": "identity#subjectRecords",
-    "route": "service",
-    "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
-   }
   ],
   "readColumns": {
    "marketing.form_submission": [
@@ -129045,9 +130052,6 @@
     "scope_path",
     "submission_id",
     "unit_index"
-   ],
-   "pii.subject": [
-    "id"
    ]
   },
   "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): a waiver submission completes its waiver_requirement (form_submission_id, completed_at, status completed) and appends signatureSubmitted/markedComplete events",
@@ -129088,11 +130092,14 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
    }
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "readsInProcess": [
+   "catalogue.product"
+  ]
  },
  "uploadGuestDocument": {
   "contract": "marketing-crm",
@@ -129102,11 +130109,13 @@
    "cache:idempotency",
    "marketing.consent_record",
    "marketing.guest_document",
+   "marketing.guest_document_upload",
    "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.guest_document"
+   "marketing.guest_document",
+   "marketing.guest_document_upload"
   ],
   "routing": null,
   "scope": "venue",
@@ -129126,7 +130135,7 @@
    {
     "query": "identity#subjectRecords",
     "route": "service",
-    "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
+    "for": "its read of pii.subject, Identity's data (CHG-MOD-001): a staff caller's subjectId must be a known subject (ADAM CR-521)"
    }
   ],
   "readColumns": {
@@ -129177,7 +130186,7 @@
   "readVia": [
    {
     "query": "catalogue#eventRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.event, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -129210,6 +130219,7 @@
    ]
   },
   "readsInProcess": [
+   "catalogue.event",
    "platform.scope",
    "platform.venue_settings"
   ]
@@ -129504,7 +130514,6 @@
   "path": "/seo-metadata",
   "reads": [
    "cache:idempotency",
-   "catalogue.product",
    "marketing.seo_metadata"
   ],
   "writes": [
@@ -129524,13 +130533,6 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ],
-  "readVia": [
-   {
-    "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
-   }
   ],
   "cache": {
    "store": "cache:resolution",
@@ -129802,7 +130804,7 @@
   "readVia": [
    {
     "query": "promotions#promotionRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of promotions.promotion, Catalogue's data (CHG-MOD-001)"
    }
   ],
@@ -129820,7 +130822,10 @@
     "status"
    ]
   },
-  "guestCallable": true
+  "guestCallable": true,
+  "readsInProcess": [
+   "promotions.promotion"
+  ]
  },
  "setCallDisposition": {
   "contract": "marketing-crm",
@@ -130242,6 +131247,7 @@
   ],
   "readColumns": {
    "marketing.message_dispatch": [
+    "body",
     "campaign_id",
     "campaign_variant_id",
     "channel",
@@ -130294,6 +131300,7 @@
   ],
   "readColumns": {
    "marketing.message_dispatch": [
+    "body",
     "campaign_id",
     "campaign_variant_id",
     "channel",
@@ -130543,7 +131550,7 @@
   "readVia": [
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
   ],
@@ -130562,7 +131569,10 @@
     "tier_id",
     "tier_name"
    ]
-  }
+  },
+  "readsInProcess": [
+   "orders.sales_order"
+  ]
  },
  "redeemLoyaltyPoints": {
   "contract": "marketing-crm",
@@ -131177,12 +132187,12 @@
   "readVia": [
    {
     "query": "orders#cartRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.cart, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "tenancy#deviceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.device, Tenancy's data (CHG-MOD-001)"
    }
   ],
@@ -131200,7 +132210,11 @@
     "started_at",
     "venue_id"
    ]
-  }
+  },
+  "readsInProcess": [
+   "orders.cart",
+   "platform.device"
+  ]
  },
  "endKioskAssist": {
   "contract": "marketing-crm",
@@ -133246,6 +134260,7 @@
   ],
   "readColumns": {
    "marketing.message_dispatch": [
+    "body",
     "campaign_id",
     "campaign_variant_id",
     "channel",
@@ -133293,6 +134308,7 @@
   ],
   "readColumns": {
    "marketing.message_dispatch": [
+    "body",
     "campaign_id",
     "campaign_variant_id",
     "channel",
@@ -134728,7 +135744,6 @@
    "marketing.communication_preference_type",
    "marketing.consent_capture_point",
    "marketing.consent_purpose",
-   "marketing.consent_purpose_channel",
    "marketing.cookie_banner_design",
    "marketing.minor_privacy_rule",
    "marketing.privacy_notice_governance",
@@ -134754,7 +135769,7 @@
    {
     "query": "white-label#policyRecords",
     "route": "in-process",
-    "for": "what its text calls \"whitelabel.policy\": whitelabel.policy, WhiteLabel's data (CHG-R10GEN-001), served in process within the operations host; the policies in force, scheduled and in the directory (ADAM CR-378)"
+    "for": "what its text calls \"whitelabel.policy\": whitelabel.policy, WhiteLabel's data (CHG-R10GEN-001), served in process within the operations host; the policies in force, scheduled and in the directory (ADAM CR-378), asked under the routed tenant's root grant (ITenantRootGrant), as CR-336 and CR-362 read, so a venue manager's command centre sees the tenant's published policies; every other read is under the caller's grant (ADAM CR-440; CHG-CR440-001)"
    }
   ],
   "readsInProcess": [
@@ -136096,7 +137111,7 @@
   "readVia": [
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"approvals.request\": approvals.request, Tenancy's data (CHG-R10GEN-001)"
    },
    {
@@ -136104,6 +137119,9 @@
     "route": "service",
     "for": "what its text calls \"pii.subject\": pii.subject, Identity's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "approvals.request"
   ]
  },
  "listCustomerServiceProfile": {
@@ -136156,17 +137174,17 @@
    },
    {
     "query": "orders#groupBookingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.group_booking, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#reservationRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.reservation, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    },
    {
@@ -136194,7 +137212,12 @@
     "value"
    ]
   },
-  "lineageNote": "persistence names these tables (orders/access already read by marketing neighbours); wallet.balance comes through wallet, not a table read"
+  "lineageNote": "persistence names these tables (orders/access already read by marketing neighbours); wallet.balance comes through wallet, not a table read",
+  "readsInProcess": [
+   "orders.group_booking",
+   "orders.reservation",
+   "orders.sales_order"
+  ]
  },
  "listUnifiedInteractionCommunication": {
   "contract": "marketing-crm",
@@ -136433,17 +137456,17 @@
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.order_line\": orders.order_line, Order's data (CHG-R10GEN-001)"
    },
    {
     "query": "orders#paymentRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.payment\": orders.payment, Order's data (CHG-R10GEN-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the order and its policies (422 not-permitted-by-policy) (CHG-MOD-003)"
    }
   ],
@@ -136467,7 +137490,12 @@
     "target_product_id",
     "updated_at"
    ]
-  }
+  },
+  "readsInProcess": [
+   "orders.order_line",
+   "orders.payment",
+   "orders.sales_order"
+  ]
  },
  "setRefundCompensationService": {
   "contract": "marketing-crm",
@@ -136518,27 +137546,27 @@
   "readVia": [
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"approvals.request\": approvals.request, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "orders#orderFeeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.order_fee\": orders.order_fee, Order's data (CHG-R10GEN-001)"
    },
    {
     "query": "orders#refundPolicyRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.refund_policy\": orders.refund_policy, Order's data (CHG-R10GEN-001)"
    },
    {
     "query": "orders#refundRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.refund\": orders.refund, Order's data (CHG-R10GEN-001)"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.sales_order\": orders.sales_order, Order's data (CHG-R10GEN-001)"
    },
    {
@@ -136548,6 +137576,11 @@
    }
   ],
   "readsInProcess": [
+   "approvals.request",
+   "orders.order_fee",
+   "orders.refund",
+   "orders.refund_policy",
+   "orders.sales_order",
    "platform.venue_settings"
   ]
  },
@@ -136683,7 +137716,7 @@
   "readVia": [
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"approvals.request\": approvals.request, Tenancy's data (CHG-R10GEN-001)"
    },
    {
@@ -136693,6 +137726,7 @@
    }
   ],
   "readsInProcess": [
+   "approvals.request",
    "platform.venue_settings"
   ]
  },
@@ -136742,7 +137776,7 @@
   "readVia": [
    {
     "query": "approvals#requestRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"approvals.request\": approvals.request, Tenancy's data (CHG-R10GEN-001)"
    },
    {
@@ -136752,6 +137786,7 @@
    }
   ],
   "readsInProcess": [
+   "approvals.request",
    "platform.venue_settings"
   ]
  },
@@ -137059,9 +138094,12 @@
   "readVia": [
    {
     "query": "workforce#shiftRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"workforce.shift\": workforce.shift, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "workforce.shift"
   ]
  },
  "setAgentServiceProfile": {
@@ -137135,7 +138173,7 @@
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
   ],
@@ -137160,7 +138198,10 @@
     "reason_category"
    ]
   },
-  "lineageNote": "one row per escalated open case as of its latest case_escalation row (reason, category, escalated by/to, at); case; related order total from orders.sales_order as the neighbours read it"
+  "lineageNote": "one row per escalated open case as of its latest case_escalation row (reason, category, escalated by/to, at); case; related order total from orders.sales_order as the neighbours read it",
+  "readsInProcess": [
+   "orders.sales_order"
+  ]
  },
  "listQualityAgentEvaluation": {
   "contract": "marketing-crm",
@@ -137315,11 +138356,14 @@
   "readVia": [
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
   ],
-  "lineageNote": "case, conversation, form_submission (CSAT), related orders; contact drivers by case_category"
+  "lineageNote": "case, conversation, form_submission (CSAT), related orders; contact drivers by case_category",
+  "readsInProcess": [
+   "orders.sales_order"
+  ]
  },
  "listContactAutomation": {
   "contract": "marketing-crm",
@@ -138271,21 +139315,26 @@
   "readVia": [
    {
     "query": "catalogue#performanceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    },
    {
     "query": "orders#groupBookingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.group_booking, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    }
   ],
-  "lineageNote": "rows are waiver_requirement joined to form_definition, form_submission, waiver_signature, waiver_verification, waiver_exception (requirement_id), order_line, group_booking, performance"
+  "lineageNote": "rows are waiver_requirement joined to form_definition, form_submission, waiver_signature, waiver_verification, waiver_exception (requirement_id), order_line, group_booking, performance",
+  "readsInProcess": [
+   "catalogue.performance",
+   "orders.group_booking",
+   "orders.order_line"
+  ]
  },
  "listParticipantWaiverStatus": {
   "contract": "marketing-crm",
@@ -138319,7 +139368,7 @@
   "readVia": [
    {
     "query": "catalogue#performanceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -138329,12 +139378,12 @@
    },
    {
     "query": "orders#groupBookingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.group_booking, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    }
   ],
@@ -138364,7 +139413,12 @@
     "id"
    ]
   },
-  "lineageNote": "waiver_requirement per participant and booking with form_definition, form_submission, waiver_verification, waiver_exception, order_line, group_booking, performance; names from pii.subject"
+  "lineageNote": "waiver_requirement per participant and booking with form_definition, form_submission, waiver_verification, waiver_exception, order_line, group_booking, performance; names from pii.subject",
+  "readsInProcess": [
+   "catalogue.performance",
+   "orders.group_booking",
+   "orders.order_line"
+  ]
  },
  "actOnWaiverRequirements": {
   "contract": "marketing-crm",
@@ -138399,11 +139453,14 @@
   "readVia": [
    {
     "query": "orders#groupBookingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.group_booking, Orders's data (CHG-MOD-001)"
    }
   ],
-  "lineageNote": "updates waiver_requirement (link issued/expiry/use, status, signatory, version, owner) and appends a waiver_requirement_event per action with its reason; sends through sendTransactionalMessage (message_dispatch); guardian authority from guest_relationship"
+  "lineageNote": "updates waiver_requirement (link issued/expiry/use, status, signatory, version, owner) and appends a waiver_requirement_event per action with its reason; sends through sendTransactionalMessage (message_dispatch); guardian authority from guest_relationship",
+  "readsInProcess": [
+   "orders.group_booking"
+  ]
  },
  "listDigitalSigningCollection": {
   "contract": "marketing-crm",
@@ -138471,12 +139528,12 @@
    },
    {
     "query": "orders#groupBookingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.group_booking, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    }
   ],
@@ -138492,7 +139549,11 @@
     "value"
    ]
   },
-  "lineageNote": "guest_relationship, waiver_requirement (signatory, status), form_submission, group_booking, order_line; names/contacts from pii"
+  "lineageNote": "guest_relationship, waiver_requirement (signatory, status), form_submission, group_booking, order_line; names/contacts from pii",
+  "readsInProcess": [
+   "orders.group_booking",
+   "orders.order_line"
+  ]
  },
  "listWaiverVerificationQueue": {
   "contract": "marketing-crm",
@@ -138645,7 +139706,7 @@
   "readVia": [
    {
     "query": "catalogue#performanceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of catalogue.performance, Catalogue's data (CHG-MOD-001)"
    },
    {
@@ -138655,12 +139716,12 @@
    },
    {
     "query": "orders#groupBookingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.group_booking, Orders's data (CHG-MOD-001)"
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.order_line, Orders's data (CHG-MOD-001)"
    }
   ],
@@ -138703,7 +139764,12 @@
     "id"
    ]
   },
-  "lineageNote": "not-ready waiver_requirement rows (owner, next_reminder_at) with form_submission, waiver_verification, waiver_exception, message_dispatch; remindersSent counted from waiver_requirement_event; order_line, group_booking, performance; names from pii.subject"
+  "lineageNote": "not-ready waiver_requirement rows (owner, next_reminder_at) with form_submission, waiver_verification, waiver_exception, message_dispatch; remindersSent counted from waiver_requirement_event; order_line, group_booking, performance; names from pii.subject",
+  "readsInProcess": [
+   "catalogue.performance",
+   "orders.group_booking",
+   "orders.order_line"
+  ]
  },
  "listSiteWaiverException": {
   "contract": "marketing-crm",
@@ -138770,9 +139836,12 @@
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"orders.order_line\": orders.order_line, Order's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "orders.order_line"
   ]
  },
  "setWaiverException": {
@@ -138805,7 +139874,7 @@
   "readVia": [
    {
     "query": "catalogue#performanceRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the performance the exception's scope names (422 scope-incomplete) (CHG-MOD-003)"
    }
   ],
@@ -138832,7 +139901,10 @@
     "valid_until"
    ]
   },
-  "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): an exception names its requirement (waiver_exception.requirement_id); approval appends an exceptionApproved event"
+  "lineageNote": "OUTSIDE L3 (amend the existing lineage entry by hand; derive-lineage --apply does not update): an exception names its requirement (waiver_exception.requirement_id); approval appends an exceptionApproved event",
+  "readsInProcess": [
+   "catalogue.performance"
+  ]
  },
  "listComplianceEvidenceWaiver": {
   "contract": "marketing-crm",
@@ -139088,11 +140160,14 @@
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
   ],
-  "lineageNote": "chronology over marketing rows (touches, messages, cases, surveys, waivers, loyalty, reviews, notes) plus orders and entitlements (as getGuestProfile/identifyGuest read); scans/wallet come through their services"
+  "lineageNote": "chronology over marketing rows (touches, messages, cases, surveys, waivers, loyalty, reviews, notes) plus orders and entitlements (as getGuestProfile/identifyGuest read); scans/wallet come through their services",
+  "readsInProcess": [
+   "orders.sales_order"
+  ]
  },
  "getGuestRelationships": {
   "contract": "marketing-crm",
@@ -139198,11 +140273,14 @@
   "readVia": [
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
    }
   ],
-  "lineageNote": "inputs: guest_profile (engagement_score, lifetime_value), touches, loyalty, orders; scores with factors/confidence/model version have no table"
+  "lineageNote": "inputs: guest_profile (engagement_score, lifetime_value), touches, loyalty, orders; scores with factors/confidence/model version have no table",
+  "readsInProcess": [
+   "orders.sales_order"
+  ]
  },
  "getIdentityResolutionRules": {
   "contract": "marketing-crm",
@@ -139386,7 +140464,7 @@
   "readVia": [
    {
     "query": "tenancy#dataRetentionSettingRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of tenancy.data_retention_setting, Tenancy's data (CHG-MOD-001)"
    }
   ],
@@ -139407,7 +140485,10 @@
     "scope_path"
    ]
   },
-  "lineageNote": "reads the tenant's guestProfile period to refuse a longer rule (422)"
+  "lineageNote": "reads the tenant's guestProfile period to refuse a longer rule (422)",
+  "readsInProcess": [
+   "tenancy.data_retention_setting"
+  ]
  },
  "runDataRetention": {
   "contract": "marketing-crm",
@@ -139757,7 +140838,7 @@
   "readVia": [
    {
     "query": "catalogue#productRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "whether a rule's product exists (409 unknown-reward-or-product) (CHG-MOD-003)"
    }
   ],
@@ -139802,7 +140883,10 @@
     "retain_lifetime_points",
     "validity_months"
    ]
-  }
+  },
+  "readsInProcess": [
+   "catalogue.product"
+  ]
  },
  "listLoyaltyCampaigns": {
   "contract": "marketing-crm",
@@ -140261,6 +141345,7 @@
     "is_active",
     "is_required",
     "name",
+    "scope_path",
     "tenant_id",
     "type",
     "updated_at"
@@ -140310,6 +141395,7 @@
     "is_active",
     "is_required",
     "name",
+    "scope_path",
     "tenant_id",
     "type",
     "updated_at"
@@ -140715,7 +141801,7 @@
   "readVia": [
    {
     "query": "orders#cartRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the questions the cart asks (409, 422 question-not-asked) (CHG-MOD-003)"
    }
   ],
@@ -140743,7 +141829,10 @@
     "superseded_at"
    ]
   },
-  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table"
+  "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
+  "readsInProcess": [
+   "orders.cart"
+  ]
  },
  "listMyNotifications": {
   "contract": "marketing-crm",
@@ -141691,12 +142780,12 @@
    },
    {
     "query": "orders#orderLineRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "a ticket owner's order line must be on the order and its unit within the line's quantity: orders.order_line, Orders' data"
    },
    {
     "query": "orders#salesOrderRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the order must exist, be of the sent venue, and a reservation owner must be its buyer: orders.sales_order, Orders' data"
    }
   ],
@@ -141724,7 +142813,11 @@
     "submission_id",
     "unit_index"
    ]
-  }
+  },
+  "readsInProcess": [
+   "orders.order_line",
+   "orders.sales_order"
+  ]
  },
  "eraseSubject": {
   "contract": "ai",
@@ -141898,7 +142991,8 @@
     "maximum_per_day",
     "maximum_per_transfer",
     "scope_path",
-    "transferable_credit_type_ids"
+    "transferable_credit_type_ids",
+    "version"
    ]
   },
   "readVia": [
@@ -142516,8 +143610,8 @@
  },
  "listSubjectBiometricRecords": {
   "contract": "identity",
-  "verb": "GET",
-  "path": "/internal/subject-biometrics",
+  "verb": "POST",
+  "path": "/queries/subject-biometric-records",
   "reads": [
    "pii.subject_biometric"
   ],
@@ -142554,6 +143648,65 @@
     "source",
     "subject_id"
    ]
-  }
+  },
+  "pure": "a served query's route (ADAM CR-438: POST /queries/<name>): it reads its query's rows and writes nothing"
+ },
+ "createGuestDocumentUpload": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/guest-documents/uploads",
+  "reads": [
+   "cache:idempotency"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.guest_document_upload"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "GUEST_VIEW_PII",
+  "offline": false,
+  "summary": "Issue the key and a signed upload URL for a guest document",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres"
+  ],
+  "readVia": [
+   {
+    "query": "identity#subjectRecords",
+    "route": "service",
+    "for": "a staff caller's subjectId must be a known subject, pii.subject, Identity's data (404 if unknown; ADAM CR-521)"
+   }
+  ]
+ },
+ "getTenantRequestLimits": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/internal/tenant-request-limits",
+  "reads": [
+   "control.contract",
+   "control.plan"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "The request limits the kernel middleware applies to a tenant",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
  }
 }

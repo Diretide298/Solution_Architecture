@@ -306,8 +306,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The catalogue of payment methods the tenant can offer; a method is not a provider (Apple Pay is a method; the acquirer behind it is routing).
 
 **Known correction pending (do not draw the wrong version)**
@@ -762,7 +760,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Digital Wallet, Gift Card, Card. Each needs an operation, or needs removing from the screen; this is the …
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Digital Wallet, Gift Card, Card. Each needs an operation, or needs removing from the screen; this is the …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Different payment configuration per venue and business unit.
 
@@ -1074,7 +1072,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved: Channel, Venue, Product, Product category, Transaction amount, Customer type, Membership, Country/market … **Payment Eligibility & Availability Rule Builder\t13 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. …
+**Known gaps.** **The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved: Channel, Venue, Product, Product category, Transaction amount, Customer type, Membership, Country/market … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When a method is available for a transaction (amount, product, guest).
 
@@ -1224,7 +1222,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Fixed payment fee, Percentage fee, Minimum fee, Maximum fee, Payment-method-specific fee, Channel-specific … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved: Fixed payment fee, Percentage fee, Minimum fee, Maximum fee, Payment-method-specific fee, Channel-specific … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Payment fees and surcharges where legally and contractually allowed.
 
@@ -1376,7 +1374,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Effective from, Scheduled expiry. Each needs an operation, or needs removing from the screen; this is the … **Payment Policy, Governance & Approval Manager\t15 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none …
+**Known gaps.** **The pack names 2 actions on this screen and the screen declares 4 operations.** Unserved: Effective from, Scheduled expiry. Each needs an operation, or needs removing from the screen; this is the …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Governance of sensitive payment configuration: the rule set (currency, eligibility, fee) replaced whole, with approval.
 
@@ -1521,8 +1519,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Route | `/commercial/payment-configuration-simulator-validation-center-t16-adm-568` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What a guest would be offered and what it would cost, before publishing payment configuration; errors stop sales silently.
 

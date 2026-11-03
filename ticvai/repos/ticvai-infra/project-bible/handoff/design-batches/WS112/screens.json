@@ -1033,11 +1033,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack ACCREDITATION.pdf, page 42 §The screen shall display"
-   },
-   {
-    "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of HolderAccess (per holder or across holders); affects BO-660, BO-661, BO-668.",
     "source": "contracts/satellite/accreditation.yaml#setHolderAccess"
    }

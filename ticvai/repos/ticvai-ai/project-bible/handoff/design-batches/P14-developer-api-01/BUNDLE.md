@@ -366,6 +366,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Email `members[].email` | email field | optional | — | — | name@example.ae | — | `setDeveloperMembers` body |
 | Role `members[].role` | radio group | optional | — | Owner · Admin · Developer · Read only | — | — | `setDeveloperMembers` body |
 
+Errors to draw in the form: 409 The body would not leave exactly one `owner` (`developer-owner-required`). Nothing is written.
+
 **Sent by *Register developer*** (`registerDeveloper`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -416,7 +418,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|---|
 | Invite (primary button) | navigation or local | — | — | — | — |
 | Register developer (primary button) | `registerDeveloper` POST `/developers` | CreateDeveloperAccountRequest | DeveloperAccount | 400 Validation failed; 409 An organisation is already registered under this contact email, compared without case (`developer-already-registered`; ADAM CR-098). | — |
-| Save developer members (secondary button) | `setDeveloperMembers` PUT `/developers/{developerId}/members` | inline | DeveloperMember[] | — | opens modal first |
+| Save developer members (secondary button) | `setDeveloperMembers` PUT `/developers/{developerId}/members` | inline | DeveloperMember[] | 409 The body would not leave exactly one `owner` (`developer-owner-required`). Nothing is written. | opens modal first |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -437,7 +439,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Empty, first run (`?state=emptyFirstRun`) | **You are the first member and you are the owner.** An integration outlives the engineer who built it, so this is an organisation rather than a personal account — and the invite action is the point of the state. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVELOPER_VIEW`, which `getDeveloperAccount` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `setDeveloperMembers`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An organisation is already registered under this contact email, compared without case (`developer-already-registered`; ADAM CR-098). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An organisation is already registered under this contact email, compared without case (`developer-already-registered`; ADAM CR-098).; 409 The body would not leave exactly one `owner` (`developer-owner-required`). Nothing is written. |
 
 #### Consistency with other screens
 
@@ -467,7 +469,7 @@ members:
 - `registerDeveloper` → no permission · public
 - `setDeveloperMembers` → `DEVELOPER_MANAGE` (configure) · partner
 - `getDeveloperAccount` → `DEVELOPER_VIEW` (read) · partner, staff
-- `listDeveloperMembers` → `DEVELOPER_VIEW` (read) · staff
+- `listDeveloperMembers` → `DEVELOPER_VIEW` (read) · staff, partner
 
 **A refused user sees:** Shown when the caller lacks `DEVELOPER_VIEW`, which `getDeveloperAccount` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `setDeveloperMembers`.
 
@@ -591,7 +593,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Ip allow list `ipAllowList` | list of values (chips) | required | — | at least 1 | — | — | `requestProductionAccess` body |
 | Note `note` | text area | optional | — | max length 1000 | — | — | `requestProductionAccess` body |
 
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 An empty `ipAllowList` (`ip-allow-list-required`), an unknown scope (`unknown-scope`), or a `listingId` of another developer (`listing-not-owned`, ADAM CR-203).
+Errors to draw in the form: 403 TICVAI staff and tenant staff: partners only; or a partner whose member role is `readOnly`, which never writes (ADAM CR-536).; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 An empty `ipAllowList` (`ip-allow-list-required`), an unknown scope (`unknown-scope`), or a `listingId` of another developer (`listing-not-owned`, ADAM CR-203).
 
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -642,7 +644,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Create API client (primary button) | `createApiClient` POST `/api-clients` | ApiClient | inline | 409 A `production` client without a current certification, or asked for by a developer rather than issued by TICVAI (`certification-required`, M17-06).; 422 A `production` client with an empty `ipAllowList` … | opens modal first |
 | Rotate API credential (secondary button) | `rotateApiCredential` POST `/api-clients/{clientId}/credentials` | inline | inline | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The client is `suspended` (`api-client-suspended`) or `revoked` (`api-client-revoked`); rotation never … | opens modal first |
 | Revoke API credential (destructive button) | `revokeApiCredential` DELETE `/api-clients/{clientId}/credentials` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The client is already `revoked` (`api-client-revoked`), which is terminal. Nothing changes. | — |
-| Request production access (secondary button) | `requestProductionAccess` POST `/api-clients/{clientId}/production-access` | inline | ProductionAccessRequest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not … | opens modal first |
+| Request production access (secondary button) | `requestProductionAccess` POST `/api-clients/{clientId}/production-access` | inline | ProductionAccessRequest | 403 TICVAI staff and tenant staff: partners only; or a partner whose member role is `readOnly`, which never writes (ADAM CR-536).; 404 The resource does not exist, or is outside the caller's scope. This includes a … | opens modal first |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -768,7 +770,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (403, 404, 409, 422).
 - [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create client, Create API client, Rotate API credential, Revoke API credential, Request production access.
@@ -840,7 +842,7 @@ Errors to draw in the form: 409 The caller's developer account is not `verified`
 | Ip allow list `ipAllowList` | list of values (chips) | required | — | at least 1 | — | — | `requestProductionAccess` body |
 | Note `note` | text area | optional | — | max length 1000 | — | — | `requestProductionAccess` body |
 
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 An empty `ipAllowList` (`ip-allow-list-required`), an unknown scope (`unknown-scope`), or a `listingId` of another developer (`listing-not-owned`, ADAM CR-203).
+Errors to draw in the form: 403 TICVAI staff and tenant staff: partners only; or a partner whose member role is `readOnly`, which never writes (ADAM CR-536).; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 An empty `ipAllowList` (`ip-allow-list-required`), an unknown scope (`unknown-scope`), or a `listingId` of another developer (`listing-not-owned`, ADAM CR-203).
 
 #### Outputs: what the screen shows and produces
 
@@ -904,7 +906,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Reset (secondary button) | navigation or local | — | — | — | — |
 | Create sandbox (primary button) | `createSandbox` POST `/sandboxes` | inline | Sandbox | 409 The caller's developer account is not `verified` (`developer-not-verified`; ADAM CR-098). | opens modal first |
 | Reset sandbox (destructive button) | `resetSandbox` POST `/sandboxes/{sandboxId}/reset` | — | Sandbox | 409 The sandbox is already `resetting` (`sandbox-already-resetting`), or is not `active` (`provisioning`, `expired` or `deleted`; `sandbox-not-active`). | — |
-| Request production access (secondary button) | `requestProductionAccess` POST `/api-clients/{clientId}/production-access` | inline | ProductionAccessRequest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not … | opens modal first |
+| Request production access (secondary button) | `requestProductionAccess` POST `/api-clients/{clientId}/production-access` | inline | ProductionAccessRequest | 403 TICVAI staff and tenant staff: partners only; or a partner whose member role is `readOnly`, which never writes (ADAM CR-536).; 404 The resource does not exist, or is outside the caller's scope. This includes a … | opens modal first |
 
 **Data it reads**: `listSandboxes` (onLoad, Sandboxes and their expiry); `listProductionAccessRequests` (onLoad, The path to production and its state)
 
@@ -1010,7 +1012,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (403, 404, 409, 422).
 - [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Provision sandbox, Reset, Create sandbox, Reset sandbox, Request production access.
@@ -1606,7 +1608,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (403).
 - [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Submit for certification, Submit integration listing.

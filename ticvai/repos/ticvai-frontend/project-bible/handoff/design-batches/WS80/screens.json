@@ -105,11 +105,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Game_and_Ride_Module.pdf, page 23 §Show"
-   },
-   {
-    "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): A wallet operations dashboard read of aggregates across wallets (getWallet reads one guest wallet).",
     "source": "screens/P08-venue-back-office.yaml#BO-414"
    }

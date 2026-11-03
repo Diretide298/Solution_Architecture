@@ -1986,8 +1986,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `dashboardId` (navigation) |
 | Route | `/analytics/customer-membership-loyalty-pulse-anl-017` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Customer, membership and loyalty pulse: acquisition, renewals, retention, member visits, loyalty activity and points liability, with inactive members flagged for follow-up. It implements the client's Customer & Membership board and the 8 Sep CRM board. The one thing to get right: it is an aggregate view; any list of named customers is permission-gated and masked, and points liability is a finance figure from the ledger.
 
 **Known correction pending (do not draw the wrong version)**
@@ -2184,8 +2182,6 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/analytics/alerts-exception-center-anl-018` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process.** The management alerts and exceptions queue; from the ticketing angle, sales exceptions (sold-out sessions, unusual refunds, payment gateway mismatches) belong here. After Block A.
 

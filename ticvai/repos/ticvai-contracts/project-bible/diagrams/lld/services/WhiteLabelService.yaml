@@ -351,7 +351,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 4
+    reads: 5
     writes: 0
   - operation: getStoreAccounts
     verb: GET
@@ -608,7 +608,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 0
-    writes: 1
+    writes: 2
   - operation: regenerateDomainToken
     verb: POST
     path: /tenant-domains/{domainId}/token
@@ -640,7 +640,7 @@ operationsByContract:
     permission: TENANT_PUBLISH
     offline: false
     reads: 14
-    writes: 11
+    writes: 12
   - operation: restoreKioskConfigVersion
     verb: POST
     path: /kiosk-configs/{kioskConfigId}/versions/{versionNumber}/restore
@@ -1252,7 +1252,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.config_version
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -1440,7 +1440,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: whitelabel.site_package
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1511,6 +1511,7 @@ writesOutside:
     - platform.outbox
   - operation: recordStorefrontSessionEvents
     tables:
+    - platform.idempotency_record
     - platform.outbox
   - operation: regenerateDomainToken
     tables:
@@ -1542,6 +1543,7 @@ screens:
 - P01:WEB-011 Guest Details & Attendee Forms
 - P01:WEB-012 Checkout — Payment
 - P01:WEB-021 Wallet & Gift Cards
+- P01:WEB-022 Membership Plans
 - P01:WEB-025 Help Centre / FAQ
 - P01:WEB-028 Contact & Venue Information
 - P01:WEB-029 Error / Sold Out / Maintenance

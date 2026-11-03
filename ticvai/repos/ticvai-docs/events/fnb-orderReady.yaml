@@ -34,11 +34,6 @@ consumers:
   idempotencyKey: orderId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Preparation time
-  idempotencyKey: orderId
-  onFailure: retry
-  isCritical: false
 retention: 30 days after publication
 notes: '**Not critical, deliberately.** A guest who missed the push still sees the counter screen and
   the order number, so a failed notification is an inconvenience rather than lost food.'

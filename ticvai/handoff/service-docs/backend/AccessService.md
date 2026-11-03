@@ -465,6 +465,8 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | suspendedReason | string |  | (nullable) |
 | freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
 | freezeNote | string |  | The note the latest freezeEntitlement took, required there when reason is other (decided 28 September, audit R222). (max length 500; nullable) |
+| frozenFrom | string (date) |  | The freeze window's first day (ADAM CR-543; Chinmay, 3 November 2026): written by freezeEntitlement from its from. (read-only; nullable) |
+| frozenUntil | string (date) |  | The freeze window's last day (ADAM CR-543): written by freezeEntitlement from its to; null means open-ended. (read-only; nullable) |
 | isNameBound | boolean |  | (default False) |
 | holderName | string |  | (nullable) |
 | sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
@@ -695,6 +697,8 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].suspendedReason | string |  | (nullable) |
 | items[].freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
 | items[].freezeNote | string |  | The note the latest freezeEntitlement took, required there when reason is other (decided 28 September, audit R222). (max length 500; nullable) |
+| items[].frozenFrom | string (date) |  | The freeze window's first day (ADAM CR-543; Chinmay, 3 November 2026): written by freezeEntitlement from its from. (read-only; nullable) |
+| items[].frozenUntil | string (date) |  | The freeze window's last day (ADAM CR-543): written by freezeEntitlement from its to; null means open-ended. (read-only; nullable) |
 | items[].isNameBound | boolean |  | (default False) |
 | items[].holderName | string |  | (nullable) |
 | items[].sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
@@ -785,6 +789,8 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].suspendedReason | string |  | (nullable) |
 | items[].freezeReason | enum (travelling, injury, personal, seasonal, other) |  | The reason of the latest freezeEntitlement (audit R222). (nullable) |
 | items[].freezeNote | string |  | The note the latest freezeEntitlement took, required there when reason is other (decided 28 September, audit R222). (max length 500; nullable) |
+| items[].frozenFrom | string (date) |  | The freeze window's first day (ADAM CR-543; Chinmay, 3 November 2026): written by freezeEntitlement from its from. (read-only; nullable) |
+| items[].frozenUntil | string (date) |  | The freeze window's last day (ADAM CR-543): written by freezeEntitlement from its to; null means open-ended. (read-only; nullable) |
 | items[].isNameBound | boolean |  | (default False) |
 | items[].holderName | string |  | (nullable) |
 | items[].sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
@@ -878,7 +884,7 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 **The entitlement survives.** A guest who withdraws their face still has their annual pass and enters another way (3.2.9 allows the check to be deactivated per ticket type).
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own FacePass enrolment; another guest's enrolment is refused exactly as one that does not exist, never returned. `GUEST_MANAGE` is what a staff caller must hold to act for any guest (ADR-0025).
 
-**How the row is destroyed** (ADAM CR-391, Chinmay, 31 October 2026). The operation reads the enrolment through `identity#subjectBiometricRecords` on Identity's service route (`listSubjectBiometricRecords`, `serviceAuth`); the access role gets no grant on `pii`. If the `enrolmentId` is unknown, is not a `facePass`, or belongs to another guest (for a guest caller), the answer is `404 not-found`. Otherwise it publishes `biometric.enrolmentChanged` with `change` `revoked` and the row's fields, and answers `204`. On `revoked`, Identity's consumer deletes the `pii.subject_biometric` row; it never deactivates it. The vendor's delete and its receipt join that consumer once ADR-0063 is settled; until then TICVAI holds no template and the row is the whole record. The read needs service sign-in (#37051, ADAM CR-281): the operation and the consumer change are built now, and the read is connected when #37051 is Ready for QA.
+**How the row is destroyed** (ADAM CR-391, Chinmay, 31 October 2026). The operation reads the enrolment through `identity#subjectBiometricRecords` on Identity's service route (`listSubjectBiometricRecords`, POST /queries/subject-biometric-records with `ids` or `where` as the body, ADAM CR-438; `serviceAuth`); the access role gets no grant on `pii`. If the `enrolmentId` is unknown, is not a `facePass`, or belongs to another guest (for a guest caller), the answer is `404 not-found`. Otherwise it publishes `biometric.enrolmentChanged` with `change` `revoked` and the row's fields, and answers `204`. On `revoked`, Identity's consumer deletes the `pii.subject_biometric` row; it never deactivates it. The vendor's delete and its receipt join that consumer once ADR-0063 is settled; until then TICVAI holds no template and the row is the whole record. The read needs service sign-in (#37051, ADAM CR-281): the operation and the consumer change are built now, and the read is connected when #37051 is Ready for QA.
 
 |  |  |
 |---|---|
@@ -1346,7 +1352,9 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 **Consent first, on the venue's own form, and a warning where TICVAI holds the data** (decided 2 October 2026, Chinmay, batch 4, BO-188; DEC-128; CHG-CSP-018). A profile names the consent form its captures are taken on (`consentFormId`); where TICVAI stores the templates the response says so (`FaceTagTemporaryEnrollmentView.templatesHeldByTicvai`) and the screen warns the venue. How long a Face Tag may be kept past its trigger is still for counsel (DEC-240, research pending).
 
-**The profile names the form, not a version** (ADAM CR-390). `consentFormId` is stored on the profile (`access.biometric_profile.consent_form_id`) and read back on the view. The form's version is not kept on the profile: each capture records the version the guest accepted on its own enrolment record (CHG-CSP-018). The venue's biometrics settings (`consentFormId` for the fallback, `templatesHeldByTicvai` for the view) are read through `tenancy#venueSettingsRecords`, in process, through Tenancy's own query class and under the caller's row security (XDR-032). No `consentFormId` on the profile and none on the venue is `422 consent-form-required`.
+**The profile names the form, not a version** (ADAM CR-390). `consentFormId` is stored on the profile (`access.biometric_profile.consent_form_id`) and read back on the view. The form's version is not kept on the profile: each capture records the version the guest accepted on its own enrolment record (CHG-CSP-018). The venue's biometrics settings (`consentFormId` for the fallback, `templatesHeldByTicvai` for the view) are read through `tenancy#venueSettingsRecords`, in process, through Tenancy's own query class and under the caller's row security (XDR-032).
+
+**The consent form in force** (ADAM CR-445, Chinmay, 1 November 2026; CHG-CR445-001): the profile's `consentFormId`, else the venue's biometrics settings (`VenueSettings.biometrics.consentFormId`), else the tenant default (the settings row with `venue_id` null, as `VenueSettings` promises a null field inherits it), the last read through the same query under the routed tenant's root grant (ITenantRootGrant), for that one statement only. Only when all three are empty is it `422 consent-form-required`. The view's `consentFormId` is the stored value: null means the venue's (or the tenant's) form applies, so a client that PUTs the view back keeps following the venue.
 
 |  |  |
 |---|---|
@@ -1389,7 +1397,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | templatesHeldByTicvai | boolean |  | Where TICVAI stores the Face Tag templates, the screen warns the venue that every guest must accept the venue's consent form before capture (decided 2 October 2026, Chinmay, batch 4, BO-188; DEC-128;… (read-only) |
-| consentFormId | string (uuid) |  | The venue's consent form this profile captures on (DEC-128; CHG-CSP-018). (nullable) |
+| consentFormId | string (uuid) |  | The consent form stored on this profile (DEC-128; CHG-CSP-018), never the form in effect (ADAM CR-445, Chinmay, 1 November 2026; CHG-CR445-001): null means the venue's form applies, or the tenant's w… (nullable) |
 | enrollmentChannels | array of enum (ticketCounter, entryGate) |  | Where a Face Tag may be captured |
 | bindTo | enum (ticket, visit, temporaryCredential) |  | What the Face Tag is bound to |
 | deletionTrigger | enum (ticketFullyRedeemed, endOfVisit, ticketExpiration, credentialCancellation, operationalRetentionThreshold) |  | When the Face Tag is automatically deleted; default ticketFullyRedeemed |
@@ -1755,6 +1763,7 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Updated, and re-pushed |
 | 409 |  | The plate cannot change in the entitlement's state (used, expired, revoked). |
 | 400 | BadRequest | Validation failed |
@@ -2842,6 +2851,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | suspended_reason | text | no |  |
 | freeze_reason | text | no | The reason of the latest freezeEntitlement (audit R222). |
 | freeze_note | text | no | The note the latest freezeEntitlement took, required there when reason is other (decided 28 September, audit R222). |
+| frozen_from | date | no | The freeze window's first day (ADAM CR-543; Chinmay, 3 November 2026): written by freezeEntitlement from its from. |
+| frozen_until | date | no | The freeze window's last day (ADAM CR-543): written by freezeEntitlement from its to; null means open-ended. |
 | is_name_bound | boolean | no |  |
 | holder_name | text | no |  |
 | shared_with_subject_ids | text[] | no | shareEntitlement. |

@@ -636,7 +636,7 @@ screens:
         why: >-
           Two models for one question; the guidedAnswerIds filter has only requiresSwimmer true/false and
           no "some of us" vest counter. Needs one model before the build.
-        source: DI-1108; REV3-26; contracts/spine/catalogue.yaml#searchCatalogue (guidedAnswerIds "leaves out products whose consent questions include the swim question")
+        source: DI-1108; REV3-26; contracts/spine/catalogue.yaml#searchCatalogue (guidedAnswerIds "a product needs a swimmer when any of its consent questions has kind")
         status: logged
         by: CHG-SGU-024
     decisions:

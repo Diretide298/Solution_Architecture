@@ -1481,12 +1481,12 @@
    "maxCelsius": {
     "type": "number",
     "nullable": true,
-    "description": "**Null at either end is legitimate** — a core probe has a floor and no ceiling. Both null is not, and is what an unconfigured checkpoint looks like."
+    "description": "**Null at either end is legitimate** — a core probe has a floor and no ceiling. Both null is not, and is what an unconfigured checkpoint looks like. With both set, `minCelsius` is not greater than `maxCelsius` (`400` at `setTemperatureCheckpoint`; ADAM CR-453)."
    },
    "checkFrequencyMinutes": {
     "type": "integer",
     "nullable": true,
-    "description": "**How often it must be read.** The gap this leaves open otherwise is the one an inspector finds: not a bad reading, but a missing one."
+    "description": "**How often it must be read.** The gap this leaves open otherwise is the one an inspector finds: not a bad reading, but a missing one. Greater than 0 when set (`400` at `setTemperatureCheckpoint`; ADAM CR-453)."
    },
    "requiresCorrectiveActionOnBreach": {
     "type": "boolean"

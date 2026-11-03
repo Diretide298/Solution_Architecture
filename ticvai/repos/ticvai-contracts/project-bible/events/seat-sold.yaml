@@ -32,11 +32,6 @@ consumers:
   idempotencyKey: orderId + seatId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Seat-level sales and heat maps
-  idempotencyKey: orderId + seatId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Candidate availability (a sold seat is no longer a recommendation) and forecast and risk
     context (AI system design section 3.2)

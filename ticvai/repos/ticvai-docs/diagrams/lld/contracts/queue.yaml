@@ -83,6 +83,7 @@ operations:
   - device
   offline: true
   reads:
+  - queue.feed
   - queue.queue
   - queue.reading
   writes: []
@@ -210,6 +211,7 @@ operations:
   reads:
   - cache:idempotency
   - queue.entry
+  - queue.queue
   writes:
   - cache:idempotency
   - platform.outbox
@@ -225,6 +227,7 @@ operations:
   reads:
   - cache:idempotency
   - queue.entry
+  - queue.queue
   writes:
   - cache:idempotency
   - platform.outbox

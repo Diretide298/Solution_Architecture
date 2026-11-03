@@ -33,7 +33,7 @@
     {
      "to": "GST-031",
      "trigger": "AI Concierge – Home",
-     "provenance": "derived — GST-031 declares entryState.params conversationId, messageId, outletId and GST-030 holds none of them. The edge carries nothing: conversationId, outletId, messageId only pre-select (deep link or optional), and GST-031 opens on its own"
+     "provenance": "derived — GST-031 declares entryState.params conversationId, messageId, outletId and GST-030 holds none of them. The edge carries nothing: conversationId, outletId, messageId only pre-select (optional), and GST-031 opens on its own"
     }
    ]
   },
@@ -111,7 +111,7 @@
     "verified": "2026-09-28",
     "match": "exact",
     "view": "DEFERRED (R242), still in the prototype: Account → All screens → Wave 2 → In-venue notifications; At-venue tab → Alerts",
-    "differences": "The YAML defers this (no in-app notification feed in the first release), but the prototype still shows a feed and an Alerts tab, so the client will expect it."
+    "differences": "The YAML deferred this (no in-app notification feed in the first release), and the prototype still shows a feed and an Alerts tab. **Superseded 29 September (rev 3 GAP-C1, DI-1075): the screen is in the first release** (CHG-SGU-017), as WEB-046 says."
    },
    "stateViews": {
     "loading": "P02/venue-loader",

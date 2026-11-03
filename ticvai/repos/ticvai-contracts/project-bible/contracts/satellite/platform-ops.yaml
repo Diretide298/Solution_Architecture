@@ -128,6 +128,70 @@ x-ticvai-queries:
       deployables (ADR-0073, #37051): approvals' createApprovalRequest (Tenancy, commerce) asks it for a request of
       subject type tenant.
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  controlPlaneEvents:
+    module: platform-ops
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.incidentOpened, tenantDomain.mapped, whitelabel.passCertificateExpiring]
+    reads: [control.tenant_domain]
+    writes: [control.tenant_domain]
+    emits: [tenantDomain.rejected]
+    for: 'Platform''s control-plane consumers: write the hostname''s control.tenant_domain row from tenantDomain.mapped (critical:
+      the edge resolves hosts from it; it also emits tenantDomain.rejected), and alert TICVAI operations about an expiring
+      Apple pass certificate; link an AI incident to the operational incident.'
+    source:
+    - events/ai-incidentOpened.yaml
+    - events/tenantDomain-mapped.yaml
+    - events/whitelabel-passCertificateExpiring.yaml
+  migrationRun:
+    module: platform-ops
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: migration-run, from: canary, to: failed}
+    - {model: migration-run, from: running, to: paused}
+    - {model: migration-run, from: running, to: complete}
+    - {model: migration-run, from: running, to: failed}
+    reads: [control.migration_run]
+    writes: [control.migration_run]
+    builtBy: PLATFORM-MIGRATE
+    for: The migration fan-out run across cells.
+    source: ['states/migration-run.yaml:1']
+  outboxRepublish:
+    module: platform-ops
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: outbox-republish, from: queued, to: running}
+    - {model: outbox-republish, from: running, to: completed}
+    - {model: outbox-republish, from: running, to: failed}
+    reads: [control.outbox_republish]
+    writes: [control.outbox_republish]
+    builtBy: PLATFORM-REPUBLISH
+    for: The relay loop that runs a queued outbox republish (ADR-0058).
+    source: ['states/outbox-republish.yaml:1']
+  releaseRollout:
+    module: platform-ops
+    host: workers
+    trigger: {kind: event}
+    consumes: [approval.granted]
+    moves:
+    - {model: rollout, from: rolling, to: complete}
+    - {model: rollout, from: rolling, to: failed}
+    - {model: rollout-cell, from: running, to: complete}
+    - {model: rollout-cell, from: running, to: failed}
+    reads: [control.rollout]
+    writes: [control.rollout]
+    for: Control Plane release rollout runner.
+    source: ['states/rollout-cell.yaml:30', 'states/rollout.yaml:52']
 paths:
   /rollouts/{rolloutId}/cells/{cellId}/skip:
     parameters:

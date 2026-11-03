@@ -83,8 +83,8 @@ screens:
     - to: ADM-004
       trigger: Platform Audit Log
       provenance: 'derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-001
-        holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (deep
-        link or optional), and ADM-004 opens on its own'
+        holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (optional),
+        and ADM-004 opens on its own'
     - to: PTR-001
       trigger: A partner user signs in through the same door
       provenance: flow F104 step 3→4
@@ -606,13 +606,11 @@ screens:
     - to: ADM-022
       trigger: Release & Version Management
       provenance: 'derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them.
-        The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-022 opens
-        on its own'
+        The edge carries nothing: releaseId only pre-selects (optional), and ADM-022 opens on its own'
     - to: ADM-023
       trigger: Staging Promotion & Approval
       provenance: 'derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them.
-        The edge carries nothing: releaseId only pre-selects (deep link or optional), and ADM-023 opens
-        on its own'
+        The edge carries nothing: releaseId only pre-selects (optional), and ADM-023 opens on its own'
     - to: ADM-026
       trigger: End-of-Support Notice Management
       carries:
@@ -622,8 +620,8 @@ screens:
     - to: ADM-027
       trigger: Database Migration Console
       provenance: 'derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them.
-        The edge carries nothing: runId only pre-selects (deep link or optional), and ADM-027 opens on
-        its own'
+        The edge carries nothing: ADM-027 finds runId (applyMigration) itself, and ADM-027 opens on its
+        own'
     - to: ADM-029
       trigger: Deployment Monitor
       carries:
@@ -645,8 +643,8 @@ screens:
     - to: ADM-032
       trigger: WAF & Security Policy View
       provenance: 'derived — ADM-032 declares entryState.params cellId, wafRuleId and ADM-002 holds none
-        of them. The edge carries nothing: cellId, wafRuleId only pre-select (deep link or optional),
-        and ADM-032 opens on its own'
+        of them. The edge carries nothing: cellId, wafRuleId only pre-select (optional), and ADM-032 opens
+        on its own'
     - to: ADM-033
       trigger: Backup & DR Status
       carries:
@@ -656,8 +654,7 @@ screens:
     - to: ADM-034
       trigger: Archival Job Monitor
       provenance: 'derived — ADM-034 declares entryState.params cellId and ADM-002 holds none of them.
-        The edge carries nothing: cellId only pre-selects (deep link or optional), and ADM-034 opens on
-        its own'
+        The edge carries nothing: cellId only pre-selects (optional), and ADM-034 opens on its own'
     - to: ADM-037
       trigger: AI Provider & Credentials
       carries:
@@ -667,8 +664,8 @@ screens:
     - to: ADM-318
       trigger: Dead Letters
       provenance: 'derived — ADM-318 declares entryState.params deadLetterId, republishId and ADM-002
-        holds none of them. The edge carries nothing: deadLetterId, republishId only pre-select (deep
-        link or optional), and ADM-318 opens on its own'
+        holds none of them. The edge carries nothing: deadLetterId, republishId only pre-select (optional),
+        and ADM-318 opens on its own'
     - to: ADM-024
       trigger: Release Notification Composer
       provenance: structural — ADM-002 is P09's home screen and its exits are its launcher
@@ -985,9 +982,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-003 holds none of them. The edge
@@ -996,8 +993,8 @@ screens:
     - to: ADM-004
       trigger: Platform Audit Log
       provenance: 'derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-003
-        holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (deep
-        link or optional), and ADM-004 opens on its own'
+        holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (optional),
+        and ADM-004 opens on its own'
     - to: SCN-003
       trigger: Guest scans at the other venue
       provenance: flow F19 step 2→3
@@ -1306,9 +1303,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-004 holds none of them. The edge
@@ -1544,9 +1541,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-005 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-005 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-005 holds none of them. The edge
@@ -2056,9 +2053,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-006 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-006 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-006 holds none of them. The edge
@@ -2417,9 +2414,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-007 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-007 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-007 holds none of them. The edge
@@ -2709,9 +2706,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-008 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-008 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-008 holds none of them. The edge
@@ -3146,9 +3143,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-009 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-009 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-009 holds none of them. The edge
@@ -3396,9 +3393,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-010 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-010 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-010 holds none of them. The edge
@@ -3601,9 +3598,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-011 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-011 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-011 holds none of them. The edge
@@ -3915,9 +3912,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-012 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-012 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-012 holds none of them. The edge
@@ -4172,9 +4169,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-013 holds none of them. The edge
@@ -4370,9 +4367,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-014 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-014 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-014 holds none of them. The edge
@@ -4581,9 +4578,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-015 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-015 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-015 holds none of them. The edge
@@ -5020,9 +5017,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-016 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-016 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-016 holds none of them. The edge
@@ -5528,9 +5525,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-017 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-017 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-017 holds none of them. The edge
@@ -6078,9 +6075,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-019 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-019 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-019 holds none of them. The edge
@@ -6330,9 +6327,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-020 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-020 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-020 holds none of them. The edge
@@ -6600,9 +6597,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-021 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-021 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-021 holds none of them. The edge
@@ -7123,9 +7120,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-022 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-022 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-022 holds none of them. The edge
@@ -7395,9 +7392,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-023 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-023 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-023 holds none of them. The edge
@@ -7629,9 +7626,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-024 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-024 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-024 holds none of them. The edge
@@ -7810,9 +7807,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-025 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-025 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-025 holds none of them. The edge
@@ -7951,9 +7948,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-026 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-026 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-026 holds none of them. The edge
@@ -8228,9 +8225,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-027 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-027 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-027 holds none of them. The edge
@@ -8463,9 +8460,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-028 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-028 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-028 holds none of them. The edge
@@ -8836,9 +8833,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-029 holds none of them. The edge
@@ -9148,9 +9145,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-030 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-030 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-030 holds none of them. The edge
@@ -9338,9 +9335,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-031 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-031 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-031 holds none of them. The edge
@@ -9630,9 +9627,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-032 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-032 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-032 holds none of them. The edge
@@ -9821,9 +9818,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-033 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-033 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-033 holds none of them. The edge
@@ -9992,9 +9989,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-034 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-034 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-034 holds none of them. The edge
@@ -10138,9 +10135,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-035 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-035 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-035 holds none of them. The edge
@@ -10296,9 +10293,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-036 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-036 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-036 holds none of them. The edge
@@ -11008,10 +11005,10 @@ screens:
     configuration.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Create
-      Tax Profile, Create Fee, Create Calculation Profile, Run Simulation, Validate Configuration, View
-      Dependencies. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 4 operations.** Unserved:
+      Create Tax Profile, Create Fee, Create Calculation Profile, Run Simulation, Validate Configuration,
+      View Dependencies. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions
   layout:
     template: split
@@ -11295,9 +11292,9 @@ screens:
     - to: ADM-001
       trigger: Platform Login / MFA
       provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
-        ADM-318 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
-        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001
-        opens on its own'
+        ADM-318 holds none of them. The edge carries nothing: providerId only pre-selects (optional);
+        ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on
+        its own'
   notes: 'Added 4 September. **47 consumers declare `retryThenDeadLetter` and all 47 are marked `isCritical`,
     and until this screen existed nothing in the package read the table they land in.** Deliberately not
     DEV-005 Webhooks: `replayEvents` is partner-facing redelivery of a customer''s own integration, and
@@ -11716,12 +11713,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Table Columns) and no metric row
   purpose: Provide a central portfolio of every TICVAI customer and their current commercial position.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 8 §Table Columns
+  gaps: []
   layout:
     template: split
     regions:
@@ -12053,12 +12045,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§KPIs) and a per-row directory (§Show)
     — counts over a population, then the population
   purpose: Analyze TICVAI revenue across all commercial structures.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §Show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -12298,11 +12285,6 @@ screens:
     — counts over a population, then the population
   purpose: Manage upcoming renewals and identify retention or commercial restructuring requirements.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §Columns
   - operation: listMembershipRenewalRetention
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-021): listMembershipRenewalRetention is the guest membership
@@ -12453,11 +12435,6 @@ screens:
   purpose: Identify opportunities beyond traditional tier upgrades. This is a key revision from the original
     Upgrade, Downgrade & Expansion Opportunities screen.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Show
   - operation: listRenewalAuto
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-021): listRenewalAuto is the guest membership renewal queue
@@ -12691,7 +12668,7 @@ screens:
     modules.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved:
       Board 1 — Standardized Commercial Metrics. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Actions
@@ -14087,12 +14064,7 @@ screens:
     directory — it is settings, not a population
   purpose: Configure how TICVAI determines the operational size and complexity of a customer. VSI remains
     important even where VSI does not determine customer pricing.
-  gaps:
-  - operation: null
-    why: '**VSI Model Builder declares no operation that writes anything** — its only declared call is
-      `none`, a read. The name promises authoring and the contract offers none, so either the write operations
-      are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -14908,12 +14880,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Allow TICVAI to test commercial models before applying them. This screen now becomes more powerful
     than the original Board 3 simulator.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 40 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -15017,10 +14984,10 @@ screens:
   purpose: Govern changes to all commercial, VSI, licensing, billable-unit and pricing rules.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
-      Revised Board 3 — Critical Architecture, 1. Operational Classification. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Revised
+      Board 3 — Critical Architecture, 1. Operational Classification. Each needs an operation, or needs
+      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
+      the contract side.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -15790,12 +15757,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Compare different ways of commercially packaging the same customer. This screen must consume
     the commercial models configured in Board 3.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 51 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -15899,12 +15861,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Provide the complete package before customer acceptance or internal approval.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 53 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -16291,7 +16248,7 @@ screens:
   purpose: Capture the legally correct customer and billing information.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 5 operations.** Unserved:
       Commercial Customer ≠ Operating Venue, Validate Entity / Save / Continue. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
@@ -17261,16 +17218,11 @@ screens:
     template after subscription/trial activation.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
-      Retry / Investigate / Assign / Escalate, Revised Board 5 — Commercial Model Behavior. Each needs
-      an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
-      screen side rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Retry
+      / Investigate / Assign / Escalate, Revised Board 5 — Commercial Model Behavior. Each needs an operation,
+      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
+      rather than the contract side.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Show
   layout:
     template: split
     regions:
@@ -17426,6 +17378,7 @@ screens:
       provenance: structural — pack board 6 wiring, 11 September 2026
       carries:
       - tenantId
+      - cellId
     - to: ADM-425
       trigger: Venue Template Application
       provenance: structural — pack board 6 wiring, 11 September 2026
@@ -18432,6 +18385,11 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
+    - name: cellId
+      from: navigation
+      optional: true
+      notes: 'Held only to carry back: ADM-419 needs it, ADM-419 opens this screen with it, and nothing
+        this screen reads has a cell id (`Tenant` has `cellHost`) (r13, CHG-RCR33-001).'
   notes: '**One vocabulary 4 October 2026: ModuleListing.moduleCode, LicencePosition.licensedModules[].moduleKey
     and ModuleEnablement.moduleKey all hold ModuleKey values (the contract is asked to type the first
     two as ModuleKey, ledger). Activate is enabled for a module only when it is licensed and every module
@@ -19318,12 +19276,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Apply the correct technical enforcement behavior when licensed resources reach or exceed limits.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 113 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -19426,12 +19379,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Forecast) and no metric row
   purpose: Track the commercial consumption position against contractual minimum guarantees. This screen
     does not issue the invoice. It provides Board 10 with the reconciled consumption basis.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 114 §Forecast
+  gaps: []
   layout:
     template: split
     regions:
@@ -19769,12 +19717,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Track) and no metric row
   purpose: Ensure that the approved contract, subscription, license and actual metering configuration
     remain synchronized.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 119 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -19925,12 +19868,7 @@ screens:
     (§Show) — counts over a population, then the population
   purpose: Provide finance, commercial and subscription teams with a consolidated view of the customer's
     financial position.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -20428,12 +20366,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Manage changes to an active commercial agreement without losing contractual history.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 127 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -20534,11 +20467,6 @@ screens:
     (§Analyze) — counts over a population, then the population
   purpose: Manage the complete customer renewal pipeline.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Analyze
   - operation: listRenewalAuto
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-021): listRenewalAuto and setRenewalAutoMembership are guest
@@ -21000,10 +20928,9 @@ screens:
   purpose: Finalize renewal and synchronize the approved future commercial agreement across TICVAI.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
-      Revised Board 10 — Commercial Model Calculation. Each needs an operation, or needs removing from
-      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
-      side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Revised
+      Board 10 — Commercial Model Calculation. Each needs an operation, or needs removing from the screen;
+      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 133 §Actions
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -21134,16 +21061,11 @@ screens:
     AI.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 6 operations.** Unserved:
       Create New Configuration, Modify Existing Configuration, Extend Existing Configuration, Clone &
       Adapt Existing Setup. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
     source: pack AI_Configuration_Assistant_Reference.pdf, page 4 §Allow
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Configuration_Assistant_Reference.pdf, page 4 §Show intelligent cards such as
   layout:
     template: split
     regions:
@@ -21375,13 +21297,7 @@ screens:
     Areas) and no display directory — it is settings, not a population
   purpose: Understand what the administrator is actually trying to accomplish before asking detailed configuration
     questions. This is the first AI interview screen.
-  gaps:
-  - operation: null
-    why: '**Setup Type & Business Intent Discovery declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -21605,7 +21521,7 @@ screens:
     relevant.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved:
       Confirm | Edit Understanding | Continue. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Actions
@@ -22283,7 +22199,7 @@ screens:
     board 1.6, page 12): understand the operational rules needed to deliver the configured products.'
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved:
       Confirm Operations | Add Requirement | Continue. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
@@ -24013,11 +23929,6 @@ screens:
     board 2.5, page 30): convert commercial requirements into proposed pricing, tax, fee, and commercial
     rules using TICVAI''s existing Pricing architecture.'
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Configuration_Assistant_Reference.pdf, page 30 §Show
   - operation: setChannelPricingCommercial
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-012): The assistant only drafts (ADR-0020); pricing is written
@@ -24787,7 +24698,7 @@ screens:
     before it is presented for approval. This should be one of the most important screens in Board 2.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 4 operations.** Unserved:
       Link Existing, Configure Later, Ask AI. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack AI_Configuration_Assistant_Reference.pdf, page 36 §Actions
@@ -25698,12 +25609,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Track) and no metric row
   purpose: Separate mandatory configuration from AI recommendations so the administrator understands what
     is required and what is advice.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Configuration_Assistant_Reference.pdf, page 47 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -26259,12 +26165,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Provide a detailed real-time view of execution dependencies, failures, retries, and downstream
     configuration status.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Configuration_Assistant_Reference.pdf, page 51 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -26486,12 +26387,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Show exactly what TICVAI objects were created or changed after successful execution.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Configuration_Assistant_Reference.pdf, page 53 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -26686,7 +26582,7 @@ screens:
     capability.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 3 operations.** Unserved:
       Prepare Change | Ask More | Cancel. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack AI_Configuration_Assistant_Reference.pdf, page 54 §Actions
@@ -27051,12 +26947,7 @@ screens:
     Configuration Audit & Governance (pack AI_Configuration_Assistant_Reference.pdf, board 3.10, page
     57): provide an immutable governance record showing how AI participated in every configuration decision
     and execution. This is essential for an enterprise AI system.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Configuration_Assistant_Reference.pdf, page 57 §For each configuration value show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -29265,12 +29156,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Allow management to test possible future conditions without changing production configuration.
     This is one of the most important screens.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 18 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -30535,12 +30421,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Translate predicted operational demand into required staffing levels.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 38 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -30730,12 +30611,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Forecast) and no metric row
   purpose: Predict the number of active selling/service points required to handle expected transaction
     volume and maintain acceptable service levels.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 40 §Forecast
+  gaps: []
   layout:
     template: split
     regions:
@@ -31418,7 +31294,7 @@ screens:
     to the appropriate TICVAI modules. This is the final screen of the Forecasting module.
   gaps:
   - operation: null
-    why: '**The pack names 20 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 20 actions on this screen and the screen declares 3 operations.** Unserved:
       Critical Board 1 → Board 2 Architecture, BOARD 1, ATTENDANCE, DEMAND & REVENUE FORECASTING, ├──
       Attendance, ├── Arrival Pattern, ├── Product Demand, ├── Timeslot Demand, ├── Channel Demand ….
       Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
@@ -32947,7 +32823,7 @@ screens:
     A rule suitable for a development sandbox may not be acceptable in production.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 4 operations.** Unserved:
       Generate Configuration Allow Allow Allow Allow, Prepare Change Allow Allow Allow Allow, Customer
       Data Use Synthetic Restricted Restricted Governed. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
@@ -34045,7 +33921,7 @@ screens:
   purpose: Translate Board 1 governance decisions into the correct human approval workflow.
   gaps:
   - operation: null
-    why: '**The pack names 11 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 11 actions on this screen and the screen declares 6 operations.** Unserved:
       Single Approval, Sequential Approval, Parallel Approval, Conditional Approval, Risk-Based Approval,
       → Commercial Manager, → Commercial Manager + General Manager, → Commercial Director + General Manager
       …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
@@ -34656,12 +34532,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Allow the approver to question the AI proposal before making a decision. Human oversight should
     not mean simply clicking Approve.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Governance_Reference.pdf, page 36 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -35089,12 +34960,7 @@ screens:
     and no metric row
   purpose: Allow authorized humans to monitor and intervene after an AI-driven action has been approved
     and entered execution. This is different from approval.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Governance_Reference.pdf, page 39 §High-impact intervention should show
+  gaps: []
   layout:
     template: split
     regions:
@@ -35833,7 +35699,7 @@ screens:
     activating it in production.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved:
       but Operations Assistant lacks Pricing approval rights,. Each needs an operation, or needs removing
       from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
@@ -36897,12 +36763,7 @@ screens:
     48 Potential Products ↓ 42 Active 6 removed ↓ 35 Channel Eligible 7 removed ↓ 28 Date / Time Eligible
     7 removed ↓ 22 Customer Eligible 6 removed ↓ 18 Capacity Available 4 removed ↓ 14 Passed Exclusions
     4 removed ↓ 10 Passed Guardrails 4 removed ↓ 10 Ranked ↓ Fast Pass #1'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Governance_Reference.pdf, page 62 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -37093,12 +36954,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Record which AI technology produced or contributed to the decision. This gives TICVAI provider
     and model traceability without duplicating AI Platform configuration.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Governance_Reference.pdf, page 64 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -37678,7 +37534,7 @@ screens:
   purpose: Create a complete, tamper-evident audit package for an AI decision or group of decisions.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 6 actions on this screen and the screen declares 5 operations.** Unserved:
       Single Decision, Customer Journey, AI Capability, Incident, Model Version, Governance Policy. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -37865,12 +37721,7 @@ screens:
   purpose: Allow authorized governance/technical teams to reconstruct an AI decision and understand whether
     the same conditions would produce the same or a different outcome. This should be a powerful investigation
     tool.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Governance_Reference.pdf, page 71 §Compare
+  gaps: []
   layout:
     template: split
     regions:
@@ -38382,7 +38233,7 @@ screens:
     are operational.
   gaps:
   - operation: null
-    why: '**The pack names 21 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 21 actions on this screen and the screen declares 5 operations.** Unserved:
       Customer, Commercial, Financial, Operational, Security, Model / AI Quality, Risk Matrix, Critical
       …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
@@ -38763,12 +38614,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§Compliance KPIs) and a per-row directory
     (§Show) — counts over a population, then the population
   purpose: Continuously detect AI activity that violates or attempts to violate Board 1 governance policies.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Governance_Reference.pdf, page 87 §Show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -38981,12 +38827,7 @@ screens:
     (§Show) — counts over a population, then the population
   purpose: Monitor whether AI capabilities are actually using data according to the policies configured
     in Board 1. This screen is monitoring—not the configuration of the data policies themselves.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack AI_Governance_Reference.pdf, page 89 §Show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -39702,7 +39543,7 @@ screens:
     remediation and closure.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 9 operations.** Unserved:
       Revalidate thresholds Fraud Team 15 Sep Pending, Run control test Governance 15 Sep Pending. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -40023,7 +39864,7 @@ screens:
     generic BI platform.
   gaps:
   - operation: null
-    why: '**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 9 actions on this screen and the screen declares 5 operations.** Unserved:
       AI Capability Inventory, AI Risk Register, AI Policy Compliance, AI Approval Compliance, AI Data
       Usage, AI Exceptions, Control Effectiveness, Model / Provider Governance …. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
@@ -40219,7 +40060,7 @@ screens:
     cycle. This is the final screen of the entire AI Governance module.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved:
       Critical Continuous Monitoring Architecture. Each needs an operation, or needs removing from the
       screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack AI_Governance_Reference.pdf, page 97 §Actions
@@ -40419,12 +40260,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory
     (§Show) — counts over a population, then the population
   purpose: Provide an executive and operational overview of payment reconciliation and settlement health.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 138 §Show
+  gaps: []
   layout:
     template: dashboard
     regions:

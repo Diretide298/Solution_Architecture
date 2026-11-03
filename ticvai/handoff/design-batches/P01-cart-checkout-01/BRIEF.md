@@ -1,6 +1,6 @@
 # P01-cart-checkout-01 — P01 · Cart & Checkout
 
-**5 screens · 29 operations · 50 schemas · 6 permissions**
+**5 screens · 29 operations · 51 schemas · 6 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-010` | Shopping Cart | A | 13 | 69 | 5 | 34 | 12 | 6 | guest | review (client-verified) |
 | `WEB-011` | Guest Details & Attendee Forms | A | 12 | 21 | 6 | 9 | 15 | 0 | guest | review (client-verified) |
 | `WEB-012` | Checkout — Payment | A | 14 | 32 | 5 | 23 | 17 | 6 | guest | review (client-verified) |
-| `WEB-013` | Booking Confirmation | A | 21 | 10 | 5 | 14 | 4 | 6 | guest | review (client-verified) |
+| `WEB-013` | Booking Confirmation | A | 22 | 10 | 5 | 14 | 4 | 6 | guest | review (client-verified) |
 | `WEB-014` | Pay for a Booking | A | 3 | 3 | 5 | 0 | 2 | 6 | guest | review (designed) |
 
 ## Design inputs from the client meetings

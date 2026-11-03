@@ -1617,7 +1617,7 @@
     "format": "uuid",
     "readOnly": true,
     "x-ticvai-references": "seating.seat_map",
-    "description": "**The map the section belongs to** (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into: createSeatMap, editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, and the imports when committed. A map's codes are unique on it, matched exactly (`section_seat_map_id_code_uniq`)."
+    "description": "**The map the section belongs to** (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into: createSeatMap, editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, and the imports when committed. A map's codes are unique on it, matched exactly (`section_seat_map_id_code_uniq`).\n\n**NOT NULL, in one guarded forward migration** (ADAM CR-470, decided by Chinmay on 2 November 2026, as CR-402 decided: the contract requires it and handoff/migration-review.md lists it; the derived file leaves it nullable only because a derived file never adds NOT NULL). In this order: (1) if the table holds any row, stop with an error giving the count and tell the lead; (2) `ADD COLUMN IF NOT EXISTS seat_map_id uuid`, then `SET NOT NULL`; (3) `section_seat_map_id_fkey` to `seating.seat_map(id)`; (4) the plain index `section_seat_map_id_idx` on (`seat_map_id`); (5) the unique index `section_seat_map_id_code_uniq` on (`seat_map_id`, `code`), the code matched exactly. Row security is unchanged. A database check that reports the column NOT NULL against the nullable statement is the difference migration-review.md lists, not a fault."
    },
    "code": {
     "type": "string",
@@ -2014,6 +2014,7 @@
    "org_unit_id"
   ],
   "x-ticvai-guest-read": true,
+  "x-ticvai-tenant-row-read": true,
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -2362,8 +2363,9 @@
      60
     ],
     "nullable": true,
+    "default": 30,
     "x-ticvai-persistence-column": "integer",
-    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13). **The `default` is the proposed tenant default only** (ADAM CR-484, Chinmay, 3 November 2026; CHG-CR484-001), as every other configured limit carries its own: it is never written into a venue's row, and a venue's own null stays null when the venue's settings are read, as `cartLeaseSeconds` and the other limits behave. When the client corrects it, only this default changes."
    },
    "cartLeaseSeconds": {
     "type": "integer",

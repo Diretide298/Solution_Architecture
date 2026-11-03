@@ -629,6 +629,7 @@
     "description": "Order among providers with the same role and selectors; 1 is tried first."
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setChannelProvider saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "type": "string",
     "enum": [
      "active",
@@ -1632,6 +1633,7 @@
     ]
    },
    "status": {
+    "x-ticvai-caller-sets": "The caller moves it (setSenderIdentityDomain saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.",
     "type": "string",
     "enum": [
      "pendingVerification",

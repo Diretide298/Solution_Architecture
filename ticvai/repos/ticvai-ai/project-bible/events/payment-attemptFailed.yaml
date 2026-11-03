@@ -9,6 +9,9 @@ description: A call to a payment provider was declined or errored. One event per
 aggregate: paymentAttempt
 emittedWhen: createPayment or capturePayment (spine/orders.yaml) writes a `payments.payment_attempt` row
   with outcome declined or errored
+emittedBy:
+- orders.createPayment
+- orders.capturePayment
 payload:
 - field: paymentAttemptRef
   type: uuid

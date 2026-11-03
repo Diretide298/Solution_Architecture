@@ -208,13 +208,7 @@
   "purpose": "Set how long an event's performances last, including durations that vary by day or session.",
   "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-698)",
   "division": "Shares `getEvent`, `setEventSchedule` with BO-697; this screen is Dynamic Performance Duration Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 86): set how long an event's performances last, including durations that vary by day or session.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [

@@ -173,8 +173,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-finance-liability-command-center-bo-1163` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** All wallet obligations and movements for finance.
 
 **Known correction pending (do not draw the wrong version)**
@@ -847,8 +845,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `subjectId` (navigation) |
 | Route | `/orders-money/reconciliation-exception-resolution-workbench-bo-1167` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Investigate reconciliation failures (payment succeeded but wallet not funded, and the reverse) and fix them with an adjustment.
 
 #### Inputs: what the user enters or picks
@@ -997,8 +993,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/gift-card-liability-management-bo-1168` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Outstanding gift card obligations: balances, redeemed, unredeemed, expired.
 
@@ -1168,7 +1162,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/breakage-revenue-recognition-policy-bo-1169` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.
+**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet accounting mapping that setWalletAccountingMapping writes.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Breakage and revenue recognition rules for expired or unredeemed value.
 
@@ -1508,8 +1502,6 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/wallet-analytics-management-reporting-bo-1171` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Wallet analytics: usage, balances and behaviour by credit type.
 
 **Known correction pending (do not draw the wrong version)**
@@ -1673,8 +1665,6 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Route | `/orders-money/finance-validation-reporting-audit-center-bo-1172` |
 
 **What the spec says about it.** **Reconciliation is daily, per venue** (decided 2 October 2026, Chinmay; CHG-FIN-009; audit R110 (b)). The unit of work and of sign-off is one venue-day: POS cash, gateway settlements, bank and wallet against the ledger for that day. A longer range reviews days already reconciled; a provider's monthly file (DI-268) is matched day by day.
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** The finance controls centre (DI-277): one place that shows the transactions and balances with exceptions or variances needing review, proves that wallet balances, the wallet sub-ledger, the general ledger and the acquirer agree, and moves the period through submit and approve. Get right: the person who submits the close is never the one who approves it, and every check names what to fix.
 

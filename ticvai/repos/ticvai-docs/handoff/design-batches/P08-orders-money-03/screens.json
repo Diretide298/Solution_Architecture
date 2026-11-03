@@ -38,7 +38,7 @@
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-075 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
+     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-075 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (optional), and BO-077 opens on its own"
     },
     {
      "to": "ADM-020",
@@ -366,17 +366,17 @@
     {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "provenance": "derived — BO-074 declares entryState.params accountId and BO-076 holds none of them. The edge carries nothing: accountId only pre-selects (deep link or optional), and BO-074 opens on its own"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-076 holds none of them. The edge carries nothing: BO-074 finds accountId (listAccounts) itself, and BO-074 opens on its own"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-076 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-076 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and BO-075 opens on its own"
     },
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-076 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
+     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-076 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (optional), and BO-077 opens on its own"
     }
    ]
   },
@@ -629,12 +629,12 @@
     {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "provenance": "derived — BO-074 declares entryState.params accountId and BO-077 holds none of them. The edge carries nothing: accountId only pre-selects (deep link or optional), and BO-074 opens on its own"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-077 holds none of them. The edge carries nothing: BO-074 finds accountId (listAccounts) itself, and BO-074 opens on its own"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-077 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-077 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and BO-075 opens on its own"
     }
    ]
   },
@@ -956,7 +956,7 @@
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-089 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-089 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and BO-075 opens on its own"
     }
    ]
   },
@@ -1266,7 +1266,7 @@
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-090 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-090 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and BO-075 opens on its own"
     }
    ]
   },
@@ -1585,22 +1585,22 @@
     {
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-101 holds none of them. The edge carries nothing: productId only pre-selects (deep link or optional); BO-008 finds variantId (listProductVariants), version (searchMedia) itself, and BO-008 opens on its own"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-101 holds none of them. The edge carries nothing: BO-008 finds variantId (listProductVariants), version (searchMedia) itself; BO-008 opens on listBookingFlows, and productId has no source on BO-008 yet (a gap in BO-008, not in this edge)"
     },
     {
      "to": "BO-022",
      "trigger": "Order Detail",
-     "provenance": "derived — BO-022 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep link or optional), and BO-022 opens on its own"
+     "provenance": "derived — BO-022 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (optional), and BO-022 opens on its own"
     },
     {
      "to": "BO-023",
      "trigger": "Refunds & Exchanges",
-     "provenance": "derived — BO-023 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep link or optional), and BO-023 opens on its own"
+     "provenance": "derived — BO-023 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (optional), and BO-023 opens on its own"
     },
     {
      "to": "BO-024",
      "trigger": "Payment Exceptions",
-     "provenance": "derived — BO-024 declares entryState.params depositId, paymentId and BO-101 holds none of them. The edge carries nothing: paymentId, depositId only pre-select (deep link or optional), and BO-024 opens on its own"
+     "provenance": "derived — BO-024 declares entryState.params depositId, paymentId and BO-101 holds none of them. The edge carries nothing: depositId only pre-selects (optional); BO-024 opens on listPaymentReconciliationException, and paymentId has no source on BO-024 yet (a gap in BO-024, not in this edge)"
     },
     {
      "to": "BO-025",
@@ -1613,17 +1613,17 @@
     {
      "to": "BO-026",
      "trigger": "Group Bookings",
-     "provenance": "derived — BO-026 declares entryState.params groupBookingId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, groupBookingId only pre-select (deep link or optional), and BO-026 opens on its own"
+     "provenance": "derived — BO-026 declares entryState.params groupBookingId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, groupBookingId only pre-select (optional), and BO-026 opens on its own"
     },
     {
      "to": "BO-027",
      "trigger": "Reissue & Media Replacement",
-     "provenance": "derived — BO-027 declares entryState.params credentialId, mediaCode, mediaId and BO-101 holds none of them. The edge carries nothing: mediaCode, mediaId, credentialId only pre-select (deep link or optional), and BO-027 opens on its own"
+     "provenance": "derived — BO-027 declares entryState.params credentialId, mediaCode, mediaId and BO-101 holds none of them. The edge carries nothing: mediaId, credentialId only pre-select (optional); BO-027 opens on listTicketReissueFulfillment, and mediaCode has no source on BO-027 yet (a gap in BO-027, not in this edge)"
     },
     {
      "to": "BO-029",
      "trigger": "Report Builder",
-     "provenance": "derived — BO-029 declares entryState.params conversationId, reportId and BO-101 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and BO-029 opens on its own"
+     "provenance": "derived — BO-029 declares entryState.params conversationId, reportId and BO-101 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (optional), and BO-029 opens on its own"
     },
     {
      "to": "BO-039",
@@ -1643,7 +1643,7 @@
     {
      "to": "BO-042",
      "trigger": "Banking & Safe",
-     "provenance": "derived — BO-042 declares entryState.params boxId, shiftId and BO-101 holds none of them. The edge carries nothing: boxId, shiftId only pre-select (deep link or optional), and BO-042 opens on its own"
+     "provenance": "derived — BO-042 declares entryState.params boxId, shiftId and BO-101 holds none of them. The edge carries nothing: boxId, shiftId only pre-select (optional), and BO-042 opens on its own"
     },
     {
      "to": "BO-043",
@@ -1656,22 +1656,22 @@
     {
      "to": "BO-047",
      "trigger": "Order Corrections & Exceptions",
-     "provenance": "derived — BO-047 declares entryState.params orderId and BO-101 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional), and BO-047 opens on its own"
+     "provenance": "derived — BO-047 declares entryState.params orderId and BO-101 holds none of them. The edge carries nothing: orderId only pre-selects (optional), and BO-047 opens on its own"
     },
     {
      "to": "BO-048",
      "trigger": "Retail Products",
-     "provenance": "derived — BO-048 declares entryState.params merchandiseId, productId and BO-101 holds none of them. The edge carries nothing: merchandiseId, productId only pre-select (deep link or optional), and BO-048 opens on its own"
+     "provenance": "derived — BO-048 declares entryState.params merchandiseId, productId and BO-101 holds none of them. The edge carries nothing: productId only pre-selects (optional); BO-048 finds merchandiseId (listMerchandise) itself, and BO-048 opens on its own"
     },
     {
      "to": "BO-059",
      "trigger": "Sales Reports",
-     "provenance": "derived — BO-059 declares entryState.params conversationId, reportId and BO-101 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (deep link or optional), and BO-059 opens on its own"
+     "provenance": "derived — BO-059 declares entryState.params conversationId, reportId and BO-101 holds none of them. The edge carries nothing: conversationId, reportId only pre-select (optional), and BO-059 opens on its own"
     },
     {
      "to": "BO-061",
      "trigger": "Scheduled Reports",
-     "provenance": "derived — BO-061 declares entryState.params reportId, scheduleId and BO-101 holds none of them. The edge carries nothing: reportId only pre-selects (deep link or optional); BO-061 finds scheduleId (listReportSchedules) itself, and BO-061 opens on its own"
+     "provenance": "derived — BO-061 declares entryState.params reportId, scheduleId and BO-101 holds none of them. The edge carries nothing: reportId only pre-selects (optional); BO-061 finds scheduleId (listReportSchedules) itself, and BO-061 opens on its own"
     },
     {
      "to": "BO-062",
@@ -1681,37 +1681,37 @@
     {
      "to": "BO-065",
      "trigger": "Venue Configuration",
-     "provenance": "derived — BO-065 declares entryState.params locationId and BO-101 holds none of them. The edge carries nothing: locationId only pre-selects (deep link or optional), and BO-065 opens on its own"
+     "provenance": "derived — BO-065 declares entryState.params locationId and BO-101 holds none of them. The edge carries nothing: locationId only pre-selects (optional), and BO-065 opens on its own"
     },
     {
      "to": "BO-074",
      "trigger": "Chart of Accounts",
-     "provenance": "derived — BO-074 declares entryState.params accountId and BO-101 holds none of them. The edge carries nothing: accountId only pre-selects (deep link or optional), and BO-074 opens on its own"
+     "provenance": "derived — BO-074 declares entryState.params accountId and BO-101 holds none of them. The edge carries nothing: BO-074 finds accountId (listAccounts) itself, and BO-074 opens on its own"
     },
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-101 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-101 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (optional), and BO-075 opens on its own"
     },
     {
      "to": "BO-077",
      "trigger": "FX Rates & Variances",
-     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-101 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (deep link or optional), and BO-077 opens on its own"
+     "provenance": "derived — BO-077 declares entryState.params rateId, varianceId and BO-101 holds none of them. The edge carries nothing: varianceId, rateId only pre-select (optional), and BO-077 opens on its own"
     },
     {
      "to": "BO-089",
      "trigger": "Journal Entries",
-     "provenance": "derived — BO-089 declares entryState.params entryId and BO-101 holds none of them. The edge carries nothing: entryId only pre-selects (deep link or optional), and BO-089 opens on its own"
+     "provenance": "derived — BO-089 declares entryState.params entryId and BO-101 holds none of them. The edge carries nothing: entryId only pre-selects (optional), and BO-089 opens on its own"
     },
     {
      "to": "BO-090",
      "trigger": "Period Close",
-     "provenance": "derived — BO-090 declares entryState.params periodId and BO-101 holds none of them. The edge carries nothing: periodId only pre-selects (deep link or optional), and BO-090 opens on its own"
+     "provenance": "derived — BO-090 declares entryState.params periodId and BO-101 holds none of them. The edge carries nothing: periodId only pre-selects (optional), and BO-090 opens on its own"
     },
     {
      "to": "BO-028",
      "trigger": "Refund Approval Queue",
-     "provenance": "derived — BO-028 declares entryState.params refundId and BO-101 holds none of them. The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens on its own"
+     "provenance": "derived — BO-028 declares entryState.params refundId and BO-101 holds none of them. The edge carries nothing: refundId only pre-selects (optional), and BO-028 opens on its own"
     },
     {
      "to": "BO-1088",

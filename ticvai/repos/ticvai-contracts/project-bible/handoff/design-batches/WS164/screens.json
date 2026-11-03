@@ -96,13 +96,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide executives and operational managers with a single enterprise dashboard showing the overall health and performance of Resource Management.",
   "purposeNote": "Authorized management users can understand overall Resource Management performance and identify areas requiring attention from a single dashboard.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -782,6 +776,8 @@
       {
        "kind": "metricTile",
        "label": "Forecast Demand",
+       "operation": "listDemandBookingCurve",
+       "bindsTo": "AiDemandForecastingBookingCurveStudioView.demand",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 157 §Display"
       },
       {
@@ -929,13 +925,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§KPI Library; Each KPI shall support) and no metric row",
   "purpose": "Allow organizations to define measurable Resource Management performance standards.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 158 §KPI Library"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1243,13 +1233,7 @@
   "patternReason": "the pack gives this screen a display directory (§Each request shall show) and no metric row",
   "purpose": "Provide one centralized workspace for governed Resource Management exceptions.",
   "purposeNote": "Resource exceptions and overrides are processed through controlled, permission-based workflows rather than informal administrative changes.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 160 §Each request shall show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1618,13 +1602,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Monitor all technical integrations and synchronization services supporting Resource Management.",
   "purposeNote": "Administrators can monitor integration health and understand the operational impact of synchronization failures.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 163 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1779,13 +1757,7 @@
   "patternReason": "the pack gives this screen both a metric directory (§Track) and a per-row directory (§Each recommendation shall show) — counts over a population, then the population",
   "purpose": "Complete the Resource Management module with an executive AI workspace that converts operational data into management recommendations. This should be the hero screen of Board 10.",
   "purposeNote": "Executives can use Resource Management data and AI intelligence to identify measurable opportunities for improving capacity, cost, reliability, utilization, and operational performance. Board 10 — Resource Management Control Tower Board 10 effectively becomes the Control Tower sitting above the previous nine boards. The architecture should conceptually operate as: Board 1–2 Resource Master + Availability ↓ Board 3–4 Workforce + Rostering ↓",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Each recommendation shall show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [

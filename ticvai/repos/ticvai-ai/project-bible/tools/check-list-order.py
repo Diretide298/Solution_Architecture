@@ -28,6 +28,16 @@ Rules:
                       (displayOrder, sortOrder, position, rank, ...), and whose text states no order at all.
                       A paged list is C-PAGED-ORDER's; a computed answer (a report row, a finding) is left out, its
                       order being part of the computation that makes it.
+    LO-FIELD          (r13 review, 3 November 2026, CHG-R13RVB-006) a list's order, in the phrases the order
+                      generators write ("Newest first, by `x` descending, then by `y`", "Sorted by `x` ascending",
+                      "Sorted by `x` descending (a UUIDv7, so newest first)", "and `id` breaks every tie"), names a
+                      field its items do not have; or calls a field other than the item's own `id` "a UUIDv7, so
+                      newest first" where the item has an `id` or is a stored row, or a field that references
+                      another table (a projection with neither is keyed by its subject). listFiscalPeriods was ordered on `occurredAt`, which a period does not have, and
+                      listAccountMappings on `creditAccountId`, the mapped account, "newest first". The generators
+                      (contract_shapes.order_sentence, fix-order-and-refusals) now name only the item's own fields.
+                      The members found on 3 November need an order ruling each (which field), so they are a
+                      ceiling (LO_FIELD_CEILING) that only falls; a new one fails.
 
 An order is read from the operation's summary, description, x-ticvai-note and its 200's description, with the field
 finders of check-contract-shapes (`order_names_field`). Each finding needs a ruling: where the rows without the key
@@ -50,7 +60,20 @@ RULES = {
     "LO-NULLABLE-KEY": "a list's stated order names a field that can be null and states no place for the rows "
                        "without it (CR-236, CR-206; CHG-R10GEN-004)",
     "LO-UNORDERED": "a whole list of stored rows a screen shows states no order (CR-190; CHG-R10GEN-004)",
+    "LO-FIELD": "a list's stated order names a field its items do not have, or calls a field not the item's own key "
+                "'a UUIDv7, so newest first' (r13 review; CHG-R13RVB-006)",
 }
+# 3 November 2026 (CHG-R13RVB-006): the LO-FIELD members the r13 review's class sweep found besides the two it fixed,
+# each needing the lead's ruling on which field orders the list. Lower it as they are ruled; never raise it.
+LO_FIELD_CEILING = 60
+# The generated order phrases and the fields they name.
+GENERATED_ORDER = (
+    re.compile(r"\b(?:Newest|Oldest|Soonest|Latest|Earliest)(?: \w+)? first, by `(\w+)` (?:ascending|descending)"
+               r"(?:, then by `(\w+)`)?"),
+    re.compile(r"\bSorted by `(\w+)` (?:ascending|descending)(?:, then by `(\w+)`)?"),
+    re.compile(r"and `(id)` breaks every tie"),
+)
+UUID_NEWEST = re.compile(r"\bSorted by `(\w+)` descending \(a UUIDv7, so newest first\)")
 _spec = importlib.util.spec_from_file_location("contract_shapes", Path(__file__).resolve().parent /
                                                "check-contract-shapes.py")
 cs = importlib.util.module_from_spec(_spec)
@@ -193,6 +216,38 @@ def null_place_stated(text: str, field: str, cols: list) -> bool:
     return False
 
 
+def item_fields(item: dict, idoc: dict, docs: dict, depth: int = 0) -> dict:
+    """The item's properties, through allOf / oneOf / anyOf."""
+    out = dict(item.get("properties") or {})
+    for part in (item.get("allOf") or []) + (item.get("oneOf") or []) + (item.get("anyOf") or []):
+        p, d = resolve(part, idoc, docs)
+        if isinstance(p, dict) and depth < 5:
+            out.update(item_fields(p, d, docs, depth + 1))
+    return out
+
+
+def order_field_gaps(text: str, fields: dict, idoc: dict, docs: dict, persisted: bool = False) -> list:
+    """LO-FIELD: what a generated order phrase in `text` names that is not the item's (CHG-R13RVB-006)."""
+    text = text.replace("**", "")
+    bad = []
+    for rx in GENERATED_ORDER:
+        for m in rx.finditer(text):
+            for k in m.groups():
+                if k and k not in fields and k not in bad:
+                    bad.append(k)
+    for m in UUID_NEWEST.finditer(text):
+        k = m.group(1)
+        if k == "id" or k not in fields:
+            continue
+        prop, _ = resolve(fields.get(k), idoc, docs)
+        refs = str((prop or {}).get("x-ticvai-references") or "none")
+        # A projection with no `id` is keyed by its subject (`partnerId`); a stored row, or an item with an `id`,
+        # is not, and a field that references another table is that table's key.
+        if "id" in fields or persisted or refs != "none":
+            bad.append(f"{k} (not the item's own key, so not 'newest first')")
+    return bad
+
+
 def findings() -> list:
     """[(rule, key, message)] over the package."""
     docs = _docs()
@@ -210,6 +265,11 @@ def findings() -> list:
         stem = next((s for s, d in docs.items() if d is idoc), f["contract"])
         props = item.get("properties") or {}
         text = order_text(op, doc, docs)
+        persisted = not str(item.get("x-ticvai-persistence") or "none").strip().startswith("none")
+        gaps = order_field_gaps(text, item_fields(item, idoc, docs), idoc, docs, persisted)
+        if gaps:
+            out.append(("LO-FIELD", oid, f"{oid}: its order names {', '.join(f'`{x}`' for x in gaps)}, not a field of "
+                                         f"its items ({sname or 'the item'}): order on the item's own fields"))
         for fld in order_fields(text, props):
             prop, _ = resolve(props.get(fld), idoc, docs)
             fc = cols.get(f"{stem}.{sname}.{fld}", []) if sname else []
@@ -233,8 +293,20 @@ def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-list-order", RULES)
     found = findings()
+    lo_field = [x for x in found if x[0] == "LO-FIELD"]
+    if len(lo_field) <= LO_FIELD_CEILING:
+        # Under the ceiling: each is listed for the lead's ruling, and none fails (CHG-R13RVB-006).
+        guard.note(f"LO-FIELD: {len(lo_field)} list(s) ordered on a field their items do not have (ceiling "
+                   f"{LO_FIELD_CEILING}; it only falls), each needing the lead's order ruling"
+                   + (f" -- lower LO_FIELD_CEILING to {len(lo_field)}" if len(lo_field) < LO_FIELD_CEILING else ""))
+        if guard.show_all:
+            for _r, _k, msg in lo_field:
+                guard.note(f"  {msg}")
+        found = [x for x in found if x[0] != "LO-FIELD"]
     for rule, key, msg in found:
-        guard.add(rule, key, f"{msg}. Fixer: python tools/fix-order-and-refusals.py --apply")
+        fixer = (". Rule the field: tools/fix-order-and-refusals.py prints it" if rule == "LO-FIELD"
+                 else ". Fixer: python tools/fix-order-and-refusals.py --apply")
+        guard.add(rule, key, f"{msg}{fixer}")
     guard.note(f"{len(found)} finding(s)")
     if found:
         guard.note("the fix (CHG-R10GEN-006): python tools/fix-order-and-refusals.py --apply writes the default "

@@ -1175,4 +1175,12 @@ components:
       description: 'Partner and developer authentication. Keys are tenant-scoped, carry their own permission
         set, and are rate-limited per key. Deferred pending the Developer & API workshop.
 
+
+        **A device key** (ADAM CR-451, Chinmay, 1 November 2026; CHG-CR451-001): a device''s `X-Api-Key`, such as a
+        signage display''s, is a `tenancy.device_credential` of kind `apiKey`, of which only a hash is stored, bound to
+        one device and its venue; it is shown once when issued (`issueDeviceCredential`) and revoked per device
+        (`revokeDeviceCredential`). A request with it opens a device session scoped to that venue: a `venueId` or
+        `queueId` outside it is `403`, and a missing, wrong or revoked key is `401`. One device-key sign-in serves
+        every `apiKeyAuth` operation (issue, hash and store, verify, revoke).
+
         '

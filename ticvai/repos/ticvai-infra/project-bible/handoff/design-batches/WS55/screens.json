@@ -746,7 +746,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Single Approval, Sequential Approval, Parallel Approval, Any-One Approval, Conditional Approval, Multi-Level Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Single Approval, Sequential Approval, Parallel Approval, Any-One Approval, Conditional Approval, Multi-Level Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 11 §Support"
    }
   ],
@@ -925,7 +925,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Event operations. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved: Event operations. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Support temporary authority for"
    }
   ],
@@ -1168,7 +1168,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Venue Calendar. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Venue Calendar. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 14 §Support"
    }
   ],
@@ -1676,7 +1676,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule, Selected Tenant, Selected Venue, Selected Brand. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved: Publish Now, Schedule, Selected Tenant, Selected Venue, Selected Brand. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Support"
    }
   ],

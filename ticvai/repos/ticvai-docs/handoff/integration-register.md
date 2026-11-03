@@ -29,7 +29,7 @@ Tested by searching every contract for each named system. A "no trace" result me
 | 17 | Google ID | `identity` | Covered — guest-app social login |
 | 18 | **NI Payment Gateway** | — | 🔴 **No trace.** Network International |
 | 19 | **NI Payment Device** | — | 🔴 **No trace** |
-| 20 | Breached-password check (added 20 October 2026, not in the matrix; R117) | `identity` | Covered — no outside service: a local corpus of breached-password SHA-1 hashes shipped with each release, behind the adapter `checkPasswordBreached(passwordSha1Prefix)` (R8 blocker cause IDENTITY-C06, CHG-R8SPN-019). The client may still name a vendor under R117 |
+| 20 | Breached-password check (added 20 October 2026, not in the matrix; R117) | `identity` | Covered — no outside service: a local corpus of breached-password SHA-1 hashes shipped with each release, behind the adapter `checkPasswordBreached(passwordSha1Prefix)` (R8 blocker cause IDENTITY-C06, CHG-R8SPN-019). The corpus is the Pwned Passwords SHA-1 range dataset (one `SUFFIX:COUNT` file per five-hex prefix, `00000.txt` to `FFFFF.txt`), mounted read-only at `Identity:BreachCorpusPath` per region; a missing corpus fails Identity's readiness check (ADAM CR-514, CHG-CR514-001). The client may still name a vendor under R117 |
 
 ## Hardware — 16
 
@@ -46,7 +46,7 @@ the venue-scanner app, Emirates ID to `idReader`, facial readers to `biometricRe
 
 | Device | Port | Status | Owner and next step |
 |---|---|---|---|
-| **BOCA** ticket and wristband printer (Lemur family) | `ticketPrinter` (FGL, ADR-0015 Tier A) | **Documentation received 5 Oct 2026** (specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding on the Lemur, Windows driver; `sources/client/2026-10-05-allam-boca-printer.md`, URLs to follow). **Hardware shipping to India**, date not given | Backend: DEVICE-BOCA-FGL (Block A2) builds the FGL driver on an emulator now; hardware validation when the unit reaches India. Client (Allam): the six BOCA questions in the Decisions Register (model, connection and host OS, stock, RFID scope, arrival and BOCA contact, mandated settings). CHG-R4-002 |
+| **BOCA** ticket and wristband printer (Lemur family) | `ticketPrinter` (FGL, ADR-0015 Tier A) | **Documentation received 5 Oct 2026** (specifications, SDK samples, operator manuals and FGL programming guide, RFID encoding on the Lemur, Windows driver; `sources/client/2026-10-05-allam-boca-printer.md`, URLs to follow). **Hardware shipping to India**, date not given | Backend: DEVICE-BOCA-FGL (Block A2) builds the FGL driver on an emulator now; hardware validation when the unit reaches India. On Windows kiosks and tills the driver runs in a small .NET device host the kiosk and POS apps call on localhost (ADAM CR-448, CHG-CR448-001); its API is `contracts/devices/ticket-printer.yaml` and the layout it prints `TicketLayout` in the orders contract (ADAM CR-447, CR-463). Android waits on the client's answer on how the printer connects. Client (Allam): the six BOCA questions in the Decisions Register (model, connection and host OS, stock, RFID scope, arrival and BOCA contact, mandated settings). CHG-R4-002 |
 
 ---
 

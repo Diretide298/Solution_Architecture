@@ -133,15 +133,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-216` | Group Leader & Fast B2B Validation | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-217` | Group Attendance & Partial Entry Manager | C | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-218` | Family, Child, POD & Companion Journey | C | 13 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-219` | Re-entry & Temporary Exit Journey | C | 4 | 0 | 5 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-219` | Re-entry & Temporary Exit Journey | C | 4 | 0 | 5 | 11 | 0 | 6 | — | notStarted (generated) |
 | `BO-220` | Multi-Park & Crossover Journey Orchestrator | C | 47 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
 | `BO-221` | Fast Pass & Attraction Access Journey | C | 25 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-222` | Special Event, Free View & Alternative Admission | C | 13 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-222` | Special Event, Free View & Alternative Admission | C | 60 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-223` | Journey Simulation, Audit & Publication | C | 8 | 26 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**BO-216, BO-217, BO-220, BO-222 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-216, BO-217, BO-220 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

@@ -574,21 +574,21 @@
     "minimum": 0,
     "maximum": 100,
     "nullable": true,
-    "description": "A `percentage` allocation's share of the capacity, 0 to 100 (ADAM CR-412; the column is envelope_percent, naming-and-style 3: Envelope, not Allocation, in DDL): required there, and `setChannelAllocations` sets `allocatedUnits` to the floor of capacity x percent / 100. Null for the other types."
+    "description": "A `percentage` allocation's share of the capacity, 0 to 100 (ADAM CR-412; the column is envelope_percent, naming-and-style 3: Envelope, not Allocation, in DDL): required there, and `setChannelAllocations` sets `allocatedUnits` to the floor of capacity x percent / 100. Null for the other types. The 0 to 100 rule is `setChannelAllocations`' `400 validation` from this minimum and maximum: the column is numeric(18,4), nullable, with no range check (ADAM CR-461, decided by Chinmay on 2 November 2026)."
    },
    "releasedUnits": {
     "type": "integer",
     "minimum": 0,
     "default": 0,
     "readOnly": true,
-    "description": "Units the allocation release job gave back to the general pool, added in the same transaction as each release (ADAM CR-412)."
+    "description": "Units the allocation release job gave back to the general pool, added in the same transaction as each release (ADAM CR-412). The column is integer DEFAULT 0 and nullable (ADAM CR-461): a reader takes a null count as 0."
    },
    "returnedUnits": {
     "type": "integer",
     "minimum": 0,
     "default": 0,
     "readOnly": true,
-    "description": "Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction as each release (ADAM CR-412)."
+    "description": "Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction as each release (ADAM CR-412). The column is integer DEFAULT 0 and nullable (ADAM CR-461): a reader takes a null count as 0."
    }
   }
  },
@@ -771,7 +771,7 @@
    "id": {
     "type": "string",
     "format": "uuid",
-    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
+    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. In an offline replay through `syncOrders` the entry carries no header of its own: the batch POST takes a fresh UUIDv7 `Idempotency-Key` per batch, never an entry's id, and this id alone deduplicates the entry (r13 root R41).\n"
    },
    "venueId": {
     "type": "string",
@@ -3473,6 +3473,7 @@
    "org_unit_id"
   ],
   "x-ticvai-guest-read": true,
+  "x-ticvai-tenant-row-read": true,
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -3821,8 +3822,9 @@
      60
     ],
     "nullable": true,
+    "default": 30,
     "x-ticvai-persistence-column": "integer",
-    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13). **The `default` is the proposed tenant default only** (ADAM CR-484, Chinmay, 3 November 2026; CHG-CR484-001), as every other configured limit carries its own: it is never written into a venue's row, and a venue's own null stays null when the venue's settings are read, as `cartLeaseSeconds` and the other limits behave. When the client corrects it, only this default changes."
    },
    "cartLeaseSeconds": {
     "type": "integer",

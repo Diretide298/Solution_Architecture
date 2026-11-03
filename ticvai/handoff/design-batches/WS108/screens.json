@@ -272,13 +272,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Each application record shall display) and no metric row",
   "purpose": "Central repository of all accreditation applications.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack ACCREDITATION.pdf, page 4 §Each application record shall display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -591,13 +585,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Fields may be configured as) and no display directory — it is settings, not a population",
   "purpose": "Configure applicant-facing registration forms without software development.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Accreditation Form Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "form",
    "regions": [
@@ -658,13 +646,6 @@
     "purpose": "Build the application form",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "updateAccreditationProgramme",
-    "contract": "accreditation",
-    "purpose": "Link the built form to the programme (formId)",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    },
    {
     "operationId": "listForms",
@@ -930,11 +911,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**Accreditation Program Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack ACCREDITATION.pdf, page 7"
    },
@@ -955,7 +931,9 @@
        "derived": true,
        "impliedBy": "createAccreditationProgramme",
        "label": "Create",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "createAccreditationProgramme",
+       "provenance": "contract accreditation.yaml POST /accreditation-programmes; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       },
       {
        "kind": "secondaryButton",
@@ -963,6 +941,27 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "createAccreditationProgramme"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every accreditation programme",
+       "bindsTo": "AccreditationProgramme",
+       "columns": [
+        "AccreditationProgramme.id",
+        "AccreditationProgramme.code",
+        "AccreditationProgramme.name",
+        "AccreditationProgramme.venueIds",
+        "AccreditationProgramme.eventIds",
+        "AccreditationProgramme.categories"
+       ],
+       "operation": "listAccreditationProgrammes",
+       "provenance": "contract accreditation.yaml GET /accreditation-programmes; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Edit programme",
+       "operation": "updateAccreditationProgramme",
+       "provenance": "contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       }
      ]
     }
@@ -1022,6 +1021,74 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCreateAccreditationProgramme",
+    "component": "modal",
+    "trigger": "Create",
+    "body": "**Collects what `createAccreditationProgramme` sends before it is called.** Required: `code`, `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`, `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccreditationProgramme",
+    "confirm": {
+     "label": "Create",
+     "operation": "createAccreditationProgramme"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "id",
+      "venueIds",
+      "eventIds",
+      "categories",
+      "applicantTypes",
+      "applicationsOpenAt",
+      "applicationsCloseAt",
+      "approvalWorkflowId",
+      "formId",
+      "isTemplate",
+      "status",
+      "faceMatching",
+      "identityVerification",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract accreditation.yaml POST /accreditation-programmes; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+   },
+   {
+    "id": "formUpdateAccreditationProgramme",
+    "component": "modal",
+    "trigger": "Edit programme",
+    "body": "**Collects what `updateAccreditationProgramme` sends before it is called.** Required: `code`, `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`, `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccreditationProgramme",
+    "confirm": {
+     "label": "Edit programme",
+     "operation": "updateAccreditationProgramme"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "id",
+      "venueIds",
+      "eventIds",
+      "categories",
+      "applicantTypes",
+      "applicationsOpenAt",
+      "applicationsCloseAt",
+      "approvalWorkflowId",
+      "formId",
+      "isTemplate",
+      "status",
+      "faceMatching",
+      "identityVerification",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1335,13 +1402,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§The screen shall show) and no metric row",
   "purpose": "Give operations teams visibility into incoming accreditation demand.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack ACCREDITATION.pdf, page 8 §The screen shall show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1537,7 +1598,9 @@
        "derived": true,
        "impliedBy": "updateAccreditationProgramme",
        "label": "Save",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "updateAccreditationProgramme",
+       "provenance": "contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       },
       {
        "kind": "secondaryButton",
@@ -1580,6 +1643,41 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formUpdateAccreditationProgramme",
+    "component": "modal",
+    "trigger": "Save",
+    "body": "**Collects what `updateAccreditationProgramme` sends before it is called.** Required: `code`, `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`, `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccreditationProgramme",
+    "confirm": {
+     "label": "Save",
+     "operation": "updateAccreditationProgramme"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "id",
+      "venueIds",
+      "eventIds",
+      "categories",
+      "applicantTypes",
+      "applicationsOpenAt",
+      "applicationsCloseAt",
+      "approvalWorkflowId",
+      "formId",
+      "isTemplate",
+      "status",
+      "faceMatching",
+      "identityVerification",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

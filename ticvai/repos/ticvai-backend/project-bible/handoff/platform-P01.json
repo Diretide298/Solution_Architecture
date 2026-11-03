@@ -7,15 +7,15 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-11-01",
+ "generated": "2026-11-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 50,
-  "operations": 206,
+  "operations": 208,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 23
+  "operationsWithNoScreen": 22
  },
  "waves": {
   "wave1": 50
@@ -130,12 +130,12 @@
    "operations": 35
   },
   {
-   "contract": "identity",
-   "operations": 18
+   "contract": "catalogue",
+   "operations": 19
   },
   {
-   "contract": "catalogue",
-   "operations": 17
+   "contract": "identity",
+   "operations": 18
   },
   {
    "contract": "fnb",
@@ -162,10 +162,6 @@
    "operations": 7
   },
   {
-   "contract": "seating",
-   "operations": 6
-  },
-  {
    "contract": "resources",
    "operations": 6
   },
@@ -174,11 +170,15 @@
    "operations": 6
   },
   {
-   "contract": "promotions",
-   "operations": 5
+   "contract": "seating",
+   "operations": 6
   },
   {
    "contract": "queue",
+   "operations": 5
+  },
+  {
+   "contract": "promotions",
    "operations": 5
   },
   {
@@ -241,7 +241,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/ticket-type-selection",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -394,7 +394,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 1,
    "route": "/membership-loyalty-and-value/membership-plans",
-   "operations": 3,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -653,22 +653,10 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "getPlanBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Which benefits a plan grants, and how much of each"
-   },
-   {
     "operation": "listGuestMemberships",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listMembershipBenefits",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "Benefits a plan can grant"
    },
    {
     "operation": "listMembershipProgrammes",
@@ -705,6 +693,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Does this contact already have a profile here"
+   },
+   {
+    "operation": "createGuestDocumentUpload",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue the key and a signed upload URL for a guest document"
    },
    {
     "operation": "decideGuestCheckoutMatch",

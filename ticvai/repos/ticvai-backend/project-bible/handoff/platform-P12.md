@@ -54,12 +54,12 @@
 | `setSessionVenue` | identity | PUT | Switch the back-office session to another venue it may act at |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
 | `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
+| `createGuestDocumentUpload` | marketing-crm | POST | Issue the key and a signed upload URL for a guest document |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
 | `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
 | `getCaseInvestigationResolution` | marketing-crm | GET | Read the case workspace |
 | `getDigitalWaiverForm` | marketing-crm | GET | Load the layout of a waiver version |
 | `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
-| `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
 | … | | | 47 more |
 
 ### 2 modules split across waves

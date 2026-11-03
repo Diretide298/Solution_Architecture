@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-953` | Seat Map Command Center | C | 0 | 11 | 6 | 1 | 4 | 6 | — | notStarted (—) |
-| `BO-954` | Venue Canvas | A | 35 | 20 | 6 | 3 | 3 | 0 | — | notStarted (—) |
+| `BO-954` | Venue Canvas | A | 39 | 20 | 6 | 2 | 3 | 0 | — | notStarted (—) |
 | `BO-955` | Sections & Zones | C | 17 | 20 | 6 | 2 | 2 | 0 | — | notStarted (—) |
 | `BO-956` | Rows & Seats | C | 35 | 15 | 6 | 9 | 2 | 6 | — | notStarted (—) |
 | `BO-957` | Standing Zones | C | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |

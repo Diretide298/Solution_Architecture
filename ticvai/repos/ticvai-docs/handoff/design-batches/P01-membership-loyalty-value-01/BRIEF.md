@@ -1,6 +1,6 @@
 # P01-membership-loyalty-value-01 — P01 · Membership, Loyalty & Value
 
-**5 screens · 39 operations · 76 schemas · 12 permissions**
+**5 screens · 48 operations · 91 schemas · 12 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -127,14 +127,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-021` | Wallet & Gift Cards | A | 4 | 36 | 6 | 37 | 13 | 6 | guest | review (client-verified) |
-| `WEB-022` | Membership Plans | A | 0 | 17 | 6 | 16 | 4 | 0 | guest | review (client-verified) |
+| `WEB-022` | Membership Plans | A | 28 | 17 | 6 | 35 | 4 | 0 | guest | review (client-verified) |
 | `WEB-023` | Membership Management | A | 3 | 28 | 6 | 5 | 5 | 0 | guest | review (client-verified) |
 | `WEB-024` | Devices, Wishlist & Consent | A | 4 | 85 | 6 | 52 | 2 | 4 | guest | review (client-verified) |
 | `WEB-043` | Loyalty & Rewards | A | 9 | 51 | 6 | 12 | 2 | 2 | guest | review (client-verified) |
-
-## Thin screens in this batch
-
-**WEB-022 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

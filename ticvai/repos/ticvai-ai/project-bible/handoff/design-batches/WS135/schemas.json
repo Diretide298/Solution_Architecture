@@ -1197,6 +1197,7 @@
   }
  },
  "MarketingGuestExtraField": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.guest_extra_field",
   "description": "**Taken from the backend workbook, 20 September.** NEW TABLE. Defines an extra field that Admin wants to add to the customer form, such as Date of Birth, Emergency Contact, or Jersey Size.",
@@ -1207,9 +1208,15 @@
    "isRequired",
    "displayOrder",
    "isActive",
-   "createdAt"
+   "createdAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the venue whose set it is (setGuestExtraFields replaces the caller's venue's set), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes its own fields, as its options and values already carry it (MOD audit, CHG-MOD-007; r13 gate, CHG-R13BO-001)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"

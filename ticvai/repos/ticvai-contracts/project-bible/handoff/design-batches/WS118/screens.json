@@ -676,13 +676,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Separate mandatory configuration from AI recommendations so the administrator understands what is required and what is advice.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 47 §Track"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1383,13 +1377,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide a detailed real-time view of execution dependencies, failures, retries, and downstream configuration status.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 51 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1668,13 +1656,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Show exactly what TICVAI objects were created or changed after successful execution.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 53 §Show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1919,7 +1901,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Prepare Change | Ask More | Cancel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 1 actions on this screen and the screen declares 3 operations.** Unserved: Prepare Change | Ask More | Cancel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack AI_Configuration_Assistant_Reference.pdf, page 54 §Actions"
    },
    {
@@ -2381,13 +2363,7 @@
   "patternReason": "the pack gives this screen both a metric directory (§Header KPIs; Show) and a per-row directory (§For each configuration value show) — counts over a population, then the population",
   "purpose": "Provide an immutable governance record showing how AI participated in every configuration decision and execution. This is essential for an enterprise AI system.",
   "division": "Shares `getAiDecisionTrace`, `searchAiDecisions` with ADM-537, ADM-540; this screen is AI Configuration Audit & Governance (pack AI_Configuration_Assistant_Reference.pdf, board 3.10, page 57): provide an immutable governance record showing how AI participated in every configuration decision and execution. This is essential for an enterprise AI system.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §For each configuration value show"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "dashboard",
    "regions": [

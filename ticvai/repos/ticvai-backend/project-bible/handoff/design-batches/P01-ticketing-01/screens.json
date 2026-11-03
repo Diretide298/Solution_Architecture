@@ -26,7 +26,7 @@
     {
      "to": "WEB-031",
      "trigger": "My Reservations",
-     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId, resourceId only pre-select (deep link or optional); WEB-031 finds productId (listGroupPackages) itself, and WEB-031 opens on its own"
+     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId, resourceId only pre-select (optional); WEB-031 finds productId (listGroupPackages) itself, and WEB-031 opens on its own"
     },
     {
      "to": "GST-014",
@@ -716,7 +716,7 @@
     {
      "to": "WEB-030",
      "trigger": "Ticket Transfer",
-     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: orderId, transferId only pre-select (deep link or optional), and WEB-030 opens on its own"
+     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: transferId only pre-selects (optional); WEB-030 finds orderId (listMyOrders) itself, and WEB-030 opens on its own"
     },
     {
      "to": "WEB-031",
@@ -728,7 +728,7 @@
     }
    ]
   },
-  "notes": "Added 17 August. **The surface the matrix names** — 2.6.33 *\"website should be able to display multi currency\"* and 2.9.1 *\"in the B2C portal for guests comparison\"*. First on the website, before the app, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).\n\nRates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change).\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.",
+  "notes": "Added 17 August. **The surface the matrix names** — 2.6.33 *\"website should be able to display multi currency\"* and 2.9.1 *\"in the B2C portal for guests comparison\"*. First on the website, before the app, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).\n\nRates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change).\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.\n\n**Design change, logged under the rule of 28 October 2026** (ADAM CR-473, decided by Chinmay on 2 November 2026, as recommended, with one condition). The page is drawn as built on #32309: the coins icon in a tinted tile beside a larger heading and lead, and a faded skyline drawing at the top right on wide screens; currency chips with a round flag (two initials where no flag is drawn), the picked chip filled in the brand colour; How you pay in a tinted box with a wallet icon; Exchange rates in use a bold title, each row the base currency's flag, the pair, the approx. tag and the rate in a pill; the Rates as of footnote under a divider with an info icon. Colours come from the tenant's tokens; flags keep their own colours. **The condition:** the page keeps the Prices in your currency cards CR-358 decided, in the new style. Nothing else changes behind the screen.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -751,7 +751,7 @@
        "kind": "banner",
        "label": "How you pay",
        "operation": "listFxRates",
-       "notes": "\"You pay in USD. Your card is charged USD 81.72; the venue records AED 300.00 at 3.6710.\" For a currency shown but not chargeable: \"Prices in EUR are approximate. You pay in AED.\" (CHG-FIN-001). The purpose filter is fixed to `tender`, never typed by a guest.",
+       "notes": "\"You pay in USD. Your card is charged USD 81.72; the venue records AED 300.00 at 3.6710.\" For a currency shown but not chargeable: \"Prices in EUR are approximate. You pay in AED.\" (CHG-FIN-001). The purpose filter is fixed to `tender`, never typed by a guest. Drawn in a tinted box with a wallet icon (ADAM CR-473).",
        "provenance": "contract finance.yaml GET /fx-rates"
       },
       {
@@ -844,9 +844,9 @@
     "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
     "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
-    "match": "exact",
+    "match": "partial",
     "view": "Discover → 'Prices in your currency'",
-    "differences": "Matches the YAML's charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts 'always charged in AED'. **Resolved 2 October 2026 (CHG-FIN-001):** the guest may pay in the selected currency, so a storefront currency switch is right where the venue charges that currency."
+    "differences": "Matches the YAML's charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts 'always charged in AED'. **Resolved 2 October 2026 (CHG-FIN-001):** the guest may pay in the selected currency, so a storefront currency switch is right where the venue charges that currency. **Since ADAM CR-473 (2 November 2026)** the guest-web build changes the look and nothing behind it; the frame `wireframes/P01 Guest Web.dc.html#web-035` draws the build (flag chips, wallet banner, rate pills, skyline header), with the CR-358 price cards kept."
    },
    "stateViews": {
     "loading": "P01/turnstile-loader",

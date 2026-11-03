@@ -24,7 +24,8 @@ transitions:
   to: retrying
   operation: retryChannelIncident
   trigger: operation
-  guard: The failed call is queued again with the same idempotency reference
+  guard: The failed call is queued again with the same idempotency reference (catalogue.channelIncidentRetryRequested,
+    ADAM CR-457)
 - from: investigating
   to: retrying
   operation: retryChannelIncident
@@ -33,11 +34,14 @@ transitions:
 - from: retrying
   to: resolved
   trigger: job
-  guard: The retried call succeeded
+  guard: 'The retried call succeeded: Catalogue''s channel retry job (workers host), consuming catalogue.channelIncidentRetryRequested,
+    got the partner''s success (ADAM CR-457); never without one'
 - from: retrying
   to: investigating
   trigger: job
-  guard: The retried call failed again
+  guard: The retried call failed again (the channel retry job; connectorNotAvailable until a connector
+    exists for the connection's type), or the event was dead-lettered (retryNotDelivered), so nothing
+    stays retrying (ADAM CR-457)
 - from: open
   to: resolved
   trigger: job

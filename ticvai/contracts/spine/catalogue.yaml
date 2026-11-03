@@ -6698,6 +6698,7 @@ paths:
     get:
       operationId: getPerformance
       x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-007 Interactive Seat Selection"
         - "P01 WEB-010 Shopping Cart"

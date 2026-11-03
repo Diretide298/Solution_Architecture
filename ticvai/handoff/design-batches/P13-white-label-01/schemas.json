@@ -1910,6 +1910,106 @@
    "archived"
   ]
  },
+ "MediaTaxonomy": {
+  "x-ticvai-rls": "read-beneath",
+  "type": "object",
+  "x-ticvai-persistence": "assets.taxonomy",
+  "description": "Boards 1.5 and 1.6. **Metadata fields are per asset type**, because an image has dimensions and a contract has an expiry.\n",
+  "properties": {
+   "categories": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "parentCategoryId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "applicableAssetTypes": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "fields": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "dataType": {
+       "type": "string"
+      },
+      "applicableAssetTypes": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "mandatory": {
+       "type": "boolean"
+      },
+      "allowedValues": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "keywordVocabularies": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "terms": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "closed": {
+       "type": "boolean",
+       "default": false,
+       "description": "**A closed vocabulary refuses terms not in the list.** Open vocabularies are how a library ends up with `logo`, `logos`, `Logo` and `brand-logo`.\n"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
  "MediaUsage": {
   "x-ticvai-persistence": "assets.media_usage",
   "type": "object",
@@ -2261,6 +2361,55 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "isFeatured": {
+    "type": "boolean",
+    "default": false,
+    "description": "**The plan card's Most popular badge** (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. Stored on `catalogue.product` as `is_featured`, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the badge on a featured plan."
+   },
+   "compareAtPrice": {
+    "x-ticvai-column": "compare_at_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**What the same visits cost bought singly** (ADAM CR-482): the comparison price behind the plan card's saving. Stored on `catalogue.product` as `compare_at_amount` in the venue's trading currency, set by `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a made-up value."
+   },
+   "highlightBadge": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "description": "**The card's highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every operation that answers Product, to every audience. WEB-005's card shows the value for the guest's language, falling back to the English value, as the pill on the card image in capitals; null shows no badge."
+   },
+   "rating": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "required": [
+     "average",
+     "count"
+    ],
+    "properties": {
+     "average": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "multipleOf": 0.1,
+      "description": "The average rating, 1.0 to 5.0, one decimal."
+     },
+     "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "How many reviews the average is over."
+     }
+    },
+    "description": "**The card's rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001): readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is not null."
    },
    "nameLocalised": {
     "allOf": [

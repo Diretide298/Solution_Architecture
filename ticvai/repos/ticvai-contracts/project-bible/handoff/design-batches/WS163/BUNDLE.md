@@ -189,8 +189,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/my-resource-operations-home-bo-933` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The employee's home in the Staff App for resource work: one card that always answers "What am I supposed to do now?" (NOW - Private Ski Lesson 14:00-15:00, Ski School Zone A, booking BK-28491, 3 participants, starts in 12 min, View assignment, Check in), the NEXT card, then alerts, pending tasks, handovers, requests and messages. The one thing to get right: it is a phone screen in the Staff App, big targets and minimal typing, and it keeps working on the cached day when the signal drops.
 
 **Known correction pending (do not draw the wrong version)**
@@ -397,8 +395,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/my-schedule-assignment-calendar-bo-934` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
-
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The employee's own schedule on the phone: assignments, breaks and free time as a day timeline (08:00-10:00 Group lesson Zone A, 10:00-10:30 Break, 10:30-12:00 Private lesson Zone B), with status per assignment and live changes ("Zone A -> Zone C") pushed as they happen. The one thing to get right: a changed assignment shows old and new side by side and stays marked until the employee has seen it.
 
 **Known correction pending (do not draw the wrong version)**
@@ -599,8 +595,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | `resourceId` (navigation), `bookingId` (navigation) |
 | Route | `/rentals/assignment-detail-operational-brief-bo-935` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Everything an employee needs to carry out one assignment on the phone: what, when, where (zone, meeting point, map link), who (participants, only the guest notes that matter operationally), what to collect (radio, helmet set, cones, tablet - Ready or Collect), the checklist and the supervisor, with Start, Check in, Report issue, Request replacement and Complete. The one thing to get right: every action works offline with the device time recorded, and customer data stays minimal.
 
@@ -827,8 +821,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/mobile-staff-check-in-check-out-bo-936` |
-
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The resource pack's mobile check-in and check-out screen (board 9, screen 4). Board 9 is delivered inside the Employee App, not as a separate app, so this is the Staff App's clock screen (EMP-024): shift, venue, current time, "Ready to check in", and one button, with configurable verification and offline capture. The one thing to get right: draw it once, as EMP-024, adding the pack's verification methods, assignment-level check-in and the check-out summary.
 
@@ -1461,7 +1453,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | `requestId` (navigation) |
 | Route | `/rentals/manager-mobile-approval-center-bo-940` |
 
-**Known gaps.** **Manager Mobile Approval Center declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Approve operational requests from a phone: the same decisions as the inbox, in a mobile layout, with the second factor where required.
 

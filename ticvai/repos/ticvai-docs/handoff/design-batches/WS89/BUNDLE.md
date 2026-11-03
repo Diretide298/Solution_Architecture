@@ -1617,7 +1617,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Opens with | nothing: it opens on its own |
 | Route | `/rentals/inventory-intelligence-rebalancing-bo-513` |
 
-**Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 2 October 2026 (CHG-WIR-008): Reorder suggestions buy stock; rebalancing moves rental units between stations (R254; design-notes correction fnb-retail BO-513).
+**Known gaps.** Removed 2 October 2026 (CHG-WIR-008): Reorder suggestions buy stock; rebalancing moves rental units between stations (R254; design-notes correction fnb-retail BO-513).
 
 **From the Food, Beverage & Retail process.** Where rental units are short or idle across stations, and suggested transfers to rebalance. The one thing to get right: suggestions are advisory — a person creates the transfer.
 

@@ -45,22 +45,22 @@
     {
      "to": "BO-052",
      "trigger": "Goods Receipt",
-     "provenance": "derived — BO-052 declares entryState.params purchaseOrderId, receiptId and BO-105 holds none of them. The edge carries nothing: purchaseOrderId, receiptId only pre-select (deep link or optional), and BO-052 opens on its own"
+     "provenance": "derived — BO-052 declares entryState.params purchaseOrderId, receiptId and BO-105 holds none of them. The edge carries nothing: BO-052 finds purchaseOrderId (createGoodsReceipt), receiptId (createGoodsReceipt) itself, and BO-052 opens on its own"
     },
     {
      "to": "BO-078",
      "trigger": "Requisitions",
-     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-105 holds none of them. The edge carries nothing: requisitionId only pre-selects (deep link or optional), and BO-078 opens on its own"
+     "provenance": "derived — BO-078 declares entryState.params requisitionId and BO-105 holds none of them. The edge carries nothing: BO-078 finds requisitionId (listRequisitions) itself, and BO-078 opens on its own"
     },
     {
      "to": "BO-079",
      "trigger": "Stock Count",
-     "provenance": "derived — BO-079 declares entryState.params countId and BO-105 holds none of them. The edge carries nothing: countId only pre-selects (deep link or optional), and BO-079 opens on its own"
+     "provenance": "derived — BO-079 declares entryState.params countId and BO-105 holds none of them. The edge carries nothing: BO-079 finds countId (listStockCounts) itself, and BO-079 opens on its own"
     },
     {
      "to": "BO-080",
      "trigger": "Stock Transfers",
-     "provenance": "derived — BO-080 declares entryState.params transferId and BO-105 holds none of them. The edge carries nothing: transferId only pre-selects (deep link or optional), and BO-080 opens on its own"
+     "provenance": "derived — BO-080 declares entryState.params transferId and BO-105 holds none of them. The edge carries nothing: BO-080 finds transferId (listStockTransfers) itself, and BO-080 opens on its own"
     },
     {
      "to": "BO-081",
@@ -73,17 +73,17 @@
     {
      "to": "BO-083",
      "trigger": "Suppliers",
-     "provenance": "derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds none of them. The edge carries nothing: supplierId, contractId only pre-select (deep link or optional), and BO-083 opens on its own"
+     "provenance": "derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds none of them. The edge carries nothing: supplierId, contractId only pre-select (optional), and BO-083 opens on its own"
     },
     {
      "to": "BO-137",
      "trigger": "Recipe Consumption & Theoretical Inventory",
-     "provenance": "derived — BO-137 declares entryState.params countId, runId and BO-105 holds none of them. The edge carries nothing: countId, runId only pre-select (deep link or optional), and BO-137 opens on its own"
+     "provenance": "derived — BO-137 declares entryState.params countId, runId and BO-105 holds none of them. The edge carries nothing: BO-137 finds runId (listProductionRuns) itself; BO-137 opens on listRecipes, and countId has no source on BO-137 yet (a gap in BO-137, not in this edge)"
     },
     {
      "to": "BO-138",
      "trigger": "Production Execution & Batch Management",
-     "provenance": "derived — BO-138 declares entryState.params runId and BO-105 holds none of them. The edge carries nothing: runId only pre-selects (deep link or optional), and BO-138 opens on its own"
+     "provenance": "derived — BO-138 declares entryState.params runId and BO-105 holds none of them. The edge carries nothing: runId only pre-selects (optional), and BO-138 opens on its own"
     },
     {
      "to": "BO-139",
@@ -93,12 +93,12 @@
     {
      "to": "BO-140",
      "trigger": "Product Availability, 86 & Operational Food Safety",
-     "provenance": "derived — BO-140 declares entryState.params checkpointId, itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId, outletId, checkpointId only pre-select (deep link or optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
+     "provenance": "derived — BO-140 declares entryState.params checkpointId, itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId, outletId, checkpointId only pre-select (optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
     },
     {
      "to": "BO-141",
      "trigger": "Operational Alerts, AI Replenishment & Action Center",
-     "provenance": "derived — BO-141 declares entryState.params alertId and BO-105 holds none of them. The edge carries nothing: alertId only pre-selects (deep link or optional), and BO-141 opens on its own"
+     "provenance": "derived — BO-141 declares entryState.params alertId and BO-105 holds none of them. The edge carries nothing: alertId only pre-selects (optional), and BO-141 opens on its own"
     },
     {
      "to": "BO-051",
@@ -964,6 +964,12 @@
        "operation": "setMenuItemDailyCount",
        "notes": "**Daily counts (\"6 left\"); the dish goes sold out automatically at zero (decided 2 October 2026 by Chinmay, DEC-194; CHG-CSA-017).** A temperature breach suggests \"86 affected items\" and does not 86 on its own (DEC-193).",
        "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/daily-count"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Edit checkpoint",
+       "operation": "setTemperatureCheckpoint",
+       "provenance": "contract fnb.yaml PUT /food-safety/checkpoints/{checkpointId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
       }
      ]
     }
@@ -1106,6 +1112,32 @@
      ]
     },
     "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/daily-count"
+   },
+   {
+    "id": "formSetTemperatureCheckpoint",
+    "component": "modal",
+    "trigger": "Edit checkpoint",
+    "body": "**Collects what `setTemperatureCheckpoint` sends before it is called.** Required: `kind`, `label`, `isActive`. Optional: `outletId`, `minCelsius`, `maxCelsius`, `checkFrequencyMinutes`, `requiresCorrectiveActionOnBreach`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TemperatureCheckpoint",
+    "confirm": {
+     "label": "Edit checkpoint",
+     "operation": "setTemperatureCheckpoint"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "label",
+      "isActive",
+      "outletId",
+      "minCelsius",
+      "maxCelsius",
+      "checkFrequencyMinutes",
+      "requiresCorrectiveActionOnBreach",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /food-safety/checkpoints/{checkpointId}; design change approved by the lead (\"approve all\", 3 November 2026; CHG-R13INT-029)"
    }
   ],
   "gaps": [

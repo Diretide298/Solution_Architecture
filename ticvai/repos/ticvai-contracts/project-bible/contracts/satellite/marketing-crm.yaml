@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 234
+  x-ticvai-screen-count: 235
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -415,6 +415,230 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within operations, through the C# query interface Marketing implements.
     served: [in-process]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  personalDataRetention:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [tenancy.data_retention_setting, marketing.guest_profile, marketing.guest_note, marketing.guest_document, marketing.guest_preference, marketing.form_submission, marketing.consent_record, marketing.conversation_message]
+    writes: [marketing.guest_profile, marketing.guest_note, marketing.guest_document, marketing.guest_preference, marketing.form_submission, marketing.consent_record, marketing.conversation_message]
+    reliesOn: [setDataRetentionSetting, setDataRetentionPolicy]
+    for: "Marketing's retention job: guest profiles, notes, documents, preferences, form submissions, consent records and conversation messages. Every day it reads the tenant's period for guestProfile from Tenancy's data retention settings (tenancy#dataRetentionSettingRecords; a class with no row takes the platform default, ADR-0047) and applies its onExpiry (archive, anonymise or delete) to its own rows past the period, counted from the class's anchor; another module's rows are that module's job (the lead, 2 November 2026, on lane s's question (\"(Recommended)\"): one retention job in each module that holds personal data, run by that module's retention setting (tenancy.data_retention_setting); CHG-R13INT-011)."
+    source: ['contracts/spine/tenancy.yaml']
+  guestDocumentUploadCleanup:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: timer}
+    reads: [marketing.guest_document_upload]
+    writes: []
+    reliesOn: [createGuestDocumentUpload]
+    for: 'Deletes from the guest-document store a pending object not attached within 24 hours of its issue (ADAM
+      CR-521, Chinmay, 3 November 2026; CHG-CR521-001).'
+    source: ['contracts/satellite/marketing-crm.yaml']
+  mfaCodeSender:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.mfaCodeIssued]
+    reads: []
+    writes: [marketing.message_dispatch]
+    for: 'Marketing''s MFA code sender (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001): on identity.mfaCodeIssued
+      it decrypts destination and code at send time and sends the 6-digit code by email through the tenant''s
+      configured email provider, in the person''s language, recording a transactional marketing.message_dispatch row
+      without the code; idempotent on challengeId, retried until expiresAt and never dead-lettered.'
+    source: ['events/identity-mfaCodeIssued.yaml']
+  campaignScheduler:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: campaign, from: scheduled, to: sending}
+    - {model: campaign, from: sending, to: completed}
+    - {model: campaign, from: sending, to: failed}
+    reads: [marketing.campaign]
+    writes: [marketing.campaign]
+    for: 'Marketing''s campaign scheduler: start a scheduled campaign at its send window.'
+    source: ['states/campaign.yaml:30']
+  consentAndPrivacy:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - approval.granted
+    - approval.rejected
+    - biometric.enrolmentChanged
+    - identity.guestRegistered
+    - identity.privacyRequestRaised
+    - paymentToken.stored
+    reads: [marketing.consent_record, marketing.privacy_request]
+    writes: [marketing.consent_record, marketing.privacy_notice_governance, marketing.privacy_request]
+    for: 'Marketing''s consent and privacy consumers: record the consent given at registration, at a Face Pass enrolment and
+      when a payment method is stored as marketing.consent_record rows Marketing owns; open the privacy request in the queue;
+      apply an approval decision to the privacy-notice governance record.'
+    source:
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/biometric-enrolmentChanged.yaml
+    - events/identity-guestRegistered.yaml
+  eventRegistration:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: queue}
+    reads: [marketing.business_event]
+    writes: [marketing.business_event]
+    reliesOn: [setBusinessEventMapping]
+    for: Marketing's event-catalogue registration job.
+    source: ['contracts/satellite/marketing-crm.yaml']
+  journeys:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - access.validated
+    - accreditation.applicationDecided
+    - accreditation.credentialIssued
+    - accreditation.holderStatusChanged
+    - accreditation.renewalDue
+    - ai.riskAlertRaised
+    - cart.abandoned
+    - catalogue.productPublished
+    - entitlement.expiringSoon
+    - order.completed
+    - order.created
+    - stock.depleted
+    - wallet.debited
+    reads: []
+    writes: [marketing.consent_record]
+    for: 'Marketing''s journey, campaign and later notification consumers: attendance behaviour, products available to campaigns,
+      abandoned-cart and abandoned-payment journeys, post-visit campaigns, low-balance journeys, pre-expiry alerts, low-stock
+      alerts, fraud-analyst alerts and the accreditation notices.'
+    source:
+    - events/access-validated.yaml
+    - events/accreditation-applicationDecided.yaml
+    - events/accreditation-credentialIssued.yaml
+    - events/accreditation-holderStatusChanged.yaml
+  messageSender:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: guest-device, from: active, to: failed}
+    - {model: message-dispatch, from: queued, to: suppressed}
+    - {model: message-dispatch, from: queued, to: sent}
+    - {model: message-dispatch, from: sent, to: delivered}
+    - {model: message-dispatch, from: sent, to: bounced}
+    - {model: message-dispatch, from: delivered, to: opened}
+    - {model: message-dispatch, from: opened, to: clicked}
+    - {model: message-dispatch, from: delivered, to: clicked}
+    - {model: message-dispatch, from: queued, to: failed}
+    - {model: message-dispatch, from: sent, to: failed}
+    reads: [marketing.guest_device, marketing.message_dispatch]
+    writes: [marketing.guest_device, marketing.message_dispatch]
+    builtBy: CR442-MESSAGE-SENDER
+    for: Marketing message sender (CR-442).
+    source: ['states/guest-device.yaml:24', 'states/message-dispatch.yaml:22']
+  notifications:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - ai.capabilityPaused
+    - ai.ceilingApproaching
+    - ai.incidentOpened
+    - ai.insightRaised
+    - ai.operationalRequirementIssued
+    - ai.planExecuted
+    - ai.planFailed
+    - approval.rejected
+    - conversation.handedOver
+    - fnb.orderReady
+    - whitelabel.passCertificateExpiring
+    reads: []
+    writes: [marketing.privacy_notice_governance]
+    for: 'Marketing''s operational notifications: route a handed-over conversation to a queue and notify agents (critical),
+      push the guest that their food is ready (critical), tell a requester their approval was rejected, notify owners of an
+      AI capability pause, ceiling, incident, insight, plan result or operational requirement, and warn the tenant admin 30
+      days before the Apple pass certificate expires.'
+    source:
+    - events/ai-capabilityPaused.yaml
+    - events/ai-ceilingApproaching.yaml
+    - events/ai-incidentOpened.yaml
+    - events/ai-insightRaised.yaml
+  profileAndLoyalty:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes: [entitlement.issued, order.paid, order.refunded]
+    reads: []
+    writes: [marketing.guest_profile, marketing.loyalty_points]
+    for: 'Marketing''s guest-profile and loyalty consumers: record purchase behaviour and accrue loyalty on a paid order,
+      adjust loyalty and lifetime value on a refund, attach an issued entitlement to the guest profile.'
+    source:
+    - events/entitlement-issued.yaml
+    - events/order-paid.yaml
+    - events/order-refunded.yaml
+  timers:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: case, from: resolved, to: closed}
+    - {model: challenge, from: active, to: ended}
+    - {model: conversation, from: withAssistant, to: abandoned}
+    - {model: conversation, from: queued, to: abandoned}
+    - {model: conversation, from: waitingOnGuest, to: timedOut}
+    - {model: conversation, from: queued, to: withAssistant}
+    - {model: invitation, from: issued, to: expired}
+    - {model: invitation, from: viewed, to: expired}
+    - {model: invitation-campaign, from: open, to: closed}
+    - {model: lost-item, from: open, to: disposed}
+    - {model: lost-item, from: matched, to: disposed}
+    - {model: privacy-notice-governance, from: scheduled, to: published}
+    - {model: referral, from: issued, to: expired}
+    - {model: referral, from: registered, to: expired}
+    - {model: waiver-requirement, from: notAssigned, to: assigned}
+    - {model: waiver-requirement, from: sent, to: expired}
+    - {model: waiver-requirement, from: opened, to: expired}
+    - {model: waiver-requirement, from: verified, to: expired}
+    reads:
+    - marketing.case
+    - marketing.case_resolution
+    - marketing.challenge
+    - marketing.conversation
+    - marketing.invitation
+    - marketing.invitation_campaign
+    - marketing.lost_item
+    - marketing.privacy_notice_governance
+    - marketing.referral
+    - marketing.waiver_requirement
+    - marketing.waiver_requirement_event
+    writes:
+    - marketing.case
+    - marketing.case_resolution
+    - marketing.challenge
+    - marketing.conversation
+    - marketing.invitation
+    - marketing.invitation_campaign
+    - marketing.lost_item
+    - marketing.privacy_notice_governance
+    - marketing.referral
+    - marketing.waiver_requirement
+    - marketing.waiver_requirement_event
+    emits: [marketing.caseClosed]
+    for: 'Marketing''s guest-facing timers: cases, conversations, challenges, invitations, referrals, lost items, notices,
+      waivers.'
+    source:
+    - states/case.yaml:70
+    - states/challenge.yaml:33
+    - states/conversation.yaml:86
+    - states/invitation-campaign.yaml:23
 paths:
   /my/cases:
     get:
@@ -963,7 +1187,7 @@ paths:
       operationId: checkGuestCheckoutMatch
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       summary: Does this contact already have a profile here
       deprecated: true
@@ -1024,7 +1248,7 @@ paths:
       operationId: decideGuestCheckoutMatch
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: orders.cart
@@ -1381,10 +1605,10 @@ paths:
       operationId: createInvitationCampaign
       x-ticvai-read-via:
       - query: catalogue#eventRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: A quota-bounded, addressed invitation
       description: 'BL-150 and CF-74''s issuance half. **A campaign broadcasts; an invitation is addressed
@@ -1437,7 +1661,7 @@ paths:
         - "P02 GST-072 Share & Group Booking"
       x-ticvai-read-via:
       - query: orders#invitationRecords
-        route: service
+        route: in-process
         for: 'its read of orders.invitation, Orders''s data (CHG-MOD-001)'
       x-ticvai-names-for-context: [access.entitlement]
       security:
@@ -1480,6 +1704,9 @@ paths:
                   enum:
                   - accept
                   - decline
+                  x-ticvai-stored-as: marketing.invitation.status
+                  description: Stored as the invitation's `status`, `accepted` or `declined`, with `respondedAt` (r13
+                    gate, CHG-R13BO-002).
                 plusOnes:
                   type: integer
                   default: 0
@@ -1614,7 +1841,7 @@ paths:
         - "P13 CMS-043 Digital Waiver & Form Builder"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: Define a waiver, survey or capture form
       description: 'CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey
@@ -1731,10 +1958,16 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
-      x-ticvai-read-via:
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [pii.subject]
+      x-ticvai-reads:
+      - table: marketing.waiver_version_control
+        for: 'the submitted form version''s resign rule, whether an earlier version''s live acceptance counts (Marketing''s
+          own data; ADAM CR-472), read under the routed tenant''s root grant filtered to the caller''s scope paths (ADAM
+          CR-496)'
+      - table: marketing.form_definition
+        for: 'the submitted formId and formVersion, published, read under the routed tenant''s root grant
+          (ITenantRootGrant) filtered to the caller''s scope paths, so a form published above the caller''s venue is
+          found (ADAM CR-496)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1756,6 +1989,45 @@ paths:
         version that does not exist or is not published is `404 form-version-not-found`. Where a live
         acceptance already exists, the answer is `200` with the existing submission and no new row is
         written; a new acceptance is `201`.
+
+
+        **It reads nothing from `pii.subject`** (ADAM CR-472, Chinmay, 2 November 2026). It asks no query of
+        Identity and calls no service route: a guest submits for its own subject, and staff with a grant at the
+        venue submit for any guest, both guarded by the grant-holder-write policy on `marketing.form_submission`
+        (CR-318). It checks no one''s age; where a form asks about age, the form''s own fields carry it.
+
+
+        **What a live acceptance is** (ADAM CR-472). Before writing, it looks for a `marketing.form_submission`
+        row for the same form id, the same `subjectId` and the same `onBehalfOfSubjectId` (both null or both
+        equal), with `expires_at` later than now; only versions with `validForMonths` set give a row an
+        `expires_at`. The row counts when its `form_version` is the version being submitted. It also counts when
+        it is an earlier version and `marketing.waiver_version_control.resign_rule` for the submitted form and
+        version is `noResign` (Marketing''s own data; no route is needed). When a row counts, the answer is `200`
+        with that submission and nothing is written. Every other case is a new acceptance: there is no live row,
+        or the submitted version''s resign rule is `resignAtNextBooking` or `resignBeforeNextVisit`, or the version
+        has no resign rule. It is written with its own `form_version`, `expires_at` set from that version''s
+        `validForMonths`, and answered `201`. No grant or migration is needed.
+
+
+        **A form published above the caller''s venue is found** (ADAM CR-496, option A, Chinmay, 3 November 2026;
+        CHG-CR496-001), as for the published privacy policies and the other tenant-root reads. Before anything is
+        written: (1) the caller''s scope paths for this request are taken: a staff member''s grants, or a guest''s
+        venue path from `guestAuth`. (2) Under the routed tenant''s root grant (`ITenantRootGrant`), in one
+        statement, the `marketing.form_definition` row for the submitted `formId` and `formVersion` with status
+        `published` is read, and kept only when its `scope_path` is at or below one of the caller''s paths or at or
+        above one of them (`scope_path <@ ANY(paths) OR scope_path @> ANY(paths)`). If no row is left, the answer is
+        `404 form-version-not-found` and nothing is written; a form published at another venue or another brand
+        stays 404. (3) Under the same grant and the same scope filter, `marketing.waiver_version_control` is read
+        for that `form_id` and `form_version`, and its `resign_rule` decides the earlier-version rule (`noResign`);
+        no row means no resign rule applies. (4) The connection returns to the caller''s own grant (`SET LOCAL`
+        back) before `marketing.form_submission` is touched: the live-acceptance check (200) and the insert (201)
+        stay under the grant-holder-write policy of CR-318, so a guest still reads and writes only its own
+        submissions. (5) Nothing else is read under the root grant, and nothing from those two rows is returned
+        beyond what the response already carries. No migration, no change to the request or the responses; the
+        row security of `form_definition` and `waiver_version_control` stays as it is for every other operation.
+        Tests: a form published at the tenant path is submitted by venue staff and by a guest at that venue (201,
+        then 200 on a repeat); a form at another venue is 404; a draft or retired version is 404; a tenant-level
+        `noResign` rule on an earlier version is applied; a guest cannot read another guest''s submission.
 
         '
       tags:
@@ -1824,7 +2096,7 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -1881,7 +2153,15 @@ paths:
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001): a staff caller''s subjectId must be a known
+          subject (ADAM CR-521)'
+      x-ticvai-reads:
+      - table: marketing.guest_document_upload
+        for: 'the upload row createGuestDocumentUpload issued for the storageRef: same subject_id and kind, status
+          pending (ADAM CR-521)'
+      x-ticvai-writes:
+      - table: marketing.guest_document_upload
+        for: 'marks the upload row attached, in the same transaction as the guest_document insert (ADAM CR-521)'
       x-ticvai-consumed-by:
       security:
       - guestAuth: []
@@ -1894,6 +2174,20 @@ paths:
         `retainUntil` is required. **A guest document with no deletion date is a guest document kept forever.**
         It is the end of the document''s purpose plus the retention period client counsel sets, which is
         still open (audit R149).
+
+
+        **The server issues and checks every key; a key the client makes up is never stored** (ADAM CR-521,
+        option A, Chinmay, 3 November 2026; CHG-CR521-001). `storageRef` is accepted only when a
+        `marketing.guest_document_upload` row exists for it with the same `subject_id` and `kind`, status
+        `pending`, and the object exists in the guest-document store at no more than the issued size; otherwise
+        the answer is `422 guest-document-upload-invalid` and nothing is written. In the same transaction it
+        inserts `marketing.guest_document`, marks the upload row `attached`, and sets `id`, `uploaded_at` (now) and
+        `uploaded_by_principal_id` (the staff principal, or null for a guest''s own upload); any of these three sent
+        by the client is ignored. The subject rules are those of `createGuestDocumentUpload`: a guest may send only
+        its own session''s `subjectId` (otherwise 403); staff may name any subject, checked through
+        `identity#subjectRecords` (404 if unknown). `marketing.guest_document` takes the grant-holder subject
+        policy (`x-ticvai-rls: grant-holder-write`, `platform.apply_grant_holder_subject_rls`), as
+        `form_submission` has, so staff with a grant write for a guest and a guest only for itself.
 
         '
       tags:
@@ -1924,6 +2218,105 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestDocument'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          x-ticvai-problem-types: [guest-document-upload-invalid]
+          description: 'The storageRef was not issued by createGuestDocumentUpload for this subject and kind, is no
+            longer pending, or its object is missing from the store or larger than the issued size (ADAM CR-521);
+            nothing is written.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-documents/uploads:
+    post:
+      operationId: createGuestDocumentUpload
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'a staff caller''s subjectId must be a known subject, pii.subject, Identity''s data (404 if unknown;
+          ADAM CR-521)'
+      x-ticvai-writes:
+      - table: marketing.guest_document_upload
+        for: 'the issued upload row, pending, with its storage_ref, subject, kind, content type, size, issuer and
+          expiry (ADAM CR-521)'
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      summary: Issue the key and a signed upload URL for a guest document
+      description: '**The upload step for the guest-document store** (ADAM CR-521, option A, Chinmay, 3 November
+        2026; CHG-CR521-001). The server issues and checks every guest-document key; a key the client makes up is
+        never stored. A guest may send only its own session''s `subjectId` (otherwise 403); staff may name any
+        subject, checked through `identity#subjectRecords` (404 if unknown). Allowed types are image/jpeg,
+        image/png and application/pdf, up to 10 MB, as for guest identity uploads; otherwise `400
+        media-type-not-permitted` or `media-too-large`. It writes a `marketing.guest_document_upload` row (status
+        `pending`) and answers 201 with `storageRef`, a signed upload URL into the tenant''s private guest-document
+        store (not the media library) and `expiresAt` (15 minutes). The server builds the key from the subject and
+        a random id. `uploadGuestDocument` then takes the `storageRef`. A pending object not attached within 24
+        hours is deleted (`x-ticvai-jobs.guestDocumentUploadCleanup`).
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: GUEST_VIEW_PII
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [kind, contentType, sizeBytes, subjectId]
+              properties:
+                kind:
+                  type: string
+                  enum: [avatar, idDocument, visa, signedWaiver, medicalNote, accessibilityEvidence, photo, other]
+                contentType:
+                  type: string
+                  enum: [image/jpeg, image/png, application/pdf]
+                sizeBytes:
+                  type: integer
+                  minimum: 1
+                  maximum: 10485760
+                subjectId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The key and the signed upload URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestDocumentUploadTicket'
+        '400':
+          x-ticvai-problem-types: [media-type-not-permitted, media-too-large]
+          description: A content type other than image/jpeg, image/png or application/pdf, or a file larger than
+            10 MB (ADAM CR-521).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /challenges:
@@ -1934,7 +2327,7 @@ paths:
         - "P08 BO-829 Family, Team & Event Challenges"
       x-ticvai-read-via:
       - query: catalogue#eventRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
         route: in-process
@@ -2256,10 +2649,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
-      x-ticvai-read-via:
-      - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [control.url_redirect]
       x-ticvai-body-key: [entityId]
       x-ticvai-body-key-note: 'Keyed by the body''s `entityId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per entity and locale within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Titles, descriptions, canonicals and hreflang
@@ -2274,6 +2664,19 @@ paths:
         database, so Marketing owns the table beside them, under the tenant''s row-level security, and no
         write crosses a module or a database. It moved from the shared control
         database, which Platform owned and Marketing wrote with no declared route.
+
+
+        **It reads nothing from Catalogue** (ADAM CR-474, Chinmay, 2 November 2026). It asks no Catalogue query
+        and calls no service route. It stores the metadata for the `entityKind`, `entityId` and `locale` sent,
+        creating or replacing the one record for that key within the caller''s tenant, and does not check that
+        the entity exists.
+
+
+        **A changed slug is stored, and the redirect is a separate call** (ADAM CR-474). A PUT that changes
+        `slug` stores the new slug; it does not refuse and does not write a redirect. The 301 from the old
+        address to the new one is made by `createUrlRedirect` (POST /seo-redirects, #33242), which CMS-013 calls
+        when a live slug is edited. That redirect lives in `control.url_redirect`, outside this tenant
+        transaction. No grant or migration is needed.
 
         '
       tags:
@@ -2501,7 +2904,7 @@ paths:
         - "P08 BO-830 Referral & Streak Management"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -3414,7 +3817,7 @@ paths:
       operationId: accrueLoyaltyPoints
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Award points for a completed order
       description: '**`games` awards points on play and ticketing did not**, so a guest earned for an
@@ -4119,10 +4522,10 @@ paths:
         - "P08 BO-799 Agent Workspace"
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       - query: tenancy#deviceRecords
-        route: service
+        route: in-process
         for: 'its read of platform.device, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -4842,6 +5245,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RecordConsentRequest'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '201':
           headers:
             X-Consistency-Token:
@@ -5191,14 +5596,24 @@ paths:
 
 
         **What is sent.** To each guest on every channel they have: push to each active `marketing.guest_device`, then
-        SMS and email to the contacts on `marketing.guest_profile`, through the tenant''s configured provider for the
-        channel (`marketing.communication_provider`). The text is `messageLocalised` in the guest''s language, else
-        `message`. It ignores suppression, quiet hours, throttling and channel preference, and writes one
-        transactional `marketing.message_dispatch` row per guest and channel with `sourceRef` the `broadcastId`.
+        SMS and email to the contacts on `marketing.guest_profile`. The text is `messageLocalised` in the guest''s
+        language, else `message`. It ignores suppression, quiet hours, throttling and channel preference, and writes
+        one transactional `marketing.message_dispatch` row per guest and channel, queued, with `sourceRef` the
+        `broadcastId` and `body` the resolved text (ADAM CR-442).
 
 
-        **Idempotent on `broadcastId` + `subjectId` + `channel`**: a redelivered event finds the dispatch already
-        written and does not send it again.'
+        **Who sends it** (ADAM CR-442, Chinmay, 1 November 2026; CHG-CR442-001). This consumer writes the queued
+        rows; Marketing''s message sender, the dispatch worker, sends queued dispatch rows through the provider each
+        channel has configured (`setChannelProvider`: email, SMS and push, ranked by `role` and `priority`, with
+        fallback) and records `delivered` or `failed` with the provider''s reference. Until the message sender
+        exists, the consumer dead-letters each delivery rather than pretend to send.
+
+
+        **Idempotent on `broadcastId` + `subjectId` + `channel`, through the consumer''s inbox** (ADAM CR-442).
+        Every dispatch row of one delivery is written in the inbox''s transaction, after a check that no row for
+        that `sourceRef`, `subjectId` and `channel` exists (the non-unique index on the three; the table stays
+        partitioned by `queued_at`, ADR-0056). A redelivered event finds the dispatch already written and does
+        not write it again.'
       tags:
       - message
       x-ticvai-permission: null
@@ -5327,7 +5742,8 @@ paths:
 
         **What it does.** It decrypts `destination` and `code` at send time through the kernel''s field encryption
         (#37050) and sends the code on `channel` through the tenant''s configured provider for that channel
-        (`marketing.communication_provider`), with the system template `guestOneTimeCode` in the guest''s `locale`. The
+        (`marketing.communication_provider`), through Marketing''s message sender, the same dispatch worker guest
+        broadcasts send through (ADAM CR-442; CHG-CR442-001), with the system template `guestOneTimeCode` in the guest''s `locale`. The
         template carries its own subject line, so the message needs none. It writes a transactional
         `marketing.message_dispatch` row for the send, without the code: sent under contract performance, not marketing
         consent. The decrypted values are never logged or stored.
@@ -6005,6 +6421,8 @@ paths:
       security:
       - guestAuth: []
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           description: Devices
           content:
@@ -6097,6 +6515,7 @@ paths:
                 token:
                   type: string
                   maxLength: 512
+                  x-ticvai-stored-as: marketing.guest_device.token_ciphertext   # GuestDevice.tokenRef, field-encrypted (r13 gate, CHG-R13BO-002)
                   description: The provider's push token. Stored only encrypted (`GuestDevice.tokenRef`) and as a
                     keyed hash (`GuestDevice.tokenFingerprint`); never stored or logged as sent (CHG-MKT-001).
                 installationId:
@@ -6116,6 +6535,8 @@ paths:
                 locale:
                   type: string
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -9258,13 +9679,14 @@ paths:
       - query: white-label#policyRecords
         route: in-process
         for: 'what its text calls "whitelabel.policy": whitelabel.policy, WhiteLabel''s data (CHG-R10GEN-001), served
-          in process within the operations host; the policies in force, scheduled and in the directory (ADAM CR-378)'
+          in process within the operations host; the policies in force, scheduled and in the directory (ADAM CR-378),
+          asked under the routed tenant''s root grant (ITenantRootGrant), as CR-336 and CR-362 read, so a venue
+          manager''s command centre sees the tenant''s published policies; every other read is under the caller''s
+          grant (ADAM CR-440; CHG-CR440-001)'
       x-ticvai-reads:
       - table: marketing.consent_purpose
         for: 'activeConsentPurposes, the review and policyExpired checks on noticeVersion, and the directory''s
           consentPurpose items (ADAM CR-378; CHG-CR378-001)'
-      - table: marketing.consent_purpose_channel
-        for: 'the channel filter on consent purposes (ADAM CR-378)'
       - table: marketing.communication_preference_type
         for: 'communicationPreferenceTypes and the directory''s communicationPreference items (ADAM CR-378)'
       - table: marketing.consent_capture_point
@@ -9305,6 +9727,12 @@ paths:
         at the item's scope or above.
 
 
+        **Whose grant each read is under** (ADAM CR-440, Chinmay, 1 November 2026; CHG-CR440-001). The in-force
+        policy (`white-label#policyRecords`) is read under the routed tenant's root grant (`ITenantRootGrant`), as
+        CR-336 and CR-362 read, so a venue manager's command centre sees the tenant's published policies. Every
+        other read is under the caller's grant.
+
+
         **Counts.** `activeConsentPurposes` = `marketing.consent_purpose` rows. `activePrivacyPolicies` = in-force
         policies of kind `privacy` or `cookie`. `pendingPolicyApprovals` = `marketing.privacy_notice_governance` rows
         with status `review`. `scheduledPolicyChanges` = published `privacy` or `cookie` policies whose
@@ -9316,7 +9744,13 @@ paths:
         purposes whose `noticeVersion` is not the in-force privacy policy's version.
 
 
-        **Warnings**, most severe first, then by `configurationId`, at most 100. `capturePointWithoutNotice`: a
+        **Warnings**, most severe first, at most 100 (ADAM CR-469, Chinmay, 2 November 2026; CHG-CR469-001). The
+        ranking is the order CR-378 lists the codes in: `capturePointWithoutNotice`, `policyExpired`,
+        `purposeWithoutLawfulBasis`, `purposeWordingDiffersByChannel`, `translationMissing`; within a code, by
+        `configurationId`, nulls last. With no privacy policy in force, every consent purpose raises `policyExpired`
+        and counts in `consentConfigurationsRequiringReview`, and a published capture point whose notice step names
+        a kind with no policy in force raises `capturePointWithoutNotice`; the cap of 100 keeps the list bounded.
+        `capturePointWithoutNotice`: a
         published capture point with no `privacyNotice` step, or whose `privacyNotice` step's `policyKind` has no
         policy in force. `policyExpired`: a consent purpose whose `noticeVersion` is not the in-force privacy
         policy's version. `purposeWithoutLawfulBasis`: an active `marketing.processing_purpose` whose `lawfulBasis`
@@ -9337,16 +9771,29 @@ paths:
         `consent_capture_point` (its `publicationStatus`; `superseded`, or status `retired`, as `retired`).
         `communicationPreference` from `communication_preference_type` (`active` as `published`, `retired` as
         `retired`). `minorPrivacy` from `marketing.minor_privacy_rule` (`name` "Minor privacy, <country>", status
-        `published`). `effectiveFrom` is set only on policies; the other items sort by `updatedAt`.
+        `published`). `effectiveFrom` is set only on policies; the other items sort by `updatedAt`. Items with no
+        date (consent purposes, and rows whose `updated_at` is null) sort after every dated item, by id (ADAM
+        CR-469).
 
 
         **Filters.** `status`, `effectiveFrom` and `effectiveTo` narrow only the directory (by status, and by
         `effectiveFrom` or else `updatedAt`). `brandId`, `country`, `venueId`, `channel`, `language`,
         `consentPurpose` and `policyId` narrow every count and item that carries that attribute. Brand: capture
         point `brandId`, preference type `applicableBrandIds`, banner `brandId`. Country: capture point, preference
-        type `applicableCountries`, minor rule, tracking technology `countries`. Venue: `scopePath` at or beneath
-        the venue. Channel: capture point, `marketing.consent_purpose_channel`, preference type
-        `availableChannels`, banner, tracking technology `channels`. Language: capture point and banner
+        type `applicableCountries`, minor rule, tracking technology `countries`. Venue (ADAM CR-469): policies
+        (`whitelabel.policy` items and counts, with their `privacy_notice_governance` rows) are kept when their
+        scope is the venue's or an ancestor's, the tenant root included, read under the tenant root grant as
+        CR-440 decided; a policy in force at the venue is the latest of its kind at the venue or above. Every other
+        item keeps `scopePath` at or beneath the venue. Channel (ADAM CR-469): the filter takes a `ConsentSource`
+        value. Capture points match it exactly. Cookie banners and tracking technologies use the web channel list,
+        so the filter maps onto it: `website` to `b2cWebsite`, `customerPortal`, `whiteLabelSite` and
+        `partnerMicrosite`; `guestApp` to `mobileApp`; `checkout` to `embeddedCheckout`; `cookieBanner` to all six.
+        `kiosk`, `pos`, `callCentre`, `import` and `agentRecorded` map to none of them, so banners and tracking
+        technologies drop out under those filters, because no cookie banner shows there. Consent purposes
+        (`consent_purpose_channel`) and communication preference types (`availableChannels`) hold message channels
+        (`email`, `sms` and the rest), which say how a guest is contacted, not where consent is captured, so the
+        channel filter does not narrow them: they count as items without the attribute and stay in. The channel
+        rule applies alike to the counts, the warnings and the directory. Language: capture point and banner
         `languages`, policy body keys. `consentPurpose`: the purpose, capture points with a consent step for it,
         preference types naming it. `policyId`: that policy and its governance row. An item without the attribute
         applies everywhere and stays in.
@@ -11615,7 +12062,7 @@ paths:
         - "P12 SUP-010 Customer 360° Service Profile"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: identity#subjectRecords
         route: service
@@ -11685,13 +12132,13 @@ paths:
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#reservationRecords
-        route: service
+        route: in-process
         for: 'its read of orders.reservation, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       - query: wallet#balanceRecords
         route: service
@@ -12022,16 +12469,16 @@ paths:
         - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'the order and its policies (422 not-permitted-by-policy) (CHG-MOD-003)'
       - query: access#entitlementRecords
         route: service
         for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_line": orders.order_line, Order''s data (CHG-R10GEN-001)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.payment": orders.payment, Order''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
@@ -12105,19 +12552,19 @@ paths:
         - "P12 SUP-015 Refund, Compensation & Service Exception Workspace"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: orders#orderFeeRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_fee": orders.order_fee, Order''s data (CHG-R10GEN-001)'
       - query: orders#refundRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.refund": orders.refund, Order''s data (CHG-R10GEN-001)'
       - query: orders#refundPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.refund_policy": orders.refund_policy, Order''s data (CHG-R10GEN-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.sales_order": orders.sales_order, Order''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -12346,7 +12793,7 @@ paths:
         - "P12 SUP-017 Case Resolution, Closure & Customer Feedback"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -12459,7 +12906,7 @@ paths:
       operationId: setCaseResolution
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -12895,7 +13342,7 @@ paths:
         - "P12 SUP-023 Agent Workload, Availability & Workforce Control"
       x-ticvai-read-via:
       - query: workforce#shiftRecords
-        route: service
+        route: in-process
         for: 'what its text calls "workforce.shift": workforce.shift, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
@@ -13062,7 +13509,7 @@ paths:
         - "P12 SUP-024 Escalation & Critical Case Monitor"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -13509,7 +13956,7 @@ paths:
         - "P12 SUP-027 Service Analytics & Root-Cause Intelligence"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15025,6 +15472,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getWaiverTesting
+      x-ticvai-consumed-by:
+        - "P13 CMS-050 Waiver Approval, Testing & Publication Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.21-22 (11.1.10 Pre-Publication Checklist, Testing Sandbox, Rule Simulation); the workspace needs its read'
@@ -15135,13 +15584,13 @@ paths:
         - "P13 CMS-051 Waiver Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15277,16 +15726,16 @@ paths:
         - "P13 CMS-052 Participant Waiver Status & Tracking"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15406,7 +15855,7 @@ paths:
       operationId: actOnWaiverRequirements
       x-ticvai-read-via:
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15683,10 +16132,10 @@ paths:
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15983,16 +16432,16 @@ paths:
         - "P13 CMS-056 Missing, Expired & Invalid Waiver Management"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -16140,7 +16589,7 @@ paths:
         route: service
         for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_line": orders.order_line, Order''s data (CHG-R10GEN-001)'
       - query: identity#subjectRecords
         route: service
@@ -16242,7 +16691,7 @@ paths:
       operationId: setWaiverException
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'the performance the exception''s scope names (422 scope-incomplete) (CHG-MOD-003)'
       x-ticvai-audience:
         - staff
@@ -16713,7 +17162,7 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Everything this guest did, in order, across the platform
       description: 'Board 1.5. Purchases, scans, reservations, visits, membership changes, loyalty,
@@ -16868,7 +17317,7 @@ paths:
         - "P08 BO-832 AI Engagement Optimization"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Value, engagement, churn and propensity, with their reasons
       description: 'Board 1.10 — *"turn the unified record into **explainable** customer insight."*
@@ -17102,7 +17551,7 @@ paths:
       operationId: setDataRetentionPolicy
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
-        route: service
+        route: in-process
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       summary: How long guest data is kept, and what happens at expiry
       description: 'Board 2.8. **`listDataRetentionExpiry` could read them and nothing set them.**
@@ -17481,7 +17930,7 @@ paths:
         - "P08 BO-828 Milestones & Reward Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'whether a rule''s product exists (409 unknown-reward-or-product) (CHG-MOD-003)'
       summary: Replace a programme's rules as one set
       description: '**Applied whole or not at all.** Setting rules one at a time leaves a live
@@ -18018,6 +18467,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           description: Badges held
           content:
@@ -18606,7 +19057,7 @@ paths:
         - "P02 GST-007 Select Date & Time"
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'the questions the cart asks (409, 422 question-not-asked) (CHG-MOD-003)'
       security:
       - guestAuth: []
@@ -20135,10 +20586,10 @@ paths:
       x-ticvai-auth: service
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'the order must exist, be of the sent venue, and a reservation owner must be its buyer: orders.sales_order, Orders'' data'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'a ticket owner''s order line must be on the order and its unit within the line''s quantity: orders.order_line, Orders'' data'
       - query: identity#subjectRecords
         route: service
@@ -21584,6 +22035,7 @@ components:
           maxLength: 1000
           nullable: true
     MarketingGuestExtraField:
+      x-ticvai-rls: grant-holder-read   # r13 gate (CHG-R13BO-001): read and set below the tenant by listGuestExtraFields and setGuestExtraFields, as its options and values are (MOD audit, CHG-MOD-007)
       type: object
       x-ticvai-persistence: marketing.guest_extra_field
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines an extra field that Admin wants to add to the customer form, such as Date of Birth, Emergency Contact, or Jersey Size.'
@@ -21595,7 +22047,12 @@ components:
       - displayOrder
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the venue whose set it is (setGuestExtraFields replaces the caller''s venue''s set), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes its own fields, as its options and values already carry it (MOD audit, CHG-MOD-007; r13 gate, CHG-R13BO-001).'
         id:
           type: string
           format: uuid
@@ -23759,7 +24216,7 @@ components:
             is written only by the Orders service through `recordSaleOwnerAnswers` (service-to-service), never by a
             caller of `submitForm`. Null for a submission made outside a sale.
     GuestDocument:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listComplianceEvidenceWaiver, uploadGuestDocument
+      x-ticvai-rls: grant-holder-write   # ADAM CR-521 (3 November 2026): staff with a grant write for a guest, a guest only for itself, as form_submission (CR-318); was grant-holder-read (CHG-MOD-007)
       type: object
       x-ticvai-persistence: marketing.guest_document
       description: 'BL-133. **No store for guest photos, avatars, IDs or signed documents anywhere.**
@@ -23798,9 +24255,10 @@ components:
         storageRef:
           type: string
           description: '**The stored object''s key in the guest-document store**, which is deliberately not
-            `assets` (BL-133). No operation in this contract issues one yet: `assets` `createUpload` is
-            staff-only and writes the media library, so the upload step for this store is still to be
-            designed.
+            `assets` (BL-133). **`createGuestDocumentUpload` issues it** (ADAM CR-521, 3 November 2026): the
+            server builds the key from the subject and a random id, and `uploadGuestDocument` accepts it only
+            when its upload row is pending for the same subject and kind and the object is in the store at no
+            more than the issued size.
 
             '
         contentType:
@@ -23829,6 +24287,91 @@ components:
           type: string
           format: uuid
           nullable: true
+    GuestDocumentUpload:
+      x-ticvai-rls: grant-holder-write   # the same row security as guest_document (ADAM CR-521)
+      type: object
+      x-ticvai-persistence: marketing.guest_document_upload
+      description: '**A guest-document key the server issued** (ADAM CR-521, option A, Chinmay, 3 November 2026;
+        CHG-CR521-001). `createGuestDocumentUpload` writes it `pending`; `uploadGuestDocument` accepts its
+        `storageRef` only while it is pending for the same subject and kind, and marks it `attached` in the
+        transaction that inserts the guest_document. A pending object not attached within 24 hours is deleted from
+        the store.'
+      required:
+      - id
+      - storageRef
+      - subjectId
+      - kind
+      - contentType
+      - sizeBytes
+      - issuedAt
+      - expiresAt
+      - status
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        storageRef:
+          readOnly: true
+          type: string
+          maxLength: 500
+          x-ticvai-unique: tenant
+          description: The key the server built from the subject and a random id.
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+        kind:
+          type: string
+          maxLength: 40
+          description: The kind the key was issued for, one of GuestDocument.kind's values, as the request body's enum
+            checks; uploadGuestDocument accepts the key only for the same kind.
+        contentType:
+          type: string
+          enum: [image/jpeg, image/png, application/pdf]
+        sizeBytes:
+          type: integer
+          minimum: 1
+          maximum: 10485760
+          description: The issued size; the stored object may be no larger.
+        issuedByPrincipalId:
+          readOnly: true
+          type: string
+          format: uuid
+          nullable: true
+          description: The staff principal that asked for the key, or null for a guest's own upload.
+        issuedAt:
+          readOnly: true
+          type: string
+          format: date-time
+        expiresAt:
+          readOnly: true
+          type: string
+          format: date-time
+          description: When the signed upload URL stops working (15 minutes after issue).
+        status:
+          readOnly: true
+          type: string
+          enum: [pending, attached]
+          default: pending
+    GuestDocumentUploadTicket:
+      x-ticvai-persistence: 'none — response shape: what createGuestDocumentUpload answers; the row is
+        GuestDocumentUpload (marketing.guest_document_upload)'
+      type: object
+      required: [storageRef, uploadUrl, expiresAt]
+      properties:
+        storageRef:
+          type: string
+          maxLength: 500
+          description: The issued key, which uploadGuestDocument takes (ADAM CR-521).
+        uploadUrl:
+          type: string
+          description: Signed. PUT the file here, into the tenant's private guest-document store (not the media
+            library).
+        expiresAt:
+          type: string
+          format: date-time
+          description: 15 minutes after issue.
     Challenge:
       type: object
       x-ticvai-persistence: marketing.challenge
@@ -24066,7 +24609,9 @@ components:
           type: string
           nullable: true
           description: '22.11.6. **Human-readable, and changing one is a redirect rather than an edit**
-            — a slug that changes without a 301 is a page that was ranking and now is not.
+            — a slug that changes without a 301 is a page that was ranking and now is not. `setSeoMetadata`
+            stores the new slug and writes no redirect; the 301 is `createUrlRedirect`, which CMS-013 calls when a
+            live slug is edited (ADAM CR-474).
 
             '
         hreflang:
@@ -26604,6 +27149,7 @@ components:
           performance:
             $ref: '#/components/schemas/CampaignPerformance'
     GuestNote:
+      x-ticvai-rls: grant-holder-write   # r13 gate (CHG-R13BO-001): addGuestNote and getGuestTimeline at a venue, the rule CHG-R11FXC-003 settled for a guest's row with no scope; any staff grant reads and writes, the guest its own
       type: object
       x-ticvai-persistence: marketing.guest_note
       description: 'A note on a guest, written by staff (`addGuestNote`). **Attributed and personal data**,
@@ -27205,7 +27751,10 @@ components:
     MessageDispatch:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getCampaignPerformance, getGuestTimeline, getJourneyPerformance, getMessageStatus and others
       x-ticvai-append-only: queuedAt
-      x-ticvai-index: [[sourceRef]]   # listMessageDispatches filters on it (ADAM CR-379; CHG-CR379-001)
+      # [sourceRef]: listMessageDispatches filters on it (ADAM CR-379; CHG-CR379-001). [sourceRef, subjectId, channel]:
+      # non-unique, the check sendGuestBroadcast makes before each insert (ADAM CR-442; CHG-CR442-001); the table stays
+      # partitioned by queued_at (ADR-0056), so no unique key on the three can exist.
+      x-ticvai-index: [[sourceRef], [sourceRef, subjectId, channel]]
       x-ticvai-persistence: marketing.message_dispatch
       type: object
       required:
@@ -27299,6 +27848,12 @@ components:
           nullable: true
           description: The id of the record whose business event triggered the message (a performance id, a guest
             broadcast id), which `listMessageDispatches` filters on (ADAM CR-379; CHG-CR379-001). Null for a campaign.
+        body:
+          type: string
+          nullable: true
+          description: '**The resolved message as sent** (ADAM CR-442, Chinmay, 1 November 2026; CHG-CR442-001), which
+            Marketing''s message sender sends; for a guest broadcast, `messageLocalised` in the guest''s language,
+            else `message` (`sendGuestBroadcast`).'
     CaseStatus:
       type: string
       enum:
@@ -28197,6 +28752,7 @@ components:
           minimum: 1
           description: Order among providers with the same role and selectors; 1 is tried first.
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setChannelProvider saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
             - active
@@ -28311,6 +28867,7 @@ components:
             - production
             - sandbox
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setSenderIdentityDomain saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
             - pendingVerification
@@ -29464,6 +30021,7 @@ components:
           format: date-time
           nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setDataProcessingPurpose saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - draft
@@ -29708,6 +30266,7 @@ components:
           default: manual
           readOnly: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setTrackingTechnology saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - detected
@@ -30262,6 +30821,9 @@ components:
           x-ticvai-persistence-column: jsonb
           x-ticvai-persistence-kind: valueObject
           type: array
+          description: '**The change set''s contents, stored whole** (ADAM CR-437, Chinmay, 1 November 2026;
+            CHG-CR437-001). `marketing.privacy_change_set.items` (jsonb, nullable) holds this list exactly as this view
+            returns it, written whole on each save.'
           items:
             type: object
             properties:
@@ -30327,7 +30889,9 @@ components:
         approvalRequestId:
           type: string
           nullable: true
-          description: The approvals-engine request, once submitted.
+          x-ticvai-references: approvals.request
+          description: The approvals-engine request, once submitted. A foreign key to `approvals.request(id)`, as
+            `workforce.leave_request.approval_request_id` is (ADAM CR-437; CHG-CR437-001).
         publishAt:
           type: string
           format: date-time
@@ -30750,6 +31314,7 @@ components:
                 maxLength: 200
                 nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setPrivacyRequestTypes saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - active
@@ -34920,6 +35485,7 @@ components:
           - human
           - ai
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setQualityEvaluation saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - draft
@@ -35708,6 +36274,7 @@ components:
           type: boolean
           default: false
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setContactAutomation saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - draft
@@ -36609,6 +37176,7 @@ components:
               format: uuid
               nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setWaiverAssociation saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - active
@@ -36772,6 +37340,7 @@ components:
                 items:
                   $ref: '#/components/schemas/MessageChannel'
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setWaiverTriggerRule saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - active
@@ -38577,6 +39146,7 @@ components:
           nullable: true
           description: The supervisor asked to decide.
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setWaiverException saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - requested
@@ -39577,6 +40147,7 @@ components:
           - locationServicesNotice
           - other
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setPrivacyNoticePolicyGovernance saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - draft

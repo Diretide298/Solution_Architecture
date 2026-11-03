@@ -455,8 +455,6 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | `walletTypeId` (navigation) |
 | Route | `/orders-money/wallet-creation-provisioning-rules-bo-1085` |
 
-**Known gaps.** **Wallet Creation & Provisioning Rules declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the …
-
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** When a wallet is created automatically (at registration, first top-up, membership) or manually.
 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only createWalletType, updateWalletType and nothing that returns the current configuration. (CHG-WIR-025).
@@ -912,6 +910,8 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | Opens with | `creditTypeId` (navigation) |
 | Route | `/orders-money/credit-balance-type-configuration-bo-1088` |
 
+**What the spec says about it.** **Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled for BO-1144). The fifteen credit kinds are the values of one property, `CreditType.category`; Balance code, Display name, Monetary, Transferable, Refundable, Expirable, Accounting classification and Consumption priority are `CreditType` properties. Currency applicable, Top-up allowed, Promotional, Redeemable channels, Applicable products, Applicable venues and Liability classification have no `CreditType` property, so nothing is sent for them (eligibility is `CreditEligibility`'s). **No control on the layout sends `createCreditType` or `updateCreditType`**: under the lead's rule of 28 October 2026 the developer adds them (Create credit type, Save) and logs a "Design change:" CR in ADAM; the package's own fix does not change the approved layout.
+
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** All value types a wallet may hold (cash, bonus, redemption tickets, gift, refund, promotional), monetary or not.
 
 **Known correction pending (do not draw the wrong version)**
@@ -924,36 +924,36 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Cash Credit | select field | — | — | — | — | — | — |
-| Refund Credit | select field | — | — | — | — | — | — |
-| Bonus Credit | select field | — | — | — | — | — | — |
-| Promotional Credit | select field | — | — | — | — | — | — |
-| Gift Card Credit | select field | — | — | — | — | — | — |
-| Membership Credit | select field | — | — | — | — | — | — |
-| Loyalty Credit | select field | — | — | — | — | — | — |
-| Ride Credit | select field | — | — | — | — | — | — |
-| Attraction Credit | select field | — | — | — | — | — | — |
-| Redemption Ticket Credit | select field | — | — | — | — | — | — |
-| Meal Credit | select field | — | — | — | — | — | — |
-| Retail Credit | select field | — | — | — | — | — | — |
-| Parking Credit | select field | — | — | — | — | — | — |
-| Event Credit | select field | — | — | — | — | — | — |
-| Custom Credit Type | select field | — | — | — | — | — | — |
-| Balance code | select field | — | — | — | — | — | — |
-| Display name | select field | — | — | — | — | — | — |
-| Monetary/non-monetary | select field | — | — | — | — | — | — |
+| Cash Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `cash` value of `CreditType.category`. | `CreditType.category` |
+| Refund Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `refund` value of `CreditType.category`. | `CreditType.category` |
+| Bonus Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `bonus` value of `CreditType.category`. | `CreditType.category` |
+| Promotional Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `promotional` value of `CreditType.category`. | `CreditType.category` |
+| Gift Card Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `giftCard` value of `CreditType.category`. | `CreditType.category` |
+| Membership Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `membership` value of `CreditType.category`. | `CreditType.category` |
+| Loyalty Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `loyalty` value of `CreditType.category`. | `CreditType.category` |
+| Ride Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `ride` value of `CreditType.category`. | `CreditType.category` |
+| Attraction Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `attraction` value of `CreditType.category`. | `CreditType.category` |
+| Redemption Ticket Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `redemption` value of `CreditType.category`. | `CreditType.category` |
+| Meal Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `fnb` value of `CreditType.category`. | `CreditType.category` |
+| Retail Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `retail` value of `CreditType.category`. | `CreditType.category` |
+| Parking Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `parking` value of `CreditType.category`. | `CreditType.category` |
+| Event Credit | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `event` value of `CreditType.category`. | `CreditType.category` |
+| Custom Credit Type | select | optional | — | Cash · Refund · Bonus · Promotional · Gift card · Membership · Loyalty · Ride · Attraction · Redemption · Fnb · Retail … | — | The `other` value of `CreditType.category`. | `CreditType.category` |
+| Balance code | text field | optional | — | — | — | — | `CreditType.code` |
+| Display name | text field | optional | — | — | — | — | `CreditType.name` |
+| Monetary/non-monetary | toggle | optional | on | A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet. | — | Loyalty points are not money. A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet. | `CreditType.monetary` |
 | Currency applicable | select field | — | — | — | — | — | — |
-| Transferable | select field | — | — | — | — | — | — |
-| Refundable | select field | — | — | — | — | — | — |
+| Transferable | toggle | optional | off | — | — | — | `CreditType.transferable` |
+| Refundable | toggle | optional | off | — | — | Promotional credit is not refundable and cash credit is. A venue that refunds promotional credit to a card has converted marketing spend into cash. | `CreditType.refundable` |
 | Top-up allowed | select field | — | — | — | — | — | — |
 | Promotional | select field | — | — | — | — | — | — |
-| Expirable | select field | — | — | — | — | — | — |
+| Expirable | toggle | optional | off | — | — | — | `CreditType.expires` |
 | Redeemable channels | select field | — | — | — | — | — | — |
 | Applicable products | select field | — | — | — | — | — | — |
 | Applicable venues | select field | — | — | — | — | — | — |
-| Accounting classification | select field | — | — | — | — | — | — |
+| Accounting classification | text field | optional | — | — | — | — | `CreditType.ledgerAccountCode` |
 | Liability classification | select field | — | — | — | — | — | — |
-| Consumption priority | select field | — | — | — | — | — | — |
+| Consumption priority | number field | optional | 0 | — | — | — | `CreditType.priority` |
 
 #### Outputs: what the screen shows and produces
 
@@ -1540,7 +1540,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | — | `publishWalletConfiguration` body |
+| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | What the call does, not a fact about the version: `publish` writes the version and its snapshots, `validateOnly` writes nothing. | `publishWalletConfiguration` body |
 | Note `note` | text area | optional | — | — | — | — | `publishWalletConfiguration` body |
 
 #### Outputs: what the screen shows and produces

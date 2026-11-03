@@ -25,15 +25,15 @@ servicesCalled:
 - service: WhiteLabelService
   operationCalls: 122
 - service: MarketingService
-  operationCalls: 75
+  operationCalls: 76
 - service: VenueOpsService
-  operationCalls: 67
+  operationCalls: 68
 - service: AiService
   operationCalls: 14
 - service: CatalogueService
   operationCalls: 8
 - service: IdentityService
-  operationCalls: 6
+  operationCalls: 8
 - service: TenancyService
   operationCalls: 2
 - service: OrderService
@@ -352,6 +352,7 @@ screens:
   - deleteMediaAsset
   - getExpiringRights
   - getMediaAsset
+  - getMediaTaxonomy
   - listCollections
   - replaceMediaAsset
   - searchMedia
@@ -620,6 +621,8 @@ screens:
   wave: 1
   density: compact
   operations:
+  - createDelegatedAccess
+  - deleteDelegatedAccess
   - listPrincipals
   - listRoles
   - updatePrincipal
@@ -632,6 +635,7 @@ screens:
   offlineState: false
   entryParams:
   - principalId<-session
+  - delegatedAccessId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -1133,7 +1137,7 @@ screens:
   name: Waiver & Consent Command Center
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listWaiverConsent
@@ -1339,10 +1343,11 @@ screens:
   name: Waiver Approval, Testing & Publication Workspace
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - approveWaiverTesting
+  - getWaiverTesting
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1590,7 +1595,7 @@ screens:
   name: Digital Asset Management Command Center
   module: Media Library
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getMediaUsageAnalytics
@@ -1693,7 +1698,7 @@ screens:
   name: Metadata & Taxonomy Management
   module: Media Library
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getMediaTaxonomy

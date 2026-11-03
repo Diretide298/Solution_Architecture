@@ -737,6 +737,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Answered. |
 | 429 |  | Usage limit reached (8.3.76). |
 | 503 |  | Every configured provider failed. |

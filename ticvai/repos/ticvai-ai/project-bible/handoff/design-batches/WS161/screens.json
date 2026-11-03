@@ -102,13 +102,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide event and operations managers with a single workspace for understanding the resource readiness of upcoming events.",
   "purposeNote": "Managers can immediately understand resource readiness across upcoming events and identify events requiring operational attention.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 99 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -303,18 +297,7 @@
   "purpose": "Define every resource required to deliver a specific event.",
   "purposeNote": "Event managers can define a complete structured resource requirement plan for each event.",
   "division": "Shares `getEventResourcePlan`, `setEventResourcePlan` with BO-711, BO-713, BO-715; this screen is Event Resource Requirement Builder (pack Resource_Management_Configuration_Reference.pdf, board 7.02, page 100): define every resource required to deliver a specific event.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 100 §Display"
-   },
-   {
-    "operation": null,
-    "why": "**Event Resource Requirement Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -488,13 +471,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Assign suitable physical spaces to an event and its operational components.",
   "purposeNote": "Users can assign suitable venues and spaces while TICVAI validates the entire operational occupancy period rather than only the event start/end time.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 102 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
@@ -1409,13 +1386,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Calculate the expected resource cost of delivering an event.",
   "purposeNote": "Event managers can understand expected resource cost before approving the operational event plan.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
-    "source": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Display"
-   }
-  ],
+  "gaps": [],
   "layout": {
    "template": "split",
    "regions": [
