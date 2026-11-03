@@ -1,0 +1,51 @@
+id: CHG-CR525-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'setRolePermissions moves from the Tenancy contract to the Identity contract (path, body, answers and errors unchanged
+  on the wire): it reads and writes Identity''s own tables (role, role_permission, segregation_rule, delegated_access read,
+  session and refresh_token through identity.end_principal_sessions), writes inherits_from_role_id with 400 validation for
+  a parent it refuses, ends the sessions of every holder of a role that lost a permission in the same transaction, and drops
+  its three in-process reads of Identity.'
+decision:
+  what: 'Posted on #31183 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "setRolePermissions is built in the Identity module, beside createRole and updateRole.
+    Its path, body, answers and errors do not change ... Drop the three in-process reads declared from Tenancy ... inheritsFromRoleId:
+    write identity.role.inherits_from_role_id in the same transaction ... Answer 400 validation naming inheritsFromRoleId
+    ... call identity.end_principal_sessions(principalId, the caller''s principal id, ''role-permissions-changed'') ... Tenancy
+    no longer writes identity.role_permission."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-525 (Chinmay Patkar, #31183): Tenancy''s operation wrote identity.role_permission and had to write identity.role.inherits_from_role_id
+  with no published path; ADR-0055 rule 3, CR-079 (CHG-IDR-003), CR-180 and CR-483 (identity.end_principal_sessions), audit
+  R126.'
+keys_touched:
+  operations:
+  - setRolePermissions
+  tables:
+  - identity.role
+  - identity.role_permission
+  - identity.session
+  - identity.refresh_token
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/identity.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: an operation writes another module's tables with no published path
+tickets:
+  started: []
+  unstarted:
+  - '31183 (setRolePermissions, Chinmay Patkar): build it in the Identity service to the posted decision; BC-714.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-525
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ROLE-PERMISSIONS-HOME
+status: open
+notes: 'Breaking change BC-714 (the operation leaves contracts/spine/tenancy.yaml). Beyond the posted words: the 400 response
+  is new (the decision''s 400 validation for inheritsFromRoleId); its service in the lineage becomes IdentityService. The
+  plan task SVC-TENANCY-IDENTITY-1#setRolePermissions (#31183) keeps its key: the integration pass decides whether its service
+  label moves (plan files are not touched here).'

@@ -1,0 +1,49 @@
+id: CHG-CR497-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'approveRoleAuthorityDelegation: delegator, delegate, requiredRole and venue are uuids and requestKind an ApprovalKind
+  (else the shared 400 validation naming the field, beside invalid-window and delegate-is-delegator); scope_path is always
+  the caller''s venue path (scope, region and department display only); authorityAmount is in the venue''s currency and scale
+  from platform.venue_settings; the 200 is filled from the row written, with the echoed and left-out fields named; the MFA
+  step-up goes through Identity''s in-process step-up check (CR-509).'
+decision:
+  what: 'Posted on #30847 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "option A for ids, kinds, money and the response; the delegation''s scope is always
+    the caller''s venue ... venue is optional; when sent it must be that venue''s id ... requestKind must be an ApprovalKind
+    value ... delegator, delegate and requiredRole must be uuids ... This 400 is the shared validation problem with errors[]
+    and no refusedReason ... authorityAmount is in the venue''s money: read currencyCode and currencyScale from the venue''s
+    settings row (platform.venue_settings) ... The MFA step-up is checked and consumed through Identity''s in-process step-up
+    check decided on #30846"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-497 (Deep Khanvilkar, #30847): the drafted input left the write undefined (scope fields with no format and against
+  the caller''s venue, a requestKind that was not an ApprovalKind, ids with no format); R129 (same role, same venue), CHG-FXC-005,
+  CHG-CR352-001, CHG-CR479-001.'
+keys_touched:
+  operations:
+  - approveRoleAuthorityDelegation
+  schemas:
+  - RolesAuthorityDelegationApprovalLimitsInput
+  - RolesAuthorityDelegationApprovalLimitsView
+  files:
+  - contracts/spine/approvals.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: an operation's drafted input names no format, kind or scope rule for the row it writes
+tickets:
+  started: []
+  unstarted:
+  - '30847 (approveRoleAuthorityDelegation, Deep): build to the posted decision; BC-710.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-497
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DELEGATION-INPUT
+status: open
+notes: 'Breaking change BC-710 (request and response formats, requestKind an ApprovalKind). Beyond the posted words: the 400
+  schema is oneOf the shared Problem and DelegationRefusedProblem; the step-up check is named identity#consumeMfaStepUp (CR-509);
+  the field table''s old ''user is the delegator when delegator is absent'' is replaced by ''user: display only, echoed as
+  sent'', as the draft found (delegator is required).'

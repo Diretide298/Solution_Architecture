@@ -1,0 +1,57 @@
+id: CHG-CR509-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: Identity serves an in-process step-up check, consumeMfaStepUp (sessionId, principalId, action; consumed, missing
+  or expired), which approveMatrixMultiLevel (and approveRoleAuthorityDelegation) ask before any other write in their own
+  transaction; requiredApproverRole and venue are uuids; amount is in the venue's money; minimumApprovals is required for
+  sequential and multiLevel and levels is 1 elsewhere; every save copies the version in force and applies the body to one
+  rule, unmapped fields kept; the new version keeps the active flag.
+decision:
+  what: 'Posted on #30846 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "option A ... Identity gets an in-process step-up check (new ticket under #27730),
+    modelled on its supervisor PIN query: inputs sessionId, principalId, action ... returns consumed, missing or expired ...
+    Every operation that demands an MFA step-up uses the same check ... requiredApproverRole is a role id (uuid) ... Every
+    save stores a new version: copy every rule of the version in force into it unchanged ... The new version keeps the active
+    flag of the version in force; version 1 is active."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-509 (Deep Khanvilkar, #30846): the r12 MFA step-up (CHG-CR375-001) had no declared check, requiredApproverRole
+  had no format and a replaced rule''s unmapped fields were undefined; ADR-0055 rule 3 (Identity writes its own rows), CHG-CR300-001
+  (versions).'
+keys_touched:
+  operations:
+  - approveMatrixMultiLevel
+  - approveRoleAuthorityDelegation
+  - verifyMfaChallenge
+  schemas:
+  - ApprovalMatrixMultiLevelApprovalConfigurationInput
+  files:
+  - contracts/spine/approvals.yaml
+  - contracts/spine/identity.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: an operation demands a step-up another module owns and declares no check for it
+tickets:
+  started: []
+  unstarted:
+  - '30846 (approveMatrixMultiLevel, Deep): build to the posted decision with a fake of the step-up check; BC-711.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-509
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-STEP-UP-CHECK
+status: open
+notes: 'Breaking change BC-711. **Where the posted decision meets r13** (the coordinator''s check of 3 November 2026): ''Every
+  operation that demands an MFA step-up uses the same check'' contradicts r13''s platform step-up (CHG-R13ID-001; ADR-0072
+  point 4). r13''s rule is kept, as the correction posted on #30846 and #30847 says: consumeMfaStepUp is for operations that
+  demand an MFA step-up on a tenant session; a platform caller''s step-up stays read from the Control Plane token (ticvai_step_up
+  within 5 minutes, amr includes mfa), never from a tenant session or an identity.mfa_challenge row, and the check is never
+  called for one. Beyond the posted words: the check is named identity#consumeMfaStepUp and returns {outcome}; the operation
+  reads platform.venue_settings for the money and names platform.scope for context. Only the two #30846/#30847 operations
+  declare the read-via here; the other tenant-session MFA operations (approvals approveVersioningGovernance and approveUnifiedDecision,
+  orders approveRefund, identity resetPrincipalCredential and endOwnSession, and the four access and one finance operation)
+  do not yet declare it: a follow-up for the lead. New task: ''[BE] Identity: in-process step-up check that consumes the caller''s
+  verified MFA challenge for an action'', child of #27730.'
