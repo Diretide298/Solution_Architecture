@@ -239,7 +239,7 @@ def render() -> tuple:
         "| `docs/registers/` | Conflicts, traceability, the backlog |",
         "| `handoff/` | Derived artefacts — the schema reference, the lineage, the graph |",
         f"| `tools/` | {n_checks} checks (tools/run-checks.py) and {n_derivers} derivers. `bash tools/refresh.sh` runs everything |",
-        "| `repos/` | Mirrors of this package for each build repository. Also generated |",
+        "| `repos/` | Each repository's project documents (its README, its CLAUDE.md from ADAM's starter) and `project-bible/`, a mirror of this package; no code. Also generated |",
         "",
         "---",
         "",

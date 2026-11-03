@@ -1,7 +1,7 @@
 id: CHG-R14J-001
 date: '2026-11-03'
 source: audit
-kind: generator
+kind: process
 summary: 'backend/provision-tenant.sh registers every tenant database it creates, or fails before creating it. The cell
   and the instance are inputs (TICVAI_CELL, TICVAI_INSTANCE, by name) and the tenant uuid is required; step 0 checks the
   control database first (the control.tenant row exists, the cell is active, the instance is live in it, the tenant has

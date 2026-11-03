@@ -161,6 +161,10 @@ CHECKS = [
     # 2 November (r13 root R13, CHG-R13R13-001): no README under repos/ is a copy of another package file (104 were the
     # Active page); derive-mirrors writes each from its docs/repos/ source or as an index of its folder.
     "check-repo-readmes",
+    # 3 November (the r13 system review D-06 with D-01..D-05, D-07, D-08, D-04 and D-10; the lead: "Retire the code
+    # trees"; CHG-R14J-002, CHG-R14J-003): repos/ holds each repository's project documents and no code tree, its
+    # CLAUDE.md, setup/ and rules pages are copies of ADAM's starters, and the contracts repository can publish.
+    "check-repo-trees",
     # 3 November (the r13 system review B-12, CHG-R14J-020; ADR-0026 amended): every contract is served from its host's
     # one server definition in common.yaml x-ticvai-servers, from the host its data lives on, and info.version is the
     # URL version (<N>.0.0).

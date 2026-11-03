@@ -1,0 +1,45 @@
+id: CHG-R14J-003
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'The contracts repository can publish the clients SETUP-CLIENTS needs. scripts/breaking-change-check.sh
+  matches the contract:major label with [[ ]] (the single-bracket test never matched, so a labelled break could not
+  pass), checks that each broken spec''s info.version major went up, and reads every openapi/ folder but shared/.
+  scripts/generate-clients.sh writes one @ticvai/api-client package (package.json versioned from the v* tag, one
+  namespace per contract, compiled with tsc), C# for net10.0, Python with the pydantic v2 generator, and fails early
+  without Java. The publish job runs on node:20 with a Java runtime (it ran on the .NET 8 SDK image, which has none).
+  The Makefile lints and bundles every folder, devices/ included. tools/derive-mirrors.py mirrors every contracts/
+  folder into openapi/ (devices/, the ticket printer, was missing), read from contracts/ itself.'
+decision:
+  what: 'r13 system review finding D-10, under the lead''s "Retire the code trees" of 3 November 2026: the contracts
+    repository is fixed rather than retired because developers publish from it (#27640 SETUP-CLIENTS generates and
+    publishes @ticvai/api-client from ticvai-contracts at each release tag). With "All four, one release". The
+    frontend half of D-10 (the frontend workspace''s local api-client stub) went with the retired frontend tree.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding D-10 (code scaffolds): the contracts pipeline could not publish a
+  usable client and its breaking-change override could never match; ticket #27640 SETUP-CLIENTS.'
+keys_touched:
+  files:
+  - repos/ticvai-contracts/scripts/breaking-change-check.sh
+  - repos/ticvai-contracts/scripts/generate-clients.sh
+  - repos/ticvai-contracts/.gitlab-ci.yml
+  - repos/ticvai-contracts/Makefile
+  - tools/derive-mirrors.py (OPENAPI from contracts/ folders)
+  - tools/check-repo-trees.py (RT-OPENAPI, RT-PUBLISH)
+  other:
+  - 'derived on the next refresh: repos/ticvai-contracts/openapi/devices/'
+root_class: a pipeline step nobody ran, whose failure nothing could see
+tickets:
+  started: []
+  unstarted:
+  - '#27640 SETUP-CLIENTS (New): the contracts repository''s scripts now generate and publish one @ticvai/api-client
+    package; the task builds on them in the team''s ticvai-contracts repository'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-repo-trees.py::RT-OPENAPI, RT-PUBLISH (--self-test); tools/derive-mirrors.py OPENAPI
+status: open
