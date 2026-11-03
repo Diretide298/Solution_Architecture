@@ -1,0 +1,52 @@
+id: CHG-R13INT-029
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'The 20 screen findings on started tickets, as the lead approved: BO-022 and BO-023 show their tax documents
+  (tax invoices with the invoice and its PDF, Issue tax invoice; credit memos with the PDF); BO-154, BO-222 (Create
+  admission rule) and POS-026 (Issue tax invoice) get the control their approved empty states promise; ANL-053, BO-620
+  (Create, Edit programme and the programmes list), BO-624, BO-837, BO-839, BO-874 (the staff member) and BO-954 get the
+  form or element their unbound control needs; BO-140 gets an Edit checkpoint action for its Checkpoints table; ADM-258
+  drops listChannelSaleRule, which ADM-265''s fields open on; CMS-007 gets a Delete content page action with its
+  confirmation. Each element is bound to its operation, each form''s fields are its request body''s.'
+decision:
+  what: 'The lead, 3 November 2026: "approve all", on the 20 screen findings on started tickets and their
+    recommendations (each an approved screen that declares an operation and shows no element for it). Each visible
+    change is logged in docs/active/approved-ui-changes.yaml as a design change the lead approved, as CR-473 and CR-482
+    were. The page info (design batches, wireframes) is generated from screens/ and follows at the refresh.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: check-screen-wiring S-OP-UNREACHED, 20 known findings built on by started tickets (#32306, #27857,
+  #30964, #37068, #37118, #28742, #33107, #33473, #33474, #27845, #30923, #30783, #27949, #31236, #35641, #35673,
+  #27846, #30927, #29763, #35239), the r13 gate of 3 November 2026 (run 20261103-072028-50491).'
+keys_touched:
+  screens: [BO-022, BO-023, POS-026, BO-140, BO-154, BO-222, ANL-053, BO-620, BO-624, BO-837, BO-839, BO-874, BO-954,
+    ADM-258, ADM-265, CMS-007]
+  operations: [listTaxInvoices, getTaxInvoice, getTaxDocumentRendition, issueTaxInvoice, listCreditMemos,
+    setTemperatureCheckpoint, createAdmissionRules, createDashboard, createAccreditationProgramme,
+    listAccreditationProgrammes, updateAccreditationProgramme, createContentPage, createContentBlock, getPrincipal,
+    createSeatMap, listChannelSaleRule, deleteContentPage]
+  files:
+  - screens/P04-point-of-sale.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/P13-white-label-cms.yaml
+  - screens/P16-venue-analytics.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: an approved screen that declares an operation and shows no element for it
+tickets:
+  started:
+  - '32306, 27857, 30964, 37068, 37118, 28742, 33107, 33473, 33474, 27845, 30923, 30783, 27949, 31236, 35641, 35673,
+    27846, 30927, 29763, 35239 (Ready for QA): not rewritten; the follow-up comment for each is listed for the lead.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: '**Design change** (the lead, "approve all", 3 November 2026): the elements above are added to approved screens;
+  approved-ui-changes.yaml lists each changed field with its hash. The forms are generated from the operations'' request
+  bodies (required, then optional fields). ADM-258''s gap note counts its 1 operation (tools/applied/r13-review-stale-screen-text.py).'

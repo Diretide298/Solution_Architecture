@@ -4,15 +4,15 @@ source: audit
 kind: contract
 summary: 'listFiscalPeriods ordered on `occurredAt`, which a period does not have: now newest first by `startDate`, then
   `id`. listAccountMappings was "Sorted by `creditAccountId` descending (a UUIDv7, so newest first)", the mapped account,
-  not the mapping: now by `eventType`, then `venueId` with the region''s row first. The order generators
-  (contract_shapes.order_sentence, fix-order-and-refusals) name `id` only where the item has one and never call another
-  field "newest first"; an item with no name key, createdAt or id gets no default (a ruling). check-list-order LO-FIELD
-  holds it.'
+  not the mapping: now by `eventType`, then `venueId` with the region''s row first. The order generators (contract_shapes.order_sentence,
+  fix-order-and-refusals) name `id` only where the item has one and never call another field "newest first"; an item with
+  no name key, createdAt or id gets no default (a ruling). check-list-order LO-FIELD holds it.'
 decision:
   what: 'The lead, 3 November 2026, on the r13 review of all 1,582 Block A tickets: "why are these coming back again and
-    again?", "get going on those as well so we close it", "you get the rest sorted". Review finding class
-    order-key-not-a-field (findings batch 2): generated Order sentences name a key the list item does not have, or call
-    a foreign key newest first. The two named lists ordered on their items'' own fields, as the review recommended.'
+    again?", "get going on those as well so we close it", "you get the rest sorted". Review finding class order-key-not-a-field
+    (findings batch 2): generated Order sentences name a key the list item does not have, or call a foreign key newest first.
+    The two named lists ordered on their items'' own fields, as the review recommended. The lead, 3 November 2026, accepting
+    the LO-FIELD ceiling of 60 that can only fall: "approve all".'
   by: Chinmay
   date: '2026-11-03'
 why: 'r13 Block A ticket review, finding class order-key-not-a-field (batch 2: #28412 VM-LEDGER-FISCAL-1 listFiscalPeriods,
@@ -43,9 +43,8 @@ prevention:
   type: check
   ref: tools/check-list-order.py::LO-FIELD
 status: open
-notes: 'The sweep found 60 more lists ordered on a field their items do not have (most of them projection views told
-  "`id` breaks every tie" with no `id`, and lists ordered on rank, priority, displayOrder, sequence, at, sentAt or
-  occurredAt their items lack). Which field orders each is the lead''s ruling, so they are a ceiling in check-list-order
-  (LO_FIELD_CEILING 60, only falls; `--all` lists them) and a new one fails. listAccountMappings'' items carry no id, so
-  two mappings for one event type and venue have no stated tiebreak: whether AccountMapping gains its id is the
-  lead''s.'
+notes: 'The sweep found 60 more lists ordered on a field their items do not have (most of them projection views told "`id`
+  breaks every tie" with no `id`, and lists ordered on rank, priority, displayOrder, sequence, at, sentAt or occurredAt
+  their items lack). Which field orders each is the lead''s ruling, so they are a ceiling in check-list-order (LO_FIELD_CEILING
+  60, only falls; `--all` lists them) and a new one fails. listAccountMappings'' items carry no id, so two mappings for
+  one event type and venue have no stated tiebreak: whether AccountMapping gains its id is the lead''s.'

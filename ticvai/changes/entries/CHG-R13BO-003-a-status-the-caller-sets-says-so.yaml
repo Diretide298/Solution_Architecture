@@ -2,26 +2,44 @@ id: CHG-R13BO-003
 date: '2026-11-03'
 source: audit
 kind: contract
-summary: 'The 19 writes CHG-SHP-005 kept with a caller-set status now say it on the field (x-ticvai-caller-sets: <why>), and
-  check-contract-shapes C-REQUEST-SERVER-FIELDS reads it, printing them as a note; until now the decision was only in a change
-  entry, so the rule reported them again whenever a ticket started (4 at r13).'
+summary: 'The 19 writes CHG-SHP-005 kept with a caller-set status now say it on the field (x-ticvai-caller-sets: <why>),
+  and check-contract-shapes C-REQUEST-SERVER-FIELDS reads it, printing them as a note; until now the decision was only in
+  a change entry, so the rule reported them again whenever a ticket started (4 at r13).'
 decision:
   what: 'CHG-SHP-005 (the lead, 14 October 2026: "go with your recommendation"): status is kept writable on setChannelListing,
     setChannelProvider, setConfigurationTemplate, setContactAutomation, setCurrencyRoundingRule, setDataProcessingPurpose,
     setFeeDefinition, setJourneyProfile, setPackagePricingDefinition, setPriceCalculationPolicy, setPrivacyNoticePolicyGovernance,
     setPrivacyRequestTypes, setQualityEvaluation, setSenderIdentityDomain, setTenantDomainMapping, setTrackingTechnology,
     setWaiverAssociation, setWaiverException and setWaiverTriggerRule. Recorded where the check reads, under the lead''s
-    instruction of 3 November 2026 ("why are these coming back again and again?", "you get the rest sorted").'
+    instruction of 3 November 2026 ("why are these coming back again and again?", "you get the rest sorted"). The lead,
+    3 November 2026, confirming the x-ticvai-caller-sets marks on the 19 statuses as CHG-SHP-005 at its source: "approve
+    all".'
   by: Chinmay
   date: '2026-11-03'
 why: 'Finding: r13 release gate (run 20261103-023619-14406), check-contract-shapes C-REQUEST-SERVER-FIELDS (R079), 4 known
   findings built on by started tickets #29701, #35157, #35158, #35159, #31161; the 19 are exactly CHG-SHP-005''s kept list
   (setConfigurationProfile left it in CHG-R11FXC-001).'
 keys_touched:
-  operations: [setChannelListing, setChannelProvider, setConfigurationTemplate, setContactAutomation, setCurrencyRoundingRule,
-    setDataProcessingPurpose, setFeeDefinition, setJourneyProfile, setPackagePricingDefinition, setPriceCalculationPolicy,
-    setPrivacyNoticePolicyGovernance, setPrivacyRequestTypes, setQualityEvaluation, setSenderIdentityDomain,
-    setTenantDomainMapping, setTrackingTechnology, setWaiverAssociation, setWaiverException, setWaiverTriggerRule]
+  operations:
+  - setChannelListing
+  - setChannelProvider
+  - setConfigurationTemplate
+  - setContactAutomation
+  - setCurrencyRoundingRule
+  - setDataProcessingPurpose
+  - setFeeDefinition
+  - setJourneyProfile
+  - setPackagePricingDefinition
+  - setPriceCalculationPolicy
+  - setPrivacyNoticePolicyGovernance
+  - setPrivacyRequestTypes
+  - setQualityEvaluation
+  - setSenderIdentityDomain
+  - setTenantDomainMapping
+  - setTrackingTechnology
+  - setWaiverAssociation
+  - setWaiverException
+  - setWaiverTriggerRule
   files:
   - tools/check-contract-shapes.py
   - contracts/spine/catalogue.yaml

@@ -116,9 +116,9 @@ screens:
         a link or an edge that holds one opens it instead.'
     coldEntry: '**The only screen in venue-pos that needs nothing.** That is what makes it the door, and
       why it has no screen permission: the supervisor panel and Take the till over carry SESSION_FORCE_LOGOUT
-      on the component, held by the supervisor whose PIN step-up opens them (r13, CHG-RCR29-001).
-      `workstationId` travels in the login request and comes from the terminal itself, not from a session
-      -- the contract says it identifies the device and is *NOT a permission source*.'
+      on the component, held by the supervisor whose PIN step-up opens them (r13, CHG-RCR29-001). `workstationId`
+      travels in the login request and comes from the terminal itself, not from a session -- the contract
+      says it identifies the device and is *NOT a permission source*.'
   states:
     loading: Checking the credential. The keypad stays visible and disabled.
     emptyFirstRun: '**A till nobody has signed into yet.** No recent operators, so the quick-login row
@@ -720,8 +720,8 @@ screens:
     trigger: Select role
     body: '**Collects what `selectRole` sends before it is called.** Sends the chosen role''s `roleId`
       and its grant''s `grantId`: a role held at several venues is one grant per venue, and `roleId` alone
-      is refused 422 `grant-required` (IDENTITY-C45, CHG-R8SPN-032; r13, CHG-RCR31-001). Dismissing
-      sends nothing; the screen behind is unchanged.'
+      is refused 422 `grant-required` (IDENTITY-C45, CHG-R8SPN-032; r13, CHG-RCR31-001). Dismissing sends
+      nothing; the screen behind is unchanged.'
     confirm:
       label: Select role
       operation: selectRole
@@ -9351,6 +9351,11 @@ screens:
         operation: listTaxInvoices
         notes: Query orderId; opening one shows it (getTaxInvoice) and offers the PDF.
         provenance: contract finance.yaml FinTaxInvoice (defined 4 October 2026, CHG-FXS-003)
+      - kind: secondaryButton
+        label: Issue tax invoice
+        operation: issueTaxInvoice
+        provenance: contract finance.yaml POST /tax-invoices; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
   states:
     loading: The saved receipt.
     error: Could not load. Names which read failed and leaves the receipt untouched.
@@ -9471,6 +9476,27 @@ screens:
       - validFrom
       - note
     provenance: contract orders.yaml POST /entitlements/{entitlementId}/reissue (4 October 2026, CHG-FXS-003)
+  - id: formIssueTaxInvoice
+    component: modal
+    trigger: Issue tax invoice
+    body: '**Collects what `issueTaxInvoice` sends before it is called.** Required: `invoiceType`, `orderIds`.
+      Optional: `recipient`, `languages`, `supersedesInvoiceId`, `deliverToEmail`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: FinIssueTaxInvoiceRequest
+    confirm:
+      label: Issue tax invoice
+      operation: issueTaxInvoice
+    dismiss:
+      label: Cancel
+      discards:
+      - invoiceType
+      - orderIds
+      - recipient
+      - languages
+      - supersedesInvoiceId
+      - deliverToEmail
+    provenance: contract finance.yaml POST /tax-invoices; design change approved by the lead ("approve
+      all", 3 November 2026; CHG-R13INT-029)
 - id: POS-027
   name: Guest Lookup
   module: Sell

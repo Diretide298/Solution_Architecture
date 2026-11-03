@@ -5773,10 +5773,10 @@ screens:
   purpose: Allow users to visually select which information appears in the report.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
-      Reorder columns, Rename display labels, Set width, Configure formatting. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Reorder
+      columns, Rename display labels, Set width, Configure formatting. Each needs an operation, or needs
+      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
+      the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30 §Users can
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -5973,9 +5973,9 @@ screens:
   purpose: Turn detailed transactional data into meaningful management reporting.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
-      Period-over-Period Change. Each needs an operation, or needs removing from the screen; this is the
-      Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Period-over-Period
+      Change. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 32 §Support
   - operation: null
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
@@ -6183,9 +6183,9 @@ screens:
   purpose: Control how the final report is displayed.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved:
-      TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this is
-      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: TICVAI
+      branding, Report logo. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Support
   layout:
     template: form
@@ -6981,8 +6981,8 @@ screens:
   purpose: Configure how generated reporting content reaches approved recipients or destinations.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
-      TICVAI Notification Center, Secure Download, API, External approved destination. Each needs an operation,
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: TICVAI
+      Notification Center, Secure Download, API, External approved destination. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Support configurable
@@ -7566,10 +7566,10 @@ screens:
   purpose: Monitor scheduled report execution and distribution and provide operational management of failures.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved:
-      Retry, Cancel, View Error, Change Destination, Notify Owner, Escalate. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Retry,
+      Cancel, View Error, Change Destination, Notify Owner, Escalate. Each needs an operation, or needs
+      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
+      the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Actions
   layout:
     template: split
@@ -8254,6 +8254,9 @@ screens:
         impliedBy: createDashboard
         label: Create dashboard
         notes: The act the screen exists for.
+        operation: createDashboard
+        provenance: contract reporting.yaml POST /dashboards; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -8283,6 +8286,28 @@ screens:
     page 111. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formCreateDashboard
+    component: modal
+    trigger: Create dashboard
+    body: '**Collects what `createDashboard` sends before it is called.** Required: `name`, `module`,
+      `tiles`. Optional: `description`, `venueId`, `isShared`. Dismissing sends nothing; the screen behind
+      is unchanged.'
+    bindsTo: CreateDashboardRequest
+    confirm:
+      label: Create dashboard
+      operation: createDashboard
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - module
+      - tiles
+      - description
+      - venueId
+      - isShared
+    provenance: contract reporting.yaml POST /dashboards; design change approved by the lead ("approve
+      all", 3 November 2026; CHG-R13INT-029)
 - id: ANL-054
   name: AI Report Generator
   module: Analytics

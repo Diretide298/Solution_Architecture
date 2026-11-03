@@ -9468,7 +9468,6 @@ paths:
     get:
       operationId: listChannelSaleRule
       x-ticvai-consumed-by:
-        - "P08 ADM-258 Sales Channel Command Center"
         - "P08 ADM-265 Channel Sales Rules, Limits & Restrictions"
       x-ticvai-audience:
         - staff

@@ -846,3 +846,123 @@ changes:
     by Chinmay on #31739; each entry approved its own change against the earlier content, and this is the content
     with both. What the client sees is the client-verified frame (wireframes/frames/web-005.html).'
   change: CHG-R13INT-024
+- screen: ANL-053
+  field: 'overlay:formCreateDashboard'
+  to: 0dbe87e077bdd148
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Create dashboard button needs (createDashboard).'
+  change: CHG-R13INT-029
+- screen: BO-022
+  field: 'overlay:formIssueTaxInvoice'
+  to: 769e4a270d5a4c1f
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the tax invoices of the order: their list, opening one, its PDF, and Issue tax invoice with its form.'
+  change: CHG-R13INT-029
+- screen: BO-022
+  field: 'region:collection'
+  to: 3e8dfb057e672dde
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the tax invoices of the order: their list, opening one, its PDF, and Issue tax invoice with its form.'
+  change: CHG-R13INT-029
+- screen: BO-022
+  field: 'region:rowActions'
+  to: e36f9b6ecfa440e4
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the tax invoices of the order: their list, opening one, its PDF, and Issue tax invoice with its form.'
+  change: CHG-R13INT-029
+- screen: BO-023
+  field: 'region:collection'
+  to: b2c6e974c8f3a164
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the credit memos of the refunds and their PDF.'
+  change: CHG-R13INT-029
+- screen: BO-140
+  field: 'overlay:formSetTemperatureCheckpoint'
+  to: ed35d1bd3961b2fb
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): an Edit action for the Checkpoints table (setTemperatureCheckpoint) with its form.'
+  change: CHG-R13INT-029
+- screen: BO-140
+  field: 'region:rowActions'
+  to: 991e595efead6346
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): an Edit action for the Checkpoints table (setTemperatureCheckpoint) with its form.'
+  change: CHG-R13INT-029
+- screen: BO-154
+  field: 'layout'
+  to: 63f4d57ef268fc76
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-154
+  field: 'overlay:formCreateAdmissionRules'
+  to: 0949c935659e9f15
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-154
+  field: 'region:rowActions'
+  to: 923ca631364ccc25
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-222
+  field: 'overlay:formCreateAdmissionRules'
+  to: 0949c935659e9f15
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-222
+  field: 'region:rowActions'
+  to: e53a980a7c97a846
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Create admission rule with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: BO-620
+  field: 'overlay:formCreateAccreditationProgramme'
+  to: d9409f50f4150e50
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the forms Create and Edit programme need, and the programmes list.'
+  change: CHG-R13INT-029
+- screen: BO-620
+  field: 'overlay:formUpdateAccreditationProgramme'
+  to: e626ffb3c7cc68e7
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the forms Create and Edit programme need, and the programmes list.'
+  change: CHG-R13INT-029
+- screen: BO-620
+  field: 'region:-'
+  to: 86e0d1b5b66bca9c
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the forms Create and Edit programme need, and the programmes list.'
+  change: CHG-R13INT-029
+- screen: BO-624
+  field: 'overlay:formUpdateAccreditationProgramme'
+  to: 58d2ae5cf5c15042
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Save button needs (updateAccreditationProgramme).'
+  change: CHG-R13INT-029
+- screen: BO-837
+  field: 'overlay:formCreateContentPage'
+  to: c994f789955f4890
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Create content page button needs.'
+  change: CHG-R13INT-029
+- screen: BO-839
+  field: 'overlay:formCreateContentBlock'
+  to: 68629700703f711b
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Create content block button needs.'
+  change: CHG-R13INT-029
+- screen: BO-874
+  field: 'region:fields'
+  to: 756b995c974fd279
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the staff member the fields belong to (getPrincipal).'
+  change: CHG-R13INT-029
+- screen: BO-954
+  field: 'overlay:formCreateSeatMap'
+  to: 0308f11ab87a1111
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): the form the Create seat map button needs.'
+  change: CHG-R13INT-029
+- screen: CMS-007
+  field: 'overlay:confirmDeleteContentPage'
+  to: 778eb56ba077d2cc
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): a Delete content page action with its confirmation.'
+  change: CHG-R13INT-029
+- screen: CMS-007
+  field: 'region:rowActions'
+  to: ee2d64b1ad72dc51
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): a Delete content page action with its confirmation.'
+  change: CHG-R13INT-029
+- screen: POS-026
+  field: 'overlay:formIssueTaxInvoice'
+  to: 769e4a270d5a4c1f
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Issue tax invoice with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029
+- screen: POS-026
+  field: 'region:detail'
+  to: 5c200503a5dfb84f
+  approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Issue tax invoice with its form, which the approved empty state promises.'
+  change: CHG-R13INT-029

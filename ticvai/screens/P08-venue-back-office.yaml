@@ -7438,6 +7438,22 @@ screens:
           **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
           reads *always requires confirmation*.'
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Tax invoices
+        bindsTo: FinTaxInvoice
+        columns:
+        - FinTaxInvoice.id
+        - FinTaxInvoice.invoiceNumber
+        - FinTaxInvoice.invoiceType
+        - FinTaxInvoice.status
+        - FinTaxInvoice.legalEntityId
+        - FinTaxInvoice.templateId
+        operation: listTaxInvoices
+        provenance: contract finance.yaml GET /tax-invoices; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
+        reads:
+        - getTaxInvoice
+        - getTaxDocumentRendition
     - name: contextPanel
       slot: selection
       components:
@@ -7528,6 +7544,11 @@ screens:
         label: Void order
         operation: voidOrder
         provenance: contract orders.yaml POST /orders/{orderId}/voids
+      - kind: secondaryButton
+        label: Issue tax invoice
+        operation: issueTaxInvoice
+        provenance: contract finance.yaml POST /tax-invoices; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
   overlays:
   - id: confirmVoidOrder
     component: confirmDialog
@@ -7694,6 +7715,27 @@ screens:
       - waiveFee
       - reason
     provenance: contract orders.yaml POST /orders/{orderId}/reschedule
+  - id: formIssueTaxInvoice
+    component: modal
+    trigger: Issue tax invoice
+    body: '**Collects what `issueTaxInvoice` sends before it is called.** Required: `invoiceType`, `orderIds`.
+      Optional: `recipient`, `languages`, `supersedesInvoiceId`, `deliverToEmail`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: FinIssueTaxInvoiceRequest
+    confirm:
+      label: Issue tax invoice
+      operation: issueTaxInvoice
+    dismiss:
+      label: Cancel
+      discards:
+      - invoiceType
+      - orderIds
+      - recipient
+      - languages
+      - supersedesInvoiceId
+      - deliverToEmail
+    provenance: contract finance.yaml POST /tax-invoices; design change approved by the lead ("approve
+      all", 3 November 2026; CHG-R13INT-029)
   states:
     loading: The order list.
     error: Could not load. Names which read failed and leaves the order untouched.
@@ -7942,6 +7984,21 @@ screens:
           can confirm the guests were told before they travel (F09 step 5). Shown when the refunds are
           for a cancelled performance.'
         provenance: contract marketing-crm.yaml GET /message-dispatches (12 October 2026, CHG-R6-038)
+      - kind: dataTable
+        label: Credit memos
+        bindsTo: FinCreditMemo
+        columns:
+        - FinCreditMemo.id
+        - FinCreditMemo.creditMemoNumber
+        - FinCreditMemo.taxInvoiceId
+        - FinCreditMemo.taxInvoiceNumber
+        - FinCreditMemo.kind
+        - FinCreditMemo.reason
+        operation: listCreditMemos
+        provenance: contract finance.yaml GET /credit-memos; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
+        reads:
+        - getTaxDocumentRendition
     - name: contextPanel
       slot: selection
       components:
@@ -34482,8 +34539,8 @@ screens:
       the published version of the profile to deploy, picked from the profile''s versions that `getConfigurationProfile`
       answers (a draft cannot be deployed: 409 `profile-version-draft`). Optional: `targetWorkstationIds`,
       `targetFilter`, `strategy`. The body is `DeployConfigurationProfileRequest` (CHG-R8SPN-017); the
-      answer is the ProfileDeployment the server records, whose identity, status, counts
-      and times the server sets. Dismissing sends nothing; the screen behind is unchanged (r13, CHG-RCR33-001).'
+      answer is the ProfileDeployment the server records, whose identity, status, counts and times the
+      server sets. Dismissing sends nothing; the screen behind is unchanged (r13, CHG-RCR33-001).'
     bindsTo: DeployConfigurationProfileRequest
     reads:
     - getConfigurationProfile
@@ -36430,6 +36487,11 @@ screens:
           2026 by Chinmay, DEC-194; CHG-CSA-017).** A temperature breach suggests "86 affected items"
           and does not 86 on its own (DEC-193).'
         provenance: contract fnb.yaml PUT /menu-items/{itemId}/daily-count
+      - kind: secondaryButton
+        label: Edit checkpoint
+        operation: setTemperatureCheckpoint
+        provenance: contract fnb.yaml PUT /food-safety/checkpoints/{checkpointId}; design change approved
+          by the lead ("approve all", 3 November 2026; CHG-R13INT-029)
   states:
     loading: The product availability operational list.
     error: Could not load. Names which read failed and leaves the product availability operational untouched.
@@ -36546,6 +36608,30 @@ screens:
       discards:
       - count
     provenance: contract fnb.yaml PUT /menu-items/{itemId}/daily-count
+  - id: formSetTemperatureCheckpoint
+    component: modal
+    trigger: Edit checkpoint
+    body: '**Collects what `setTemperatureCheckpoint` sends before it is called.** Required: `kind`, `label`,
+      `isActive`. Optional: `outletId`, `minCelsius`, `maxCelsius`, `checkFrequencyMinutes`, `requiresCorrectiveActionOnBreach`,
+      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: TemperatureCheckpoint
+    confirm:
+      label: Edit checkpoint
+      operation: setTemperatureCheckpoint
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - label
+      - isActive
+      - outletId
+      - minCelsius
+      - maxCelsius
+      - checkFrequencyMinutes
+      - requiresCorrectiveActionOnBreach
+      - scopePath
+    provenance: contract fnb.yaml PUT /food-safety/checkpoints/{checkpointId}; design change approved
+      by the lead ("approve all", 3 November 2026; CHG-R13INT-029)
   gaps:
   - operation: listExpiringBatches
     removed: true
@@ -38565,6 +38651,14 @@ screens:
         - Rule Applies To Location Validity Status
         notes: null
         provenance: pack Access Control Module_Reference.pdf, page 17 §Each rule displays
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Create admission rule
+        operation: createAdmissionRules
+        provenance: contract access.yaml POST /admission-rules; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
   states:
     loading: The access rule list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the access rule untouched.
@@ -38601,6 +38695,44 @@ screens:
     bound to a contract property; 13 of 27 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formCreateAdmissionRules
+    component: modal
+    trigger: Create admission rule
+    body: '**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`,
+      `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`,
+      `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`,
+      `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`, `scopePath`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AdmissionRules
+    confirm:
+      label: Create admission rule
+      operation: createAdmissionRules
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - openMinutesBefore
+      - closeMinutesAfter
+      - perProductRules
+      - maxDurationMinutes
+      - requiresExitBeforeReentry
+      - maxReentries
+      - entryLimit
+      - exitScan
+      - maxExits
+      - reEntryWindowMinutes
+      - sameDayOnly
+      - designatedAccessPointIds
+      - validity
+      - crossover
+      - allowedAccessPointIds
+      - reEntryVerification
+      - ruleConditions
+      - scopePath
+    provenance: contract access.yaml POST /admission-rules; design change approved by the lead ("approve
+      all", 3 November 2026; CHG-R13INT-029)
 - id: BO-155
   name: Visual Access Rule Builder
   module: Access & Venue
@@ -47235,6 +47367,11 @@ screens:
           day, special event and so on), whether tickets must be validated, and for a free-view or special-event
           window its admission type.'
         provenance: contract access.yaml PUT /operating-calendar-entries
+      - kind: secondaryButton
+        label: Create admission rule
+        operation: createAdmissionRules
+        provenance: contract access.yaml POST /admission-rules; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
   states:
     loading: The special event free configuration as saved.
     error: Could not load. Names which read failed and leaves the special event free untouched.
@@ -47295,6 +47432,43 @@ screens:
       - attractionValidation
       - manualAttendanceRequired
     provenance: contract access.yaml PUT /operating-calendar-entries
+  - id: formCreateAdmissionRules
+    component: modal
+    trigger: Create admission rule
+    body: '**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`,
+      `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`,
+      `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`,
+      `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`, `scopePath`.
+      Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AdmissionRules
+    confirm:
+      label: Create admission rule
+      operation: createAdmissionRules
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - openMinutesBefore
+      - closeMinutesAfter
+      - perProductRules
+      - maxDurationMinutes
+      - requiresExitBeforeReentry
+      - maxReentries
+      - entryLimit
+      - exitScan
+      - maxExits
+      - reEntryWindowMinutes
+      - sameDayOnly
+      - designatedAccessPointIds
+      - validity
+      - crossover
+      - allowedAccessPointIds
+      - reEntryVerification
+      - ruleConditions
+      - scopePath
+    provenance: contract access.yaml POST /admission-rules; design change approved by the lead ("approve
+      all", 3 November 2026; CHG-R13INT-029)
   gaps:
   - operation: setContextTimeEvent
     removed: true
@@ -56103,7 +56277,8 @@ screens:
     provenance: build, 29 September 2026; reached by Create entitlement template, r11 gate fix (CHG-R11FXS-002)
   - operationId: listMembershipAnnualPass
     contract: subscription
-    purpose: The memberships and their entitlement and admission settings as saved, which the builder opens on
+    purpose: The memberships and their entitlement and admission settings as saved, which the builder
+      opens on
     trigger: onLoad
     provenance: 'r13 integration, 2 November 2026 (CHG-R13INT-014): reads what the screen edits'
   - operationId: listMembershipBenefits
@@ -94743,11 +94918,32 @@ screens:
         impliedBy: createAccreditationProgramme
         label: Create
         notes: The act the screen exists for.
+        operation: createAccreditationProgramme
+        provenance: contract accreditation.yaml POST /accreditation-programmes; design change approved
+          by the lead ("approve all", 3 November 2026; CHG-R13INT-029)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createAccreditationProgramme
+      - kind: dataTable
+        label: Every accreditation programme
+        bindsTo: AccreditationProgramme
+        columns:
+        - AccreditationProgramme.id
+        - AccreditationProgramme.code
+        - AccreditationProgramme.name
+        - AccreditationProgramme.venueIds
+        - AccreditationProgramme.eventIds
+        - AccreditationProgramme.categories
+        operation: listAccreditationProgrammes
+        provenance: contract accreditation.yaml GET /accreditation-programmes; design change approved
+          by the lead ("approve all", 3 November 2026; CHG-R13INT-029)
+      - kind: secondaryButton
+        label: Edit programme
+        operation: updateAccreditationProgramme
+        provenance: contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; design change
+          approved by the lead ("approve all", 3 November 2026; CHG-R13INT-029)
   states:
     loading: The accreditation program list.
     error: Could not load. Names which read failed and leaves the accreditation program untouched.
@@ -94791,6 +94987,71 @@ screens:
     params:
     - name: programmeId
       from: navigation
+  overlays:
+  - id: formCreateAccreditationProgramme
+    component: modal
+    trigger: Create
+    body: '**Collects what `createAccreditationProgramme` sends before it is called.** Required: `code`,
+      `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`,
+      `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`,
+      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccreditationProgramme
+    confirm:
+      label: Create
+      operation: createAccreditationProgramme
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - id
+      - venueIds
+      - eventIds
+      - categories
+      - applicantTypes
+      - applicationsOpenAt
+      - applicationsCloseAt
+      - approvalWorkflowId
+      - formId
+      - isTemplate
+      - status
+      - faceMatching
+      - identityVerification
+      - scopePath
+    provenance: contract accreditation.yaml POST /accreditation-programmes; design change approved by
+      the lead ("approve all", 3 November 2026; CHG-R13INT-029)
+  - id: formUpdateAccreditationProgramme
+    component: modal
+    trigger: Edit programme
+    body: '**Collects what `updateAccreditationProgramme` sends before it is called.** Required: `code`,
+      `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`,
+      `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`,
+      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccreditationProgramme
+    confirm:
+      label: Edit programme
+      operation: updateAccreditationProgramme
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - id
+      - venueIds
+      - eventIds
+      - categories
+      - applicantTypes
+      - applicationsOpenAt
+      - applicationsCloseAt
+      - approvalWorkflowId
+      - formId
+      - isTemplate
+      - status
+      - faceMatching
+      - identityVerification
+      - scopePath
+    provenance: contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; design change
+      approved by the lead ("approve all", 3 November 2026; CHG-R13INT-029)
 - id: BO-621
   name: Applicant Type Configuration
   module: Access & Venue
@@ -95148,6 +95409,9 @@ screens:
         impliedBy: updateAccreditationProgramme
         label: Save
         notes: The act the screen exists for.
+        operation: updateAccreditationProgramme
+        provenance: contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; design change
+          approved by the lead ("approve all", 3 November 2026; CHG-R13INT-029)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -95179,6 +95443,39 @@ screens:
     params:
     - name: programmeId
       from: navigation
+  overlays:
+  - id: formUpdateAccreditationProgramme
+    component: modal
+    trigger: Save
+    body: '**Collects what `updateAccreditationProgramme` sends before it is called.** Required: `code`,
+      `name`. Optional: `id`, `venueIds`, `eventIds`, `categories`, `applicantTypes`, `applicationsOpenAt`,
+      `applicationsCloseAt`, `approvalWorkflowId`, `formId`, `isTemplate`, `status`, `faceMatching`, `identityVerification`,
+      `scopePath`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccreditationProgramme
+    confirm:
+      label: Save
+      operation: updateAccreditationProgramme
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - id
+      - venueIds
+      - eventIds
+      - categories
+      - applicantTypes
+      - applicationsOpenAt
+      - applicationsCloseAt
+      - approvalWorkflowId
+      - formId
+      - isTemplate
+      - status
+      - faceMatching
+      - identityVerification
+      - scopePath
+    provenance: contract accreditation.yaml PUT /accreditation-programmes/{programmeId}; design change
+      approved by the lead ("approve all", 3 November 2026; CHG-R13INT-029)
 - id: BO-625
   name: Accreditation Holder Directory
   module: Access & Venue
@@ -119109,6 +119406,9 @@ screens:
         impliedBy: createContentPage
         label: Create content page
         notes: The act the screen exists for.
+        operation: createContentPage
+        provenance: contract white-label.yaml POST /tenant-config/pages; design change approved by the
+          lead ("approve all", 3 November 2026; CHG-R13INT-029)
       - kind: dataTable
         derived: true
         impliedBy: listContentPages
@@ -119148,6 +119448,29 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateContentPage
+    component: modal
+    trigger: Create content page
+    body: '**Collects what `createContentPage` sends before it is called.** Required: `slug`, `title`,
+      `body`. Optional: `isEnabled`, `iconAssetRef`, `categoryCode`, `sortOrder`. Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: ContentPage
+    confirm:
+      label: Create content page
+      operation: createContentPage
+    dismiss:
+      label: Cancel
+      discards:
+      - slug
+      - title
+      - body
+      - isEnabled
+      - iconAssetRef
+      - categoryCode
+      - sortOrder
+    provenance: contract white-label.yaml POST /tenant-config/pages; design change approved by the lead
+      ("approve all", 3 November 2026; CHG-R13INT-029)
 - id: BO-838
   name: Content, Media & Forms
   module: Engagement & Support
@@ -119301,6 +119624,9 @@ screens:
         impliedBy: createContentBlock
         label: Create content block
         notes: The act the screen exists for.
+        operation: createContentBlock
+        provenance: contract white-label.yaml POST /content-blocks; design change approved by the lead
+          ("approve all", 3 November 2026; CHG-R13INT-029)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -119329,6 +119655,30 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateContentBlock
+    component: modal
+    trigger: Create content block
+    body: '**Collects what `createContentBlock` sends before it is called.** Required: `kind`. Optional:
+      `pageId`, `position`, `body`, `localeVariants`, `publishAt`, `expireAt`, `audienceSegmentId`. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: ContentBlock
+    confirm:
+      label: Create content block
+      operation: createContentBlock
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - pageId
+      - position
+      - body
+      - localeVariants
+      - publishAt
+      - expireAt
+      - audienceSegmentId
+    provenance: contract white-label.yaml POST /content-blocks; design change approved by the lead ("approve
+      all", 3 November 2026; CHG-R13INT-029)
 - id: BO-840
   name: Mobile App CMS
   module: Engagement & Support
@@ -123652,6 +124002,19 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: detailPanel
+        label: The staff member
+        bindsTo: Principal
+        columns:
+        - Principal.id
+        - Principal.username
+        - Principal.displayName
+        - Principal.isActive
+        - Principal.validFrom
+        - Principal.validTo
+        operation: getPrincipal
+        provenance: contract identity.yaml GET /principals/{principalId}; design change approved by the
+          lead ("approve all", 3 November 2026; CHG-R13INT-029)
       - kind: selectField
         label: Resource priority
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 35 §Configure
@@ -124677,13 +125040,13 @@ screens:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-881
     workshopBoard: wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-881
-  notes: '**Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled
-    for BO-1144). The limits are `StaffingRules` properties; Standard daily hours and Standard weekly
-    hours have none, so nothing is sent for them. **No control on the layout sends `setStaffingRules`**:
-    under the lead''s rule of 28 October 2026 the developer adds a Save and logs a "Design change:" CR
-    in ADAM. What the save sends for `minimumCover`, which this screen does not show, and whether it sends
-    If-Match, wait on the lead (review question Q13); until then the save sends back the `minimumCover`
-    that `getStaffingRules` answered, unchanged, so it cannot erase the venue''s minimum staffing.'
+  notes: '**Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled for
+    BO-1144). The limits are `StaffingRules` properties; Standard daily hours and Standard weekly hours
+    have none, so nothing is sent for them. **No control on the layout sends `setStaffingRules`**: under
+    the lead''s rule of 28 October 2026 the developer adds a Save and logs a "Design change:" CR in ADAM.
+    What the save sends for `minimumCover`, which this screen does not show, and whether it sends If-Match,
+    wait on the lead (review question Q13); until then the save sends back the `minimumCover` that `getStaffingRules`
+    answered, unchanged, so it cannot erase the venue''s minimum staffing.'
   apisNote: Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 44.
     0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
@@ -133990,6 +134353,9 @@ screens:
         impliedBy: createSeatMap
         label: Create seat map
         notes: The act the screen exists for.
+        operation: createSeatMap
+        provenance: contract seating.yaml POST /seat-maps; design change approved by the lead ("approve
+          all", 3 November 2026; CHG-R13INT-029)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -134066,6 +134432,24 @@ screens:
       - removeSeatIds
       - relabel
     provenance: contract seating.yaml PATCH /seat-maps/{seatMapId}/structure (CHG-R6-035)
+  - id: formCreateSeatMap
+    component: modal
+    trigger: Create seat map
+    body: '**Collects what `createSeatMap` sends before it is called.** Required: `name`, `venueId`. Optional:
+      `description`, `templateId`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateSeatMapRequest
+    confirm:
+      label: Create seat map
+      operation: createSeatMap
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - venueId
+      - description
+      - templateId
+    provenance: contract seating.yaml POST /seat-maps; design change approved by the lead ("approve all",
+      3 November 2026; CHG-R13INT-029)
 - id: BO-955
   name: Sections & Zones
   module: Access & Venue
@@ -150062,8 +150446,8 @@ screens:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1088
     workshopBoard: wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1088
-  notes: '**Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled
-    for BO-1144). The fifteen credit kinds are the values of one property, `CreditType.category`; Balance
+  notes: '**Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled for
+    BO-1144). The fifteen credit kinds are the values of one property, `CreditType.category`; Balance
     code, Display name, Monetary, Transferable, Refundable, Expirable, Accounting classification and Consumption
     priority are `CreditType` properties. Currency applicable, Top-up allowed, Promotional, Redeemable
     channels, Applicable products, Applicable venues and Liability classification have no `CreditType`
@@ -165595,10 +165979,10 @@ screens:
     is the first page a Revenue/Pricing Administrator sees when entering the module.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: Create
-      Price List, Duplicate, Open, Compare, Validate, View Dependencies, Export, Archive. Each needs an
-      operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
-      side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved:
+      Create Price List, Duplicate, Open, Compare, Validate, View Dependencies, Export, Archive. Each
+      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
+      the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions
   layout:
     template: dashboard
@@ -166830,10 +167214,10 @@ screens:
   purpose: Accelerate commercial setup across new venues, events, seasons and markets.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Complete
-      Price List, Rate Structure Only, Selected Categories, Product Assignments, Market Structure. Each
-      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
-      the screen side rather than the contract side.'
+    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved:
+      Complete Price List, Rate Structure Only, Selected Categories, Product Assignments, Market Structure.
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
+      from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning
   layout:
     template: form
@@ -169900,10 +170284,10 @@ screens:
     all pricing changes and governance activities.
   gaps:
   - operation: null
-    why: '**The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved: Create
-      Pricing Change, Bulk Update, Import Changes, Review Impact, Approve, Schedule Publication, View
-      Rollbacks. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved:
+      Create Pricing Change, Bulk Update, Import Changes, Review Impact, Approve, Schedule Publication,
+      View Rollbacks. Each needs an operation, or needs removing from the screen; this is the Phase 3
+      reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 57 §Quick Actions
   layout:
     template: split
@@ -170120,10 +170504,10 @@ screens:
     production pricing.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: Price
-      Change, Price List Change, Eligibility Rule Change, Tax Change, Fee Change, Formula Change, Currency/Rounding
-      Change, Emergency Change. Each needs an operation, or needs removing from the screen; this is the
-      Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved:
+      Price Change, Price List Change, Eligibility Rule Change, Tax Change, Fee Change, Formula Change,
+      Currency/Rounding Change, Emergency Change. Each needs an operation, or needs removing from the
+      screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 58 §Support
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of a pricing change request (setPricingChangeRequest,
@@ -171855,8 +172239,8 @@ screens:
     revenue management.
   gaps:
   - operation: null
-    why: '**The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved: Sales
-      per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected Booking Pace, Historical
+    why: '**The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved:
+      Sales per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected Booking Pace, Historical
       Booking Curve, Remaining Inventory. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 80 §Support
@@ -172142,8 +172526,8 @@ screens:
   purpose: Allow dynamic-pricing behavior to differ according to commercial context.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: POS,
-      Call Center, API. Each needs an operation, or needs removing from the screen; this is the Phase
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved:
+      POS, Call Center, API. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 83 §Support
   - operation: null
@@ -181234,10 +181618,10 @@ screens:
     of BO-010 Promotions & Coupons since 2 October 2026).'
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved: Campaign
-      Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each needs an
-      operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
-      side rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved:
+      Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each
+      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
+      the screen side rather than the contract side.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -183755,10 +184139,10 @@ screens:
   purpose: Test complex promotion mechanics before publication.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved: Single
-      transaction, Historical transaction replay, Sample customer segment, Forecast simulation, Bulk scenario
-      testing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved:
+      Single transaction, Historical transaction replay, Sample customer segment, Forecast simulation,
+      Bulk scenario testing. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -185025,10 +185409,10 @@ screens:
     its price and allocation, and review the AI recommendations on it.'
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved: Campaign
-      Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each needs an
-      operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
-      side rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved:
+      Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each
+      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
+      the screen side rather than the contract side.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -186516,9 +186900,9 @@ screens:
     & Coupons since 2 October 2026).
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Multiple
-      condition sets. Each needs an operation, or needs removing from the screen; this is the Phase 3
-      reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+      Multiple condition sets. Each needs an operation, or needs removing from the screen; this is the
+      Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 95 §Support
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -188635,9 +189019,9 @@ screens:
   purpose: Define the financial envelope within which a campaign is permitted to operate.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 4 operations.** Unserved: Total
-      campaign budget, Venue budget. Each needs an operation, or needs removing from the screen; this
-      is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 4 operations.** Unserved:
+      Total campaign budget, Venue budget. Each needs an operation, or needs removing from the screen;
+      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support
   layout:
     template: form
@@ -189197,10 +189581,10 @@ screens:
     requires configurable multi-level approval for promotion creation, modification, activation, and deactivation.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Sequential
-      approval, Parallel approval, Conditional approval, Mandatory approval, Optional review. Each needs
-      an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
-      screen side rather than the contract side.'
+    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved:
+      Sequential approval, Parallel approval, Conditional approval, Mandatory approval, Optional review.
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
+      from the screen side rather than the contract side.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 131 §Support
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -191640,10 +192024,10 @@ screens:
   purpose: Configure when approvals are required and who must approve. (merged into BO-086 Approval Matrix).
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Single
-      Approval, Sequential Approval, Parallel Approval, Any-One Approval, Conditional Approval, Multi-Level
-      Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
+      Single Approval, Sequential Approval, Parallel Approval, Any-One Approval, Conditional Approval,
+      Multi-Level Approval. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 11 §Support
   layout:
     template: form
@@ -191765,9 +192149,9 @@ screens:
     RBAC/PBAC rather than replace it. (a section of BO-087 Approval Delegations since 2 October 2026).
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved: Event
-      operations. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved:
+      Event operations. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Support temporary
       authority for
   layout:
@@ -191945,9 +192329,9 @@ screens:
     section of BO-388 Approval SLA Policy Configuration since 2 October 2026).
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Venue
-      Calendar. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved:
+      Venue Calendar. Each needs an operation, or needs removing from the screen; this is the Phase 3
+      reconciliation seen from the screen side rather than the contract side.'
     source: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 14 §Support
   layout:
     template: form
@@ -192301,10 +192685,10 @@ screens:
     troubleshoots, analyzes, and optimizes those workflows across the entire platform.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved: Publish
-      Now, Schedule, Selected Tenant, Selected Venue, Selected Brand. Each needs an operation, or needs
-      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
-      the contract side.'
+    why: '**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved:
+      Publish Now, Schedule, Selected Tenant, Selected Venue, Selected Brand. Each needs an operation,
+      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
+      rather than the contract side.'
     source: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Support
   layout:
     template: split
@@ -194022,10 +194406,10 @@ screens:
     operational/configuration status.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved: POS,
-      Mobile POS, Flying POS, Call Center, API, Partner Portal, Third-Party Channel, Custom Channel. Each
-      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
-      the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
+      POS, Mobile POS, Flying POS, Call Center, API, Partner Portal, Third-Party Channel, Custom Channel.
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
+      from the screen side rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as
   layout:
     template: dashboard
@@ -194162,10 +194546,6 @@ screens:
   - operationId: listSaleChannel
     contract: catalogue
     purpose: Sales Channel Command Center
-    trigger: onLoad
-  - operationId: listChannelSaleRule
-    contract: catalogue
-    purpose: Channel Sales Rules, Limits & Restrictions
     trigger: onLoad
   wireframe:
     status: notStarted
@@ -195015,54 +195395,71 @@ screens:
       - kind: selectField
         label: Minimum Quantity
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Maximum Quantity
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Maximum Per Transaction
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Maximum Per Customer
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Maximum Per Day
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Maximum Per Event
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Maximum Per Product
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Reservation permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Hold permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Payment link permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Partial payment permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Split payment permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Discount permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Promo code permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Upgrade permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Exchange permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
       - kind: selectField
         label: Reschedule permitted
         provenance: pack Sales_Channel_Management_Reference.pdf, page 13 §Configure
+        operation: listChannelSaleRule
     - name: actionBar
       slot: rowActions
       components:
@@ -196255,10 +196652,10 @@ screens:
   purpose: Provide one operational workspace for resolving channel problems.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: Connection
-      Failure, Product Sync Failure, Pricing Mismatch, Inventory Mismatch, Order Failure, Payment Error,
-      Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the screen;
-      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved:
+      Connection Failure, Product Sync Failure, Pricing Mismatch, Inventory Mismatch, Order Failure, Payment
+      Error, Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the
+      screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 27 §Support
   layout:
     template: form
@@ -196797,9 +197194,9 @@ screens:
     optimizing each channel in isolation.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 3 operations.** Unserved: Revenue
-      impact, Risk. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 3 actions on this screen and the screen declares 3 operations.** Unserved:
+      Revenue impact, Risk. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 33 §Allow management to ask
   layout:
     template: split
@@ -197567,9 +197964,10 @@ screens:
   purpose: Define how eligible ticket holders create resale listings.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved: Single
-      ticket listing, Multiple ticket listing. Each needs an operation, or needs removing from the screen;
-      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved:
+      Single ticket listing, Multiple ticket listing. Each needs an operation, or needs removing from
+      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
+      side.'
     source: pack Ticket Resale Marketplace_Reference.pdf, page 9 §Support
   layout:
     template: form
@@ -197898,10 +198296,10 @@ screens:
   purpose: Configure the commercial model of the resale marketplace.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 4 operations.** Unserved: Seller
-      fee, Buyer fee, Flat transaction fee, Percentage fee, Payment processing fee, Administrative fee,
-      Venue fee, Tax on fee. Each needs an operation, or needs removing from the screen; this is the Phase
-      3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 4 operations.** Unserved:
+      Seller fee, Buyer fee, Flat transaction fee, Percentage fee, Payment processing fee, Administrative
+      fee, Venue fee, Tax on fee. Each needs an operation, or needs removing from the screen; this is
+      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Ticket Resale Marketplace_Reference.pdf, page 12 §Support
   layout:
     template: form
@@ -206621,10 +207019,9 @@ screens:
     or asynchronous customer journeys.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved:
-      Hosted checkout, External payment authorization. Each needs an operation, or needs removing from
-      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
-      side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Hosted
+      checkout, External payment authorization. Each needs an operation, or needs removing from the screen;
+      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 74 §Support
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the hosted checkout configuration
@@ -206889,10 +207286,10 @@ screens:
     TICVAI into a card vault.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved:
-      3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each
-      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
-      the screen side rather than the contract side.'
+    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: 3-D
+      Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each needs
+      an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
+      screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 77 §Support provider capabilities such as
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the payment authentication policy
@@ -207741,8 +208138,8 @@ screens:
     for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout
     has no save control. No client approval of one is pending: under the lead''s rule of 28 October 2026
     the developer adds a Save that sends `setB2bPaymentTerms` and logs a "Design change:" CR in ADAM (r13,
-    CHG-RCR34-001). `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment
-    policy panel the pack names, which this layout does not draw (a gap, not built in Block A).'
+    CHG-RCR34-001). `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment policy
+    panel the pack names, which this layout does not draw (a gap, not built in Block A).'
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Define) and no display directory
@@ -210205,10 +210602,10 @@ screens:
     and net settlement.
   gaps:
   - operation: null
-    why: '**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved:
-      Fixed transaction fee, Percentage fee, Authorization fee, Capture fee, Refund fee, Chargeback fee,
-      Cross-border fee, Wallet/APM fee …. Each needs an operation, or needs removing from the screen;
-      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved: Fixed
+      transaction fee, Percentage fee, Authorization fee, Capture fee, Refund fee, Chargeback fee, Cross-border
+      fee, Wallet/APM fee …. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 144 §Support
   layout:
     template: split
@@ -211074,10 +211471,10 @@ screens:
   purpose: Manage high-frequency and abnormal payment activity.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
-      Customer, Device, Payment instrument reference/token, Venue, POS. Each needs an operation, or needs
-      removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
-      the contract side.'
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Customer,
+      Device, Payment instrument reference/token, Venue, POS. Each needs an operation, or needs removing
+      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
+      side.'
     source: pack Payment_Payment_Orchestration.pdf, page 167 §Support
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -211177,10 +211574,10 @@ screens:
   purpose: Provide centralized management of approved payment risk lists and signals.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
-      Trusted device, Blocked instrument reference, High-risk device, Review list. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Trusted
+      device, Blocked instrument reference, High-risk device, Review list. Each needs an operation, or
+      needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather
+      than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 168 §Support controlled lists such as
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -218375,10 +218772,10 @@ screens:
     the purchase.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
-      Recommendation tracking ID, Last recommendation, First recommendation, A/B experiment. Each needs
-      an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
-      screen side rather than the contract side.'
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Recommendation
+      tracking ID, Last recommendation, First recommendation, A/B experiment. Each needs an operation,
+      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
+      rather than the contract side.'
     source: pack Upsell,CrossSellEngine.pdf, page 159 §Support, where data permits
   layout:
     template: form
@@ -226639,9 +227036,9 @@ screens:
     agreements.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved: Per
-      Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved:
+      Per Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3
+      reconciliation seen from the screen side rather than the contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support
   layout:
     template: split
