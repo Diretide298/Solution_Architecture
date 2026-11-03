@@ -42,6 +42,9 @@ RULES = {
     "D-UNDEFINED-TYPE": "a column typed with a schema-qualified type that no DDL file creates (CHG-R6-001, CR-001)",
     "D-PROVISION-TYPE": "a type a provisioned file uses before provision-tenant.sh or an earlier file creates it, in "
                         "provisioning's own order (CHG-R12DB-001)",
+    "D-PROVISION-INSERT": "an INSERT in provision-tenant.sh or initdb-provision.sh that leaves out a NOT NULL column with "
+                          "no default (as the baseline and forward migrations leave the table), or writes through "
+                          "INSERT ... SELECT, which writes nothing without saying so (A-03, D-09; CHG-R14J-001)",
     "D-RECORDED": "a function, trigger or CHECK docs/active/recorded-ddl records that no migration carries "
                   "(CHG-R12DB-002..006)",
     "D-GUEST-BRANCH": "a contract schema states a guest branch (x-ticvai-guest-read, guest-reads-own, guest-owns) and "
@@ -578,6 +581,105 @@ def self_test_provision_types() -> list:
             for name, steps, want in cases for got in [provision_type_findings(steps)] if len(got) != want]
 
 
+# ---- CHG-R14J-001 (r13 system review A-03, D-09): what provisioning writes, it writes whole ------------------------
+# provision-tenant.sh registered a tenant with INSERT ... SELECT ... LIMIT 1 over a table nothing seeded and without
+# control.cell_tenant.instance_id (NOT NULL since ADR-0042): no row, and "provisioned". This reads every INSERT in the
+# two provisioning scripts and fails on a NOT NULL column with no default that its column list leaves out, judged on
+# the table as provisioning leaves it (the numbered files, then the forward migrations in name order), and on an
+# INSERT ... SELECT, the form that writes nothing when its SELECT finds nothing.
+PROVISION_SCRIPTS = ("provision-tenant.sh", "initdb-provision.sh")
+INSERT_RX = re.compile(r"\bINSERT INTO ([a-z_]+\.[a-z_0-9]+)\s*\(([^)]*)\)\s*(VALUES|SELECT)\b", re.I)
+
+
+def required_columns(sql_files: list) -> dict:
+    """{table: {column}}: the NOT NULL columns without a default, after every file in order."""
+    import ddl_forward as df
+    req: dict = {}
+    for text in sql_files:
+        for stmt in df.split_statements(text):
+            for one in df.inner(stmt):
+                s = df.norm(one)
+                m = re.match(r"CREATE TABLE (?:IF NOT EXISTS )?([a-z_]+\.\"?[a-z_0-9]+\"?)\s*\(", s, re.I)
+                if m:
+                    t = m.group(1).replace('"', "")
+                    cols = df.parse_table(one).cols
+                    req[t] = {c for c, d in cols.items()
+                              if re.search(r"\bNOT NULL\b", d, re.I) and not re.search(r"\bDEFAULT\b", d, re.I)}
+                    continue
+                m = re.match(r"ALTER TABLE (?:ONLY )?(?:IF EXISTS )?([a-z_]+\.[a-z_0-9]+)\s+(.*)$", s, re.I | re.S)
+                if not m:
+                    continue
+                t, rest = m.group(1), m.group(2)
+                cur = req.setdefault(t, set())
+                for clause in df.top_level_split(rest):
+                    c = clause.strip()
+                    a = re.match(r"ADD COLUMN (?:IF NOT EXISTS )?\"?(\w+)\"?\s+(.*)$", c, re.I | re.S)
+                    if a:
+                        if re.search(r"\bNOT NULL\b", a.group(2), re.I) and not re.search(r"\bDEFAULT\b", a.group(2), re.I):
+                            cur.add(a.group(1))
+                        continue
+                    a = re.match(r"ALTER COLUMN \"?(\w+)\"?\s+(SET NOT NULL|DROP NOT NULL|SET DEFAULT|DROP DEFAULT)",
+                                 c, re.I)
+                    if a:
+                        col, what = a.group(1), a.group(2).upper()
+                        if what == "SET NOT NULL":
+                            cur.add(col)
+                        elif what in ("DROP NOT NULL", "SET DEFAULT"):
+                            cur.discard(col)
+                        continue
+                    a = re.match(r"DROP COLUMN (?:IF EXISTS )?\"?(\w+)\"?", c, re.I)
+                    if a:
+                        cur.discard(a.group(1))
+    return req
+
+
+def provision_insert_findings(script: str, req: dict) -> list:
+    """[(table, problem)] for each INSERT in a provisioning script."""
+    out = []
+    for m in INSERT_RX.finditer(script):
+        t = m.group(1)
+        named = {c.strip().strip('"') for c in m.group(2).split(",")}
+        if m.group(3).upper() == "SELECT":
+            out.append((t, "INSERT ... SELECT writes nothing, silently, when its SELECT finds nothing"))
+        missing = sorted(req.get(t, set()) - named)
+        if missing:
+            out.append((t, f"leaves out NOT NULL column(s) without a default: {', '.join(missing)}"))
+    return out
+
+
+def self_test_provision_inserts() -> list:
+    ddl = ["CREATE TABLE IF NOT EXISTS c.ct (\n    id uuid PRIMARY KEY NOT NULL,\n    cell_id uuid NOT NULL,\n"
+           "    note text,\n    status text NOT NULL DEFAULT 'live'\n);",
+           "ALTER TABLE c.ct ADD COLUMN IF NOT EXISTS instance_id uuid NOT NULL;",
+           "DO $$ BEGIN IF true THEN ALTER TABLE c.ct ALTER COLUMN note SET NOT NULL; END IF; END $$;"]
+    req = required_columns(ddl)
+    cases = [
+        ("every required column", "INSERT INTO c.ct (id, cell_id, instance_id, note) VALUES (1, 2, 3, 4);", 0),
+        ("a column added NOT NULL later", "INSERT INTO c.ct (id, cell_id, note) VALUES (1, 2, 4);", 1),
+        ("a column made NOT NULL in a guarded block", "INSERT INTO c.ct (id, cell_id, instance_id) VALUES (1,2,3);", 1),
+        ("INSERT ... SELECT", "INSERT INTO c.ct (id, cell_id, instance_id, note) SELECT 1, c.id, 3, 4 FROM c.cell c;", 1),
+        ("a defaulted column left out", "INSERT INTO c.ct (id, cell_id, instance_id, note) VALUES (1, 2, 3, 4);", 0),
+    ]
+    out = [f"D-PROVISION-INSERT self-test '{name}': {len(got)} finding(s), expected {want}"
+           for name, sql, want in cases for got in [provision_insert_findings(sql, req)] if len(got) != want]
+    if req.get("c.ct") != {"cell_id", "instance_id", "note"}:
+        out.append(f"D-PROVISION-INSERT self-test: required columns {sorted(req.get('c.ct') or [])}")
+    return out
+
+
+def check_provision_inserts(guard, backend: Path) -> None:
+    req = {}
+    for db in ("tenant", "control"):
+        files = [f.read_text(encoding="utf-8") for f in sorted((backend / db).glob("*.sql"), key=lambda p: p.name)]
+        req.update(required_columns(files))
+    for name in PROVISION_SCRIPTS:
+        f = backend / name
+        if not f.exists():
+            continue
+        for t, problem in provision_insert_findings(f.read_text(encoding="utf-8"), req):
+            guard.add("D-PROVISION-INSERT", f"{name}:{t}:{problem.split(':')[0]}", f"backend/{name}: INSERT INTO {t} {problem}")
+
+
 # ---- CHG-R12DB-002..006: what live has, recorded -----------------------------------------------------------------
 RECORDED_DIR = "docs/active/recorded-ddl"
 
@@ -747,16 +849,17 @@ def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-ddl-conventions", RULES)
     backend = g.ROOT / "backend"
-    fails = self_test_provision_types()
+    fails = self_test_provision_types() + self_test_provision_inserts()
     if fails:
         print("\n".join(fails))
-        print(f"FAIL - {len(fails)} self-test(s) of D-PROVISION-TYPE failed")
+        print(f"FAIL - {len(fails)} self-test(s) of D-PROVISION-TYPE / D-PROVISION-INSERT failed")
         return 1
     # CHG-R12DB-001: what provisioning applies, in its order, uses no type an earlier step has not made.
     for db, steps in provision_steps(backend).items():
         for label, typ, where in provision_type_findings(steps):
             guard.add("D-PROVISION-TYPE", f"{db}:{label}:{typ}", f"{label} uses {typ} ({where}) before any earlier "
                       "provisioning step creates it: provision-tenant.sh stops there")
+    check_provision_inserts(guard, backend)
     check_recorded(guard, backend)
     check_household_write(guard, backend)
     tables = {}          # table -> {col: line}

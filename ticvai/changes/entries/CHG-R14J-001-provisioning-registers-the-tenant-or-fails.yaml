@@ -1,0 +1,49 @@
+id: CHG-R14J-001
+date: '2026-11-03'
+source: audit
+kind: generator
+summary: 'backend/provision-tenant.sh registers every tenant database it creates, or fails before creating it. The cell
+  and the instance are inputs (TICVAI_CELL, TICVAI_INSTANCE, by name) and the tenant uuid is required; step 0 checks the
+  control database first (the control.tenant row exists, the cell is active, the instance is live in it, the tenant has
+  no live registration), so nothing is created that cannot be registered. The control.cell_tenant INSERT names
+  instance_id and every other NOT NULL column, is VALUES ... RETURNING id, and the script fails unless exactly one row
+  came back. Ids are UUIDv7 minted in the script (ADR-0056), never gen_random_uuid() in SQL, and every value reaches
+  SQL as a psql variable, never spliced into the text; a slug outside [a-z0-9_-] is refused. initdb-provision.sh (the
+  compose stacks) registers its cell (`local`), its one live instance (`local-1`) and a control.tenant row per
+  TICVAI_TENANTS entry before provisioning, since a compose stack is its own control plane, and refuses an entry
+  without a uuid.'
+decision:
+  what: 'r13 system review findings A-03 and D-09 (the generated provisioning cannot register a tenant, ignores the
+    placement decision and says it succeeded). The lead, 3 November 2026: "All four, one release" (the review fixes go
+    into r14 together). Placement stays ADR-0042 section 2 as written: the provisioning operation picks the live
+    instance with the most headroom, or the pin, and runs this script on that host; the script refuses an instance that
+    is not live in the named cell, and decides nothing ADR-0042 leaves to the caller. No table or contract changes.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, findings A-03 (architecture) and D-09 (code scaffolds): the template in
+  tools/derive-ddl.py wrote control.cell_tenant through INSERT ... SELECT FROM control.cell WHERE status = ''active''
+  LIMIT 1, without instance_id (NOT NULL since ADR-0042), over a table nothing seeds, so every deploy file that
+  provisions registered nothing and printed "provisioned"; ADR-0039, ADR-0042, ADR-0056.'
+keys_touched:
+  tables: [control.cell_tenant, control.cell, control.cell_instance, control.tenant]
+  files:
+  - tools/derive-ddl.py (PROVISION and INITDB_PROVISION templates)
+  - tools/check-ddl-conventions.py (D-PROVISION-INSERT, self-test)
+  other:
+  - 'derived on the next refresh: backend/provision-tenant.sh, backend/initdb-provision.sh'
+root_class: a generated script whose INSERT nothing compares with the table it writes
+tickets:
+  started:
+  - '#27692 [BE] Request kernel: hostname to tenant routing (Ready for QA, Pranay Shinde): a compose stack now has its
+    tenants in control.cell_tenant (cell local, instance local-1), so the routing reads real rows locally'
+  - '#30151 [DB] control.cell_tenant and #31351 [DB] control.cell_instance (Ready for QA, Hrushikant Patkar): the
+    provisioning script now writes instance_id and expects the cell and instance rows; no column changes'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-PROVISION-INSERT (self-test runs before every check)
+status: open
