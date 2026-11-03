@@ -156,8 +156,7 @@ def main() -> int:
     since = args[args.index("--since") + 1] if "--since" in args and args.index("--since") + 1 < len(args) else None
     guard = g.Guard("check-plan-closure", RULES)
     plan = g.ROOT / PLAN
-    if not plan.exists():
-        guard.note("handoff/service-docs/plan-tasks.csv missing - run tools/build-service-docs.py")
+    if not guard.require(plan, "run tools/build-service-docs.py; without it the plan's closure is not judged"):
         return guard.finish()
     with plan.open(encoding="utf-8", newline="") as fh:
         rows = list(csv.DictReader(fh))

@@ -1,5 +1,6 @@
 {
  "generated": "2026-08-18",
+ "note": "Clusters formed on 18 August over the 175 entries then raised; their `what` and `why` describe the gaps as found that day, and tools/build-cluster-index.py reads each entry's current status from contract-backlog.json. On 3 November 2026 (r14 lane i) entryCount, rowCitations, lanes and contracts were recomputed from the entries (CL-03, CL-06, CL-07, CL-12 and CL-17 had moved lanes or gained row references since), and the seven entries raised or reclassified outside that pass (BL-001, BL-124, BL-158, BL-179, BL-180, BL-181, BL-182) were added as singletons: none belongs to an existing cluster's one decision. tools/check-authored-inputs.py holds every cluster count to its entries and every entry to a cluster or `unclustered`.",
  "clusters": [
   {
    "id": "CL-01",
@@ -66,12 +67,12 @@
     "BL-017"
    ],
    "entryCount": 6,
-   "rowCitations": 81,
+   "rowCitations": 84,
    "what": "One notification and alerting mechanism, guest-facing and operational, internal and outbound.",
    "why": "**Four entries, ~80 row-citations, one absence.** The guest half (BL-052) and the operational half (BL-152) are the same missing thing seen from two sides, and BL-155's outbound webhooks are the same again pointed outside the platform. **Every condition is already computed** \u2014 `RegisteredDevice.status` reaches `error`, `ShiftCloseResult.requiresAcceptance` fires on variance, `QueueFeedHealth.isHealthy` goes false, `PromotionUsage.isBudgetExhausted` knows the money ran out. Six contracts detect their own trouble and none tells a person. Retry, priority and channel failover (BL-174) are properties of the same mechanism.",
    "lanes": [
-    "decision",
-    "deferred"
+    "deferred",
+    "settled"
    ],
    "contracts": [
     "approvals",
@@ -154,8 +155,8 @@
    "what": "A gateway abstraction with routing, a stored payment credential, and the four things that depend on the credential.",
    "why": "**Tokenisation is the keystone.** Recurring membership billing (BL-100), wallet auto-reload, one-click checkout and payment links (BL-072) all require a stored credential and none can be designed until it is decided \u2014 and it moves the PCI boundary, which is a compliance position. Terminal behaviour (BL-119), tender-by-channel (BL-115), issuer promotions (BL-113), presentment currency (BL-070) and cross-currency refund rate (BL-087) are all properties of the same layer. **The integration register has Stripe amber and NI Payment Gateway red \u2014 Network International being the dominant UAE acquirer.**",
    "lanes": [
-    "decision",
-    "deferred"
+    "deferred",
+    "settled"
    ],
    "contracts": [
     "finance",
@@ -182,12 +183,13 @@
     "BL-083"
    ],
    "entryCount": 11,
-   "rowCitations": 83,
+   "rowCitations": 89,
    "what": "Four modules the matrix asks for and `marketing-crm` does not hold \u2014 journeys, gamification, SEO and the authoring surface \u2014 plus attribution.",
    "why": "**Each is a module rather than a gap, and journeys are the one that blocks the others.** A journey is a graph of steps with branches and waits; `CampaignTrigger` fires one campaign from one event. Sixteen requirements at 22.3 depend on it, and it compounds CL-03 \u2014 a journey with no business events to branch on cannot start. **SEO is twelve requirements against nothing, with `CMS-013` a specified screen and zero operations**, and `ContentPage` has a slug with no canonical URL or redirect, so every URL change silently breaks inbound links.",
    "lanes": [
     "decision",
-    "deferred"
+    "deferred",
+    "settled"
    ],
    "contracts": [
     "marketing-crm",
@@ -304,9 +306,8 @@
    "entryCount": 6,
    "rowCitations": 65,
    "what": "Whether to replace a settled role-based model, plus four security controls that are absent regardless of the answer.",
-   "why": "**About a third of 3.3 is already met** by `Grant` with scope inheritance \u2014 real-time evaluation, caching, offline evaluation, least privilege, temporary grants, audit. The ABAC question is whether the remaining two thirds justify replacing ADR-0002 and ADR-0018. **Four things do not depend on that answer**: no password policy or lockout (BL-144), no SoD enforcement beyond one guard (BL-147), no IP or device restriction (BL-146), and **no device authentication at all (BL-161)** \u2014 a reader on a gate holding an offline package of entitlements, on an unauthenticated channel.",
+   "why": "**About a third of 3.3 is already met** by the grant record (`DelegatedAccess`, then named Grant) with scope inheritance \u2014 real-time evaluation, caching, offline evaluation, least privilege, temporary grants, audit. The ABAC question is whether the remaining two thirds justify replacing ADR-0002 and ADR-0018. **Four things do not depend on that answer**: no password policy or lockout (BL-144), no SoD enforcement beyond one guard (BL-147), no IP or device restriction (BL-146), and **no device authentication at all (BL-161)** \u2014 a reader on a gate holding an offline package of entitlements, on an unauthenticated channel.",
    "lanes": [
-    "decision",
     "deferred",
     "settled"
    ],
@@ -445,8 +446,8 @@
    "what": "The device model registers and monitors and does not deploy, retire or link to an asset.",
    "why": "**`tenancy` covers more of domain 16 than its name suggests** \u2014 twenty device kinds under ADR-0015, heartbeat reporting *paper low, drawer open, reader offline*, remote configuration through `DeviceBinding`. **Firmware records a version and nothing deploys one**, which is a site visit per device for the life of the contract. **A device is not an asset**, so a scanner sent for repair leaves the device list saying it is merely offline. And staff devices cannot register for push (BL-163), so CL-03's alerting has nowhere to deliver on the staff side.",
    "lanes": [
-    "decision",
-    "deferred"
+    "deferred",
+    "settled"
    ],
    "contracts": [
     "maintenance",
@@ -628,6 +629,13 @@
   "BL-008",
   "BL-009",
   "BL-010",
-  "BL-024"
+  "BL-024",
+  "BL-001",
+  "BL-124",
+  "BL-158",
+  "BL-179",
+  "BL-180",
+  "BL-181",
+  "BL-182"
  ]
 }

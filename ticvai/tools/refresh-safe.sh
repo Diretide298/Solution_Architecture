@@ -18,12 +18,14 @@
 #   3. run refresh.sh there -- a copy generated from it by tools/refresh-manifest.py, identical
 #      except that it cds into the worktree, leaves run-checks to step 4, and captures the verdict
 #      of refresh.sh's closing tools/ coverage block instead of exiting on it.
-#   4. run every checker in run-checks.py and judge against tools/refresh-safe-baseline.json:
-#      a gating checker may fail only with error lines the baseline already names (check-package:
-#      the two build-readiness-21-september.md errors; check-authored-inputs: the seven stale
-#      inputs); the tools/ coverage block only on the tools the baseline lists. check-bindings and
-#      the other REPORT_ONLY checkers never gate. No NEW failure = pass. Either way the run is
-#      written as handoff/checks.json (run-checks.py --json), which ADAM's Audit page reads.
+#   4. run every checker through run-checks.py, whose verdict is the gate's (r14, CHG-R14I-001): it
+#      applies tools/refresh-safe-baseline.json itself (tools/gate_allowlist.py: an entry is dated,
+#      approved, at most 14 days old and names single findings; a crash is never let through), and
+#      check-derived-fields compares every authored file the refresh wrote with the tree it started
+#      from. The tools/ coverage block may list only allowlisted tools. check-bindings and the other
+#      REPORT_ONLY checkers never gate. A pass over allowlisted failures says "PASS with N
+#      allowlisted failure(s)". Either way the run is written as handoff/checks.json, which ADAM's
+#      Audit page reads.
 #   5. on pass only: copy the worktree's changes to ticvai/ in the main tree -- added, modified
 #      and deleted files, never gitignored files, never repos/*/.git -- after checking that
 #      nothing the refresh changed was also changed in the main tree meanwhile (conflict: nothing
@@ -117,6 +119,8 @@
 {
 set -euo pipefail
 export PYTHONIOENCODING=utf-8
+# Every tool reads and writes UTF-8 whatever the platform's locale (review E-10, CHG-R14I-006).
+export PYTHONUTF8=1
 
 die() { echo "refresh-safe: $*" >&2; exit 2; }
 
@@ -420,101 +424,76 @@ def cmd_normalise(pkg, t0):
     print("  %d file(s) set to one mtime" % n)
 
 # ---------------------------------------------------------------------------------------------
-def cmd_judge(pkg, baseline_path, log_path, tail_path="", jobs="1", out_dir="", refresh_log="", plan_path=""):
-    spec = importlib.util.spec_from_file_location("run_checks", os.path.join(pkg, "tools", "run-checks.py"))
-    rc_mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(rc_mod)
-    checks, report_only = list(rc_mod.CHECKS), dict(rc_mod.REPORT_ONLY)
-    bdoc = json.load(open(baseline_path, encoding="utf-8"))
-    base = bdoc.get("checkers", {})
-    detail = [c for c in checks if c in base and c not in report_only]
-    others = [c for c in checks if c not in detail]
-    env = dict(os.environ, PYTHONIOENCODING="utf8", PYTHONUNBUFFERED="1")
+def cmd_judge(pkg, baseline_path, log_path, tail_path="", jobs="1", out_dir="", refresh_log="", plan_path="",
+              base_tree=""):
+    # **The verdict is run-checks.py's** (r14, CHG-R14I-001; review E-02, E-11). Until r13 this judge ran the
+    # baselined checkers itself, in threads beside the whole run-checks pass (check-regenerate-twice, which writes
+    # the package while it runs, included), and compared their FAIL lines with an undated allowlist that
+    # run-checks.py never read: a checker run bare failed while the release said "gate PASS", a baselined checker
+    # that crashed after printing its known lines passed, and a count line pinned a whole rule. Now every checker
+    # runs once, through run-checks.py (so SERIAL holds for all of them), which applies
+    # tools/refresh-safe-baseline.json itself through tools/gate_allowlist.py: dated, approved, 14-day entries that
+    # name single findings, a crash never let through. This judge adds what only a refresh run has: refresh.sh's
+    # tools/ coverage block, the completion marker, and the authored files the refresh wrote (check-derived-fields
+    # --base, given the tree the refresh started from through REFRESH_SAFE_BASE).
+    sys.path.insert(0, os.path.join(pkg, "tools"))
+    import gate_allowlist
+    bdoc = gate_allowlist.load(baseline_path)
+    env = dict(os.environ, PYTHONIOENCODING="utf8", PYTHONUTF8="1", PYTHONUNBUFFERED="1")
+    if base_tree:
+        env["REFRESH_SAFE_BASE"] = base_tree
     log = open(log_path, "w", encoding="utf-8")
-    lock = threading.Lock()
-    results = {}
-
-    def run_detail(c):
-        t = time.time()
-        p = subprocess.run([sys.executable, os.path.join(pkg, "tools", c + ".py")], cwd=pkg, env=env,
-                           capture_output=True, text=True, encoding="utf-8", errors="replace")
-        out = (p.stdout or "") + (p.stderr or "")
-        with lock:
-            log.write("\n===== %s rc=%d (%.0fs)\n%s" % (c, p.returncode, time.time() - t, out))
-            log.flush()
-        results[c] = (p.returncode, out, time.time() - t)
-
-    threads = [threading.Thread(target=run_detail, args=(c,)) for c in detail]
-    for th in threads:
-        th.start()
-    print("  running %d checker(s) through run-checks.py, %s at a time; %s alongside, in full, for the baseline"
-          % (len(others), jobs, ", ".join(detail)))
+    print("  running every checker through run-checks.py, %s at a time (its verdict is the gate's)" % jobs)
     sys.stdout.flush()
-    verdicts = {}
-    # The run as JSON for ADAM's Audit page: run-checks writes its half, the baseline checkers above
-    # are added to it below, and the whole is handoff/checks.json in the worktree -- merged home with
-    # the rest of the refresh on a pass, and so part of the release that is tagged from it.
+    verdicts, allowed, gate_line, allow_bad = {}, [], None, []
     run_json = os.path.join(os.path.dirname(os.path.abspath(log_path)), "checks-run.json")
     started = time.time()
     extra = ["--jobs", str(jobs), "--json", run_json] + (["--out-dir", out_dir] if out_dir else [])
-    p = subprocess.Popen([sys.executable, os.path.join(pkg, "tools", "run-checks.py"), "--no-gate", *extra, *others],
+    p = subprocess.Popen([sys.executable, os.path.join(pkg, "tools", "run-checks.py"), "--no-gate", *extra],
                          cwd=pkg, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                          text=True, encoding="utf-8", errors="replace")
     for line in p.stdout:
-        with lock:
-            log.write(line)
+        log.write(line)
         sys.stdout.write(line)
         sys.stdout.flush()
-        m = re.match(r"^\s+(\S+)\s+(ok  |FAIL|rpt |MISSING)", line)
+        m = re.match(r"^\s+(\S+)\s+(ok  |FAIL|rpt |allw|MISSING)", line)
         if m:
             verdicts[m.group(1)] = m.group(2).strip()
+        m = re.match(r"^\s+FAIL ALLOWLIST (.*\S)", line)
+        if m:
+            allow_bad.append(m.group(1))
+        m = re.match(r"^\s+GATE: (.*\S)", line)
+        if m:
+            gate_line = m.group(1)
     p.wait()
-    for th in threads:
-        th.join()
+    log.close()
 
-    new, known_hit, notes = [], set(), []
-    for c in others:
-        v = verdicts.get(c)
-        if v is None:
-            new.append("%s: no verdict from run-checks.py" % c)
-        elif v in ("FAIL", "MISSING"):
-            new.append("%s: %s (not in the baseline)" % (c, v))
-    for c in detail:
-        rc, out, secs = results[c]
-        errs = [m.group(2).strip() for m in re.finditer(r"^\s*(FAIL|STALE|ISSUE)\s+(.*\S)\s*$", out, re.M)
-                if not m.group(2).startswith("-")]
-        pats = base[c].get("known", [])
-        unknown = [e for e in errs if not any(re.search(pt, e) for pt in pats)]
-        for e in errs:
-            for pt in pats:
-                if re.search(pt, e):
-                    known_hit.add((c, pt))
-        last = [l for l in out.splitlines() if l.strip()][-1:] or [""]
-        mark = "ok  " if rc == 0 else ("base" if not unknown and errs else "FAIL")
-        print("  %-26s %s rc=%-3d %5.1fs  %s" % (c, mark, rc, secs, last[0].strip()[:96]))
-        if rc != 0 and not errs:
-            new.append("%s: rc=%d with no FAIL/STALE/ISSUE line to compare" % (c, rc))
-        for e in unknown:
-            new.append("%s: %s" % (c, e))
-        gone = [pt for pt in pats if (c, pt) not in known_hit]
-        if gone:
-            notes.append("%s: %d baseline failure(s) no longer reported -- remove them from "
-                         "tools/refresh-safe-baseline.json" % (c, len(gone)))
+    new, notes = [], []
+    if p.returncode != 0 or gate_line is None:
+        new.append("run-checks.py: rc=%d%s" % (p.returncode, "" if gate_line else ", no GATE line (it did not finish)"))
+    for c, v in sorted(verdicts.items()):
+        if v in ("FAIL", "MISSING"):
+            new.append("%s: %s" % (c, v))
+        elif v == "allw":
+            allowed.append(c)
+    for a in allow_bad:
+        new.append("allowlist: %s" % a)
     # refresh.sh's own tools/ coverage block, captured by the generated script
     if tail_path and os.path.exists(tail_path):
         txt = open(tail_path, encoding="utf-8", errors="replace").read()
         m = re.search(r"neither runs nor excuses:(.*)", txt)
         names = m.group(1).split() if m else []
-        known = set(bdoc.get("refresh_tools_coverage", {}).get("known_unexcused", []))
+        cov = bdoc.get("refresh_tools_coverage", {}).get("known_unexcused", [])
+        known = set(n.get("name") for n in cov if isinstance(n, dict)) if not allow_bad else set()
         fresh = [n for n in names if n not in known]
         gone = sorted(known - set(names))
-        print("  %-26s %s  %d tool(s) neither run nor excused, %d in the baseline"
-              % ("refresh.sh tools/ cover", "ok  " if not names else ("base" if not fresh else "FAIL"),
+        print("  %-26s %s  %d tool(s) neither run nor excused, %d in the allowlist"
+              % ("refresh.sh tools/ cover", "ok  " if not names else ("allw" if not fresh else "FAIL"),
                  len(names), len(names) - len(fresh)))
         for n in fresh:
             new.append("refresh.sh tools/ coverage: %s is neither run nor excused" % n)
         if gone:
-            notes.append("refresh.sh tools/ coverage: %d baseline name(s) now run or excused -- remove "
+            notes.append("refresh.sh tools/ coverage: %d allowlisted name(s) now run or excused -- remove "
                          "them from tools/refresh-safe-baseline.json" % len(gone))
     else:
         print("  %-26s --    not run (no refresh step ran)" % "refresh.sh tools/ cover")
@@ -531,36 +510,31 @@ def cmd_judge(pkg, baseline_path, log_path, tail_path="", jobs="1", out_dir="", 
             print("  %-26s FAIL  no '%s' line in the refresh log" % ("refresh.sh steps", marker))
             new.append("refresh: the derive phase never reported completing all %d selected steps"
                        % len(plan["selected"]))
-    rpt = [c for c in others if verdicts.get(c) == "rpt"]
+    verdict = gate_allowlist.verdict_line(len(new), len(allowed))
     try:
         doc = json.load(open(run_json, encoding="utf-8")) if os.path.exists(run_json) else {"checks": []}
-        records = list(doc.get("checks", []))
-        for c in detail:
-            rc, out, secs = results[c]
-            r = rc_mod.record(c, rc, out, secs)
-            if rc != 0 and not any(e.startswith(c + ":") for e in new):
-                # Failing, and every line of it already in the baseline: the judge let it through.
-                r["baseline"] = base[c].get("why", "a failure tools/refresh-safe-baseline.json already names")
-            records.append(r)
-        rc_mod.write_json(os.path.join(pkg, "handoff", "checks.json"), records, started, time.time(),
-                          extra={"jobs": int(jobs), "judgement": "fail" if new else "pass", "by": "refresh-safe.sh"})
-        print("  the run as JSON: handoff/checks.json (%d checker(s))" % len(records))
+        spec = importlib.util.spec_from_file_location("run_checks", os.path.join(pkg, "tools", "run-checks.py"))
+        rc_mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rc_mod)
+        rc_mod.write_json(os.path.join(pkg, "handoff", "checks.json"), list(doc.get("checks", [])), started,
+                          time.time(), extra={"jobs": int(jobs), "judgement": "fail" if new else "pass",
+                                              "gate": verdict, "allowlisted": len(allowed), "by": "refresh-safe.sh"})
+        print("  the run as JSON: handoff/checks.json (%d checker(s))" % len(doc.get("checks", [])))
     except Exception as e:                          # the verdict stands without its JSON
         print("  note: could not write handoff/checks.json: %s" % e)
     print()
-    print("  baseline: %s" % ", ".join("%s (%d known)" % (c, len(base[c].get("known", []))) for c in detail))
-    if rpt:
-        print("  report-only, non-zero (never gates): %s" % ", ".join(rpt))
     for n in notes:
         print("  note: %s" % n)
     if new:
-        print("  JUDGEMENT: FAIL -- %d new failure(s) against the baseline:" % len(new))
+        print("  JUDGEMENT: FAIL -- %d gate failure(s):" % len(new))
         for e in new[:40]:
             print("    NEW  %s" % e[:220])
         if len(new) > 40:
             print("    ... %d more in %s" % (len(new) - 40, log_path))
         return 1
-    print("  JUDGEMENT: PASS -- no failure outside tools/refresh-safe-baseline.json")
+    # **Never a bare PASS over allowlisted failures** (review E-02): the release commit message and the
+    # release notes quote this line as it is.
+    print("  JUDGEMENT: %s%s" % (verdict, (" -- " + ", ".join(allowed)) if allowed else " -- every gating checker passes"))
     return 0
 
 # ---------------------------------------------------------------------------------------------
@@ -1029,10 +1003,10 @@ if [ "$SKIP_CHECKS" = 1 ]; then
   exit 0
 fi
 T_CHECKS0=$(date +%s)
-echo "5. checks, $JOBS at a time, judged against tools/refresh-safe-baseline.json"
+echo "5. checks, $JOBS at a time, through run-checks.py (its allowlist: tools/refresh-safe-baseline.json, gate_allowlist.py)"
 set +e
-( cd "$WPKG" && helper judge "$WPKG" "$SELF_DIR/refresh-safe-baseline.json" "$RUN/checks.log" "$RUN/tail.log" \
-    "$JOBS" "$RUN/checks" "$RUN/refresh.log" "$( [ "$STEPS" != none ] && echo "$RUN/plan.json")" )
+( cd "$WPKG" && helper judge "$WPKG" "$WPKG/tools/refresh-safe-baseline.json" "$RUN/checks.log" "$RUN/tail.log" \
+    "$JOBS" "$RUN/checks" "$RUN/refresh.log" "$( [ "$STEPS" != none ] && echo "$RUN/plan.json")" "$BASE_TREE" )
 JRC=$?
 set -e
 T_CHECKS1=$(date +%s)

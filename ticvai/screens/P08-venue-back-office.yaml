@@ -24775,7 +24775,7 @@ screens:
   name: Approval Delegations
   module: People & Access Rights
   requiresModule: core
-  wave: 2
+  wave: 1
   permission: APPROVAL_VIEW
   capability: C00
   implementation:
@@ -56585,7 +56585,7 @@ screens:
   name: Membership Commercial, Pricing & Channel Association
   module: Sell
   requiresModule: membership
-  wave: 3
+  wave: 1
   permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
@@ -57045,8 +57045,9 @@ screens:
     loading: The version's checks and impact load first.
     error: Could not load. Names the read that failed; no action is offered until it loads.
     emptyFirstRun: 'Not used: the screen opens on one product version.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_MANAGE`, which `approveMembershipProductValidation`
-      requires to show this screen, and names that permission. **Never an empty table** — that reads as
+    emptyNoAccess: Shown when the caller lacks `MEMBERSHIP_VIEW`, which `getMembershipProductValidation` requires
+      to show this screen, or `MEMBERSHIP_MANAGE`, which `approveMembershipProductValidation` requires to approve
+      it, and names that permission. **Never an empty table** — that reads as
       *there is no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: approveMembershipProductValidation
@@ -63941,7 +63942,7 @@ screens:
   name: Media Design Studio Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   permission: SCOPE_VIEW
   source:
     pack: Ticket_Media___Credential_Management_Reference.pdf
@@ -134269,7 +134270,7 @@ screens:
   name: Venue Canvas
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
@@ -141908,7 +141909,7 @@ screens:
   name: Accessible Seating Master
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   permission: CAPACITY_CONFIGURE
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
@@ -143727,7 +143728,7 @@ screens:
   name: Best Seat Recommendations
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   permission: CAPACITY_CONFIGURE
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
@@ -163313,7 +163314,7 @@ screens:
   name: Integration Monitoring & Exception Workbench
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: WALLET_VIEW
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
@@ -164691,7 +164692,7 @@ screens:
   name: Transport Departure Board
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   permission: TRANSPORT_VIEW
   implementation:
     app: venue-management-web
@@ -169069,7 +169070,7 @@ screens:
   name: Fee & Surcharge Library
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
@@ -171611,7 +171612,7 @@ screens:
   name: Dynamic Pricing Strategy Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
@@ -174767,7 +174768,7 @@ screens:
   name: Revenue Optimization Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
@@ -194532,7 +194533,7 @@ screens:
   name: Channel Creation & Profile Configuration
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -194649,7 +194650,7 @@ screens:
   name: Product & Catalogue Assignment
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -194809,7 +194810,7 @@ screens:
   name: Channel Pricing & Commercial Profile Assignment
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195007,7 +195008,7 @@ screens:
   name: Channel Sales Schedule & Availability Windows
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195510,7 +195511,7 @@ screens:
   name: Channel Fees, Payment & Fulfillment Configuration
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195631,7 +195632,7 @@ screens:
   name: Channel Publication, Readiness & AI Validation
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195722,7 +195723,7 @@ screens:
   name: Channel Operations Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195938,7 +195939,7 @@ screens:
   name: Channel Connection & Integration Manager
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -208476,7 +208477,7 @@ screens:
   name: Partial Payment, Failure & Recovery Manager
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: PAYMENT_CONFIGURE
   source:
     pack: Payment_Payment_Orchestration.pdf

@@ -294,6 +294,8 @@ if [ "${REFRESH_RESUME:-0}" = 1 ] && [ -n "$__STATE" ] && [ -f "$__STATE" ]; the
 fi
 [ "$__LOG" = /dev/null ] || [ -s "$__LOG" ] || printf 'step\tname\tstart\tseconds\texit\tstatus\n' > "$__LOG"
 __us() { __NOW=${EPOCHREALTIME/[.,]/}; }
+# A marker per step, touched as it starts: an Office output must be newer than it (review E-08, CHG-R14I-007).
+__MARKS="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/refresh-marks-$$")"; mkdir -p "$__MARKS"
 __secs() { printf '%d.%d' $(( $1 / 1000000 )) $(( $1 % 1000000 / 100000 )); }
 __step_begin() {
   if [ -n "${__RESUMED[$1]:-}" ]; then
@@ -303,6 +305,8 @@ __step_begin() {
     return 1
   fi
   echo "== refresh step $1/$__T: $2"
+  # a second before the step starts, so an output written in the step's first second is still newer
+  touch -d "@$(( ${EPOCHSECONDS:-$(date +%s)} - 1 ))" "$__MARKS/step-$1" 2>/dev/null || : > "$__MARKS/step-$1"
   __CUR=$1; __CURNAME=$2; __us; __T0=$__NOW; printf -v __START '%(%Y-%m-%dT%H:%M:%S)T' -1
   return 0
 }
@@ -324,6 +328,14 @@ __step_end() {
   for f in "$@"; do
     if [ ! -s "$f" ]; then miss="$miss $f"; continue; fi
     case "$f" in *.json|*.xlsx|*.docx|*.pptx) parse+=("$f") ;; esac
+    # **An Office output is rewritten by this run, or the step failed** (r14, review E-08, CHG-R14I-007). Every
+    # workbook builder saves unconditionally, and in a worktree checked out at HEAD the committed workbook already
+    # exists, non-empty and readable: a builder that died quietly left yesterday's file and the step passed.
+    # (repos/ mirror copies are compared before they are overwritten, so they are not held to it.)
+    case "$f" in
+      repos/*) ;;
+      *.xlsx|*.docx|*.pptx) [ "$f" -nt "$__MARKS/step-$n" ] || miss="$miss $f (not rewritten by this step)" ;;
+    esac
   done
   if [ -z "$miss" ] && [ ${#parse[@]} -gt 0 ]; then
     # REFRESH_TRACE_DIR emptied: a traced run must not record this check's reads as the step's
@@ -373,6 +385,12 @@ def _sq(s):
     return "'" + s.replace("'", "'\"'\"'") + "'"
 
 
+def _bare(cmd):
+    """A step's command without the `2>/dev/null || true` three builders carried until r14 (review E-08), so a
+    manifest traced before still covers them."""
+    return re.sub(r"\s*2>/dev/null\s*\|\|\s*true\s*$", "", str(cmd or "")).strip()
+
+
 def expected_outputs(parsed, manifest, pkg):
     """{step: [paths]}: the files a step is expected to leave behind -- the concrete (non-glob)
     writes the traced manifest records for the step's command that exist in `pkg` before the run.
@@ -383,10 +401,10 @@ def expected_outputs(parsed, manifest, pkg):
         return {}
     by_cmd = {}
     for r in manifest.get("steps") or []:
-        by_cmd.setdefault(r.get("command"), r)
+        by_cmd.setdefault(_bare(r.get("command")), r)
     out = {}
     for st in steps_of(parsed):
-        r = by_cmd.get(st["command"])
+        r = by_cmd.get(_bare(st["command"]))
         if not r:
             continue
         out[st["index"]] = sorted(w for w in r.get("writes") or []
@@ -1187,8 +1205,8 @@ def build(trace_dir, pkg, commit, out_path, parsed):
             "traced_seconds": sum(r["seconds"] or 0 for r in rows),
         },
         "derived_roots": list(DERIVED_ROOTS),
-        "post": ["tools/run-checks.py (every checker; judged by refresh-safe.sh against "
-                 "tools/refresh-safe-baseline.json)",
+        "post": ["tools/run-checks.py (every checker; its verdict is the gate's, with the dated allowlist "
+                 "tools/refresh-safe-baseline.json applied by tools/gate_allowlist.py)",
                  "audit-transitions coverage line", "tools/ coverage block"],
         "steps": rows,
     }

@@ -299,6 +299,15 @@ def tickets_text(tickets: list, most: int = 4) -> str:
     return ", ".join(shown) + more
 
 
+def _released():
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        from release_baseline import released
+        return released(ROOT)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def _days_since(iso: str):
     try:
         then = datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
@@ -346,6 +355,21 @@ class Guard:
     def note(self, text: str):
         self.notes.append(text)
 
+    def require(self, path, why: str) -> bool:
+        """**A missing input is a finding, never a pass** (r14, review E-07, CHG-R14I-007). A guard whose input a
+        failed or skipped step did not produce used to note it and finish with "PASS - 0 new": in a scoped run, a
+        fresh worktree or an agent's partial tree, the rule was simply not judged. True when `path` exists and is
+        not empty; otherwise a strict finding (never baselined) under rule INPUT, and False."""
+        p = Path(path)
+        try:
+            ok = p.is_file() and p.stat().st_size > 0
+        except OSError:
+            ok = False
+        if not ok:
+            self.rules.setdefault("INPUT", "an input the guard reads is missing or empty: the rule is not judged")
+            self.add("INPUT", _rel(p), f"{_rel(p)} is missing or empty: {why}", strict=True)
+        return ok
+
     def _entry(self) -> dict:
         data = load_json(BASELINE, {}) or {}
         return data.get(self.name) or {}
@@ -363,6 +387,14 @@ class Guard:
         if not known:
             return {}
         idx = link_index()
+        if (not idx["exists"] or not idx["cached"]) and _released():
+            # Once the package has been released, a started ticket can build on a known finding, so the rule
+            # (CHG-CRF-001) must be judged: an uncached status is a finding, not a note (review E-07).
+            self.rules.setdefault("INPUT", "an input the guard reads is missing or empty: the rule is not judged")
+            self.add("INPUT", _rel(LINKS), f"ticket status is not cached in {_rel(LINKS)} (run tools/adam-links.py "
+                                           f"--status-only): {len(known)} known finding(s) cannot be judged against "
+                                           f"started tickets", strict=True)
+            return {}
         if not idx["exists"] or not idx["cached"]:
             self.note(f"ticket status is not cached in {_rel(LINKS)} (run tools/adam-links.py with TICVAI_OP_TOKEN, "
                       f"or --status-only): {len(known)} known finding(s) not judged against started tickets")

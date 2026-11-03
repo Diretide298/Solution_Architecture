@@ -499,18 +499,29 @@ def prior_migration_files() -> dict[str, str]:
     # release handed the developer. The working plan-tasks.csv is this branch's last derive, which at r8 had already
     # renumbered seven first-release files on delivered tickets (MIG-KERNEL V0003 -> V0004 ...), so reading only it
     # kept the renumbering.
+    # **No release tag in a released package is an error, not "the working plan alone"** (r14, review E-05,
+    # CHG-R14I-004): a clone without tags silently read only the working plan, which is the renumbering bug
+    # CHG-R8WFM-002 fixed. Before the first release (release_baseline.released() is None) there is no last plan.
+    import subprocess as _sp
+    sys.path.insert(0, str(ROOT / "tools"))
+    from release_baseline import released as _released
     try:
-        import subprocess as _sp
         tags = _sp.run(["git", "tag", "--merged", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.split()
-        rel = max((t for t in tags if re.fullmatch(r"r\d+", t)), key=lambda t: int(t[1:]), default=None)
-        if rel:
-            top = _sp.run(["git", "rev-parse", "--show-prefix"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-            txt = _sp.run(["git", "show", f"{rel}:{top}handoff/service-docs/plan-tasks.csv"], cwd=ROOT,
-                          capture_output=True, text=True, encoding="utf-8").stdout
-            if txt:
-                read(csv.DictReader(io.StringIO(txt, newline="")))
-    except Exception:          # noqa: BLE001 -- no git or no release: the working plan alone
-        pass
+    except OSError:
+        tags = []
+    rel = max((t for t in tags if re.fullmatch(r"r\d+", t)), key=lambda t: int(t[1:]), default=None)
+    if rel:
+        top = _sp.run(["git", "rev-parse", "--show-prefix"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        got = _sp.run(["git", "show", f"{rel}:{top}handoff/service-docs/plan-tasks.csv"], cwd=ROOT,
+                      capture_output=True, text=True, encoding="utf-8")
+        if got.returncode != 0 or not got.stdout:
+            raise SystemExit(f"build-service-docs: the last release's plan ({rel}:handoff/service-docs/plan-tasks.csv) "
+                             f"cannot be read: {got.stderr.strip()[:200]}")
+        read(csv.DictReader(io.StringIO(got.stdout, newline="")))
+    elif _released(ROOT):
+        raise SystemExit(f"build-service-docs: no r* release tag in this clone, but {_released(ROOT)}: the planned "
+                         "migration numbers would be read from the working plan alone and renumber delivered "
+                         "tickets (CHG-R8WFM-002). Fetch the tags (git fetch --tags origin) and run again.")
     if p.exists():
         with p.open(encoding="utf-8", newline="") as fh:
             read(csv.DictReader(fh))
@@ -1790,7 +1801,10 @@ def main() -> int:
                     rel.add(x)
                     why[x] = (f"built by {k_} as " + ", ".join(sorted(a for a, b in moved_.items() if b == x))
                               + ", before a declared move (CHG-TKT-013)")
-    frontier = list(rel)
+    # sorted, not list(rel): rel is a set of strings, and a set's order follows Python's hash seed, so the
+    # "referenced by" reason MIGRATIONS.md prints changed from run to run with no input change (review E-09,
+    # CHG-R14I-005; PYTHONHASHSEED=1 and 2 gave marketing.message_template and ai.policy for the same table).
+    frontier = sorted(rel, reverse=True)
     while frontier:
         t = frontier.pop()
         for x in sorted(ddl[t]["fks"]):
