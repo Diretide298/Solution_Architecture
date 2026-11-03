@@ -1,0 +1,46 @@
+id: CHG-CR498-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: ApprovalRule.code names the one code key it has since CR-300, rule_matrix_id_matrix_version_code_uniq on (matrix_id,
+  matrix_version, lower(code)), and the guarded drop of rule_matrix_id_code_uniq in backend/tenant/V0119__names_after_r1_20261029.sql;
+  the repository's copy of that drop is a new migration task.
+decision:
+  what: 'Posted on #31185 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "option A. The package already drops the old index: backend/tenant/V0119__names_after_r1_20261029.sql,
+    lines 20-21 ... Build now: a new tenant migration in our repository ... holding exactly the package''s block ... rule_matrix_id_matrix_version_code_uniq
+    on (matrix_id, matrix_version, lower(code)) stays the only code key ... The contract text describing a rule''s code still
+    names the old key; the package catches up."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-498 (Deep Khanvilkar, #31185): the repository still carries rule_matrix_id_code_uniq because the approvals database
+  ticket #27658 was built before V0119; CHG-CR300-001 dropped it in the package.'
+keys_touched:
+  operations:
+  - setApprovalMatrix
+  - approveMatrixMultiLevel
+  schemas:
+  - ApprovalRule
+  tables:
+  - approvals.rule
+  files:
+  - contracts/spine/approvals.yaml
+  - tools/check-business-rules.py
+root_class: the forward migration and its review lose what the generator derived
+tickets:
+  started:
+  - '27658 (approvals database, Ready for QA): its text is not rewritten; the drop goes to a new child task (below).'
+  unstarted:
+  - '31185 (setApprovalMatrix, Deep) and 30846 (approveMatrixMultiLevel, Deep): build on the new migration task; nothing else
+    in them changes.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-498
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-RULE-CODE-KEY
+status: open
+notes: 'No package migration: V0119 already drops the index. New task for the integration pass: ''[DB] approvals.rule: drop
+  rule_matrix_id_code_uniq in a new guarded migration, as the package''s V0119 names migration does'', child of #27658, migration
+  owner.'

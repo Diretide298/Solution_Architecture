@@ -1,0 +1,35 @@
+id: CHG-CR526-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: listApprovalMatrices states which nodes are 'here' for a caller with several (the scope paths whose deepest listed
+  entry holds APPROVAL_CONFIGURE), what effective false and true answer for each, and that the answers are merged one copy
+  per matrix id, newest first, each keeping its scopePath and scopeLevel; no new parameter or refusal.
+decision:
+  what: 'Posted on #31239 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "option A, with the reach the standing list rule gives ... the scope paths whose deepest
+    listed entry in the session''s per-scope permissions holds APPROVAL_CONFIGURE ... Merge the answers of all the paths,
+    keep one copy of each matrix id, and sort by id descending ... No new query parameter and no new refusal."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-526 (Chinmay Patkar, #31239): ''this level'' and ''as it applies here'' were undefined for a caller whose grants
+  cover several nodes; CR-189 and CR-367 (the per-scope list rule).'
+keys_touched:
+  operations:
+  - listApprovalMatrices
+  files:
+  - contracts/spine/approvals.yaml
+  - tools/check-business-rules.py
+root_class: a permission is checked against the flat set, not per scope
+tickets:
+  started: []
+  unstarted:
+  - '31239 (listApprovalMatrices, Chinmay Patkar): build to the posted decision.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-526
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MATRIX-LIST-REACH
+status: open

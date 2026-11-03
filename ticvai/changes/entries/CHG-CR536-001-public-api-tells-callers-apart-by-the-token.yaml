@@ -1,0 +1,54 @@
+id: CHG-CR536-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: public-api states its caller kinds (TICVAI staff on the Control Plane operator token, a partner on a developer session
+  or a tenant session whose verified email is an active developer member, otherwise tenant staff), the developer session,
+  identity.principal.email (PrincipalVerifiedEmail), the member re-read on every partner request (401 inactive, 403 readOnly
+  writes), and per operation who may call it and what each gets; the four operations declare exactly their reads and writes,
+  and listDeveloperMembers admits partners.
+decision:
+  what: 'Posted on #28008 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "public-api tells callers apart by the token a request carries, never by its permissions
+    ... Developer session ... The new sign-in ticket builds it; this ticket only reads it ... Add identity.principal.email:
+    nullable, set only once verified, never taken from username ... Declare reads and writes on each operation and touch no
+    other table"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-536 (Surendra Loke, #28008): the caller rule needed a partner''s signed-in email and a staff, partner and tenant
+  split nothing provided, and the four operations declared no reads; ADR-0072 points 2 and 5, CR-098 (CHG-R10ID-011), CR-203
+  (CHG-R10ID-014).'
+keys_touched:
+  operations:
+  - listDeveloperMembers
+  - listIntegrationListings
+  - listProductionAccessRequests
+  - requestProductionAccess
+  schemas:
+  - PrincipalVerifiedEmail
+  tables:
+  - identity.principal
+  files:
+  - contracts/satellite/public-api.yaml
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: an access rule needs to know who the caller is, and no session says
+tickets:
+  started: []
+  unstarted:
+  - '28008 (the four public-api operations, Surendra): ship the TICVAI staff and tenant staff paths; test the partner path
+    with a developer session built in the test.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-536
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PUBLIC-API-CALLER
+status: open
+notes: 'Beyond the posted words: the column is described by a storage-only schema PrincipalVerifiedEmail (format email, maxLength
+  320); the four operations answer 401 (unauthenticated) for an inactive member and the staff-only ones 403 (forbidden); no
+  security scheme is added for the developer session (the sign-in task defines it). New tasks: ''[BE] Developer portal sign-in:
+  email and one-time code against control.developer_member issuing a developer session, and a verified identity.principal.email
+  for partner-portal users'', child of #28008; and the identity.principal.email column in the release''s forward migration
+  (migration owner).'

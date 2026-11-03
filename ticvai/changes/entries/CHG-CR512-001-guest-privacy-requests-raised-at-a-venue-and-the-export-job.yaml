@@ -1,0 +1,48 @@
+id: CHG-CR512-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: exportSubjectData and deleteGuestAccount take the shared X-Venue-Id header (404 not a tenant venue, 400 venue-required
+  with none and no working venue, 403 a staff venue outside GUEST_VIEW_PII), read the venue's path and its region's countryCode
+  in process (scopePath and jurisdiction); a second export while one is awaiting approval or running answers 202 with the
+  open one; the call's order is stated; the export job's rules (72-hour parts wait, layouts, storage seam, 7-day expiry, createDsarRequest)
+  are on its job declaration.
+decision:
+  what: 'Posted on #30720 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "exportSubjectData raises its request at a venue, a second export while one is open
+    answers with the open one, and the export job moves to a ticket of its own ... The operation takes the shared X-Venue-Id
+    header (GuestVenue) ... Read the venue''s path through tenancy#scopeRecords, and the countryCode ... through tenancy#regionSettingsRecords,
+    both in process, and declare both reads ... deleteGuestAccount (#30654) takes the same header by the same rule ... They
+    go to the new export job ticket, which carries these rules."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-512 (Deep Khanvilkar, #30720): no venue to raise the request at, no answer for a second export, and an export
+  job with no owner or definition; CR-198 (GuestVenue), CR-101 (CHG-R10ID-016), CHG-R10ID-024.'
+keys_touched:
+  operations:
+  - exportSubjectData
+  - deleteGuestAccount
+  tables:
+  - identity.subject_data_export
+  files:
+  - contracts/spine/identity.yaml
+  - events/identity-privacyRequestRaised.yaml
+  - tools/check-business-rules.py
+root_class: a signed-in guest's privacy request names no venue to raise it at
+tickets:
+  started: []
+  unstarted:
+  - '30720 (exportSubjectData, Deep): build to the posted decision against an IApprovalRequests test double.'
+  - '30654 (deleteGuestAccount): takes X-Venue-Id by the same rule.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-512
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRIVACY-VENUE
+status: open
+notes: 'Beyond the posted words: exportSubjectData declares a read of identity.subject_data_export; the export job is the
+  existing x-ticvai-jobs.subjectExport declaration, which now also reads identity.subject_data_export_part, identity.subject_holding
+  and pii.subject. New task: ''[BE] Guest data export job: wait for owners'' parts, assemble json/csv/pdf, store, expire after
+  7 days, with a server-side storage write/delete/sign seam'', child of #30720 (it is the subjectExport job''s plan task).'

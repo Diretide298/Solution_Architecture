@@ -1,0 +1,54 @@
+id: CHG-CR522-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'The MFA values: totp per RFC 6238 (HMAC-SHA1, 30 s, 6 digits, one step either side, each code once), a 20-byte base32
+  secret and the otpauth URI; ten Crockford base32 recovery codes (xxxxx-xxxxx, a new set on every enrolment); a pending enrolment
+  lapses in 10 minutes; an emailOtp code is 6 digits for 10 minutes; a new event identity.mfaCodeIssued v1 carries it (enrolMfaMethod
+  and createMfaChallenge emit it, Marketing''s mfaCodeSender job sends it); removeMfaMethod''s 409 stays last-required-mfa-method.'
+decision:
+  what: 'Posted on #30663 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "the MFA values follow the authenticator standard, and a code the server sends goes
+    by an outbox event like the guest''s ... Authenticator codes (totp), RFC 6238: HMAC-SHA1, 30-second time step, 6 digits
+    ... Recovery codes: ten, each 10 characters of Crockford base32 ... A pending enrolment lapses 10 minutes after enrolMfaMethod
+    ... Carrier: a new event, identity.mfaCodeIssued v1 ... removeMfaMethod''s 409 keeps its declared type, last-required-mfa-method"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-522 (Sanket Keluskar, #30663 and #30662, #30665, #30666, #30667): the TOTP, recovery-code, lapse and email-code
+  values and the code''s carrier were unstated; CR-173 (storage), CR-370 (identity.guestCodeIssued), audit R126.'
+keys_touched:
+  operations:
+  - enrolMfaMethod
+  - createMfaChallenge
+  - verifyMfaChallenge
+  - verifyMfaEnrolment
+  - removeMfaMethod
+  schemas:
+  - MfaMethod
+  - MfaEnrolment
+  - MfaRecoveryCode
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - events/identity-mfaCodeIssued.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: a credential check whose working values are unstated
+tickets:
+  started: []
+  unstarted:
+  - '30662 (createMfaChallenge), 30663 (enrolMfaMethod), 30665 (removeMfaMethod), 30666 (verifyMfaChallenge), 30667 (verifyMfaEnrolment),
+    Sanket: build to the posted values; BC-712, BC-713.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-522
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MFA-VALUES
+status: open
+notes: 'Breaking changes BC-712 and BC-713 (x-ticvai-emits). Beyond the posted words: the recovery code items carry a pattern;
+  Marketing''s consumer is the declared job x-ticvai-jobs.mfaCodeSender (writes marketing.message_dispatch). New task: ''[BE]
+  Marketing: send an MFA email code (identity.mfaCodeIssued consumer; decrypt at send time, transactional dispatch record
+  without the code)'', child of #30662 (the mfaCodeSender job''s plan task). The event file is the integration branch''s rebuild
+  (CHG-R13INT-019).'

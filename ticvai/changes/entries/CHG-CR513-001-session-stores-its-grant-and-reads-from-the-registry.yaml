@@ -1,0 +1,55 @@
+id: CHG-CR513-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'identity.session gains grant_id (SessionGrant: uuid, nullable, references identity.delegated_access, never returned),
+  written by login (one grant) and selectRole (the chosen or only grant); getCurrentSession answers from the session registry
+  filled at sign-in, rebuilds a missing entry from grant_id, answers 401 for a revoked or expired grant and 409 session-pending
+  [roleSelection] for a role with no grant_id; cellName comes from Cell:Name.'
+decision:
+  what: 'Posted on #30722 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the NEw
+    CRs in the r13" (3 November 2026): "the session stores the grant it was opened through, and permissions stay resolved
+    once at sign-in, as the permission-resolution spec says ... A forward migration adds identity.session.grant_id: uuid,
+    nullable, a foreign key to identity.delegated_access(id), indexed ... getCurrentSession answers scope, effectivePermissions
+    and permissionsByScope from the session registry entry ... WorkstationContext.cellName: fill it from the host''s configuration
+    key Cell:Name ... No wire shape changes."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-513 (Deep Khanvilkar, #30722): the grant selectRole chose was not stored, so a lost registry entry could not
+  be rebuilt; docs/architecture/specs/permission-resolution.md R7 and section 6.2; CHG-R8SPN-032 (grantId).'
+keys_touched:
+  operations:
+  - getCurrentSession
+  - login
+  - selectRole
+  schemas:
+  - SessionGrant
+  - WorkstationContext
+  tables:
+  - identity.session
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+  - tools/check-ddl-conventions.py
+root_class: the session does not keep the grant it was opened through
+tickets:
+  started:
+  - '30674 (login, Ready for QA, Hrushikant): text not rewritten; a child task writes identity.session.grant_id when a direct
+    sign-in opens the session through the principal''s one grant, and puts grantId on the session registry entry.'
+  - '30715 (selectRole, Ready for QA, Hrushikant): text not rewritten; a child task writes the chosen grantId, or the role''s
+    only grant when the body sends roleId alone, into identity.session.grant_id and the registry entry.'
+  unstarted:
+  - '30722 (getCurrentSession, Deep): build to the posted decision against the new column.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-513
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SESSION-GRANT
+status: open
+notes: 'The column is derived by derive-ddl into the release''s forward migration (integration). New task: ''[DB] identity.session.grant_id:
+  the grant a session''s role was chosen through (uuid, nullable, foreign key to identity.delegated_access, indexed)'', child
+  of #30722, migration owner. Beyond the posted words: the storage-only schema is named SessionGrant. New child tasks of the
+  started #30674 and #30715 (Hrushikant): write grant_id. check-ddl-conventions D-FK-TARGET-NAME learns the concept alias
+  grant -> identity.delegated_access, the name the contracts give a delegated_access row (RoleSummary.grantId).'
