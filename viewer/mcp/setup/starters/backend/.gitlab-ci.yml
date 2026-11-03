@@ -1,0 +1,51 @@
+# The gates quality-gates.md calls blocking, on every push and merge request: the build with warnings
+# as errors, the unit and architecture tests (the 22 permission vectors, module boundaries), and the
+# integration tests against a real PostgreSQL 16 (row-level security and the connection context).
+# A test project that runs no tests fails the job: an always-green step is not a gate.
+
+stages: [build, test]
+
+variables:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget"
+
+default:
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  cache:
+    key: nuget-$CI_COMMIT_REF_SLUG
+    paths: [.nuget/]
+
+build:
+  stage: build
+  script:
+    - dotnet restore TICVAI-Backend.slnx
+    - dotnet build TICVAI-Backend.slnx --no-restore -warnaserror
+
+test:
+  stage: test
+  services:
+    - name: postgres:16
+      alias: postgres
+  variables:
+    POSTGRES_USER: ticvai
+    POSTGRES_PASSWORD: ticvai
+    POSTGRES_DB: ticvai_test
+    TICVAI_TEST_DATABASE: "Host=postgres;Database=ticvai_test;Username=ticvai;Password=ticvai"
+    # The row-security test fails, rather than skips, when the database is missing.
+    TICVAI_REQUIRE_DATABASE: "1"
+  script:
+    - dotnet test TICVAI-Backend.slnx --logger "trx" --results-directory TestResults
+    - |
+      for project in tests/*/; do
+        name=$(basename "$project")
+        if ! grep -l "$name" TestResults/*.trx >/dev/null 2>&1; then
+          echo "$name ran no tests"; exit 1
+        fi
+      done
+      if grep -l 'outcome="NotExecuted"' TestResults/*.trx >/dev/null 2>&1; then
+        echo "a test was skipped"; exit 1
+      fi
+  artifacts:
+    when: always
+    paths: [TestResults/]

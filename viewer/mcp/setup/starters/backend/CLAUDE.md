@@ -10,13 +10,13 @@
 | `src/TICVAI.Infrastructure` | EF Core `DbContext`, repositories, external services | Application |
 | `src/TICVAI.Api` | controllers, middleware, `Program.cs` | Application, Contracts, Infrastructure |
 | `tests/TICVAI.UnitTests` | Domain and Application tests (xUnit) | |
-| `tests/TICVAI.IntegrationTests` | tests through the API | |
-| `tests/TICVAI.ArchitectureTests` | the reference rules above | |
+| `tests/TICVAI.IntegrationTests` | tests through the API, and against PostgreSQL when `TICVAI_TEST_DATABASE` is set | |
+| `tests/TICVAI.ArchitectureTests` | the reference rules above, and ADR-0055's module boundaries (`modules.json`) | |
 
 ```
 dotnet build TICVAI-Backend.slnx
 dotnet test TICVAI-Backend.slnx
-dotnet run --project src/TICVAI.Api        # needs Database:ConnectionString
+dotnet run --project src/TICVAI.Api        # needs a Tenants entry (README)
 ```
 
 ## Coding standards
@@ -41,9 +41,10 @@ Read these when the work calls for them, not before:
 
 In one session, a document already read does not need reading again.
 
-The kernel those documents name is here: `Money` and `Id` (Domain), `ITenantContext`,
-`ICurrentPrincipal`, `IIdempotencyStore`, `IIntegrationEvent`, `IOutbox` and `IBrokerPublisher`
-(Application), `SqlMigrationRunner` and `RelayOptions` (Infrastructure).
+The kernel those documents name is here: `Money`, `CurrencyMinorUnits` and `Id` (Domain), `ITenantContext`,
+`ICurrentPrincipal`, `ResolvedAuthority`, `ISessionRegistry`, `IIdempotencyStore`, `IdempotentExecution`,
+`ITransactionRunner`, `IIntegrationEvent`, `IOutbox` and `IBrokerPublisher` (Application),
+`ScopeContextInterceptor`, `TenantBinding`, `SqlMigrationRunner` and `RelayOptions` (Infrastructure).
 `Directory.Build.props` treats warnings as errors and bans server-local time and `Guid.NewGuid()`.
 
 ## Hard rules
@@ -54,7 +55,11 @@ The kernel those documents name is here: `Money` and `Id` (Domain), `ITenantCont
 - Every id is a `uuid` (`Guid`). A new one is a UUIDv7 from `Id.New()`; an id a device sent keeps its value.
   Human codes people read or type (order numbers, ticket codes) are separate columns, not ids.
 - No secrets or connection strings in source. `appsettings.json` keeps them empty.
-- Every data path is scoped by `ITenantContext`.
+- Every data path is scoped by `ITenantContext`: the tenant is the request's host's, never a header, and data
+  access runs in a transaction (`ITransactionRunner`) whose context is set with `SET LOCAL`.
+- An operation's permission is `ICurrentPrincipal.Permits(permission, scopePath)` at the scope it acts on;
+  `EffectivePermissions` never decides an operation (backend-patterns 3.4).
+- A mutating operation with an `Idempotency-Key` runs through `IdempotentExecution` (replay, `409` conflict).
 - A module publishes an event with `IOutbox.EnqueueAsync`, in the transaction of the change it reports.
   `IBrokerPublisher` is the relay's; no module calls it or a broker client (backend-patterns 3.5).
 - A contract comes first: build what the ADAM contract says - status codes, error codes, field names.

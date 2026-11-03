@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TICVAI.Api.Health;
+using TICVAI.Api.Security;
 using TICVAI.Application;
 using TICVAI.Infrastructure.DependencyInjection;
 
@@ -21,6 +23,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddInfrastructure(configuration);
+        services.AddTicvaiAuthentication(configuration);
 
         return services;
     }
@@ -28,7 +31,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddTicvaiHealthChecks(
     this IServiceCollection services)
     {
-        services.AddHealthChecks();
+        services.AddHealthChecks()
+            .AddCheck<TenantDatabasesHealthCheck>("tenant-databases");
 
         return services;
     }

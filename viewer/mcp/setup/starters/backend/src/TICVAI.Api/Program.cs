@@ -39,3 +39,6 @@ if (app.Environment.IsDevelopment())
 app.UseTicvaiPipeline();
 
 app.Run();
+
+/// <summary>The entry point, visible to TICVAI.IntegrationTests' WebApplicationFactory.</summary>
+public partial class Program;

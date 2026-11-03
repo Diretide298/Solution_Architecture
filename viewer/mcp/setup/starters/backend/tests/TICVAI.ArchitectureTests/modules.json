@@ -1,0 +1,29 @@
+{
+  "$comment": "The module map of ADR-0055 (one .NET solution, its modules deployed as commerce, access, operations; workers runs the relay and consumers) and the in-process query compositions docs/active/cross-deployable-writes.yaml records (reads[].composes: a reader deployable's host composes another module's query classes). ADAM's check-starter-fit compares this file with both; change it only with them.",
+  "modules": [
+    { "name": "Identity", "deployable": "commerce" },
+    { "name": "Tenancy", "deployable": "commerce" },
+    { "name": "Catalogue", "deployable": "commerce" },
+    { "name": "Order", "deployable": "commerce" },
+    { "name": "Ledger", "deployable": "commerce" },
+    { "name": "Wallet", "deployable": "commerce" },
+    { "name": "Access", "deployable": "access" },
+    { "name": "FnB", "deployable": "operations" },
+    { "name": "Retail", "deployable": "operations" },
+    { "name": "Inventory", "deployable": "operations" },
+    { "name": "VenueOps", "deployable": "operations" },
+    { "name": "Marketing", "deployable": "operations" },
+    { "name": "WhiteLabel", "deployable": "operations" },
+    { "name": "Reporting", "deployable": "operations" },
+    { "name": "Platform", "deployable": "operations" },
+    { "name": "CrossRegion", "deployable": "operations" }
+  ],
+  "composes": [
+    { "reader": "access", "module": "Catalogue" },
+    { "reader": "access", "module": "Tenancy" },
+    { "reader": "commerce", "module": "Access" },
+    { "reader": "operations", "module": "Catalogue" },
+    { "reader": "operations", "module": "Order" },
+    { "reader": "operations", "module": "Tenancy" }
+  ]
+}

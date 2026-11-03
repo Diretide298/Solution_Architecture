@@ -4,26 +4,28 @@ using TICVAI.Application.Abstractions.Persistence;
 namespace TICVAI.Infrastructure.Idempotency;
 
 /// <summary>
-/// One process, in memory: enough for development and tests. Production keeps keys in Redis so
-/// every API instance sees them - replace the registration, not the interface.
+/// For unit tests only: the same rule as <see cref="PostgresIdempotencyStore"/>, unique on (operation,
+/// key), with no database. It is never registered by <c>AddInfrastructure</c>: the durable record in
+/// the change's transaction is the guarantee (SD-024), and nothing in memory or in Redis can be.
 /// </summary>
 public sealed class InMemoryIdempotencyStore(TimeProvider clock) : IIdempotencyStore
 {
-    private readonly ConcurrentDictionary<string, (string Hash, IdempotentResponse Response, DateTimeOffset Until)> _entries = new();
+    private readonly ConcurrentDictionary<(string OperationId, Guid Key), (IdempotencyRecord Record, DateTimeOffset Until)> _records = new();
 
-    public Task<IdempotentResponse?> FindAsync(string key, string requestHash, CancellationToken cancellationToken)
+    public Task<IdempotencyRecord?> FindAsync(Guid key, string operationId, CancellationToken cancellationToken) =>
+        Task.FromResult(_records.TryGetValue((operationId, key), out var entry) && entry.Until > clock.GetUtcNow()
+            ? entry.Record
+            : null);
+
+    public Task RecordAsync(IdempotencyRequest request, IdempotentResponse response, CancellationToken cancellationToken)
     {
-        if (_entries.TryGetValue(key, out var entry) && entry.Until > clock.GetUtcNow() && entry.Hash == requestHash)
+        ArgumentNullException.ThrowIfNull(request);
+        var entry = (new IdempotencyRecord(request.RequestHash, response), clock.GetUtcNow().Add(PostgresIdempotencyStore.Keep));
+        if (!_records.TryAdd((request.OperationId, request.Key), entry))
         {
-            return Task.FromResult<IdempotentResponse?>(entry.Response);
+            throw new IdempotencyKeyTakenException(request.Key, request.OperationId);
         }
 
-        return Task.FromResult<IdempotentResponse?>(null);
-    }
-
-    public Task SaveAsync(string key, string requestHash, IdempotentResponse response, TimeSpan keepFor, CancellationToken cancellationToken)
-    {
-        _entries[key] = (requestHash, response, clock.GetUtcNow().Add(keepFor));
         return Task.CompletedTask;
     }
 }
