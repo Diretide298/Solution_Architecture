@@ -5,7 +5,7 @@ kind: process
 summary: 'repos/ keeps each repository''s project documents and no code. The hand-written code trees of
   repos/ticvai-backend (src, tests, tools/check-migrations.py, the solution and build settings, docker-compose),
   repos/ticvai-frontend (the six-app Nx workspace, its packages and settings) and repos/ticvai-ai (src, pyproject, CI),
-  their AGENTS.md and repos/update-bible.sh are removed. tools/derive-mirrors.py now writes what stays from what
+  their AGENTS.md and the old update-bible.sh mirror script are removed. tools/derive-mirrors.py now writes what stays from what
   developers really get: the three repositories'' CLAUDE.md from ADAM''s starter CLAUDE.md
   (viewer/mcp/setup/starters/<role>/), every bible''s setup/ from the starter docs, every bible''s repos/ rules page
   (backend, frontend, ai from the starter CLAUDE.md; contracts, infra, docs from new authored sources in
@@ -36,7 +36,7 @@ keys_touched:
   - repos/ticvai-backend (code tree and AGENTS.md removed)
   - repos/ticvai-frontend (code tree and AGENTS.md removed)
   - repos/ticvai-ai (code tree and AGENTS.md removed)
-  - repos/update-bible.sh (removed)
+  - the old mirror script update-bible.sh at the top of repos/ (removed)
   - repos/ticvai-contracts/AGENTS.md
   - repos/ticvai-contracts/CLAUDE.md
   - repos/ticvai-infra/AGENTS.md
