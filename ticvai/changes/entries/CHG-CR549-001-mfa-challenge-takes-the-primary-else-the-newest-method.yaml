@@ -1,0 +1,44 @@
+id: CHG-CR549-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'createMfaChallenge with no methodId takes the principal''s usable methods (active, less emailOtp for a guest
+  who signed in with an email code), the one marked primary, else the newest (highest UUIDv7 id); all left out is the
+  existing 409 email-otp-not-second-factor, none active the existing 422 mfa-method-not-usable; the method chosen is
+  written to identity.mfa_challenge.method_id. enrolMfaMethod writes is_primary false; verifyMfaEnrolment makes the
+  method primary when no other active method is; removeMfaMethod moves the mark to the newest remaining active method.
+  At most one primary; a null is_primary is false and MfaMethod.isPrimary is never null.'
+decision:
+  what: 'Posted on #30662 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the
+    devs" (3 November 2026): "Build now: (1) createMfaChallenge with no methodId uses the principal''s usable methods
+    ... Among those it takes the one marked primary; if none is marked primary, the newest (highest id, ids are
+    UUIDv7) ... Write the method chosen to identity.mfa_challenge.method_id; do not leave it null. (2)
+    verifyMfaEnrolment (#30667) ... (3) enrolMfaMethod (#30663) writes is_primary false on the pending method. (4)
+    removeMfaMethod (#30665) ... (5) The result is at most one primary among a principal''s active methods. A row with
+    is_primary null counts as false ... There is no new operation to choose a primary, and screens do not change."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-549 (Sanket Keluskar, #30662 createMfaChallenge): the package named "the principal''s primary method" but
+  nothing defined or set it (identity.mfa_method.is_primary nullable, written by no operation).'
+keys_touched:
+  operations: [createMfaChallenge, enrolMfaMethod, verifyMfaEnrolment, removeMfaMethod, listMfaMethods]
+  schemas: [MfaMethod, MfaChallenge]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: a default the contract names but nothing defines
+tickets:
+  started: []
+  unstarted:
+  - '30662 (createMfaChallenge), 30663 (enrolMfaMethod), 30665 (removeMfaMethod) and 30667 (verifyMfaEnrolment), Sanket
+    Keluskar, New: build to the posted comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-549
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MFA-PRIMARY
+status: open
+notes: 'No table change: is_primary and mfa_challenge.method_id stay nullable columns, as the decision reads a null as
+  false and asks the operation, not the column, to always write the method. No screen changes.'

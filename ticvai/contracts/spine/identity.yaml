@@ -2754,11 +2754,16 @@ paths:
             the session is valid and stays signed in; the attempt counts towards the lockout);
             `policy-not-met`, the new credential fails the policy (a password: `minLength`, the breach check, by the
             rule on `PasswordPolicy.requireBreachCheck`, ADAM CR-514; a PIN: not exactly `PasswordPolicy.pinLength`
-            digits), with `errors[]` naming the rule (`requireBreachCheck` for a breached password);
+            digits), answered as `CredentialPolicyNotMetProblem`: `rule` names the first rule that failed
+            (`minLength`, then `requireBreachCheck`; for a PIN `pinLength`), `detail` says it in words, and there is
+            no `errors[]`, which stays on the `400` validation answers only (ADAM CR-548, Chinmay, 3 November 2026;
+            CHG-CR548-001);
             `credential-reused`, it matches the current one or one the policy keeps (a password: the previous
             `PasswordPolicy.reusePreventionCount`, 5 unless the tenant sets another, audit R132; a PIN:
             `PasswordPolicy.pinReusePrevention`). The server keeps a hash of each replaced credential in
             `identity.principal_credential_history` for that purpose and never the credential itself.
+            `current-credential-wrong` and `credential-reused` keep the plain `Problem` body. Nothing is written when
+            the 422 answers.
 
             '
           x-ticvai-problem-types:
@@ -2768,7 +2773,9 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                oneOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Problem
+                - $ref: '#/components/schemas/CredentialPolicyNotMetProblem'
         '429':
           description: The request budget is exceeded (`rate-limited`), or wrong current credentials reached the
             lockout threshold and the method is locked until `PrincipalCredential.lockedUntil` (`credential-locked`,
@@ -3152,8 +3159,10 @@ paths:
         **`initialCredential` is held to `setPasswordPolicy`, the breach check included** (ADAM CR-514, Chinmay, 3
         November 2026; CHG-CR514-001): the same check as `changeOwnCredential`, by the rule on
         `PasswordPolicy.requireBreachCheck` (after the length check, only for a password, only when the tenant''s
-        `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` with
-        `errors[]` naming the rule, and nothing is written.
+        `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` as
+        `CredentialPolicyNotMetProblem`, `rule` naming the first rule that failed (`minLength`, then
+        `requireBreachCheck`) and no `errors[]` (ADAM CR-548, Chinmay, 3 November 2026; CHG-CR548-001), and nothing is
+        written.
 
         '
       x-ticvai-reads:
@@ -3200,13 +3209,15 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`initialCredential` fails the tenant''s password policy (`policy-not-met`): shorter than
-            `minLength`, or found in the breached-password corpus (`errors[]` names `requireBreachCheck`; ADAM CR-514).
-            Nothing is written.'
+            `minLength`, or found in the breached-password corpus (ADAM CR-514). The answer is
+            `CredentialPolicyNotMetProblem`: `rule` is the first rule that failed, `minLength` then `requireBreachCheck`,
+            `detail` says it in words, and there is no `errors[]` (ADAM CR-548, Chinmay, 3 November 2026;
+            CHG-CR548-001). Nothing is written.'
           x-ticvai-problem-types: [policy-not-met]
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CredentialPolicyNotMetProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}/credential-reset:
@@ -3273,8 +3284,10 @@ paths:
         **A `password` reset is held to `setPasswordPolicy`, the breach check included** (ADAM CR-514, Chinmay, 3
         November 2026; CHG-CR514-001): `temporaryCredential` with method `password` gets the same check as
         `changeOwnCredential`, by the rule on `PasswordPolicy.requireBreachCheck` (after the length check, only when the
-        tenant''s `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` with
-        `errors[]` naming the rule, and nothing is written.
+        tenant''s `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` as
+        `CredentialPolicyNotMetProblem`, `rule` naming the first rule that failed (`minLength`, then
+        `requireBreachCheck`) and no `errors[]` (ADAM CR-548, Chinmay, 3 November 2026; CHG-CR548-001), and nothing is
+        written.
 
         **Publishes `identity.credentialResetRequested`** (kind `staffReset`) in the same transaction
         (29 September, build pass, group G2; ADR-0033): a reset is the step an account takeover takes before
@@ -3317,13 +3330,15 @@ paths:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
         '422':
           description: 'A `password` `temporaryCredential` fails the tenant''s password policy (`policy-not-met`):
-            shorter than `minLength`, or found in the breached-password corpus (`errors[]` names `requireBreachCheck`;
-            ADAM CR-514). Nothing is written.'
+            shorter than `minLength`, or found in the breached-password corpus (ADAM CR-514). The answer is
+            `CredentialPolicyNotMetProblem`: `rule` is the first rule that failed, `minLength` then `requireBreachCheck`,
+            `detail` says it in words, and there is no `errors[]` (ADAM CR-548, Chinmay, 3 November 2026;
+            CHG-CR548-001). Nothing is written.'
           x-ticvai-problem-types: [policy-not-met]
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CredentialPolicyNotMetProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}:
@@ -5492,6 +5507,7 @@ paths:
       summary: Enrolled MFA methods
       description: >-
         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
+        `isPrimary` is false for a row whose `is_primary` is null, never null (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
       tags:
       - mfa
       x-ticvai-permission: null
@@ -5586,6 +5602,10 @@ paths:
         the `mfa_challenge` row, with `destination` and `code` field-encrypted through `IFieldEncryption`, never in
         clear. Marketing sends it through the tenant''s email provider; until that consumer is on dev, Identity''s
         delivery seam records only that a code was issued, never the code.
+
+
+        **The pending method is not primary** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001): this call writes `is_primary` false on it;
+        `verifyMfaEnrolment` decides whether it becomes the primary one.
 
         '
       x-ticvai-emits:
@@ -5691,6 +5711,11 @@ paths:
         pending enrolment lapses 10 minutes after `enrolMfaMethod` (`pendingExpiresAt`); a code after that completes
         nothing.
 
+
+        **The first active method becomes primary** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001): when the method becomes active and the
+        principal has no other active method marked primary, its `is_primary` is set to true; otherwise it is set to
+        false, in the same transaction. A principal has at most one primary among its active methods.
+
         '
       tags:
       - mfa
@@ -5774,6 +5799,11 @@ paths:
         decided 28 September, audit R135). Removing the last factor from an account that must have one is
         not a choice the account holder gets to make. **The `409` keeps its declared type,
         `last-required-mfa-method`** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001).
+
+
+        **Removing the primary method moves the mark** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001): when the removed method was the
+        primary one, the newest remaining active method (highest `id`) is marked primary in the same transaction, if
+        there is one.
 
         '
       tags:
@@ -5892,6 +5922,15 @@ paths:
         that consumer is on dev, Identity''s delivery seam records only that a code was issued, never the code. A
         `totp` challenge sends nothing (`enrolMfaMethod` states the authenticator values).
 
+
+        **Which method, when the body has no `methodId`** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). The call uses the principal''s
+        usable methods: the active ones, leaving out `emailOtp` when the caller is a guest who signed in with an email
+        code. Among those it takes the one marked primary (`MfaMethod.isPrimary`; a row with `is_primary` null counts
+        as false); if none is marked primary, the newest (highest `id`; ids are UUIDv7). If the principal has active
+        methods but every one is left out, the call answers the existing `409 email-otp-not-second-factor`. If there
+        are no active methods at all, it answers the existing `422 mfa-method-not-usable`. With a `methodId`, nothing
+        changes. The method chosen is written to `identity.mfa_challenge.method_id`, never left null.
+
         '
       x-ticvai-emits:
       - identity.mfaCodeIssued
@@ -5923,6 +5962,8 @@ paths:
                 methodId:
                   type: string
                   format: uuid
+                  description: 'The method to challenge. Absent, the server takes the principal''s primary usable
+                    method, else the newest usable one, as the description says (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).'
                 venueId:
                   type: string
                   format: uuid
@@ -5957,7 +5998,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: A guest who signed in with an email code asks for `emailOtp` as the second factor, because the same inbox
-            twice is one factor (R8 blocker fix, IDENTITY-C18).
+            twice is one factor (R8 blocker fix, IDENTITY-C18). With no `methodId`, also when the principal has active
+            methods and every one is left out that way (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
           x-ticvai-problem-types:
           - email-otp-not-second-factor
           content:
@@ -5966,7 +6008,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: The `methodId` names a method that is pending or inactive, or the principal has no active method
-            to challenge.
+            to challenge (with no `methodId`, no active method at all; ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
           x-ticvai-problem-types:
           - mfa-method-not-usable
           content:
@@ -10640,7 +10682,9 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: The `identity.mfa_method` asked; null means the principal's primary method.
+          description: 'The `identity.mfa_method` challenged. With no `methodId` in the body, the method
+            `createMfaChallenge` chose (the primary usable one, else the newest usable one); it is always written,
+            never left null (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).'
         action:
           type: string
           maxLength: 100
@@ -11718,7 +11762,8 @@ components:
             `CheckPasswordBreachedAsync(prefix)` opens `{Identity:BreachCorpusPath}/{prefix}.txt` and returns its
             (suffix, count) pairs; nothing else reads the files, and nothing leaves the host. (3) The check: take the
             SHA-1 of the UTF-8 password as upper-case hex and split it into prefix and suffix; if the suffix is
-            present with any count, refuse `422 policy-not-met` with `errors[]` naming `requireBreachCheck`. It runs
+            present with any count, refuse `422 policy-not-met` as `CredentialPolicyNotMetProblem` with `rule`
+            `requireBreachCheck` and no `errors[]` (ADAM CR-548; CHG-CR548-001). It runs
             only for a password, only when this is true (the default), after the length check. The password, its hash
             and the prefix are never logged. (4) Startup: when `Identity:BreachCorpusPath` is unset, or the directory
             does not hold `00000.txt` and `FFFFF.txt`, Identity''s host fails its readiness check and does not start;
@@ -12645,6 +12690,12 @@ components:
           type: boolean
         isPrimary:
           type: boolean
+          description: '**At most one primary among a principal''s active methods** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
+            `enrolMfaMethod` writes false on the pending method; `verifyMfaEnrolment` sets it true when the method
+            becomes active and the principal has no other active method marked primary, else false;
+            `removeMfaMethod` moves the mark to the newest remaining active method when the primary one is removed.
+            A row with `is_primary` null counts as false: `listMfaMethods` and any `MfaMethod` answer return false
+            for null, never null. There is no operation to choose a primary.'
         enrolledAt:
           type: string
           format: date-time
@@ -13495,6 +13546,33 @@ components:
           attemptsRemaining:
             type: integer
             minimum: 0
+    CredentialPolicyNotMetProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**The `422 policy-not-met` of `changeOwnCredential`, `createPrincipal` (`initialCredential`) and
+        `resetPrincipalCredential` (a `password` `temporaryCredential`)** (ADAM CR-548, Chinmay, 3 November 2026;
+        CHG-CR548-001): the shared `Problem` plus one member, `rule`, and no `errors[]`, which stays on the `400`
+        validation answers only (common.yaml; the rule set for `setApprovalMatrix` on 2 November, ADAM CR-481).
+        `type` is the existing `policy-not-met` URI, `status` 422. Nothing changes in the shared problem model or the
+        request kernel''s problem mapper. `detail` says it in words, for example "The password is shorter than 12
+        characters." or "This password appears in a list of breached passwords; choose another."; `detail` never
+        contains the password, its hash or the hash prefix, and none of them is logged. Nothing is written when the
+        422 answers. `current-credential-wrong` and `credential-reused` keep the plain `Problem` body.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - rule
+        properties:
+          rule:
+            type: string
+            enum:
+            - minLength
+            - pinLength
+            - requireBreachCheck
+            description: 'The first rule that failed, checked in this order. For a password: `minLength` (shorter
+              than `PasswordPolicy.minLength`), then `requireBreachCheck` (found in the breached-password corpus;
+              this check runs only when the tenant''s `requireBreachCheck` is true, after the length check). For a
+              PIN: `pinLength` (not exactly `PasswordPolicy.pinLength` digits).'
     LoginResponse:
       x-ticvai-persistence: none — computed
       allOf:

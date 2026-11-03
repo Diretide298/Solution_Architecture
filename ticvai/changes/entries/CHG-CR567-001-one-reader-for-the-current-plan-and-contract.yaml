@@ -1,0 +1,50 @@
+id: CHG-CR567-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'One reader for the current plan version, PlanReader.Current: of the plan''s control.plan rows with is_active
+  true, the highest version compared as an integer (never as text), else, with none active, the highest the same way;
+  it replaces the published_at ordering. getPlan answers the current version of planId (404 when no row has the id);
+  listPlans one item per plan, its current version, with its filters as before; SetSubscriptionRequest.planVersion
+  defaults through it. getSubscription, as built, is SubscriptionReader.Current: the tenant''s control.contract rows
+  started on or before today, the latest starts_at then the greatest id, any status, 404 when none has started, never
+  control.tenant.subscription_id; previewSubscriptionChange and setSubscription use the same reader.'
+decision:
+  what: 'Posted on #31278 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the
+    devs" (3 November 2026): "which plan version is current was already decided on 3 November with version numbering
+    ... Plan reads answer that version; the contract rule stays as built. Build now: - One reader, PlanReader.Current
+    ... - getPlan (#31278) ... - listPlans (#31279): one item per plan, its current version ... Earlier versions are not
+    listed ... - SetSubscriptionRequest.planVersion defaults through the same reader ... - getSubscription (#31280), as
+    built, in SubscriptionReader.Current ... Do not read control.tenant.subscription_id ... The plan-change preview
+    (#31281) and setSubscription use this same reader for the tenant''s current contract."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-567 (#31278 getPlan): getPlan, listPlans and getSubscription did not say which plan version or contract
+  row is current; CR-510 (CHG-CR510-001) had numbered the versions but no read used the rule, and the built rule
+  ordered by published_at and then by version as text.'
+keys_touched:
+  operations: [getPlan, listPlans, getSubscription, setSubscription]
+  schemas: [Plan, SetSubscriptionRequest]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: which of a table's kept history rows count as the current one
+tickets:
+  started:
+  - '31278 (getPlan, Ready for QA): text not rewritten; the posted decision is what it builds (PlanReader.Current, and
+    the TODOs naming #31278 replaced by the five tests it lists).'
+  unstarted:
+  - '31279 (listPlans): one item per plan, its current version.'
+  - '31280 (getSubscription): SubscriptionReader.Current, as built.'
+  - '30841 (setSubscription) and 31281 (previewSubscriptionChange): the default planVersion and the current contract
+    through the two readers.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-567
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CURRENT-PLAN-READER
+status: open
+notes: 'The ADM-008 plan table does not change. The statuses of #31279 and #31280 were not read from OpenProject (this
+  lane writes nothing there); if either is started, the posted decision is what it builds.'
