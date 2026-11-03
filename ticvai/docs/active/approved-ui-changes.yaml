@@ -1181,3 +1181,33 @@ changes:
   to: 752a5436e442ab9f
   approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the offline state says Hand over dropped goods (collectShopAndDrop) is disabled offline.'
   change: CHG-R14BO-004
+- screen: GST-007
+  field: 'overlay:eligibilityDeclaration'
+  to: aa73dd9b7d1996e9
+  approval: 'ADAM CR-552 (raised on #31784 GST-007, a design change; settled 3 November 2026 by Chinmay, accepted as built in 614c7ee): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on their own and log it in ADAM, after which the lead updates the screen''s UI (frontend starter, 28eb978d); this CR is that log. Who''s coming? is a bottom sheet of folding person cards with Back / Continue as equal pills; it opens on leaving selection when any chosen product''s rule has a limit set (ADAM CR-551, settled the same day).'
+  change: CHG-CR552-001
+- screen: GST-007
+  field: 'overlay:joinWaitlist'
+  to: 0379cf9795d81198
+  approval: 'ADAM CR-552 (raised on #31784 GST-007, a design change; settled 3 November 2026 by Chinmay, accepted as built in 614c7ee): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on their own and log it in ADAM, after which the lead updates the screen''s UI (frontend starter, 28eb978d); this CR is that log. The waitlist pop-up with Cancel / Join as equal pills 48 high.'
+  change: CHG-CR552-001
+- screen: GST-007
+  field: 'region:collection'
+  to: f3377d7ae3d7e760
+  approval: 'ADAM CR-552 (raised on #31784 GST-007, a design change; settled 3 November 2026 by Chinmay, accepted as built in 614c7ee): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on their own and log it in ADAM, after which the lead updates the screen''s UI (frontend starter, 28eb978d); this CR is that log. The waitlist confirmation card, You''re on the waitlist!, with the queue position (WaitlistEntry.position).'
+  change: CHG-CR552-001
+- screen: GST-007
+  field: 'overlay:consentQuestions'
+  to: 8f54b0b45210ffc9
+  approval: 'ADAM CR-556 (raised on #31784 GST-007; settled 3 November 2026 by Chinmay, the lead''s decision): the consent pop-up accepted under CR-493 opens once the cart holds this booking''s lines, on the screen that adds them, and at Checkout Entry when checkoutCart refuses for unanswered consent; the pop-up''s look stays as built. On Select Date & Time it opens only right after this screen''s own addCartLine.'
+  change: CHG-CR556-001
+- screen: GST-008
+  field: 'overlay:consentQuestions'
+  to: 19e98ce7a9611e9d
+  approval: 'ADAM CR-556 (raised on #31784 GST-007; settled 3 November 2026 by Chinmay, the lead''s decision): the consent pop-up accepted under CR-493 opens once the cart holds this booking''s lines, on the screen that adds them, and at Checkout Entry when checkoutCart refuses for unanswered consent; the pop-up''s look stays as built. On Tickets & Add-ons it opens after the step''s addCartLine calls succeed, before leaving the step, when a question is unanswered.'
+  change: CHG-CR556-001
+- screen: GST-041
+  field: 'overlay:consentQuestions'
+  to: 0670fc6a80e1326a
+  approval: 'ADAM CR-556 (raised on #31784 GST-007; settled 3 November 2026 by Chinmay, the lead''s decision): the consent pop-up accepted under CR-493 opens once the cart holds this booking''s lines, on the screen that adds them, and at Checkout Entry when checkoutCart refuses for unanswered consent; the pop-up''s look stays as built. On Checkout Entry it opens when checkoutCart refuses 422 consentRequired or consentAnswerBlocks.'
+  change: CHG-CR556-001

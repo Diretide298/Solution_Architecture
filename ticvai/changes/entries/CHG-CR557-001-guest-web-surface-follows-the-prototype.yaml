@@ -1,0 +1,51 @@
+id: CHG-CR557-001
+date: '2026-11-03'
+source: cr
+kind: design-input
+summary: 'The guest web theme engine works out the surface as the prototype''s palettes do: surface is #ffffff when
+  dark is false and mix(bg, fg, 0.04) when dark is true; surf is rgba(surface, dark ? 0.58 : 0.7) under Glass, else
+  surface; surf2 is mix(surface, fg, dark ? 0.07 : 0.055), with alpha dark ? 0.5 : 0.62 under Glass, replacing
+  mix(bg, fg, 0.08). Every other token rule stays; data-glass keeps only the blur. Theme and the contract are unchanged.'
+decision:
+  what: 'ADAM CR-557, posted on #36994: "Decided (Chinmay, 3 November 2026): the guest web theme engine works out the
+    surface the way the prototype''s palettes do, then follows the prototype''s own surface rules, so a light venue''s
+    header, footer, cards and basket are lighter than its page, as in the approved web-029 capture. Nothing behind the
+    screen changes and Theme stays as published. Build now: 1. The surface ...: when dark is false ..., surface =
+    ''#ffffff''. When dark is true, surface = mix(bg, fg, 0.04), as now. 2. surf ...: when Glass is on ..., surf =
+    rgba(surface, dark ? 0.58 : 0.7). When it is Solid, surf = surface. 3. surf2 ...: base = mix(surface, fg, dark ?
+    0.07 : 0.055). When Glass is on, surf2 = rgba(base, dark ? 0.5 : 0.62). When it is Solid, surf2 = base. This replaces
+    mix(bg, fg, 0.08). 4. Every other token rule stays as it is ... 5. Check: on Summit Peaks (page #f7f5ff, Glass) the
+    header and cards measure #fdfcff ... The file''s themeEngine.inputs (surface, surf, surf2) catch up with this
+    later; build to this decision now." The lead, 3 November 2026: "Dont hold r13. approve them and rever tto the devs"
+    and "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-557 (#36994 SETUP-SHELL-GUEST-WEB): CR-272''s surface rule (CHG-R11RUL-005), the background mixed 4% toward
+  the ink, drew a light venue''s header, footer and cards darker than its page, where the prototype''s theme() and the
+  approved web-029 capture draw them lighter.'
+keys_touched:
+  files:
+  - tools/derive-design-tokens.py
+  - handoff/design-tokens/guest-web.yaml
+  - tools/check-business-rules.py
+  tickets:
+  - SETUP-SHELL-GUEST-WEB (36994)
+root_class: a theme input the package worked out differently from the prototype's own rule
+tickets:
+  started:
+  - '36994 (SETUP-SHELL-GUEST-WEB build): through CR-557''s own posted comment; nothing beyond it.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-557
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-WEB-SURFACE
+status: open
+notes: 'tools/derive-design-tokens.py''s WEB_INPUTS write the three inputs, so handoff/design-tokens/guest-web.yaml
+  says them on the next refresh (the "catch up later" of the decision, done now). The check also holds the rule to the
+  prototype: every light preset carries surface #ffffff. **Not exact as posted (step 5):** the four light presets give
+  the prototype''s surface (#ffffff) and Summit Peaks gives #fdfcff, but the three dark presets do not: mix(bg, #ffffff,
+  0.04) gives #1d1f23, #1e1b22 and #1a1b1f where the prototype''s palettes carry #1d2027, #1e1a24 and #191c22 (no fg
+  reaches the blue channel within 4%). The rule is built as posted; the claim is for a follow-up comment.'

@@ -511,6 +511,18 @@ And one rule per decision:
                    and update, and listProducts' total order on it with no displayOrder last.
   BR-APPROVAL-DEPT-DRAFT (CR-582) a department queue is eligible inside the request's scope (platform.scope read);
                    a draft is 409 not-submitted on assignApprovalRequest and cancelApprovalRequest.
+  r14 catch-up, lane d (ADAM CR-547 to CR-557, decided 3 November 2026; lane_d_rules_r14), each failing on r13 as
+  released (dffd024e):
+  BR-CONFIG-DIFF-FLOW-ID (CR-547) diffConfigVersion's flow key is BookingFlow.id: flows paired by id, the editable
+                   properties compared, the order, and affectedProducts' flowKey.
+  BR-GST007-ELIGIBILITY-RULES (CR-551) GST-007 reads each product's rule, merges the band edges, checks once per
+                   product; GST-008's waiting-room edge is on the left-out list.
+  BR-GST007-DRAWER-AS-BUILT (CR-552) the Who's coming? person cards, the waitlist pop-up's pills and the waitlist
+                   card, logged in approved-ui-changes and the redraw on the left-out list.
+  BR-CONSENT-WHERE-LINES-ADDED (CR-556) the consent pop-up opens on the screen that adds the lines (GST-007, GST-008)
+                   and at GST-041's 422; personIndex counts the line's units.
+  BR-GUEST-WEB-SURFACE (CR-557) the guest web surface is #ffffff on a light page, surf and surf2 follow the
+                   prototype's theme() rules with the Glass alpha.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2905,6 +2917,7 @@ def main() -> int:
     lane_w3_rules_r13(need, op)
     lane_w1_rules_r13(need, op)
     lane_e_rules_r14(need, op)
+    lane_d_rules_r14(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2949,7 +2962,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_E_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_E_RULES + R14_D_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -4913,6 +4926,128 @@ def lane_e_rules_r14(need, op):
     need("BR-APPROVAL-DEPT-DRAFT", "not-submitted" in ptypes(car, "409")
          and "notSubmitted" in ((asp.get("refusedReason") or {}).get("enum") or []),
          "cancelApprovalRequest does not refuse a draft 409 notSubmitted (CR-582)")
+R14_D_RULES = ["BR-CONFIG-DIFF-FLOW-ID", "BR-GST007-ELIGIBILITY-RULES", "BR-GST007-DRAWER-AS-BUILT",
+               "BR-CONSENT-WHERE-LINES-ADDED", "BR-GUEST-WEB-SURFACE"]
+
+
+def lane_d_rules_r14(need, op):
+    """r14 catch-up, lane d (ADAM CR-547, CR-551, CR-552, CR-556 and CR-557, decided by Chinmay on 3 November 2026 and
+    posted as "Build now" comments; the lead: "start on 1,2,3"; CHG-CR547-001 to CHG-CR557-001). Each rule fails on
+    r13 as released (dffd024e) and passes once the posted decision is in."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def screen(rel, sid):
+        return next((x for x in load(rel).get("screens") or [] if (x or {}).get("id") == sid), {})
+
+    def overlay(scr, oid):
+        return next((o_ for o_ in scr.get("overlays") or [] if (o_ or {}).get("id") == oid), {})
+
+    def api(scr, oid):
+        return next((a for a in scr.get("apis") or [] if (a or {}).get("operationId") == oid), {})
+
+    def components(scr):
+        return [c for r in ((scr.get("layout") or {}).get("regions") or []) for c in (r or {}).get("components") or []]
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    p02 = "screens/P02-guest-mobile-app.yaml"
+    lo = {str((i or {}).get("id")) for i in load("docs/active/left-out.yaml").get("items") or [] if isinstance(i, dict)}
+    auc = {(str(a.get("screen")), str(a.get("field")), str(a.get("change")))
+           for a in load("docs/active/approved-ui-changes.yaml").get("changes") or [] if isinstance(a, dict)}
+
+    # BR-CONFIG-DIFF-FLOW-ID (CR-547)
+    dvd = words(op("diffConfigVersion")[3].get("description"))
+    for frag in ("**The flow key is the booking flow's id**", "the flows are paired by `id`",
+                 "`flowTypeKey`, `name`, `isDefaultForType`, `isEnabled`, `steps` (compared whole, in order) and "
+                 "`settings`", "The read-only `id`, `venueId`, `isValid`, `scopePath` and `updatedAt` are not compared",
+                 "ordered by `path`, after the `bookingFlow` area and before `theme`",
+                 "For a removed flow, the rule is resolved against the side that holds it",
+                 "A product appears once per changed flow that serves it"):
+        need("BR-CONFIG-DIFF-FLOW-ID", frag in dvd, f"diffConfigVersion does not state {frag!r} (CR-547)")
+    need("BR-CONFIG-DIFF-FLOW-ID", "the flow key)" not in dvd and "`path` the flow key." not in dvd,
+         "diffConfigVersion still names a flow key no field defines (CR-547)")
+    cdp = (schemas("contracts/satellite/white-label.yaml").get("ConfigDiff") or {}).get("properties") or {}
+    fk = ((((cdp.get("affectedProducts") or {}).get("items") or {}).get("properties") or {}).get("flowKey") or {})
+    pth = (((((cdp.get("changes") or {}).get("items") or {}).get("properties") or {}).get("path")) or {})
+    need("BR-CONFIG-DIFF-FLOW-ID", "`BookingFlow.id`" in words(fk.get("description"))
+         and "`BookingFlow.id`" in words(pth.get("description")),
+         "ConfigDiff's flowKey and path do not say they are BookingFlow.id (CR-547)")
+
+    # BR-GST007-ELIGIBILITY-RULES (CR-551)
+    g7 = screen(p02, "GST-007")
+    g7n = words(g7.get("notes"))
+    need("BR-GST007-ELIGIBILITY-RULES", api(g7, "getProductEligibilityRule").get("trigger") == "background"
+         and "once per product with a rule" in words(api(g7, "checkBookingEligibility").get("purpose")),
+         "GST-007 does not read each product's eligibility rule, or does not check once per product (CR-551)")
+    for frag in ("are band edges, not band starts", "the edges of all those rules merged, sorted, with duplicates dropped",
+                 "`heightBandIndex` is the count of that product's own edges at or below the lower bound",
+                 "The party passes only when every call is eligible", "GST-007 calls no `addCartLine`, as built"):
+        need("BR-GST007-ELIGIBILITY-RULES", frag in g7n, f"GST-007's notes do not say {frag!r} (CR-551)")
+    need("BR-GST007-ELIGIBILITY-RULES", "has a limit set" in str(overlay(g7, "eligibilityDeclaration").get("trigger"))
+         and "LO-CR551-001" in lo,
+         "GST-007's drawer does not open on a rule with a limit set, or GST-008's waiting-room edge is not on the "
+         "left-out list (CR-551)")
+
+    # BR-GST007-DRAWER-AS-BUILT (CR-552)
+    ed, jw = overlay(g7, "eligibilityDeclaration"), overlay(g7, "joinWaitlist")
+    edb = words(ed.get("body"))
+    need("BR-GST007-DRAWER-AS-BUILT", "green Completed badge" in edb and "8 years · Under 120 cm" in edb
+         and "equal pills 48 high" in edb,
+         "GST-007's eligibility drawer is not the folding person cards with the merged bands and pills (CR-552)")
+    need("BR-GST007-DRAWER-AS-BUILT", (jw.get("confirm") or {}).get("label") == "Join"
+         and (jw.get("confirm") or {}).get("operation") == "joinWaitlist"
+         and (jw.get("dismiss") or {}).get("label") == "Cancel" and "equal pills 48 high" in words(jw.get("body")),
+         "GST-007 has no waitlist pop-up with Cancel / Join as equal pills (CR-552)")
+    card = next((c for c in components(g7) if (c or {}).get("label") == "You're on the waitlist!"), {})
+    need("BR-GST007-DRAWER-AS-BUILT", "WaitlistEntry.position" in (card.get("columns") or [])
+         and "We'll tell you if a place frees up for <time>." in words(card.get("notes")),
+         "GST-007 has no waitlist confirmation card with the queue position (CR-552)")
+    need("BR-GST007-DRAWER-AS-BUILT", all(("GST-007", f, "CHG-CR552-001") in auc for f in
+                                         ("overlay:eligibilityDeclaration", "overlay:joinWaitlist", "region:collection"))
+         and "LO-CR552-001" in lo and "614c7ee" in words(((g7.get("wireframe") or {}).get("prototype") or {})
+                                                         .get("differences")),
+         "CR-552's design change is not logged in approved-ui-changes, named in prototype.differences, or its redraw "
+         "is not on the left-out list")
+
+    # BR-CONSENT-WHERE-LINES-ADDED (CR-556)
+    g8, g41 = screen(p02, "GST-008"), screen(p02, "GST-041")
+    need("BR-CONSENT-WHERE-LINES-ADDED", "own addCartLine" in str(overlay(g7, "consentQuestions").get("trigger"))
+         and "it opens no pop-up and records nothing" in g7n,
+         "GST-007's consent pop-up does not open only after its own addCartLine (CR-556)")
+    for scr, sid in ((g8, "GST-008"), (g41, "GST-041")):
+        cq = overlay(scr, "consentQuestions")
+        rca = api(scr, "recordConsentAnswers")
+        need("BR-CONSENT-WHERE-LINES-ADDED", (cq.get("confirm") or {}).get("operation") == "recordConsentAnswers"
+             and (cq.get("dismiss") or {}).get("discards") == ["answers"] and "*Adult 1*" in words(cq.get("body"))
+             and rca.get("trigger") == "onAction" and "getCart" in (rca.get("invalidates") or []),
+             f"{sid} does not open the consent pop-up and record the answers as CR-556 decided")
+    need("BR-CONSENT-WHERE-LINES-ADDED", api(g8, "getCart").get("trigger") == "background"
+         and "422 consentRequired" in str(overlay(g41, "consentQuestions").get("trigger")),
+         "GST-008 does not read the cart after its lines, or GST-041 does not open the pop-up on 422 (CR-556)")
+    rcd = words(op("recordConsentAnswers")[3].get("description"))
+    need("BR-CONSENT-WHERE-LINES-ADDED", "counts the line's units from 0 to quantity minus 1" in rcd
+         and "a `personIndex` at or above the line's quantity" in rcd,
+         "recordConsentAnswers does not count personIndex over the line's units or refuse 422 personRequired (CR-556)")
+    cart = (schemas("contracts/spine/orders.yaml").get("Cart") or {}).get("properties") or {}
+    cqi = ((cart.get("consentQuestions") or {}).get("items") or {}).get("allOf") or [{}, {}]
+    ans = ((cqi[-1].get("properties") or {}).get("answered") or {})
+    need("BR-CONSENT-WHERE-LINES-ADDED", "every one of the persons on every line in `lineIds`" in words(ans.get("description")),
+         "Cart.consentQuestions[].answered does not say every person on every line in lineIds (CR-556)")
+
+    # BR-GUEST-WEB-SURFACE (CR-557)
+    gw = load("handoff/design-tokens/guest-web.yaml")
+    inp = (gw.get("themeEngine") or {}).get("inputs") or {}
+    need("BR-GUEST-WEB-SURFACE", "'#ffffff' when dark is false" in words(inp.get("surface"))
+         and "mix(bg, fg, 0.04) when dark is true" in words(inp.get("surface"))
+         and "glass ? rgba(surface, dark ? 0.58 : 0.7) : surface" in words(inp.get("surf"))
+         and "base = mix(surface, fg, dark ? 0.07 : 0.055); glass ? rgba(base, dark ? 0.5 : 0.62) : base"
+         in words(inp.get("surf2")),
+         "guest-web's themeEngine.inputs do not work out surface, surf and surf2 as CR-557 decided")
+    light = {k: v for k, v in (gw.get("palettes") or {}).items() if isinstance(v, dict) and v.get("dark") is False}
+    need("BR-GUEST-WEB-SURFACE", light and all(str(v.get("surface")).lower() == "#ffffff" for v in light.values()),
+         "a light preset of the prototype carries a surface other than #ffffff, against CR-557's surface rule")
 
 
 if __name__ == "__main__":

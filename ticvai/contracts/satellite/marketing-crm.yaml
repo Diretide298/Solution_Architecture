@@ -19074,9 +19074,14 @@ paths:
         binds them to the order. **Append-only**: changing an answer is a new record that supersedes the
         old one, so the history survives.
 
-        **A `perPerson` question is answered per declared person** (`cartLineId` and `personIndex`, the
-        person's row in the line's `eligibilityDeclaration`); a `perBooking` one once, and it covers
-        everyone on the booking. For a `swim` question the answer fills
+        **A `perPerson` question is answered per person on each line it asks** (`cartLineId` and
+        `personIndex`); a `perBooking` one once, and it covers everyone on the booking. **`personIndex`
+        counts the line's units from 0 to quantity minus 1; on a line with an `eligibilityDeclaration` it
+        is that row** (ADAM CR-556, Chinmay, 3 November 2026; CHG-CR556-001). A per-person answer with no
+        `cartLineId`, or a `personIndex` at or above the line's quantity (the line of the cart already read,
+        `orders#cartRecords`), is `422 personRequired`. The cart's `consentQuestions[].answered` is true
+        when every one of those persons on every line in `lineIds` has an answer. `personName` is the label
+        the guest was shown (*Adult 1*, *Child 2*, or *Person n* on a line with a declaration). For a `swim` question the answer fills
         `orders.CreateOrderLine.eligibilityDeclaration.confidentSwimmer`, which is now derived from it.
 
         **An answer the venue set to block the booking is recorded, not refused**: the cart then shows a
@@ -19125,8 +19130,9 @@ paths:
                 $ref: '#/components/schemas/ConsentAnswerProblem'
         '422':
           x-ticvai-problem-types: [person-required, question-not-asked, question-retired]
-          description: 'A `perPerson` question answered without a person (`personRequired`), a question
-            this cart does not ask (`questionNotAsked`), or a retired one (`questionRetired`).'
+          description: 'A `perPerson` question answered without a person: no `cartLineId`, or a `personIndex`
+            at or above the line''s quantity (`personRequired`, ADAM CR-556), a question this cart does not
+            ask (`questionNotAsked`), or a retired one (`questionRetired`).'
           content:
             application/problem+json:
               schema:
@@ -21718,12 +21724,15 @@ components:
                 type: integer
                 minimum: 0
                 nullable: true
-                description: For a `perPerson` question, the person's row in that line's
-                  `eligibilityDeclaration`, counting from 0.
+                description: 'For a `perPerson` question, the person on that line: the line''s units counted
+                  from 0 to quantity minus 1; on a line with an `eligibilityDeclaration`, that row (ADAM CR-556).
+                  At or above the line''s quantity is `422 personRequired`.'
               personName:
                 type: string
                 maxLength: 120
                 nullable: true
+                description: 'The label the guest was shown for the person: ticket type and number (*Adult 1*,
+                  *Child 2*), or *Person n* on a line with a declaration (ADAM CR-556).'
               personSubjectId:
                 type: string
                 format: uuid

@@ -1913,8 +1913,8 @@ screens:
     with part-of-day chips. **Seated events (REV3-4, REV3-7):** this step before the seat map, or a pop-up
     on it (`seatEventDateMode`); skipped when the event has one on-sale performance; may render with GST-049
     as one step. **Language (REV3-17), experience and level (REV3-19), Booking at (REV3-18), Quick tour
-    (REV3-20).** **Consent questions (REV3-26)** pop up once after the session or date; the *Swim consent
-    pop-up (on/off)* toggle is dropped. Per-guest eligibility is `checkBookingEligibility`, unchanged
+    (REV3-20).** **Consent questions (REV3-26)** pop up once the cart holds this booking''s lines, on the
+    screen that adds them (ADAM CR-556); the *Swim consent pop-up (on/off)* toggle is dropped. Per-guest eligibility is `checkBookingEligibility`, unchanged
     (DG-3). Guest copy may say *Session* (CFG-10); code keeps `Performance`. Every booking-flow setting
     named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest
     picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field
@@ -1961,7 +1961,59 @@ screens:
     productId }` when the screen has one (the product-first flow from GST-008), else `{ eventId }` from
     the entry; never an empty query. On 404 the screen renders date, then time, then tickets with the
     flow settings'' defaults (no quick tour, no flow-level consent questions); the cart''s product consent
-    questions still apply. A 400 is the error state. The connect-to-API ticket uses the same call.'
+    questions still apply. A 400 is the error state. The connect-to-API ticket uses the same call.
+
+
+    **The eligibility drawer reads each product''s rule** (ADAM CR-551, Chinmay, 3 November 2026; CHG-CR551-001).
+    (1) For each product the screen knows (the product chosen first, and the chosen level''s product) the screen
+    calls `getProductEligibilityRule`; a product with no rule answers 200 with every limit empty. The drawer
+    opens once, on leaving selection, when any rule has a limit set: an age or height limit, `accompaniedBelowAge`,
+    a guardian age range, `waiverRequired` or `requiredCertificationCode`. (2) The `heightBandsCm` entries
+    are band edges, not band starts: [120, 140] is three bands, under 120, 120 to 139, and 140 and over.
+    Height is asked only when some rule sets `minHeightCm` or `maxHeightCm`. The chips are the bands made
+    by the edges of all those rules merged, sorted, with duplicates dropped: *Under 120 cm*, *120–139 cm*,
+    *140 cm and over*; this replaces heightBandsOf and the first-rule-with-bands logic. (3) `checkBookingEligibility`
+    is called once per product with a rule: `productIds` holds that one product, the whole party is sent,
+    and each call gets its own Idempotency-Key. For each person and product, `heightBandIndex` is the count
+    of that product''s own edges at or below the lower bound of the chip the person chose (0 for the first
+    chip). A person who fails a call is named with that product''s name and the reason. The party passes
+    only when every call is eligible. The waiver note shows when any call returns `waiverRequired`; the
+    guardian tick shows when the age falls in any rule''s guardian age range. The contracts stay as they are. (4) Party
+    size: one person to start, and the guest adds more, as built. (5) GST-007 calls no `addCartLine`, as
+    built; `getCart` and the consent pop-up stay as accepted under CR-493. The move from a refused `addCartLine`
+    to the waiting room happens on the tickets screen''s Continue (GST-008); that is a separate ticket (LO-CR551-001).
+
+
+    **Design change: the eligibility drawer, the pop-up pills and the waitlist card as built in 614c7ee**
+    (ADAM CR-552, Chinmay, 3 November 2026; CHG-CR552-001). (1) The eligibility drawer *Who''s coming?*
+    is a bottom sheet with the title and a guest-count badge. There is one card per person and only the
+    person being filled in is open: age, height as chips, the guardian tick, and Remove person. Entered
+    people fold to one line with a green Completed badge, and tapping a folded card opens it. Add another
+    person opens a new card and folds the rest. Anyone who cannot take part has the reason, with the product''s
+    name, under their card even when folded. The height chips and the folded line use the bands from the
+    edges of the products'' rules merged, as decided on CR-551: for edges 120 and 140 that is *Under 120
+    cm*, *120–139 cm* and *140 cm and over*, so the folded line reads e.g. *8 years · Under 120 cm*. (2)
+    Back / Continue in the drawer and Cancel / Join in the waitlist pop-up are equal pills 48 high: solid
+    black with white text for the step forward, white with a light border for the way back, a spinner while
+    saving, faded when disabled. (3) After joining, the waitlist confirmation card has the cream-to-amber
+    gradient, the amber border, the group icon in a round badge and *You''re on the waitlist!*. The Queue
+    position box shows `WaitlistEntry.position` large, from `joinWaitlist`''s answer. Without a position
+    it says *We''ll tell you if a place frees up for <time>.* Tokens `waitlistColors` and `waitlistCardGradient`
+    in src/theme/tokens.ts, as the build added them. Operations, request and response fields, errors and
+    permissions unchanged. The frame is redrawn to the build later (LO-CR552-001).
+
+
+    **The consent pop-up opens once the cart holds this booking''s lines, on the screen that adds them**
+    (ADAM CR-556, Chinmay, 3 November 2026; CHG-CR556-001). This screen opens the consent pop-up only right
+    after its own `addCartLine` (flows whose tickets are set on this page), with the questions from `getCart`''s
+    `consentQuestions`, per-booking and per-person, asked as Tickets & Add-ons (GST-008) asks them: a per-booking
+    question once; a per-person question once for each person on each line in its `lineIds` (a line of quantity
+    n has persons 0 to n-1), named by ticket type and number (*Adult 1*, *Child 2*), or *Person n* as the
+    eligibility drawer labels them when the line has a declaration; a question whose `answered` is true
+    is not asked again. After the last question one `recordConsentAnswers` is sent, per-person answers with
+    `cartLineId`, `personIndex` and `personName` (the label shown), and the cart is read again. When this
+    screen adds no line (date-first and product-first flows), it opens no pop-up and records nothing. Quick
+    tour, More dates, the month calendar and the pop-up''s look stay exactly as built.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getAvailability` reads one of them — list,
@@ -2056,6 +2108,17 @@ screens:
         operation: leaveWaitlist
         notes: Shown instead of Join once the guest is on this time's waitlist (CHG-R6-037).
         provenance: contract catalogue.yaml DELETE /waitlist-entries/{entryId} (12 October 2026, CHG-R6-037)
+      - kind: banner
+        label: You're on the waitlist!
+        bindsTo: WaitlistEntry
+        columns:
+        - WaitlistEntry.position
+        notes: '**The waitlist confirmation card, after joining** (as built in 614c7ee, ADAM CR-552): the
+          cream-to-amber gradient (`waitlistCardGradient`), the amber border (`waitlistColors`), the group
+          icon in a round badge and *You''re on the waitlist!*. The Queue position box shows `WaitlistEntry.position`
+          large, from `joinWaitlist`''s answer; without a position it says *We''ll tell you if a place frees
+          up for <time>.*'
+        provenance: ADAM CR-552 (design change, 3 November 2026)
   states:
     loading: The select date time list.
     error: Could not load. Names which read failed and leaves the select date time untouched.
@@ -2075,8 +2138,17 @@ screens:
   apis:
   - operationId: checkBookingEligibility
     contract: catalogue
-    purpose: Check the party's ages and heights
+    purpose: 'Check the party''s ages and heights: once per product with a rule, `productIds` holding that
+      one product, the whole party sent, each call with its own Idempotency-Key; `heightBandIndex` counts
+      that product''s own edges at or below the chosen chip''s lower bound (ADAM CR-551)'
     trigger: onAction
+  - operationId: getProductEligibilityRule
+    contract: catalogue
+    purpose: 'The eligibility rule of each product the screen knows (the product chosen first, and the chosen
+      level''s product), not a control: the drawer opens on leaving selection when any rule has a limit set;
+      a product with no rule answers 200 with every limit empty (ADAM CR-551)'
+    trigger: background
+    provenance: ADAM CR-551, 3 November 2026
   - operationId: listPerformances
     contract: catalogue
     purpose: List performances of an event
@@ -2168,7 +2240,10 @@ screens:
       view: 'Buy tickets → Timed entry → Book now (step 1: date, then entry window)'
       differences: 'Booking in the app runs the website booking engine; per-flow step order. As built
         in 22143c6 (ADAM CR-493, design change): coach-mark cards with arrows, the More dates tile and
-        the in-app month calendar, and the one-question Yes / No consent pop-up with a close (x).'
+        the in-app month calendar, and the one-question Yes / No consent pop-up with a close (x). As built
+        in 614c7ee (ADAM CR-552, design change): the eligibility drawer as one folding card per person
+        with the merged height bands, equal black and white pills in the drawer and the waitlist pop-up,
+        and the waitlist confirmation card with the queue position.'
     stateViews:
       loading: P02/venue-loader
       error: P02/state-error
@@ -2182,11 +2257,18 @@ screens:
   overlays:
   - id: eligibilityDeclaration
     component: drawer
-    trigger: Once, on leaving selection, when a chosen product has an eligibility rule
+    trigger: Once, on leaving selection, when any chosen product's rule has a limit set
     body: '**The party''s age and height, asked once per person** (DI-1037; REV3 DG-3) for the products
-      that set a rule, then checked with `checkBookingEligibility`. A person who does not meet a rule
-      is named with the product, and the guest changes the selection; never a button, and never a form
-      of product ids.'
+      that set a rule, then checked with `checkBookingEligibility`, once per product with a rule (ADAM
+      CR-551). A person who does not meet a rule is named with the product, and the guest changes the selection;
+      never a button, and never a form of product ids. **Who''s coming?** (as built in 614c7ee, ADAM CR-552):
+      a bottom sheet with the title and a guest-count badge; one card per person, only the person being
+      filled in open (age, height as chips from the merged band edges, the guardian tick, Remove person);
+      entered people fold to one line with a green Completed badge (e.g. *8 years · Under 120 cm*) and
+      tapping a folded card opens it; Add another person opens a new card and folds the rest; the reason
+      a person cannot take part, with the product''s name, stays under their card even when folded. Back
+      and Continue are equal pills 48 high: Continue solid black with white text, Back white with a light
+      border, a spinner while saving, faded when disabled.'
     confirm:
       label: Continue
       operation: checkBookingEligibility
@@ -2197,13 +2279,14 @@ screens:
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   - id: consentQuestions
     component: modal
-    trigger: Once, after the session or date is picked, when the cart has consent questions
+    trigger: Once, right after this screen's own addCartLine, when the cart has an unanswered consent question
     body: '**The venue''s consent questions for this booking** (e.g. *Are you able to swim?*), **one question
       at a time**, in the order `Cart.consentQuestions` gives (the flow''s `consentQuestionIds` and every
       cart product''s, each once). The question text is a centred large title under the icon for its kind
       (a swimmer for swim, `colors.consentIcon` #00BFFF), with the question''s `helpText` under it when
-      it has one; no *Question n of m* kicker. A per-person question is asked once for each person, naming
-      them. **Yes** (black) and **No** (red) answer and go on. When the tapped answer is the question''s
+      it has one; no *Question n of m* kicker. A per-person question is asked once for each person on each
+      line in its `lineIds`, naming them by ticket type and number (*Adult 1*, *Child 2*), or *Person n*
+      when the line has a declaration (ADAM CR-556); a question already `answered` is not asked again. **Yes** (black) and **No** (red) answer and go on. When the tapped answer is the question''s
       `blockingAnswer`, the pop-up warns first (*...Tap No again to carry on.*, or Yes when Yes blocks)
       and records it on the second tap. `recordConsentAnswers` sends every answer once, after the last
       question (question version, answer, who, when), then the cart is read again. A blocking answer marks
@@ -2235,6 +2318,22 @@ screens:
       discards:
       - the date picked in the calendar
     provenance: ADAM CR-493 (design change, 3 November 2026)
+  - id: joinWaitlist
+    component: modal
+    trigger: Join the waitlist, on a sold-out time
+    body: '**The waitlist pop-up** (as built in 614c7ee, ADAM CR-552, 3 November 2026): the party size
+      and how to be told, then Cancel and Join, equal pills 48 high: Join solid black with white text,
+      Cancel white with a light border, a spinner while saving, faded when disabled. Joining reserves nothing;
+      after it the waitlist confirmation card shows.'
+    bindsTo: WaitlistEntry
+    confirm:
+      label: Join
+      operation: joinWaitlist
+    dismiss:
+      label: Cancel
+      discards:
+      - the party size and the contact choice
+    provenance: ADAM CR-552 (design change, 3 November 2026)
   - id: quickTour
     component: modal
     trigger: First booking visit on this device, or Quick tour, when the flow's quickTour is on
@@ -2370,7 +2469,20 @@ screens:
     ticket is chosen, whether `ticketTags` is on or off (it is not a tag), and is hidden at zero; tags
     still show only when `ticketTags` is on and descriptions only when `cardInfo` is on. (3) Both changes
     are drawn in every `cardLayout` (stackedRows, splitRows, cardsAcross, posterCards) and `cardSize`,
-    and mirror in Arabic. Same operations, fields, errors and permissions as before.'
+    and mirror in Arabic. Same operations, fields, errors and permissions as before.
+
+
+    **The consent pop-up opens here once this step''s lines are in the cart** (ADAM CR-556, Chinmay, 3
+    November 2026; CHG-CR556-001). After its `addCartLine` calls succeed and before leaving the step, the
+    screen reads `getCart`. If any of its `consentQuestions` is unanswered, it opens the same consent pop-up
+    component as GST-007 (overlay `consentQuestions`: one question at a time, Yes / No, the second tap on
+    a blocking answer, close (x) discards and records nothing). A per-booking question is asked once. A
+    per-person question is asked once for each person on each line in its `lineIds`: a line of quantity
+    n has persons 0 to n-1, and the question names them by ticket type and number (*Adult 1*, *Child 2*),
+    or *Person n* as the eligibility drawer labels them when the line has a declaration. A question whose
+    `answered` is true is not asked again. After the last question one `recordConsentAnswers` is sent:
+    per-person answers with `cartLineId`, `personIndex` and `personName` (the label shown); then the cart
+    is read again.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProductVariants` reads the ticket types of the product and a stepper sets each
@@ -2493,6 +2605,20 @@ screens:
     contract: orders
     purpose: Add the tickets and add-ons
     trigger: onAction
+  - operationId: getCart
+    contract: orders
+    purpose: 'Read by the screen after its addCartLine calls succeed and before leaving the step, not a
+      control: the cart''s consentQuestions, which open the consent questions pop-up when one is unanswered
+      (ADAM CR-556); with the guest session the device already holds (ADR-0045)'
+    trigger: background
+    provenance: ADAM CR-556, 3 November 2026
+  - operationId: recordConsentAnswers
+    contract: marketing-crm
+    purpose: Record the answers to the booking's consent questions, once, after the last question (ADAM CR-556)
+    trigger: onAction
+    invalidates:
+    - getCart
+    provenance: ADAM CR-556, 3 November 2026
   - operationId: getPublishedBookingFlow
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
@@ -2574,6 +2700,26 @@ screens:
       discards:
       - answers
     provenance: client-verified
+  - id: consentQuestions
+    component: modal
+    trigger: After this step's addCartLine calls succeed, before leaving the step, when the cart has an unanswered consent question
+    body: '**The same consent pop-up component as GST-007** (ADAM CR-556, 3 November 2026; as accepted under
+      CR-493): one question at a time, Yes / No, the second tap on a blocking answer, and a close (x) that
+      discards the answers and records nothing. A per-booking question is asked once. A per-person question
+      is asked once for each person on each line in its `lineIds`: a line of quantity n has persons 0 to
+      n-1, named by ticket type and number (*Adult 1*, *Child 2*), or *Person n* as the eligibility drawer
+      labels them when the line has a declaration. A question whose `answered` is true is not asked again.
+      After the last question one `recordConsentAnswers` is sent, per-person answers with `cartLineId`,
+      `personIndex` and `personName` (the label shown); then the cart is read again.'
+    bindsTo: ConsentQuestion
+    confirm:
+      label: Yes / No
+      operation: recordConsentAnswers
+    dismiss:
+      label: Close (x)
+      discards:
+      - answers
+    provenance: ADAM CR-556 (3 November 2026); the pop-up as accepted under CR-493
 - id: GST-009
   name: Review & Payment
   module: Cart & Checkout
@@ -9112,7 +9258,9 @@ screens:
     guest checkout and matching are unchanged (DG-1). Visit date per line (23SEP-9). **On mobile the basket
     stays a bottom bar with the running total**; the floating icon and the cart side apply to the website
     (REV3-10). A spot held on the venue map counts down from its `ResourceHold.expiresAt` (REV3-15). `checkoutCart`
-    `422 consentRequired` or `consentAnswerBlocks` sends the guest back to the consent questions (REV3-26).
+    `422 consentRequired` or `consentAnswerBlocks` opens the same consent pop-up here for the unanswered
+    questions (REV3-26; ADAM CR-556, 3 November 2026, CHG-CR556-001: overlay `consentQuestions`, as GST-008
+    asks them, then `recordConsentAnswers` and the cart read again).
 
 
     **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
@@ -9249,6 +9397,14 @@ screens:
     contract: orders
     purpose: Turn the cart into an order
     trigger: onAction
+  - operationId: recordConsentAnswers
+    contract: marketing-crm
+    purpose: 'Record the answers to the questions checkoutCart refused for (422 consentRequired or consentAnswerBlocks),
+      once, after the last question (ADAM CR-556)'
+    trigger: onAction
+    invalidates:
+    - getCart
+    provenance: ADAM CR-556, 3 November 2026
   - operationId: abandonCart
     contract: orders
     purpose: Give the inventory back
@@ -9364,6 +9520,26 @@ screens:
     body: '**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather
       than the verb. A checkout entry this affects should be identified in the dialog, not just counted.'
     provenance: client-verified
+  - id: consentQuestions
+    component: modal
+    trigger: checkoutCart refuses 422 consentRequired or consentAnswerBlocks
+    body: '**The same consent pop-up component as GST-007, for the unanswered questions** (ADAM CR-556, 3 November 2026; as accepted under
+      CR-493): one question at a time, Yes / No, the second tap on a blocking answer, and a close (x) that
+      discards the answers and records nothing. A per-booking question is asked once. A per-person question
+      is asked once for each person on each line in its `lineIds`: a line of quantity n has persons 0 to
+      n-1, named by ticket type and number (*Adult 1*, *Child 2*), or *Person n* as the eligibility drawer
+      labels them when the line has a declaration. A question whose `answered` is true is not asked again.
+      After the last question one `recordConsentAnswers` is sent, per-person answers with `cartLineId`,
+      `personIndex` and `personName` (the label shown); then the cart is read again.'
+    bindsTo: ConsentQuestion
+    confirm:
+      label: Yes / No
+      operation: recordConsentAnswers
+    dismiss:
+      label: Close (x)
+      discards:
+      - answers
+    provenance: ADAM CR-556 (3 November 2026); the pop-up as accepted under CR-493
 - id: GST-042
   name: Simple Registration & OTP
   module: Account & Self-Service

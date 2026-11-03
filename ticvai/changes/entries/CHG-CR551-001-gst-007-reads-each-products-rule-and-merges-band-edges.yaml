@@ -1,0 +1,55 @@
+id: CHG-CR551-001
+date: '2026-11-03'
+source: cr
+kind: spec
+summary: 'GST-007''s eligibility drawer reads getProductEligibilityRule for each product the screen knows and opens on
+  leaving selection when any rule has a limit set; heightBandsCm are band edges, the chips are all those rules'' edges
+  merged, sorted and deduplicated; checkBookingEligibility runs once per product with a rule (one productId, the whole
+  party, its own Idempotency-Key) with heightBandIndex counted on that product''s own edges; a failing person is named
+  with the product; party size starts at one; GST-007 adds no cart line, as built. No contract change. GST-008''s move
+  to the waiting room on a refused addCartLine is a separate ticket (LO-CR551-001).'
+decision:
+  what: 'ADAM CR-551, posted on #31784: "Decided (Chinmay, 3 November 2026): your choices stand except how height bands
+    are read and how products are named. Build now: (1) For each product the screen knows ..., call
+    getProductEligibilityRule ... Open the drawer once, on leaving selection, when any rule has a limit set ... (2) The
+    heightBandsCm entries are band edges, not band starts ... The chips are the bands made by the edges of all those
+    rules merged, sorted, with duplicates dropped ... (3) Call checkBookingEligibility once per product with a rule ...
+    heightBandIndex is the count of that product''s own edges at or below the lower bound of the chip the person chose
+    ... No contract change. (4) Party size: one person to start ... (5) GST-007 calls no addCartLine, as built ... The
+    move from a refused addCartLine to the waiting room happens on the tickets screen''s Continue; that is a separate
+    ticket, so build nothing for it here." The lead, 3 November 2026: "Dont hold r13. approve them and rever tto the
+    devs" and "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-551 (#31784 GST-007): the screen could not see a product''s rule or its height bands, the result named no
+  product, and addCartLine had no place on the screen; the build read heightBandsCm as band starts and took the first
+  rule with bands.'
+keys_touched:
+  screens: [GST-007, GST-008]
+  operations: [getProductEligibilityRule, checkBookingEligibility]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/left-out.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-business-rules.py
+root_class: a screen action needs a value nothing on the screen supplies (screen-values)
+tickets:
+  started:
+  - '31784 (GST-007 build; In progress at the CR-556 pull): through CR-551''s own posted comment; nothing beyond it.'
+  unstarted:
+  - '31785 ([FE] GST-007 connect to API): getProductEligibilityRule per product and checkBookingEligibility once per
+    product, at its next pull.'
+  - 'New [FE] task under #28159 (listed for the integration pass, LO-CR551-001): GST-008 sends the guest to GST-046 when
+    addCartLine is refused 403 admission-required and brings them back with the quantities kept.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-551
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GST007-ELIGIBILITY-RULES
+status: open
+notes: '**Named beyond the posted words:** getProductEligibilityRule is on GST-007''s apis with trigger background (a
+  read, not a control); the eligibilityDeclaration overlay''s trigger reads "when any chosen product''s rule has a limit
+  set", logged in docs/active/approved-ui-changes.yaml with CR-552''s drawer (one field, one entry). The GST-007 edge to
+  GST-046 stays, for flows that add lines on GST-007 (CR-556).'

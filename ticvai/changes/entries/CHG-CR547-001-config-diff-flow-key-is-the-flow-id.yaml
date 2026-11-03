@@ -1,0 +1,47 @@
+id: CHG-CR547-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'diffConfigVersion''s "flow key" is BookingFlow.id, the uuid as text: the bookingFlows of each side are paired
+  by id; one changes entry per flow, path the id, added or removed with the whole flow, modified when flowTypeKey, name,
+  isDefaultForType, isEnabled, steps (whole, in order) or settings differ (the read-only id, venueId, isValid, scopePath
+  and updatedAt are not compared), before and after the whole flow as compact JSON, ordered by path between bookingFlow
+  and theme; affectedProducts lists each product a changed flow serves, flowKey that flow''s id, a removed flow resolved
+  on the side that holds it, a product once per changed flow. Same shape, names, 404 and change scope; no migration.'
+decision:
+  what: 'ADAM CR-547, posted on #30768: "Decided (Chinmay, 3 November 2026): wherever diffConfigVersion says \"the flow
+    key\", it means the booking flow''s id (BookingFlow.id, the uuid as text). Build now: (1) Matching flows: take the
+    bookingFlows list of each side ... and pair the flows by id ... (2) Changes entries for bookingFlows: one entry per
+    flow, with area `bookingFlows` and path the flow''s id ... A flow on both sides is `modified` when any of its
+    editable properties differ. Those are flowTypeKey, name, isDefaultForType, isEnabled, steps (compared whole, in
+    order) and settings. The read-only id, venueId, isValid, scopePath and updatedAt are not compared ... (3)
+    affectedProducts: ... flowKey is that flow''s id. For a removed flow, resolve against the side that holds it. A
+    product appears once per changed flow that serves it. (4) Nothing else changes ... No migration. The screens that
+    show this diff do not change." The lead, 3 November 2026: "Dont hold r13. approve them and rever tto the devs" and
+    "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-547 (Deep Khanvilkar, #30768 diffConfigVersion): the bookingFlows path and affectedProducts.flowKey were
+  "the flow key", which named no field of BookingFlow; CR-500 (CHG-CR500-001) had kept that wording.'
+keys_touched:
+  operations: [diffConfigVersion]
+  schemas: [ConfigDiff, BookingFlow]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: a key the contract names but no field defines
+tickets:
+  started: []
+  unstarted:
+  - '30768 (diffConfigVersion, Deep Khanvilkar): pair flows by id and compare their editable properties, as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-547
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONFIG-DIFF-FLOW-ID
+status: open
+notes: 'diffConfigVersion''s description carries the rule as a paragraph of its own and its two "flow key" phrases
+  now name the id; ConfigDiff.changes[].path and affectedProducts[].flowKey say BookingFlow.id in their descriptions
+  (no type, required list or enum changed, so no breaking change). Beyond the posted words: none.'
