@@ -1,0 +1,37 @@
+id: CHG-CR423-002
+date: '2026-11-04'
+source: cr
+kind: contract
+summary: listDynamicPricingStrategy's ruleConflicts is always present and 0 until conflict detection is decided, and operationalAlerts
+  never carries unresolvedRuleConflicts meanwhile; CHG-CR423-001's sum of the seven open-conflict counts is withdrawn.
+decision:
+  what: 'ADAM CR-423, the correction posted on #35286 on 3 November 2026 (relayed by the coordinator on 4 November): "ruleConflicts
+    is 0 and operationalAlerts never carries unresolvedRuleConflicts until conflict detection is decided". It corrects the
+    earlier answer of the same day ("ruleConflicts is an empty list"), which did not fit the integer the package declares.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-423 (Hrushikant Patkar, #35286 listDynamicPricingStrategy): the developer asked what ruleConflicts holds while
+  no conflict detection is defined; the package summed listRulePriorityConflict''s counts, which nothing computes.'
+keys_touched:
+  operations:
+  - listDynamicPricingStrategy
+  schemas:
+  - DynamicPricingStrategyCommandCenterSummary
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: a figure whose source is not built
+tickets:
+  started:
+  - '35286 (Ready for QA, Hrushikant Patkar): the correction was posted there.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-423
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-STRATEGY-FIGURES
+status: open
+notes: The coordinator relayed that the package already said this; it said the sum of the seven counts, so that sentence
+  and the two field descriptions are rewritten, and nothing else.

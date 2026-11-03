@@ -830,6 +830,11 @@ paths:
         `claimCart`''s comparison (constant-time) and the recovery link `cart.abandoned` carries. `createCart` and
         `getCart` answer it in clear to the cart''s caller. `claimCart`''s rotation is `claimCart`''s.
 
+        **The venue check for a caller with no credential** (ADAM CR-486, Chinmay, 3 November 2026, the correction
+        posted on #30682; CHG-CR486-002): `tenancy#activeVenues` is asked as above, and for a caller with no
+        credential it runs under the routed tenant''s root grant; an inactive venue, or one that is not this
+        tenant''s, is absent and answers `404`, and nothing is written.
+
         '
       tags:
       - cart
@@ -9604,6 +9609,11 @@ paths:
         transfer row is inserted with `from_subject_id` = the caller''s subject, admitted by `orders.ticket_transfer`''s
         write branch for the guest who is the sender and the order''s subject; no wider grant.
 
+
+        **The channel is stored** (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): the row''s
+        `recipient_channel` is the body''s `recipient.channel` (email, sms or whatsapp), returned as
+        `TicketTransfer.recipientChannel` here and on every answer that returns a transfer.
+
         '
       tags:
       - order
@@ -9646,6 +9656,8 @@ paths:
                   properties:
                     channel:
                       type: string
+                      description: Stored on the transfer as `recipient_channel` and returned as
+                        `TicketTransfer.recipientChannel` (ADAM CR-593).
                       enum:
                       - email
                       - sms
@@ -9759,6 +9771,7 @@ paths:
       operationId: listTicketTransfers
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
+        - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-045 Ticket Delivery & Sharing"
@@ -9789,7 +9802,14 @@ paths:
         `to_subject_id` = the caller''s subject (received; `to_subject_id` is set only on claim), a condition kept in
         the query as well as in the table''s policy. `direction` `sent` narrows to `from_subject_id`, `received` to
         `to_subject_id`; `status` is an exact match; the cursor is (`expires_at`, `id`). Another guest''s transfers
-        are never shown.'
+        are never shown.
+
+
+        **Each transfer carries the channel it was sent by** (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001):
+        `recipientChannel` (email, sms or whatsapp; null on rows written before the change), read from
+        `recipient_channel`. Nothing else about the read changes: guest-scoped, filtered by `direction`, `claimUrl`
+        still null on the sender''s rows. The page has no total: WEB-030 (`direction=sent`, every page until
+        `hasMore` is false) counts its own ''N sent this year''.'
       tags:
       - order
       x-ticvai-permission: null
@@ -24690,6 +24710,21 @@ components:
           description: Set only on claim. Ownership moves then, not at offer.
         recipientAddressMasked:
           type: string
+          description: The recipient's address as the server masks it. A screen shows it as sent and never unmasked
+            (ADAM CR-593).
+        recipientChannel:
+          type: string
+          nullable: true
+          readOnly: true
+          enum:
+          - email
+          - sms
+          - whatsapp
+          description: '**The channel the transfer was sent by** (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001):
+            `transferOrderTickets` stores its `recipient.channel` in `orders.ticket_transfer.recipient_channel` (text,
+            email, sms or whatsapp, nullable), and every answer that returns a transfer returns it. Null on rows written
+            before this change. WEB-030 draws a sent row''s channel part from it: email is ''Sent to '' plus
+            `recipientAddressMasked`, sms is ''Sent by SMS'', whatsapp is ''Sent by WhatsApp''.'
         status:
           type: string
           enum:

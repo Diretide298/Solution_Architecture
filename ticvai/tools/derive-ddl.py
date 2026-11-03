@@ -66,7 +66,8 @@ Vectors are not here: they live in each tenant's Qdrant collection (decided 30 S
 
 **Contract enums, maxLength and defaults are carried** as a `<table>_<column>_chk` CHECK and a
 column DEFAULT (storage-design.md, "Enum agreement": the database holds the same values as the
-contract). **Uniqueness is carried where the contract marks it**: a property with
+contract). An array's item properties named in `x-ticvai-item-checks` beside `type: array` carry theirs onto the
+child table the array derives (ADAM CR-594, CHG-CR594-001). **Uniqueness is carried where the contract marks it**: a property with
 `x-ticvai-unique: tenant` or `venue` becomes a `<table>_<columns>_uniq` unique index (audit R108,
 28 September). A contract schema's `x-ticvai-unique-together: [[a, b, ...]]` is a unique index over
 several columns, each named by property or by column (CHG-R6-006); with `x-ticvai-unique-nulls: not-distinct` on
@@ -1808,6 +1809,14 @@ def deployable_read_grants(db: str = "tenant") -> str:
                   "no grant written")
             continue
         used = {(role, s) for s in kernel_schemas}
+        # **A read limited to named columns** (ADAM CR-595, Chinmay, 3 November 2026; CHG-CR595-001): an entry's
+        # `columns` (one table only) grants SELECT on those columns and nothing else of the table, so the operations
+        # host reads id, is_active, valid_from and valid_to of identity.principal and no other column.
+        cols = [str(c) for c in r.get("columns") or []]
+        if cols and (len(r.get("tables") or []) != 1 or not all(re.match(r"^[a-z_][a-z0-9_]*$", c) for c in cols)):
+            print(f"  ! cross-deployable read {r.get('id')}: columns name one table's columns; no grant written")
+            continue
+        on = f"({', '.join(cols)}) ON" if cols else "ON"
         for t in r.get("tables") or []:
             schema = str(t).split(".", 1)[0]
             if area(schema) != db:
@@ -1821,7 +1830,7 @@ def deployable_read_grants(db: str = "tenant") -> str:
             out.append(f"-- {r.get('id')}: {role} reads {t} in process (ADR-0055 rule 4 as amended; "
                        f"{r.get('decision_ref') or ''})")
             out.append(f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = {sql_literal(role)}) AND "
-                       f"to_regclass({sql_literal(t)}) IS NOT NULL THEN GRANT {privs} ON {t} TO {role}; "
+                       f"to_regclass({sql_literal(t)}) IS NOT NULL THEN GRANT {privs} {on} {t} TO {role}; "
                        "END IF; END $$;")
     if not out:
         return ""
@@ -2135,6 +2144,18 @@ def load_contract_props(docs: dict | None = None) -> dict:
                         if ref.startswith("#/components/schemas/"):
                             ITEM_SCHEMA[f"{mod}.{name}.{prop}"] = f"{mod}.{ref.rsplit('/', 1)[-1]}"
                         # **A unique key over the child table, on the array property** (ADAM CR-510, CHG-CR510-001).
+                        # **An array's item property may carry its rules onto the child table** (ADAM CR-594,
+                        # Chinmay, 3 November 2026; CHG-CR594-001). `x-ticvai-item-checks: [prop, ...]` beside `type:
+                        # array` names the item properties whose enum, maxLength and default become the child
+                        # table's `<table>_<column>_chk` and DEFAULT, as a top-level property's do. Only the named
+                        # ones: until CR-594 no item property was read here at all (fnb.service_order_line.status
+                        # had no check although FnbOrder.lines[].status is FnbOrderStatus).
+                        ics = spec.get("x-ticvai-item-checks")
+                        if isinstance(ics, list) and ics:
+                            iprops = props_of(doc, spec.get("items") or {})
+                            for m in ics:
+                                if isinstance(iprops.get(str(m)), dict):
+                                    found[f"{mod}.{name}.{prop}[].{m}"] = iprops[str(m)]
                         aut = spec.get("x-ticvai-unique-together")
                         if isinstance(aut, list) and aut:
                             ARRAY_UNIQUE[f"{mod}.{name}.{prop}"] = [g for g in aut if isinstance(g, list) and g]

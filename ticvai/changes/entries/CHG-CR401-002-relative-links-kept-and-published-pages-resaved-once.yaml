@@ -1,0 +1,49 @@
+id: CHG-CR401-002
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'The rich-text link rule keeps relative internal links (a path starting with a single /, never //); http: links
+  are removed; https, mailto and tel stay. A one-off job, contentPageResanitise, re-saves every published page''s body through
+  the sanitiser once, writing an audit row per page changed; after it, updateContentPage''s 409 published-page-locked on
+  a differing cleaned body stands as built.'
+decision:
+  what: 'ADAM CR-401, the lead''s answer posted on #30923: "Decided (Chinmay, 3 November 2026), answering your question
+    on this ticket. CR-401: (1) keep internal links: relative paths starting with a single / (never //) survive; http: links
+    are still removed, https, mailto and tel stay. (2) Pages already holding unsafe markup: a one-off re-save cleans every
+    published body once, writing an audit row per page changed; after that the 409 on a differing cleaned body stands as
+    built." The lead''s answer to the developer''s question, 3 November 2026 ("Go yes"), posted on the ticket with mail
+    off.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-401 (Hrushikant Patkar, #30923 createContentPage): the allow-list dropped every relative internal link, and
+  a published page stored before the sanitiser could never be switched on or off, since its cleaned body differs from the
+  stored one.'
+keys_touched:
+  operations:
+  - createContentPage
+  - updateContentPage
+  schemas:
+  - LocalisedRichText
+  tables:
+  - whitelabel.content_page
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: a rule nobody had decided (links, and rows stored before a rule)
+tickets:
+  started:
+  - '30923 (Ready for QA, createContentPage, Hrushikant Patkar): the answer was posted there.'
+  - '30937 and 27848 (Ready for QA, updateContentPage, Hrushikant Patkar): the 409 stands; the one-off job cleans the published
+    pages first. Follow-up comment in the lane report.'
+  unstarted:
+  - 'A new job task JOB-WHITELABEL-contentPageResanitise (build-service-docs derives it from the job): the one-off re-save.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-401
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-RICH-TEXT-LINKS
+status: open
+notes: 'Beyond the posted words: the re-save is a white-label job on the workers host (x-ticvai-jobs, trigger timer, run
+  once at the deployment that ships the rule), its audit row is platform.audit_record, and a page already clean is not written.'

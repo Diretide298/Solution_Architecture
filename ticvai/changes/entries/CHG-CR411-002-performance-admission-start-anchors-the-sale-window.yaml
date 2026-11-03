@@ -1,0 +1,45 @@
+id: CHG-CR411-002
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: catalogue.performance gains a nullable admission start (Performance.admissionStartsAt, column admission_starts_at,
+  timestamptz). A sales window anchored on admissionStart uses it, and falls back to the performance's start time while
+  it is null.
+decision:
+  what: 'ADAM CR-411, the lead''s answer posted on #35240: "Decided (Chinmay, 3 November 2026), answering your question
+    on this ticket. CR-411: catalogue.performance gets a nullable admission start time (r14 adds it to the package; a migration
+    follows). A sale window anchored on admissionStart uses it, and falls back to the performance''s start time while it
+    is null." The lead''s answer to the developer''s question, 3 November 2026 ("Go yes"), posted on the ticket with mail
+    off.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-411 (Hrushikant Patkar, #35240 listChannelSaleSchedule): eventRelativeWindows.anchor offers admissionStart,
+  and no performance field held an admission time to anchor on.'
+keys_touched:
+  operations:
+  - listChannelSaleSchedule
+  schemas:
+  - Performance
+  tables:
+  - catalogue.performance
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: an option whose value no field stores
+tickets:
+  started:
+  - '35240 (Ready for QA, listChannelSaleSchedule, Hrushikant Patkar): the answer was posted there.'
+  - '27671, 27683 (Ready for QA, build catalogue.performance): the nullable admission_starts_at column. Follow-up comment
+    in the lane report.'
+  unstarted:
+  - 'A new [DB] task under MIG-CATALOGUE (migration owner): the nullable column (to be filed by the integration pass).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-411
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ADMISSION-START
+status: open
+notes: 'Beyond the posted words: the field is named admissionStartsAt (column admission_starts_at), after starts_at; it
+  is writable on createPerformance and updatePerformance like the other Performance fields.'

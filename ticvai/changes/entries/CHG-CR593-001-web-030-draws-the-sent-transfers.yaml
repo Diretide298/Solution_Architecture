@@ -1,0 +1,63 @@
+id: CHG-CR593-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: WEB-030 reads the guest's sent transfers itself (listTicketTransfers, direction=sent, every page, again after Transfer
+  tickets) and draws them as the approved frame's sent rows, title from the matching listMyOrders line, channel part from
+  the new TicketTransfer.recipientChannel and state part by status, with "N sent this year" counted on the client. The order
+  service stores recipient.channel in orders.ticket_transfer.recipient_channel (email, sms, whatsapp; nullable) and returns
+  it on every transfer answer. The layout does not change.
+decision:
+  what: 'ADAM CR-593, posted on #31904: "Decided (Chinmay, 3 November 2026): WEB-030 reads the guest''s sent transfers itself
+    and draws the sent rows exactly as the approved frame shows them. The layout does not change. Build now: 1. ... call
+    listTicketTransfers with direction=sent. Read every page until hasMore is false. Do this again after Transfer tickets
+    succeeds. 2. One row per transfer ... Channel part: for email, ''Sent to '' plus recipientAddressMasked. For SMS, ''Sent
+    by SMS''. For WhatsApp, ''Sent by WhatsApp''. ... 3. ''N sent this year'' ... 5. Backend, order service: Add the column
+    recipient_channel to orders.ticket_transfer: text, allowed values email, sms, whatsapp, nullable. transferOrderTickets
+    stores recipient.channel in that column. listTicketTransfers, and every other answer that returns a ticket transfer,
+    returns it as recipientChannel ... 6. Contract: add recipientChannel to TicketTransfer as above, and add ''P01 WEB-030
+    Ticket Transfer'' to listTicketTransfers'' consumers. On WEB-030, transferOrderTickets also refreshes listTicketTransfers."
+    The lead''s instructions, 3 November 2026: "the new one dont go in r15, log them and we add to r14 only" and "check
+    for new crs and get them going as well".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-593 (Chinmay Patkar, #31904 WEB-030 Ticket Transfer): the screen''s purpose and its client-verified frame
+  show the transfers the guest sent, but listTicketTransfers was not bound on it, and the transfer record held no send channel
+  for "Sent by SMS".'
+keys_touched:
+  operations:
+  - listTicketTransfers
+  - transferOrderTickets
+  - claimTicketTransfer
+  schemas:
+  - TicketTransfer
+  tables:
+  - orders.ticket_transfer
+  screens:
+  - WEB-030
+  files:
+  - contracts/spine/orders.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - tools/check-business-rules.py
+root_class: a screen's drawn list bound to a read that does not carry it
+tickets:
+  started:
+  - '27675 and 30488 (Ready for QA, build orders.ticket_transfer): the table gains recipient_channel (text, email/sms/whatsapp,
+    nullable); the entity and its mapping carry it. Follow-up comment in the lane report.'
+  unstarted:
+  - '31904 (WEB-030, Chinmay Patkar): the sent rows as posted.'
+  - '27861 (transferOrderTickets, Pranay Shinde): store recipient.channel as recipient_channel.'
+  - '27734 (listTicketTransfers, Narayan Gaonkar) and 30677 (On hold): return recipientChannel.'
+  - 'A new [DB] task under MIG-ORDERS (migration owner): the nullable recipient_channel column with its check (to be filed
+    by the integration pass).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-593
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TRANSFER-SENT-ROWS
+status: open
+notes: 'Beyond the posted words: recipientAddressMasked gains a description ("shown as sent and never unmasked"), and recipientChannel
+  is readOnly. The new screen read names the frame row it fills (shownBy "Sent by SMS · waiting to be claimed"), as listOwnResaleListings
+  does on the same screen.'

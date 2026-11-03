@@ -1800,6 +1800,19 @@ paths:
       x-ticvai-reads:
       - table: promotions.bundle
         for: 'the bundle itself, and whether it is published (variant_id), active (is_active) and in its window (ADAM CR-197, option B; CHG-R10CAT-002)'
+      - table: promotions.bundle_component
+        for: 'the bundle''s components, answered as GuestBundleComponent (ADAM CR-597)'
+      - table: promotions.bundle_choice_group
+        for: 'the bundle''s choice groups, answered as GuestBundleChoiceGroup (ADAM CR-597)'
+      - table: promotions.bundle_choice_option
+        for: 'each group''s options, those not offered left out (ADAM CR-597)'
+      - table: catalogue.product
+        for: 'the public name and description of every component''s and option''s product, in one lookup for all the
+          bundle''s variant ids under the venue the request names; Catalogue and Promotions run in the same service
+          (ADAM CR-597)'
+      - table: catalogue.variant
+        for: 'each component''s and option''s variant: its product and, where the product has more than one variant,
+          its name, in the same lookup (ADAM CR-597)'
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1832,7 +1845,22 @@ paths:
         set, `is_active` is true and now is within `valid_from` / `valid_to` (a null bound is open); any other bundle,
         draft, unpublished, withdrawn or out of its window, answers 404, never a reason. `variant_id` is set by the
         step that creates the bundle''s catalogue product, the publication step of `updateBundle`. `price` and
-        `savingsAmount` are Money in the venue''s currency and scale, read with `tenancy#venueSettingsRecords`.'
+        `savingsAmount` are Money in the venue''s currency and scale, read with `tenancy#venueSettingsRecords`.
+
+
+        **Enough to show and to add to the cart** (ADAM CR-597, option A with guest-only shapes, Chinmay, 3 November
+        2026; CHG-CR597-001). `GuestBundle.variantId` is the bundle''s own sellable variant
+        (`promotions.bundle.variant_id`), required: every bundle a guest can see has one. `components` are
+        `GuestBundleComponent` (id, variantId, name, quantity; description, componentKind, isOptional) and
+        `choiceGroups` are `GuestBundleChoiceGroup` (id, label, choose, options; allowDuplicates) with
+        `GuestBundleChoiceOption` options (id, variantId, name; description, quantity, isDefault). A name and
+        description are the catalogue''s public text for the variant: the product name, plus the variant name when the
+        product has more than one variant. Every name is looked up in the same read, from `catalogue.product` and
+        `catalogue.variant`, under the venue the request names, in one lookup for all the bundle''s variant ids, not
+        one per row. An option that is not offered (`unavailableBehaviour` `hideOption`) is left out; a group that can
+        no longer be met answers 404, as any bundle a guest cannot buy. No menu item, redemption outlet or
+        substitution field is sent, and no option price: the bundle price does not move with the choice.
+        `BundleComponent`, `BundleChoiceGroup` and `getBundle` are unchanged, and nothing new is stored.'
       tags:
       - bundle
       x-ticvai-permission: null
@@ -10967,12 +10995,22 @@ components:
       additionalProperties: false
       required:
       - id
+      - variantId
       - name
       - price
       properties:
         id:
           type: string
           format: uuid
+        variantId:
+          type: string
+          format: uuid
+          x-ticvai-references: catalogue.variant
+          description: '**The bundle''s own sellable variant**, `promotions.bundle.variant_id` (ADAM CR-597, option A,
+            Chinmay, 3 November 2026; CHG-CR597-001). Every bundle a guest can see has one, because an unpublished
+            bundle answers 404. Add to basket sends it as `addCartLine`''s `variantId`, with `attributes.bundle` =
+            `{bundleId: id, choices: [{choiceGroupId, optionId}, one per pick]}`; a component''s or an option''s
+            `variantId` is never the line''s.'
         name:
           type: string
         description:
@@ -10989,12 +11027,15 @@ components:
           nullable: true
         components:
           type: array
+          description: The bundle's components in the guest's shape (ADAM CR-597), named from the catalogue.
           items:
-            $ref: '#/components/schemas/BundleComponent'
+            $ref: '#/components/schemas/GuestBundleComponent'
         choiceGroups:
           type: array
+          description: The bundle's choice groups in the guest's shape (ADAM CR-597). An option that is not offered
+            (`unavailableBehaviour` `hideOption`) is left out; a group that can no longer be met makes the bundle 404.
           items:
-            $ref: '#/components/schemas/BundleChoiceGroup'
+            $ref: '#/components/schemas/GuestBundleChoiceGroup'
         validFrom:
           type: string
           format: date-time
@@ -11003,6 +11044,99 @@ components:
           type: string
           format: date-time
           nullable: true
+    GuestBundleComponent:
+      x-ticvai-persistence: none — guest projection of promotions.bundle_component, named from catalogue.product and catalogue.variant
+      type: object
+      description: '**A bundle component as a guest sees it** (ADAM CR-597, option A with guest-only shapes, Chinmay,
+        3 November 2026; CHG-CR597-001). `BundleComponent` stays the staff and stored shape and is unchanged; this
+        one carries the component''s public name and never its menu item, redemption outlets or substitution fields.
+        `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - id
+      - variantId
+      - name
+      - quantity
+      properties:
+        id:
+          type: string
+          format: uuid
+        variantId:
+          type: string
+          format: uuid
+          x-ticvai-references: catalogue.variant
+        name:
+          type: string
+          description: 'The catalogue''s public text for the component''s variant: the product name, plus the variant
+            name when the product has more than one variant.'
+        description:
+          type: string
+          nullable: true
+          description: The catalogue's public description of the component's product.
+        quantity:
+          type: integer
+          minimum: 1
+        componentKind:
+          $ref: '#/components/schemas/BundleComponentKind'
+        isOptional:
+          type: boolean
+    GuestBundleChoiceGroup:
+      x-ticvai-persistence: none — guest projection of promotions.bundle_choice_group
+      type: object
+      description: '**A bundle choice group as a guest sees it** (ADAM CR-597; CHG-CR597-001): its label and the
+        options still offered, each named. `BundleChoiceGroup` stays the staff and stored shape and is unchanged.
+        `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - id
+      - label
+      - choose
+      - options
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        choose:
+          type: integer
+          minimum: 1
+        allowDuplicates:
+          type: boolean
+        options:
+          type: array
+          description: The options offered; one not offered (`unavailableBehaviour` `hideOption`) is left out.
+          items:
+            $ref: '#/components/schemas/GuestBundleChoiceOption'
+    GuestBundleChoiceOption:
+      x-ticvai-persistence: none — guest projection of promotions.bundle_choice_option, named from catalogue.product and catalogue.variant
+      type: object
+      description: '**A choice option as a guest sees it** (ADAM CR-597; CHG-CR597-001). No option price: the bundle
+        price does not move with the choice (ADR-0019). `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - id
+      - variantId
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        variantId:
+          type: string
+          format: uuid
+          x-ticvai-references: catalogue.variant
+        name:
+          type: string
+          description: The catalogue's public text for the option's variant, as for a component.
+        description:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+        isDefault:
+          type: boolean
+          description: Preselected on the screen.
     GuestPromotion:
       x-ticvai-persistence: none — guest projection of promotions.promotion
       type: object

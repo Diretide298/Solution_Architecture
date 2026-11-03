@@ -353,6 +353,12 @@ paths:
         for: 'the account asked for (ADAM CR-565)'
       - table: control.developer_member
         for: 'the partner caller''s own member row, read again on every request (ADAM CR-565)'
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'a tenant-session caller''s principal (identity.principal by id): id, email and is_active only, its
+          verified email matched to an active control.developer_member (ADAM CR-565 and CR-569 point 2 as corrected
+          on #31389, #31295 and #31383, 4 November 2026; XDR-195; CHG-CR569-003)'
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -655,6 +661,12 @@ paths:
       x-ticvai-reads:
       - table: control.developer_member
         for: 'the partner caller''s own member row, read again on every request: active, and not readOnly (ADAM CR-569)'
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'a tenant-session caller''s principal (identity.principal by id): id, email and is_active only, its
+          verified email matched to an active control.developer_member (ADAM CR-565 and CR-569 point 2 as corrected
+          on #31389, #31295 and #31383, 4 November 2026; XDR-195; CHG-CR569-003)'
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -828,6 +840,12 @@ paths:
       x-ticvai-reads:
       - table: control.developer_member
         for: 'the partner caller''s own member row, read again on every request: active, and not readOnly (ADAM CR-569)'
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'a tenant-session caller''s principal (identity.principal by id): id, email and is_active only, its
+          verified email matched to an active control.developer_member (ADAM CR-565 and CR-569 point 2 as corrected
+          on #31389, #31295 and #31383, 4 November 2026; XDR-195; CHG-CR569-003)'
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
