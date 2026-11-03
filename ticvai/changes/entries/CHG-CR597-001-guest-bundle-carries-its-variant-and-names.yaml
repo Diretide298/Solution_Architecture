@@ -43,6 +43,7 @@ keys_touched:
   - screens/P02-guest-mobile-app.yaml
   - screens/P01-guest-web-storefront.yaml
   - tools/check-business-rules.py
+  - docs/glossary.md
 root_class: a guest read shape that leaves out what its screen must show and send
 tickets:
   started: []
@@ -62,4 +63,7 @@ notes: 'Beyond the posted words: getGuestBundle also declares its reads of promo
   and bundle_choice_option (it already read them by lineage); the components and choiceGroups arrays say what they hold.
   Approved UI is fixed: GST-056''s detail panel keeps its columns (check-approved-ui); the drawing and add rules are on
   the screens'' getGuestBundle and addCartLine bindings. CR-591 (lane f) sets bundleId only while getGuestBundle would return
-  the bundle, the same rule.'
+  the bundle, the same rule. The glossary banned ''Variant'' outright (as a synonym of Attribute), so check-glossary-terms
+  failed the three variantId fields the decision names; docs/glossary.md now defines Variant (a catalogue.variant row, referenced
+  as variantId) as its own term, which keeps the ban on calling an Attribute axis a variant. That glossary row is the lane''s,
+  for the lead to confirm.'

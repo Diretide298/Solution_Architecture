@@ -498,7 +498,7 @@ And one rule per decision:
   CR-401, CR-411 and CR-451; lane_l_rules_r14), each failing on 9b572f8f:
   BR-TRANSFER-SENT-ROWS (CR-593) TicketTransfer carries recipientChannel, stored from recipient.channel; WEB-030 reads
                    listTicketTransfers (sent) and Transfer tickets refreshes it.
-  BR-FNB-LINE-TRANSFERABLE (CR-594) the F&B line's status and comp reason carry checks, the line records the comp, and
+  BR-FNB-LINE-TRANSFERABLE (CR-594) the F&B line's status carries its check, the line records the comp, and
                    transferOrderItems names each refusal's cause from F&B's own data.
   BR-QUEUE-REDEEM-DENIALS (CR-596) redeemWaitingGuest takes an optional queueId, never stores body.id, and states the
                    check order, the denial answer and that entitlementExhausted is never answered.
@@ -4825,16 +4825,18 @@ def lane_l_rules_r14(need, op):
     # BR-FNB-LINE-TRANSFERABLE (CR-594)
     fnb = schemas("contracts/satellite/fnb.yaml")
     lines = ((fnb.get("FnbOrder") or {}).get("properties") or {}).get("lines") or {}
-    need("BR-FNB-LINE-TRANSFERABLE", {"status", "compReason"} <= set(lines.get("x-ticvai-item-checks") or []),
-         "FnbOrder.lines does not carry its status and compReason checks onto fnb.service_order_line (CR-594)")
+    need("BR-FNB-LINE-TRANSFERABLE", "status" in set(lines.get("x-ticvai-item-checks") or []),
+         "FnbOrder.lines does not carry its status check onto fnb.service_order_line (CR-594)")
     item = {}
     for part in ((lines.get("items") or {}).get("allOf") or []):
         item.update((part or {}).get("properties") or {})
     need("BR-FNB-LINE-TRANSFERABLE", {"compedAt", "compReason", "compedByPrincipalId"} <= set(item),
          "the F&B line does not record comped_at, comp_reason and comped_by_principal_id (CR-594)")
-    need("BR-FNB-LINE-TRANSFERABLE", (item.get("compReason") or {}).get("enum") == [
-        "qualityIssue", "wait", "wrongItem", "allergyIncident", "goodwill", "staffMeal", "wastage", "other"],
-         "the line's compReason is not compItem's reasons (CR-594)")
+    need("BR-FNB-LINE-TRANSFERABLE", (item.get("compReason") or {}).get("type") == "string"
+         and "compItem" in words((item.get("compReason") or {}).get("description")),
+         "the line's compReason is not the text of compItem's reason (CR-594)")
+    need("BR-FNB-LINE-TRANSFERABLE", "fnb.sub_bill" in tables(op("transferOrderItems")[3], "x-ticvai-reads"),
+         "transferOrderItems does not declare its read of fnb.sub_bill (CR-594)")
     toi = words(op("transferOrderItems")[3].get("description"))
     for frag in ("(cause `notOnVisit`)", "(`voided`)", "`payment_timing` `payFirst` and `sent_to_kitchen_at` set",
                  "with status `paid` (`paid`)", "has `comped_at` set (`comped`)",

@@ -2447,6 +2447,19 @@ paths:
         route: in-process
         for: 'the target visit''s outlet (409 target-visit-not-open) (CHG-MOD-003)'
       x-ticvai-names-for-context: [orders.order_line]
+      x-ticvai-reads:
+      - table: fnb.table_visit
+        for: 'both visits: the source, and the target''s state and outlet (409 target-visit-not-open)'
+      - table: fnb.service_order
+        for: 'each line''s service order: sales_order_id, payment_timing and sent_to_kitchen_at for paid (ADAM CR-594)'
+      - table: fnb.service_order_line
+        for: 'the lines asked for: their visit, status (voided) and comped_at (comped) (ADAM CR-594)'
+      - table: fnb.sub_bill
+        for: 'the visit''s paid sub-bills, whose line_ids make a line paid (ADAM CR-594)'
+      - table: fnb.kitchen_ticket
+        for: 'the kitchen tickets the moved lines stay on: never re-fired'
+      - table: fnb.kitchen_ticket_line
+        for: 'the kitchen ticket lines of the moved lines: never re-fired'
       summary: Move items to another table's bill
       description: 'Board 4. **A guest moves from the bar to a table and their drinks should follow.**
         `transferTableVisit` hands a whole visit to another server; this moves lines between bills.
@@ -12558,10 +12571,10 @@ components:
           $ref: '#/components/schemas/FnbOrderStatus'
         lines:
           type: array
-          # **The line's status and comp reason carry their values onto fnb.service_order_line** (ADAM CR-594, Chinmay,
-          # 3 November 2026; CHG-CR594-001): a check on each column allowing exactly the enum, nullable
-          # (tools/derive-ddl.py reads x-ticvai-item-checks).
-          x-ticvai-item-checks: [status, compReason]
+          # **The line's status carries its values onto fnb.service_order_line** (ADAM CR-594, Chinmay, 3 November
+          # 2026; CHG-CR594-001): a check on the column allowing exactly FnbOrderStatus, nullable (tools/derive-ddl.py
+          # reads x-ticvai-item-checks).
+          x-ticvai-item-checks: [status]
           description: '**A line''s `status` is its kitchen lifecycle** (ADAM CR-594, Chinmay, 3 November 2026;
             CHG-CR594-001): `FnbOrderStatus`''s nine values, held by a check on `fnb.service_order_line.status`,
             nullable. `createFnbOrder` and `amendFnbOrder` write `ordered` on each new line, and a null status reads
@@ -12590,16 +12603,9 @@ components:
                   type: string
                   nullable: true
                   readOnly: true
-                  enum:
-                  - qualityIssue
-                  - wait
-                  - wrongItem
-                  - allergyIncident
-                  - goodwill
-                  - staffMeal
-                  - wastage
-                  - other
-                  description: The reason `compItem` took (ADAM CR-594); null on a line never comped.
+                  description: 'The reason `compItem` took, one of its reasons (qualityIssue, wait, wrongItem,
+                    allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line
+                    never comped. The note an `other` reason requires stays on the comp''s write to Orders.'
                 compedByPrincipalId:
                   type: string
                   format: uuid

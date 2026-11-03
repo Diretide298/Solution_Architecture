@@ -3,10 +3,10 @@ date: '2026-11-03'
 source: cr
 kind: contract
 summary: fnb.service_order_line.status stays FnbOrderStatus (the kitchen lifecycle) and gets its check, nullable; create
-  and amend write ordered on each new line. The F&B line gains comped_at, comp_reason (compItem's reasons, with a check)
-  and comped_by_principal_id, which compItem sets. transferOrderItems refuses 422 line-not-transferable with each refused
-  line's cause (notOnVisit, voided, paid, comped) from F&B's own data. tools/derive-ddl.py now carries an array item property's
-  enum onto its child table where the array names it in x-ticvai-item-checks.
+  and amend write ordered on each new line. The F&B line gains comped_at, comp_reason (compItem's reason, as text) and comped_by_principal_id,
+  which compItem sets. transferOrderItems refuses 422 line-not-transferable with each refused line's cause (notOnVisit,
+  voided, paid, comped) from F&B's own data. tools/derive-ddl.py now carries an array item property's enum onto its child
+  table where the array names it in x-ticvai-item-checks.
 decision:
   what: 'ADAM CR-594, posted on #32800: "Decided (Chinmay, 3 November 2026): fnb.service_order_line.status already has values.
     They are the contract''s FnbOrderStatus ... and it stays the kitchen lifecycle. Paid, voided and comped are read as
@@ -32,6 +32,7 @@ keys_touched:
   - FnbOrder
   tables:
   - fnb.service_order_line
+  - fnb.sub_bill
   files:
   - contracts/satellite/fnb.yaml
   - tools/derive-ddl.py
@@ -58,7 +59,9 @@ prevention:
   ref: tools/check-business-rules.py::BR-FNB-LINE-TRANSFERABLE
 status: open
 notes: 'The generator rule behind the check: tools/derive-ddl.py carries the enum of an item property the array names in
-  x-ticvai-item-checks onto the child table. Beyond the posted words: comp_reason carries a check of compItem''s eight reasons,
-  as the posted text lists them; the three comp fields are readOnly on FnbOrder.lines; compItem declares its write of fnb.service_order_line.
-  78 other array item columns (fnb.kitchen_ticket_line.status, control.invoice_line.kind, ...) still carry no contract enum
-  check: x-ticvai-item-checks is opt-in, so they are untouched; the class is in the lane report for the lead.'
+  x-ticvai-item-checks onto the child table. Beyond the posted words: the three comp fields are readOnly on FnbOrder.lines;
+  comp_reason is plain text with no check (a check of compItem''s eight reasons would hold ''other'' with no note beside
+  it, which R222 forbids; the note stays on the write to Orders); compItem declares its write of fnb.service_order_line
+  and transferOrderItems declares its reads, fnb.sub_bill among them. 78 other array item columns (fnb.kitchen_ticket_line.status,
+  control.invoice_line.kind, ...) still carry no contract enum check: x-ticvai-item-checks is opt-in, so they are untouched;
+  the class is in the lane report for the lead.'
