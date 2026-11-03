@@ -1,0 +1,56 @@
+id: CHG-CR542-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: A new table catalogue.import_job_row (id, import_job_id, scope_path, row_number, action, target_product_id, payload,
+  is_excluded, outcome, failure, product_id; unique (import_job_id, row_number)) stages the parse; catalogue.import_job
+  gains mode, applied_count and failed_count (read-only on CatalogueImportJob). importProductCatalogue stores mode and writes
+  one row per parsed product, excluding error rows. commitCatalogueImport refuses wrong kind, not ready, already committed,
+  found nothing and live orders (two new slugs), then applies pending rows in order, each in its own transaction as createProduct
+  or updateProduct would, records each row's outcome and ends committed or failed, never rolled back.
+decision:
+  what: 'ADAM CR-542, posted on #30972: "Decided (Chinmay, 3 November 2026): the parse stages what it found and the commit
+    applies exactly that. Build now: Storage, an additive migration on this ticket: new table catalogue.import_job_row with
+    id uuid primary key; import_job_id uuid not null referencing catalogue.import_job; scope_path ltree not null (the job''s,
+    so row security follows the job); row_number integer not null; action text (create, update); target_product_id uuid;
+    payload jsonb not null (the normalised product with its variants, shaped as createProduct takes it); is_excluded boolean
+    not null default false; outcome text not null default pending (pending, applied, failed, excluded); failure text; product_id
+    uuid; unique (import_job_id, row_number). catalogue.import_job gains mode text not null default createOnly (createOnly,
+    upsert, replaceCategory), applied_count integer and failed_count integer. CatalogueImportJob ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-542 (Narayan Gaonkar, #30972 commitCatalogueImport): catalogue.import_job stored no parsed rows and no import
+  mode, and partial failure, row disposition and the not-previewReady slug were undefined.'
+keys_touched:
+  operations:
+  - importProductCatalogue
+  - commitCatalogueImport
+  schemas:
+  - CatalogueImportJob
+  - CatalogueImportJobRow
+  tables:
+  - catalogue.import_job
+  - catalogue.import_job_row
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: a two-phase write whose second phase had nothing stored to apply (contract against storage)
+tickets:
+  started: []
+  unstarted:
+  - '30972 (commitCatalogueImport, Narayan Gaonkar): the refusals and the per-row apply as posted, once the migration lands.'
+  - '31634 (importProductCatalogue): store mode and write the staged rows.'
+  - 'A new [DB] task under MIG-CATALOGUE (#27671, Hrushikant Patkar): the table and the three columns (to be filed by the
+    integration pass).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-542
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-IMPORT-STAGED-ROWS
+status: open
+notes: 'Beyond the posted words: commitCatalogueImport declares the reads and writes the text names (catalogue.import_job_row;
+  catalogue.product, variant, product_version and audit_entry as createProduct or updateProduct write them) and the orders#salesOrderRecords
+  read in process for the live-order check, as importProductCatalogue already declares it.'

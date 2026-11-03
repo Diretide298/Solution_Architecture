@@ -1,0 +1,50 @@
+id: CHG-CR538-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: retryChannelIncident refuses a retrying, resolved or closed incident with 409 not-retryable and changes nothing;
+  the job keeps its retry_count guard. The channel retry job finds the trace by api_request_reference, else correlation_id;
+  with no trace the connector rebuilds the call from the incident or ends retryNotDelivered; one audit entry per attempt
+  (action retry, entity channelIncident, the reference sent); response_excerpt null when nothing answered, otherwise scrubbed
+  by one shared step then cut to 2,000 characters; error_code up to 100 characters; no connection ends connectorNotAvailable.
+decision:
+  what: 'ADAM CR-538, posted on #35231: "Decided (Chinmay, 3 November 2026): five of the six readings stand; an incident
+    already retrying is refused. Build now: (1) retryChannelIncident moves only an open or investigating incident to retrying.
+    A retrying, resolved or closed incident answers 409 not-retryable and nothing changes: no retry_count rise and no new
+    queued call. This is what states/channel-incident.yaml allows, and it keeps one call in flight per incident. Keep the
+    job''s retry_count check as a guard. (2) The job finds the trace in catalogue.audit_entry with domain channel and reference
+    equal to the incident''s api_request_reference; when that is null, reference equal to the incident''s correlation_id.
+    As built. (3) With no trace found, the connector receives no trace and rebuilds the call from the incident (sales channel,
+    connection, product, event). If it cannot, the attempt ends as retryNotDelivered. As built. (4) ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-538 (#35231 retryChannelIncident): CR-457''s rule left open an incident already retrying, the trace match,
+  a missing trace, the job''s audit entry, the excerpt''s scrubbing and an incident with no connection.'
+keys_touched:
+  operations:
+  - retryChannelIncident
+  tables:
+  - catalogue.channel_incident
+  - catalogue.audit_entry
+  files:
+  - contracts/spine/catalogue.yaml
+  - events/catalogue-channelIncidentRetryRequested.yaml
+  - tools/check-business-rules.py
+root_class: a background job whose edge cases were left to the builder
+tickets:
+  started: []
+  unstarted:
+  - '35231 (retryChannelIncident and the channel retry job): the six readings as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-538
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CHANNEL-RETRY-READINGS
+status: open
+notes: 'For a follow-up comment, not changed: retryChannelIncident sets a null api_request_reference to the incident''s
+  id in the same transaction (CR-457), so by the time the job runs api_request_reference is never null and the posted correlation_id
+  fallback (2) only fires if the job reads the value the failed call carried. The package states (2) as posted. Beyond the
+  posted words: none.'

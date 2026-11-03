@@ -1,0 +1,57 @@
+id: CHG-CR543-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'getMyMemberships stays the guest''s read (listGuestMemberships stays for staff) and GuestMembership is defined
+  field by field: rows and chains from access.entitlement, the status rule, the stored freeze window (new access.entitlement.frozen_from
+  and frozen_until, written by freezeEntitlement), dates in the venue''s time zone, benefits from plan_benefit and membership_benefit,
+  tier and renewsOn null, previous terms newest first with endedBecause by rule, includeLapsed and the order. Marketing
+  is not called; both operations build the view with the same code.'
+decision:
+  what: 'ADAM CR-543, posted on #30973: "Decided (Chinmay, 3 November 2026): getMyMemberships stays the guest''s read, as
+    the 2 October decision binds it on WEB-022, WEB-023 and GST-015 (listGuestMemberships stays for staff), and GuestMembership
+    is defined field by field. Build now: Rows: the signed-in guest''s access.entitlement rows (subject_id is the guest)
+    whose product''s kind is membership. A chain is the guest''s entitlements of one product plus any linked by supersedes_entitlement_id.
+    The newest in a chain is the row; the earlier ones are its previousTerms. status: cancelled becomes cancelled; expired,
+    fullyConsumed, or valid_to before today becomes expired; issued or partiallyConsumed with suspended_reason set becomes
+    suspended; otherwise, with a freeze covering today, frozen; otherwise active. A surrendered entitlement (transferred
+    away) is not shown. Freeze: add access.entitlement.frozen_from date and frozen_until date ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-543 (Narayan Gaonkar, #30973 getMyMemberships): GuestMembership''s frozen status, benefits, tier, renewsOn
+  and previousTerms had no source, and listGuestMemberships answered the same view from different data.'
+keys_touched:
+  operations:
+  - getMyMemberships
+  - listGuestMemberships
+  - freezeEntitlement
+  schemas:
+  - GuestMembership
+  - Entitlement
+  tables:
+  - access.entitlement
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/access.yaml
+  - tools/check-business-rules.py
+root_class: a view whose fields had no stated source (contract against storage)
+tickets:
+  started: []
+  unstarted:
+  - '30973 (getMyMemberships, Narayan Gaonkar): GuestMembership by the posted rules.'
+  - '35279 (freezeEntitlement): write frozen_from and frozen_until.'
+  - '31827 (listGuestMemberships): the same code and rules.'
+  - 'A new [DB] task under MIG-ACCESS (Hrushikant Patkar): the two nullable date columns (to be filed by the integration
+    pass).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-543
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-MEMBERSHIP-FIELDS
+status: open
+notes: 'Beyond the posted words: getMyMemberships'' marketing-crm#loyaltyPositionRecords read is removed ("do not call Marketing");
+  listGuestMemberships declares access#entitlementRecords and the two benefit tables, which building with the same code
+  needs. The venue''s time zone is the Region''s (RegionSettings.timeZone); no new read of it is declared.'

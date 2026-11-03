@@ -1,0 +1,56 @@
+id: CHG-CR532-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'One guided-answer filter, written once as shared code on #36283 and called by previewGuidedChoice now and by listProducts
+  and searchCatalogue when built: fields ANDed within and across answers; productIds; productCategoryIds with their subcategories;
+  segment tags as segmentTag; age by range overlap with open bounds; requiresSwimmer from a consent question of kind swim
+  or the old swimAbility confident; certification with holdsCertification. The three callers declare marketing#consentQuestionRecords
+  (service, for the kind only); GuidedChoice answer.filter and the guidedAnswerIds texts say the rules.'
+decision:
+  what: 'ADAM CR-532, posted on #36283: "Decided (Chinmay, 3 November 2026): Build now: one guided-answer filter, written
+    once as shared code in this ticket. Catalogue''s listProducts (and searchCatalogue''s guidedAnswerIds) will call the
+    same code when they are built, and previewGuidedChoice calls it now over the venue''s published products. Inputs: the
+    product, its eligibility rule (no rule means every limit is empty) and the kinds of its consent questions. Fields are
+    ANDed within an answer and answers are ANDed with each other; an empty field narrows nothing. - productIds: keep products
+    in the list. - productCategoryIds: keep products filed under a listed category or any category below it in the category
+    tree, as listProducts'' categoryId already does. - segmentTags: match as listProducts'' segmentTag does (a tag matches
+    itself and tags below it). - Age: keep a product when the answer''s range and the product''s [minAgeYears, ..." The
+    lead''s instruction, 3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-532 (Chinmay Patkar, #36283 previewGuidedChoice): listProducts was unbuilt and the two contracts defined requiresSwimmer
+  differently and left the age match undefined.'
+keys_touched:
+  operations:
+  - previewGuidedChoice
+  - listProducts
+  - searchCatalogue
+  schemas:
+  - GuidedChoice
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: an undecided rule two operations had to share
+tickets:
+  started: []
+  unstarted:
+  - '36283 (previewGuidedChoice, Chinmay Patkar): write the shared filter and its six tests; the preview''s counts equal
+    listProducts''.'
+  - '27870 (listProducts) and 31004 (searchCatalogue): call the shared filter and declare the consent-question read.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-532
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUIDED-ANSWER-FILTER
+status: open
+notes: '**r13''s routing rule kept**: the posted text asks the consent questions "through the service route"; Marketing
+  runs in the operations host with WhiteLabel, and the operations host asks the modules it composes in process (CHG-R13INP-001,
+  ADR-0055 as amended 2 November; check-cross-module-reads XR-INPROCESS-HOST), so previewGuidedChoice asks marketing-crm#consentQuestionRecords
+  in process. listProducts and searchCatalogue (commerce) ask it on the service route, as posted. Beyond the posted words:
+  previewGuidedChoice''s eligibility-rule read also names swimAbility and requiredCertificationCode; the age text says "its
+  eligibility rule" rather than naming Catalogue''s schema, so the white-label operations that share GuidedChoice need no
+  new read.'

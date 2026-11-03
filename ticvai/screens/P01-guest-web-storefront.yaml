@@ -1255,6 +1255,19 @@ screens:
           tickets (`listProducts?categoryId=`); `flatList`: every ticket at once.'
         operation: listProductCategories
         provenance: decided 29 September, rev 3 REV3-16
+      - kind: cardList
+        label: Ticket cards
+        bindsTo: Product
+        columns:
+        - Product.highlightBadge
+        - Product.rating
+        operation: listProducts
+        notes: '**The cards stay as the client approved them** (ADAM CR-504, Chinmay, 3 November 2026). The pill on
+          the card image is `Product.highlightBadge`, the value for the guest''s language falling back to the English
+          value, shown in capitals as drawn; null shows no badge. The star line under the display tags is
+          `Product.rating` (a star, the average, then `count` followed by reviews), shown whenever `rating` is not
+          null. Nothing else on the card changes.'
+        provenance: client-verified frame web-005; ADAM CR-504, decided 3 November 2026
       - kind: selectField
         label: Choose your experience
         bindsTo: ProductCategory

@@ -1,0 +1,45 @@
+id: CHG-CR545-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: cloneProduct's body code takes CreateProductRequest.code's rules (maxLength 64, the pattern, unique per tenant
+  ignoring case; 409 duplicate-code from the unique index; 400 validation for length or pattern) and name maxLength 200;
+  responses 201, 400, 409, 429. includePrices copies each copied variant's price rows (price_list_id, list_price, tax_code_id)
+  to the matching new variant in the same transaction; with includeVariants false it is 400. The description lists what
+  a clone copies, sets fresh and leaves out, and the six tests.
+decision:
+  what: 'ADAM CR-545, posted on #30971: "Decided (Chinmay, 3 November 2026): cloneProduct gets the same code rules as createProduct,
+    a defined includePrices and a stated copy list. Build now: 1. Body code: maxLength 64, pattern ^[A-Za-z0-9_-]+$, unique
+    per tenant compared ignoring case, exactly as CreateProductRequest.code. A code already used by any product in the tenant
+    answers 409 duplicate-code (the shared DuplicateCode response), taken from the unique index on insert, not from a read
+    first. A code that breaks the length or pattern answers 400 validation. Body name: maxLength 200, as Product.name. Responses:
+    201, 400, 409, 429. 2. includePrices (default false): when true, for each source variant copied, copy every catalogue.price
+    row of that variant (price_list_id, list_price, tax_code_id) to the clone''s matching new variant, on the same price
+    list, with a new id, in the same transaction as the clone. cloneProduct now ..." The lead''s instruction, 3 November
+    2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-545 (Narayan Gaonkar, #30971 cloneProduct): includePrices had no declared write, a duplicate code''s 409 and
+  the code''s constraints were not listed, and what a clone copies was not spelled out.'
+keys_touched:
+  operations:
+  - cloneProduct
+  tables:
+  - catalogue.price
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: a copy operation whose copy list and constraints were never stated (contract against storage)
+tickets:
+  started: []
+  unstarted:
+  - '30971 (cloneProduct, Narayan Gaonkar): the six points and tests as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-545
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CLONE-PRODUCT-RULES
+status: open
+notes: 'Beyond the posted words: none.'

@@ -1,0 +1,59 @@
+id: CHG-CR544-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'bulkChangePrices: selection fields AND together (none = the whole venue); productKind is ProductKind and channel
+  the catalogue Channel, matched on price_list.channels; a run changes the matched variants'' prices except partnerNetRate,
+  fixedPriceBundle and openChangeRequest, each named in skipped (reason now an enum); roundTo half away from zero; any negative
+  result is 400 validation for the whole run; BulkPriceResult gains a required escalates; a real escalating run without
+  PRICE_CONFIGURE is 403 price-escalation-required (declared); a future effectiveFrom is 400; each changed price writes
+  its audit entry and versions.'
+decision:
+  what: 'ADAM CR-544, posted on #30970: "Decided (Chinmay, 3 November 2026): bulkChangePrices leaves untouched what its
+    contract says it cannot touch, by rules on stored columns, and its result says whether the run escalates. Build now:
+    Selection: categoryId (that exact category), productKind (now the ProductKind enum), priceListId and channel combine
+    with AND; with none given, every product of the venue is selected. channel becomes the catalogue Channel enum (pos,
+    kiosk, web, mobile, b2b, ota, callCentre) and matches price lists whose channels contain it. A run changes catalogue.price.amount
+    for the matched products'' variants on the matched price lists, except these, which stay unchanged and are named in
+    skipped. partnerNetRate: the price list''s price_list_type is b2b, reseller or ota. fixedPriceBundle: the product has
+    a catalogue.package_pricing row with pricing_model fixedPackagePrice, for that price list or with no price ..." The
+    lead''s instruction, 3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-544 (Narayan Gaonkar, #30970 bulkChangePrices): Which prices a run must skip was undefined, the dry run had
+  no field to report escalation, selection.channel was the wrong vocabulary, and effectiveFrom had no storage.'
+keys_touched:
+  operations:
+  - bulkChangePrices
+  schemas:
+  - BulkPriceResult
+  tables:
+  - catalogue.price
+  - catalogue.price_list
+  - catalogue.package_pricing
+  - catalogue.change_request
+  - catalogue.change_request_line
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+  - docs/active/breaking-changes.yaml
+  other:
+  - BC-680 (selection.productKind becomes ProductKind), BC-681 (selection.channel becomes catalogue Channel), BC-682 (skipped[].reason
+    becomes an enum), approved by the posted decision
+root_class: an undecided rule over which stored rows a bulk write may touch
+tickets:
+  started: []
+  unstarted:
+  - '30970 (bulkChangePrices, Narayan Gaonkar): the selection, skips, rounding, escalation and refusals as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-544
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-BULK-PRICE-SKIPS
+status: open
+notes: '**For a follow-up comment**: the posted text says the run changes "catalogue.price.amount"; the column is list_price
+  since V0107 (the field is Price.amount), and the package says catalogue.price (Price.amount). Beyond the posted words:
+  the writes of catalogue.audit_entry and catalogue.product_version are declared for "what setPrices writes: audit entry
+  and versions", though setPrices itself declares neither.'

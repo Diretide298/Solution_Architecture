@@ -38,18 +38,29 @@ payload:
 consumers:
 - context: catalogue
   purpose: 'Catalogue''s channel retry job (the workers host). If the incident is no longer `retrying`, or its
-    retry_count is not the event''s, it does nothing. Otherwise it finds the failed call''s trace in
-    catalogue.audit_entry (domain channel, reference equal to the incident''s original apiRequestReference, or by
-    correlationId when it had none) and sends that call again through the channel connector for channelConnectionId,
-    with apiRequestReference as the partner''s idempotency reference: product, price and availability calls send
-    today''s values, not the stale ones; order and cancellation calls send the same request. On the partner''s
-    success it sets status resolved, resolved_at now and resolution_note ''Retry <retry_count> succeeded''. On
-    failure it sets status investigating, with error_code and response_excerpt from the answer (truncated and
-    scrubbed of personal data). Until a connector exists for the connection''s type the attempt fails with error_code
-    connectorNotAvailable: an incident is never marked resolved without a partner''s success. If the event is
-    dead-lettered, the incident moves to investigating with error_code retryNotDelivered, so nothing stays retrying.
-    Each move writes the incident and one catalogue.audit_entry (domain channel, result success or failure, source
-    sync, actor_system channelRetryJob) in one transaction.'
+    retry_count is not the event''s, it does nothing (a guard; retryChannelIncident already refuses an incident that
+    is retrying, ADAM CR-538). An incident with no channel_connection_id ends the attempt as connectorNotAvailable:
+    the incident goes back to investigating with error_code connectorNotAvailable and a null excerpt. Otherwise it
+    finds the trace in catalogue.audit_entry with domain channel and reference equal to the incident''s
+    api_request_reference; when that is null, reference equal to the incident''s correlation_id. It sends that call
+    again through the channel connector for channelConnectionId, with apiRequestReference as the partner''s
+    idempotency reference: product, price and availability calls send today''s values, not the stale ones; order and
+    cancellation calls send the same request. With no trace found, the connector receives no trace and rebuilds the
+    call from the incident (sales channel, connection, product, event); if it cannot, the attempt ends as
+    retryNotDelivered. On the partner''s success it sets status resolved, resolved_at now and resolution_note ''Retry
+    <retry_count> succeeded''. On failure it sets status investigating, with error_code taken as answered, up to 100
+    characters, and response_excerpt. **response_excerpt** (ADAM CR-538) is null when nothing answered
+    (connectorNotAvailable, retryNotDelivered). Otherwise the job scrubs the answer first, then cuts it to 2,000
+    characters. Scrubbing is one shared step in the job, not left to each connector: it replaces with [removed]
+    every e-mail address, every phone number (7 or more digits, with an optional + and separators), every run of 13
+    to 19 digits, and the value of any JSON or XML field whose name contains name, email, phone, mobile, address,
+    birth, passport, nationalId, card or holder. A connector may scrub more, never less. Until a connector exists for
+    the connection''s type the attempt fails with error_code connectorNotAvailable: an incident is never marked
+    resolved without a partner''s success. If the event is dead-lettered, the incident moves to investigating with
+    error_code retryNotDelivered, so nothing stays retrying. **Each attempt writes one catalogue.audit_entry**
+    (ADAM CR-538): domain channel, action retry, entity_type channelIncident, entity_id the incident''s id,
+    sales_channel_id from the incident, result success or failure, source sync, actor_system channelRetryJob, and
+    reference the idempotency reference it sent; the incident and the entry are written in one transaction.'
   writes:
   - catalogue.channel_incident
   - catalogue.audit_entry

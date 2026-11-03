@@ -1,0 +1,48 @@
+id: CHG-CR540-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: testChannelConnection records a named test that does not apply as notSupported (nothing sent, testedAt now, replacing
+  the earlier entry); notSupported never counts toward connectionStatus and a call where nothing ran leaves it unchanged;
+  ticvaiNative gets notSupported for every named test; 422 order-test-in-production only for an applying order test in production.
+  lastTests keeps the CR-458 stored names, which listChannelConnectionIntegration answers as ADM-269 names (see notes).
+decision:
+  what: 'ADAM CR-540, posted on #35235: "Decided (Chinmay, 3 November 2026): a named test that does not apply to the connection
+    is recorded as notSupported. It is neither silently skipped nor refused. Build now: testChannelConnection runs the named
+    tests that apply to the connection, under the type and direction rules already decided. For each named test that does
+    not apply, it sends nothing to the channel and writes a lastTests entry with result notSupported and testedAt now, replacing
+    any earlier entry for that test. notSupported does not count toward connectionStatus, which is worked out only from
+    the tests that ran; a call where nothing ran leaves connectionStatus unchanged. A ticvaiNative connection gets notSupported
+    for every named test. The 422 order-test-in-production fires only when orderCreation or cancellation is named, applies
+    to the connection, and the connection''s environment is production. A named order test ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-540 (#35235 testChannelConnection): The contract did not say what a named test that does not apply to the
+  connection does.'
+keys_touched:
+  operations:
+  - testChannelConnection
+  tables:
+  - catalogue.channel_connection
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: an undecided rule for an input outside the operation's rules
+tickets:
+  started: []
+  unstarted:
+  - '35235 (testChannelConnection): notSupported as posted; keep the CR-458 stored test names and the ticvaiNative connected
+    status (see notes).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-540
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CHANNEL-TEST-NOT-SUPPORTED
+status: open
+notes: '**r13''s rule kept on two points** (CR-458, CHG-CR458-001, already in r13): (1) the posted "write lastTests with
+  the names ADM-269 shows" is not applied: lastTests keeps storing productSync, pricing and orderCreation, and listChannelConnectionIntegration
+  answers them as product, price and order for ADM-269; (2) a ticvaiNative connection keeps CR-458''s status connected,
+  while every named test on it is notSupported. Everything else is as posted.'

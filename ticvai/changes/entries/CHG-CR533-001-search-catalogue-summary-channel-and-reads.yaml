@@ -1,0 +1,52 @@
+id: CHG-CR533-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'searchCatalogue: summary is catalogue.product.description, with nameLocalised and summaryLocalised; q matches
+  name, description and every language of the two localised maps; the optional channel (as on listProducts) sets the on-sale
+  scope and fromPrice; showInfoOnly from the tenant''s current published configuration (white-label#tenantLanguageRecords,
+  service) with the venue override laid over, on when absent; the swim rule through marketing#consentQuestionRecords (service),
+  once per page; fromPrice by the shared price-list function with declared reads of catalogue.price_list and catalogue.price.
+  listProducts declares the same reads for showInfoOnly and the swim rule.'
+decision:
+  what: 'ADAM CR-533, posted on #31004: "Decided (Chinmay, 3 November 2026): option A, using the reads that already exist.
+    Build now on searchCatalogue: (1) summary is the product''s description (catalogue.product.description). Each result
+    also carries nameLocalised and summaryLocalised (catalogue.product.name_localised and description_localised); the screen
+    shows the guest''s language and falls back to name and summary. q matches case-insensitively against name, description
+    and every language value of name_localised and description_localised; every word must match somewhere in them. No summary
+    column is added. (2) Add the optional channel query parameter exactly as on listProducts (catalogue Channel; a credential
+    names it, a visitor sends web or mobile, absent with no credential web). It sets both the on-sale scope and fromPrice.
+    (3) showInfoOnly: declare white-label#tenantLanguageRecords (service) for the tenant''s current ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-533 (Narayan Gaonkar, #31004 searchCatalogue): searchCatalogue matched and answered a summary Product does
+  not have, had no channel for a visitor, and declared no read of BookingFlowConfig.showInfoOnly or the swim consent question.'
+keys_touched:
+  operations:
+  - searchCatalogue
+  - listProducts
+  tables:
+  - catalogue.price_list
+  - catalogue.price
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: reads between modules the text uses and the operation never declared
+tickets:
+  started: []
+  unstarted:
+  - '31004 (searchCatalogue, Narayan Gaonkar): the five points as posted.'
+  - '27870 (listProducts): the same showInfoOnly and swim reads and rules.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-533
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SEARCH-CATALOGUE-SOURCES
+status: open
+notes: '**r13''s price rule kept** (the coordinator, 3 November 2026: a posted decision that contradicts an earlier r13
+  lane keeps r13''s rule): the one price rule is catalogue#variantPriceRecords (CR-439, CHG-CR439-001, built once in Catalogue
+  on #35288), so the package names it where the posted text says the price-list function built on #27870. The query is marketing-crm#consentQuestionRecords
+  (its declared name). Beyond the posted words: summary is marked nullable (a product''s description may be empty).'

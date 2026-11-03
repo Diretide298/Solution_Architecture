@@ -1,0 +1,47 @@
+id: CHG-CR539-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'listPricingChangeImpact''s projectedRevenue reprices each counted order line''s server_unit_price by the ratio
+  proposed_amount / current_amount of the most specific change_request_line that reaches it (product, then rate through
+  the price assignments naming it, then priceList; rate lines by the mean ratio); revenueImpact = projected - current; money
+  rounded to the currency scale and percentages to two places, half away from zero. Confirmed: an empty impacted_channels
+  means the price lists'' channels; a line with current_amount 0 is left out of the percentages; the three revenue figures
+  are nullable and null across currencies.'
+decision:
+  what: 'ADAM CR-539, posted on #35388: "Decided (Chinmay, 3 November 2026): build projectedRevenue and revenueImpact with
+    this path; the four readings stand. Build now: The current price of an order line is its server_unit_price (what was
+    charged). currentRevenue is over the same order lines and quantities you already use. A change_request_line reprices
+    order lines only when current_amount is above 0 and proposed_amount is set. It reprices them by its ratio, proposed_amount
+    / current_amount, multiplied into each reached line''s server_unit_price. Which order lines a line reaches: a product
+    line (object_type product, configuration_area pricing) reaches every order line whose variant belongs to that product.
+    A rate line reaches the order lines of the variants that a catalogue.price_assignment on the rate''s price list names
+    with that rate in category_rates. Its object_ids are variants when assignment_scope is productVariant, and ..." The
+    lead''s instruction, 3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-539 (#35388 listPricingChangeImpact): CR-456''s projectedRevenue rule had no path from a variant to "its price
+  or rate" on a change_request_line.'
+keys_touched:
+  operations:
+  - listPricingChangeImpact
+  schemas:
+  - PricingChangeImpactAnalysisView
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: a computed figure with no path from its inputs (contract against storage)
+tickets:
+  started: []
+  unstarted:
+  - '35388 (listPricingChangeImpact): the repricing path and the confirmed readings as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-539
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CHANGE-IMPACT-REPRICE
+status: open
+notes: 'Beyond the posted words: currentRevenue, projectedRevenue and revenueImpact are marked nullable in the view, which
+  "null when the venues trade in more than one currency" needs.'

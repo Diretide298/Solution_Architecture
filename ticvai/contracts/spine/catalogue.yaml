@@ -965,6 +965,21 @@ paths:
         (not `brand`, `collection`, `season` or `department`), at every depth, unless the screen asks for a kind:
         `kind` narrows the tree to that kind. Staff see every kind and the inactive ones, as before.
 
+
+        **How the tree is built when a node is dropped** (ADAM CR-523; Chinmay, 3 November 2026; CHG-CR523-001):
+        inactive nodes are pruned with their whole subtree; a node dropped only for its kind passes its kept
+        descendants up. The answer is built in two passes over the venue''s `catalogue.product_category` rows.
+        **Pass 1, for a guest or visitor only:** drop every inactive node together with everything below it,
+        whatever the kinds below, so a section a venue switches off hides all that is filed under it. Staff skip
+        pass 1 and see inactive nodes. **Pass 2, for every caller:** the kind in force is the `kind` parameter;
+        with no `kind` parameter it is `category` for a guest or visitor, and every kind for staff (so nothing is
+        dropped). Remove each remaining node whose kind is not the one in force, and attach each kept child to the
+        nearest kept ancestor, or make it a root when no ancestor is kept. Among the new siblings, order by
+        `displayOrder` ascending, then by `id`. A node never appears under a node it is not filed beneath. Contract
+        tests: a category under a department appears as a root for a guest; a brand under a category answers `kind=brand`
+        with the brand as a root; an active category under an inactive one is absent for a guest and present for
+        staff.
+
         '
       tags:
       - catalogue
@@ -1000,8 +1015,8 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
-          description: The tree. The root categories in `displayOrder`, each carrying its `children`
-            the same way, all the way down.
+          description: The tree. The root categories in `displayOrder`, then `id`, each carrying its `children`
+            the same way, all the way down, after the two passes the description states (ADAM CR-523).
           content:
             application/json:
               schema:
@@ -1121,12 +1136,49 @@ paths:
       operationId: commitCatalogueImport
       x-ticvai-consumed-by:
         - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'replaceCategory: live orders against the category, checked again at commit (409 category-has-live-orders;
+          ADAM CR-542)'
+      x-ticvai-reads:
+      - table: catalogue.import_job_row
+        for: 'the staged rows the parse wrote, applied in row_number order (ADAM CR-542)'
+      x-ticvai-writes:
+      - table: catalogue.import_job_row
+        for: 'each row''s outcome (applied with product_id, or failed with failure) (ADAM CR-542)'
+      - table: catalogue.product
+        for: 'each row applied exactly as createProduct or updateProduct would; under replaceCategory the category''s
+          products not in the file go from live to withdrawn, or from draft to archived (ADAM CR-542)'
+      - table: catalogue.variant
+        for: 'the variants of each row''s payload, as createProduct or updateProduct would write them (ADAM CR-542)'
+      - table: catalogue.product_version
+        for: 'the product version createProduct or updateProduct writes for each applied row (ADAM CR-542)'
+      - table: catalogue.audit_entry
+        for: 'the audit createProduct or updateProduct writes for each applied row (ADAM CR-542)'
       summary: Apply a parsed catalogue import
       description: '1.4.2. The second phase. **An operator has seen the findings and accepted them** —
         two-phase exists so nobody commits 2,847 products sight-unseen.
 
         Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that applies nothing
         and reports success is the defect CF-122 fixed in `seating`**, and it is not being rebuilt here.
+
+
+        **The parse stages what it found and the commit applies exactly that** (ADAM CR-542; Chinmay, 3 November
+        2026; CHG-CR542-001). It refuses these cases and changes nothing: a `jobKind` other than `productImport`,
+        `409 catalogue-import-wrong-kind` (pricing jobs become change requests on ADM-080); status `parsing`,
+        `committing` or `failed`, `409 catalogue-import-not-ready`; `committed`, `409
+        catalogue-import-already-committed`; `outcome` `nothingFound` or `unreadable`, or no row left to apply, `409
+        catalogue-import-found-nothing`; `replaceCategory` with live orders against the category, checked again,
+        `409 category-has-live-orders`. Otherwise it moves the job to `committing` and applies the `pending`
+        `catalogue.import_job_row` rows in `row_number` order, each in its own transaction, exactly as
+        `createProduct` or `updateProduct` would, with their audit and product version. New products are `draft`;
+        updated products keep their lifecycle state. Under `replaceCategory`, products of the category that are not
+        in the file go from `live` to `withdrawn`, or from `draft` to `archived`. Each row ends `applied`
+        (`product_id` set) or `failed` (`failure` set, plus a finding with its row, severity `error` and the
+        message). At the end the job is `committed` if every row applied, and `failed` if any row failed (the
+        partial application is recorded, never rolled back), with `applied_count`, `failed_count` and
+        `completed_at` set. The answer is `200` with the job either way. The source file is never read again.
 
         '
       tags:
@@ -1150,8 +1202,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/CatalogueImportJob'
         '409':
-          x-ticvai-problem-types: [catalogue-import-found-nothing, catalogue-import-already-committed]
-          description: 'The job found nothing, or was already committed. **Partial application is reported
+          x-ticvai-problem-types: [catalogue-import-found-nothing, catalogue-import-already-committed,
+            catalogue-import-wrong-kind, catalogue-import-not-ready, category-has-live-orders]
+          description: 'The job found nothing or has no row left to apply (`catalogue-import-found-nothing`), was
+            already committed (`catalogue-import-already-committed`), is not a `productImport`
+            (`catalogue-import-wrong-kind`), is `parsing`, `committing` or `failed` (`catalogue-import-not-ready`),
+            or is a `replaceCategory` whose category has live orders (`category-has-live-orders`); nothing changes
+            (ADAM CR-542). **Partial application is reported
             rather than rolled back** — three thousand products half-created is a state somebody has to
             see to repair.
 
@@ -1172,10 +1229,13 @@ paths:
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: in-process
-        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
-      - query: marketing-crm#loyaltyPositionRecords
-        route: service
-        for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001): the guest''s membership entitlements, their
+          chains, freeze window and status (ADAM CR-543)'
+      x-ticvai-reads:
+      - table: catalogue.plan_benefit
+        for: 'benefits: entitlement.template_id to the active plan benefits, by priority (ADAM CR-543)'
+      - table: catalogue.membership_benefit
+        for: 'benefits: each active benefit''s code, name, value and unit (ADAM CR-543)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1189,6 +1249,21 @@ paths:
 
         Includes lapsed terms. **A guest deciding whether to renew is comparing against what they had**,
         and a membership that vanishes on expiry makes that impossible.
+
+
+        **The guest''s read** (ADAM CR-543): it stays the guest''s read, as the 2 October decision binds it on WEB-022,
+        WEB-023 and GST-015; `listGuestMemberships` stays for staff and builds `GuestMembership` with the same code and
+        rules.
+
+
+        **GuestMembership, field by field** (ADAM CR-543; Chinmay, 3 November 2026; CHG-CR543-001). Rows: the
+        signed-in guest''s `access.entitlement` rows (`subject_id` is the guest) whose product''s kind is
+        `membership`. A chain is the guest''s entitlements of one product plus any linked by
+        `supersedes_entitlement_id`; the newest in a chain is the row, and the earlier ones are its
+        `previousTerms`. A surrendered entitlement (transferred away) is not shown. `includeLapsed=false` leaves out
+        rows whose `status` is `expired` or `cancelled`; true (the default) keeps them. Order: `validFrom` ascending,
+        then `entitlementId`. Benefits are read from `catalogue.plan_benefit` and `catalogue.membership_benefit`;
+        Marketing is not called (`tier` is null). `GuestMembership` states each field''s rule.
 
         '
       tags:
@@ -1228,6 +1303,9 @@ paths:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'live orders against a category the file would replace (409 category-has-live-orders) (CHG-MOD-003)'
+      x-ticvai-writes:
+      - table: catalogue.import_job_row
+        for: 'one row per parsed product, staged for the commit (ADAM CR-542)'
       summary: Parse a catalogue file into a preview
       description: '1.4.2 and 1.4.3. **`seating` has a two-phase import built for exactly this shape of
         problem and validated against real client files; `catalogue` had nothing**, so a venue with three
@@ -1241,6 +1319,14 @@ paths:
 
         **The `202` carries the job in `parsing`.** Poll `getCatalogueImportJob` until it reads
         `previewReady` (or `failed`), show its findings, then call `commitCatalogueImport`.
+
+
+        **The parse stages what it found** (ADAM CR-542; Chinmay, 3 November 2026; CHG-CR542-001). It stores `mode`
+        on the job and writes one `catalogue.import_job_row` per parsed product: `create` for a new code; `update`
+        for an existing code under `upsert` or `replaceCategory`. Under `createOnly` an existing code is an error
+        finding. A row with a severity `error` finding is excluded (`is_excluded` true, outcome `excluded`).
+        `createCount` and `updateCount` count rows that are not excluded. The row''s `payload` is the normalised
+        product with its variants, shaped as `createProduct` takes it, so the commit never reads the file again.
 
         '
       tags:
@@ -1359,6 +1445,15 @@ paths:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      - query: access#entitlementRecords
+        route: in-process
+        for: 'the guest''s membership entitlements, their chains, freeze window and status, by getMyMemberships'' code
+          (ADAM CR-543)'
+      x-ticvai-reads:
+      - table: catalogue.plan_benefit
+        for: 'benefits, by getMyMemberships'' code (ADAM CR-543)'
+      - table: catalogue.membership_benefit
+        for: 'benefits, by getMyMemberships'' code (ADAM CR-543)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1379,7 +1474,12 @@ paths:
 
         **Order.** Soonest first, by `validFrom` ascending, then by `entitlementId`.
 
-        **Statuses.** Every `status` is returned, ended ones included (`cancelled`, `expired`); a screen that shows only live rows filters on `status` itself.'
+        **Statuses.** Every `status` is returned, ended ones included (`cancelled`, `expired`); a screen that shows only live rows filters on `status` itself.
+
+
+        **Built with getMyMemberships'' code and rules** (ADAM CR-543; Chinmay, 3 November 2026): staff read a guest''s
+        memberships here, `getMyMemberships` stays the guest''s read, and both build `GuestMembership` with the same code,
+        as that schema states field by field.'
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
@@ -1787,6 +1887,30 @@ paths:
         reports whether the run escalates; a real run that escalates without `PRICE_CONFIGURE` is a
         `403` (`price-escalation-required`).
 
+
+        **What a run touches and what it leaves** (ADAM CR-544; Chinmay, 3 November 2026; CHG-CR544-001): it leaves
+        untouched what its contract says it cannot touch, by rules on stored columns, and its result says whether the
+        run escalates. **Selection:** `categoryId` (that exact category), `productKind` (the `ProductKind` enum),
+        `priceListId` and `channel` combine with AND; with none given, every product of the venue is selected.
+        `channel` is the catalogue `Channel` enum (pos, kiosk, web, mobile, b2b, ota, callCentre) and matches price
+        lists whose `channels` contain it. A run changes `catalogue.price` (`Price.amount`) for the matched products''
+        variants on the matched price lists, except these, which stay unchanged and are named in `skipped`:
+        `partnerNetRate`, the price list''s `price_list_type` is b2b, reseller or ota; `fixedPriceBundle`, the product
+        has a `catalogue.package_pricing` row with `pricing_model` fixedPackagePrice, for that price list or with no
+        price list; `openChangeRequest`, the product is named, by `change_request.product_id` or by a
+        `change_request_line` with `object_type` product, in a pricing change request whose status is not rejected,
+        published or rolledBack. `skipped` has one {productId, reason} per product and reason. `productsMatched`
+        counts the products matched; `pricesChanged` counts the price rows changed, or that would change.
+        **Adjustment:** `roundTo` rounds to the nearest multiple, half away from zero; without it, the result is
+        rounded to the currency''s scale. Any result below zero refuses the whole run with `400 validation` naming the
+        price, and nothing changes. **Escalation:** `BulkPriceResult.escalates` is true when any changed price moves
+        by more than `catalogue.bulkPriceChangeEscalationPercent`, or `pricesChanged` exceeds
+        `catalogue.bulkPriceChangeEscalationCount` (venue settings). The dry run answers it. A real run that
+        escalates, from a caller without `PRICE_CONFIGURE`, answers `403 price-escalation-required` and changes
+        nothing. **effectiveFrom:** null, now or past applies now. A future `effectiveFrom` answers `400 validation`
+        saying a future-dated change goes through a pricing change request, since `catalogue.price` stores no
+        validity. Every changed price writes what `setPrices` writes: audit entry and versions.
+
         '
       tags:
       - catalogue
@@ -1800,9 +1924,24 @@ paths:
       x-ticvai-reads:
       - table: catalogue.price
         for: 'the prices the selection reaches, each variant''s list_price on its price list (r13 root R21)'
+      - table: catalogue.price_list
+        for: 'the matched price lists: channels contains the selected channel; price_list_type b2b, reseller or ota is
+          skipped as partnerNetRate (ADAM CR-544)'
+      - table: catalogue.package_pricing
+        for: 'fixedPriceBundle: a pricing_model fixedPackagePrice row for the product, on that price list or with none
+          (ADAM CR-544)'
+      - table: catalogue.change_request
+        for: 'openChangeRequest: a pricing change request naming the product, status not rejected, published or
+          rolledBack (ADAM CR-544)'
+      - table: catalogue.change_request_line
+        for: 'openChangeRequest: a line with object_type product naming the product (ADAM CR-544)'
       x-ticvai-writes:
       - table: catalogue.price
         for: 'a real run''s new list_price per price reached (r13 root R21)'
+      - table: catalogue.audit_entry
+        for: 'what setPrices writes for every changed price: its audit entry (ADAM CR-544)'
+      - table: catalogue.product_version
+        for: 'what setPrices writes for every changed price: its versions (ADAM CR-544)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1821,7 +1960,8 @@ paths:
                 selection:
                   type: object
                   description: '**A selection, not a list of ids.** A category, a product kind, a channel
-                    or a price list — the same shape `BulkUpdateSeatsRequest` takes.
+                    or a price list — the same shape `BulkUpdateSeatsRequest` takes. The fields combine with AND;
+                    with none given, every product of the venue is selected (ADAM CR-544).
 
                     '
                   properties:
@@ -1829,15 +1969,22 @@ paths:
                       type: string
                       format: uuid
                       nullable: true
+                      description: That exact category (ADAM CR-544).
                     productKind:
-                      type: string
+                      allOf:
+                      - $ref: '#/components/schemas/ProductKind'
                       nullable: true
+                      description: The `ProductKind` enum (ADAM CR-544).
                     priceListId:
                       type: string
                       format: uuid
                       nullable: true
                     channel:
-                      $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+                      allOf:
+                      - $ref: '#/components/schemas/Channel'
+                      nullable: true
+                      description: The catalogue `Channel` (pos, kiosk, web, mobile, b2b, ota, callCentre), matching
+                        price lists whose `channels` contain it (ADAM CR-544).
                 adjustment:
                   type: object
                   required:
@@ -1872,6 +2019,9 @@ paths:
                   type: string
                   format: date-time
                   nullable: true
+                  description: Null, now or past applies now. A future value is `400 validation`, since
+                    `catalogue.price` stores no validity; a future-dated change goes through a pricing change request
+                    (ADAM CR-544).
       responses:
         '200':
           headers:
@@ -1882,6 +2032,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkPriceResult'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: 'An adjustment that takes any price below zero (naming the price), or a future `effectiveFrom`
+            (a future-dated change goes through a pricing change request); the whole run is refused and nothing
+            changes (ADAM CR-544).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          x-ticvai-problem-types: [price-escalation-required]
+          description: 'A real run that escalates (`BulkPriceResult.escalates`), from a caller without `PRICE_CONFIGURE`;
+            nothing changes (ADAM CR-544).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/reinstate:
@@ -1996,6 +2163,11 @@ paths:
         A frozen entitlement is refused at a gate with a different message from a suspended one, and the
         guest can unfreeze it themselves.
 
+
+        **The freeze window is stored** (ADAM CR-543; Chinmay, 3 November 2026): it writes
+        `access.entitlement.frozen_from` from `from` and `frozen_until` from `to` (null means open-ended), which
+        `GuestMembership.status` reads for `frozen`.
+
         '
       tags:
       - catalogue
@@ -2109,6 +2281,31 @@ paths:
         is `409 duplicate-code` and nothing is written. The clone''s `familyKey` is null: the family key is unique
         per venue (`product_venue_id_family_key_uniq`), so the source''s cannot be copied.
 
+
+        **The same code rules as createProduct, a defined includePrices and a stated copy list** (ADAM CR-545;
+        Chinmay, 3 November 2026; CHG-CR545-001). (1) The body''s `code` is exactly as `CreateProductRequest.code`:
+        maxLength 64, pattern `^[A-Za-z0-9_-]+$`, unique per tenant compared ignoring case. A code already used by
+        any product in the tenant answers `409 duplicate-code` (the shared DuplicateCode response), taken from the
+        unique index on insert, not from a read first. A code that breaks the length or pattern answers `400
+        validation`. `name` is maxLength 200, as `Product.name`. (2) `includePrices` (default false): when true,
+        for each source variant copied, every `catalogue.price` row of that variant (`price_list_id`, `list_price`,
+        `tax_code_id`) is copied to the clone''s matching new variant, on the same price list, with a new id, in the
+        same transaction as the clone; CatalogueService owns the table. `includePrices` true with `includeVariants`
+        false is refused with `400 validation` and nothing is written. Prices on price lists the caller cannot see at
+        this venue are not copied. (3) **What a clone copies:** kind, venue, description, descriptionLocalised,
+        category, responsible department, segment tags, channels, entitlement template, isStockTracked, onSaleFrom,
+        onSaleTo, validTo, media rows (`catalogue.product_media`, pointing to the same assets), and, unless
+        `includeVariants` is false, the variants under new ids with sku, barcode, axis values and names as stored.
+        (4) **What a clone sets fresh:** new id; `code` and `name` from the body; `nameLocalised` null (`name` is the
+        fallback, so guests never see the source''s name); `familyKey` null (unique per venue); lifecycle `draft`, so
+        `isSellable` false; `createdByPrincipalId` the caller; `approvedByPrincipalId` null; `createdAt` now; no
+        versions, bundles, orders or other history. (5) **What a clone leaves out:** variant dimensions and asset
+        usage records (VenueOps keeps those); staff add them after the clone. `fromPrice` in the
+        `201` answer stays null. (6) **Tests:** a code already used in the tenant in different letter case gives `409
+        duplicate-code`; a code with a space gives `400`; `includePrices` true copies each price row to the matching
+        new variant; `includePrices` with `includeVariants` false gives `400` and writes nothing; the clone''s
+        `nameLocalised` is null, `familyKey` null, `isSellable` false. The screen''s clone form does not change.
+
         '
       tags:
       - catalogue
@@ -2138,14 +2335,24 @@ paths:
               properties:
                 code:
                   type: string
+                  maxLength: 64
+                  pattern: ^[A-Za-z0-9_-]+$
+                  x-ticvai-unique: tenant
+                  description: The clone's code, exactly as `CreateProductRequest.code` (ADAM CR-545) - unique per
+                    tenant compared ignoring case; a used code is `409 duplicate-code`, from the unique index on insert.
                 name:
                   type: string
+                  maxLength: 200
+                  description: As `Product.name` (ADAM CR-545).
                 includeVariants:
                   type: boolean
                   default: true
                 includePrices:
                   type: boolean
                   default: false
+                  description: When true, every `catalogue.price` row of each copied source variant is copied to the
+                    matching new variant, on the same price list (ADAM CR-545). True with `includeVariants` false is
+                    `400 validation` and nothing is written.
       responses:
         '201':
           headers:
@@ -2156,6 +2363,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: 'A `code` that breaks the length or pattern, or `includePrices` true with `includeVariants`
+            false; nothing is written (ADAM CR-545).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
@@ -2184,6 +2399,19 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: body.fromPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: white-label#tenantLanguageRecords
+        route: service
+        for: 'BookingFlowConfig.showInfoOnly: the tenant''s current published configuration version, its snapshot''s
+          BookingFlowConfig with the venue''s venueOverrides entry laid over field by field (ADAM CR-533)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'the swim rule: the kinds of the consent questions the candidate products name (catalogue.product.consent_question_ids),
+          asked once per page, for the kind only (ADAM CR-533, CR-532)'
+      x-ticvai-reads:
+      - table: catalogue.price_list
+        for: 'fromPrice, by the one price rule, catalogue#variantPriceRecords (ADAM CR-439, built on #35288; CR-533)'
+      - table: catalogue.price
+        for: 'fromPrice, by the one price rule, catalogue#variantPriceRecords (ADAM CR-439, built on #35288; CR-533)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2212,6 +2440,22 @@ paths:
         **Help me choose narrows the search too** (decided 29 September, W4): `guidedAnswerIds` applies the
         chosen answers'' filters, exactly as on `listProducts`.
 
+
+        **What it matches, answers and reads** (ADAM CR-533, option A; Chinmay, 3 November 2026; CHG-CR533-001).
+        (1) `summary` is the product''s description (`catalogue.product.description`); no summary column is added.
+        Each result also carries `nameLocalised` and `summaryLocalised` (`catalogue.product.name_localised` and
+        `description_localised`); the screen shows the guest''s language and falls back to `name` and `summary`.
+        (2) The optional `channel` sets both the on-sale scope and `fromPrice`. (3) `showInfoOnly` is read through
+        `white-label#tenantLanguageRecords` (service) for the tenant''s current published configuration version:
+        `BookingFlowConfig` from its snapshot, with the venue''s `venueOverrides` entry laid over field by field;
+        when the setting is absent it is on. When it is off, `infoOnly` products are left out. (4) The swim rule: a
+        product''s questions are `catalogue.product.consent_question_ids`; `marketing-crm#consentQuestionRecords`
+        (service) is asked once per page for the ids the candidate products name, and when an answer has
+        `requiresSwimmer` false, any product with a question of kind `swim` is left out. (5) `fromPrice` calls the
+        one price rule, `catalogue#variantPriceRecords` (ADAM CR-439, built once in Catalogue on #35288; called,
+        never copied), reading `catalogue.price_list` and `catalogue.price`. `listProducts` declares the same reads for (3) and (4) and
+        applies the same rules.
+
         '
       x-ticvai-agreed: '29 September: W4 (Help me choose filters the catalogue)'
       tags:
@@ -2223,7 +2467,8 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: q
-        description: 'Keywords matched case-insensitively against the product''s `name` and `summary`, in the requested language and in English; every word must match.'
+        description: 'Keywords matched case-insensitively against the product''s `name`, `description` and every language
+          value of `name_localised` and `description_localised`; every word must match somewhere in them (ADAM CR-533).'
         in: query
         required: true
         schema:
@@ -2254,11 +2499,21 @@ paths:
           from the venue''s published guided choice (white-label `getPublishedGuidedChoice`). Each answer''s
           `filter` (products, categories, segment tags, age range, swimmer, certification) is applied on the
           server and the answers are combined with AND, so web, mobile and kiosk show the same list for the same
-          answers. Segment tags match as `segmentTag` does, the age range is read against
-          `ProductEligibilityRule` minimum and maximum age, and `requiresSwimmer: false` leaves out products
-          whose consent questions include the swim question, so a guest who said they cannot swim is not later
-          asked to consent to swimming (REV3-26 stays a consent, asked once). An answer with no filter narrows
-          nothing. The filter fields are white-label `GuidedChoice` `answer.filter`''s, by name: `productIds`,
+          answers. **One shared guided-answer filter** (ADAM CR-532; Chinmay, 3 November 2026; written once on
+          #36283 and called here, never copied), with white-label `GuidedChoice` `answer.filter`''s rules: fields
+          are ANDed within an answer and answers with each other, and an empty field narrows nothing; `productIds`
+          keeps the products listed; `productCategoryIds` keeps products filed under a listed category or any
+          category below it; segment tags match as `segmentTag` does; the age range keeps a product when the
+          answer''s range and the product''s [`minAgeYears`, `maxAgeYears`] overlap, an empty bound on either side
+          open, so a product with no age limits is always kept (each person''s age is still checked at booking); a
+          product needs a swimmer when any of its consent questions has kind `swim` (read through
+          `marketing-crm#consentQuestionRecords`, for the kind only) or its eligibility rule still has the old
+          `swimAbility` `confident`, and `requiresSwimmer` false leaves those out, true keeps only those, so a guest
+          who said they cannot swim is not later asked to consent to swimming (REV3-26 stays a consent, asked
+          once); `certificationCode` with `holdsCertification` false leaves out products whose
+          `requiredCertificationCode` is that code, and true or no flag keeps products needing that code or no
+          certification. A product with no eligibility rule has every limit empty. An answer with no filter
+          narrows nothing. The filter fields are white-label `GuidedChoice` `answer.filter`''s, by name: `productIds`,
           `productCategoryIds`, `segmentTags`, `minAgeYears`/`maxAgeYears` (against `ProductEligibilityRule`),
           `requiresSwimmer`, and `certificationCode` with `holdsCertification` (against
           `ProductEligibilityRule.requiredCertificationCode`). An id that is not an answer of the venue''s
@@ -2269,6 +2524,14 @@ paths:
           items:
             type: string
             format: uuid
+      - name: channel
+        in: query
+        required: false
+        description: 'The channel the search is scoped and priced for, exactly as `listProducts''` `channel` (ADAM
+          CR-533): it sets both the on-sale scope and `fromPrice`. A credential names it; a visitor with no credential
+          sends `web` or `mobile`; absent with no credential it is `web`.'
+        schema:
+          $ref: '#/components/schemas/Channel'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
@@ -2288,8 +2551,23 @@ paths:
                       type: string
                     name:
                       type: string
+                    nameLocalised:
+                      allOf:
+                      - $ref: '#/components/schemas/LocalisedText'
+                      nullable: true
+                      description: '`catalogue.product.name_localised` (ADAM CR-533); the screen shows the guest''s
+                        language and falls back to `name`.'
                     summary:
                       type: string
+                      nullable: true
+                      description: 'The product''s description, `catalogue.product.description` (ADAM CR-533); no
+                        summary column exists.'
+                    summaryLocalised:
+                      allOf:
+                      - $ref: '#/components/schemas/LocalisedText'
+                      nullable: true
+                      description: '`catalogue.product.description_localised` (ADAM CR-533); the screen shows the
+                        guest''s language and falls back to `summary`.'
                     fromPrice:
                       allOf:
                       - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -2705,6 +2983,15 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Product.fromPrice (ADAM CR-358, option (a); CHG-CR358-001; ADR-0018)'
+      - query: white-label#tenantLanguageRecords
+        route: service
+        for: 'BookingFlowConfig.showInfoOnly: the tenant''s current published configuration version, its snapshot''s
+          BookingFlowConfig with the venue''s venueOverrides entry laid over field by field, on when absent (ADAM
+          CR-533, the rule searchCatalogue states)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'the swim rule of the shared guided-answer filter: the kinds of the consent questions the candidate products
+          name (catalogue.product.consent_question_ids), asked once per page, for the kind only (ADAM CR-532, CR-533)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2826,11 +3113,21 @@ paths:
           from the venue''s published guided choice (white-label `getPublishedGuidedChoice`). Each answer''s
           `filter` (products, categories, segment tags, age range, swimmer, certification) is applied on the
           server and the answers are combined with AND, so web, mobile and kiosk show the same list for the same
-          answers. Segment tags match as `segmentTag` does, the age range is read against
-          `ProductEligibilityRule` minimum and maximum age, and `requiresSwimmer: false` leaves out products
-          whose consent questions include the swim question, so a guest who said they cannot swim is not later
-          asked to consent to swimming (REV3-26 stays a consent, asked once). An answer with no filter narrows
-          nothing. The filter fields are white-label `GuidedChoice` `answer.filter`''s, by name: `productIds`,
+          answers. **One shared guided-answer filter** (ADAM CR-532; Chinmay, 3 November 2026; written once on
+          #36283 and called here, never copied), with white-label `GuidedChoice` `answer.filter`''s rules: fields
+          are ANDed within an answer and answers with each other, and an empty field narrows nothing; `productIds`
+          keeps the products listed; `productCategoryIds` keeps products filed under a listed category or any
+          category below it; segment tags match as `segmentTag` does; the age range keeps a product when the
+          answer''s range and the product''s [`minAgeYears`, `maxAgeYears`] overlap, an empty bound on either side
+          open, so a product with no age limits is always kept (each person''s age is still checked at booking); a
+          product needs a swimmer when any of its consent questions has kind `swim` (read through
+          `marketing-crm#consentQuestionRecords`, for the kind only) or its eligibility rule still has the old
+          `swimAbility` `confident`, and `requiresSwimmer` false leaves those out, true keeps only those, so a guest
+          who said they cannot swim is not later asked to consent to swimming (REV3-26 stays a consent, asked
+          once); `certificationCode` with `holdsCertification` false leaves out products whose
+          `requiredCertificationCode` is that code, and true or no flag keeps products needing that code or no
+          certification. A product with no eligibility rule has every limit empty. An answer with no filter
+          narrows nothing. The filter fields are white-label `GuidedChoice` `answer.filter`''s, by name: `productIds`,
           `productCategoryIds`, `segmentTags`, `minAgeYears`/`maxAgeYears` (against `ProductEligibilityRule`),
           `requiresSwimmer`, and `certificationCode` with `holdsCertification` (against
           `ProductEligibilityRule.requiredCertificationCode`). An id that is not an answer of the venue''s
@@ -3170,11 +3467,19 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for GroupPackageDefinition.unitPrice, should this operation fill it; it answers unitPrice null (ADAM CR-499; check-money-currency, ADR-0018), so the read is not asked until it does'
       summary: Define a school-trip format or party package
       description: '**Design gap, 23 September.** The kids club sells school trips (half-day, full-day,
         curriculum day, priced per pupil) and birthday parties (Explorer to Exclusive hire, priced per package,
         with hosts). The product carries the price; this carries what makes it a group package.
+
+
+        **It answers what it stores** (ADAM CR-499, option C; Chinmay, 3 November 2026; CHG-CR499-001). It writes
+        `catalogue.group_package` exactly as specified, one row per product, and answers `200` with the stored fields:
+        `id`, `productId`, `kind`, `maxParticipants`, `durationMinutes`, `minimumSize`, `hostCount`, `pricingBasis`,
+        `freeLeaderRatio`, `paymentMode`, `includes`, `scopePath`. It answers `name` and `unitPrice` as null and reads
+        no price and no product name, so it does not ask the currency read (that read was only for `unitPrice`). `name` and
+        `unitPrice` sent in the body are ignored, as readOnly fields are. BO-011 binds neither.
 
         '
       tags:
@@ -3228,7 +3533,20 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
-      description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
+      description: '**Each package is named and priced the way the product listing does** (ADAM CR-499; Chinmay,
+        3 November 2026; CHG-CR499-001; built on #27870 with `listProducts`). `name` is `catalogue.product.name`, and
+        each package also carries `nameLocalised` (`catalogue.product.name_localised`, read-only, not stored on the
+        package): as on Product, a guest screen shows the entry for its guest''s language and falls back to `name`;
+        staff screens show `name`. `unitPrice` is the package product''s `fromPrice`, computed as `listProducts`
+        computes it: the lowest list price among the product''s sellable variants on the caller''s channel now, in the
+        venue''s trading currency, by the same price-list function `listProductVariants` uses, the one price rule
+        `catalogue#variantPriceRecords` (ADAM CR-439; call it, do not copy it); null where no price list prices it on
+        that channel. The channel is `listProducts''`: a credential names
+        it, a visitor sends `web` or `mobile`, and with neither it is `web` (a staff caller may send one too).
+        `pricingBasis` says what the amount is per (participant or package); it never changes the amount.
+
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -3267,6 +3585,14 @@ paths:
           enum:
           - school
           - party
+      - name: channel
+        in: query
+        required: false
+        description: 'The channel `GroupPackageDefinition.unitPrice` is priced for, exactly as `listProducts''`
+          `channel` (ADAM CR-499, CHG-CR499-001). A credential names it; a visitor with no credential sends `web` or
+          `mobile`; with neither it is `web`. A staff caller may send one too.'
+        schema:
+          $ref: '#/components/schemas/Channel'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
@@ -12667,6 +12993,19 @@ paths:
         until an AI producer exists (LO-CR419-001). `channelComparison` runs the same rule for each channel asked in
         `compareChannels`.
 
+
+        **Channels: SalesChannel in, catalogue Channel at the price list** (ADAM CR-537; Chinmay, 3 November 2026;
+        CHG-CR537-001). One function, used for `channel` and for every entry of `compareChannels`, translates each
+        SalesChannel into catalogue `Channel` with the map the package already uses for channel availability:
+        `guestWeb` becomes `web`, `guestApp` becomes `mobile`, `partner` becomes `b2b`, and `pos`, `kiosk`,
+        `callCentre`, `b2b` and `ota` keep their names. `api` and `backOffice` have no catalogue channel. The selected
+        rate is then matched as a `Channel` value in `catalogue.price_list.channels`, and the live dynamic price''s
+        deployments go through the existing map from `Channel` to deployments (web is b2c, mobile is mobileApp,
+        callCentre is callCenter, the rest by the same name). If the main `channel` is `api` or `backOffice`, the
+        answer is `422 no-selected-rate`. For such a channel in `compareChannels`, its comparison entry has no
+        `finalPayable`, and `difference` says that no price list prices this variant on that channel. Member, fee and
+        tax rules keep matching on SalesChannel as they do now. The answer echoes the SalesChannel the caller sent.
+
         **The member, dynamic, fee and tax rules** (ADAM CR-439, decided 1 November 2026, and CR-455, 2 November
         2026; CHG-CR439-001, CHG-CR455-001). The price, fee and tax steps are one Catalogue calculation component,
         not code inside the endpoint, so that checkout can call the same code later. `at` below is the instant
@@ -12768,7 +13107,8 @@ paths:
           x-ticvai-problem-types: [no-selected-rate, no-calculation-profile, promotion-evaluation-unavailable,
             unsupported-tax-method]
           description: '`no-selected-rate`: no price resolves for the variant at the venue on the channel on the date
-            (catalogue#variantPriceRecords; ADAM CR-455). `no-calculation-profile`: the venue has no active default
+            (catalogue#variantPriceRecords; ADAM CR-455), or the main `channel` is `api` or `backOffice`, which have
+            no catalogue channel (ADAM CR-537). `no-calculation-profile`: the venue has no active default
             calculation profile in force on the date (ADAM CR-419). `promotion-evaluation-unavailable`: the request
             carries a `promotionCode` and Promotions'' evaluatePromotions is not built yet (ADAM CR-439).
             `unsupported-tax-method`: the winning tax rule uses the fixedTax or tiered method (ADAM CR-455,
@@ -13338,20 +13678,34 @@ paths:
         of those variants. `events` = the distinct non-null `product.event_id`. `performances` = the
         `catalogue.performance` rows of those events with `starts_at` after the request''s `effective_date` (now when it
         is null). `venues` = the distinct `product.venue_id`. `markets` = the distinct non-null `product.market_code`,
-        plus the request''s `market_code`. `channels` = the request''s `impacted_channels` when set, else the distinct
-        channels of the affected price lists. `memberships` = the affected products of kind membership. `packages` = the
+        plus the request''s `market_code`. `channels` = the request''s `impacted_channels` when set and not empty, else
+        the distinct channels of the affected price lists (an empty `impacted_channels` means the channels of the price
+        lists involved; ADAM CR-539). `memberships` = the affected products of kind membership. `packages` = the
         `catalogue.group_package` rows whose `product_id` is an affected product. `existingReservations` is 0, and
         `affectsExistingOrders` and `affectsExistingReservations` are false, because a change never reaches what is
         already sold. `futureReservations` = the `orders.order_line` rows on affected variants for those performances,
         read in process through `orders#orderLineRecords`, in orders whose status is not voided, failed or refunded.
         `affectsFutureUnsoldInventory` = `products` > 0. Price changes are the lines that have both `current_amount`
-        and `proposed_amount`; each line''s change is (proposed - current) / current * 100. `averagePriceChange` is their
-        mean, and `maximumChange` and `minimumChange` are the extremes; all three are null when there are no such
-        lines. `currentRevenue` = the sum of quantity * `server_unit_price` over order lines on affected variants, in
+        and `proposed_amount`; each line''s change is (proposed - current) / current * 100. A line with
+        `current_amount` 0 has no percent change and is left out of `averagePriceChange`, `maximumChange` and
+        `minimumChange` (ADAM CR-539). `averagePriceChange` is their mean, and `maximumChange` and `minimumChange` are
+        the extremes; all three are null when there are no such lines. `currentRevenue` = the sum of quantity * `server_unit_price` over order lines on affected variants, in
         orders with status paid, partiallyPaid, completed or partiallyRefunded, created in the 365 days before the
-        read. `projectedRevenue` = the same quantities priced at the proposed amount wherever a line names the
-        variant''s price or rate, and at the current price otherwise. `revenueImpact` = `projectedRevenue` -
-        `currentRevenue`. `customerExposure` is the summed quantity, and `transactionVolume` the number of distinct
+        read. **`projectedRevenue` and `revenueImpact`** (ADAM CR-539; Chinmay, 3 November 2026; CHG-CR539-001): the
+        current price of an order line is its `server_unit_price` (what was charged), and `currentRevenue` is over the
+        same order lines and quantities. A `change_request_line` reprices order lines only when `current_amount` is
+        above 0 and `proposed_amount` is set, by its ratio, `proposed_amount` / `current_amount`, multiplied into each
+        reached line''s `server_unit_price`. Which order lines a line reaches: a product line (`object_type` product,
+        `configuration_area` pricing) reaches every order line whose variant belongs to that product. A rate line
+        reaches the order lines of the variants that a `catalogue.price_assignment` on the rate''s price list names
+        with that rate in `category_rates`; its `object_ids` are variants when `assignment_scope` is productVariant,
+        and products (all their variants) when it is productLevel. A priceList line reaches every variant with a
+        `catalogue.price` row on that list. When several lines reach one order line, the most specific wins: product,
+        then rate, then priceList; among several rate lines, the mean of their ratios is used. An order line no line
+        reaches is priced at its `server_unit_price`. `projectedRevenue` is the sum of the repriced quantities;
+        `revenueImpact` = `projectedRevenue` - `currentRevenue`. Rounding: money to the trading currency''s scale and
+        percentages to two places, both half away from zero. `currentRevenue`, `projectedRevenue` and `revenueImpact`
+        are null when the venues involved trade in more than one currency, and the percentages are still answered. `customerExposure` is the summed quantity, and `transactionVolume` the number of distinct
         orders, in the same window. Money is in the venue''s trading currency (`tenancy#venueSettingsRecords`).
         `derivedRates` = the `catalogue.rate` rows whose `base_rate_id` is a rate a line names. `contractRates` = the
         affected price lists with `price_list_type` b2b, reseller, ota or corporate; `membershipRates` = those of type
@@ -18668,11 +19022,22 @@ paths:
         answer is never cached at the edge.
 
 
-        **On the guest web the edge also sets the token as an HttpOnly, short-lived, per-performance cookie** on
-        the admitted answer (ADR-0066 amendment of 25 October 2026, ADAM CR-216): the browser sends it with
-        `addCartLine` and the page stores nothing, so a reload or a second tab stays admitted. **A `404` for a
-        performance the caller knows means the entry is gone** (evicted, or the room restarted): the guest
-        re-enters with `enterWaitingRoom`.
+        **On the guest web the token is also an HttpOnly, short-lived, per-performance cookie** on the admitted
+        answer (ADR-0066 amendment of 25 October 2026, ADAM CR-216): the browser sends it with `addCartLine` and the
+        page stores nothing, so a reload or a second tab stays admitted. **The API itself sends the cookie** on the
+        admitted answer (ADAM CR-524, Chinmay, 3 November 2026; ADR-0066 amendment of 3 November 2026):
+        `Set-Cookie`, HttpOnly, Secure, scoped to the performance, expiring with the token. Front Door passes it
+        through and never caches the admitted answer. **A `404` for a performance the caller knows means the entry
+        is gone** (evicted, or the room restarted): the guest re-enters with `enterWaitingRoom`.
+
+
+        **Built with the waiting room, on #29033** (ADAM CR-524, Chinmay, 3 November 2026; CHG-CR524-001), with
+        `enterWaitingRoom`, the release controller and the token check, as that ticket lists; not on the catalogue
+        event ticket. #29033 settles in its own design, before building, everything both operations and the cart
+        check share: the per-performance Redis keys (the arrival counter and the admitted-up-to mark the controller
+        advances), the per-entry record and its lifetime, the token (format, signing algorithm, Key Vault secret
+        name, lifetime), the rules for `position`, `aheadOfYou`, `estimatedWaitSeconds` and `pollAfterSeconds`, and
+        when an entry is expired or the room closed rather than `notRequired`.
 
         '
       tags:
@@ -18686,6 +19051,13 @@ paths:
       responses:
         '200':
           description: The position, or the admission
+          headers:
+            Set-Cookie:
+              description: 'On the admitted answer to the guest web only (ADAM CR-524): the admission token as an
+                HttpOnly, Secure cookie scoped to the performance and expiring with the token, sent by the API itself;
+                Front Door passes it through and never caches the admitted answer.'
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -20018,10 +20390,22 @@ paths:
         B, with the result values `ChannelConnectionIntegrationManagerView.lastTests` already lists).
 
         - **Which tests apply.** `ticvaiNative` has none (no call is made, and the status is `connected`). `fileSftp`
-        gets `connectivity` and `authentication`. A connection whose `direction` is `inbound` gets `authentication`
-        only. Every other `connectionType` gets all eight. Leaving `tests` out means all that apply, minus
-        `orderCreation` and `cancellation` in `production`; naming either of those in `production` stays `422
-        order-test-in-production`, and a `disabled` connection stays `409 connection-disabled`.
+        gets `connectivity` and `authentication`. A connection whose `direction` is `inbound` gets `authentication` only. Every other
+        `connectionType` gets all eight. Leaving `tests` out means all that apply, minus `orderCreation` and
+        `cancellation` in `production`, and a `disabled` connection stays `409 connection-disabled`.
+
+        - **A named test that does not apply is recorded as `notSupported`** (ADAM CR-540; Chinmay, 3 November 2026;
+        CHG-CR540-001): it is neither silently skipped nor refused. The tests that apply to the connection run, under
+        the type and direction rules above. For each named test that does not apply, nothing is sent to the channel
+        and a `lastTests` entry is written with result `notSupported` and `testedAt` now, replacing any earlier entry
+        for that test. `notSupported` does not count toward `connectionStatus`, which is worked out only from the
+        tests that ran; a call where nothing ran leaves `connectionStatus` unchanged, but for `ticvaiNative`, whose
+        status stays `connected` (CR-458). A `ticvaiNative` connection gets `notSupported` for every named test. The
+        `422 order-test-in-production` fires only when `orderCreation` or `cancellation` is named, applies to the
+        connection, and the connection''s `environment` is `production`; a named order test that does not apply is
+        `notSupported`, not `422`. Omitting `tests` still means all that apply. The stored `lastTests` keep CR-458''s
+        names (`productSync`, `pricing`, `orderCreation`, ...); `listChannelConnectionIntegration` answers them as
+        the names ADM-269 shows (`product`, `price`, `order`). The answer is `200` with the connection.
 
         - **connectivity.** The endpoint must be `https` (`sftp` for `fileSftp`). Its host is resolved, and the test
         fails with detail ''endpoint address not allowed'' for a loopback, private, link-local or cloud metadata address,
@@ -20103,7 +20487,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [order-test-in-production]
-          description: '`orderTestInProduction`.'
+          description: '`orderTestInProduction`: `orderCreation` or `cancellation` is named, applies to the connection,
+            and its `environment` is `production` (ADAM CR-540).'
           content:
             application/problem+json:
               schema:
@@ -20367,13 +20752,16 @@ paths:
       description: '**Retry, as a call** (29 September, writers pass). Moves an `open` or `investigating`
         `catalogue.channel_incident` to `retrying`, increments `retryCount` and queues the failed call again with
         the same idempotency reference, so a partner that did receive the first call does not book twice. The job
-        moves it to `resolved` on success or back to `investigating` on failure. A `resolved` or `closed`
-        incident answers `409` `notRetryable`.
+        moves it to `resolved` on success or back to `investigating` on failure. A `retrying`, `resolved` or
+        `closed` incident answers `409` `notRetryable` (ADAM CR-538).
 
 
         **The retry is a fact written to the outbox and carried out by a job** (ADAM CR-457, decided by Chinmay on 2
-        November 2026, option A). In one transaction: an incident that is `resolved` or `closed` answers `409
-        not-retryable` and nothing changes. Otherwise the `catalogue.channel_incident` moves to `retrying`,
+        November 2026, option A). In one transaction: an incident that is `retrying`, `resolved` or `closed` answers
+        `409 not-retryable` and nothing changes: no `retry_count` rise and no new queued call (ADAM CR-538; Chinmay, 3
+        November 2026; CHG-CR538-001). It moves only an `open` or `investigating` incident to `retrying`, which is what
+        `states/channel-incident.yaml` allows, and keeps one call in flight per incident; the job keeps its
+        `retry_count` check as a guard. Otherwise the `catalogue.channel_incident` moves to `retrying`,
         `retry_count` goes up by 1 and `updated_at` is set; where `api_request_reference` is null it is set to the
         incident''s id as text, so this retry and every later one share one reference. One `catalogue.audit_entry` is
         written (domain `channel`, action `retry`, entity_type `channelIncident`, entity_id the incident) and one
@@ -20412,7 +20800,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [not-retryable]
-          description: '`notRetryable`: the incident is `resolved` or `closed`, and nothing changes (ADAM CR-457).'
+          description: '`notRetryable`: the incident is `retrying`, `resolved` or `closed`, and nothing changes: no
+            `retry_count` rise and no new queued call (ADAM CR-457, CR-538).'
           content:
             application/problem+json:
               schema:
@@ -23344,6 +23733,7 @@ components:
           nullable: true
     CataloguePlanBenefit:
       type: object
+      x-ticvai-rls: grant-holder-read   # ADAM CR-543: read below the tenant by getMyMemberships and listGuestMemberships, as catalogue.membership_benefit is (CHG-MOD-007)
       x-ticvai-persistence: catalogue.plan_benefit
       description: '**Taken from the backend workbook, 20 September.** Maps membership benefits to plans and defines usage limits for each benefit.'
       required:
@@ -24445,6 +24835,7 @@ components:
       - id
       - status
       - parsedCount
+      - mode
       properties:
         id:
           type: string
@@ -24468,8 +24859,30 @@ components:
           type: integer
         createCount:
           type: integer
+          description: The staged rows with action `create` that are not excluded (ADAM CR-542).
         updateCount:
           type: integer
+          description: The staged rows with action `update` that are not excluded (ADAM CR-542).
+        mode:
+          type: string
+          readOnly: true
+          enum:
+          - createOnly
+          - upsert
+          - replaceCategory
+          default: createOnly
+          description: The `mode` `importProductCatalogue` was sent, stored on the job (`catalogue.import_job.mode`,
+            text not null default createOnly; ADAM CR-542) so the commit applies the rows under it.
+        appliedCount:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: The rows the commit applied; set when the commit ends (ADAM CR-542).
+        failedCount:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: The rows the commit failed to apply; set when the commit ends (ADAM CR-542).
         findings:
           x-ticvai-persistence-column: jsonb
           x-ticvai-persistence-kind: valueObject
@@ -24605,10 +25018,90 @@ components:
           format: date-time
           nullable: true
           readOnly: true
+    CatalogueImportJobRow:
+      type: object
+      x-ticvai-persistence: catalogue.import_job_row
+      x-ticvai-unique-together:
+      - [importJobId, rowNumber]
+      description: '**One parsed product, staged for the commit** (ADAM CR-542; Chinmay, 3 November 2026;
+        CHG-CR542-001). `importProductCatalogue` writes one row per parsed product and `commitCatalogueImport` applies
+        exactly these rows, never the file again. Storage only: no operation answers it.'
+      required:
+      - id
+      - importJobId
+      - scopePath
+      - rowNumber
+      - payload
+      - isExcluded
+      - outcome
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        importJobId:
+          type: string
+          format: uuid
+          x-ticvai-references: catalogue.import_job
+          description: The job that parsed it.
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005): the job''s, so row security follows the job.'
+        rowNumber:
+          type: integer
+          description: The row of the file; the commit applies rows in this order.
+        action:
+          type: string
+          nullable: true
+          enum:
+          - create
+          - update
+          - null
+          description: '`create` for a new code; `update` for an existing code under `upsert` or `replaceCategory`.'
+        targetProductId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.product
+          description: The existing product an `update` row replaces.
+        payload:
+          type: object
+          additionalProperties: true
+          description: The normalised product with its variants, shaped as `createProduct` takes it.
+        isExcluded:
+          type: boolean
+          default: false
+          description: True for a row with a severity `error` finding; it is never applied.
+        outcome:
+          type: string
+          enum:
+          - pending
+          - applied
+          - failed
+          - excluded
+          default: pending
+        failure:
+          type: string
+          nullable: true
+          description: Why the commit could not apply the row.
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.product
+          description: The product the commit created or updated.
     GuestMembership:
       type: object
       description: '19.2.26 to 19.2.28. **A view, not a table** — assembled from the entitlement, the
         product that granted it and the order that bought it.
+
+
+        **Defined field by field** (ADAM CR-543; Chinmay, 3 November 2026; CHG-CR543-001): `getMyMemberships` and
+        `listGuestMemberships` build it with the same code and rules. Rows: the guest''s `access.entitlement` rows
+        (`subject_id` is the guest) whose product''s kind is `membership`. A chain is the guest''s entitlements of one
+        product plus any linked by `supersedes_entitlement_id`; the newest in a chain is the row, the earlier ones its
+        `previousTerms`. A surrendered entitlement (transferred away) is not shown.
 
         '
       required:
@@ -24629,6 +25122,8 @@ components:
         tier:
           type: string
           nullable: true
+          description: Null (ADAM CR-543) - nothing links a membership to a loyalty programme, so Marketing is not
+            called.
         status:
           type: string
           enum:
@@ -24643,24 +25138,34 @@ components:
 
             No state model of its own, deliberately: **two models over one lifecycle drift.**
 
+
+            **The rule** (ADAM CR-543): `cancelled` becomes `cancelled`; `expired`, `fullyConsumed`, or `valid_to`
+            before today becomes `expired`; `issued` or `partiallyConsumed` with `suspended_reason` set becomes
+            `suspended`; otherwise, with a freeze covering today, `frozen`; otherwise `active`. A freeze covers today
+            when `frozen_from` is on or before today and `frozen_until` is null or on or after today.
+
             '
         validFrom:
           type: string
           format: date
+          description: The entitlement's `valid_from`, as a date in the venue's time zone (ADAM CR-543).
         validTo:
           type: string
           format: date
+          description: The entitlement's `valid_to`, as a date in the venue's time zone (ADAM CR-543).
         frozenDays:
           type: integer
           description: 'Days lost to a freeze and added back to `validTo`. **Shown because a guest who
             paused a pass will check the maths**, and a validity date that moved without explanation is
-            a support call.
+            a support call. As stored on the entitlement (ADAM CR-543).
 
             '
         benefits:
           type: array
           description: '5.4.31. From the product''s entitlement template. **Traceable to what grants them**,
-            so a gate can honour what the app promised.
+            so a gate can honour what the app promised. **The rule** (ADAM CR-543): `entitlement.template_id` to
+            `catalogue.plan_benefit` (`is_active`) to `catalogue.membership_benefit` (`is_active`), ordered by
+            `plan_benefit.priority` then `code`.
 
             '
           items:
@@ -24668,18 +25173,24 @@ components:
             properties:
               code:
                 type: string
+                description: '`membership_benefit.code`.'
               name:
                 type: string
+                description: '`membership_benefit.name`.'
               value:
                 type: string
                 nullable: true
+                description: '`membership_benefit.value` as a plain decimal string, followed by a space and the
+                  `unit` when `unit` is set (`10 percent`); null when `value` is null (ADAM CR-543).'
         renewsOn:
           type: string
           format: date
           nullable: true
+          description: Null (ADAM CR-543) - nothing stores an automatic renewal.
         previousTerms:
           type: array
-          description: Prior terms, including lapsed ones.
+          description: 'Prior terms, including lapsed ones: the chain''s earlier entitlements, newest first (ADAM
+            CR-543).'
           items:
             type: object
             properties:
@@ -24696,6 +25207,9 @@ components:
                 - renewed
                 - cancelled
                 - upgraded
+                description: '`upgraded` when the next term is a different product; `cancelled` when the term was
+                  cancelled other than by being superseded; `renewed` when the next term starts no later than the day
+                  after this term''s `validTo`; otherwise `expired` (ADAM CR-543).'
     ProductVersion:
       type: object
       x-ticvai-persistence: catalogue.product_version
@@ -24838,18 +25352,28 @@ components:
       required:
       - applied
       - productsMatched
+      - escalates
       properties:
         applied:
           type: boolean
         productsMatched:
           type: integer
+          description: The products matched (ADAM CR-544).
         pricesChanged:
           type: integer
+          description: The price rows changed, or that would change (ADAM CR-544).
+        escalates:
+          type: boolean
+          description: '**Whether the run escalates** (ADAM CR-544): true when any changed price moves by more than
+            `catalogue.bulkPriceChangeEscalationPercent`, or `pricesChanged` exceeds
+            `catalogue.bulkPriceChangeEscalationCount` (venue settings). The dry run answers it; a real run that
+            escalates from a caller without `PRICE_CONFIGURE` is `403 price-escalation-required`.'
         skipped:
           type: array
           description: '**Products the selection matched and the adjustment could not touch** — a fixed-price
-            bundle, a partner net rate, a product in an open period. Named rather than counted, because
-            whoever ran this will be asked why the total is short.
+            bundle, a partner net rate, a product named in an open pricing change request. Named rather than counted,
+            because whoever ran this will be asked why the total is short. One {productId, reason} per product and
+            reason (ADAM CR-544).
 
             '
           items:
@@ -24860,6 +25384,15 @@ components:
                 format: uuid
               reason:
                 type: string
+                enum:
+                - partnerNetRate
+                - fixedPriceBundle
+                - openChangeRequest
+                description: '`partnerNetRate`: the price list''s `price_list_type` is b2b, reseller or ota.
+                  `fixedPriceBundle`: the product has a `catalogue.package_pricing` row with `pricing_model`
+                  fixedPackagePrice, for that price list or with no price list. `openChangeRequest`: the product is
+                  named in a pricing change request whose status is not rejected, published or rolledBack (ADAM
+                  CR-544).'
     AlternativeCode:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listAlternativeCodes, setAlternativeCodes
       x-ticvai-persistence: catalogue.alternative_code
@@ -25787,16 +26320,33 @@ components:
         name:
           type: string
           readOnly: true
+          nullable: true
           x-ticvai-persisted: false
           description: '**Read from the package''s product, not stored here** (R8 blocker ORDERS-MONEY-C20,
-            CHG-R8MIG-009): `catalogue.product.name`, in the caller''s language.'
+            CHG-R8MIG-009; ADAM CR-499, CHG-CR499-001). `listGroupPackages` answers `catalogue.product.name`, beside
+            `nameLocalised`: as on Product, a guest screen shows the entry for its guest''s language and falls back to
+            `name`; staff screens show `name`. `setGroupPackageDefinition` answers null and reads no product name.'
+        nameLocalised:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**The package product''s `nameLocalised`, read-only, not stored on the package** (ADAM CR-499,
+            CHG-CR499-001): `catalogue.product.name_localised`, answered by `listGroupPackages`. See
+            `Product.nameLocalised`; `name` is the fallback.'
         unitPrice:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           readOnly: true
+          nullable: true
           x-ticvai-persisted: false
-          description: The product's price per participant (`pricingBasis` perParticipant) or per package, read from
-            the product's current price; not stored here.
+          description: '**The package product''s `fromPrice`, not stored here** (ADAM CR-499, CHG-CR499-001).
+            `listGroupPackages` computes it as `listProducts` computes `Product.fromPrice`: the lowest list price among
+            the product''s sellable variants on the caller''s channel now, by the same
+            price-list function `listProductVariants` uses, `catalogue#variantPriceRecords` (ADAM CR-439; called, never
+            copied); null where no price list prices it on that channel. `pricingBasis` says what the amount is per (participant or package); it never changes the
+            amount. `setGroupPackageDefinition` answers null and reads no price.'
         minimumSize:
           type: integer
           minimum: 1
@@ -25923,6 +26473,43 @@ components:
             `createProduct` and `updateProduct`, returned by `listProducts` and `getProduct`. WEB-022 shows the saving
             as `compareAtPrice` minus `fromPrice` when `compareAtPrice` is the greater; null shows no saving, never a
             made-up value.'
+        highlightBadge:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+            maxLength: 20
+          description: '**The card''s highlight badge** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g.
+            POPULAR or BEST VALUE, keyed by ISO 639-1 code like `LocalisedText`, at most 20 characters per language
+            (longer is `400 validation`). Stored in the nullable jsonb column `catalogue.product.highlight_badge`, set
+            with `createProduct` and `updateProduct` by a caller holding `PRODUCT_CONFIGURE`, and answered by every
+            operation that answers Product, to every audience. WEB-005''s card shows the value for the guest''s
+            language, falling back to the English value, as the pill on the card image in capitals; null shows no
+            badge.'
+        rating:
+          type: object
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          required:
+          - average
+          - count
+          properties:
+            average:
+              type: number
+              minimum: 1.0
+              maximum: 5.0
+              multipleOf: 0.1
+              description: The average rating, 1.0 to 5.0, one decimal.
+            count:
+              type: integer
+              minimum: 1
+              description: How many reviews the average is over.
+          description: '**The card''s rating summary** (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001):
+            readOnly, not stored on the product. `listProducts` answers it; every other operation answers null. It is
+            null until the rating source is decided, and nothing invents a value meanwhile. WEB-005 shows it as the
+            star line under the display tags (a star, the average, then `count` followed by reviews) whenever it is
+            not null.'
         nameLocalised:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
@@ -26376,6 +26963,14 @@ components:
           nullable: true
           description: What the same visits cost bought singly, behind the plan card's saving (`Product.compareAtPrice`;
             ADAM CR-482).
+        highlightBadge:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+            maxLength: 20
+          description: The card's highlight badge per language, at most 20 characters each (longer is `400
+            validation`); null clears it (`Product.highlightBadge`; ADAM CR-504).
     UpdateProductRequest:
       type: object
       minProperties: 1
@@ -26463,6 +27058,14 @@ components:
           nullable: true
           description: What the same visits cost bought singly, behind the plan card's saving (`Product.compareAtPrice`;
             ADAM CR-482).
+        highlightBadge:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+            maxLength: 20
+          description: The card's highlight badge per language, at most 20 characters each (longer is `400
+            validation`); null clears it (`Product.highlightBadge`; ADAM CR-504).
     VariantDimension:
       x-ticvai-persistence: catalogue.variant_dimension
       type: object
@@ -36249,10 +36852,15 @@ components:
               channel:
                 $ref: ../shared/common.yaml#/components/schemas/SalesChannel
               finalPayable:
-                $ref: ../shared/common.yaml#/components/schemas/Money
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+                description: 'Absent (null) for a channel with no catalogue channel, `api` or `backOffice` (ADAM
+                  CR-537): no price list prices the variant there.'
               difference:
                 type: string
-                description: Why it differs, e.g. Call Center Booking Fee
+                description: Why it differs, e.g. Call Center Booking Fee; for `api` or `backOffice`, that no price
+                  list prices this variant on that channel (ADAM CR-537)
           description: Channel Comparison results
         aiInsights:
           type: array
@@ -37171,11 +37779,18 @@ components:
           nullable: true
           description: 'Affected integrations (count): no source yet, answered null (ADAM CR-456, LO-CR456-001)'
         currentRevenue:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Current Revenue
+          allOf:
+            - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: 'Current Revenue: quantity * server_unit_price over the counted order lines; null when the venues
+            involved trade in more than one currency (ADAM CR-539)'
         projectedRevenue:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Projected Revenue
+          allOf:
+            - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: 'Projected Revenue: the same quantities, each reached line''s server_unit_price multiplied by the
+            ratio of the most specific change_request_line that reaches it (ADAM CR-539); null when the venues involved
+            trade in more than one currency'
         averagePriceChange:
           type: number
           nullable: true
@@ -37237,7 +37852,9 @@ components:
         revenueImpact:
           allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: projectedRevenue minus currentRevenue, over the 365 days before the read (ADAM CR-456)
+          nullable: true
+          description: projectedRevenue minus currentRevenue, over the 365 days before the read (ADAM CR-456); null when
+            the venues involved trade in more than one currency (ADAM CR-539)
         affectsExistingOrders:
           type: boolean
           description: Whether the change affects existing orders; always false for price changes (never retroactive)

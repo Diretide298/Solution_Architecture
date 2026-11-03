@@ -5770,7 +5770,13 @@ paths:
           guest (r8, WHITE-C26)'
       - query: catalogue#productEligibilityRuleRecords
         route: in-process
-        for: 'the age and height limits an age or level answer filters on (r8, WHITE-C26)'
+        for: 'the age and height limits an age or level answer filters on (r8, WHITE-C26), the old swimAbility and the
+          requiredCertificationCode (ADAM CR-532)'
+      - query: marketing-crm#consentQuestionRecords
+        route: in-process
+        for: 'the kinds of the products'' consent questions (Product.consentQuestionIds), for the kind only: a product
+          needs a swimmer when one has kind swim (ADAM CR-532, the shared guided-answer filter); in process, since
+          Marketing runs in the operations host with WhiteLabel (CHG-R13INP-001)'
       x-ticvai-audience:
       - staff
       summary: What a draft Help me choose leaves, combination by combination
@@ -5780,7 +5786,19 @@ paths:
         products it leaves and up to three of their ids, so the editor sees a combination that leaves nothing
         before publishing. Nothing is stored and nothing is published; the guest filter is the one listProducts
         applies, so the preview and the published behaviour cannot differ. A set-up with `behaviour` `recommend`
-        is answered with each last answer''s `target` instead of a count.'
+        is answered with each last answer''s `target` instead of a count.
+
+
+        **One guided-answer filter, written once as shared code** (ADAM CR-532; Chinmay, 3 November 2026;
+        CHG-CR532-001; built on #36283). Catalogue''s `listProducts` (and `searchCatalogue`''s `guidedAnswerIds`) call
+        the same code when they are built, and this preview calls it now over the venue''s published products. Its
+        inputs: the product, its eligibility rule (no rule means every limit is empty) and the kinds of its consent
+        questions. The rules are `GuidedChoice` `answer.filter`''s, field by field. It reads the product, its
+        eligibility rule and the products'' consent questions in Marketing (`consentQuestionRecords`, for the kind
+        only), asked in process because Marketing runs in the operations host with WhiteLabel (CHG-R13INP-001). The preview''s counts must equal what `listProducts` would
+        return for the same answers. The filter is tested on its own with these cases: overlap at both edges, open
+        bounds, subcategory depth, a swim consent question, a product with only the old swim rule, and a product with
+        no rule.'
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -8576,6 +8594,12 @@ components:
                         `behaviour` `filter`. The server applies it (catalogue `guidedAnswerIds`), so web, mobile
                         and kiosk show the same list.
 
+
+                        **One shared filter** (ADAM CR-532, Chinmay, 3 November 2026): fields are ANDed within an
+                        answer and answers are ANDed with each other; an empty field narrows nothing. Its inputs are
+                        the product, its eligibility rule (no rule means every limit is empty) and the kinds of its
+                        consent questions. `productIds` keeps the products listed.
+
                         '
                       properties:
                         productIds:
@@ -8585,12 +8609,15 @@ components:
                             format: uuid
                         productCategoryIds:
                           type: array
+                          description: Keeps products filed under a listed category or any category below it in the
+                            category tree, as `listProducts`' `categoryId` already does (ADAM CR-532).
                           items:
                             type: string
                             format: uuid
                         segmentTags:
                           type: array
-                          description: Catalogue `Product.segmentTags`, e.g. a level tag.
+                          description: Catalogue `Product.segmentTags`, e.g. a level tag, matched as `listProducts`'
+                            `segmentTag` does (a tag matches itself and tags below it; ADAM CR-532).
                           items:
                             type: string
                         minAgeYears:
@@ -8601,19 +8628,25 @@ components:
                           type: integer
                           minimum: 0
                           nullable: true
-                          description: With `minAgeYears`, checked against each product's age rule (catalogue
-                            `ProductEligibilityRule`).
+                          description: '**Age** (ADAM CR-532): a product is kept when the answer''s range
+                            [`minAgeYears`, `maxAgeYears`] and the product''s own age limits [`minAgeYears`,
+                            `maxAgeYears`] (its eligibility rule) overlap; an empty bound on either side is open. So ''Kids 3-12''
+                            keeps a 6+ activity, and a product with no age limits is always kept. Each person''s age is
+                            still checked at booking.'
                         requiresSwimmer:
                           type: boolean
                           nullable: true
-                          description: False hides products whose eligibility needs a swimmer; true keeps only
-                            those.
+                          description: '**Swimmer** (ADAM CR-532): a product needs a swimmer when any of its consent
+                            questions (`Product.consentQuestionIds`) has kind `swim`, or its eligibility rule still has
+                            the old `swimAbility` `confident`. false leaves those out; true keeps only those; empty
+                            narrows nothing.'
                         certificationCode:
                           type: string
                           nullable: true
                           maxLength: 40
-                          description: Keeps products that need this certificate, or with `holdsCertification`
-                            false, hides them.
+                          description: '**Certification** (ADAM CR-532), with `holdsCertification`: false leaves out
+                            products whose `requiredCertificationCode` is this code; true or no flag keeps products
+                            needing this code or no certification.'
                         holdsCertification:
                           type: boolean
                           nullable: true
