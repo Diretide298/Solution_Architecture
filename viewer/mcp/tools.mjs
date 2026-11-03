@@ -3248,9 +3248,11 @@ export const TOOLS = [
       // **Kept short per table, because the count is what grows.** Marketing
       // reached 130 tables and 60 KB with no essay in it — every row was ~470
       // characters of which the service name, nulls and a 300-character reason
-      // were most. The service is said once when every table shares it, empty
-      // fields are left out, and the reason is cut to its opening; adam_table
-      // has the whole of it.
+      // were most. The service is said once when every table shares it and empty
+      // fields are left out. A storage-only table is only flagged here: at r13 the
+      // reasons, even cut to 120 characters, were 16.5 of Marketing's 41 KB and
+      // failed the install check on developers' machines (3 November 2026).
+      // adam_table has the whole reason.
       const services = [...new Set(mine.map((t) => t.service).filter(Boolean))];
       const shared = services.length === 1 ? services[0] : null;
 
@@ -3264,11 +3266,9 @@ export const TOOLS = [
           ...(t.derivedFrom ? { derivedFrom: t.derivedFrom } : {}),
           ...(!shared && t.service ? { service: t.service } : {}),
           ...(t.migration ? { migration: t.migration } : {}),
-          ...(t.storageOnly
-            ? { storageOnly: true, storageReason: trim(String(t.storageReason ?? '').replace(/^storage only\s*—\s*/i, ''), 120) }
-            : {}),
+          ...(t.storageOnly ? { storageOnly: true } : {}),
         })),
-        next: 'pass one of those names to adam_table for its columns, keys and the whole reason',
+        next: 'pass one of those names to adam_table for its columns, keys and, for a storageOnly table, why it is storage only',
       };
     },
   },

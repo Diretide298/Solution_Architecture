@@ -353,7 +353,9 @@ contract schema behind it, and the package answers at length — **160 fields ac
 are over 2 KB and every one of them is a `storageReason`**, the largest at 25,450 characters.
 Returned whole, three of those made one module's table list 59 KB. So a listing trims to a sentence
 and says it has; `adam_table` on that one table keeps the whole thing, because there the prose is
-the answer you asked for.
+the answer you asked for. `adam_module` goes further and only flags a table `storageOnly`: at r13
+even the 120-character openings were 16.5 of Marketing's 41 KB, over the install check's 40 KB
+(3 November 2026); without them the largest module answer is 23 KB.
 
 **`adam_contract` answers in two steps on purpose.** `contracts/spine/access.yaml` is 756 KB; a tool
 that returned every schema with its properties would fill a context window in one call and leave no
