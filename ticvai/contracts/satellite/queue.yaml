@@ -735,6 +735,29 @@ paths:
         `party_size` is `400 validation`: nothing is written, no state changes, no event. Partial admission (fewer
         than the party) stays normal. The states, the override's three `409`s and fields, the answer
         (`entitlementRemaining` null) and idempotency are unchanged.
+
+        **When a redemption is denied, and why** (ADAM CR-596, option A, Chinmay, 3 November 2026; CHG-CR596-001).
+        The checks run in this order and stop at the first that applies: (1) the body fails the schema: `400
+        validation`. (2) No entry with `entryId` in scope: `404`. (3) `admittedCount` above the entry's `party_size`:
+        `400 validation`, as above. (4) `queueId` given and different from the entry's `queue_id`: denied,
+        `wrongQueue`. (5) The entry's status: `waiting` is `notCalled`; `redeemed` is `alreadyRedeemed`; `cancelled`
+        or `released` is `cancelled`; `expired` or `noShow` is `outsideReturnWindow`, including a `noShow` whose
+        window has not yet ended, because an operator's no-show record stands until a supervisor overrides it. (6)
+        Status `called` and the body's `recordedAt` later than `return_window_ends_at`: `outsideReturnWindow`. (7)
+        Otherwise admit: `called` to `redeemed`, setting `redeemed_at` and `admitted_count`, and writing
+        `queueEntry.redeemed` for a Fast Pass entry, exactly as above. **A denial** answers `200` with `outcome`
+        `denied`, the `denyReason`, `entryId`, `recordedAt` from the body, and `admittedCount`, `entitlementRemaining`
+        and `overriddenByPrincipalId` all null. It writes nothing to `queue.entry`, writes nothing to the outbox,
+        emits no event and leaves the entry's status unchanged; `overrideWaitingGuest` stays the only way to admit an
+        expired, no-show or late party. A redemption recorded offline is checked the same way when the device syncs,
+        against the entry as it is then: if the timer has already expired the entry, the answer is
+        `outsideReturnWindow` and a supervisor overrides it. **Never `entitlementExhausted` from this operation**:
+        Access takes the Fast Pass use when it consumes `queueEntry.redeemed`, and Queue never reads the uses; the
+        enum is left as it is. A replay with the same `Idempotency-Key` gets the first answer back. A later duplicate
+        of a redemption that already went through is denied as `alreadyRedeemed` and writes nothing. Tests: each
+        denial reason above, with nothing written and no event; `wrongQueue` only when `queueId` is sent and differs;
+        a call without `queueId` never answers `wrongQueue`; an offline redemption syncing onto an expired entry is
+        denied.
       tags: [entry]
       x-ticvai-permission: QUEUE_REDEEM
       x-ticvai-scope-level: workstation
@@ -750,7 +773,19 @@ paths:
               type: object
               required: [id, recordedAt]
               properties:
-                id: { type: string, format: uuid }
+                id:
+                  type: string
+                  format: uuid
+                  x-ticvai-persisted: false
+                  description: The device's client-generated UUIDv7 for this redemption, used for offline
+                    de-duplication alongside `Idempotency-Key` and never stored; no column (ADAM CR-596).
+                queueId:
+                  type: string
+                  format: uuid
+                  x-ticvai-persisted: false
+                  description: 'Optional: the queue of the ride where the party presented, sent by the scanner
+                    (ADAM CR-596). Given and different from the entry''s `queue_id`, the answer is denied,
+                    `wrongQueue`; omitted, `wrongQueue` is never answered. Compared, never stored.'
                 admittedCount:
                   type: integer
                   minimum: 1

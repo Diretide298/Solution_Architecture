@@ -1,0 +1,64 @@
+id: CHG-CR594-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: fnb.service_order_line.status stays FnbOrderStatus (the kitchen lifecycle) and gets its check, nullable; create
+  and amend write ordered on each new line. The F&B line gains comped_at, comp_reason (compItem's reasons, with a check)
+  and comped_by_principal_id, which compItem sets. transferOrderItems refuses 422 line-not-transferable with each refused
+  line's cause (notOnVisit, voided, paid, comped) from F&B's own data. tools/derive-ddl.py now carries an array item property's
+  enum onto its child table where the array names it in x-ticvai-item-checks.
+decision:
+  what: 'ADAM CR-594, posted on #32800: "Decided (Chinmay, 3 November 2026): fnb.service_order_line.status already has values.
+    They are the contract''s FnbOrderStatus ... and it stays the kitchen lifecycle. Paid, voided and comped are read as
+    below, not added to status. Build now: (1) Migration (MIG owner): a check on fnb.service_order_line.status allowing
+    exactly those nine values, nullable. createFnbOrder and amendFnbOrder write ''ordered'' on each new line, and a null
+    status reads as ordered. Add three nullable columns to fnb.service_order_line: comped_at timestamptz, comp_reason text
+    (compItem''s reasons ...) and comped_by_principal_id uuid. compItem sets them in its own ticket. (2) transferOrderItems
+    refuses with 422 line-not-transferable, listing every refused line id and its cause ... (3) Everything else as the contract
+    says ..." The lead''s instructions, 3 November 2026: "the new one dont go in r15, log them and we add to r14 only" and
+    "check for new crs and get them going as well".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-594 (Surendra Loke, #32800 transferOrderItems): the refusal of lines "already paid, voided or comped" read
+  facts nothing on an F&B line recorded, and the line status column had no check, because derive-ddl never carried an array
+  item property''s enum onto its child table.'
+keys_touched:
+  operations:
+  - transferOrderItems
+  - compItem
+  - createFnbOrder
+  - amendFnbOrder
+  schemas:
+  - FnbOrder
+  tables:
+  - fnb.service_order_line
+  files:
+  - contracts/satellite/fnb.yaml
+  - tools/derive-ddl.py
+  - tools/check-business-rules.py
+root_class: an operation's rule reads a fact nothing stores; a generator that dropped an array item's enum
+tickets:
+  started:
+  - '27708 (Ready for QA, createFnbOrder, Hrushikant Patkar): write status ordered on each new line.'
+  - '27678, 30597 (Ready for QA, build fnb.service_order_line): the status check and the three comp columns. Follow-up comments
+    in the lane report.'
+  unstarted:
+  - '32800 (transferOrderItems, Surendra Loke): the refusal rules as posted.'
+  - '28597, 32822 (amendFnbOrder): write ordered on each new line.'
+  - 'A new task under 32786 (compItem, Narayan Gaonkar): mark the F&B line comped (comped_at, comp_reason, comped_by_principal_id)
+    beside the write to Orders.'
+  - 'A new [DB] task under MIG-FNB (migration owner): the status check and the three columns (to be filed by the integration
+    pass).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-594
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FNB-LINE-TRANSFERABLE
+status: open
+notes: 'The generator rule behind the check: tools/derive-ddl.py carries the enum of an item property the array names in
+  x-ticvai-item-checks onto the child table. Beyond the posted words: comp_reason carries a check of compItem''s eight reasons,
+  as the posted text lists them; the three comp fields are readOnly on FnbOrder.lines; compItem declares its write of fnb.service_order_line.
+  78 other array item columns (fnb.kitchen_ticket_line.status, control.invoice_line.kind, ...) still carry no contract enum
+  check: x-ticvai-item-checks is opt-in, so they are untouched; the class is in the lane report for the lead.'

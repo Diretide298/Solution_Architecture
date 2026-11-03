@@ -9324,6 +9324,11 @@ paths:
         (an enabled, not excluded `catalogue.product_channel_assignment` for that sales channel). `aiInsights` is always
         an empty list until an insight source is declared.
 
+
+        **The admissionStart anchor** (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): a
+        window anchored on `admissionStart` is reckoned from the performance''s `admission_starts_at`
+        (`Performance.admissionStartsAt`), and from its `starts_at` while that is null.
+
         **Order.** Sorted by `product` ascending, then by `channelId`. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
@@ -27820,6 +27825,14 @@ components:
         endsAt:
           type: string
           format: date-time
+        admissionStartsAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: '**When admission opens for the performance** (ADAM CR-411, Chinmay, 3 November 2026, answering
+            #35240; CHG-CR411-002): stored as `catalogue.performance.admission_starts_at`, nullable. A sales window
+            anchored on `admissionStart` (`eventRelativeWindows.anchor`) uses it, and falls back to `startsAt` while it
+            is null.'
         approvalRequestId:
           type: string
           format: uuid
@@ -31904,7 +31917,8 @@ components:
           nullable: true
           description: 'Event-relative windows (pack p.11: B2C opens 90 days before, OTA closes 4 hours before,
             kiosk opens 2 hours before admission; MoM: onsite closes 15 min before a timed show). Offsets in minutes
-            before the anchor; negative means after'
+            before the anchor; negative means after. Anchor `admissionStart` is the performance''s
+            `admissionStartsAt`, or its `startsAt` while that is null (ADAM CR-411, 3 November 2026)'
           properties:
             anchor:
               type: string

@@ -2425,7 +2425,14 @@ screens:
     trigger: onAction
   - operationId: getGuestBundle
     contract: promotions
-    purpose: A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009)
+    purpose: 'A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). The add-ons page uses
+      the same read as the app''s Bundle Package (GST-056). Draw the component rows from `components[].name`, and each
+      choice group as its `label` followed by its options'' names, as the approved frame shows; preselect the
+      `isDefault` option; the look does not change. Add to basket calls `addCartLine` with `variantId` =
+      `GuestBundle.variantId`, `quantity` = the chosen number, `attributes.bundle` = {`bundleId`: `GuestBundle.id`,
+      `choices`: [{`choiceGroupId`: group `id`, `optionId`: option `id`}, one entry per pick]}; never a component''s
+      or an option''s `variantId` as the line''s. Until the backend serves this shape, build against it with mocked
+      data; never guess ids or show bare ids (ADAM CR-597, Chinmay, 3 November 2026; CHG-CR597-001).'
     trigger: onAction
   - operationId: decideRecommendations
     contract: ai
@@ -7947,12 +7954,33 @@ screens:
     trigger: onLoad
     shownBy: Listed for resale · AED 180
     provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
+  - operationId: listTicketTransfers
+    contract: orders
+    purpose: 'The guest''s sent transfers, drawn as the approved frame''s sent rows in Transfer & resale, above the
+      resale rows; no component of its own and the layout does not change (ADAM CR-593, Chinmay, 3 November 2026;
+      CHG-CR593-001). Called with `direction=sent` when the screen opens, every page read until `hasMore` is false,
+      and again after Transfer tickets succeeds. One row per transfer, in the order returned (soonest to lapse
+      first). Title: the line of the `listMyOrders` order whose `id` is the transfer''s `orderId` and whose
+      `entitlementIds` hold its `ticketIds`, written as the order cards write that line (more order pages are read
+      when the order is not loaded). Second line: the channel part, '' · '', the state part. Channel part from
+      `recipientChannel`: email is ''Sent to '' plus `recipientAddressMasked` (always masked, as the server sends
+      it), sms is ''Sent by SMS'', whatsapp is ''Sent by WhatsApp''. State part: offered is ''waiting to be claimed''
+      (no date); claimed is ''claimed'' plus the day and month of `claimedAt`; expired is ''expired, tickets
+      returned'' plus the day and month of `expiresAt`; cancelled is ''cancelled''. ''N sent this year'' at the top
+      right counts the sent transfers whose `offeredAt` falls in the current calendar year in the venue''s time
+      zone; the read has no total. The loading and empty states that speak of the ticket transfer list mean this
+      list: a guest with no sent transfers sees the first-run empty state. The rows'' Details and Cancel transfer
+      buttons are not part of this read (no operation exists for them).'
+    trigger: onLoad
+    shownBy: Sent by SMS · waiting to be claimed
+    provenance: ADAM CR-593, Chinmay, 3 November 2026 (CHG-CR593-001)
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
     invalidates:
     - listMyOrders
+    - listTicketTransfers
   - operationId: listMyOrders
     contract: orders
     purpose: The orders this guest placed

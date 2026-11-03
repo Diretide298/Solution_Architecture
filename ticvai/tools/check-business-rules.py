@@ -494,6 +494,21 @@ And one rule per decision:
                    rule; no Marketing read.
   BR-BULK-PRICE-SKIPS (CR-544) bulkChangePrices' selection, skip reasons, escalates, 403 and 400.
   BR-CLONE-PRODUCT-RULES (CR-545) cloneProduct's code and name constraints, 400, and its copy list.
+  r14 lane l (ADAM CR-593, CR-594, CR-596 and CR-597, decided 3 November 2026, and the lead's answers of 3 November on
+  CR-401, CR-411 and CR-451; lane_l_rules_r14), each failing on 9b572f8f:
+  BR-TRANSFER-SENT-ROWS (CR-593) TicketTransfer carries recipientChannel, stored from recipient.channel; WEB-030 reads
+                   listTicketTransfers (sent) and Transfer tickets refreshes it.
+  BR-FNB-LINE-TRANSFERABLE (CR-594) the F&B line's status and comp reason carry checks, the line records the comp, and
+                   transferOrderItems names each refusal's cause from F&B's own data.
+  BR-QUEUE-REDEEM-DENIALS (CR-596) redeemWaitingGuest takes an optional queueId, never stores body.id, and states the
+                   check order, the denial answer and that entitlementExhausted is never answered.
+  BR-GUEST-BUNDLE-CART (CR-597) GuestBundle carries its variantId and guest-only named components and choice options,
+                   read from the catalogue in one lookup; the staff shapes are unchanged.
+  BR-ADMISSION-START (CR-411) catalogue.performance holds a nullable admission start; the admissionStart anchor falls
+                   back to the start time.
+  BR-RICH-TEXT-LINKS (CR-401) relative internal links are kept, http: removed, and a one-off job re-saves the
+                   published pages.
+  BR-DEVICE-KEY-DISPLAY-ONLY (CR-451) issueDeviceCredential issues display keys only; other devices answer 400.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2887,6 +2902,7 @@ def main() -> int:
     lane_w5_rules_r13(need, op, ops)
     lane_w3_rules_r13(need, op)
     lane_w1_rules_r13(need, op)
+    lane_l_rules_r14(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2931,7 +2947,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_L_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -4757,6 +4773,150 @@ def lane_w1_rules_r13(need, op):
          and "What a clone copies:" in words(clp.get("description"))
          and "`nameLocalised` null" in words(clp.get("description")),
          "cloneProduct does not take createProduct's code rules, refuse with 400, or state what a clone copies (CR-545)")
+
+
+
+R14_L_RULES = ["BR-TRANSFER-SENT-ROWS", "BR-FNB-LINE-TRANSFERABLE", "BR-QUEUE-REDEEM-DENIALS", "BR-GUEST-BUNDLE-CART",
+               "BR-ADMISSION-START", "BR-RICH-TEXT-LINKS", "BR-DEVICE-KEY-DISPLAY-ONLY"]
+
+
+def lane_l_rules_r14(need, op):
+    """r14 lane l (ADAM CR-593, CR-594, CR-596 and CR-597, decided by Chinmay on 3 November 2026: "check for new crs and
+    get them going as well"; and the lead's "Go yes" answers of 3 November on CR-401, CR-411 and CR-451). Each rule
+    fails on 9b572f8f, the base the lane was cut from."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    def tables(o_, key):
+        return {str(x.get("table") if isinstance(x, dict) else x) for x in o_.get(key) or []}
+
+    def body(o_):
+        return ((((o_.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema")
+                or {})
+
+    def screen(rel, sid):
+        return next((x for x in load(rel).get("screens") or [] if (x or {}).get("id") == sid), {})
+
+    def api(scr, oid):
+        return next((a for a in scr.get("apis") or [] if (a or {}).get("operationId") == oid), {})
+
+    # BR-TRANSFER-SENT-ROWS (CR-593)
+    ords = schemas("contracts/spine/orders.yaml")
+    rc = ((ords.get("TicketTransfer") or {}).get("properties") or {}).get("recipientChannel") or {}
+    need("BR-TRANSFER-SENT-ROWS", rc.get("enum") == ["email", "sms", "whatsapp"] and rc.get("nullable") is True,
+         "TicketTransfer has no nullable recipientChannel (email, sms, whatsapp) (CR-593)")
+    tot = op("transferOrderTickets")[3]
+    need("BR-TRANSFER-SENT-ROWS", "`recipient_channel` is the body''s `recipient.channel`".replace("''", "'")
+         in words(tot.get("description")), "transferOrderTickets does not store recipient.channel (CR-593)")
+    ltt = op("listTicketTransfers")[3]
+    need("BR-TRANSFER-SENT-ROWS", "P01 WEB-030 Ticket Transfer" in (ltt.get("x-ticvai-consumed-by") or []),
+         "listTicketTransfers does not name WEB-030 among its consumers (CR-593)")
+    w30 = screen("screens/P01-guest-web-storefront.yaml", "WEB-030")
+    a30 = api(w30, "listTicketTransfers")
+    need("BR-TRANSFER-SENT-ROWS", a30.get("trigger") == "onLoad" and "`direction=sent`" in words(a30.get("purpose"))
+         and "Sent by WhatsApp" in words(a30.get("purpose")) and "sent this year" in words(a30.get("purpose")),
+         "WEB-030 does not read listTicketTransfers (direction=sent) to draw the sent rows (CR-593)")
+    need("BR-TRANSFER-SENT-ROWS", "listTicketTransfers" in (api(w30, "transferOrderTickets").get("invalidates") or []),
+         "WEB-030's Transfer tickets does not refresh listTicketTransfers (CR-593)")
+
+    # BR-FNB-LINE-TRANSFERABLE (CR-594)
+    fnb = schemas("contracts/satellite/fnb.yaml")
+    lines = ((fnb.get("FnbOrder") or {}).get("properties") or {}).get("lines") or {}
+    need("BR-FNB-LINE-TRANSFERABLE", {"status", "compReason"} <= set(lines.get("x-ticvai-item-checks") or []),
+         "FnbOrder.lines does not carry its status and compReason checks onto fnb.service_order_line (CR-594)")
+    item = {}
+    for part in ((lines.get("items") or {}).get("allOf") or []):
+        item.update((part or {}).get("properties") or {})
+    need("BR-FNB-LINE-TRANSFERABLE", {"compedAt", "compReason", "compedByPrincipalId"} <= set(item),
+         "the F&B line does not record comped_at, comp_reason and comped_by_principal_id (CR-594)")
+    need("BR-FNB-LINE-TRANSFERABLE", (item.get("compReason") or {}).get("enum") == [
+        "qualityIssue", "wait", "wrongItem", "allergyIncident", "goodwill", "staffMeal", "wastage", "other"],
+         "the line's compReason is not compItem's reasons (CR-594)")
+    toi = words(op("transferOrderItems")[3].get("description"))
+    for frag in ("(cause `notOnVisit`)", "(`voided`)", "`payment_timing` `payFirst` and `sent_to_kitchen_at` set",
+                 "with status `paid` (`paid`)", "has `comped_at` set (`comped`)",
+                 "One refused line refuses the whole request, and nothing moves",
+                 "it needs no read of Orders and the declared reads stay as they are"):
+        need("BR-FNB-LINE-TRANSFERABLE", frag in toi, f"transferOrderItems does not say {frag!r} (CR-594)")
+    need("BR-FNB-LINE-TRANSFERABLE", "fnb.service_order_line" in tables(op("compItem")[3], "x-ticvai-writes"),
+         "compItem does not write the comp marker on fnb.service_order_line (CR-594)")
+    for oid in ("createFnbOrder", "amendFnbOrder"):
+        need("BR-FNB-LINE-TRANSFERABLE", "**Each new line is written `ordered`**" in words(op(oid)[3].get("description")),
+             f"{oid} does not write 'ordered' on each new line (CR-594)")
+
+    # BR-QUEUE-REDEEM-DENIALS (CR-596)
+    rwg = op("redeemWaitingGuest")[3]
+    rb = body(rwg)
+    rp = rb.get("properties") or {}
+    need("BR-QUEUE-REDEEM-DENIALS", "queueId" in rp and "queueId" not in (rb.get("required") or []),
+         "redeemWaitingGuest takes no optional queueId (CR-596)")
+    need("BR-QUEUE-REDEEM-DENIALS", (rp.get("id") or {}).get("x-ticvai-persisted") is False
+         and "UUIDv7" in words((rp.get("id") or {}).get("description")),
+         "redeemWaitingGuest's body.id is not described as the device's UUIDv7, never stored (CR-596)")
+    rd = words(rwg.get("description"))
+    for frag in ("`queueId` given and different from the entry's `queue_id`: denied, `wrongQueue`",
+                 "`expired` or `noShow` is `outsideReturnWindow`, including a `noShow` whose window has not yet ended",
+                 "It writes nothing to `queue.entry`, writes nothing to the outbox, emits no event",
+                 "**Never `entitlementExhausted` from this operation**",
+                 "A later duplicate of a redemption that already went through is denied as `alreadyRedeemed`"):
+        need("BR-QUEUE-REDEEM-DENIALS", frag in rd, f"redeemWaitingGuest does not say {frag!r} (CR-596)")
+
+    # BR-GUEST-BUNDLE-CART (CR-597)
+    pro = schemas("contracts/satellite/promotions.yaml")
+    gb = pro.get("GuestBundle") or {}
+    gbp = gb.get("properties") or {}
+    need("BR-GUEST-BUNDLE-CART", "variantId" in (gb.get("required") or []) and "variantId" in gbp,
+         "GuestBundle does not carry its required variantId (CR-597)")
+    for prop, shape in (("components", "GuestBundleComponent"), ("choiceGroups", "GuestBundleChoiceGroup")):
+        need("BR-GUEST-BUNDLE-CART", ((gbp.get(prop) or {}).get("items") or {}).get("$ref")
+             == f"#/components/schemas/{shape}", f"GuestBundle.{prop} is not {shape} (CR-597)")
+    for shape, req, banned in (("GuestBundleComponent", {"id", "variantId", "name", "quantity"},
+                                {"menuItemId", "redeemAtOutletIds", "substituteVariantIds"}),
+                               ("GuestBundleChoiceGroup", {"id", "label", "choose", "options"}, set()),
+                               ("GuestBundleChoiceOption", {"id", "variantId", "name"}, set())):
+        sch = pro.get(shape) or {}
+        need("BR-GUEST-BUNDLE-CART", sch.get("additionalProperties") is False and set(sch.get("required") or []) == req
+             and not banned & set(sch.get("properties") or {}),
+             f"{shape} is not the guest-only shape CR-597 names")
+    need("BR-GUEST-BUNDLE-CART", "menuItemId" in ((pro.get("BundleComponent") or {}).get("properties") or {}),
+         "BundleComponent, the staff and stored shape, was changed (CR-597 leaves it as it is)")
+    ggb = op("getGuestBundle")[3]
+    need("BR-GUEST-BUNDLE-CART", {"catalogue.product", "catalogue.variant"} <= tables(ggb, "x-ticvai-reads")
+         and "in one lookup for all the bundle''s variant ids".replace("''", "'") in words(ggb.get("description")),
+         "getGuestBundle does not read the catalogue's names in one lookup (CR-597)")
+    g56 = screen("screens/P02-guest-mobile-app.yaml", "GST-056")
+    need("BR-GUEST-BUNDLE-CART", "`variantId` = `GuestBundle.variantId`" in words(api(g56, "getGuestBundle").get("purpose")),
+         "GST-056 does not say what Add to basket sends (CR-597)")
+
+    # BR-ADMISSION-START (CR-411, the lead's answer on #35240)
+    cat = schemas("contracts/spine/catalogue.yaml")
+    ads = ((cat.get("Performance") or {}).get("properties") or {}).get("admissionStartsAt") or {}
+    need("BR-ADMISSION-START", ads.get("format") == "date-time" and ads.get("nullable") is True,
+         "catalogue.performance has no nullable admission start (CR-411)")
+    need("BR-ADMISSION-START", "and from its `starts_at` while that is null" in words(
+        op("listChannelSaleSchedule")[3].get("description")),
+         "listChannelSaleSchedule does not anchor admissionStart on the admission start, else the start (CR-411)")
+
+    # BR-RICH-TEXT-LINKS (CR-401, the lead's answer on #30923)
+    wl = load("contracts/satellite/white-label.yaml")
+    lrt = words((((wl.get("components") or {}).get("schemas") or {}).get("LocalisedRichText") or {}).get("description"))
+    need("BR-RICH-TEXT-LINKS", "a path starting with a single `/` (never `//`), which is kept" in lrt
+         and "An `http:` link is removed" in lrt, "LocalisedRichText does not keep relative internal links (CR-401)")
+    job = (wl.get("x-ticvai-jobs") or {}).get("contentPageResanitise") or {}
+    need("BR-RICH-TEXT-LINKS", "whitelabel.content_page" in (job.get("writes") or [])
+         and "platform.audit_record" in (job.get("writes") or []),
+         "no one-off job re-saves the published pages with an audit row each (CR-401)")
+    need("BR-RICH-TEXT-LINKS", "`contentPageResanitise`" in words(op("updateContentPage")[3].get("description")),
+         "updateContentPage does not name the one-off re-save (CR-401)")
+
+    # BR-DEVICE-KEY-DISPLAY-ONLY (CR-451, the lead's answer on #37205)
+    idc = op("issueDeviceCredential")[3]
+    need("BR-DEVICE-KEY-DISPLAY-ONLY", "400" in (idc.get("responses") or {})
+         and "**Only display keys are issued here**" in words(idc.get("description")),
+         "issueDeviceCredential does not refuse a device that is not a signage display with 400 (CR-451)")
 
 
 if __name__ == "__main__":

@@ -409,6 +409,17 @@ x-ticvai-jobs:
     - events/approval-rejected.yaml
     - events/catalogue-productPublished.yaml
     - events/catalogue-productWithdrawn.yaml
+  contentPageResanitise:
+    module: white-label
+    host: workers
+    trigger: {kind: timer}
+    reads: [whitelabel.content_page]
+    writes: [whitelabel.content_page, platform.audit_record]
+    for: 'The one-off re-save of pages stored before the sanitiser (ADAM CR-401, Chinmay, 3 November 2026, answering
+      #30923; CHG-CR401-002): run once, when the release that ships the link rule is deployed, it puts every published
+      page''s body through the shared sanitiser (LocalisedRichText''s allow-list) and stores the cleaned body where it
+      differs, writing one audit row per page changed; a page already clean is not written. It never runs again.'
+    source: ['contracts/satellite/white-label.yaml']
   contentSchedule:
     module: white-label
     host: workers
@@ -3909,6 +3920,13 @@ paths:
         runs through the module''s one shared sanitiser, against the allow-list `LocalisedRichText` states.
         Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what
         the response returns, so the editor sees what was kept.
+
+
+        **Pages stored before the sanitiser** (ADAM CR-401, Chinmay, 3 November 2026, answering #30923;
+        CHG-CR401-002): a one-off re-save (the `contentPageResanitise` job) runs every published page''s `body`
+        through the same sanitiser once and stores the cleaned body, writing one audit row per page it changed.
+        After that, a published page whose cleaned body differs from the stored one is refused 409
+        `published-page-locked`, as built.
 
         '
       tags:
@@ -10933,7 +10951,9 @@ components:
         - **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img;
         colspan and rowspan on th and td.
 
-        - **URL schemes**: https, mailto and tel for href; https only for src.
+        - **URL schemes**: https, mailto and tel for href, and a relative internal link, a path starting with a
+        single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923;
+        CHG-CR401-002); https only for src. An `http:` link is removed.
 
         - **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are
         removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute,

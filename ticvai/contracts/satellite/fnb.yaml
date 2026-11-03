@@ -2467,6 +2467,23 @@ paths:
         that is `settled`, `merged` or `cancelled`, or in another outlet (`409 target-visit-not-open`).
         **Replayed offline** (`serverWins`): a line already on the target is skipped, so a replay is a no-op.
 
+
+        **What paid, voided and comped are** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001). The line''s
+        `status` stays the kitchen lifecycle (`FnbOrderStatus`); paid, voided and comped are read as follows, not
+        added to it. The request is refused `422 line-not-transferable`, the problem''s detail listing every refused
+        line id and its cause, for any line that: is not on a service order of `visitId` (cause `notOnVisit`); has
+        status `cancelled` or `refunded` (`voided`); belongs to a service order with `sales_order_id` set, or with
+        `payment_timing` `payFirst` and `sent_to_kitchen_at` set (`paid`: a round charged before the kitchen); is
+        listed in `line_ids` of a `fnb.sub_bill` of `visitId` with status `paid` (`paid`); or has `comped_at` set
+        (`comped`). One refused line refuses the whole request, and nothing moves. All of this is F&B''s own data, so
+        it needs no read of Orders and the declared reads stay as they are. Everything else as above: each line is
+        re-parented to an open service order on `toVisitId`, one opened there if the visit has none with the source
+        order''s outlet, `serviceMode` `tableService` and payment timing; `gross_amount` is recomputed on both service
+        orders and `running_total` on both visits; the kitchen is not re-fired and `orders` is not changed; `409
+        target-visit-not-open` as written; on an offline replay a line already on the target is skipped; `200` with
+        the target visit. Until `compItem` writes `comped_at`, no line reads as comped: that is correct, not a fault
+        in this operation.
+
         '
       tags:
       - fnb
@@ -2519,8 +2536,9 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
-          description: A line is not on the source visit, or is already paid, voided or comped (named in the
-            problem's detail).
+          description: 'A line is not on the source visit, or is already paid, voided or comped: the problem''s
+            detail lists every refused line id with its cause (`notOnVisit`, `voided`, `paid` or `comped`; ADAM
+            CR-594). One refused line refuses the whole request, and nothing moves.'
           x-ticvai-problem-types: [line-not-transferable]
           content:
             application/problem+json:
@@ -3657,6 +3675,9 @@ paths:
       x-ticvai-write-via:
       - table: orders.order_line
         operation: applyManualDiscount
+      x-ticvai-writes:
+      - table: fnb.service_order_line
+        for: 'the comp marker on the F&B line: comped_at, comp_reason and comped_by_principal_id (ADAM CR-594)'
       summary: Take a line off the bill, with a reason and a name
       description: 'Board 4. **A comp is not a discount.** A discount is a price decision; a comp is a
         service recovery, it comes out of a different budget, and **a venue that cannot tell them apart
@@ -3671,6 +3692,12 @@ paths:
         default, proposed AED 100.00, client to correct under audit R094) needs `ORDER_DISCOUNT`; at or
         below it, `ORDER_MODIFY` is enough. Above it without `ORDER_DISCOUNT` is a `403`
         (`comp-escalation-required`).
+
+
+        **The F&B line records the comp** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): beside its write
+        to Orders, `compItem` sets `comped_at` (now), `comp_reason` (the body''s `reason`) and
+        `comped_by_principal_id` (the caller) on the `fnb.service_order_line` named by `orderLineId`, so
+        `transferOrderItems` refuses a comped line. Built in its own ticket.
 
         '
       tags:
@@ -6712,6 +6739,11 @@ paths:
         Offline behaviour depends on the items: an order containing only untracked items queues normally,
         while one containing a recipe-linked item is refused offline because stock depletes in real time.
 
+
+        **Each new line is written `ordered`** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001):
+        `fnb.service_order_line.status` holds `FnbOrderStatus`''s values (a check, nullable), and a null status reads
+        as `ordered`.
+
         '
       tags:
       - order
@@ -7027,6 +7059,10 @@ paths:
         **The reasons a void may carry are the void reason list** (decided 28 September, audit R125 (4)),
         the same list every void takes, ending in `other` with a required note (audit R222). No second list
         is kept for F&B. The refusal names `voidOrder` in `suggestedOperation`.
+
+
+        **Each new line is written `ordered`** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001), as
+        `createFnbOrder` writes them; a null status reads as `ordered`.
 
         '
       tags:
@@ -12522,6 +12558,15 @@ components:
           $ref: '#/components/schemas/FnbOrderStatus'
         lines:
           type: array
+          # **The line's status and comp reason carry their values onto fnb.service_order_line** (ADAM CR-594, Chinmay,
+          # 3 November 2026; CHG-CR594-001): a check on each column allowing exactly the enum, nullable
+          # (tools/derive-ddl.py reads x-ticvai-item-checks).
+          x-ticvai-item-checks: [status, compReason]
+          description: '**A line''s `status` is its kitchen lifecycle** (ADAM CR-594, Chinmay, 3 November 2026;
+            CHG-CR594-001): `FnbOrderStatus`''s nine values, held by a check on `fnb.service_order_line.status`,
+            nullable. `createFnbOrder` and `amendFnbOrder` write `ordered` on each new line, and a null status reads
+            as `ordered`. Paid, voided and comped are not statuses: voided is `cancelled` or `refunded`, paid is read
+            from the service order and the sub-bills, and comped from `compedAt` (`transferOrderItems`).'
           items:
             allOf:
             - $ref: '#/components/schemas/CreateFnbOrderLine'
@@ -12533,6 +12578,34 @@ components:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 lineTotal:
                   $ref: ../shared/common.yaml#/components/schemas/Money
+                compedAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  readOnly: true
+                  description: '**When the line was comped** (ADAM CR-594; CHG-CR594-001): set by `compItem` with
+                    `compReason` and `compedByPrincipalId`; null on a line never comped. A line with `compedAt` set
+                    is comped and is not transferable.'
+                compReason:
+                  type: string
+                  nullable: true
+                  readOnly: true
+                  enum:
+                  - qualityIssue
+                  - wait
+                  - wrongItem
+                  - allergyIncident
+                  - goodwill
+                  - staffMeal
+                  - wastage
+                  - other
+                  description: The reason `compItem` took (ADAM CR-594); null on a line never comped.
+                compedByPrincipalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  readOnly: true
+                  description: Who comped the line, the caller of `compItem` (ADAM CR-594); null on a line never comped.
         salesOrderId:
           type: string
           format: uuid

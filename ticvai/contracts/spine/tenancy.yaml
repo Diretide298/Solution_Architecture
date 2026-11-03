@@ -3542,6 +3542,11 @@ paths:
         answered once, in this 201 (`key`), and only a hash of it is stored. `revokeDeviceCredential` revokes it for
         that device alone; a revoked key is `401` at once.
 
+
+        **Only display keys are issued here** (ADAM CR-451, Chinmay, 3 November 2026, answering #37205;
+        CHG-CR451-002): a device of any other kind answers `400` (validation) and nothing is issued. The device
+        registry''s own credential work (VM-TENANCY-DEVICES-1) builds on this route rather than adding its own.
+
         '
       tags:
       - devices
@@ -3574,6 +3579,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':

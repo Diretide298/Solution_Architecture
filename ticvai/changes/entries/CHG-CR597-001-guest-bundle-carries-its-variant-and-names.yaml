@@ -1,0 +1,65 @@
+id: CHG-CR597-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: GuestBundle gains a required variantId (promotions.bundle.variant_id); its components become GuestBundleComponent
+  and its choice groups GuestBundleChoiceGroup with GuestBundleChoiceOption, guest-only shapes (additionalProperties false)
+  carrying the catalogue's public names, looked up in one read of catalogue.product and catalogue.variant. BundleComponent,
+  BundleChoiceGroup and getBundle are unchanged. GST-056, GST-004's Buy meal combo and WEB-008 draw the names and add the
+  bundle with its own variantId and attributes.bundle; the look does not change.
+decision:
+  what: 'ADAM CR-597, posted on #31836: "Decided (Chinmay, 3 November 2026): option A, using guest-only shapes. Build now:
+    Backend, getGuestBundle ... 1. GuestBundle gets a required variantId (uuid) ... 2. GuestBundle.components items become
+    a new guest-only shape, GuestBundleComponent ... 3. GuestBundle.choiceGroups items become GuestBundleChoiceGroup ...
+    Each option is GuestBundleChoiceOption ... 4. Look up every name in the same read ... Record that the operation reads
+    the catalogue product and variant tables. 5. Leave BundleComponent, BundleChoiceGroup and getBundle unchanged ... Frontend,
+    Bundle Package (and Item Detail''s Buy meal combo, and the web add-ons page ...): Draw the component rows from components[].name
+    ... Add to basket calls addCartLine with: variantId = GuestBundle.variantId ... attributes.bundle = { bundleId ...,
+    choices: [...] } ..." The lead''s instructions, 3 November 2026: "the new one dont go in r15, log them and we add to
+    r14 only" and "check for new crs and get them going as well".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-597 (Chinmay Patkar, #31836 GST-056 Bundle Package): GuestBundle omitted the bundle''s own variantId that
+  addCartLine needs, and its components and choice options carried no names to show.'
+keys_touched:
+  operations:
+  - getGuestBundle
+  - addCartLine
+  schemas:
+  - GuestBundle
+  - GuestBundleComponent
+  - GuestBundleChoiceGroup
+  - GuestBundleChoiceOption
+  tables:
+  - promotions.bundle
+  - catalogue.product
+  - catalogue.variant
+  screens:
+  - GST-056
+  - GST-004
+  - WEB-008
+  files:
+  - contracts/satellite/promotions.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - tools/check-business-rules.py
+root_class: a guest read shape that leaves out what its screen must show and send
+tickets:
+  started: []
+  unstarted:
+  - '36301 (getGuestBundle, Chinmay Patkar): the guest shapes and the one catalogue lookup.'
+  - '31836 (GST-056, Chinmay Patkar), 33014 to 33016 (GST-004), 33410 to 33412 (WEB-008): draw the names, add with GuestBundle.variantId
+    and attributes.bundle; mocked data until 36301 serves it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-597
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-BUNDLE-CART
+status: open
+notes: 'Beyond the posted words: getGuestBundle also declares its reads of promotions.bundle_component, bundle_choice_group
+  and bundle_choice_option (it already read them by lineage); the components and choiceGroups arrays say what they hold.
+  Approved UI is fixed: GST-056''s detail panel keeps its columns (check-approved-ui); the drawing and add rules are on
+  the screens'' getGuestBundle and addCartLine bindings. CR-591 (lane f) sets bundleId only while getGuestBundle would return
+  the bundle, the same rule.'
