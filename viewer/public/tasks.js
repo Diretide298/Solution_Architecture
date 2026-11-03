@@ -962,6 +962,7 @@ function people(focus) {
   for (const t of inFocus(focus, { everyone: true })) row(who(t)).sprint.push(t);
   for (const r of rows.values()) {
     r.c = count(r.sprint);
+    r.ca = count(r.all);
     r.open = r.all.filter(isOpenWork).length;
     r.finishedAll = r.all.filter(isFinished).length;
     r.lateAll = r.all.filter(isLate).length;
@@ -1030,12 +1031,14 @@ const MOVED_NOTE = 'Last moved is the newest change to any of their tickets that
   + 'OpenProject 10 gives no date a status changed, so a comment or a close by QA counts too. '
   + `! marks open work with nothing moved in ${STILL_DAYS} working days.`;
 
-function sortPeople(rows) {
+/** `shown` is the counts a row's bar and Finished are drawn from: the focus
+ *  sprint's, or every sprint's when the roster is not held to one. */
+function sortPeople(rows, shown = (r) => r.c) {
   const unassignedLast = (a, b) => (a.name === 'Unassigned') - (b.name === 'Unassigned');
   const by = {
-    behind: (a, b) => b.behind - a.behind || b.c.live - a.c.live,
-    planned: (a, b) => b.c.live - a.c.live,
-    done: (a, b) => b.c.finished - a.c.finished,
+    behind: (a, b) => b.behind - a.behind || shown(b).live - shown(a).live,
+    planned: (a, b) => shown(b).live - shown(a).live,
+    done: (a, b) => shown(b).finished - shown(a).finished,
     name: () => 0,
   }[state.teamSort] ?? (() => 0);
   return rows.sort((a, b) => unassignedLast(a, b) || by(a, b) || a.name.localeCompare(b.name));
@@ -1044,13 +1047,26 @@ function sortPeople(rows) {
 const initials = (name) => (name === 'Unassigned' ? '–'
   : name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join(''));
 
+// With the Sprint filter on Every sprint, the bar and Finished count every
+// sprint, as the filter says (2 Nov: the roster showed the current sprint under
+// "Every sprint", so a developer with 38 waiting for QA read as 0). Against pace
+// stays the current sprint's, the only one an even pace can be measured in, and
+// its heading names it.
 function drawRoster(focus) {
   const k = focus ? clock(focus) : null;
-  const rows = sortPeople(people(focus));
-  const biggest = Math.max(1, ...rows.map((r) => r.c.live));
-  $('tk-roster-head-bar').textContent = `${focus ? focus.name : 'This sprint'}, ${Ws()}`;
+  const wide = !state.scope.sprint;
+  const shown = (r) => (wide ? r.ca : r.c);
+  const rows = sortPeople(people(focus), shown);
+  const biggest = Math.max(1, ...rows.map((r) => shown(r).live));
+  $('tk-roster-head-bar').textContent = `${wide ? 'Every sprint' : focus ? focus.name : 'This sprint'}, ${Ws()}`;
+  $('tk-roster-head-pace').textContent = wide && focus ? `Against pace, ${focus.name}` : 'Against pace';
   const running = k?.phase === 'running';
-  $('tk-team-note').textContent = focus
+  $('tk-team-note').textContent = wide
+    ? `Each bar is one person's ${Ws()} across every sprint, on one scale, and Finished counts them all. `
+      + (focus ? `Against pace is ${focus.name} alone: an even pace is measured within one sprint. ` : '')
+      + 'Open in the plan is everything still theirs across every sprint. '
+      + `${MOVED_NOTE} Select a person to open everything about them.`
+    : focus
     ? `Each bar is one person's ${Ws()} in ${focus.name}, on one scale. `
       + (running ? 'The upright mark is where an even pace would have their finished part by the end of today. ' : '')
       + 'Open in the plan is everything still theirs across every sprint, as a number, so a big backlog does not drown the sprint. '
@@ -1067,16 +1083,17 @@ function drawRoster(focus) {
     const ident = el('span', 'tk-person-who');
     ident.append(el('span', 'tk-avatar', initials(r.name)), el('span', 'tk-person-name', r.name));
 
+    const c = shown(r);
     const bar = el('span', 'tk-person-bar');
-    if (r.c.live) {
-      bar.append(stack(r.c, { scale: r.c.live / biggest, label: r.name,
-        tick: running ? (r.expected / biggest) : null }));
+    if (c.live) {
+      bar.append(stack(c, { scale: c.live / biggest, label: r.name,
+        tick: running && !wide ? (r.expected / biggest) : null }));
     } else {
-      bar.append(el('span', 'tk-quiet', focus ? `nothing in ${focus.name}` : 'no sprint'));
+      bar.append(el('span', 'tk-quiet', wide ? 'nothing' : focus ? `nothing in ${focus.name}` : 'no sprint'));
     }
 
     const done = el('span', 'tk-person-done');
-    if (r.c.live) done.append(el('strong', null, num(r.c.finished)), el('span', null, ` of ${nu(r.c.live)}`));
+    if (c.live) done.append(el('strong', null, num(c.finished)), el('span', null, ` of ${nu(c.live)}`));
 
     const pace = el('span', 'tk-person-pace');
     if (!r.c.live) pace.append(el('span', 'tk-quiet', ''));
@@ -1099,7 +1116,9 @@ function drawRoster(focus) {
     row.append(ident, bar, done, pace, open, moved);
     const lastMoved = r.name === 'Unassigned' ? ''
       : ` Last moved a ticket ${r.moved.at ? fmtDay(r.moved.at) : 'never'}${r.moved.still ? `: ${stillWords(r.moved)}` : ''}.`;
-    row.setAttribute('aria-label', `${r.name}. ${focus ? `${focus.name}: ${num(r.c.finished)} of ${num(r.c.live)} finished` : ''}`
+    row.setAttribute('aria-label', `${r.name}. `
+      + `${wide ? `Every sprint: ${num(c.finished)} of ${num(c.live)} finished. ` : ''}`
+      + `${focus ? `${focus.name}: ${num(r.c.finished)} of ${num(r.c.live)} finished` : ''}`
       + `${running && r.c.live ? (r.behind > 0 ? `, ${num(r.behind)} behind an even pace` : ', on pace') : ''}`
       + `. ${num(r.open)} open in the whole plan.${lastMoved} Opens everything about ${r.name}.`);
     row.onclick = () => openPerson(r.name);
@@ -1107,8 +1126,8 @@ function drawRoster(focus) {
   }));
   if (!rows.length) box.append(el('p', 'tk-empty', `Nobody has a ${W1()} in this view.`));
 
-  const key = legendItems($('tk-roster-key'), KINDS.filter((kind) => rows.some((r) => r.c[kind.id])));
-  if (running) {
+  const key = legendItems($('tk-roster-key'), KINDS.filter((kind) => rows.some((r) => shown(r)[kind.id])));
+  if (running && !wide) {
     const item = el('li', 'tk-legend-item');
     item.append(el('span', 'tk-key-tick'), el('span', 'tk-legend-label', 'Even pace by today'));
     key.append(item);
