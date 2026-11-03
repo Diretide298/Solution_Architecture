@@ -78,6 +78,11 @@ GLOB_BUDGET = 80
 # Copies, whatever reads them: derive-mirrors and sync-project-bible compare each copy before
 # overwriting it, which the trace records as a read, but "project-bible/ is a copy, not a source".
 DERIVED_ROOTS = ("repos/*/project-bible/**", "repos/ticvai-docs/**")
+# Written whole by a refresh step added after the manifest was traced, so the traced manifest names no writer for it
+# and classify() would call it authored: file -> the step that writes it. The next trace finds the writer itself.
+UNTRACED_DERIVED = {
+    "handoff/known-findings.json": "tools/build-known-findings.py",   # r14 lane k, CHG-R14PUL-001
+}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -1259,7 +1264,7 @@ def classify(manifest, paths):
     sets = [(GlobSet(r["writes"]), GlobSet(r.get("self_reads") or [])) for r in manifest["steps"]]
     out = {}
     for p in paths:
-        if any(fnmatch.fnmatch(p.lower(), r) for r in roots):     # fnmatch's * crosses "/"
+        if any(fnmatch.fnmatch(p.lower(), r) for r in roots) or p in UNTRACED_DERIVED:  # fnmatch's * crosses "/"
             out[p] = "derived"
             continue
         writers = [sr for w, sr in sets if w.hits(p)]

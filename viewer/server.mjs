@@ -43,6 +43,7 @@ import { splitDetail } from './lib/detail.mjs';
 import { resolveRelease, writeServed, describeRelease, releaseRoot, TAG as RELEASE_TAG } from './lib/releases.mjs';
 import { buildView, diffTicket } from './lib/release-diff.mjs';
 import { ticketText } from './lib/ticket-text.mjs';
+import { knownFindings } from './lib/known-findings.mjs';
 // The connector's own manifest, so the two sides compute the build the same
 // way rather than agreeing by coincidence.
 import { acceptedOf as connectorAccepted, buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
@@ -1344,6 +1345,15 @@ const server = http.createServer(async (req, res) => {
       const served = pkg.release?.mode === 'tag' ? pkg.release.tag : null;
       const answer = await ticketText(pkg.root, { id: /^#?\d+$/.test(id) ? id : '', key, served });
       return send(res, 200, JSON.stringify({ project: pkg.id, served, ...answer }), MIME['.json']);
+    }
+
+    // The package's known findings by artefact (lib/known-findings.mjs, CHG-R14PUL-001): what a pull lists as gaps
+    // already on the list, for the artefacts the ticket links. Whole, with an ETag: the connector holds it as a layer
+    // and asks again only whether it still holds, so a release's index crosses the wire once per connector.
+    if (route === 'known-findings') {
+      const served = pkg.release?.mode === 'tag' ? pkg.release.tag : null;
+      const { stamp, ...answer } = await knownFindings(pkg.root);
+      return sendCachedJson(res, req, pkg.packed, `known-findings:${stamp}`, { project: pkg.id, served, ...answer });
     }
 
     if (route === 'index') {

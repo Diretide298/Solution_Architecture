@@ -245,6 +245,11 @@ CHECKS = [
     # owner sends. Here it runs bare: its self-test (fixture snapshots, no Docker), and the package inputs it judges by
     # (migration-review.md, MIGRATIONS.md, backend/) still parse and every review kind has a rule. Never baselined.
     "check-schema-drift",
+    # 3 November 2026 (r14 lane k, CHG-R14PUL-001; the lead: "a ticket's pull lists the package checks it already
+    # fails, so developers stop raising change requests for gaps we already know about"): handoff/known-findings.json,
+    # what ADAM's pull lists as known gaps, is the builder's output now, holds every baselined finding, and maps each
+    # to an artefact a ticket links or says why it names none. Its self-test runs first. Strict: never baselined.
+    "check-known-findings",
 ]
 
 # Arguments a checker is run with here, when its bare form is not the one a gate run needs (CHG-R8GEN-002).

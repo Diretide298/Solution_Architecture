@@ -515,6 +515,67 @@ export async function releaseTextFor(client, wp) {
   };
 }
 
+// ---- known gaps: the package's own known findings on what the ticket links ------------------------------------
+//
+// **The lead, 3 November 2026** (r14 lane k, CHG-R14PUL-001): "a ticket's pull lists the package checks it already
+// fails, so developers stop raising change requests for gaps we already know about". The package's gate keeps many
+// findings in its checks' baselines; a pull never showed them, so a developer met a known gap, raised a change request,
+// and a round went on settling something already on the list. ADAM serves them as the package route `known-findings`
+// (viewer/lib/known-findings.mjs, from TICVAI's handoff/known-findings.json): read as a layer, once per connector and
+// release, and indexed once per answer, so a pull costs one revalidation, asked beside its other reads.
+
+const KNOWN_BY = new WeakMap(); // the layer's answer -> Map "kind:id" -> [finding]
+/** The README lists this many; ticket.json `knownFindings` keeps every one. */
+export const KNOWN_SHOWN = 30;
+
+/** The known findings on the ticket's links, in the ticket's link order, each once with the link it came by; or null
+ *  when this ADAM serves none (an older ADAM or package): the README then has no section, as before. */
+export async function knownFor(client, touches) {
+  if (typeof client.layer !== 'function') return null;
+  const doc = await client.layer('known-findings').catch(() => null);
+  if (!doc?.found || !Array.isArray(doc.findings)) return null;
+  let by = KNOWN_BY.get(doc);
+  if (!by) {
+    by = new Map();
+    for (const f of doc.findings) {
+      for (const a of f.artefacts ?? []) {
+        if (!by.has(a)) by.set(a, []);
+        by.get(a).push(f);
+      }
+    }
+    KNOWN_BY.set(doc, by);
+  }
+  const seen = new Set();
+  const findings = [];
+  for (const t of touches) {
+    for (const f of by.get(`${t.kind}:${t.id}`) ?? []) {
+      if (seen.has(f)) continue;
+      seen.add(f);
+      findings.push({ via: `${t.kind} ${t.id}`, check: f.check, rule: f.rule, message: f.message });
+    }
+  }
+  return { release: doc.served ?? null, findings };
+}
+
+/** "Known gaps in the package (already on our list)": '' when the ticket's links carry none, or ADAM serves none. */
+export function knownSection(known) {
+  if (!known?.findings?.length) return '';
+  const all = known.findings;
+  let out = `\n## Known gaps in the package (already on our list) (${all.length})\n\n`
+    + `The package's own checks already know these gaps on what this ticket links${known.release ? ` (${known.release})` : ''}. `
+    + '**They are known and being fixed: build around them as the package says now, and raise a change request only '
+    + 'if one blocks you.**\n\n';
+  for (const f of all.slice(0, KNOWN_SHOWN)) {
+    const at = f.via.indexOf(' ');
+    out += `- ${f.via.slice(0, at)} \`${f.via.slice(at + 1)}\` - ${f.check} ${f.rule}: `
+      + `${String(f.message).replace(/\s+/g, ' ').trim()}\n`;
+  }
+  if (all.length > KNOWN_SHOWN) {
+    out += `\n${all.length - KNOWN_SHOWN} more are in ticket.json (\`knownFindings\`).\n`;
+  }
+  return out;
+}
+
 /** One line when the release's text and OpenProject's differ; '' when they agree. */
 export function textNotice(text) {
   if (!text || text.same) return '';
@@ -545,7 +606,7 @@ export function descriptionSection(wp, text) {
 }
 
 function ticketReadme(wp, files, missing, when, decisions = [], release = null, changes = undefined, blockedBy = [],
-  tree = {}, db = null, { looks = [], runs = [], kind = 'build', screens = [] } = {}) {
+  tree = {}, db = null, { looks = [], runs = [], kind = 'build', screens = [], known = null } = {}) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
   out += line('Project', wp.project) + line('Type', wp.type) + line('Part of', partOfText(tree.partOf))
@@ -584,6 +645,7 @@ function ticketReadme(wp, files, missing, when, decisions = [], release = null, 
   out += runSection(runs, release);
   out += lookSection(looks);
   out += screenUseSection(kind, screens);
+  out += knownSection(known);
   // The files above are summaries. On #20354 (24 September) an agent read them as the whole truth and
   // reported three gaps that were not there - parameters, the item schema and row-level security - and
   // proposed a change request for them. A gap is only a gap once the source says so.
@@ -2650,11 +2712,13 @@ async function pullOne(client, key, base, when) {
   if (!answer.ok) return { key, error: answer.data?.detail ?? `HTTP ${answer.status}` };
   // `subtasks` and `partOf` from an ADAM with CHG-ADM-006; an older one sends neither and the README has neither.
   const { workPackage: wp, touches = [], blockedBy = [], subtasks, partOf = null } = answer.data;
-  // Three independent reads, asked side by side (each was waited for in turn).
-  const [release, changes, text] = await Promise.all([
+  // Four independent reads, asked side by side (each was waited for in turn). The known findings are a held layer:
+  // after the first pull of a release, one revalidation (CHG-R14PUL-001).
+  const [release, changes, text, known] = await Promise.all([
     releaseFor(client, wp.key, touches).catch((error) => ({ available: false, why: error.message })),
     changesFor(client, wp.key).catch(() => null),
     releaseTextFor(client, wp).catch(() => null),
+    knownFor(client, touches).catch(() => null),
   ]);
 
   const folder = path.join(base, 'work', safeName(wp.key));
@@ -2739,6 +2803,7 @@ async function pullOne(client, key, base, when) {
     ...(blockedBy.length ? { blockedBy } : {}),
     ...(subtasks !== undefined ? { subtasks } : {}),
     ...(partOf ? { partOf } : {}),
+    ...(known?.findings?.length ? { knownFindings: known.findings } : {}),
     // The text README.md shows: the release's, and whether OpenProject's description still differs from it.
     ...(text ? { releaseText: { release: text.release, key: text.key, source: text.source,
       matchesOpenProject: text.same, openProjectRelease: text.openProjectRelease,
@@ -2747,7 +2812,7 @@ async function pullOne(client, key, base, when) {
   const db = await writeExpectedSchema(client, wp, touches, folder, release, [text?.text, wp.description].filter(Boolean).join('\n'));
   await writeFile(path.join(folder, 'README.md'),
     ticketReadme(wp, files, missing, when, decisions, release, changes, blockedBy, { subtasks, partOf, text }, db,
-      { looks, runs, kind, screens }));
+      { looks, runs, kind, screens, known }));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -2771,6 +2836,7 @@ async function pullOne(client, key, base, when) {
     ...(Array.isArray(subtasks) && subtasks.length ? { subtasks: subtasks.length } : {}),
     ...(subtasks === null ? { subtasks: 'could not be read' } : {}),
     ...(partOf?.key ? { partOf: partOf.key } : {}),
+    ...(known?.findings?.length ? { knownGaps: known.findings.length } : {}),
     ...(db ? { database: db.written
       ? { migration: db.databases.map((d) => `db/${d}/${db.migration}`).join(' and '), kind: db.kind,
         expected: path.join(folder, 'expected-schema.json'), tables: db.tables, statements: db.statements }
@@ -3950,7 +4016,9 @@ export const TOOLS = [
       + 'A blocked ticket is not built: always raise a CR for a new blocker, propose the ticket On hold naming '
       + 'the CR, and move to the next ticket you can finish (adam_board with only: "workable"). README.md lists the '
       + 'ticket\'s sub-tasks at every depth under "Sub-tasks" (status and who holds each, in the order they are '
-      + 'done), and a sub-task\'s README names its parent on a "Part of" line. With no `key`, pulls '
+      + 'done), and a sub-task\'s README names its parent on a "Part of" line. README.md lists the package\'s known '
+      + 'gaps on what the ticket links under "Known gaps in the package (already on our list)": known and being '
+      + 'fixed, so build around them and raise a change request only if one blocks you. With no `key`, pulls '
       + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone; to start work without a '
       + 'ticket number, do not pull the whole board: adam_board\'s `startHere` is the ticket to start. **Use '
       + 'this at the start of work on a ticket**, then read the files you need instead of holding '
@@ -4002,6 +4070,11 @@ export const TOOLS = [
           next += ' Its sub-tasks could not be read from OpenProject: say so in one line.';
         }
         if (one.partOf) next += ` It is part of #${one.partOf} (the "Part of" line in README.md).`;
+        if (one.knownGaps) {
+          next += ` README.md lists ${one.knownGaps} known gap${one.knownGaps === 1 ? '' : 's'} in the package on what `
+            + 'this ticket links ("Known gaps in the package (already on our list)"): they are known and being fixed, so '
+            + 'build around them as the package says now and raise a change request only if one blocks you.';
+        }
         if (one.blockedBy?.length) {
           next = `Blocked: ${one.blockedBy.map((c) => `${c.id} (${c.status}, via ${c.via})`).join('; ')}. `
             + 'Read the "Blocked by" section of README.md. Do not build the blocked part and do not work around it: '

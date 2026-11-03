@@ -324,6 +324,12 @@ python3 tools/build-package-report.py --apply
 # Called bare rather than with `2>/dev/null || true` like the two workbook builders above it.
 # Discarding an exit code is the habit the gate was restored to break, and openpyxl is present.
 python3 tools/build-readiness-workbook.py
+# **The known findings by artefact, for ADAM's pull** (r14 lane k, CHG-R14PUL-001; the lead, 3 November 2026: "a
+# ticket's pull lists the package checks it already fails, so developers stop raising change requests for gaps we
+# already know about"). Runs the baselined guards and the refresh-safe-baseline checkers once, after every step they
+# read and before derive-mirrors (which copies handoff/ into the mirrors), and writes handoff/known-findings.json;
+# check-known-findings (run-checks) holds it complete and current.
+python3 tools/build-known-findings.py
 python3 tools/derive-mirrors.py
 
 echo
