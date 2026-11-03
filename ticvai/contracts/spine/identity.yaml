@@ -66,15 +66,32 @@ x-ticvai-queries:
       permission: Permission, the asking operation's x-ticvai-permission (contracts/shared/permissions.yaml)
       scopePath: ltree, the scope the asking operation acts at (its venue or workstation)
       reversedPrincipalId: uuid or null, whose act is being reversed, where the asking operation forbids self-approval
+      offline: OfflineStepUpEvidence or null, SupervisorStepUp.offline, sent only by a call queued offline (CHG-R14V-001)
+      operationId: string, the asking operation's operationId (kept on the offline step-up's record)
+      actId: uuid, the id of the act the step-up signs (the asking request's `id`, its idempotency key)
+      callerPrincipalId: uuid, the principal whose session made the asking call
+      workstationId: uuid, the workstation the call came from (the session's, or the device's under deviceAuth)
+      recordedAt: date-time, the act's device time (the asking request's `recordedAt`)
     returns:
       verified: boolean
-      refusal: one of credentialWrong, credentialLocked, noPin, permissionNotHeld, notActiveHere, selfApproval; null when verified
+      refusal: one of credentialWrong, credentialLocked, noPin, permissionNotHeld, notActiveHere, selfApproval, verifierInvalid; null when verified
       lockedUntil: date-time or null, when refusal is credentialLocked
+      offlineVerdict: confirmed, refusedAtSync or null; set only when `offline` was sent
     rule: 'common.yaml SupervisorStepUp: the PIN matches the principal''s current `pin` row in identity.principal_credential
       (PHC hash with the tenant''s Key Vault pepper, ADR-0071) and the row is not locked; the principal is active, holds
       `permission` at `scopePath` through a live grant, and is not `reversedPrincipalId`. A wrong PIN counts towards
       PasswordPolicy.pinLockoutAfterAttempts exactly as at sign-in. Any refusal is the asking operation''s 403
-      `supervisor-step-up-refused` and nothing is written by it.'
+      `supervisor-step-up-refused` and nothing is written by it. **With `offline` (a call queued offline, ADR-0013
+      amendment of 3 November 2026, CHG-R14V-001)** the same checks are made as at `recordedAt`: the PIN against the
+      `pin` credential in force then (the current row, or the identity.principal_credential_history row it replaced
+      after `recordedAt`), the lock ignored and no attempt counted (the attempt was made on the device); the
+      principal active and holding `permission` at `scopePath` then, and not `reversedPrincipalId`; and the verifier
+      `offline.verifierId` was in package `offline.packageId`, which was issued to `workstationId`, and was neither
+      expired nor revoked at `recordedAt` (else `verifierInvalid`). The answer is `offlineVerdict` confirmed or
+      refusedAtSync with its refusal, and it is written, in the asking operation''s transaction, as one
+      identity.offline_step_up row (idempotent on operationId and actId); a refusedAtSync also publishes
+      identity.offlineStepUpRefused. **A refusedAtSync is never a 403**: the asking operation records its act as
+      sent and answers its success with `X-Ticvai-Step-Up-Verdict: refusedAtSync` (common.yaml StepUpVerdict).'
     served: [in-process, service]
     operation: verifySupervisorStepUp
   # **The MFA step-up, checked and consumed for the operation that demands it** (ADAM CR-509, decided 3 November 2026;
@@ -644,6 +661,13 @@ paths:
   /internal/step-up/verify:
     post:
       operationId: verifySupervisorStepUp
+      x-ticvai-writes:
+      - table: identity.offline_pin_verifier
+        for: 'a correct online PIN mints the supervisor''s offline verifiers (ADR-0013 amendment of 3 November 2026, CHG-R14V-001)'
+      - table: identity.offline_step_up
+        for: 'an offline step-up re-checked at sync, one row with its verdict (CHG-R14V-001)'
+      x-ticvai-emits:
+      - identity.offlineStepUpRefused
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -660,7 +684,14 @@ paths:
         **Answers, never decides.** It returns whether the step-up holds and, when it does not, why; the asking
         operation answers its own caller 403 `supervisor-step-up-refused` and writes nothing. A wrong PIN is counted
         against the supervisor''s `pin` credential (`PrincipalCredential.failedAttempts`, `pinLockoutAfterAttempts`),
-        which is the only thing this operation writes. The PIN is never logged, stored or echoed.
+        and a correct one mints the supervisor''s offline verifiers (`OfflinePinVerifier`). The PIN is never logged,
+        stored or echoed.
+
+
+        **An offline step-up re-checked at sync** (`stepUp.offline`; ADR-0013 amendment of 3 November 2026,
+        CHG-R14V-001) is checked as at the act''s `recordedAt` by the query''s rule, counts no attempt, and is written
+        as one `identity.offline_step_up` row with its `offlineVerdict`; a `refusedAtSync` publishes
+        `identity.offlineStepUpRefused`. The asking operation records its act either way.
 
         '
       tags:
@@ -1027,10 +1058,20 @@ paths:
         scope and permissions; `venue_id` and `working_venue_id` are written as now. Permissions stay resolved once,
         here or at `selectRole`.
 
+
+        **A correct `pin` sign-in mints the principal''s offline step-up verifiers** (decided 3 November 2026, Chinmay,
+        system review finding F-01: "Offline verifier"; ADR-0013 amendment of 3 November 2026; CHG-R14V-001). In the
+        same transaction, one `identity.offline_pin_verifier` row (`OfflinePinVerifier`, replacing the previous one)
+        for the venue of the `workstationId` and for each venue where the principal holds a permission an offline
+        step-up operation asks for, so tills there can check the PIN with no connection. Nothing in the response
+        changes; a wrong PIN mints nothing.
+
         '
       x-ticvai-writes:
       - table: identity.session
         for: 'grant_id, the one grant a direct sign-in opens the session through (ADAM CR-513)'
+      - table: identity.offline_pin_verifier
+        for: 'a correct `pin` sign-in at a device door mints the principal''s offline step-up verifiers (ADR-0013 amendment of 3 November 2026, CHG-R14V-001)'
       security: []
       requestBody:
         required: true
@@ -2664,6 +2705,69 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /auth/offline-step-up-package:
+    get:
+      operationId: getOfflineStepUpPackage
+      x-ticvai-reads:
+      - table: identity.offline_pin_verifier
+        for: 'the venue''s verifiers that still count (OfflinePinVerifier), decrypted into the package (CHG-R14V-001)'
+      - table: identity.principal_credential
+        for: 'that each signer''s `pin` row is the one the verifier was minted from and is not locked (CHG-R14V-001)'
+      - table: identity.open_shift_marker
+        for: 'which signers have a shift open at the venue, so may witness (CHG-R14V-001)'
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the venue of the workstation the asking device is bound to (CHG-R14V-001)'
+      security:
+      - deviceAuth: []
+      x-ticvai-audience: [device]
+      x-ticvai-read-routing: primary
+      x-ticvai-bounded: the signers of one venue (at most 500)
+      summary: The till's offline step-up package
+      description: '**What a till or handheld needs to check a supervisor''s PIN with no connection** (decided 3
+        November 2026, Chinmay, on system review finding F-01: "Offline verifier" (the till keeps a verifier,
+        re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001). Called by the device, never by a
+        person: under `deviceAuth` the caller is the registered device, and the package is for the workstation it
+        is bound to and that workstation''s venue. **The device fetches it whenever it is online**: after each sync
+        drains its outbox and at least hourly, and replaces the package it holds whole (so a verifier left out is
+        gone from the device at its next sync).
+
+
+        **Who is in it.** Every active principal with a verifier for the venue that still counts (`OfflinePinVerifier`:
+        not expired or revoked, minted from the current `pin` row, which is not locked), with the offline step-up
+        permissions they hold at the venue now through a live grant, after deny resolution, as the step-up check
+        resolves them: today `ORDER_VOID` (`voidOrder`) and `CASH_NO_SALE` (`recordNoSale`), the permissions of the
+        operations that declare `x-ticvai-offline-step-up: verifier`; and `witness` where they have a shift open at
+        the venue (`withdrawFromDepositBox`''s witness, the cashier the cash came from). A principal with neither is
+        left out. By `displayName`, then `principalId`.
+
+
+        **What the device does with it** (`SupervisorStepUp` in contracts/shared/common.yaml; the `supervisorPinPrompt`
+        component''s `offline` state): offline, the prompt offers the signers whose `permissions` hold the act''s
+        permission (or `witness`, for a witness step-up), leaving out the signed-in caller; it computes the Argon2id
+        of the typed PIN with the verifier''s own salt and parameters and compares; a wrong PIN counts for that signer,
+        and at `attemptLimit` the signer is locked on this device until its next sync; after `expiresAt` no PIN is
+        checked offline. The package is kept in the device''s encrypted local store only, never logged, and deleted
+        when the device is retired.'
+      tags:
+      - identity
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-self-scoped: principal
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The package
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfflineStepUpPackage'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/credential:
     post:
       operationId: changeOwnCredential
@@ -2719,7 +2823,17 @@ paths:
         has no local password to change: `method: password` is 409 `credential-managed-by-sso` (a PIN issued to them by
         `resetPrincipalCredential` is changed here like anyone''s).
 
+
+        **A new PIN mints the principal''s offline step-up verifiers** (ADR-0013 amendment of 3 November 2026,
+        CHG-R14V-001): with `method: pin`, the same transaction replaces the principal''s `identity.offline_pin_verifier`
+        rows from the new PIN, for the venue of the session''s workstation and each venue where the principal holds a
+        permission an offline step-up operation asks for. The verifiers of the old PIN stop counting at once, because
+        their `credentialSetAt` no longer matches the `pin` row.
+
         '
+      x-ticvai-writes:
+      - table: identity.offline_pin_verifier
+        for: 'a new PIN replaces the principal''s offline step-up verifiers (CHG-R14V-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -10789,11 +10903,39 @@ components:
           format: uuid
           nullable: true
           description: Whose act is being reversed, where the asking operation forbids the same person signing it.
+        operationId:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The asking operation's operationId. Required when `stepUp.offline` is sent (CHG-R14V-001).
+        actId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The id of the act the step-up signs (the asking request's `id`). Required with `stepUp.offline`.
+        callerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The principal whose session made the asking call. Required with `stepUp.offline`.
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The workstation the asking call came from. Required with `stepUp.offline`.
+        recordedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The act's device time (the asking request's `recordedAt`). Required with `stepUp.offline`; the
+            step-up is checked as at this time.
     SupervisorStepUpVerdict:
       type: object
       x-ticvai-persistence: none — computed
       description: '`verifySupervisorStepUp`''s answer (14 October 2026, CHG-CRD-004). The asking operation maps any
-        refusal to its own 403 `supervisor-step-up-refused`.'
+        refusal to its own 403 `supervisor-step-up-refused`, **except an offline step-up re-checked at sync**
+        (CHG-R14V-001): then `offlineVerdict` is set, the act is recorded as sent and the success response carries
+        it as `X-Ticvai-Step-Up-Verdict`.'
       required: [verified]
       properties:
         verified:
@@ -10801,13 +10943,223 @@ components:
         refusal:
           type: string
           nullable: true
-          enum: [credentialWrong, credentialLocked, noPin, permissionNotHeld, notActiveHere, selfApproval]
-          description: Why it does not hold; null when `verified`.
+          enum: [credentialWrong, credentialLocked, noPin, permissionNotHeld, notActiveHere, selfApproval, verifierInvalid]
+          description: Why it does not hold; null when `verified`. `verifierInvalid` (offline only) is a verifier that
+            was not for the workstation's venue, or was expired or revoked at the act's `recordedAt`.
         lockedUntil:
           type: string
           format: date-time
           nullable: true
           description: When the supervisor's PIN unlocks, where `refusal` is `credentialLocked`.
+        offlineVerdict:
+          type: string
+          nullable: true
+          enum: [confirmed, refusedAtSync]
+          description: Set only when the question carried `stepUp.offline` (CHG-R14V-001).
+    OfflineStepUpPackage:
+      type: object
+      x-ticvai-persistence: none — computed for the asking device from identity.offline_pin_verifier
+      description: '**What a till or handheld holds to check a supervisor''s PIN with no connection** (decided 3
+        November 2026, Chinmay, system review finding F-01: "Offline verifier"; ADR-0013 amendment of 3 November
+        2026; CHG-R14V-001). `getOfflineStepUpPackage` answers it. **The device replaces its package whole** each
+        time it fetches one, so a verifier left out of the new package is gone from the device at its next sync.'
+      required: [packageId, workstationId, venueId, issuedAt, expiresAt, pinLength, attemptLimit, signers]
+      properties:
+        packageId:
+          type: string
+          format: uuid
+          description: A fresh UUIDv7 per answer; the device sends it back in `OfflineStepUpEvidence.packageId`.
+        workstationId:
+          type: string
+          format: uuid
+          description: The workstation the asking device is bound to.
+        venueId:
+          type: string
+          format: uuid
+          description: That workstation's venue; every verifier in the package is for it.
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: '`issuedAt` plus 24 hours. After it the device checks no PIN offline and the prompt says the
+            step-up needs a connection.'
+        pinLength:
+          type: integer
+          enum: [4, 6, 8]
+          description: The tenant's `PasswordPolicy.pinLength`.
+        attemptLimit:
+          type: integer
+          enum: [3, 5, 10]
+          description: The tenant's `PasswordPolicy.pinLockoutAfterAttempts`. At this many wrong PINs for one signer
+            the device locks that signer until its next sync.
+        signers:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/OfflineStepUpSigner'
+    OfflineStepUpSigner:
+      type: object
+      x-ticvai-persistence: none — computed from identity.offline_pin_verifier, identity.principal and the grants
+      description: One person who may sign an offline step-up at the package's venue, and how the device checks them
+        (CHG-R14V-001).
+      required: [principalId, displayName, permissions, witness, verifierId, verifier, expiresAt]
+      properties:
+        principalId:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+          description: What the offline picker shows, as `listStepUpSupervisors` does.
+        permissions:
+          type: array
+          items:
+            $ref: ../shared/permissions.yaml#/components/schemas/Permission
+          description: 'The offline step-up permissions this signer holds at the venue now (of those the operations
+            declaring `x-ticvai-offline-step-up: verifier` ask for). The picker offers the signer for an act whose
+            permission is in this list.'
+        witness:
+          type: boolean
+          description: True where the signer has a shift open at the venue (identity.open_shift_marker), so may
+            countersign as the cashier the cash came from (`withdrawFromDepositBox`'s `witnessStepUp`).
+        verifierId:
+          type: string
+          format: uuid
+        verifier:
+          type: string
+          maxLength: 300
+          description: '**An Argon2id PHC string over the signer''s PIN with its own salt** (ADR-0071 as amended 3
+            November 2026), never the PIN and never the server''s peppered credential hash. The device keeps it in
+            its encrypted local store only.'
+        expiresAt:
+          type: string
+          format: date-time
+          description: The earlier of the package's `expiresAt` and the verifier's own.
+    OfflinePinVerifier:
+      x-ticvai-persistence: identity.offline_pin_verifier
+      x-ticvai-unique-together: [[principalId, venueId]]
+      type: object
+      description: '**A signer''s offline verifier for one venue, as Identity keeps it** (decided 3 November 2026,
+        Chinmay, system review finding F-01: "Offline verifier"; ADR-0013 and ADR-0071 as amended 3 November 2026;
+        CHG-R14V-001). **Never returned as stored**; `getOfflineStepUpPackage` decrypts `verifierHash` into a
+        package. **Minted only where Identity has just checked the PIN itself**, since it never holds a PIN: a
+        correct `pin` sign-in (`login`), a correct online supervisor step-up (`verifySupervisorStepUp`) and a new PIN
+        set by `changeOwnCredential`. Each mints, in the same transaction, one row (replacing the old one) for the
+        venue of the workstation the PIN was used at and for every venue where the principal holds a permission an
+        offline step-up operation asks for. **It stops counting** when it expires (30 days after it was minted), when
+        `revokedAt` is set, when the principal''s `pin` row is no longer the one it was minted from (`setAt` differs:
+        a change or a reset), while that row is locked, or when the principal is not active.'
+      required: [id, principalId, venueId, verifierHash, credentialSetAt, issuedAt, expiresAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The verifier id the package and the offline evidence carry.
+        principalId:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The venue (`platform.venue.id`, Tenancy's); not a foreign key, since Identity reads nothing
+            above it (ADR-0028).
+        verifierHash:
+          x-ticvai-secret: field-encrypted
+          type: string
+          writeOnly: true
+          description: The Argon2id PHC string over the PIN with its own 16-byte salt and ADR-0071's parameters, with
+            no pepper (the device must compute it), stored encrypted with the tenant's field key (ADR-0063) so a copy
+            of the table yields nothing.
+        credentialSetAt:
+          type: string
+          format: date-time
+          description: The `setAt` of the `pin` credential it was minted from.
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: 30 days after `issuedAt`.
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Set when the principal is deactivated or loses every offline step-up permission at the venue,
+            so the verifier leaves every later package.
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), the venue's path.
+    OfflineStepUp:
+      x-ticvai-persistence: identity.offline_step_up
+      x-ticvai-unique-together: [[operationId, actId]]
+      type: object
+      description: '**Every offline step-up, as the server found it at sync** (decided 3 November 2026, Chinmay,
+        system review finding F-01: "Offline verifier"; CHG-R14V-001). Written by the `verifySupervisorStepUp`
+        query, in the asking operation''s transaction, once per act (idempotent on `operationId` and `actId`, so a
+        replay writes nothing). **Never returned by any operation**; a `refusedAtSync` row publishes
+        `identity.offlineStepUpRefused`, and that event''s alert is how a person sees it.'
+      required: [id, operationId, actId, workstationId, callerPrincipalId, signerPrincipalId, packageId, verifierId,
+        verifiedAt, recordedAt, syncedAt, failedAttemptsBefore, verdict]
+      properties:
+        id:
+          type: string
+          format: uuid
+        operationId:
+          type: string
+          maxLength: 100
+        actId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The act's id in its own module (an order void's, a no-sale's, a cash movement's).
+        workstationId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The till (`platform.workstation.id`); not a foreign key (ADR-0028).
+        callerPrincipalId:
+          type: string
+          format: uuid
+        signerPrincipalId:
+          type: string
+          format: uuid
+        packageId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+        verifierId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The verifier the device checked against; not a foreign key, since a replaced verifier's row
+            is gone.
+        verifiedAt:
+          type: string
+          format: date-time
+        recordedAt:
+          type: string
+          format: date-time
+        syncedAt:
+          type: string
+          format: date-time
+        failedAttemptsBefore:
+          type: integer
+          minimum: 0
+        verdict:
+          type: string
+          enum: [confirmed, refusedAtSync]
+        refusal:
+          type: string
+          nullable: true
+          enum: [credentialWrong, noPin, permissionNotHeld, notActiveHere, selfApproval, verifierInvalid]
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), the workstation's path.
     OpenShiftMarker:
       x-ticvai-persistence: identity.open_shift_marker
       # Keyed on the shift; read by principal and workstation (storage-core request 2 at the merge, CHG-R8MIG-014).

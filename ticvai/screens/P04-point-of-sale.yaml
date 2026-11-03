@@ -6443,7 +6443,7 @@ screens:
       somebody to support with the wrong question. A caller who can see the screen but lacks what an action
       needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT`
       for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`.'
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
+    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync. A void or a no-sale that needs a supervisor is still signed here: the supervisor picks their name from the till''s own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001).'
     approvalRejected: The supervisor declined the no-sale or void; the drawer stays shut and the reason
       is shown.
   apis:
@@ -7249,7 +7249,7 @@ screens:
       and sends somebody to support with the wrong question. A caller who can see the screen but lacks
       what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`,
       `withdrawFromDepositBox`.'
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
+    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync. A withdrawal is still countersigned here: the cashier the cash came from picks their name from the till''s own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001).'
   apis:
   - operationId: createCashMovement
     contract: shift

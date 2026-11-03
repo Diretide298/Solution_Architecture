@@ -966,3 +966,13 @@ changes:
   to: 5c200503a5dfb84f
   approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Issue tax invoice with its form, which the approved empty state promises.'
   change: CHG-R13INT-029
+- screen: POS-014
+  field: 'state:offline'
+  to: 0ee3a22cad7564fd
+  approval: 'Design change approved by the lead, 3 November 2026 ("Offline verifier" (the till keeps a verifier, re-checked at sync), on system review finding F-01): offline, a void or a no-sale that needs a supervisor is signed from the till''s own list and PIN check, the supervisorPinPrompt component''s offline state.'
+  change: CHG-R14V-001
+- screen: POS-018
+  field: 'state:offline'
+  to: 1ed6e4283e0a9e04
+  approval: 'Design change approved by the lead, 3 November 2026 ("Offline verifier" (the till keeps a verifier, re-checked at sync), on system review finding F-01): offline, a withdrawal is countersigned from the till''s own list and PIN check, the supervisorPinPrompt component''s offline state.'
+  change: CHG-R14V-001

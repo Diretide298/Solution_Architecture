@@ -1,0 +1,59 @@
+# identity.offlineStepUpRefused v1 — published by identity
+# Checked by tools/check-states.py against states/ and the contracts.
+
+name: identity.offlineStepUpRefused
+version: 1
+publisher: identity
+description: A supervisor or witness step-up a till checked offline against its offline verifier was not confirmed
+  when the server re-checked it at sync. The act it signed is recorded all the same, because it happened at the till.
+aggregate: offlineStepUp
+emittedWhen: the verifySupervisorStepUp query, asked with stepUp.offline at sync (in process by voidOrder, recordNoSale
+  and withdrawFromDepositBox in commerce, or over its service route), writes an identity.offline_step_up row with
+  verdict refusedAtSync
+emittedBy:
+- identity.verifySupervisorStepUp
+payload:
+- field: offlineStepUpId
+  type: uuid
+  notes: The identity.offline_step_up row. The idempotency key for every consumer
+- field: operationId
+  type: string
+  notes: The act's operation (voidOrder, recordNoSale, withdrawFromDepositBox)
+- field: actId
+  type: uuid
+  notes: The act's id in its own module (the void's order event, the no-sale, the cash movement)
+- field: workstationId
+  type: uuid
+  notes: The till the act was done at
+- field: callerPrincipalId
+  type: uuid
+  notes: Whose session did the act
+- field: signerPrincipalId
+  type: uuid
+  notes: The supervisor or witness the till accepted
+- field: refusal
+  type: string
+  notes: Why the server did not confirm it (credentialWrong, noPin, permissionNotHeld, notActiveHere, selfApproval,
+    verifierInvalid). Never the PIN
+- field: failedAttemptsBefore
+  type: integer
+  notes: Wrong PINs the till counted for this signer before the one it accepted
+- field: recordedAt
+  type: timestamp
+  notes: When the act happened at the till
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+consumers:
+- context: reporting
+  purpose: Raise the alert to the venue's managers (the roles that hold the act's permission at the venue), as the
+    tamper alert is raised, so it is listed by listAlerts on the till's Shift Exceptions & Alerts (POS-020) and the
+    back office's Offline Alerts, Limits & Audit (BO-133) until someone acknowledges it
+  idempotencyKey: offlineStepUpId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 1 year after publication
+notes: '**Added 3 November 2026** (decided by Chinmay on system review finding F-01: "Offline verifier" (the till keeps a
+  verifier, re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001). No state model emits this: an
+  offline step-up is a record, not a status, so the emit sits on the verifySupervisorStepUp query that writes it.'
