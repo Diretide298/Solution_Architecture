@@ -76,6 +76,7 @@ keys_touched:
   - tools/run-checks.py
   - tools/derive-delivery-slice.py
   - tools/build-service-docs.py
+  - tools/check-plan-closure.py
   - tools/refresh.sh
   - tools/check-schema-drift.py
   - handoff/api-data-lineage-overrides.json
