@@ -8711,6 +8711,8 @@ screens:
     purpose: Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit
       R236)
     trigger: onAction
+    inputSources:
+      orderId: checkoutCart.id
   - operationId: addCartLine
     contract: orders
     purpose: Add the chosen item to the cart, for collection on the way out

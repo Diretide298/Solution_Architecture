@@ -1,0 +1,48 @@
+id: CHG-R14BO-005
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'createPayment and inquirePaymentStatus gain their partner variant, as they have a guest one: marked
+  x-ticvai-partner-callable, a partner user on the partner portal (P10) calls them with no workstation, under the
+  session''s venue grant (the order''s venue), and only on an order of the partner''s own channel. check-screen-wiring
+  S-WORKSTATION-OP accepts a partner-callable operation on P10, as it accepts a guest-callable one on a guest platform.'
+decision:
+  what: 'The lead, 3 November 2026: "Approve all 28 as recommended", taking for PTR-012 the recommendation "a partner
+    variant (venue-scoped, the partner''s own order and allocation; scope level venue for a partner caller, as
+    guest-callable does for guests)", the decision CHG-SCO-009 left to the lead. The variant is the same operation,
+    as the guest variant is (CHG-GCF-003, CHG-SCR-012): no new operation, path or permission.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: check-screen-wiring S-WORKSTATION-OP (R100), PTR-012 createPayment and inquirePaymentStatus, known since
+  CHG-SCO-009 and built on by started ticket #31898; the partner cart and order are already written under the
+  session''s venue grant (ADAM CR-184).'
+keys_touched:
+  screens: [PTR-012]
+  operations: [createPayment, inquirePaymentStatus]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/README.md
+  - tools/check-screen-wiring.py
+root_class: a workstation-scoped operation called from a platform that signs no workstation in
+tickets:
+  started:
+  - '31898 ([FE] WEB-012, Chinmay Patkar, In progress): no change to WEB-012.'
+  unstarted:
+  - 'The backend tickets of createPayment and inquirePaymentStatus and PTR-012''s frontend ticket: a partner caller
+    needs no workstation, acts under its venue grant, and only on its own channel''s orders.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Not a breaking change: the request, the response and the permission are unchanged; a partner caller was already
+  in the audience. The other ten P10 keeps (createOrder, holdOrder and resumeOrder on PTR-002, PTR-008 and PTR-015;
+  capturePayment on PTR-012) stay known findings, on no started ticket: the lead decided PTR-012''s two. **A rule, not an exemption:** contracts/README.md ("Callers with no workstation") defines the marker: who may
+  call (a partner in the audience), what the caller is checked against (the operation''s permission, at the session''s
+  venue grant) and how it answers (its own channel''s records only; another''s is 404, no permission 403), and the
+  description paragraph that says so. check-screen-wiring takes it only when all of that holds and only on P10; its
+  self-test shows a defined variant taken, and refused on another platform, without a partner audience, without a
+  permission, without the paragraph, and for an unmarked staff-only operation on P10.'

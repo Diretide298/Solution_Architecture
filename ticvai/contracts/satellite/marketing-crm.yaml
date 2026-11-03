@@ -27749,7 +27749,7 @@ components:
             version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed
             operations)'
     MessageDispatch:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getCampaignPerformance, getGuestTimeline, getJourneyPerformance, getMessageStatus and others
+      x-ticvai-rls: grant-holder-write   # MOD audit, CHG-MOD-007: read below the tenant by getCampaignPerformance, getGuestTimeline, getJourneyPerformance, getMessageStatus and others; r14 gate (CHG-R14BO-001): written at a venue by sendBookingConfirmation, sendTransactionalMessage, launchCampaign and seven more, so the rule CHG-R11FXC-003 settled for a guest's row with no scope (any staff grant reads and writes, the guest its own)
       x-ticvai-append-only: queuedAt
       # [sourceRef]: listMessageDispatches filters on it (ADAM CR-379; CHG-CR379-001). [sourceRef, subjectId, channel]:
       # non-unique, the check sendGuestBroadcast makes before each insert (ADAM CR-442; CHG-CR442-001); the table stays

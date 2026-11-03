@@ -1,0 +1,62 @@
+id: CHG-R14BO-004
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'The screen findings on started tickets, as the lead approved: ADM-331, ADM-333, ADM-334, ADM-335 and BO-639
+  list the approval matrices and their Save approval matrix opens its form (setApprovalMatrix); BO-718, BO-771, BO-922,
+  BO-1010, BO-1031 and BO-1080''s Create approval request opens its form, and BO-243 (Submit for approval), BO-301
+  (Request approval), BO-1181 and ADM-567 (Send for approval) gain the action with its form (createApprovalRequest);
+  ADM-581 gains Activate terminal (enrolDevice); ADM-595, ADM-597 and ADM-615 gain a Check status row action
+  (inquirePaymentStatus); BO-1049''s primary action is Run simulation with its form; BO-1179''s Retry and Replay open
+  the replay form (replayEvents); BO-143 gains Find dropped goods, the goods found and Dispose of dropped goods;
+  BO-488 drops topUpWallet; BO-842''s Save SEO metadata opens its form; KIT-009 gains Edit targets (setKitchenSla);
+  POS-012''s offline state says Hand over dropped goods is disabled offline. Each element is bound to its operation,
+  each form''s fields are its request body''s.'
+decision:
+  what: 'The lead, 3 November 2026: "Approve all 28 as recommended", on the 28 screen findings on started tickets and
+    the recommendation for each (CHG-R14BO-003''s list). Each visible change is logged in
+    docs/active/approved-ui-changes.yaml as a design change the lead approved, as CHG-R13INT-029''s were. Where a
+    recommendation offered a second choice (drop the operation), the first was built. PTR-012''s partner variant is
+    CHG-R14BO-005.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: check-screen-wiring S-OP-UNREACHED (R273) 25 and S-OFFLINE-QUEUED 1, known findings built on by started
+  tickets (#31185, #30848, #33989, #31898, #35288, #31358, #30872, #30860, #27923, #31164, #31211, #30869), the r14 lane
+  s gate of 3 November 2026 (slot 1, run 20261103-191134-1618); recommendations in CHG-R14BO-003.'
+keys_touched:
+  screens: [ADM-331, ADM-333, ADM-334, ADM-335, BO-639, BO-086, BO-718, BO-771, BO-922, BO-1010, BO-1031, BO-1080,
+    BO-243, BO-301, BO-1181, ADM-567, ADM-581, ADM-595, ADM-597, ADM-615, BO-1049, BO-1179, BO-143, BO-488, BO-842,
+    KIT-009, POS-012]
+  operations: [setApprovalMatrix, listApprovalMatrices, createApprovalRequest, enrolDevice, inquirePaymentStatus,
+    simulatePriceBreakdownCalculation, replayEvents, lookupShopAndDrop, disposeShopAndDrop, topUpWallet, setSeoMetadata,
+    setKitchenSla, collectShopAndDrop, listEvents, listProducts, listProductVariants]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P15-kitchen-display.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/wallet.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: an approved screen that declares an operation and shows no element for it
+tickets:
+  started:
+  - '31185, 30848, 33989, 31898, 35288, 31358, 30872, 31164, 27923, 31211, 30869 (backend operations): no change to the
+    operation; the follow-up comment for each says what changes on the screens that call it.'
+  - '30860 (topUpWallet): no change; BO-488 no longer calls it.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: '**Design change** (the lead, "Approve all 28 as recommended", 3 November 2026): the elements above are added to
+  approved screens; approved-ui-changes.yaml lists each changed field with its hash (43 entries). The forms are
+  generated from the operations'' request bodies (required, then optional fields). The five matrix screens now share
+  listApprovalMatrices and setApprovalMatrix with BO-086, so each states its division (derive-screen-wiring). BO-488
+  keeps its unbound primary action, as before. BO-1049''s form picks its event, product and variant from listEvents,
+  listProducts and listProductVariants (declared, named in the form''s reads; check-screen-value-sources SV-PICK). The page info (design batches, wireframes) is generated from screens/
+  and follows at the refresh.'

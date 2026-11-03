@@ -1,0 +1,50 @@
+id: CHG-R14BO-002
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'Ten request fields of acts said nowhere where they go; each now says it on the field, from the operation''s own
+  text: certifyIntegration.decision is stored as the listing''s status, decideProductionAccess.decision as the request''s
+  status, topUpWallet.bonusAmount as the bonus lot''s issued_amount (x-ticvai-stored-as); acceptShiftVariance.supervisorStepUp
+  (verified, never stored; the supervisor is the variance approval row, as on approveShiftOpen), claimOpenShift.openShiftId
+  (names the row it updates), cloneProduct.includePrices and includeVariants (instructions to the call),
+  testChannelConnection.tests (the results are lastTests) and topUpWallet.tender (the receipt''s label) are not stored
+  (x-ticvai-persisted: false, with why). certifyIntegration.notes is stored, as the lead decided (CHG-R14BO-006).'
+decision:
+  what: 'The lead, 3 November 2026, on r14: "start on 1,2,3"; fix at the source, as CHG-R13BO-002 did: store a field
+    where its operation''s decision says, or mark it not stored with the reason. Each mark states what the operation''s
+    own text already says. certifyIntegration.notes, the one field the text says nothing about, went to the lead, who
+    decided "Keep them" (3 November 2026; CHG-R14BO-006).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: r14 lane gates of 3 November 2026 (lane d''s run 20261103-132023-2094), check-request-fields-stored
+  RF-ACTION-NOT-STORED, 10 known findings built on by started tickets #30803, #31294, #37102, #30971, #31296, #35235,
+  #30860 (CHG-R8WFC-002); the step-up mark follows approveShiftOpen''s (ADAM CR-200).'
+keys_touched:
+  operations: [acceptShiftVariance, certifyIntegration, claimOpenShift, cloneProduct, decideProductionAccess,
+    testChannelConnection, topUpWallet]
+  tables: [control.integration_listing, control.production_access_request, wallet.credit_lot]
+  files:
+  - contracts/spine/shift.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/wallet.yaml
+root_class: an act's request field whose destination is stated only in prose, or nowhere
+tickets:
+  started:
+  - '31294 (certifyIntegration, Narayan Gaonkar, Ready for QA): decision is the listing''s status (no change); for
+    notes see CHG-R14BO-006.'
+  - '30860 (topUpWallet, Pranay Shinde, Ready for QA): no change; bonusAmount is the bonus lot''s issued_amount and
+    tender is not stored, as the operation''s text says.'
+  - '30803, 37102, 30971, 31296, 35235: no change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r14 gate fix lane s (fix/r14-s), started-ticket findings, under the lead''s instruction of 3 November 2026'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open
+notes: 'Nothing beyond the operations'' own words. No migration here (the notes column is CHG-R14BO-006''s); no field''s
+  type or requirement moves.'

@@ -1676,9 +1676,20 @@ paths:
               type: object
               required: [decision]
               properties:
-                decision: { type: string, enum: [certify, reject, revoke] }
+                decision:
+                  type: string
+                  enum: [certify, reject, revoke]
+                  x-ticvai-stored-as: control.integration_listing.status
+                  description: Stored as the listing's `status`, `certified`, `rejected` or `revoked` (r14 gate,
+                    CHG-R14BO-002).
                 certifiedUntil: { type: string, format: date, nullable: true }
-                notes: { type: string, nullable: true }
+                notes:
+                  type: string
+                  nullable: true
+                  x-ticvai-stored-as: control.integration_listing.certification_notes
+                  description: Stored as the listing's `certificationNotes` (control.integration_listing
+                    certification_notes, nullable), replacing the note of an earlier decision; a decision with no
+                    notes stores null (the lead, 3 November 2026, "Keep them"; r14 gate, CHG-R14BO-006).
       responses:
         '200':
           headers:
@@ -2262,7 +2273,12 @@ paths:
               type: object
               required: [decision]
               properties:
-                decision: { type: string, enum: [approve, reject] }
+                decision:
+                  type: string
+                  enum: [approve, reject]
+                  x-ticvai-stored-as: control.production_access_request.status
+                  description: Stored as the request's `status`, `approved` or `rejected`, with `decidedByPrincipalId`
+                    and `decidedAt` (r14 gate, CHG-R14BO-002).
                 reason: { type: string, nullable: true, maxLength: 1000 }
                 scopes:
                   type: array
@@ -3154,6 +3170,13 @@ components:
             **Certification expires.** An integration certified against v1 and still listed after v3
             is TICVAI vouching for something it has not looked at in two years.
         certifiedAgainstVersion: { type: string, nullable: true, readOnly: true }
+        certificationNotes:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The reviewer's note on the latest certification decision, as `certifyIntegration` sent it in
+            `notes`; null when it sent none. Set only by `certifyIntegration` (the lead, 3 November 2026, "Keep them";
+            r14 gate, CHG-R14BO-006).
         listingFeeModel: { type: string, enum: [none, flat, revenueShare], nullable: true }
         visibility:
           type: string

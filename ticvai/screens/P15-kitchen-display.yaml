@@ -1884,7 +1884,12 @@ screens:
     regions:
     - name: actionBar
       slot: publish
-      components: []
+      components:
+      - kind: primaryButton
+        label: Edit targets
+        operation: setKitchenSla
+        provenance: contract fnb.yaml PUT /outlets/{outletId}/kitchen-sla; design change approved by the
+          lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
     - name: contentBody
       slot: carried
       components:
@@ -1991,6 +1996,23 @@ screens:
       on a kitchen device is a permission leak, and prioritising one ticket is a live act on the pass
       (KIT-003), not a rules setting (R254; design-notes corrections fnb-retail KIT-009).'
     source: contracts/spine/tenancy.yaml#setVenueSettings | R254
+  overlays:
+  - id: formSetKitchenSla
+    component: modal
+    trigger: Edit targets
+    body: '**Collects what `setKitchenSla` sends before it is called.** Required: nothing. Optional: `targets`,
+      `priorityWeights`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: KitchenSla
+    confirm:
+      label: Edit targets
+      operation: setKitchenSla
+    dismiss:
+      label: Cancel
+      discards:
+      - targets
+      - priorityWeights
+    provenance: contract fnb.yaml PUT /outlets/{outletId}/kitchen-sla; design change approved by the lead
+      ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: KIT-010
   name: Kitchen Performance, AI & Operational Optimization
   module: Kitchen

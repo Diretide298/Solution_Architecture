@@ -2538,7 +2538,6 @@ paths:
       operationId: topUpWallet
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
-        - "P08 BO-488 Self-Service Wallet Top-Up"
       x-ticvai-names-for-context: [platform.scope]
       x-ticvai-read-via:
       - query: orders#paymentRecords
@@ -2681,7 +2680,12 @@ paths:
               properties:
                 id: { type: string, format: uuid }
                 amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-                tender: { type: string }
+                tender:
+                  type: string
+                  x-ticvai-persisted: false
+                  description: The receipt's label for how the sale was paid, as the description says ("`tender` stays
+                    the receipt's label"). Wallet does not store it; the payment itself is kept as the lot's
+                    `source_reference` (`paymentId`) (r14 gate, CHG-R14BO-002).
                 orderLineId:
                   type: string
                   format: uuid
@@ -2709,7 +2713,9 @@ paths:
                     applying `bonusRules` entry's `bonusAmount`, or its `bonusPercent` of `amount`.
                     Any other value, or a bonus when no rule applies, is `422 bonus-not-applicable`
                     and nothing is credited. It is credited as a lot of that rule's
-                    `bonusCreditTypeId`.
+                    `bonusCreditTypeId`: stored as that bonus lot's `issued_amount` (source_kind `promotion`;
+                    r14 gate, CHG-R14BO-002).
+                  x-ticvai-stored-as: wallet.credit_lot.issued_amount
                 recordedAt: { type: string, format: date-time }
       responses:
         '201':

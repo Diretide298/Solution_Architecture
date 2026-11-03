@@ -2350,12 +2350,17 @@ paths:
                 includeVariants:
                   type: boolean
                   default: true
+                  x-ticvai-persisted: false
+                  description: Whether the source's variants are copied (under new ids). An instruction to this call,
+                    not stored on the clone (r14 gate, CHG-R14BO-002).
                 includePrices:
                   type: boolean
                   default: false
+                  x-ticvai-persisted: false
                   description: When true, every `catalogue.price` row of each copied source variant is copied to the
                     matching new variant, on the same price list (ADAM CR-545). True with `includeVariants` false is
-                    `400 validation` and nothing is written.
+                    `400 validation` and nothing is written. An instruction to this call, not stored on the clone
+                    (r14 gate, CHG-R14BO-002).
       responses:
         '201':
           headers:
@@ -2965,6 +2970,7 @@ paths:
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-048 Retail Products"
         - "P08 BO-094 Map Editor & Publish"
+        - "P08 BO-1049 Scenario & What-If Planning"
         - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-877 Qualification & Assignment Rule Engine"
@@ -3991,6 +3997,7 @@ paths:
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
         - "P08 BO-048 Retail Products"
+        - "P08 BO-1049 Scenario & What-If Planning"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
@@ -4405,6 +4412,7 @@ paths:
         - "P02 GST-005 What's On"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-1049 Scenario & What-If Planning"
         - "P08 BO-694 Event Catalogue Command Center"
         - "P13 CMS-101 Help Me Choose"
       description: '**The venue''s programme, for a guest too** (decided 20 October 2026, Chinmay, R8 blocker cause
@@ -20456,7 +20464,10 @@ paths:
               properties:
                 tests:
                   type: array
-                  description: The tests to run; all that apply to the connection type when omitted.
+                  x-ticvai-persisted: false
+                  description: The tests to run; all that apply to the connection type when omitted. Which tests to
+                    run, not stored as sent; each test's result is stored in the connection's `lastTests` (r14 gate,
+                    CHG-R14BO-002).
                   items:
                     type: string
                     enum:
