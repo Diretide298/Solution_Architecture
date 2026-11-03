@@ -1297,6 +1297,9 @@ paths:
       operationId: createShopAndDrop
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+      x-ticvai-reads:
+      - table: retail.merchandise
+        for: 'on the orderId path, the merchandise rows with each line''s variantId at outlets of the order''s venue (ADAM CR-508)'
       x-ticvai-read-via:
       - query: orders#orderLineRecords
         route: in-process
@@ -1306,7 +1309,22 @@ paths:
         route: in-process
         for: 'collectionPointClosed and the collectBy default: the collection point''s own opensAt and closesAt (ADAM
           CR-096; the lead''s answer of 25 October 2026 to the r10 question 16 kept these over CR-104''s serving-outlet
-          hours, so no outlet hours are read; r13 root R41)'
+          hours, so no outlet hours are read; r13 root R41); and, by ADAM CR-508, that it exists, is of kind
+          collectionPoint and belongs to the drop''s venue, its label (collectionPointName) and its servingOutletIds'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'the order on the orderId path (ADAM CR-508): its venueId (the drop''s venue) and its subjectId; asked as
+          orders#orderLineRecords is, in process from the operations host (XDR-075)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the dropReference prefix (ADAM CR-508): platform.scope.code of the drop venue''s scope row (XDR-004)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the Region''s time zone, in which opensAt, closesAt and recordedAt''s local day are read (ADAM CR-508; XDR-004)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the drop''s venue on the till path (the venue of the sale''s outlet) and, on the orderId path, the outlets
+          of the order''s venue whose retail.merchandise carries a line''s variant (ADAM CR-508; XDR-004)'
       x-ticvai-audience: [staff, service]
       security:
         - bearerAuth: []
@@ -1333,11 +1351,32 @@ paths:
         `lineIds`. A staff caller at a till sends `saleId`. Exactly one of the two is sent.
 
         **Collection point hours** (r8 walk of ticket 27820; the one rule, the lead's answer of 25 October 2026 to
-        the r10 question 16, which keeps these over CR-104's serving-outlet hours; r13 root R41): the collection point
-        (`fnb.DeliveryLocation`) has
-        `opensAt` and `closesAt` (time of day, local to the venue). The drop is refused 409 `collectionPointClosed`
-        when it would be collected while the point is closed, and `collectBy` defaults to the close of the point's
-        day when the request sends none.
+        the r10 question 16, which keeps these over CR-104's serving-outlet hours; r13 root R41; stated in full by
+        ADAM CR-508, Chinmay, 3 November 2026): the collection point (`fnb.DeliveryLocation`) has `opensAt` and
+        `closesAt`, wall-clock times in the Region's time zone, the package's rule for local times. The point's day
+        is `recordedAt`'s local date. When no `collectBy` is sent, it defaults to `closesAt` on that day, or, when
+        `closesAt` is null, to the end of that day (the next local midnight). `collectionPointClosed` applies only
+        to hours the point states: a `collectBy` before `opensAt` or after `closesAt` on its local day is refused.
+        A null `opensAt` or `closesAt` sets no limit, so a point with neither is never closed. When an online order
+        is for a later visit day, the order service sends `collectBy` for that day.
+
+
+        **The collection point** (ADAM CR-508). The point (`fnb#deliveryLocationRecords`, in process) must exist,
+        be of kind `collectionPoint` and belong to the drop's venue, else `422 unknown-collection-point`. Its
+        `label` is copied into `collectionPointName`. **The drop's venue**: on the till path, the venue of the
+        sale's outlet; on the order path, the order's `venueId`, never the line's own venue, which can be null.
+
+
+        **The order path** (ADAM CR-508). The order is read through `orders#salesOrderRecords`, on the route
+        `orders#orderLineRecords` is asked on. An order the caller cannot see is `422 unknown-order`. `subjectId`
+        is the order's `subjectId`, null when it names none. `lineIds` is required and must not be empty: a
+        missing or empty list is `400 line-ids-required`. Each entry must be a line of that order, else `422
+        unknown-line`. For each line, the `retail.merchandise` rows with the line's `variantId` at outlets of the
+        order's venue are found. If there is exactly one, it is used. If there are several, those at the
+        collection point's serving outlets are kept, and the one left is used if exactly one remains. None, or
+        still several, is `422 unknown-line` naming that line. The drop line takes that merchandise's id and name
+        and the order line's quantity, with `collectedQuantity` 0. The till path is unchanged: omitting `lineIds`
+        drops the whole sale.
 
         **What is refused, and how** (ADAM CR-104, option 1 as amended; Chinmay, 15 October 2026; CHG-R10ORD-017).
         Both `saleId` and `orderId`, or neither, is `400 sale-or-order-required`. A `saleId`, `orderId` or
@@ -1346,9 +1385,13 @@ paths:
         unknown-line`. **One drop per sale and one per order**: a second is `409 alreadyDropped`, kept by a unique
         index on each of `sale_id` and `order_id` (a row without one does not count), whatever `lineIds` it names.
         **`itemNotDroppable` is not raised** until an approved screen can set `MerchandiseItem.isDroppable`: none
-        does today (CR-104), so every item is droppable. **`dropReference`** is server-assigned, the venue prefix
-        and a sequence per venue, as `orderNumber` is (for example `DXB1-SD-000123`), unique in the tenant; the slip
-        prints it and `lookupShopAndDrop` matches it exactly.
+        does today (CR-104), so every item is droppable. **`dropReference`** (ADAM CR-508, Chinmay, 3 November
+        2026) is the venue's code (`platform.scope.code` of the venue's scope row, upper-cased, its first 22
+        characters) + `-SD-` + a number zero-padded to at least 6 digits, for example `DXB1-SD-000123`, never over
+        32 characters. In the insert's transaction it takes a transaction-scoped lock on that prefix, then uses 1 +
+        the highest number already issued under it in `retail.shop_and_drop`. Numbering is per prefix, so two
+        venues that share a code never clash. The unique index on `drop_reference` stays as the backstop. Gaps are
+        allowed. The slip prints it and `lookupShopAndDrop` matches it exactly.
 
 
         **The order's lines are asked in process** (ADAM CR-477, Chinmay, 2 November 2026). On the `orderId` path
@@ -1394,7 +1437,9 @@ paths:
                 collectionPointId: { type: string, format: uuid }
                 lineIds:
                   type: array
-                  description: Omit to drop the whole sale.
+                  description: On the till path, omit to drop the whole sale. On the order path (`orderId`) it is
+                    required and must not be empty (`400 line-ids-required`; ADAM CR-508), each entry a line of that
+                    order.
                   items: { type: string }
                 collectBy:
                   type: string
@@ -1413,16 +1458,19 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ShopAndDrop' }
         '400':
-          description: Both `saleId` and `orderId`, or neither (`sale-or-order-required`; ADAM CR-104).
-          x-ticvai-problem-types: [sale-or-order-required]
+          description: Both `saleId` and `orderId`, or neither (`sale-or-order-required`; ADAM CR-104), or an
+            `orderId` with `lineIds` missing or empty (`line-ids-required`; ADAM CR-508).
+          x-ticvai-problem-types: [sale-or-order-required, line-ids-required]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
           description: >
             The sale, order or collection point named is not one the caller can see (`unknown-sale`,
-            `unknown-order`, `unknown-collection-point`), or a `lineIds` entry is not a line of it (`unknown-line`;
-            ADAM CR-104). `errors[]` names the field.
+            `unknown-order`, `unknown-collection-point`; a collection point that is not of kind
+            `collectionPoint` or not at the drop's venue is `unknown-collection-point` too, ADAM CR-508), or a
+            `lineIds` entry is not a line of it, or on the order path a line matches no single merchandise row
+            (`unknown-line`; ADAM CR-104, CR-508). `errors[]` names the field.
           x-ticvai-problem-types: [unknown-sale, unknown-order, unknown-collection-point, unknown-line]
           content:
             application/problem+json:
@@ -1433,6 +1481,12 @@ paths:
             fragile, oversized — (`itemNotDroppable`, not raised until an approved screen sets
             `isDroppable`; ADAM CR-104), or the collection point is closed before
             `collectBy` (`collectionPointClosed`). `refusedReason` says which.
+
+            One problem type per reason (ADAM CR-508, as collectShopAndDrop's, CR-345):
+            `shop-and-drop-already-dropped` (`alreadyDropped`), `shop-and-drop-item-not-droppable`
+            (`itemNotDroppable`, still never raised while no approved screen sets `isDroppable`) and
+            `shop-and-drop-collection-point-closed` (`collectionPointClosed`).
+          x-ticvai-problem-types: [shop-and-drop-already-dropped, shop-and-drop-item-not-droppable, shop-and-drop-collection-point-closed]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/ShopAndDropProblem' }
@@ -2700,9 +2754,12 @@ components:
           maxLength: 32
           x-ticvai-unique: tenant
           x-ticvai-unique-compare: exact
-          description: Short and readable. Printed on the slip a guest may or may not keep. **Server-assigned, the
-            venue prefix and a sequence per venue** (ADAM CR-104; as `orderNumber`), for example `DXB1-SD-000123`,
-            unique in the tenant.
+          description: >-
+            Short and readable. Printed on the slip a guest may or may not keep. **Server-assigned**
+            (ADAM CR-104; the rule ADAM CR-508's): the venue's `platform.scope.code`, upper-cased, its first 22
+            characters, + `-SD-` + a number per prefix zero-padded to at least 6 digits, for example
+            `DXB1-SD-000123`, never over 32 characters, unique in the tenant (`createShopAndDrop` says how it is
+            numbered).
         saleId:
           type: string
           nullable: true

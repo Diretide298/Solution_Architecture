@@ -1,0 +1,57 @@
+id: CHG-CR508-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'createShopAndDrop: one 409 problem type per reason (shop-and-drop-already-dropped, -item-not-droppable, -collection-point-closed);
+  dropReference = the venue scope code (upper-cased, first 22 characters) + -SD- + a per-prefix number under a transaction-scoped
+  lock; the collection point must be a collectionPoint of the drop''s venue (else 422 unknown-collection-point), its label
+  copied; the drop''s venue from the sale''s outlet or the order''s venueId; the order path reads orders#salesOrderRecords,
+  requires a non-empty lineIds (400 line-ids-required) and matches each line to one merchandise row; the point''s hours
+  are local wall-clock with collectBy defaulting to closesAt or the next local midnight.'
+decision:
+  what: 'ADAM CR-508, posted on #30870: "Decided (Chinmay, 3 November 2026): createShopAndDrop is built on its existing
+    ticket with these rules. Build now: 1. The 409 declares one problem type per reason, as collectShopAndDrop''s does:
+    shop-and-drop-already-dropped, shop-and-drop-item-not-droppable (still never raised while no approved screen sets isDroppable)
+    and shop-and-drop-collection-point-closed. refusedReason is unchanged. 2. dropReference = the venue''s code (platform.scope.code
+    of the venue''s scope row, upper-cased, its first 22 characters) + "-SD-" + a number zero-padded to at least 6 digits,
+    for example DXB1-SD-000123, never over 32 characters. In the insert''s transaction, take a transaction-scoped lock on
+    that prefix, then use 1 + the highest number already issued under it in retail.shop_and_drop. Numbering is per prefix,
+    so two venues that share a code never clash. The unique index on drop_reference stays as the ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-508 (Deep Khanvilkar, #30870 createShopAndDrop): The 409s declared no problem types, dropReference had no
+  generator, and the orderId path had no source for a line''s merchandise and name, the drop''s venue or subjectId.'
+keys_touched:
+  operations:
+  - createShopAndDrop
+  schemas:
+  - ShopAndDrop
+  tables:
+  - retail.shop_and_drop
+  - retail.shop_and_drop_line
+  files:
+  - contracts/satellite/retail.yaml
+  - tools/check-business-rules.py
+root_class: a write whose generated values, refusals and cross-module sources were never stated (contract against storage)
+tickets:
+  started: []
+  unstarted:
+  - '30870 (createShopAndDrop, Deep Khanvilkar): build the six rules as posted, reading the order in process (see notes).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-508
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SHOP-DROP-RULES
+status: open
+notes: '**Differs from the posted words on one point, for a follow-up comment**: the decision says to read the order "through
+  orders#salesOrderRecords on the same service route as orders#orderLineRecords" and that "a service read needs no table
+  grant". In r13 orderLineRecords is asked in process from the operations host (CR-477, posted 2 November; XDR-071), the
+  operations host asks every Orders query in process (CHG-R13INP-001, ADR-0055 as amended, check-cross-module-reads XR-INPROCESS-HOST
+  refuses a service read), and XDR-075 already grants the operations role SELECT on orders.sales_order for salesOrderRecords.
+  So the package declares salesOrderRecords in process, on the route orderLineRecords is asked on, and no new grant is needed.
+  Also declared beyond the words: tenancy#scopeRecords (the venue code) and tenancy#outletRecords (the sale''s outlet, the
+  venue''s outlets) and tenancy#regionSettingsRecords (the Region''s time zone the hours are read in), in process under
+  XDR-004.'

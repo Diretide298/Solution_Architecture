@@ -429,6 +429,8 @@ And one rule per decision:
                    settings; listGroupPackages names and prices a package as listProducts does, with channel.
   BR-PRODUCT-BADGE-RATING (CR-504) Product.highlightBadge (per language, 20 characters) on create and update, and
                    Product.rating (readOnly, not stored); WEB-005's cards bind both.
+  BR-SHOP-DROP-RULES (CR-508) createShopAndDrop's 409 types per reason, 400 line-ids-required, the dropReference
+                   rule, the drop's venue, the order path's merchandise match and the collection point's hours.
   BR-CATEGORY-TREE-PASSES (CR-523) listProductCategories prunes inactive subtrees for guests and lifts a node's
                    kept descendants past a node dropped for its kind.
   BR-WAITING-ROOM-COOKIE (CR-524) getWaitingRoomPosition is built on #29033 and its admitted answer carries the
@@ -3755,7 +3757,7 @@ def roots_r13_v(need, op):
          "setSubstitutionRules does not state when requiresApproval is true (R41)")
 
 
-R13_W1_RULES = ["BR-GROUP-PACKAGE-SOURCE", "BR-PRODUCT-BADGE-RATING", "BR-CATEGORY-TREE-PASSES",
+R13_W1_RULES = ["BR-GROUP-PACKAGE-SOURCE", "BR-PRODUCT-BADGE-RATING", "BR-SHOP-DROP-RULES", "BR-CATEGORY-TREE-PASSES",
                 "BR-WAITING-ROOM-COOKIE", "BR-GUIDED-ANSWER-FILTER", "BR-SEARCH-CATALOGUE-SOURCES",
                 "BR-SIMULATION-CHANNEL-MAP", "BR-CHANNEL-RETRY-READINGS", "BR-CHANGE-IMPACT-REPRICE",
                 "BR-CHANNEL-TEST-NOT-SUPPORTED", "BR-IMPORT-STAGED-ROWS", "BR-GUEST-MEMBERSHIP-FIELDS",
@@ -3826,6 +3828,21 @@ def lane_w1_rules_r13(need, op):
              and {"Product.highlightBadge", "Product.rating"} <= set((c or {}).get("columns") or [])]
     need("BR-PRODUCT-BADGE-RATING", bool(cards), "WEB-005's cards do not bind Product.highlightBadge and Product.rating "
          "on listProducts (CR-504)")
+
+    # BR-SHOP-DROP-RULES (CR-508)
+    csd = op("createShopAndDrop")[3]
+    need("BR-SHOP-DROP-RULES", ptypes(csd, "409") == {"shop-and-drop-already-dropped", "shop-and-drop-item-not-droppable",
+                                                      "shop-and-drop-collection-point-closed"}
+         and "line-ids-required" in ptypes(csd, "400"),
+         "createShopAndDrop's 409 does not declare one problem type per reason, or its 400 has no line-ids-required "
+         "(CR-508)")
+    need("BR-SHOP-DROP-RULES", any(q == "orders#salesOrderRecords" for q, _ in vias(csd)),
+         "createShopAndDrop does not declare its read of the order (orders#salesOrderRecords) (CR-508)")
+    cdd = words(csd.get("description"))
+    for frag in ("first 22 characters", "`-SD-`", "transaction-scoped lock on that prefix", "Numbering is per prefix",
+                 "never the line's own venue", "of kind `collectionPoint`", "the next local midnight",
+                 "A null `opensAt` or `closesAt` sets no limit", "collection point's serving outlets"):
+        need("BR-SHOP-DROP-RULES", frag in cdd, f"createShopAndDrop does not say {frag!r} (CR-508)")
 
     # BR-CATEGORY-TREE-PASSES (CR-523)
     lpc = words(op("listProductCategories")[3].get("description"))
