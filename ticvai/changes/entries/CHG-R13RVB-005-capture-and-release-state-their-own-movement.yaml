@@ -1,0 +1,41 @@
+id: CHG-R13RVB-005
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'captureWalletHold''s and releaseWalletHold''s x-ticvai-lock-note carried holdWalletFunds'' reservation statement word
+  for word (available_balance - n, hold_balance + n, WHERE available_balance >= n). Each now states its own movement, as
+  its description already says: capture of a hold of h for n (n <= h) takes h off hold_balance, n off balance_amount and
+  returns h - n to available_balance, guarded on hold_balance >= h; release returns h from hold_balance to
+  available_balance, guarded the same way.'
+decision:
+  what: 'The lead, 3 November 2026, on the r13 review of all 1,582 Block A tickets: "why are these coming back again and
+    again?", "get going on those as well so we close it", "you get the rest sorted". Review finding class
+    copied-lock-note (findings batch 2): a lock note copied onto capture and release contradicts their own movement, so
+    a developer copying it reserves again on release. Written from each operation''s own description; no rule changes.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 Block A ticket review, finding class copied-lock-note (batch 2: #28321 SVC-WALLET-WALLET-8). The one balance
+  writer is SD-027 (29 September system-design review); the columns are WalletBalance (wallet.balance: available_balance,
+  hold_balance, balance_amount the total).'
+keys_touched:
+  operations:
+  - captureWalletHold
+  - releaseWalletHold
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-contract-shapes.py
+root_class: a lock note that states another operation's statement
+tickets:
+  started: []
+  unstarted:
+  - '#28321 SVC-WALLET-WALLET-8: build each operation''s own guarded statement.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 Block A ticket review, class copied-lock-note (lane x2)'
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py::C-LOCK-NOTE-COPIED
+status: open
+notes: 'C-LOCK-NOTE-COPIED fails when two operations'' lock notes state the same guarded `UPDATE ... SET` word for word;
+  these were the only ones.'

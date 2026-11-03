@@ -1,0 +1,82 @@
+id: CHG-R13RVB-001
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'Every self-scoped operation addressed by a path id declares the shared NotFound (404), the answer the package
+  rule gives another caller''s record "exactly as one that does not exist" (contracts/README.md, CHG-GCF-002). 24
+  operations declared none: the cart (getCart, extendCart, abandonCart, addCartLine, applyCartPromoCode, checkoutCart,
+  removeCartLine, updateCartLine), claimTicketTransfer, transferOrderTickets, cancelReservation, retryMyDunningPayment
+  (the review''s 12), and leaveQueue, listCustomerBadges, listFulfilmentSlots, listGuestDevices, recordConsent,
+  registerGuestDevice, removeMfaMethod, sendAiMessage, updateParkingEntitlement, updateTableReservation,
+  verifyMfaChallenge, verifyMfaEnrolment, which the same rule covers.'
+decision:
+  what: 'The lead, 3 November 2026, on the r13 review of all 1,582 Block A tickets: "why are these coming back again and
+    again?", "get going on those as well so we close it", "you get the rest sorted". Review finding class
+    self-scoped-404-undeclared (findings batch 2): self-scoped guest operations addressed by a path id promise another
+    subject''s record is refused exactly as one that does not exist, and declare no 404. Declared as the self-scoped
+    reads already do; no new rule.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 Block A ticket review, finding class self-scoped-404-undeclared (batch 2; tickets #27735, #27910, #27860,
+  #27861, #28141, #28219, #28233). The rule is contracts/README.md "x-ticvai-self-scoped" (Chinmay, 3 October 2026,
+  CHG-GCF-002) and common.yaml NotFound; check-contract-shapes had no rule that the answer is declared.'
+keys_touched:
+  operations:
+  - getCart
+  - extendCart
+  - abandonCart
+  - addCartLine
+  - applyCartPromoCode
+  - checkoutCart
+  - removeCartLine
+  - updateCartLine
+  - claimTicketTransfer
+  - transferOrderTickets
+  - cancelReservation
+  - retryMyDunningPayment
+  - leaveQueue
+  - listCustomerBadges
+  - listFulfilmentSlots
+  - listGuestDevices
+  - recordConsent
+  - registerGuestDevice
+  - removeMfaMethod
+  - sendAiMessage
+  - updateParkingEntitlement
+  - updateTableReservation
+  - verifyMfaChallenge
+  - verifyMfaEnrolment
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/access.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/ai.yaml
+  - tools/check-contract-shapes.py
+root_class: a self-scoped operation whose promised answer for another caller's record is not declared
+tickets:
+  started:
+  - '#30707 listGuestDevices (Ready for QA): answer 404 not-found for another guest''s or an unknown subjectId, and test it.'
+  - '#37050 field encryption in the kernel (In progress): nothing to build; registerGuestDevice, verifyMfaChallenge and
+    verifyMfaEnrolment now list the 404 the services already owe.'
+  - '#30696 WEB-016, #30702 GST-042, #30712 GST-073, #30790 PTR-001, #31749 and #31751 WEB-048, #31775 GST-008, #31893
+    and #31895 WEB-010, #32100 and #32102 WEB-023 (frontend, Ready for QA): a 404 from these calls is the screen''s
+    not-found answer (the record was another caller''s or is gone); show it as not found, and the tests assert it.'
+  unstarted:
+  - 'The backend tickets of the 24 operations: the shared 404 is in the responses the Done-when tests.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 Block A ticket review, class self-scoped-404-undeclared (lane x2)'
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py::C-SELF-404
+status: open
+notes: 'Additive (check-contract-compat: a new response). Left for the lead: tools/op-descriptions.py writes "another
+  caller''s id gets 403 on self-scoped operations" in every self-scoped ticket''s Done-when, against the README rule (404);
+  it writes OpenProject text, so it is not changed here. listBillingStatements says a guest supplying another subject is
+  403, against the same rule, while common.yaml NotFound says an unmatched query filter is an empty page: which of 403,
+  404 or an empty page is the lead''s.'

@@ -661,6 +661,8 @@ paths:
         - guestAuth: []
         - bearerAuth: []
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '204':
           description: Left
           headers:

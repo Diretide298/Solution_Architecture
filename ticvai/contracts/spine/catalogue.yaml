@@ -1875,6 +1875,13 @@ paths:
                   format: date-time
                   nullable: true
       responses:
+        '403':
+          description: 'The caller lacks the permission (`forbidden`), or a real run escalates and the caller holds no `PRICE_CONFIGURE` (`price-escalation-required`).'
+          x-ticvai-problem-types: [forbidden, price-escalation-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '200':
           headers:
             X-Consistency-Token:

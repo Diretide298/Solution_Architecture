@@ -480,6 +480,13 @@ paths:
                       email: { type: string, format: email }
                       role: { type: string, enum: [owner, admin, developer, readOnly] }
       responses:
+        '409':
+          description: 'The body would not leave exactly one `owner` (`developer-owner-required`). Nothing is written.'
+          x-ticvai-problem-types: [developer-owner-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '200':
           headers:
             X-Consistency-Token:

@@ -9884,10 +9884,6 @@ screens:
     why: Deferred until after r2 (POS v2 decision POSV2-8, 1 October 2026). Kept in the fnb contract and
       on EMP-058; comes back to the till in a later release.
     source: docs/registers/pos-v2-decisions.md
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-audience table reservation create
-      for the till.'
-    source: contracts/satellite/fnb.yaml#createTableReservation
   wireframe:
     status: approved
     provenance: client-verified

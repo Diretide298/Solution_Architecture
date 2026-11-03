@@ -287,8 +287,7 @@ screens:
       - accessPointId
       provenance: derived — SCN-016 declares entryState.params accessPointId, changeId and SCN-002 holds
         accessPointId, so an edge into it carries them
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
+  notes: 'Definition derived from the wireframe board on 14 August. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
     updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
     is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine
     the lane is a handheld that can admit anywhere. **`setTurnstileMode` belongs here and flow F06 is
@@ -510,8 +509,7 @@ screens:
       trigger: A school party of forty arrives on one booking
       provenance: flow F61 step 4→5
       operation: validateAccess
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **Absorbed SCN-004, SCN-005, SCN-006, SCN-010, SCN-012 on 18 August.** A scanner
+  notes: 'Definition derived from the wireframe board on 14 August. **Absorbed SCN-004, SCN-005, SCN-006, SCN-010, SCN-012 on 18 August.** A scanner
     is one screen the device sits on all day, and an outcome is a state of it — **routing to `/access/admitted`
     for something gone in 1.5 seconds is a page load per guest**, and at a gate doing 40 a minute that
     is the whole problem. Every absorbed screen kept its copy as a named state. **Authoring operations
@@ -775,8 +773,7 @@ screens:
     - to: SCN-014
       trigger: The session ends and the device syncs
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-001): flow F61 step 6→7'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: comfortable
   pattern: listDetail
   patternReason: '`listScans` reads the population and `getOfflinePackage` reads one of them — list, select,
@@ -952,8 +949,7 @@ screens:
       - rightId
       provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-008 holds mediaCode,
         rightId, so an edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: comfortable
   pattern: listDetail
   patternReason: '`listScans` reads the population and `getOfflinePackage` reads one of them — list, select,
@@ -1131,8 +1127,7 @@ screens:
       carries:
       - mediaCode
       - rightId
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: comfortable
   pattern: listDetail
   patternReason: '`listScans` reads the population and `getOfflinePackage` reads one of them — list, select,
@@ -1332,8 +1327,7 @@ screens:
       - rightId
       provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-011 holds rightId,
         so an edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: comfortable
   pattern: statusTracker
   patternReason: '`getCrossRegionEntitlement` reads one record and nothing reads a population — the screen
@@ -1465,8 +1459,7 @@ screens:
       - rightId
       provenance: derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-013 holds mediaCode,
         rightId, so an edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: comfortable
   pattern: listDetail
   patternReason: '`listScans` reads the population and `getOfflinePackage` reads one of them — list, select,
@@ -1695,8 +1688,7 @@ screens:
       operation: syncScans
       crossesDevice: true
       back: false
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not navigate
+  notes: 'Definition derived from the wireframe board on 14 August. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not navigate
     to a back office and a guest app does not navigate to either** — those are device handovers, and a
     flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
   density: comfortable
@@ -1985,8 +1977,7 @@ screens:
       carries:
       - mediaCode
       - rightId
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: comfortable
   pattern: listDetail
   patternReason: '`listScans` reads the population and `getOfflinePackage` reads one of them — list, select,
@@ -2135,8 +2126,7 @@ screens:
       provenance: 'derived — SCN-003 declares entryState.params mediaCode, rightId and SCN-016 holds none
         of them. The edge carries nothing: mediaCode, rightId only pre-select (deep link or optional),
         and SCN-003 opens on its own'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
+  notes: 'Definition derived from the wireframe board on 14 August. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
     updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
     is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine
     the lane is a handheld that can admit anywhere. **The podium sets the operating mode** (normal, freeFlow,

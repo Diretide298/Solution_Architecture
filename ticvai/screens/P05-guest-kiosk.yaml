@@ -100,8 +100,7 @@ screens:
       back: false
       carries:
       - kioskConfigId
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it
+  notes: Definition derived from the wireframe board on 14 August. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it
     — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
     existed in the schema and five platforms used none, so every screen in them read as unreachable.
   density: touchLarge
@@ -226,8 +225,7 @@ screens:
       provenance: 'derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them.
         The edge carries nothing: productId only pre-selects (deep link or optional), and KSK-004 opens
         on its own'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-002
@@ -352,8 +350,7 @@ screens:
       operation: listProducts
       carries:
       - productId
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-003
@@ -449,8 +446,7 @@ screens:
       provenance: flow F07 step 4→5
       carries:
       - variantId
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: 'Definition derived from the wireframe board on 14 August.
 
 
     **Tickets first, then date and time (decided by Chinmay, 2 October 2026; DEC-170).** The kiosk differs
@@ -555,8 +551,7 @@ screens:
     - to: KSK-006
       trigger: Reviews the order
       provenance: flow F07 step 5→6
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-005
@@ -663,8 +658,7 @@ screens:
       - paymentId
     entryFrom:
     - KSK-003
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-006
@@ -790,8 +784,7 @@ screens:
       operation: createPayment
       carries:
       - orderId
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
+  notes: 'Definition derived from the wireframe board on 14 August. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
     reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency
     is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk
     accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency
@@ -895,8 +888,7 @@ screens:
       operation: inquirePaymentStatus
       carries:
       - orderId
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-008
@@ -1002,8 +994,7 @@ screens:
       - orderId
       provenance: derived — KSK-010 declares entryState.params orderId and KSK-009 holds orderId, so an
         edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-009
@@ -1128,8 +1119,7 @@ screens:
       trigger: They call for help
       provenance: flow F57 step 3→4
       operation: reprintOrder
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-010
@@ -1237,8 +1227,7 @@ screens:
       - orderId
       provenance: derived — KSK-012 declares entryState.params orderId and KSK-011 holds orderId, so an
         edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-011
@@ -1328,8 +1317,7 @@ screens:
     notes: '**Reached from KSK-011** — a booking is found by the search that looked for it. Stated on
       4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-012
@@ -1409,8 +1397,7 @@ screens:
     inferred: true
     entryFrom:
     - KSK-009
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk, not
+  notes: Definition derived from the wireframe board on 14 August. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk, not
     by the guest — **the guest presses a button and the device raises the call**, which is why the operation
     authenticates as a device and authorises nothing. A guest cannot end an assist session they did not
     start.
@@ -1534,8 +1521,7 @@ screens:
     notes: '**Reached from KSK-001** — the attract loop is what an out-of-service kiosk replaces. Stated
       on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  notes: Definition derived from the wireframe board on 14 August.
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-014

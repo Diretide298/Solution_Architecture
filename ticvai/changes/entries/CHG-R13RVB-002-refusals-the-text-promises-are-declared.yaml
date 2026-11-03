@@ -1,0 +1,72 @@
+id: CHG-R13RVB-002
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'The refusals operations'' own texts promise are declared: 404 (the shared NotFound) on updateReport, updateDashboard,
+  saveNaturalLanguageQuery, transferWalletBalance and recordDeviceTamperEvent; 403 with the named type on voidOrder
+  (supervisor-step-up-refused), compItem (comp-escalation-required) and bulkChangePrices (price-escalation-required);
+  409 developer-owner-required on setDeveloperMembers ("Exactly one owner must remain, or 409"). withdrawFromDepositBox''s
+  text named two 403 types its 403 does not list; the text now names the declared supervisor-step-up-refused, the type
+  CHG-RUL-019 gave the witness refusal and CHG-R8SPN-035 gave signing one''s own act.'
+decision:
+  what: 'The lead, 3 November 2026, on the r13 review of all 1,582 Block A tickets: "why are these coming back again and
+    again?", "get going on those as well so we close it", "you get the rest sorted". Review root R38 (findings batches 2,
+    4a, 4b, 8b): refusals the text promises and the responses do not declare, because check-contract-shapes
+    C-REFUSAL-UNDECLARED read only "(409 when ...)" and "refused (409)". Its pattern is widened and the responses the
+    texts already name are declared; no refusal the text does not state is added.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 Block A ticket review, root R38 (batch 2: #27861 voidOrder, #28308 and #35716 transferWalletBalance, #28479
+  and #28739 updateReport and saveNaturalLanguageQuery, #28506 and #28746 updateDashboard, #28319 expireCreditLots;
+  batch 4b: #27977 setDeveloperMembers). The narrow pattern is ADAM CR-316 (CHG-CR316-001).'
+keys_touched:
+  operations:
+  - updateReport
+  - updateDashboard
+  - saveNaturalLanguageQuery
+  - transferWalletBalance
+  - recordDeviceTamperEvent
+  - voidOrder
+  - compItem
+  - bulkChangePrices
+  - setDeveloperMembers
+  - withdrawFromDepositBox
+  files:
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/spine/shift.yaml
+  - tools/check-contract-shapes.py
+root_class: a refusal an operation's own text promises that its responses do not declare
+tickets:
+  started:
+  - '#32125 WEB-021 Wallet & Gift Cards (frontend, Ready for QA): transferWalletBalance now declares the 404 its text
+    promised for an unknown or other-tenant recipient; the screen''s not-found answer handles it.'
+  unstarted:
+  - 'The backend tickets of the nine operations: the declared statuses and problem types are in the responses the
+    Done-when tests.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 Block A ticket review, root R38 (lane x2)'
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py::C-REFUSAL-UNDECLARED
+status: open
+notes: 'The widened rule reads "is `404`", "is the shared 404", a clause ending ", or 409.", and a status written with
+  its problem type ("`403` (`x`)", "`403 x`"), which must be declared with that type; a paragraph naming another
+  operation is not read (it tells what that one answers), nor "there is no `409 x`". The shared 400 validation and 403
+  forbidden stay unread, as CR-316 decided, so expireCreditLots'' "400 validation" is the shared BadRequest. Additive
+  (check-contract-compat). Left for the lead (each needs a rule, an owner or a choice): setAlertRule''s and setKpiTargets''
+  untyped 403 for a scope the caller cannot reach (the shared Forbidden, or a named type); listBillingStatements'' 403
+  (see CHG-R13RVB-001); replaceCredential''s text names `409 approval-required` where its 409 lists
+  replacement-approval-required; recordWaste and saveNaturalLanguageQuery C-ACTION-409 (readOnly or a 409); the other
+  R38 findings of batches 1, 4a and 4b (offline replay of createGoodsReceipt and consumeCrossRegionEntitlement, the
+  paid-to-completed move, verifyMfaEnrolment''s wrong-code status, createMfaChallenge''s default method,
+  updatePrincipal''s primaryRoleId, getDeviceAssignment for an unassigned device, the clientHosted jurisdictions and
+  cloud regions, createOrgUnit''s rules, who may revoke a delegation, removeLicenceAddOn with no add-on, what a prospect
+  sees in listPlans).'

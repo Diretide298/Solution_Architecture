@@ -184,14 +184,18 @@ def tick_list(xs) -> str:
 
 def unordered_sentence(item: dict, lo, docs, idoc, sname, stem, cols) -> str:
     props = item.get("properties") or {}
+    tie = ", then by `id`" if "id" in props else ""
     for k in NAME_KEYS:
         if k in props:
             prop, _ = lo.resolve(props[k], idoc, docs)
             if not lo.can_be_null(k, item, prop or {}, cols.get(f"{stem}.{sname}.{k}", [])):
-                return f"**Order.** Sorted by `{k}` ascending, then by `id`. {TAG}"
+                return f"**Order.** Sorted by `{k}` ascending{tie}. {TAG}"
     if "createdAt" in props:
-        return f"**Order.** Newest first, by `createdAt` descending, then by `id`. {TAG}"
-    return f"**Order.** Sorted by `id` descending (a UUIDv7, so newest first). {TAG}"
+        return f"**Order.** Newest first, by `createdAt` descending{tie}. {TAG}"
+    if "id" in props:
+        return f"**Order.** Sorted by `id` descending (a UUIDv7, so newest first). {TAG}"
+    # Only the item's own fields (r13 review, CHG-R13RVB-006): with no name key, createdAt or id, the lead rules.
+    return None
 
 
 def main() -> int:
@@ -212,15 +216,24 @@ def main() -> int:
     plan, ruling = [], []
     for rule, key, _msg in lo.findings():
         op = key.split(":")[0]
+        if rule == "LO-FIELD":  # the order names a field the item does not have: which field is the lead's
+            ruling.append(f"  NEEDS A RULING {rule}: {_msg}")
+            continue
+        f = ops[op]
+        _k, item, idoc, sname = lo.list_items(f["op"], docs[f["contract"]], docs)
         if rule == "LO-NULLABLE-KEY":
             fld = key.split(":")[1]
+            # `id` breaks the tie only where the item has one (r13 review, CHG-R13RVB-006).
+            tie = ", and `id` breaks every tie" if "id" in (item.get("properties") or {}) else ""
             plan.append(("d", op, OVERRIDE.get(op) or f"Where `{fld}` is null the row sorts after the rows that have "
-                                                      f"it (NULLS LAST), and `id` breaks every tie. {TAG}"))
+                                                      f"it (NULLS LAST){tie}. {TAG}"))
         else:
-            f = ops[op]
-            _k, item, idoc, sname = lo.list_items(f["op"], docs[f["contract"]], docs)
             stem = next((s for s, d in docs.items() if d is idoc), f["contract"])
-            plan.append(("d", op, OVERRIDE.get(op) or unordered_sentence(item, lo, docs, idoc, sname, stem, cols)))
+            sent = OVERRIDE.get(op) or unordered_sentence(item, lo, docs, idoc, sname, stem, cols)
+            if sent is None:
+                ruling.append(f"  NEEDS A RULING {rule}: {op}: no field of its items to order on")
+                continue
+            plan.append(("d", op, sent))
     models = dict(sr.load_models())
     for rule, key, msg in sr.findings():
         mf, op = key.split(":")[:2]

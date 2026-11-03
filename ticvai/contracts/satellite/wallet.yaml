@@ -2325,6 +2325,8 @@ paths:
                     The sender's note, stored as the `reason` of both `transfer` transactions, so the sender's history
                     and the recipient's show it (`WalletTransaction.reason`; CHG-R11FXC-004).
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -3541,9 +3543,11 @@ paths:
       x-ticvai-lock-excludes:
       - "cache:idempotency"
       x-ticvai-lock-note: 'SD-027 (29 September). One balance writer: the `wallet.balance` row is locked for one
-        statement, `UPDATE wallet.balance SET available_balance = available_balance - n, hold_balance =
-        hold_balance + n, version = version + 1 WHERE wallet_id = ? AND available_balance >= n`, and the hold
-        and the `wallet.wallet_transaction` row are written in the same transaction.'
+        statement, its own movement (r13 review, CHG-R13RVB-005: the reservation''s statement was copied here). For a
+        hold of h captured for n (n <= h; the rest returns to available): `UPDATE wallet.balance SET hold_balance =
+        hold_balance - h, balance_amount = balance_amount - n, available_balance = available_balance + (h - n),
+        version = version + 1 WHERE wallet_id = ? AND hold_balance >= h`, and the hold (`captured`) and the
+        `wallet.wallet_transaction` row are written in the same transaction.'
       x-ticvai-emits:
       - wallet.debited
       parameters:
@@ -3605,9 +3609,10 @@ paths:
       x-ticvai-lock-excludes:
       - "cache:idempotency"
       x-ticvai-lock-note: 'SD-027 (29 September). One balance writer: the `wallet.balance` row is locked for one
-        statement, `UPDATE wallet.balance SET available_balance = available_balance - n, hold_balance =
-        hold_balance + n, version = version + 1 WHERE wallet_id = ? AND available_balance >= n`, and the hold
-        and the `wallet.wallet_transaction` row are written in the same transaction.'
+        statement, its own movement (r13 review, CHG-R13RVB-005: the reservation''s statement was copied here). For a
+        hold of h: `UPDATE wallet.balance SET available_balance = available_balance + h, hold_balance = hold_balance
+        - h, version = version + 1 WHERE wallet_id = ? AND hold_balance >= h`, and the hold (`released`) and the
+        `wallet.wallet_transaction` row are written in the same transaction.'
       x-ticvai-emits:
       - wallet.credited
       parameters:

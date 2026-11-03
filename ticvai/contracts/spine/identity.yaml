@@ -5716,6 +5716,8 @@ paths:
                   description: The first code from the method being enrolled, compared with the pending method's
                     secret (or the code sent to its destination) and never stored (r13 gate, CHG-R13BO-002).
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:
@@ -5784,6 +5786,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '204':
           headers:
             X-Consistency-Token:
@@ -6097,6 +6101,8 @@ paths:
                 code:
                   type: string
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '200':
           headers:
             X-Consistency-Token:

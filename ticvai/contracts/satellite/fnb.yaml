@@ -3722,6 +3722,13 @@ paths:
                   nullable: true
                   description: Free text. Required where the reason is `other` (audit R222).
       responses:
+        '403':
+          description: 'The caller lacks the permission (`forbidden`), or the comp is above the venue setting `fnb.compEscalationAmount` and the caller holds no `ORDER_DISCOUNT` (`comp-escalation-required`).'
+          x-ticvai-problem-types: [forbidden, comp-escalation-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
@@ -4734,6 +4741,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateTableReservationRequest'
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
@@ -5669,6 +5678,8 @@ paths:
       - {}
       - guestAuth: []
       responses:
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '400':
           $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':

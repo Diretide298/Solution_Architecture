@@ -182,18 +182,30 @@ def read_route(reader_deployable: str, owner_deployable: str, query: str = None)
 def order_sentence(props: dict, required) -> str:
     """(b) CHG-R10GEN-004, ADAM CR-206, CR-236, CR-190: the order a generated list states. A never-null name key, then
     `id`; a name key that can be null, its rows last (NULLS LAST) and `id` breaking ties; else newest first by
-    `createdAt`; else `id` descending. The wording is fix-order-and-refusals', so check-list-order reads it."""
+    `createdAt`; else `id` descending. The wording is fix-order-and-refusals', so check-list-order reads it.
+
+    **Only the item's own fields** (r13 review, 3 November 2026, CHG-R13RVB-006; check-list-order LO-FIELD): `id` is
+    named, as the tiebreak or as "a UUIDv7, so newest first", only when the item has an `id`. An item with no name
+    key, no `createdAt` and no `id` has no default: ValueError, and the order is the lead's to rule. Before, a view
+    with no `id` was told "`id` breaks every tie", and listAccountMappings was sorted on a foreign key "newest
+    first"."""
     req = set(required or ())
+    props = props or {}
+    tie = ", then by `id`" if "id" in props else ""
+    tie_null = ", and `id` breaks every tie" if "id" in props else ""
     for k in ORDER_NAME_KEYS:
-        if k in (props or {}) and k in req:
-            return f"**Order.** Sorted by `{k}` ascending, then by `id`. {R10_TAG}"
+        if k in props and k in req:
+            return f"**Order.** Sorted by `{k}` ascending{tie}. {R10_TAG}"
     for k in ORDER_NAME_KEYS:
-        if k in (props or {}):
+        if k in props:
             return (f"**Order.** Sorted by `{k}` ascending. Where `{k}` is null the row sorts after the rows that "
-                    f"have it (NULLS LAST), and `id` breaks every tie. {R10_TAG}")
-    if "createdAt" in (props or {}):
-        return f"**Order.** Newest first, by `createdAt` descending, then by `id`. {R10_TAG}"
-    return f"**Order.** Sorted by `id` descending (a UUIDv7, so newest first). {R10_TAG}"
+                    f"have it (NULLS LAST){tie_null}. {R10_TAG}")
+    if "createdAt" in props:
+        return f"**Order.** Newest first, by `createdAt` descending{tie}. {R10_TAG}"
+    if "id" in props:
+        return f"**Order.** Sorted by `id` descending (a UUIDv7, so newest first). {R10_TAG}"
+    raise ValueError("no name key, createdAt or id among the item's fields: the list's order needs a ruling "
+                     "(CHG-R13RVB-006)")
 
 
 def is_public_guest_venue_read(method: str, path: str, audience, scope: str, params=()) -> bool:

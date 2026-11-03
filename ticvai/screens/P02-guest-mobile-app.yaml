@@ -80,8 +80,8 @@ platform:
         appSection).'
   appShell:
     tabs: 'Home (GST-001), Explore (GST-002), Plan (GST-051), Tickets (GST-012) by default, plus the Buy
-      tickets button. The set, order, labels and icons are venue configuration (`NavigationConfig.bottomNavigation`
-      items of `LinkTarget` kind `appSection`: home, explore, plan, tickets, map, account, buyTickets),
+      tickets button. The set, order, labels and icons are venue configuration (the `items` of the `NavigationConfig` whose `kind` is
+      `bottomNavigation`, each a `LinkTarget` of kind `appSection`: home, explore, plan, tickets, map, account, buyTickets),
       edited on CMS-009. Map is optional (GST-038). The Plan tab is hidden when the venue turns module
       `visitPlanner` off. Account is the header icon (GST-039), not a tab.'
     buyButton: A persistent **Buy tickets** button on every screen, opening GST-003 Buy Tickets. Style
@@ -2016,7 +2016,7 @@ screens:
         provenance: decided 29 September, rev 3 REV3-19
       - kind: iconButton
         label: Quick tour
-        notes: 'Replays the four coach marks when `BookingFlowConfig.quickTour` is on: the date card, the entry
+        notes: 'Replays the four coach marks when `BookingFlowLevelSettings.quickTour` is on: the date card, the entry
           windows, Continue, the selection summary (ADAM CR-493).'
         provenance: decided 29 September, rev 3 REV3-20
       - kind: dataTable
@@ -6960,8 +6960,9 @@ screens:
       match: exact
       view: 'DEFERRED (R242), still in the prototype: Account → All screens → Wave 2 → In-venue notifications;
         At-venue tab → Alerts'
-      differences: The YAML defers this (no in-app notification feed in the first release), but the prototype
-        still shows a feed and an Alerts tab, so the client will expect it.
+      differences: 'The YAML deferred this (no in-app notification feed in the first release), and the prototype
+        still shows a feed and an Alerts tab. **Superseded 29 September (rev 3 GAP-C1, DI-1075): the screen is in
+        the first release** (CHG-SGU-017), as WEB-046 says.'
     stateViews:
       loading: P02/venue-loader
       error: P02/state-error

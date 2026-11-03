@@ -1,0 +1,59 @@
+id: CHG-R13RVB-003
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'The 13 screen references to `BookingFlowConfig.signInAt`, `performanceReveal`, `quickTour`, `seatEventDateMode`
+  and `consentQuestionIds` (WEB-005, WEB-006, WEB-007, WEB-008, WEB-012, GST-007, CMS-018) name
+  `BookingFlowLevelSettings.<field>`, the schema of `BookingFlow.settings` that getPublishedBookingFlow returns, where the
+  29 September decision W12 moved them. The P02 app shell''s `NavigationConfig.bottomNavigation` is written as what it
+  is: the `items` of the NavigationConfig whose `kind` is `bottomNavigation`.'
+decision:
+  what: 'The lead, 3 November 2026, on the r13 review of all 1,582 Block A tickets: "why are these coming back again and
+    again?", "get going on those as well so we close it", "you get the rest sorted". Review finding class
+    moved-setting-named-on-old-schema (findings batch 7): 13 screen references name BookingFlowConfig fields that W12
+    moved to BookingFlow.settings. Text only; no screen shows anything different.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 Block A ticket review, finding class moved-setting-named-on-old-schema (batch 7: #28146 WEB-005, #28197 WEB-007,
+  #28222 WEB-012, #28152 WEB-006, #28162 GST-007, #28858 WEB-008). The move is white-label.yaml BookingFlowConfig''s
+  "What is left here is venue-wide (decided 29 September, W12)".'
+keys_touched:
+  screens:
+  - WEB-005
+  - WEB-006
+  - WEB-007
+  - WEB-008
+  - WEB-012
+  - GST-007
+  - CMS-018
+  schemas:
+  - BookingFlowConfig
+  - BookingFlowLevelSettings
+  - NavigationConfig
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P13-white-label-cms.yaml
+  - tools/check-screen-value-sources.py
+root_class: a screen naming a field on a schema that no longer has it
+tickets:
+  started:
+  - '#31848 WEB-007 Interactive Seat Selection (frontend, In progress): read seatEventDateMode from the booking flow''s
+    settings (getPublishedBookingFlow), not BookingFlowConfig.'
+  - '#27878 WhiteLabelService booking flow definitions, #27848 and #27922 (CMS-018), #27701, #27847 and #30687 (WEB-012)
+    (backend, Ready for QA): nothing to build; the screens now name the schema the service already returns.'
+  unstarted:
+  - 'The frontend tickets of WEB-005, WEB-006, WEB-008, WEB-012, GST-007 and CMS-018: the five settings are
+    BookingFlow.settings, read with getPublishedBookingFlow.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 Block A ticket review, class moved-setting-named-on-old-schema (lane x2)'
+prevention:
+  type: check
+  ref: tools/check-screen-value-sources.py::SV-NO-SUCH-FIELD
+status: open
+notes: 'SV-NO-SUCH-FIELD reads every backticked Schema.field in a screen record, parentheses included (SV-FIELD''s
+  precision rules skip a sentence that cites a rule, which is where these sat); it found these 13 and nothing else in
+  the screen records. The app shell (P02 appShell.tabs) is not a screen record and is not read by it; the same sweep
+  over the raw files found its NavigationConfig reference, the only other one.'

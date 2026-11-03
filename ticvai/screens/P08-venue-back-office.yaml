@@ -2461,11 +2461,7 @@ screens:
       - changes
       - previewOnly
     provenance: contract catalogue.yaml POST /products/bulk-update
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): A catalogue-contract bulk product write:
-      bulkUpdateProducts lives in the inventory contract while every other product write is catalogue''s.'
-    source: contracts/satellite/inventory.yaml#bulkUpdateProducts
+  gaps: []
 - id: BO-008
   name: Product Detail & Variants
   module: Sell
@@ -2928,11 +2924,7 @@ screens:
       discards:
       - note
     provenance: contract catalogue.yaml POST /products/{productId}/versions/{version}/restore
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): An operation that renders the PDF ticket
-      and Wallet pass preview of a product (printTicketProof works on a template, not a product).'
-    source: screens/P08-venue-back-office.yaml#BO-008
+  gaps: []
 - id: BO-009
   name: Pricing Rules
   module: Sell
@@ -8324,10 +8316,6 @@ screens:
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No operation lists message dispatches (for
-      F09 step 5, confirming guests of a cancelled performance were notified).'
-    source: F09 step 5 | contracts/satellite/marketing-crm.yaml#retryMessageDispatch
   - operation: createOrder
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-025): createOrder, holdOrder and resumeOrder are till operations
@@ -19622,9 +19610,6 @@ screens:
       listDeliveryLocations are guest-audience reads, not venue configuration; outlets are configured
       on BO-044 (R254; design-notes correction fnb-retail BO-065).'
     source: R254 | contracts/satellite/fnb.yaml#listDiningOutlets
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-audience read of delivery locations.'
-    source: contracts/satellite/fnb.yaml#listDeliveryLocations
 - id: BO-066
   name: Notification Settings
   module: People & Access Rights
@@ -31615,10 +31600,7 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract inventory.yaml POST /stock-transfers; wiring fix, 2 October 2026
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No read of production plans (list or get).'
-    source: contracts/satellite/fnb.yaml#/components/schemas/ProductionPlan
+  gaps: []
 - id: BO-113
   name: Central Kitchen & Commissary Management
   module: Sell
@@ -42661,11 +42643,7 @@ screens:
     bound to a contract property; 8 of 27 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of the Face Pass enrolment configuration
-      (setFacePassEnrollment has no get).'
-    source: contracts/spine/access.yaml#setFacePassEnrollment
+  gaps: []
   overlays:
   - id: formSetFacePassEnrollment
     component: modal
@@ -66939,12 +66917,7 @@ screens:
   pattern: commandCentre
   patternReason: the pack gives this screen a display directory (§Key Functions) and no metric row
   purpose: Provide management and approvers with a real-time overview of approval activity.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 3 §Key Functions
+  gaps: []
   layout:
     template: split
     regions:
@@ -67600,12 +67573,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Manage requests that were escalated because of SLA breaches, risk conditions, unavailable approvers
     or configured escalation rules.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 8 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -69861,12 +69829,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Identify) and no metric row
   purpose: Provide management with analytics about where approval delays and escalations occur. The source
     explicitly requires escalation reporting and escalation trend analytics.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 47 §Identify
+  gaps: []
   layout:
     template: split
     regions:
@@ -71517,12 +71480,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Directory Columns) and no metric row
   purpose: Maintain the master inventory of physical readers connected to TICVAI. The source requires
     the ability to define a minimum of three reader types.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 14 §Directory Columns
+  gaps: []
   layout:
     template: split
     regions:
@@ -71702,11 +71660,6 @@ screens:
     directory — it is settings, not a population
   purpose: Configure the technical and operational identity of an individual reader.
   gaps:
-  - operation: null
-    why: '**Reader Profile & Device Setup declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: setReaderProfile
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): setReaderProfile writes the shared display and retry profile,
@@ -72334,11 +72287,6 @@ screens:
     screen directly addresses requirement 10.2.13: the system must validate the customer''s credit/card
     balance, bonus and entitlements in real time before the game starts.'
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 20 §Identify Card / Wallet
   - operation: setReaderConfiguration
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): Per-outcome responses (what the reader shows and does)
@@ -72457,12 +72405,7 @@ screens:
   purpose: Configure dedicated balance-check readers and provide administrators with a test environment
     for deployed reader configurations. Requirement 10.2.20 specifically requires a reader through which
     the customer can check their balance.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 21 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -72598,11 +72541,6 @@ screens:
   purpose: Provide a central management view of wallet balances, credit issuance, bonus utilization, free-game
     credits and top-up activity across the operation.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 23 §Show
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): A wallet operations dashboard read of aggregates
       across wallets (getWallet reads one guest wallet).'
@@ -74313,11 +74251,6 @@ screens:
     requires: Create a package with specific games. Define validity for the game entitlement.'
   gaps:
   - operation: null
-    why: '**Game Package Builder declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -75246,11 +75179,6 @@ screens:
     RFID tap should deduct a lower amount than the original price.'
   gaps:
   - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 48 §Guest taps card
-  - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No read lists stored retry prices.'
     source: contracts/satellite/games.yaml#getGamePricing
   layout:
@@ -75957,12 +75885,7 @@ screens:
     no metric row
   purpose: Configure the integration with ticket-eater machines that convert physical redemption tickets
     into digital wallet credits.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 55 §Customer identifies wallet/card
+  gaps: []
   layout:
     template: split
     regions:
@@ -76050,12 +75973,7 @@ screens:
   purpose: Configure games that automatically send redemption-credit results to TICVAI after gameplay.
     The source requires integration with redemption games to digitally load credits after the guest completes
     a game.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 56 §Guest taps card
+  gaps: []
   layout:
     template: split
     regions:
@@ -76238,11 +76156,6 @@ screens:
   purpose: Provide the operator interface used when a customer exchanges redemption credits for prizes.
     The source explicitly requires redemption-credit usage at a redemption counter for prizes.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 58 §Scan / Tap Customer Card
   - operation: setRedemptionRules
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): A counter attendant does not change earn rules; the binding
@@ -76815,11 +76728,6 @@ screens:
   purpose: Provide complete traceability of redemption credits earned, redeemed, adjusted and associated
     inventory movements.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 62 §Compare
   - operation: setPrizeCost
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): A ledger needs reads of plays with credits earned and
@@ -77081,11 +76989,7 @@ screens:
   apisNote: Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 64. 0 of 6 labels bound to
     a contract property; 14 of 22 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No staff-audience read of a game card (getGameCard
-      is guest-only; used on BO-396, BO-454, BO-455, BO-457, BO-462, BO-486).'
-    source: contracts/satellite/games.yaml#getGameCard
+  gaps: []
 - id: BO-455
   name: Card / Credential Profile
   module: Games & Rides
@@ -77120,12 +77024,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Card Information) and no metric row
   purpose: Provide the master backend profile for an individual physical or digital game credential.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 65 §Card Information
+  gaps: []
   layout:
     template: split
     regions:
@@ -77488,11 +77387,6 @@ screens:
     row
   purpose: Show how TICVAI automatically handles a card tap when the credential is active or expired.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 68 §CARD VALID
   - operation: authoriseGameplay
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): authoriseGameplay decides a real tap now and charges for
@@ -77602,12 +77496,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Blocked Card Tap) and no metric row
   purpose: Allow authorized operators to disable a lost, suspicious or invalid card without affecting
     the underlying wallet record.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 69 §Blocked Card Tap
+  gaps: []
   layout:
     template: split
     regions:
@@ -77734,12 +77623,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Old Card) and no metric row
   purpose: Allow a damaged, lost or replaced physical card to be substituted while retaining the customer's
     wallet and entitlements.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 70 §Old Card
+  gaps: []
   layout:
     template: split
     regions:
@@ -77843,12 +77727,7 @@ screens:
   purpose: Provide the backend configuration/view that supports balance-check readers, operator kiosks
     and self-service kiosks. The source requires a dedicated reader for checking customer balance and
     also requires wallet credits to be viewable at operator and self-service kiosks.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 71 §Card Information
+  gaps: []
   layout:
     template: split
     regions:
@@ -77945,12 +77824,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Card Issued; Card Blocked) and no metric
     row
   purpose: Maintain full traceability of card lifecycle changes.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 72 §Card Issued
+  gaps: []
   layout:
     template: split
     regions:
@@ -78155,12 +78029,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Selecting a transaction should show)
     and no metric row
   purpose: Display gameplay transactions as they occur across all connected readers.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 75 §Selecting a transaction should show
+  gaps: []
   layout:
     template: split
     regions:
@@ -78445,12 +78314,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§Rejection KPIs) and a per-row directory
     (§Time Attraction Card Reason Reader; Show) — counts over a population, then the population
   purpose: Centralize all rejected gameplay transactions and identify why customers are being denied.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 78 §Time Attraction Card Reason Reader
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -79657,12 +79521,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Card Tap) and no metric row
   purpose: Configure how an approved TICVAI transaction physically starts a game or ride.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 90 §Card Tap
+  gaps: []
   layout:
     template: split
     regions:
@@ -80574,12 +80433,7 @@ screens:
     and no metric row
   purpose: 'Configure the first customer step: identifying the customer''s game card or digital wallet
     securely.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 98 §Validate Card Status
+  gaps: []
   layout:
     template: split
     regions:
@@ -80672,12 +80526,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Card Information) and no metric row
   purpose: Present all relevant wallet balances clearly to the customer. The source specifically requires
     customers' stored credits to be viewable through self-service kiosks.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Game_and_Ride_Module.pdf, page 99 §Card Information
+  gaps: []
   layout:
     template: split
     regions:
@@ -81552,11 +81401,6 @@ screens:
   purpose: Guided workflow for creating a new rental product.
   gaps:
   - operation: null
-    why: '**Create Rental Product Wizard declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -81646,12 +81490,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Provide the complete master configuration of a rental product.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Rental_Management.pdf, page 8 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -81777,12 +81616,6 @@ screens:
     rather than passed off as a decision'
   purpose: Configure reusable categories rather than hard-coding individual rental types.
   gaps:
-  - operation: null
-    why: '**Rental Category & Classification Setup declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -83493,11 +83326,6 @@ screens:
   purpose: Use operational data and AI to improve rental inventory distribution and utilization. This
     is one of the areas where TICVAI should go beyond the original matrix.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Rental_Management.pdf, page 24 §Display
   - operation: getSuggestedRequisitions
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-008): Reorder suggestions buy stock; rebalancing moves rental
@@ -83961,13 +83789,7 @@ screens:
     and no display directory — it is settings, not a population
   purpose: Configure how rental availability is presented to customers. The source supports both fixed
     and customer-defined rental periods.
-  gaps:
-  - operation: null
-    why: '**Timeslot & Duration Availability Setup declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -84622,12 +84444,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Use AI to forecast demand and proactively optimize rental availability. The source recommends
     AI-based utilization and demand forecasting.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Rental_Management.pdf, page 34 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -84899,12 +84716,7 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Select) and no display directory
     — it is settings, not a population
   purpose: Create the master commercial pricing profile associated with a rental product.
-  gaps:
-  - operation: null
-    why: '**Pricing Profile Builder declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -85842,12 +85654,7 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Select) and no display directory
     — it is settings, not a population
   purpose: Allow POS/rental operators to create a reservation through a guided workflow.
-  gaps:
-  - operation: null
-    why: '**New Rental Booking Wizard declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -86264,12 +86071,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Complete all mandatory customer acknowledgments before confirmation or checkout. This implements
     the digital rental agreement/waiver capability recommended in the source.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Rental_Management.pdf, page 55 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -86540,11 +86342,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Manage the reservation after confirmation but before/during fulfillment.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Rental_Management.pdf, page 58 §Display
   - operation: createRentalBooking
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-008): Modifying is updateRentalBooking; a second booking (createRentalBooking)
@@ -90923,12 +90720,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Use AI to move TICVAI from reactive maintenance toward predictive maintenance. This is where
     I recommend making the module significantly stronger than the original matrix.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Rental_Management.pdf, page 118 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -91901,12 +91693,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Track) and no metric row
   purpose: Provide management and administrators with traceability across Rental Management. The source
     requires role-based permissions and audit logging for rental operations.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Rental_Management.pdf, page 131 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -92322,11 +92109,6 @@ screens:
     plan.
   gaps:
   - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Subscription_Licensing_AI_Self_Service.pdf, page 85 §Each Task Shows
-  - operation: null
     why: '**Guided Setup Plan declares no operation that writes anything** — its only declared call is
       `none`, a read. The name promises authoring and the contract offers none, so either the write operations
       are missing or this screen is a view of something another screen builds.'
@@ -92735,11 +92517,6 @@ screens:
   purpose: Provide a guided workspace for the fundamental venue configuration.
   gaps:
   - operation: null
-    why: '**Venue, Calendar & Operational Setup declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -92826,12 +92603,6 @@ screens:
     directory — it is settings, not a population
   purpose: Configure the customer's initial products and where they can be sold.
   gaps:
-  - operation: null
-    why: '**Product, Pricing & Sales Channel Setup declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: setChannelListing
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-025): setChannelListing lists products on OTAs (subscription,
@@ -94520,12 +94291,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Each application record shall display)
     and no metric row
   purpose: Central repository of all accreditation applications.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack ACCREDITATION.pdf, page 4 §Each application record shall display
+  gaps: []
   layout:
     template: split
     regions:
@@ -94737,12 +94503,7 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Fields may be configured as) and
     no display directory — it is settings, not a population
   purpose: Configure applicant-facing registration forms without software development.
-  gaps:
-  - operation: null
-    why: '**Accreditation Form Builder declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -94962,11 +94723,6 @@ screens:
     rather than passed off as a decision'
   purpose: Create the accreditation program governing a particular event, venue, season or organization.
   gaps:
-  - operation: null
-    why: '**Accreditation Program Setup declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -95240,12 +94996,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§The screen shall show) and no metric
     row
   purpose: Give operations teams visibility into incoming accreditation demand.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack ACCREDITATION.pdf, page 8 §The screen shall show
+  gaps: []
   layout:
     template: split
     regions:
@@ -95507,12 +95258,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Each holder record shall display) and
     no metric row
   purpose: Central searchable directory of all accreditation holders.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack ACCREDITATION.pdf, page 10 §Each holder record shall display
+  gaps: []
   layout:
     template: split
     regions:
@@ -96523,12 +96269,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Each record shall show) and no metric
     row
   purpose: Central operational queue for applications requiring review.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack ACCREDITATION.pdf, page 20 §Each record shall show
+  gaps: []
   layout:
     template: split
     regions:
@@ -96883,11 +96624,6 @@ screens:
   purpose: Design the product approval workflows (who approves a product change, in which order); accreditation
     approvals are configured with the approvals platform.
   gaps:
-  - operation: null
-    why: '**Approval Workflow Builder declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -97907,11 +97643,6 @@ screens:
     rather than passed off as a decision'
   purpose: Design physical accreditation badges.
   gaps:
-  - operation: null
-    why: '**Badge Template Designer declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -99217,11 +98948,6 @@ screens:
     row
   purpose: Assign access permissions to an individual accreditation holder.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack ACCREDITATION.pdf, page 42 §The screen shall display
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of HolderAccess (per holder or across
       holders); affects BO-660, BO-661, BO-668.'
@@ -101611,12 +101337,7 @@ screens:
   division: 'Shares `getKpiValues`, `listAccreditationHolders` with BO-685; this screen is Accreditation
     Executive Dashboard (pack ACCREDITATION.pdf, board 8.1, page 65): provide management with a real-time
     overview of the complete accreditation operation.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack ACCREDITATION.pdf, page 65 §Dashboard filters shall include
+  gaps: []
   layout:
     template: split
     regions:
@@ -101804,12 +101525,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Metrics shall include) and no metric
     row
   purpose: Determine whether issued accreditations are actually being used.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack ACCREDITATION.pdf, page 67 §Metrics shall include
+  gaps: []
   layout:
     template: split
     regions:
@@ -103037,12 +102753,7 @@ screens:
   division: 'Shares `getEvent`, `setEventSchedule` with BO-697; this screen is Dynamic Performance Duration
     Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 86):
     set how long an event''s performances last, including durations that vary by day or session.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -103453,12 +103164,7 @@ screens:
   division: 'Shares `listSpaces`, `setSpace` with BO-701; this screen is Space Access Rules Configuration
     (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 3.06, page 85): set the access
     rules of a space: who may enter it and when.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -104123,12 +103829,7 @@ screens:
     The purpose was pack text attached by page rather than by screen and does not describe this screen;
     it is rewritten from the screen''s name and operations (design-notes correction ticketing-backoffice
     BO-708)'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -104681,12 +104382,7 @@ screens:
     is Contractor & External Workforce Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
     board 6.04, page 84): plan the contractors and external workers an event needs, as part of its resource
     plan.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 84 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -104787,12 +104483,7 @@ screens:
     The purpose, columns and governance headings came from pack page 85 (Screen 06 AI-Assisted Event Creation);
     Event Shift and Roster Configuration is Screen 06 of board 6 on pages 46-47 of the same pack (design-notes
     correction venue-operations BO-714).'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -104932,12 +104623,7 @@ screens:
   division: 'Shares `getEventResourcePlan`, `setEventResourcePlan` with BO-711, BO-713, BO-914; this screen
     is Resource Location & Deployment Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
     board 6.07, page 86): set where and when each of an event''s resources is deployed.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -105486,11 +105172,6 @@ screens:
     refund, exchange or move.'
   gaps:
   - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display
-  - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): A write and read storing the default ticket,
       reservation and customer treatment per kind of event change (rescheduleEvent performs one change).'
     source: screens/P08-venue-back-office.yaml#BO-720
@@ -105830,12 +105511,7 @@ screens:
   division: 'Shares `listPerformanceTemplates`, `setPerformanceTemplate` with BO-016, BO-721, BO-724;
     this screen is Peak, Off-Peak & Super Prime Time Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf,
     board 8.07, page 86): set the peak, off-peak and super-prime time bands of a slot template.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 86 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -106700,12 +106376,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Device cards/table) and no metric row
   purpose: POS & Device Assignment
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 8 §Device cards/table
+  gaps: []
   layout:
     template: split
     regions:
@@ -111197,11 +110868,6 @@ screens:
     integrated with the named shared services and traceable in the audit history.'
   gaps:
   - operation: null
-    why: '**Multichannel Composer declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -112125,11 +111791,6 @@ screens:
     task end to end; saved changes are validated, permission-controlled, integrated with the named shared
     services and traceable in the audit history.'
   gaps:
-  - operation: null
-    why: '**Visual Journey Builder declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -113359,11 +113020,6 @@ screens:
     Authorized users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the audit history.'
   gaps:
-  - operation: null
-    why: '**Newsletter Builder declares no operation that writes anything** — its only declared call is
-      `none`, a read. The name promises authoring and the contract offers none, so either the write operations
-      are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -115746,11 +115402,6 @@ screens:
     integrated with the named shared services and traceable in the audit history.'
   gaps:
   - operation: null
-    why: '**Case Creation declares no operation that writes anything** — its only declared call is `none`,
-      a read. The name promises authoring and the contract offers none, so either the write operations
-      are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -116740,11 +116391,6 @@ screens:
     can complete the described task end to end; saved changes are validated, permission-controlled, integrated
     with the named shared services and traceable in the audit history.'
   gaps:
-  - operation: null
-    why: '**Survey Builder declares no operation that writes anything** — its only declared call is `none`,
-      a read. The name promises authoring and the contract offers none, so either the write operations
-      are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -119256,11 +118902,6 @@ screens:
     with the named shared services and traceable in the audit history.'
   gaps:
   - operation: null
-    why: '**Site, Brand & Domain Setup declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -119448,11 +119089,6 @@ screens:
     users can complete the described task end to end; saved changes are validated, permission-controlled,
     integrated with the named shared services and traceable in the audit history.'
   gaps:
-  - operation: null
-    why: '**Page & Landing Builder declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -120230,11 +119866,6 @@ screens:
     history.'
   gaps:
   - operation: null
-    why: '**Waiver Template Builder declares no operation that writes anything** — its only declared call
-      is `none`, a read. The name promises authoring and the contract offers none, so either the write
-      operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -120534,11 +120165,6 @@ screens:
     the described task end to end; saved changes are validated, permission-controlled, integrated with
     the named shared services and traceable in the audit history.'
   gaps:
-  - operation: null
-    why: '**Signature Experience Setup declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -121819,12 +121445,7 @@ screens:
     application.
   purposeNote: Administrators can extend resource records with reusable, validated, type-specific attributes
     without requiring application development.
-  gaps:
-  - operation: null
-    why: '**Configurable Attribute Builder declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -122039,12 +121660,7 @@ screens:
     or influences another resource.
   purposeNote: Administrators can define reusable dependency rules, and the system validates those dependencies
     before affected resources can be reserved or assigned.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 13 §The system shall display
+  gaps: []
   layout:
     template: split
     regions:
@@ -123665,12 +123281,7 @@ screens:
     and operational activities.
   purposeNote: Operations teams can understand resource demand across parallel events and identify shortages
     or allocation conflicts before operations begin.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 29 §The screen shall display
+  gaps: []
   layout:
     template: split
     regions:
@@ -125114,11 +124725,6 @@ screens:
     intelligent Workforce Operations and Rostering Engine ... Board 4 shall enable managers to ...") pasted
     after the screen''s own sentence.'
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 45 §Display
   - operation: listRotaAssignments
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): listRotaAssignments was bound as "Rota synchronisation";
@@ -125430,11 +125036,6 @@ screens:
   purposeNote: Managers can construct operational staffing rosters against actual attraction, event, experience,
     and ticketing demand.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 50 §Each candidate shall show
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns candidates for a rota position
       (skill, availability, suitability).'
@@ -125934,12 +125535,7 @@ screens:
     for operation.
   purposeNote: Managers can monitor planned versus actual workforce attendance in real time and immediately
     understand operational impact.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 55 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -126204,12 +125800,7 @@ screens:
     rules before roster publication or assignment.
   purposeNote: No workforce roster is published without passing configured compliance validation or following
     an explicitly authorized exception workflow.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 58 §Each issue shall display
+  gaps: []
   layout:
     template: split
     regions:
@@ -126307,12 +125898,7 @@ screens:
     publication.
   purposeNote: Managers can understand staffing cost and budget impact before approving workforce plans
     and can analyze actual labor expenditure after operations.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 59 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -126699,13 +126285,7 @@ screens:
     session, or service.
   purposeNote: Administrators can define all operational resource requirements for an experience and TICVAI
     can use those requirements during availability, sale, reservation, and assignment.
-  gaps:
-  - operation: null
-    why: '**Experience Resource Requirement Builder declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -126959,12 +126539,7 @@ screens:
   division: 'Shares `createResourcePackage`, `listResourcePackages`, `updateResourcePackage` with BO-861,
     BO-918; this screen is Resource Combination Builder (pack Resource_Management_Configuration_Reference.pdf,
     board 5.03, page 67): allow experiences to require multiple resources in valid combinations.'
-  gaps:
-  - operation: null
-    why: '**Resource Combination Builder declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -127877,11 +127452,6 @@ screens:
   purposeNote: Authorized users can understand the real-time operational state of all physical resources
     and immediately identify assets requiring operational action.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 82 §Display
   - operation: createResourceCost
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): A resource cost table and a primary "Create resource cost"
@@ -128411,12 +127981,7 @@ screens:
     for it.
   purposeNote: Every checked-out tracked resource can be traced to the responsible guest, booking, transaction,
     and issuing employee.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 87 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -128540,12 +128105,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Control rental periods and manage extensions, overdue items, and returns.
   purposeNote: and final return.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 88 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -128683,12 +128243,7 @@ screens:
   purpose: Configure and manage deposits associated with rental resources.
   purposeNote: Deposits are collected, held, adjusted, and returned according to configurable rental policies
     with complete financial traceability.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 89 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -129123,12 +128678,7 @@ screens:
     operational history. Purpose rewritten 2 October 2026 (CHG-WIR-003): The purpose carried the board
     7 introduction ("Provide TICVAI with a centralized Event Resource Planning Engine ... The board shall
     manage event requirements across ...") after the screen''s own sentence.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 93 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -129387,12 +128937,7 @@ screens:
     readiness of upcoming events.
   purposeNote: Managers can immediately understand resource readiness across upcoming events and identify
     events requiring operational attention.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 99 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -129534,17 +129079,7 @@ screens:
   division: 'Shares `getEventResourcePlan`, `setEventResourcePlan` with BO-711, BO-713, BO-715; this screen
     is Event Resource Requirement Builder (pack Resource_Management_Configuration_Reference.pdf, board
     7.02, page 100): define every resource required to deliver a specific event.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 100 §Display
-  - operation: null
-    why: '**Event Resource Requirement Builder declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: split
     regions:
@@ -129665,12 +129200,7 @@ screens:
   purpose: Assign suitable physical spaces to an event and its operational components.
   purposeNote: Users can assign suitable venues and spaces while TICVAI validates the entire operational
     occupancy period rather than only the event start/end time.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 102 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -130329,12 +129859,7 @@ screens:
   purpose: Calculate the expected resource cost of delivering an event.
   purposeNote: Event managers can understand expected resource cost before approving the operational event
     plan.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 108 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -130757,12 +130282,7 @@ screens:
     conditions across the organization.
   purposeNote: Authorized managers can immediately understand current and forecast resource conditions
     and see prioritized AI-generated actions from one command center.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 117 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -131042,12 +130562,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Predict future demand for resources before shortages occur.
   purposeNote: or excess capacity before the operating date.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 121 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -131889,12 +131404,7 @@ screens:
     their attention now and next.
   purposeNote: Employees can immediately understand their current operational status and next required
     action without navigating through multiple screens.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 136 §The screen shall display
+  gaps: []
   layout:
     template: split
     regions:
@@ -132008,12 +131518,7 @@ screens:
   purpose: Provide employees with a mobile view of their working schedule and operational assignments.
   purposeNote: Employees can view their complete operational schedule and receive synchronized updates
     whenever assignments change.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 137 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -132128,12 +131633,7 @@ screens:
   purpose: Give the employee all information required to execute a specific assignment.
   purposeNote: Employees can access all permitted operational information needed to execute an assignment
     from one mobile screen.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 138 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -132302,12 +131802,7 @@ screens:
   purpose: Allow employees to record attendance and assignment presence from the Employee App.
   purposeNote: Employees can record shift and assignment attendance from the mobile application with configurable
     validation and full audit history.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 139 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -132734,11 +132229,6 @@ screens:
     to the desktop backend.'
   gaps:
   - operation: null
-    why: '**Manager Mobile Approval Center declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -133063,12 +132553,7 @@ screens:
     overall health and performance of Resource Management.
   purposeNote: Authorized management users can understand overall Resource Management performance and
     identify areas requiring attention from a single dashboard.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 153 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -133645,12 +133130,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§KPI Library; Each KPI shall support)
     and no metric row
   purpose: Allow organizations to define measurable Resource Management performance standards.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 158 §KPI Library
+  gaps: []
   layout:
     template: split
     regions:
@@ -133874,12 +133354,7 @@ screens:
   purpose: Provide one centralized workspace for governed Resource Management exceptions.
   purposeNote: Resource exceptions and overrides are processed through controlled, permission-based workflows
     rather than informal administrative changes.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 160 §Each request shall show
+  gaps: []
   layout:
     template: split
     regions:
@@ -134120,12 +133595,7 @@ screens:
   purpose: Monitor all technical integrations and synchronization services supporting Resource Management.
   purposeNote: Administrators can monitor integration health and understand the operational impact of
     synchronization failures.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 163 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -134237,13 +133707,7 @@ screens:
     Board 10 — Resource Management Control Tower Board 10 effectively becomes the Control Tower sitting
     above the previous nine boards. The architecture should conceptually operate as: Board 1–2 Resource
     Master + Availability ↓ Board 3–4 Workforce + Rostering ↓'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Resource_Management_Configuration_Reference.pdf, page 165 §Each recommendation shall
-      show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -136666,11 +136130,6 @@ screens:
     detailed production behavior is defined in the following scope. Configuration Scope of Work | Version
     1.0 13'
   gaps:
-  - operation: null
-    why: '**AI Venue Designer & Publish declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -140633,11 +140092,6 @@ screens:
     changes are validated, permission-controlled, integrated with the named shared services and traceable
     in the immutable audit history. Configuration Scope of Work | Version 1.0 26.'
   gaps:
-  - operation: null
-    why: '**Hold Pool Creation declares no operation that writes anything** — its only declared call is
-      `none`, a read. The name promises authoring and the contract offers none, so either the write operations
-      are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -146873,11 +146327,6 @@ screens:
     1.0 49'
   gaps:
   - operation: null
-    why: '**Report Builder, Export & Audit declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -148258,11 +147707,6 @@ screens:
     coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work
     | Version 1.0 53'
   gaps:
-  - operation: null
-    why: '**Setup, Clone & Inheritance declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -150007,12 +149451,7 @@ screens:
   purpose: Define how and when TICVAI automatically or manually creates a wallet.
   purposeNote: The system creates wallets according to configurable business triggers, validation rules
     and authorization controls.
-  gaps:
-  - operation: null
-    why: '**Wallet Creation & Provisioning Rules declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -152881,12 +152320,7 @@ screens:
     page 24): create and maintain the individual value buckets that can exist inside a TICVAI wallet.
     The source explicitly requires support for different digital wallet credit types such as Cash Credit,
     Bonus Credit, Redemption Tickets Credit and Rides Credit, with configurable usage criteria.'
-  gaps:
-  - operation: null
-    why: '**Credit Type Definition Studio declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -153769,12 +153203,7 @@ screens:
   division: 'Shares `expireCreditLots`, `listCreditLots` with BO-1130; this screen is Credit Expiry, Extension
     & Forfeiture Operations (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.09, page 31):
     provide governed administrative management of credits approaching or reaching expiry.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 31 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -154036,12 +153465,7 @@ screens:
     Corporate wallets. Backend Configuration & Monitoring
   purposeNote: Authorized administrators can monitor shared-wallet structures and drill down from consolidated
     information to individual wallets, members, allocations and transactions.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 38 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -155394,12 +154818,7 @@ screens:
     benefits across all tenants and venues. Dashboard KPIs
   purposeNote: Authorized users can monitor all gift-card, voucher and digital-benefit programs and drill
     into their balances, issuance and redemption activity.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -155610,11 +155029,6 @@ screens:
     and transaction history. Gift Card Types
   purposeNote: Administrators can create and maintain gift-card products entirely through backend configuration.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 50 §For each gift card define
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the gift card products
       that setGiftCardProduct writes.'
@@ -156118,13 +155532,7 @@ screens:
   division: 'Shares `createVoucherType`, `listVoucherTypes` with BO-1126; this screen is Voucher Eligibility
     & Redemption Rule Studio (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.05, page 54):
     define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules.'
-  gaps:
-  - operation: null
-    why: '**Voucher Eligibility & Redemption Rule Studio declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -156679,12 +156087,7 @@ screens:
     Recognition. Liability Dashboard
   purposeNote: Outstanding gift-card balances can be reconciled to financial liability, and configured
     expiry/breakage events produce traceable finance integration events.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 58 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -158296,12 +157699,7 @@ screens:
     wallet operational activity and exceptions. Dashboard KPIs
   purposeNote: Authorized users can monitor all wallet operational activity and trace every operation
     to the underlying wallet, transaction and administrator action.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 75 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -159157,13 +158555,7 @@ screens:
     Fraud recovery where authorized
   purposeNote: No manual balance adjustment can occur without the required permissions, reason, approval
     and ledger record.
-  gaps:
-  - operation: null
-    why: '**Administrative Balance Adjustment Studio declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -159766,11 +159158,6 @@ screens:
     wallet, customer, credential, transaction and risk decision.
   gaps:
   - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 89 §Display
-  - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk
       rules that setWalletRiskRules writes.'
     source: contracts/satellite/wallet.yaml#setWalletRiskRules | screens/P08-venue-back-office.yaml#BO-1153
@@ -160234,12 +159621,7 @@ screens:
     4.3.32 specifically includes detection of account sharing and unauthorized access patterns. Device
     Intelligence
   purposeNote: customer's underlying balance.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 93 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -160407,16 +159789,6 @@ screens:
   purposeNote: AI-generated alerts contain understandable contributing factors and are governed by configurable
     thresholds and human-review policies.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 94 §Every AI alert should show
-  - operation: null
-    why: '**AI Fraud & Anomaly Detection Studio declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet risk
       rules that setWalletRiskRules writes.'
@@ -160639,12 +160011,7 @@ screens:
   purpose: Provide security teams with a structured investigation workspace. Alert Queue
   purposeNote: Every security alert can be investigated through a controlled case workflow with complete
     decision history.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 96 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -160983,12 +160350,7 @@ screens:
     2 October 2026 (CHG-WIR-026): The purpose carried the financial-control layer text of another board
     (liabilities, breakage, reconciliation); the operations are versioning, audit and risk-rule status,
     so the screen''s own sentence is kept (design-notes correction ticketing-backoffice BO-1162)'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -161234,12 +160596,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display; Show) and no metric row
   purpose: Provide Finance and authorized management users with a consolidated financial view of all wallet
     obligations and movements. Executive KPIs
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 102 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -161849,12 +161206,7 @@ screens:
     Exception Examples Payment successful / Wallet not funded Wallet funded / Payment failed Wallet debited
     / POS transaction missing Duplicate wallet debit Refund issued / Finance event missing Gift card redeemed
     / Liability unchanged
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 106 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -161981,12 +161333,7 @@ screens:
     explicitly requires reporting of outstanding gift-card balances, redeemed value, unredeemed balances,
     expired balances and liability exposure by venue, tenant, currency and accounting period. Liability
     Dashboard
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 107 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -162115,11 +161462,6 @@ screens:
     4.3.37 requires configurable expiration policies, gift-card breakage calculation and generation of
     revenue- recognition entries according to configured accounting policies. Breakage Configuration
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 108 §Gift Card
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): A read (get or list) of the wallet accounting
       mapping that setWalletAccountingMapping writes.'
@@ -162362,12 +161704,7 @@ screens:
     Outstanding Stored Value Funding Redemption Refunds Transfers Expired Value Breakage Gift Card Liability
     Operational Analytics Active wallets Average wallet balance Average top-up Average spend Transaction
     volume Wallet usage frequency Dormant wallets Credit utilization Channel Analytics
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 110 §Compare
+  gaps: []
   layout:
     template: split
     regions:
@@ -162494,12 +161831,7 @@ screens:
     capabilities required across the full wallet scope. The source specifically requires integration with
     internal and external systems through APIs, including balance inquiry, transaction history, wallet
     funding, wallet payment, refund processing and wallet-to-wallet transfers.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Compare
+  gaps: []
   layout:
     template: split
     regions:
@@ -162716,11 +162048,6 @@ screens:
   purposeNote: Authorized administrators can monitor Wallet connectivity and identify failed, degraded
     or delayed integrations from a centralized workspace.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Each integration displays
   - operation: createApiClient
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-021): createApiClient and setApiClientStatus on the tenant''s
@@ -163655,12 +162982,7 @@ screens:
   purpose: Give technical and operational teams a dedicated workspace for failed integrations.
   purposeNote: Every integration failure is traceable through a controlled exception workflow without
     modifying the original financial transaction.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -163862,12 +163184,7 @@ screens:
     this screen is Wallet Configuration Governance & Version Control (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
     board 10.08, page 123): provide centralized governance for configuration changes across all ten Wallet
     boards. This screen becomes the master configuration governance layer for the entire Wallet module.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 123 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -164099,12 +163416,7 @@ screens:
     & Consumption → Family / Corporate → Gift Cards & Benefits → Channels & Wearables → Transfers & Refunds
     → Fraud & Risk → Finance & Liability ↓ Wallet API & Event Layer ↙︎ Ticketing ↙︎ Membership ↙︎ CRM
     ↙︎ Pricing &'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Display
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -166283,7 +165595,7 @@ screens:
     is the first page a Revenue/Pricing Administrator sees when entering the module.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Create
+    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: Create
       Price List, Duplicate, Open, Compare, Validate, View Dependencies, Export, Archive. Each needs an
       operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
       side rather than the contract side.'
@@ -167518,7 +166830,7 @@ screens:
   purpose: Accelerate commercial setup across new venues, events, seasons and markets.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Complete
+    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Complete
       Price List, Rate Structure Only, Selected Categories, Product Assignments, Market Structure. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -167812,7 +167124,7 @@ screens:
     pricing rules.
   gaps:
   - operation: null
-    why: '**The pack names 13 actions on this screen and the screen declares 1 operation.** Unserved:
+    why: '**The pack names 13 actions on this screen and the screen declares 3 operations.** Unserved:
       Customer Segment, Membership, Channel, Quantity, Timeslot, Event, Create Rule, Duplicate …. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -170588,7 +169900,7 @@ screens:
     all pricing changes and governance activities.
   gaps:
   - operation: null
-    why: '**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Create
+    why: '**The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved: Create
       Pricing Change, Bulk Update, Import Changes, Review Impact, Approve, Schedule Publication, View
       Rollbacks. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
@@ -170808,7 +170120,7 @@ screens:
     production pricing.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Price
+    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: Price
       Change, Price List Change, Eligibility Rule Change, Tax Change, Fee Change, Formula Change, Currency/Rounding
       Change, Emergency Change. Each needs an operation, or needs removing from the screen; this is the
       Phase 3 reconciliation seen from the screen side rather than the contract side.'
@@ -172036,7 +171348,7 @@ screens:
     strategies. This should be the primary operational screen for Revenue Managers.
   gaps:
   - operation: null
-    why: '**The pack names 13 actions on this screen and the screen declares 1 operation.** Unserved:
+    why: '**The pack names 13 actions on this screen and the screen declares 2 operations.** Unserved:
       Demand Based, Inventory Based, Booking Velocity, Timeslot, Channel, Create Strategy, Duplicate,
       Open …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
@@ -172543,7 +171855,7 @@ screens:
     revenue management.
   gaps:
   - operation: null
-    why: '**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Sales
+    why: '**The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved: Sales
       per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected Booking Pace, Historical
       Booking Curve, Remaining Inventory. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
@@ -172830,7 +172142,7 @@ screens:
   purpose: Allow dynamic-pricing behavior to differ according to commercial context.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: POS,
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: POS,
       Call Center, API. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 83 §Support
@@ -179292,12 +178604,7 @@ screens:
     directory (§Dashboard Visualizations) — counts over a population, then the population
   purpose: Provide management with a real-time executive and operational overview of all promotional activities.
     (a section of BO-010 Promotions & Coupons since 2 October 2026).
-  gaps:
-  - operation: listPromotions
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Promotions___Bundles_Management_Reference.pdf, page 6 §Dashboard Visualizations
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -179760,11 +179067,6 @@ screens:
     configuration. (a section of BO-010 Promotions & Coupons since 2 October 2026).
   gaps:
   - operation: listPromotions
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Promotions___Bundles_Management_Reference.pdf, page 9 §Display
-  - operation: listPromotions
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-025): The overview of one selected promotion listed every promotion
       (listPromotions); it reads the selected promotion (getPromotion) and its usage (getPromotionUsage).
@@ -179927,12 +179229,6 @@ screens:
   purpose: Control the operational lifecycle of promotions. (a section of BO-010 Promotions & Coupons
     since 2 October 2026).
   gaps:
-  - operation: null
-    why: '**Promotion Lifecycle & Status Manager declares no operation that writes anything** — its only
-      declared call is `listPromotionLifecycleStatus`, a read. The name promises authoring and the contract
-      offers none, so either the write operations are missing or this screen is a view of something another
-      screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -181938,7 +181234,7 @@ screens:
     of BO-010 Promotions & Coupons since 2 October 2026).'
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Campaign
+    why: '**The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved: Campaign
       Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each needs an
       operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
       side rather than the contract side.'
@@ -182470,13 +181766,7 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Users define) and no display directory
     — it is settings, not a population
   purpose: Generate and manage large quantities of secure unique promotional codes.
-  gaps:
-  - operation: null
-    why: '**Unique Code Generation & Batch Manager declares no operation that writes anything** — its
-      only declared call is `listUniqueCodeGeneration`, a read. The name promises authoring and the contract
-      offers none, so either the write operations are missing or this screen is a view of something another
-      screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -184465,7 +183755,7 @@ screens:
   purpose: Test complex promotion mechanics before publication.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Single
+    why: '**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved: Single
       transaction, Historical transaction replay, Sample customer segment, Forecast simulation, Bulk scenario
       testing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
@@ -185735,7 +185025,7 @@ screens:
     its price and allocation, and review the AI recommendations on it.'
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Campaign
+    why: '**The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved: Campaign
       Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each needs an
       operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
       side rather than the contract side.'
@@ -187226,7 +186516,7 @@ screens:
     & Coupons since 2 October 2026).
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Multiple
+    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Multiple
       condition sets. Each needs an operation, or needs removing from the screen; this is the Phase 3
       reconciliation seen from the screen side rather than the contract side.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 95 §Support
@@ -189345,7 +188635,7 @@ screens:
   purpose: Define the financial envelope within which a campaign is permitted to operate.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Total
+    why: '**The pack names 2 actions on this screen and the screen declares 4 operations.** Unserved: Total
       campaign budget, Venue budget. Each needs an operation, or needs removing from the screen; this
       is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support
@@ -189907,7 +189197,7 @@ screens:
     requires configurable multi-level approval for promotion creation, modification, activation, and deactivation.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Sequential
+    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved: Sequential
       approval, Parallel approval, Conditional approval, Mandatory approval, Optional review. Each needs
       an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
       screen side rather than the contract side.'
@@ -190265,13 +189555,7 @@ screens:
   purpose: Allow TICVAI to test campaign variants and determine which commercial strategy performs better.
     The matrix explicitly requires A/B testing of promotion variants, including discount levels, validity
     periods, bundles, and target segments.
-  gaps:
-  - operation: null
-    why: '**Campaign Experiment & A/B Test Manager declares no operation that writes anything** — its
-      only declared call is `listCampaignExperimentTest`, a read. The name promises authoring and the
-      contract offers none, so either the write operations are missing or this screen is a view of something
-      another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: split
     regions:
@@ -192356,7 +191640,7 @@ screens:
   purpose: Configure when approvals are required and who must approve. (merged into BO-086 Approval Matrix).
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Single
+    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Single
       Approval, Sequential Approval, Parallel Approval, Any-One Approval, Conditional Approval, Multi-Level
       Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
@@ -192481,7 +191765,7 @@ screens:
     RBAC/PBAC rather than replace it. (a section of BO-087 Approval Delegations since 2 October 2026).
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Event
+    why: '**The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved: Event
       operations. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
     source: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Support temporary
@@ -192661,7 +191945,7 @@ screens:
     section of BO-388 Approval SLA Policy Configuration since 2 October 2026).
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Venue
+    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Venue
       Calendar. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
     source: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 14 §Support
@@ -193017,7 +192301,7 @@ screens:
     troubleshoots, analyzes, and optimizes those workflows across the entire platform.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Publish
+    why: '**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved: Publish
       Now, Schedule, Selected Tenant, Selected Venue, Selected Brand. Each needs an operation, or needs
       removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
       the contract side.'
@@ -193737,7 +193021,7 @@ screens:
   purpose: Provide one controlled workspace for failed workflow executions.
   gaps:
   - operation: null
-    why: '**The pack names 15 actions on this screen and the screen declares 1 operation.** Unserved:
+    why: '**The pack names 15 actions on this screen and the screen declares 2 operations.** Unserved:
       Business Rule Failure, Missing Data, Permission Failure, Integration Failure, Action Failure, Duplicate
       Event, Service Unavailable, Configuration Error …. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
@@ -194738,7 +194022,7 @@ screens:
     operational/configuration status.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: POS,
+    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: POS,
       Mobile POS, Flying POS, Call Center, API, Partner Portal, Third-Party Channel, Custom Channel. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -196971,7 +196255,7 @@ screens:
   purpose: Provide one operational workspace for resolving channel problems.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Connection
+    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: Connection
       Failure, Product Sync Failure, Pricing Mismatch, Inventory Mismatch, Order Failure, Payment Error,
       Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
@@ -197513,7 +196797,7 @@ screens:
     optimizing each channel in isolation.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Revenue
+    why: '**The pack names 3 actions on this screen and the screen declares 3 operations.** Unserved: Revenue
       impact, Risk. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 33 §Allow management to ask
@@ -198283,7 +197567,7 @@ screens:
   purpose: Define how eligible ticket holders create resale listings.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Single
+    why: '**The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved: Single
       ticket listing, Multiple ticket listing. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Ticket Resale Marketplace_Reference.pdf, page 9 §Support
@@ -198614,7 +197898,7 @@ screens:
   purpose: Configure the commercial model of the resale marketplace.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Seller
+    why: '**The pack names 8 actions on this screen and the screen declares 4 operations.** Unserved: Seller
       fee, Buyer fee, Flat transaction fee, Percentage fee, Payment processing fee, Administrative fee,
       Venue fee, Tax on fee. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
@@ -200196,7 +199480,7 @@ screens:
   purpose: Handle exceptional scenarios that occur after a resale transaction.
   gaps:
   - operation: null
-    why: '**The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved:
+    why: '**The pack names 11 actions on this screen and the screen declares 3 operations.** Unserved:
       Event cancellation, Event postponement, Buyer refund, Payment chargeback, Failed ownership transfer,
       Failed credential issuance, Duplicate transaction, Ticket access issue …. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
@@ -203154,12 +202438,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Cards) and no metric row
   purpose: Maintain the centralized catalogue of payment/tender types supported by TICVAI.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 6 §Cards
+  gaps: []
   layout:
     template: split
     regions:
@@ -203503,7 +202782,7 @@ screens:
     This is important for TICVAI''s multi-venue architecture.'
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved:
       Digital Wallet, Gift Card, Card. Each needs an operation, or needs removing from the screen; this
       is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 9 §Supports
@@ -203733,17 +203012,11 @@ screens:
     determine whether a payment method should be available for a particular transaction.'
   gaps:
   - operation: null
-    why: '**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved:
       Channel, Venue, Product, Product category, Transaction amount, Customer type, Membership, Country/market
       where applicable …. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 11 §Support conditions such as
-  - operation: null
-    why: '**Payment Eligibility & Availability Rule Builder\t13 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -203870,7 +203143,7 @@ screens:
     configure payment-related commercial rules where legally and contractually permitted.'
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved:
       Fixed payment fee, Percentage fee, Minimum fee, Maximum fee, Payment-method-specific fee, Channel-specific
       fee, Currency-specific fee, Waiver rule. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
@@ -203997,16 +203270,10 @@ screens:
   purpose: Provide governance over sensitive payment configuration changes.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 4 operations.** Unserved:
       Effective from, Scheduled expiry. Each needs an operation, or needs removing from the screen; this
       is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 13 §Support
-  - operation: null
-    why: '**Payment Policy, Governance & Approval Manager\t15 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   layout:
     template: form
     regions:
@@ -204114,12 +203381,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Credit Card) and no metric row
   purpose: Allow administrators to test payment configuration before publishing it. This is especially
     important because payment configuration errors can immediately stop sales.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 14 §Credit Card
+  gaps: []
   layout:
     template: split
     regions:
@@ -204263,12 +203525,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory
     (§Display) — counts over a population, then the population
   purpose: Provide real-time operational visibility across all payment gateways, PSPs and acquirers.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 25 §Display
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -204560,16 +203817,11 @@ screens:
   purpose: Configure how TICVAI technically connects to each payment provider.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 3 operations.** Unserved:
       API endpoint reference, Webhook configuration, Callback configuration, Retry configuration. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 27 §Support
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 27 §Display
   layout:
     template: split
     regions:
@@ -204804,16 +204056,11 @@ screens:
     that determine which provider should receive each payment transaction.'
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved:
       Venue, Legal entity, Channel, Payment method, Transaction amount, Transaction type, Customer type
       where appropriate, Weighted distribution. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 29 §Support
-  - operation: null
-    why: '**Payment Routing Rule Builder\t31 declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -205014,12 +204261,6 @@ screens:
     of the most important screens in the Payment Orchestration module.
   gaps:
   - operation: null
-    why: '**Failover, Retry & Resilience Manager\t34 declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the payment failover policy (setPaymentFailoverPolicy
       has no get).'
     source: contracts/satellite/payments.yaml#setPaymentFailoverPolicy | screens/P08-venue-back-office.yaml#ADM-575
@@ -205113,12 +204354,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§Health Metrics) and a per-row directory
     (§Compare) — counts over a population, then the population
   purpose: Monitor each provider's technical and transactional health.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 33 §Compare
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -205327,12 +204563,7 @@ screens:
     metric row
   purpose: Allow administrators to test exactly how a payment will be routed before deploying routing
     changes.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 35 §Credit Card can route through
+  gaps: []
   layout:
     template: split
     regions:
@@ -205595,7 +204826,7 @@ screens:
   purpose: Maintain the centralized inventory of all payment terminals connected to TICVAI.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved:
       Fixed POS terminal, SoftPOS where supported, Device owner, Last service, Replacement date. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -205710,7 +204941,7 @@ screens:
   purpose: Configure and activate a physical terminal for TICVAI use.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved:
       Device reference, Receipt configuration, Connection profile. Each needs an operation, or needs removing
       from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
@@ -205836,12 +205067,6 @@ screens:
     rather than passed off as a decision'
   purpose: Control which terminal is connected or assigned to each TICVAI selling device.
   gaps:
-  - operation: null
-    why: '**POS, Kiosk & Terminal Assignment Manager\t52 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -206084,11 +205309,6 @@ screens:
     server and payment provider.
   gaps:
   - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 53 §Show
-  - operation: null
     why: '**Payment Server & Terminal Connectivity Manager\t54 declares no operation that writes anything**
       — its only declared call is `none`, a read. The name promises authoring and the contract offers
       none, so either the write operations are missing or this screen is a view of something another screen
@@ -206204,11 +205424,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide operations teams with real-time visibility into card-present payment attempts.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 54 §Display
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists card-present payment attempts
       by terminal.'
@@ -206351,18 +205566,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Manage card-present operations when normal connectivity is unavailable. This directly addresses
     the degraded-mode requirement in the payment matrix.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 55 §Show
-  - operation: null
-    why: '**Degraded, Offline & Store-and-Forward Manager\t56 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: split
     regions:
@@ -206478,7 +205682,7 @@ screens:
   purpose: Provide centralized lifecycle monitoring and operational maintenance of terminal hardware.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved:
       Device replacement, Certification update. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 56 §Support
@@ -206593,7 +205797,7 @@ screens:
     production activation.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved:
       Successful payment, Card decline, Lost connection, Reversal, Duplicate request, Temporary assignment,
       Venue, Assignment history. Each needs an operation, or needs removing from the screen; this is the
       Phase 3 reconciliation seen from the screen side rather than the contract side.'
@@ -206799,12 +206003,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory
     (§Compare) — counts over a population, then the population
   purpose: Provide centralized operational visibility across all digital and alternative payment journeys.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 70 §Compare
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -206942,17 +206141,11 @@ screens:
     board 4.2, page 70): configure the digital payment experiences available through TICVAI.'
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved:
       Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods
       through adapters. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 70 §Support provider-enabled methods such as
-  - operation: null
-    why: '**Digital & Alternative Payment Method Manager\t71 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -207173,12 +206366,6 @@ screens:
     customer to be physically present at a POS.
   gaps:
   - operation: null
-    why: '**Payment Link Builder & Configuration\t73 declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No staff read of payment links (getPaymentLink
       is guest/anonymous by token; there is no list).'
     source: contracts/spine/orders.yaml#createPaymentLink | screens/P08-venue-back-office.yaml#ADM-592
@@ -207287,12 +206474,6 @@ screens:
     rather than passed off as a decision'
   purpose: Manage how a generated payment request is delivered and how its lifecycle progresses.
   gaps:
-  - operation: null
-    why: '**Payment Link Distribution & Customer Journey Manager\t74 declares no operation that writes
-      anything** — its only declared call is `none`, a read. The name promises authoring and the contract
-      offers none, so either the write operations are missing or this screen is a view of something another
-      screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -207440,7 +206621,7 @@ screens:
     or asynchronous customer journeys.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved:
       Hosted checkout, External payment authorization. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
@@ -207552,11 +206733,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Provide operational teams with real-time visibility into digital payment sessions.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 75 §Show
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment sessions and
       their state.'
@@ -207713,16 +206889,11 @@ screens:
     TICVAI into a card vault.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved:
       3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 77 §Support provider capabilities such as
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 77 §Display
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the payment authentication policy
       (setPaymentAuthenticationPolicy has no get).'
@@ -207849,11 +207020,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Centralize operational handling of incomplete or abnormal digital-payment journeys.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 78 §Show
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists digital payment exceptions
       (failed, abandoned, expired sessions).'
@@ -208234,18 +207400,7 @@ screens:
   division: 'Shares `getMixedTenderRules`, `setMixedTenderRules` with ADM-605; this screen is Mixed Tender
     Rule & Combination Builder (pack Payment_Payment_Orchestration.pdf, board 5.2, page 92): define which
     payment methods may be combined within a single transaction.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 92 §Card r t Credit
-  - operation: null
-    why: '**Mixed Tender Rule & Combination Builder\t93 declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: split
     regions:
@@ -208350,12 +207505,6 @@ screens:
     rather than passed off as a decision'
   purpose: Determine how an order total is allocated across several payment methods.
   gaps:
-  - operation: null
-    why: '**Split Payment & Tender Allocation Manager\t94 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -208492,12 +207641,6 @@ screens:
     clients or partners. This is not the general B2B customer profile. The B2B/CRM module remains authoritative
     for the customer/account itself. Board 5 owns the payment-credit capability.
   gaps:
-  - operation: null
-    why: '**B2B Credit Account & Limit Manager\t95 declares no operation that writes anything** — its
-      only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: listB2bCreditAccounts
     removed: true
     why: 'Removed 29 October 2026 (CHG-R11FXU-004): the approved screen has no list, table or picker that
@@ -208882,16 +208025,11 @@ screens:
     configured in Board 1.'
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved:
       Minimum card amount, Credit restriction, Voucher exclusivity. Each needs an operation, or needs
       removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
       the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 97 §Support
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 97 §Gift Card second
   layout:
     template: split
     regions:
@@ -209001,18 +208139,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Gift Card; Card) and no metric row
   purpose: Handle situations where some tenders succeed but another tender fails. This is one of the most
     important screens in Board 5.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card
-  - operation: null
-    why: '**Partial Payment, Failure & Recovery Manager\t100 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: split
     regions:
@@ -209225,16 +208352,11 @@ screens:
   purpose: Allow administrators to test complex tender combinations before activating rules.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved:
       Require card for excess, Request approval, Reject B2B credit, Reduce credit allocation. Each needs
       an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
       screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 101 §Available actions according to policy
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 101 §Gift Card
   layout:
     template: split
     regions:
@@ -209515,16 +208637,11 @@ screens:
   purpose: Provide the operational workspace for creating and validating a refund request.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved:
       Entire transaction, Selected items, Selected tickets, Selected quantities, Specific monetary amount.
       Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
       from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 116 §Allow
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 116 §Display
   - operation: createRefundRequest
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-025): The staff refund workspace raised refunds with createRefundRequest,
@@ -209893,16 +209010,10 @@ screens:
   purpose: Clearly distinguish voids and reversals from refunds. These should not all be called “refund”.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved:
       Refund ✓, Void ✕, Reversal ✕. Each needs an operation, or needs removing from the screen; this is
       the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 119 §Available Actions
-  - operation: null
-    why: '**Void, Reversal & Cancellation Manager\t120 declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -210014,12 +209125,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Provide governed approval for financially sensitive refund actions.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 120 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -210143,11 +209249,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Track refund execution through the appropriate provider and recover failed or uncertain operations.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 121 §Show
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read lists refunds across orders by provider
       status (same gap as BO-028).'
@@ -210273,12 +209374,6 @@ screens:
     controlled.
   gaps:
   - operation: null
-    why: '**Payment Adjustment & Financial Correction Manager\t123 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -210374,12 +209469,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Card AED 800; Card AED 100; Show) and
     no metric row
   purpose: Provide complete traceability from original sale through refund/reversal/adjustment.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 123 §Card AED 800
+  gaps: []
   layout:
     template: split
     regions:
@@ -210626,16 +209716,10 @@ screens:
     records.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 4 operations.** Unserved:
       Scheduled report imports. Each needs an operation, or needs removing from the screen; this is the
       Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 140 §Support provider-specific sources such as
-  - operation: null
-    why: '**Reconciliation Source & Import Manager\t141 declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -210851,12 +209935,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Centralize all payment discrepancies requiring operational or financial investigation.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 142 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -210978,11 +210057,6 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Track expected and actual settlements from payment providers/acquirers.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 143 §Display
   - operation: null
     why: '**Settlement & Payout Manager\t144 declares no operation that writes anything** — its only declared
       call is `none`, a read. The name promises authoring and the contract offers none, so either the
@@ -211131,16 +210205,11 @@ screens:
     and net settlement.
   gaps:
   - operation: null
-    why: '**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved:
       Fixed transaction fee, Percentage fee, Authorization fee, Capture fee, Refund fee, Chargeback fee,
       Cross-border fee, Wallet/APM fee …. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Payment_Payment_Orchestration.pdf, page 144 §Support
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 144 §Compare
   layout:
     template: split
     regions:
@@ -211275,18 +210344,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row Rendered
     on the calendar template (M17-03, 29 September).
   purpose: Manage operational settlement expectations across providers, merchant accounts and legal entities.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 145 §Display
-  - operation: null
-    why: '**Merchant Account & Settlement Calendar Manager\t146 declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: calendar
     regions:
@@ -211421,12 +210479,6 @@ screens:
   purpose: Control when reconciled payment information becomes ready for downstream financial posting
     and period close.
   gaps:
-  - operation: null
-    why: '**Settlement Posting, Finance Handoff & Close Manager\t148 declares no operation that writes
-      anything** — its only declared call is `none`, a read. The name promises authoring and the contract
-      offers none, so either the write operations are missing or this screen is a view of something another
-      screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -211627,12 +210679,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Forecast) and no metric row
   purpose: Provide simulation, forecasting and AI-assisted analysis across reconciliation and settlement
     operations.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 149 §Forecast
+  gaps: []
   layout:
     template: split
     regions:
@@ -211774,12 +210821,7 @@ screens:
     (§Show; Analyze) — counts over a population, then the population
   purpose: Provide real-time operational visibility over fraud, suspicious transactions, payment risk
     and chargebacks across the TICVAI ecosystem.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 165 §Show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -211920,7 +210962,7 @@ screens:
   purpose: Allow administrators to configure deterministic payment risk rules and actions.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 6 actions on this screen and the screen declares 3 operations.** Unserved:
       Allow, Monitor, Require additional verification, Route to manual review, Block, Trigger alert. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -212032,7 +211074,7 @@ screens:
   purpose: Manage high-frequency and abnormal payment activity.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
       Customer, Device, Payment instrument reference/token, Venue, POS. Each needs an operation, or needs
       removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
       the contract side.'
@@ -212135,7 +211177,7 @@ screens:
   purpose: Provide centralized management of approved payment risk lists and signals.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
       Trusted device, Blocked instrument reference, High-risk device, Review list. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
@@ -212231,12 +211273,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display; Show) and no metric row
   purpose: Convert suspicious activity into controlled investigation cases.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 169 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -212459,12 +211496,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory
     (§Display) — counts over a population, then the population
   purpose: Provide centralized operational management for provider/acquirer chargebacks and payment disputes.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Payment_Payment_Orchestration.pdf, page 171 §Display
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -213143,12 +212175,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display; Show) and no metric row
   purpose: Provide the central operational dashboard for the complete TICVAI Recommendation Engine. This
     becomes the entry point for Marketing, Commercial, Revenue, CRM and authorized operational users.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 7 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -213286,11 +212313,6 @@ screens:
     centrally. Increase cross-attraction sales.
   gaps:
   - operation: null
-    why: '**Recommendation Strategy Manager declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -213404,7 +212426,7 @@ screens:
     weighted objectives.'
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 2 operations.** Unserved:
       Revenue, Incremental revenue, Membership conversion, Capacity utilization, Inventory movement. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -213542,17 +212564,11 @@ screens:
     board 1.4, page 13): define the commercial relationships from which recommendations can be generated.'
   gaps:
   - operation: null
-    why: '**The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 12 actions on this screen and the screen declares 2 operations.** Unserved:
       Ticket → Ticket, Ticket → Bundle, Ticket → F&B, Ticket → Retail, Ticket → Parking, Ticket → Locker,
       Ticket → Photo, Ticket → Rental …. Each needs an operation, or needs removing from the screen; this
       is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Upsell,CrossSellEngine.pdf, page 13 §Support relationships between
-  - operation: null
-    why: '**Recommendation Type & Product Relationship Manager declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -213668,12 +212684,6 @@ screens:
     are permitted to appear. This is a major requirement for the engine.'
   gaps:
   - operation: null
-    why: '**Recommendation Placement & Touchpoint Manager declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -213782,11 +212792,6 @@ screens:
     board 1.6, page 17): control recommendation behavior across TICVAI''s omnichannel environment.'
   gaps:
   - operation: null
-    why: '**Channel & Journey Strategy Manager declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -213891,7 +212896,7 @@ screens:
     from Promotion Board 8.
   gaps:
   - operation: null
-    why: '**The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 7 actions on this screen and the screen declares 3 operations.** Unserved:
       Revenue potential, Product affinity, Customer propensity, Inventory, Capacity, Commercial priority,
       Campaign priority. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
@@ -214521,16 +213526,11 @@ screens:
     2.2, page 39): define valid upgrade relationships between products. governed product relationships.'
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved:
       Recommend next level only, Recommend multiple levels. Each needs an operation, or needs removing
       from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
     source: pack Upsell,CrossSellEngine.pdf, page 39 §Allow
-  - operation: null
-    why: '**Upgrade Path & Product Ladder Builder declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -214630,7 +213630,7 @@ screens:
     architecture.'
   gaps:
   - operation: null
-    why: '**The pack names 10 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 10 actions on this screen and the screen declares 2 operations.** Unserved:
       Current product, Product variant, Customer type, Guest type, Membership, Channel, Venue, Timeslot
       …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
@@ -214760,13 +213760,7 @@ screens:
     configure how TICVAI calculates and communicates the commercial difference between the current product
     and the recommended upgrade. The Recommendation Engine should not become the authoritative pricing
     engine. It should consume the authoritative price difference from Pricing/Promotion services.'
-  gaps:
-  - operation: null
-    why: '**Upgrade Price Difference & Value Proposition Manager declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -214876,18 +213870,7 @@ screens:
   division: 'Shares `listProductRelationships`, `quoteUpgrade` with ADM-652, ADM-654; this screen is Ticket,
     Experience & Bundle Upgrade Manager (pack Upsell,CrossSellEngine.pdf, board 2.5, page 44): configure
     detailed upsell relationships for ticketing and experience products.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 44 §Track
-  - operation: null
-    why: '**Ticket, Experience & Bundle Upgrade Manager declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: split
     regions:
@@ -215108,13 +214091,7 @@ screens:
     ADM-644, ADM-646, ADM-647, ADM-651, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674,
     ADM-675, ADM-681, ADM-684, ADM-695; this screen is Pre-Purchase, Cart & Checkout Upsell Manager (pack
     Upsell,CrossSellEngine.pdf, board 2.7, page 47): control upselling during the active purchase journey.'
-  gaps:
-  - operation: null
-    why: '**Pre-Purchase, Cart & Checkout Upsell Manager declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -215216,13 +214193,7 @@ screens:
     — it is settings, not a population
   purpose: Support upgrades after the initial transaction where the product and operational rules permit
     them. This is explicitly important because upselling should not stop at checkout.
-  gaps:
-  - operation: null
-    why: '**Post-Purchase & In-Journey Upgrade Manager declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -215549,12 +214520,7 @@ screens:
     (§Show) — counts over a population, then the population
   purpose: Provide centralized visibility into cross-sell relationships, recommendation performance, attach
     rates and commercial opportunities.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 64 §Show
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -215691,21 +214657,11 @@ screens:
     page 66): allow administrators to manually define governed complementary-product relationships.'
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved:
       Experience Extension, Destination Extension, Service Add-On, Partner Product. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
     source: pack Upsell,CrossSellEngine.pdf, page 66 §Support
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 66 §Identify
-  - operation: null
-    why: '**Cross-Sell Relationship Builder declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   layout:
     template: split
     regions:
@@ -215916,12 +214872,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Analyze) and no metric row
   purpose: Analyze transaction baskets to discover products commonly purchased together.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 70 §Analyze
+  gaps: []
   layout:
     template: split
     regions:
@@ -216031,11 +214982,6 @@ screens:
     3.5, page 71): manage recommendations across TICVAI''s different commercial modules. This is especially
     important because TICVAI is not only a ticketing platform.'
   gaps:
-  - operation: null
-    why: '**Cross-Category Recommendation Manager declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -216520,12 +215466,7 @@ screens:
     ADM-688, ADM-698; this screen is Cross-Sell Simulator & AI Opportunity Advisor (pack Upsell,CrossSellEngine.pdf,
     board 3.10, page 79): allow administrators to test cross-sell strategies and AI recommendations before
     activation. ↓.'
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 79 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -216806,13 +215747,7 @@ screens:
     ADM-675, ADM-681, ADM-684, ADM-695; this screen is Customer Journey Map & Touchpoint Designer (pack
     Upsell,CrossSellEngine.pdf, board 4.2, page 95): allow TICVAI administrators to visually configure
     the customer journey and recommendation-enabled touchpoints.'
-  gaps:
-  - operation: null
-    why: '**Customer Journey Map & Touchpoint Designer declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -216941,7 +215876,7 @@ screens:
     and operational context.'
   gaps:
   - operation: null
-    why: '**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved:
       Current product, Basket value, Guest count, Guest type, Current venue, Selected date, Selected timeslot,
       Current channel …. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
@@ -217069,13 +216004,7 @@ screens:
     ADM-675, ADM-681, ADM-684, ADM-695; this screen is Pre-Purchase & Booking Journey Recommendation Manager
     (pack Upsell,CrossSellEngine.pdf, board 4.4, page 99): manage recommendation behavior before transaction
     completion.'
-  gaps:
-  - operation: null
-    why: '**Pre-Purchase & Booking Journey Recommendation Manager declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -217182,13 +216111,7 @@ screens:
     ADM-675, ADM-681, ADM-684, ADM-695; this screen is Post-Purchase & Pre-Visit Recommendation Manager
     (pack Upsell,CrossSellEngine.pdf, board 4.5, page 101): continue the commercial journey after payment
     while respecting the guest''s existing purchase and visit plan.'
-  gaps:
-  - operation: null
-    why: '**Post-Purchase & Pre-Visit Recommendation Manager declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -217503,12 +216426,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Track) and no metric row
   purpose: Coordinate recommendations across channels so customers receive a consistent experience.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 106 §Track
+  gaps: []
   layout:
     template: split
     regions:
@@ -218158,11 +217076,6 @@ screens:
   purpose: Calculate the likelihood that a guest will take specific commercial actions.
   gaps:
   - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 129 §Show
-  - operation: null
     why: '**Propensity Model & Customer Intent Manager declares no operation that writes anything** —
       its only declared call is `none`, a read. The name promises authoring and the contract offers none,
       so either the write operations are missing or this screen is a view of something another screen
@@ -218278,11 +217191,6 @@ screens:
     personalized recommendation.
   gaps:
   - operation: null
-    why: '**Next-Best-Offer Decision Studio declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -218390,17 +217298,11 @@ screens:
     commercial factors into the final recommendation ranking.'
   gaps:
   - operation: null
-    why: '**The pack names 10 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 10 actions on this screen and the screen declares 2 operations.** Unserved:
       Customer propensity, Product affinity, Historical acceptance, Revenue, Incremental revenue, Capacity,
       Inventory, Commercial priority …. Each needs an operation, or needs removing from the screen; this
       is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Upsell,CrossSellEngine.pdf, page 132 §Support
-  - operation: null
-    why: '**Personalized Ranking & Decision Policy Builder declares no operation that writes anything**
-      — its only declared call is `none`, a read. The name promises authoring and the contract offers
-      none, so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
@@ -218532,11 +217434,6 @@ screens:
   purpose: Prevent personalization from becoming repetitive or intrusive. Board 4 provides general journey
     frequency controls. Board 5 adds customer-specific behavioral suppression.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 134 §Track
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of recommendation suppression settings
       (setRecommendationSuppression has no get).'
@@ -218735,12 +217632,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Make personalized AI decisions understandable and governable.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 137 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -219143,12 +218035,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Compare) and no metric row
   purpose: Determine which recommendation strategies, placements, channels and journey stages perform
     best.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 155 §Compare
+  gaps: []
   layout:
     template: split
     regions:
@@ -219264,13 +218151,7 @@ screens:
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Allow TICVAI to scientifically test recommendation strategies rather than relying only on assumptions.
     Increase Family Meal cross-sell.
-  gaps:
-  - operation: null
-    why: '**Recommendation Experiment & A/B Test Studio declares no operation that writes anything** —
-      its only declared call is `none`, a read. The name promises authoring and the contract offers none,
-      so either the write operations are missing or this screen is a view of something another screen
-      builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: dashboard
     regions:
@@ -219494,7 +218375,7 @@ screens:
     the purchase.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
       Recommendation tracking ID, Last recommendation, First recommendation, A/B experiment. Each needs
       an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
       screen side rather than the contract side.'
@@ -219594,11 +218475,6 @@ screens:
   purpose: Monitor whether recommendation and propensity models continue performing correctly after deployment.
     This screen is critical if TICVAI wants a serious AI architecture.
   gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 161 §Show
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): An AI model performance and drift read (ai
       process); getRecommendationPerformance carries no model metrics.'
@@ -219720,15 +218596,10 @@ screens:
     and AI changes move into production.'
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 2 operations.** Unserved:
       Channel rollout, Venue rollout. Each needs an operation, or needs removing from the screen; this
       is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Upsell,CrossSellEngine.pdf, page 162 §Support
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 162 §Monitor
   layout:
     template: split
     regions:
@@ -219840,7 +218711,7 @@ screens:
     and business contexts.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 3 operations.** Unserved:
       Disable model, Disable recommendation type, Disable specific relationship, Raise confidence threshold,
       Emergency suspend. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
@@ -220122,16 +218993,11 @@ screens:
     This is the final optimization screen for Module 2.'
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 6 actions on this screen and the screen declares 2 operations.** Unserved:
       Simulate, Create Experiment, Create Draft, Send for Approval, Dismiss, Snooze. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
     source: pack Upsell,CrossSellEngine.pdf, page 168 §Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Upsell,CrossSellEngine.pdf, page 168 §Track
   layout:
     template: split
     regions:
@@ -221849,11 +220715,6 @@ screens:
     should use business-friendly configuration rather than programming.
   gaps:
   - operation: null
-    why: '**Condition & Decision Rule Builder declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -223529,12 +222390,7 @@ screens:
     no display directory — it is settings, not a population
   purpose: Define combinations of actions that the same person must not be allowed to perform. The matrix
     explicitly states that users shall be prevented from approving their own requests.
-  gaps:
-  - operation: null
-    why: '**Segregation of Duties Policy Manager declares no operation that writes anything** — its only
-      declared call is `none`, a read. The name promises authoring and the contract offers none, so either
-      the write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
+  gaps: []
   layout:
     template: form
     regions:
@@ -224158,12 +223014,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Protect completed approval records from unauthorized modification. The matrix requires completed
     approval records to be immutable and requires detection of unauthorized modification attempts.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 55 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -225269,11 +224120,6 @@ screens:
     for every integration.
   gaps:
   - operation: null
-    why: '**Data & Workflow Mapping Studio declares no operation that writes anything** — its only declared
-      call is `none`, a read. The name promises authoring and the contract offers none, so either the
-      write operations are missing or this screen is a view of something another screen builds.'
-    source: contract — the screen's declared operations
-  - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
@@ -225949,12 +224795,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Columns) and no metric row
   purpose: Automatically identify where approval processes are becoming slow or congested. The source
     explicitly requires approval bottleneck analysis.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Approval_Workflows_and_Governance_Reference.pdf, page 74 §Columns
+  gaps: []
   layout:
     template: split
     regions:
@@ -227798,7 +226639,7 @@ screens:
     agreements.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Per
+    why: '**The pack names 1 actions on this screen and the screen declares 5 operations.** Unserved: Per
       Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support

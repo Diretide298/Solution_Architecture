@@ -7085,7 +7085,7 @@ screens:
   purpose: Control transaction limits and provide a governed mechanism for commercial exceptions.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Price
+    why: '**The pack names 4 actions on this screen and the screen declares 3 operations.** Unserved: Price
       Exception, Credit Exception, Allocation Exception. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'

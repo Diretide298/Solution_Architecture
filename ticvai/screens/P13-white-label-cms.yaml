@@ -172,8 +172,7 @@ screens:
       trigger: Opens Cookie Banner & Preference Center Designer
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **The
     tenant workspace.** Lands a tenant on what is live rather than on a form. **Declared 20 August** —
     `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as
@@ -406,8 +405,7 @@ screens:
       - uploadId
       provenance: derived — CMS-004 declares entryState.params uploadId and CMS-002 holds uploadId, so
         an edge into it carries them
-  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations\
-    \ still to be written. States derived from the screen pattern on 17 August, not individually considered\
+  notes: "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered\
     \ — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\
     \ \n**This screen owns the marks and the logo variant** (logo, dark logo, variant, favicon); CMS-004\
     \ owns the app icons, the splash and the intro video, so the two never edit the same fields (CHG-SGU-022).\
@@ -557,8 +555,7 @@ screens:
     - to: CMS-006
       trigger: Component Preview
       provenance: flow F102 step 2→3
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37
     operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical
     41 operations** — a Typography screen that could create banners and a Component Preview that could
@@ -690,8 +687,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-004 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 
 
@@ -916,8 +912,7 @@ screens:
       provenance: 'derived — CMS-006 declares entryState.params productId and CMS-005 holds none of them.
         The edge carries nothing: productId only pre-selects (deep link or optional), and CMS-006 opens
         on its own'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 
 
@@ -1069,8 +1064,7 @@ screens:
       trigger: White-Label Branding Management
       provenance: flow F102 step 3→4
       operation: createPreview
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
+  notes: Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **36
     operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical
     41 operations** — a Typography screen that could create banners and a Component Preview that could
@@ -1287,8 +1281,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-007 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 
 
@@ -1673,8 +1666,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-008 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations\
-    \ still to be written. States derived from the screen pattern on 17 August, not individually considered\
+  notes: "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered\
     \ — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\
     \ \n**Banners and promo blocks go live on their own schedule, not with Publish** (the contract header\
     \ lists them outside the draft); the screen says so beside each (CHG-SGU-022)."
@@ -2011,8 +2003,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-009 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
+  notes: Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   density: compact
   pattern: listDetail
@@ -2285,8 +2276,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-010 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 
 
@@ -2735,8 +2725,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-013 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
+  notes: Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   density: compact
   pattern: configEditor
@@ -2888,8 +2877,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-011 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: "Definition derived from the wireframe board on 14 August. Components, states and operations\
-    \ still to be written. States derived from the screen pattern on 17 August, not individually considered\
+  notes: "Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered\
     \ — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\
     \ \nThe CHG-WIR-017 gap (no read follows a proposeTranslations job) is closed: getTranslationProposals\
     \ was built (CHG-CSA-045) and is bound here (CHG-SGU-022).\n\n**proposeTranslations bound again 4\
@@ -3024,8 +3012,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-012 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Build
     note (r8, WHITE-C03): nothing is read on entry. The preview is made by `createPreview` when the person
     presses the action and is empty until then (not a 404); Validate calls `validateTenantConfig`; the
@@ -3134,8 +3121,7 @@ screens:
       - version
     entryFrom:
     - CMS-006
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 
 
@@ -3391,8 +3377,7 @@ screens:
         publish is a separate, deliberate step
       carries:
       - version
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 
 
@@ -3582,8 +3567,7 @@ screens:
       trigger: Help me choose
       provenance: authored 29 September, rev 3 REV3-11 — Help me choose sits on the booking page these
         settings shape, so it is set up from here
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
+  notes: Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   density: compact
   pattern: statusTracker
@@ -3800,8 +3784,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-017 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
+  notes: Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   density: compact
   pattern: listDetail
@@ -4023,8 +4006,7 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-018 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
+  notes: 'Definition derived from the wireframe board on 14 August. States derived from the screen pattern on 17 August, not individually considered
     — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
 
 
@@ -4154,7 +4136,7 @@ screens:
         notes: '**A consent, not a data field** (decided 29 September, rev 3 REV3-26). Each question has
           its own text per locale, a version, and whether it is asked for each person or once per booking.
           Filter by `kind` and `status`. **Attaching** is done where the question is used: to a booking
-          flow on CMS-016 (`BookingFlowConfig.consentQuestionIds`, per venue), to a product on BO-008
+          flow on CMS-016 (`BookingFlowLevelSettings.consentQuestionIds`, per venue), to a product on BO-008
           (`Product.consentQuestionIds`).'
         provenance: contract marketing-crm.yaml GET /consent-questions
         permission: GUEST_VIEW
@@ -5440,16 +5422,10 @@ screens:
   purpose: Provide a no-code designer for privacy/cookie interfaces displayed on digital channels.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional
+    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Additional
       configured languages. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Support
-  - operation: null
-    why: '**Cookie Banner & Preference Center Designer declares no operation that writes anything** —
-      its only declared call is `listCookieBannerPreference`, a read. The name promises authoring and
-      the contract offers none, so either the write operations are missing or this screen is a view of
-      something another screen builds.'
-    source: contract — the screen's declared operations
   layout:
     template: form
     regions:
@@ -7045,7 +7021,7 @@ screens:
   purpose: Operationalize retention policies associated with Board 1 processing purposes and data categories.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Review,
+    why: '**The pack names 6 actions on this screen and the screen declares 3 operations.** Unserved: Review,
       Extend where authorized, Delete, Archive, Place Hold, Release Hold. Each needs an operation, or
       needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather
       than the contract side.'
@@ -7233,7 +7209,7 @@ screens:
     investigation.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Security,
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Security,
       Operations, Data Owner. Each needs an operation, or needs removing from the screen; this is the
       Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Privacy__Consent___Preference_Management_Reference.pdf, page 32 §Allow escalation to
@@ -7934,17 +7910,11 @@ screens:
     are configured.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Create
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Create
       New, Duplicate Existing, Create From Approved Corporate Template. Each needs an operation, or needs
       removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than
       the contract side.'
     source: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 8 §Allow
-  - operation: null
-    why: '**Waiver Template Library & Master Setup declares no operation that writes anything** — its
-      only declared call is `listWaiverTemplateMaster`, a read. The name promises authoring and the contract
-      offers none, so either the write operations are missing or this screen is a view of something another
-      screen builds.'
-    source: contract — the screen's declared operations
   layout:
     template: form
     regions:
@@ -8080,7 +8050,7 @@ screens:
     form.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Information
+    why: '**The pack names 3 actions on this screen and the screen declares 2 operations.** Unserved: Information
       Box, Customer Details, Guardian Details. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 9 §Support configurable
@@ -8364,7 +8334,7 @@ screens:
   purpose: Define who is legally or operationally required to complete and sign the waiver.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Ticket
+    why: '**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: Ticket
       Holder, Rental Customer, Other Authorized Signatory, Customer + Authorized Representative. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
@@ -8853,7 +8823,7 @@ screens:
   purpose: Configure how the waiver appears across different brands, languages and customer channels.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional
+    why: '**The pack names 1 actions on this screen and the screen declares 2 operations.** Unserved: Additional
       languages as configured. Each needs an operation, or needs removing from the screen; this is the
       Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 19 §Support
@@ -8975,7 +8945,7 @@ screens:
     group, or activity.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Publish
+    why: '**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved: Publish
       Now, Schedule Publication, Publish to Selected Venues, Publish to Selected Products. Each needs
       an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
       screen side rather than the contract side.'
@@ -10366,16 +10336,11 @@ screens:
     the authorized tenant and venue scope.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved:
       Upload Assets, Browse Library, Create Collection. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
     source: pack Digital Asset Management DAM.pdf, page 3 §Quick Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 3 §Display
   - operation: searchMedia
     removed: true
     why: 'Removed 29 October 2026 (CHG-R11FXU-005): the approved screen has no list, table or chart that
@@ -10499,16 +10464,11 @@ screens:
   purpose: Provide the main workspace for browsing all digital assets available to the authorized user.
   gaps:
   - operation: null
-    why: '**The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 7 actions on this screen and the screen declares 2 operations.** Unserved:
       File Size, Ticket Media, Preview, View Details, Download, Add to Collection, Move. Each needs an
       operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
       side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 5 §Support
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 5 §Each card should show
   layout:
     template: split
     regions:
@@ -10669,7 +10629,7 @@ screens:
   purpose: Provide a controlled process for adding digital assets into TICVAI. before or after upload.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 3 operations.** Unserved:
       Browse Files, Bulk Upload, Import from Approved Source. Each needs an operation, or needs removing
       from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
@@ -10792,7 +10752,7 @@ screens:
   purpose: Allow users to organize assets without relying only on physical file-storage concepts.
   gaps:
   - operation: null
-    why: '**The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 12 actions on this screen and the screen declares 2 operations.** Unserved:
       Manual Collection, Dynamic Collection, Campaign Collection, Brand Collection, Event Collection,
       Create Folder, Create Collection, Move Assets …. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
@@ -10903,7 +10863,7 @@ screens:
   purpose: Create the structured metadata model that makes TICVAI's DAM searchable and scalable.
   gaps:
   - operation: null
-    why: '**The pack names 9 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 9 actions on this screen and the screen declares 2 operations.** Unserved:
       Asset Name, Asset Type, Venue, Campaign, Event, Attraction, Owner, Source …. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
@@ -11115,7 +11075,7 @@ screens:
     millions of records.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
       Asset Type, File Format, Venue, Collection, Owner. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
@@ -11226,12 +11186,7 @@ screens:
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show; Display) and no metric row
   purpose: Provide one authoritative record for every digital asset.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 13 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -11377,7 +11332,7 @@ screens:
   purpose: Allow enterprise users to efficiently manage large groups of digital assets.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved:
       Select Individual, Select Search Results, Select Collection. Each needs an operation, or needs removing
       from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
@@ -11468,17 +11423,12 @@ screens:
     the asset library.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
       Review Unclassified, Fix Metadata, Review Duplicate Candidates, Review Orphaned Assets, View Activity
       Log, Board 1 — Shared Configuration Requirements, Asset types, supported file formats. Each needs
       an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
       screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 16 §Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 16 §Display
   layout:
     template: split
     regions:
@@ -11644,16 +11594,11 @@ screens:
     duplicate detection, rendition generation, and asset-quality issues.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
       Review AI Results, Duplicate Review, Version Activity, Rendition Queue, Processing Failures. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 25 §Quick Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 25 §Display
   - operation: listAssets
     removed: true
     why: 'Removed 2 October 2026 (CHG-WIR-001): The screen is about media files in the DAM (assets.yaml);
@@ -11827,7 +11772,7 @@ screens:
   purpose: Automatically analyze uploaded assets and generate useful descriptive metadata.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 2 operations.** Unserved:
       Accept, Reject, Edit, Accept All Above Threshold. Each needs an operation, or needs removing from
       the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
       side.'
@@ -11943,12 +11888,7 @@ screens:
     row
   purpose: Allow users to search based on meaning rather than exact filenames or tags. Board 1 provided
     structured search.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 28 §Each result should show
+  gaps: []
   layout:
     template: split
     regions:
@@ -12167,7 +12107,7 @@ screens:
     content.
   gaps:
   - operation: null
-    why: '**The pack names 7 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 7 actions on this screen and the screen declares 3 operations.** Unserved:
       Exact Duplicate, Near Duplicate, Keep Both, Mark Related, Create Version Relationship, Replace Duplicate,
       Archive Duplicate. Each needs an operation, or needs removing from the screen; this is the Phase
       3 reconciliation seen from the screen side rather than the contract side.'
@@ -12629,7 +12569,7 @@ screens:
   purpose: Monitor media-processing jobs and ensure required formats are ready before content is distributed.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
       Retry, Cancel, View Error, Regenerate. Each needs an operation, or needs removing from the screen;
       this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 34 §Actions
@@ -12735,17 +12675,12 @@ screens:
     assets are reused or distributed.
   gaps:
   - operation: null
-    why: '**The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 12 actions on this screen and the screen declares 1 operation.** Unserved:
       Accept Recommendation, Reject, Review Asset, Generate Rendition, Resolve Issue, Board 2 — Shared
       Configuration Requirements, AI processing enabled/disabled, supported AI capabilities …. Each needs
       an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the
       screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 35 §Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 35 §Track
   layout:
     template: split
     regions:
@@ -12932,16 +12867,11 @@ screens:
     one overview of asset governance.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
       Approval Queue, Rights Review, Expiring Assets, External Shares, Governance Issues. Each needs an
       operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
       side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 43 §Quick Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 43 §Display
   layout:
     template: split
     regions:
@@ -13064,7 +12994,7 @@ screens:
     This should be separate from the person who simply uploaded the file.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
       Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 45 §Support
@@ -13164,7 +13094,7 @@ screens:
   purpose: Define exactly how an asset is legally and commercially allowed to be used.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved:
       Commercial use permitted, Non-commercial only. Each needs an operation, or needs removing from the
       screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 46 §Support
@@ -13256,7 +13186,7 @@ screens:
     use.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved:
       Approve, Reject, Request Changes, Delegate, Add Comment, Rejection. Each needs an operation, or
       needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather
       than the contract side.'
@@ -13594,7 +13524,7 @@ screens:
     copies.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
       Copy Secure Link, Extend, Change Permission, Revoke, View Activity. Each needs an operation, or
       needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather
       than the contract side.'
@@ -13703,16 +13633,11 @@ screens:
   purpose: Prevent expired assets from continuing to be used across TICVAI channels.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved:
       Renew Rights, Upload Renewal Document, Change Expiry, Find Replacement, Notify Owner, Expiry Workflow.
       Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
       from the screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 52 §Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 52 §Show
   layout:
     template: split
     regions:
@@ -13832,7 +13757,7 @@ screens:
   purpose: Provide complete traceability for asset governance.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
       Action. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 53 §Support
@@ -13909,12 +13834,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide a consolidated view of governance risks and use AI to help identify problems requiring
     human attention.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 54 §Display
+  gaps: []
   layout:
     template: split
     regions:
@@ -14068,16 +13988,11 @@ screens:
     external channels.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved:
       Distribution Map, Channel Management, Delivery Monitor, Replacement Center, API & Integration, Analytics.
       Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
       from the screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 62 §Quick Actions
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 62 §Display
   layout:
     template: split
     regions:
@@ -14232,12 +14147,7 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Show exactly where a digital asset is currently being used. This is one of the most important
     screens in the DAM.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 64 §Show
+  gaps: []
   layout:
     template: split
     regions:
@@ -14462,7 +14372,7 @@ screens:
   purpose: Provide optimized and controlled delivery of DAM assets without exposing private storage.
   gaps:
   - operation: null
-    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
       tokenized access, configurable expiry, cache policy, revocation where applicable. Each needs an
       operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen
       side rather than the contract side.'
@@ -14564,7 +14474,7 @@ screens:
     no longer suitable.
   gaps:
   - operation: null
-    why: '**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
       Replace Everywhere Eligible, Replace Selected Uses, Schedule Replacement, Keep Existing Version,
       Create Fallback. Each needs an operation, or needs removing from the screen; this is the Phase 3
       reconciliation seen from the screen side rather than the contract side.'
@@ -14667,7 +14577,7 @@ screens:
     delivery.
   gaps:
   - operation: null
-    why: '**The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 12 actions on this screen and the screen declares 1 operation.** Unserved:
       Usage-Level Fallback, Asset archived, rights expired, approval revoked, rendition unavailable, asset
       restricted, delivery failure, version unavailable …. Each needs an operation, or needs removing
       from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
@@ -14778,7 +14688,7 @@ screens:
     systems.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved:
       API credentials, service accounts. Each needs an operation, or needs removing from the screen; this
       is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Digital Asset Management DAM.pdf, page 69 §Support appropriate
@@ -14863,7 +14773,7 @@ screens:
   purpose: Monitor the technical health of DAM delivery and connected integrations.
   gaps:
   - operation: null
-    why: '**The pack names 11 actions on this screen and the screen declares 0 operations.** Unserved:
+    why: '**The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved:
       View Consumer, Assign Replacement, Retry, View Logs, Notify Owner, Alerting, high error rate, delivery
       latency …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
       seen from the screen side rather than the contract side.'
@@ -14975,12 +14885,7 @@ screens:
   patternReason: the pack gives this screen both a metric directory (§Performance Metrics) and a per-row
     directory (§Display; Identify) — counts over a population, then the population
   purpose: Show how digital assets are actually being consumed across TICVAI.
-  gaps:
-  - operation: null
-    why: '**This screen''s operations return no schema with described properties**, so not one of its
-      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
-      shape exists.'
-    source: pack Digital Asset Management DAM.pdf, page 71 §Display
+  gaps: []
   layout:
     template: dashboard
     regions:
