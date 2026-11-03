@@ -1593,6 +1593,10 @@ paths:
                 openShiftId:
                   type: string
                   format: uuid
+                  x-ticvai-persisted: false
+                  description: The open shift claimed. It names the workforce.open_shift row the claim updates (its
+                    `id`) and is not stored as a value of its own; the claim is recorded on that row (`status`
+                    `claimed`, `claimedBy`, `claimedAt`) and on its rota assignment (r14 gate, CHG-R14BO-002).
       responses:
         '200':
           headers:

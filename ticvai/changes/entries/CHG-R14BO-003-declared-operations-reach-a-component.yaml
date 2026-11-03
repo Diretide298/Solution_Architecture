@@ -1,0 +1,56 @@
+id: CHG-R14BO-003
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'Of check-screen-wiring''s 38 started-ticket findings, 10 are fixed in invisible screen metadata (no approved UI
+  changes): the controls that already show or send an operation are bound to it (ADM-243 and ADM-330''s rule fields and
+  BO-863, BO-1120 and BO-1149''s approval buttons to setApprovalMatrix, the last three as the VM close-out of 29 September
+  mapped them; ADM-329''s two headline counts to listApprovalMatrices; BO-1173''s Retry Failed Event to replayEvents, as
+  that close-out mapped it); ADM-342 no longer declares listMfaMethods, which answers only the caller''s own methods and
+  which nothing showed; WEB-033''s Pay names its order as the one checkoutCart returns, and KSK-007 takes orderId from
+  the screen that made the order. 28 that would change what an approved screen shows or does, or need a contract
+  decision, are brought to the lead.'
+decision:
+  what: 'The lead, 3 November 2026, on r14: "start on 1,2,3"; fix at the source, never acknowledge, baseline or exempt;
+    approved UI is fixed, so what needs a visible element or a product decision is brought back (the lead''s rule of 14
+    October, "the UI is fixed"), as CHG-R13BO-004 did.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: r14 lane gates of 3 November 2026 (lane d''s run 20261103-132023-2094), check-screen-wiring S-OP-UNREACHED
+  (R273) 33, S-WORKSTATION-OP (R100) 2, S-OFFLINE-QUEUED 1, S-INPUT-SOURCE (CR-142) 2, built on by started tickets
+  (#31185, #27950, #31239, #30664, #30848, #33989, #31898, #35288, #31358, #30872, #30860, #27923, #31164, #31211,
+  #30869); the VM close-out mappings are the screens'' own apisNote of 29 September.'
+keys_touched:
+  screens: [ADM-243, ADM-329, ADM-330, ADM-342, BO-863, BO-1120, BO-1149, BO-1173, WEB-033, KSK-007]
+  operations: [setApprovalMatrix, listApprovalMatrices, listMfaMethods, replayEvents, createPayment]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P05-guest-kiosk.yaml
+  - contracts/spine/identity.yaml
+root_class: a declared operation, or an id, that nothing on an approved screen reaches or names
+tickets:
+  started:
+  - '31185 (setApprovalMatrix), 27950 and 31239 (listApprovalMatrices), 31358 (replayEvents): no change; more screens
+    reach the operation, as before.'
+  - '30664 (listMfaMethods, Sanket Keluskar): no change; ADM-342 no longer calls it.'
+  - '31898 ([FE] WEB-012, Chinmay Patkar, In progress): no change to WEB-012; WEB-033 and KSK-007 now say where
+    createPayment''s orderId comes from.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r14 gate fix lane s (fix/r14-s), started-ticket findings, under the lead''s instruction of 3 November 2026'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Left for the lead (approved UI or a contract decision), each with its recommendation in the lane report:
+  setApprovalMatrix on ADM-331, ADM-333, ADM-334, ADM-335 and BO-639 (a Save button and nothing that collects a matrix);
+  createApprovalRequest on BO-718, BO-771, BO-922, BO-1010, BO-1031, BO-1080 (a Create approval request button and no
+  form), BO-243, BO-301, BO-1181 and ADM-567 (no element); enrolDevice on ADM-581; inquirePaymentStatus on ADM-595,
+  ADM-597 and ADM-615; simulatePriceBreakdownCalculation on BO-1049; replayEvents on BO-1179; lookupShopAndDrop on
+  BO-143; topUpWallet on BO-488; setSeoMetadata on BO-842; setKitchenSla on KIT-009; createPayment and
+  inquirePaymentStatus on PTR-012 (S-WORKSTATION-OP: the partner variant CHG-SCO-009 left to the lead); POS-012''s
+  offline state (S-OFFLINE-QUEUED, collectShopAndDrop). KSK-007''s orderId is carried in by the edges derive-carries
+  writes from KSK-006 and KSK-016.'

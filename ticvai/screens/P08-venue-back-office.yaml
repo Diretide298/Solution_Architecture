@@ -122485,12 +122485,21 @@ screens:
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require
       - kind: secondaryButton
         label: Manager approval
+        operation: setApprovalMatrix
+        notes: Routes resource changes to this approver group, as the VM close-out of 29 September mapped it
+          (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require
       - kind: secondaryButton
         label: Finance approval
+        operation: setApprovalMatrix
+        notes: Routes resource changes to this approver group, as the VM close-out of 29 September mapped it
+          (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require
       - kind: secondaryButton
         label: Operations approval
+        operation: setApprovalMatrix
+        notes: Routes resource changes to this approver group, as the VM close-out of 29 September mapped it
+          (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require
       - kind: secondaryButton
         label: Create
@@ -154805,15 +154814,31 @@ screens:
       components:
       - kind: primaryButton
         label: Post-spend review
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29 September
+          mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support
       - kind: secondaryButton
         label: Single approval
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29 September
+          mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support
       - kind: secondaryButton
         label: Multi-level approval
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29 September
+          mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support
       - kind: secondaryButton
         label: Exception approval
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29 September
+          mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support
   states:
     loading: The corporate budget policy configuration as saved.
@@ -158967,6 +158992,10 @@ screens:
       components:
       - kind: primaryButton
         label: Multi-level approval
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Requires multi-level approval of balance adjustments on the selected matrix, as the VM close-out
+          of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 81 §Support
   states:
     loading: The administrative balance adjustment configuration as saved.
@@ -162535,6 +162564,9 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions
       - kind: secondaryButton
         label: Retry Failed Event
+        operation: replayEvents
+        notes: Re-delivers the selected subscription's failed events, as the VM close-out of 29 September mapped
+          it (`replayEvents`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions
       - kind: secondaryButton
         label: Open Error Log
@@ -192153,6 +192185,10 @@ screens:
           by
       - kind: selectField
         label: Role
+        operation: setApprovalMatrix
+        bindsTo: ApprovalMatrix.rules
+        notes: The approver role of the selected matrix's rule (`ApprovalRule.approverRoleIds`), saved with
+          `setApprovalMatrix` on the matrix picked in the table above (r14 gate, CHG-R14BO-003).
         provenance: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Define
           by
       - kind: selectField
@@ -221690,9 +221726,15 @@ screens:
       components:
       - kind: metricTile
         label: Active Approval Matrices
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix.isActive
+        notes: The matrices in force (`isActive`), counted from `listApprovalMatrices` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards
       - kind: metricTile
         label: Approval Rules
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix.rules
+        notes: The rules across the matrices listed, counted from `listApprovalMatrices` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards
       - kind: metricTile
         label: Tenants Covered
@@ -221788,6 +221830,9 @@ screens:
       components:
       - kind: selectField
         label: Role
+        operation: setApprovalMatrix
+        bindsTo: ApprovalMatrix.rules
+        notes: The rule's `approverRoleIds`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
       - kind: selectField
         label: User
@@ -221806,12 +221851,18 @@ screens:
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
       - kind: selectField
         label: Transaction value
+        operation: setApprovalMatrix
+        bindsTo: ApprovalMatrix.rules
+        notes: The rule's `minAmount` and `maxAmount`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
       - kind: selectField
         label: Percentage
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
       - kind: selectField
         label: Risk level
+        operation: setApprovalMatrix
+        bindsTo: ApprovalMatrix.rules
+        notes: The rule's `riskScoreAbove`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
   states:
     loading: The approval authority configuration as saved.
@@ -222975,7 +223026,12 @@ screens:
 
 
     **Stale gaps removed 4 October 2026: the content is defined and getPasswordPolicy is bound, so setPasswordPolicy
-    saves what was read. The step-up table is bound to StepUpPolicy** (CHG-FXS-005)'
+    saves what was read. The step-up table is bound to StepUpPolicy** (CHG-FXS-005)
+
+
+    **listMfaMethods is not read here** (r14 gate, CHG-R14BO-003): it answers only the signed-in caller''s own
+    enrolled methods (x-ticvai-self-scoped: principal), so it could not say which methods approvers hold, and no
+    element showed it. Each person''s methods are on their own security screen (ADM-699, EMP-042).'
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -223107,11 +223163,6 @@ screens:
       drop (decided 28 September, audit R135); and the tenant's PIN settings, chosen from drop-downs (`pinLength`,
       `pinReusePrevention`, `pinLockoutAfterAttempts`; CHG-CRD-002)
     trigger: onAction
-  - operationId: listMfaMethods
-    contract: identity
-    purpose: Which methods approvers have enrolled, because a policy demanding a factor nobody holds locks
-      the action
-    trigger: onLoad
   - operationId: getGuestVerificationPolicy
     contract: identity
     purpose: The tenant's guest identity-verification workflow

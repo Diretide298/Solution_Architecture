@@ -2350,12 +2350,17 @@ paths:
                 includeVariants:
                   type: boolean
                   default: true
+                  x-ticvai-persisted: false
+                  description: Whether the source's variants are copied (under new ids). An instruction to this call,
+                    not stored on the clone (r14 gate, CHG-R14BO-002).
                 includePrices:
                   type: boolean
                   default: false
+                  x-ticvai-persisted: false
                   description: When true, every `catalogue.price` row of each copied source variant is copied to the
                     matching new variant, on the same price list (ADAM CR-545). True with `includeVariants` false is
-                    `400 validation` and nothing is written.
+                    `400 validation` and nothing is written. An instruction to this call, not stored on the clone
+                    (r14 gate, CHG-R14BO-002).
       responses:
         '201':
           headers:
@@ -20456,7 +20461,10 @@ paths:
               properties:
                 tests:
                   type: array
-                  description: The tests to run; all that apply to the connection type when omitted.
+                  x-ticvai-persisted: false
+                  description: The tests to run; all that apply to the connection type when omitted. Which tests to
+                    run, not stored as sent; each test's result is stored in the connection's `lastTests` (r14 gate,
+                    CHG-R14BO-002).
                   items:
                     type: string
                     enum:

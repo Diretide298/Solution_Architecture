@@ -5463,7 +5463,6 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
-        - "P08 ADM-342 Authentication & MFA Policy Manager"
         - "P09 ADM-699 My Account & Security"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords

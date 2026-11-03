@@ -1770,9 +1770,13 @@ paths:
                 supervisorStepUp:
                   allOf:
                     - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+                  x-ticvai-persisted: false
                   description: >
                     The supervisor accepting, signing on this device (CHG-RUL-019). Refused without it
                     (`403 supervisor-step-up-refused`). May not be the cashier whose shift it is.
+                    Verified, never stored: the PIN is not kept, and the supervisor it names is recorded as the
+                    accepting principal, the shift's `variance` approval row (`approvals`, orders.pos_shift_approval
+                    principal_id), as on approveShiftOpen (r14 gate, CHG-R14BO-002).
       responses:
         '200':
           headers:

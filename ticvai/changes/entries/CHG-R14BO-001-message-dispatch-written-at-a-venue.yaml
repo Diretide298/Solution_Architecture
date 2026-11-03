@@ -1,0 +1,44 @@
+id: CHG-R14BO-001
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'marketing.message_dispatch takes the grant-holder-write rule CHG-R11FXC-003 settled for a guest''s row with no
+  scope: any staff grant reads and writes it, and a guest reads and writes only its own. It was grant-holder-read (any
+  staff grant reads, only the tenant root writes), while ten operations that run at a venue write it
+  (sendBookingConfirmation, sendTransactionalMessage, sendOrderNotification, launchCampaign, retryMessageDispatch,
+  createPaymentLink, resendPaymentLink, notifyServer, notifyWaitlistParty, actOnWaiverRequirements). No column changes.'
+decision:
+  what: 'The lead, 3 November 2026, on r14: "start on 1,2,3"; fix the started-ticket findings at their source, never by
+    acknowledging, baselining or exempting (as at r13: "you get the rest sorted"). The rule applied is a settled one:
+    CHG-R11FXC-003 (the lead, 29 October 2026: grant-holder-write for a guest''s row with no scope that venue staff
+    write), as CHG-R13BO-001 applied it to marketing.guest_note and three more.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: r14 lane gates of 3 November 2026 (lane d''s refresh-safe run 20261103-132023-2094),
+  check-rls-scope-fit RF-TENANT-ROOT, 10 known findings now built on by started ticket #37169 ([DB]
+  marketing.message_dispatch, CR-379, Ready for QA); CR-076 and CHG-GEN-010.'
+keys_touched:
+  operations: [sendBookingConfirmation, sendTransactionalMessage, sendOrderNotification, launchCampaign,
+    retryMessageDispatch, createPaymentLink, resendPaymentLink, notifyServer, notifyWaitlistParty, actOnWaiverRequirements]
+  schemas: [MessageDispatch]
+  tables: [marketing.message_dispatch]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'a table''s row security written by one rule and judged by another: a guest''s row with no scope that venue
+  staff write, left at the tenant root for writes'
+tickets:
+  started:
+  - '37169 ([DB] marketing.message_dispatch, Hrushikant Patkar, Ready for QA): the table''s policy becomes
+    grant-holder-write (platform.apply_grant_holder_subject_rls) in the r14 forward migration, with its rollback; no
+    column change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r14 gate fix lane s (fix/r14-s), started-ticket findings, under the lead''s instruction of 3 November 2026'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'Database change: one policy re-applied, in the integration''s r14 forward migration (derive-ddl wrote it as
+  V0129 in this lane, deleted before commit). Judged on this tree: check-rls-scope-fit RF-TENANT-ROOT 10 gone, 0 new.'

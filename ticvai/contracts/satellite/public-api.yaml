@@ -1676,9 +1676,19 @@ paths:
               type: object
               required: [decision]
               properties:
-                decision: { type: string, enum: [certify, reject, revoke] }
+                decision:
+                  type: string
+                  enum: [certify, reject, revoke]
+                  x-ticvai-stored-as: control.integration_listing.status
+                  description: Stored as the listing's `status`, `certified`, `rejected` or `revoked` (r14 gate,
+                    CHG-R14BO-002).
                 certifiedUntil: { type: string, format: date, nullable: true }
-                notes: { type: string, nullable: true }
+                notes:
+                  type: string
+                  nullable: true
+                  x-ticvai-persisted: false
+                  description: Not stored (r14 gate, CHG-R14BO-002). The listing keeps the decision as its `status`
+                    and `certifiedUntil`; no column of control.integration_listing holds a reviewer's note.
       responses:
         '200':
           headers:
@@ -2262,7 +2272,12 @@ paths:
               type: object
               required: [decision]
               properties:
-                decision: { type: string, enum: [approve, reject] }
+                decision:
+                  type: string
+                  enum: [approve, reject]
+                  x-ticvai-stored-as: control.production_access_request.status
+                  description: Stored as the request's `status`, `approved` or `rejected`, with `decidedByPrincipalId`
+                    and `decidedAt` (r14 gate, CHG-R14BO-002).
                 reason: { type: string, nullable: true, maxLength: 1000 }
                 scopes:
                   type: array
