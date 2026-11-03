@@ -66,6 +66,10 @@ def main() -> int:
         for t in (nav.get("entryFrom") or []):
             if t in screens:
                 out[t].add(sid)
+        # a redirect is reached when the screen its route goes to is (CHG-R14J-030, the r13 system review F-14)
+        to = (s.get("implementation") or {}).get("redirect")
+        if to in screens:
+            out[to].add(sid)
     reachable = 0
     for code, ids in by_plat.items():
         entries = {i for i in ids if (screens[i].get("navigation") or {}).get("isEntryPoint")}

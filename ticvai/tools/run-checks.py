@@ -147,6 +147,10 @@ CHECKS = [
     # 13 October (Chinmay, r5, CHG-R6-059): the frontend is one GitLab repository per app; every screen platform and
     # frontend app has its entry in docs/active/frontend-repos.yaml, and ADAM setup's table names the same ones.
     "check-frontend-repos",
+    # 3 November (the r13 system review F-14 and F-11; the lead, "All four, one release"; CHG-R14J-030, CHG-R14J-031):
+    # a merged screen is an implementation.redirect to a built screen, with no component of its own; a frontend
+    # manifest says per platform what each platform declares (the kiosk is not the native guest app).
+    "check-screen-redirects", "check-frontend-manifests",
     # 14 October (Chinmay, r6, CHG-ADM-001 and CHG-ADM-002): developers and agents are always on the latest release
     # (nothing ADAM says asks them to choose one), and a settled CR reaches its ticket: a comment for the agent while
     # it is open, a child task when it is closed. Both read ../viewer, the way check-frontend-repos does.

@@ -1,0 +1,59 @@
+id: CHG-R14J-030
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'The nineteen back-office screens merged into another on 2 October ("One implementation, both ids kept ...
+  routes to X") carry implementation.redirect (the screen their route goes to) in place of a component path of their
+  own: BO-031, BO-110, BO-113, BO-135, BO-138, BO-365, BO-389, BO-390, BO-528, BO-669, BO-677, BO-728, BO-729, ADM-097,
+  ADM-242, ADM-249, ADM-252, ADM-611 and ADM-353. screens/_schema.yaml declares the field. tools/ticket_done.py
+  merged_into reads it first (the task hold and the bindings a merged screen hands its target), the frontend manifests
+  list a redirect with its target and no path, check-frontend.py accepts a route with no component on a redirect, and
+  derive-overview and check-screens count a redirect as reached when its target is, so BO-031 and BO-365 are no longer
+  the package''s two unreachable screens. New tools/check-screen-redirects.py (SR-MERGED, SR-TARGET, SR-COMPONENT).'
+decision:
+  what: 'r13 system review finding F-14 (screens merged away still ship as routes; BO-031 and BO-365 are the two
+    unreachable screens). The lead, 3 November 2026: "All four, one release" (the review fixes go into r14 together).
+    Marked as redirects rather than removed: their ids stay for traceability, as each merge decided (CHG-WIR-001,
+    CHG-WIR-008, CHG-WIR-021, CHG-SBO-021, CHG-MOV-002, CHG-CLN-003). Nothing a screen shows changes: no state, layout,
+    overlay or operation is touched, and each redirect''s target is the screen the merge named. The 27 screens merged
+    "as a section of" another already carry implementation.sectionOf (CHG-SPF-005) and are left as they are.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding F-14 (screens and flows); the review counted 18 zero-operation
+  screens, the package has 17 with no operations plus BO-135 and BO-669, whose bindings are their target''s
+  (merge_bindings; their apisNote already says "No operations of its own").'
+keys_touched:
+  screens: [BO-031, BO-110, BO-113, BO-135, BO-138, BO-365, BO-389, BO-390, BO-528, BO-669, BO-677, BO-728, BO-729,
+    ADM-097, ADM-242, ADM-249, ADM-252, ADM-611, ADM-353]
+  files:
+  - screens/P08-venue-back-office.yaml (implementation.redirect replaces implementation.component on the 19)
+  - screens/_schema.yaml (implementation.redirect)
+  - tools/ticket_done.py (merged_into: the field first, then the notes)
+  - tools/check-screen-value-sources.py, tools/check-flow-briefs.py (read ticket_done.merged_into)
+  - tools/derive-frontend.py (a redirect row carries redirect, no path)
+  - tools/derive-overview.py, tools/check-screens.py (a redirect is reached with its target)
+  - tools/check-frontend.py (a redirect has a route and no component)
+  - tools/check-screen-redirects.py (new; self-test)
+  - tools/run-checks.py
+  - changes/schema.yaml (id_blocks R14J)
+  other:
+  - 'derived on the next refresh: frontend/venue-management-web.yaml (19 rows: redirect in place of path), OVERVIEW.md
+    (screens reachable), the screens'' mirrors under repos/'
+root_class: a decision recorded only in a screen's prose, so the generators kept treating the screen as one to build
+tickets:
+  started: []
+  unstarted:
+  - 'none: no ticket links any of the 19 (adam-links, read 3 November 08:08 UTC); their work is on the targets''
+    tickets (ticket_done.screen_hold, unchanged in effect)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-redirects.py::SR-MERGED (--self-test)
+status: open
+notes: 'On the r13 tree check-screen-redirects fails SR-MERGED on exactly these 19; on the fixed tree it passes.
+  BO-135 and BO-669 keep their bindings (getKitchenRoutingRules, setKitchenRoutingRules; listAccreditationProgrammes,
+  getAccreditationValidity), which merge_bindings builds on BO-134 and BO-666; moving them onto the targets'' own apis is
+  a binding change on two screens and is not made here.'
