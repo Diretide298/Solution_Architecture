@@ -442,6 +442,18 @@ x-ticvai-jobs:
     for: 'Deletes from the guest-document store a pending object not attached within 24 hours of its issue (ADAM
       CR-521, Chinmay, 3 November 2026; CHG-CR521-001).'
     source: ['contracts/satellite/marketing-crm.yaml']
+  mfaCodeSender:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.mfaCodeIssued]
+    reads: []
+    writes: [marketing.message_dispatch]
+    for: 'Marketing''s MFA code sender (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001): on identity.mfaCodeIssued
+      it decrypts destination and code at send time and sends the 6-digit code by email through the tenant''s
+      configured email provider, in the person''s language, recording a transactional marketing.message_dispatch row
+      without the code; idempotent on challengeId, retried until expiresAt and never dead-lettered.'
+    source: ['events/identity-mfaCodeIssued.yaml']
   campaignScheduler:
     module: marketing-crm
     host: workers

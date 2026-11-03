@@ -74,6 +74,33 @@ info:
     sandbox or a production request is 409 `developer-not-verified`. This rule is stated once here; each operation
     that reaches a developer's rows applies it.
 
+    ## How public-api tells callers apart (ADAM CR-536, Chinmay, 3 November 2026; CHG-CR536-001)
+
+    **By the token a request carries, never by its permissions.**
+
+    1. **Caller kinds.** A request on the Control Plane operator token (its subject is a `control.platform_operator`,
+    ADR-0072) is **TICVAI staff**, unrestricted on `listDeveloperMembers`, `listIntegrationListings`,
+    `listProductionAccessRequests` and `requestProductionAccess`. A request on a **developer session** (2) is a
+    **partner caller** for the one developer account it names. A request on a tenant's own session is a partner caller
+    when its principal's verified email (3) belongs to an active `control.developer_member`, acting for that member's
+    account; otherwise it is **tenant staff** of that tenant.
+
+    2. **Developer session.** The developer portal signs in against `control.developer_member`, not a tenant: the
+    member's email, then a one-time code sent to it, the same way the prospect sign-up session works. It is issued only
+    to an active member and carries the member id and the developer account id, with no tenant and no permission. A
+    sign-in task of its own builds it; the operations here only read it.
+
+    3. **Partner portal.** `identity.principal.email` (`PrincipalVerifiedEmail`) is nullable, set only once verified,
+    and never taken from `username`. A partner signed in through the tenant's login acts for the developer account
+    whose active member has that email; with no match the caller has no developer account.
+
+    4. **On every partner request** the member row is read again: a member no longer active is `401`, and role
+    `readOnly` never writes (`403`).
+
+    5. **Per operation** each states who may call it and what each caller kind gets; each declares its reads and
+    writes and touches no other table. Until the sign-in task lands, the partner path is tested with a developer
+    session built in the test, and the TICVAI staff and tenant staff paths ship.
+
 servers:
   - url: https://api.ticvai.com/v1
 
@@ -363,11 +390,19 @@ paths:
       summary: Who is in a developer organisation
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; DEV-002: setDeveloperMembers wrote members nothing read).** The organisation's `control.developer_member` rows (DeveloperMember), owner first, then by email; removed members are left out.
+
+        **Who may call it** (ADAM CR-536, Chinmay, 3 November 2026; CHG-CR536-001; the caller kinds in this contract's description). TICVAI staff, any account; a partner caller only its own account (another account is `404`); tenant staff `403`. Partners may now call it as well as staff. A partner whose member row is no longer active is `401`.
+      x-ticvai-reads:
+      - table: control.developer_account
+        for: 'the account asked for (ADAM CR-536)'
+      - table: control.developer_member
+        for: 'its members, and the partner caller''s own member row, read again on every request (ADAM CR-536)'
       tags:
       - publicApi
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience:
       - staff
+      - partner
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false
@@ -390,6 +425,18 @@ paths:
                   $ref: '#/components/schemas/DeveloperMember'
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '401':
+          description: 'A partner caller whose `control.developer_member` row is no longer active (ADAM CR-536). Nothing is read or written.'
+          x-ticvai-problem-types: [unauthenticated]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: 'Tenant staff: only TICVAI staff and the account''s own partner callers read its members (ADAM CR-536).'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
@@ -1494,8 +1541,18 @@ paths:
         TICVAI staff get every developer's listings (DEV-008, the certification queue), and may narrow them with
         `status` and `developerId`. A partner caller's `developerId` other than its own answers an empty page.
 
+        **Who may call it** (ADAM CR-536, Chinmay, 3 November 2026; CHG-CR536-001; the caller kinds in this
+        contract's description). TICVAI staff: every listing, narrowed by `status` and `developerId`. A partner
+        caller: its own account's listings in every status (another `developerId` is an empty page). Tenant staff:
+        `403`, since no tenant screen calls it. A partner whose member row is no longer active is `401`.
+
         **Order.** Listings waiting for review first (`submitted`, then `inReview`), then by `name` ascending, then
         by `id`. Paged.
+      x-ticvai-reads:
+      - table: control.integration_listing
+        for: 'the listings (ADAM CR-536)'
+      - table: control.developer_member
+        for: 'the partner caller''s member row, read again on every request (ADAM CR-536)'
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -1527,6 +1584,18 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/IntegrationListing' }
+        '401':
+          description: 'A partner caller whose `control.developer_member` row is no longer active (ADAM CR-536). Nothing is read or written.'
+          x-ticvai-problem-types: [unauthenticated]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: 'Tenant staff: no tenant screen calls it (ADAM CR-536).'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -1982,6 +2051,25 @@ paths:
         contract's description); `listingId` must name a listing whose `developerId` is that same account, else 422
         `listing-not-owned` and nothing is written, so a developer cannot ride on another developer's
         certification. An account that is not `verified` is 409 `developer-not-verified`.
+
+        **Partners only** (ADAM CR-536, Chinmay, 3 November 2026; CHG-CR536-001; the caller kinds in this contract's
+        description): TICVAI staff and tenant staff are `403`, and so is a partner whose member role is `readOnly`; a
+        partner whose member row is no longer active is `401`. The client and the listing must be the partner's own
+        account's, and an account that is not verified is `409 developer-not-verified`, as above.
+      x-ticvai-reads:
+      - table: control.api_client
+        for: 'the sandbox client, which must be the partner''s own account''s (ADAM CR-536)'
+      - table: control.integration_listing
+        for: 'the certified listing, which must be the partner''s own account''s (ADAM CR-536)'
+      - table: control.developer_account
+        for: 'whether the account is verified (409 developer-not-verified; ADAM CR-536)'
+      - table: control.developer_member
+        for: 'the partner caller''s member row, read again on every request: active, and not readOnly (ADAM CR-536)'
+      - table: control.production_access_request
+        for: 'an open request for the same client (409 production-access-pending; ADAM CR-536)'
+      x-ticvai-writes:
+      - table: control.production_access_request
+        for: 'the request (ADAM CR-536)'
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [partner]
@@ -2046,6 +2134,18 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '401':
+          description: 'A partner caller whose `control.developer_member` row is no longer active (ADAM CR-536). Nothing is read or written.'
+          x-ticvai-problem-types: [unauthenticated]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: 'TICVAI staff and tenant staff: partners only; or a partner whose member role is `readOnly`, which never writes (ADAM CR-536). Nothing is written.'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -2071,9 +2171,19 @@ paths:
         Which caller is which: a partner caller is a developer member (the rule in this contract's description), a
         TICVAI platform operator is platform staff, and any other staff caller is the tenant's.
 
+        **Who may call it** (ADAM CR-536, Chinmay, 3 November 2026; CHG-CR536-001; the caller kinds in this
+        contract's description, told apart by the token, never by its permissions). TICVAI staff: every request. A
+        partner caller: its own account's. Tenant staff: only requests whose `allowedTenantIds` contain their tenant. A
+        partner whose member row is no longer active is `401`.
+
         **Order.** Pending first (by `status`), then newest first, by `requestedAt` descending, then by `id`.
 
         Where `requestedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
+      x-ticvai-reads:
+      - table: control.production_access_request
+        for: 'the requests (ADAM CR-536)'
+      - table: control.developer_member
+        for: 'the partner caller''s member row, read again on every request (ADAM CR-536)'
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -2100,6 +2210,12 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/ProductionAccessRequest' }
+        '401':
+          description: 'A partner caller whose `control.developer_member` row is no longer active (ADAM CR-536). Nothing is read or written.'
+          x-ticvai-problem-types: [unauthenticated]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

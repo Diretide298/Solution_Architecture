@@ -1964,3 +1964,71 @@ changes:
     tag: r13
     producer-tickets: ['30679']
     consumer-tickets: [none-linked]
+  # BC-710 to BC-714: r13 second CR round, lane w4 (ADAM CR-497, CR-509, CR-522, CR-525; decided 3 November 2026 and
+  # settled on the lead's "Close the CRs and respond to devs" and "get the NEw CRs in the r13" of the same day).
+  - id: BC-710
+    contract: approvals
+    operation: approveRoleAuthorityDelegation
+    reason: 'ADAM CR-497 (CHG-CR497-001): delegator, delegate and requiredRole are uuids (two principal ids and a role
+      id) and venue is the caller''s venue id, a uuid; requestKind is an ApprovalKind value. The row''s columns were
+      always uuids and an ApprovalKind list, so a value of any other form failed at the write; it is now 400 validation
+      naming the field, and the 200 answers the same formats from the row written. A request field given a format, and
+      a type that becomes an enum, cannot be additive.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-497 posted on #30847: "option A for ids, kinds, money and the response
+      ... requestKind must be an ApprovalKind value ... delegator, delegate and requiredRole must be uuids"), with the
+      lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13" of the same day'
+    tag: r13
+    producer-tickets: ['30847']
+    consumer-tickets: [none-linked]
+  - id: BC-711
+    contract: approvals
+    operation: approveMatrixMultiLevel
+    reason: 'ADAM CR-509 (CHG-CR509-001): requiredApproverRole is a role id (uuid) and venue the venue''s platform.scope
+      id (uuid); not a uuid is 400 validation naming the field. The rule''s required_approver_role_id and the matrix''s
+      scope were always uuids. A request field given a format cannot be additive.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-509 posted on #30846: "option A ... requiredApproverRole is a role id
+      (uuid) ... venue is the venue''s id (its platform.scope id)"), with the lead''s "Close the CRs and respond to devs"
+      and "get the NEw CRs in the r13" of the same day'
+    tag: r13
+    producer-tickets: ['30846']
+    consumer-tickets: [none-linked]
+  - id: BC-712
+    contract: identity
+    operation: enrolMfaMethod
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-522 (CHG-CR522-001): an emailOtp enrolment code goes by a new outbox event,
+      identity.mfaCodeIssued v1, written in the same transaction as the mfa_challenge row, which Marketing sends through
+      the tenant''s email provider. An emitted event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-522 posted on #30663: "a code the server sends goes by an outbox event like
+      the guest''s ... a new event, identity.mfaCodeIssued v1"), with the lead''s "Close the CRs and respond to devs" and
+      "get the NEw CRs in the r13" of the same day'
+    tag: r13
+    producer-tickets: ['30663']
+    consumer-tickets: [none-linked]
+  - id: BC-713
+    contract: identity
+    operation: createMfaChallenge
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-522 (CHG-CR522-001): a sign-in or step-up emailOtp code goes by identity.mfaCodeIssued v1, as
+      enrolMfaMethod''s does (BC-712). An emitted event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-522 posted on #30662: "enrolMfaMethod and createMfaChallenge write it to
+      the outbox for emailOtp"), with the lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13" of
+      the same day'
+    tag: r13
+    producer-tickets: ['30662']
+    consumer-tickets: [none-linked]
+  - id: BC-714
+    contract: tenancy
+    operation: setRolePermissions
+    change: "operation removed"
+    reason: 'ADAM CR-525 (CHG-CR525-001): setRolePermissions is built in the Identity module, beside createRole and
+      updateRole, so it moves from contracts/spine/tenancy.yaml to contracts/spine/identity.yaml. Its method, path,
+      body, answers and errors do not change on the wire (both are served by the cell under /api/v1), with the 400
+      validation the decision adds for an inheritsFromRoleId it refuses. The compat rule counts an operation leaving a
+      contract as removed.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-525 posted on #31183: "setRolePermissions is built in the Identity module,
+      beside createRole and updateRole. Its path, body, answers and errors do not change"), with the lead''s "Close the
+      CRs and respond to devs" and "get the NEw CRs in the r13" of the same day'
+    tag: r13
+    producer-tickets: ['31183']
+    consumer-tickets: ['27938', '28289']
