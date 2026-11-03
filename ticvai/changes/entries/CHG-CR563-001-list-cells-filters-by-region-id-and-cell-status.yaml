@@ -1,0 +1,38 @@
+id: CHG-CR563-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'listCells filters by regionId (a uuid, matched exactly against control.cell.region_id) instead of region, and
+  status takes CellStatus and matches control.cell.status exactly; anything else is 400 validation naming the
+  parameter, an unknown regionId is an empty page, and both together narrow by both (BC-750, BC-751).'
+decision:
+  what: 'Posted on #31366 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026: "option A. listCells filters by regionId, the same
+    way listCellClusters does ... (1) Replace the query parameter region with regionId (string, uuid, optional) ... A
+    uuid that matches no cell returns an empty page, not 404 ... (2) status is optional and takes the CellStatus values
+    ... Any other value is 400 validation naming status. (3) Everything else stays as you built it."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-563 (#31366 listCells): the region query parameter did not say which cell field it matched, while
+  listCellClusters filters by a uuid regionId; status was a free string.'
+keys_touched:
+  operations: [listCells]
+  schemas: [CellStatus]
+  files:
+  - contracts/satellite/subscription.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: 'a list filter that names no field it matches'
+tickets:
+  started:
+  - '31366 (listCells, On hold): build to the posted comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-563
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CELL-LIST-FILTERS
+status: open
+notes: 'Breaking by the compat rule (a removed parameter, a parameter typed anew): BC-750 and BC-751 in
+  docs/active/breaking-changes.yaml, tag r14. ADM-003 sends neither parameter, so no screen changes.'

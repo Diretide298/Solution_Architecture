@@ -1,0 +1,54 @@
+id: CHG-CR570-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'deprecateApiVersion records the deprecation and its reason and leaves the notice to the declared job
+  public-api#deprecationNotice: control.api_version gains deprecation_reason (ApiVersion.deprecationReason, returned) and
+  deprecation_notified_at (ApiVersionNotice, storage only, left null), and version is unique (exact). Unknown version 404,
+  not current 409, sunsetAt short of minimum_notice_months 422 notice-too-short, nothing changed on a refusal; it reads
+  and writes control.api_version alone (the carried override with control.api_client and marketing.message_dispatch is
+  removed).'
+decision:
+  what: 'Posted on #31297 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026: "deprecateApiVersion records the deprecation and
+    its reason, enforces the minimum notice, and leaves the notice waiting for its job ... (1) Migration on
+    control.api_version: add deprecation_reason text and deprecation_notified_at timestamptz (both nullable), and a
+    unique index on version. Before adding the index, check for duplicate version rows and stop the migration if any are
+    found ... (3) ... 422 notice-too-short ... (5) Notify nobody here ... (6) Remove marketing.message_dispatch ... (7)
+    Update the contract text to match: the 404 and 422 responses, the reason column, and ''the notice is sent by the
+    notice job''."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-570 (#31297 deprecateApiVersion): no record of which client calls which version, the linked message table
+  is a tenant guest dispatch, the reason had no column, no error enforced minimumNoticeMonths and no 404 was declared.'
+keys_touched:
+  operations: [deprecateApiVersion]
+  schemas: [ApiVersion, ApiVersionNotice]
+  tables: [control.api_version]
+  files:
+  - contracts/satellite/public-api.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'contract against storage: an input with no column and a side effect with no owner'
+tickets:
+  started:
+  - '31297 (deprecateApiVersion, On hold): build to the posted comment; marketing.message_dispatch is gone from the
+    operation''s tables.'
+  unstarted:
+  - 'New task JOB-PUBLIC-API-DEPRECATION-NOTICE (tools/build-service-docs.py makes it from the declared job
+    public-api#deprecationNotice): the notice job and the per-client, per-version, per-operation usage record it needs.'
+  - 'New [DB] child of MIG-CONTROL (#27647) for the migration owner: before api_version_version_uniq, count duplicate
+    version rows and stop the migration naming them; the two columns and the index come from the release''s forward
+    migration.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-570
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-API-VERSION-DEPRECATION
+status: open
+notes: 'Beyond the posted words: the notice job is declared in public-api''s x-ticvai-jobs (deprecationNotice, workers,
+  queue, reliesOn deprecateApiVersion; check-jobs J-HANDOFF holds "the notice job" to a declaration); the body''s reason
+  maps to the column (x-ticvai-column: deprecation_reason); version compares exactly. The generated forward migration
+  creates the unique index with no explicit duplicate count: on duplicates the index build itself fails and stops the
+  migration; the named count is the migration owner''s.'

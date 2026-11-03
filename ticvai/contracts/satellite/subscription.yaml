@@ -337,6 +337,15 @@ x-ticvai-jobs:
     reliesOn: [updateCellTier]
     for: 'Control Plane cell job runner: provisioning, migration and tier-change jobs.'
     source: ['contracts/satellite/subscription.yaml', 'states/cell-job.yaml:20', 'states/cell.yaml:18']
+  cellHealthWriter:
+    module: subscription
+    host: workers
+    trigger: {kind: timer}
+    reads: [control.cell]
+    writes: [control.cell]
+    for: 'The writer of control.cell.health (ADAM CR-562, CHG-CR562-001): stores each cell''s health reading in the
+      CellHealth shape, which getCell and getCellHealth answer; separate work on its own task.'
+    source: ['contracts/satellite/subscription.yaml']
   membershipAndOnboardingTimers:
     module: subscription
     host: workers
@@ -2755,7 +2764,15 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List a tenant's cells
-      description: One per region (ADR-0014), with placement, tier and health. **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
+      description: |-
+        One per region (ADR-0014), with placement, tier and health. **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
+
+        **A cell is the tenant's while the tenant still has a database there** (ADAM CR-564, Chinmay, 3 November 2026; CHG-CR564-001). It answers each `control.cell` that has at least one `control.cell_tenant` row for the tenant whose `status` is `provisioning`, `live`, `suspended` or `draining`; a dropped placement is history, kept only so migration records stay readable, and a cell whose only rows for the tenant are `dropped` is left out. Each cell appears once however many rows it has. While a tenant moves, the old cell (`draining`) and the new one (`provisioning`) are both listed; once the old database is dropped, only the new one is. The rule is kept in one place, the status filter of the query. A tenant with no such row, an unknown tenant included, gets 200 with an empty array: there is no 404, and `control.tenant` is not read. Each item is the `Cell` as it is.
+      x-ticvai-reads:
+      - table: control.cell_tenant
+        for: 'the tenant''s placements whose status is provisioning, live, suspended or draining (ADAM CR-564)'
+      - table: control.cell
+        for: 'the cells those placements name, each once (ADAM CR-564)'
       tags:
       - cell
       x-ticvai-permission: PLATFORM_CELL_VIEW
@@ -3570,10 +3587,13 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: Cell health and schema version
-      description: 'Includes the schema version register, so version skew across a tenant''s cells is
-        visible. Skew is expected; unexplained skew is a defect.
+      description: |-
+        Includes the schema version register, so version skew across a tenant's cells is visible. Skew is expected; unexplained skew is a defect.
 
-        '
+        **The last stored reading** (ADAM CR-562, Chinmay, 3 November 2026; CHG-CR562-001). It answers the reading stored in `control.cell.health`, the same value `getCell` returns as `CellDetail.health`; nothing is polled here. PLATFORM_CELL_VIEW is required (403 otherwise), and a `cellId` that is not a uuid is 400 `validation`. It reads `control.cell` by id on the replica and nothing else (not `control.cell_instance`): no row is 404 `not-found`. A row whose `health` is null is 404 `not-found` with the detail "This cell has no health reading yet." A stored value that lacks `isHealthy`, `schemaVersion` or `checkedAt` is treated as no reading (the same 404) and a warning is logged; a value is never filled in. Otherwise the stored value is returned as stored, mapped to `CellHealth`, with `cellId` the row's `id`; optional members absent from the stored value are left out of the answer. The screens that call it (ADM-003, ADM-013, ADM-014, ADM-029, ADM-033) show their existing unknown or no-data state on a 404. Until the writer of `control.cell.health` (`cellHealthWriter`) runs, every cell answers 404, which is correct.
+      x-ticvai-reads:
+      - table: control.cell
+        for: 'the cell by id, and its stored health reading (ADAM CR-562)'
       tags:
       - cell
       x-ticvai-permission: PLATFORM_CELL_VIEW
@@ -3587,6 +3607,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CellHealth'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          description: 'No cell with this id, or the cell has no usable health reading: `health` is null, or the stored
+            value lacks `isHealthy`, `schemaVersion` or `checkedAt` (detail "This cell has no health reading yet."; ADAM
+            CR-562). Nothing is filled in.'
+          x-ticvai-problem-types: [not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cells/{cellId}/jobs:
@@ -12133,7 +12166,9 @@ paths:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
       summary: The cells, with their health
       description: |-
-        **Added 4 October 2026 (CHG-FXC-011; ADM-003, the cross-tenant dashboard had only per-cell and per-tenant reads).** Every cell, in the shape `getCell` returns, ordered by name; `region` and `status` narrow it.
+        **Added 4 October 2026 (CHG-FXC-011; ADM-003, the cross-tenant dashboard had only per-cell and per-tenant reads).** Every cell, in the shape `getCell` returns, ordered by name, then by `id`; `regionId` and `status` narrow it.
+
+        **The filters** (ADAM CR-563, Chinmay, 3 November 2026; CHG-CR563-001), the same way `listCellClusters` filters. `regionId` (a uuid, optional) returns only the cells whose `control.cell.region_id` equals it exactly; a value that is not a uuid is 400 `validation` naming `regionId`, and a uuid that matches no cell is an empty page, not 404. `status` (optional) takes the `CellStatus` values and matches `control.cell.status` exactly; any other value is 400 `validation` naming `status`. Sent together they narrow by both. There is no `region` parameter. ADM-003 sends neither.
       tags:
       - cell
       x-ticvai-permission: PLATFORM_CELL_VIEW
@@ -12144,17 +12179,19 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-      - name: region
+      - name: regionId
         in: query
         required: false
+        description: 'Only the cells whose `control.cell.region_id` equals it (ADAM CR-563).'
         schema:
           type: string
+          format: uuid
       - name: status
         in: query
         required: false
+        description: 'Only the cells whose `control.cell.status` equals it (ADAM CR-563).'
         schema:
-          type: string
-
+          $ref: '#/components/schemas/CellStatus'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -12171,6 +12208,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CellDetail'
+        '400':
+          description: '`regionId` is not a uuid, or `status` is not a `CellStatus` value (`validation`, naming the
+            parameter; ADAM CR-563).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
@@ -19440,7 +19485,13 @@ components:
                 detail:
                   type: string
     CellHealth:
-      x-ticvai-persistence: none — polled, not stored
+      x-ticvai-persistence: none — a value stored whole in control.cell.health (jsonb), not a table of its own
+      description: >-
+        **A cell's last health reading, as stored** (ADAM CR-562, Chinmay, 3 November 2026; CHG-CR562-001). The reading
+        is kept in `control.cell.health`; `getCell` returns it as `CellDetail.health` (left out while the column is
+        null) and `getCellHealth` answers it, with `cellId` the cell row's `id`. A stored value missing `isHealthy`,
+        `schemaVersion` or `checkedAt` is no reading. The writer of `control.cell.health` (`cellHealthWriter`) is
+        separate work on its own task.
       type: object
       required:
       - cellId

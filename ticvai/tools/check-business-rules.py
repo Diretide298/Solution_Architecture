@@ -140,6 +140,12 @@ And one rule per decision:
                    CHG-CR488-001 to CHG-CR541-001): the cell tier change, the tenant request limits and their route,
                    plan versions, the module catalogue and listing, the licence position and the downgrade check, as
                    lane_w5_rules_r13 lists them.
+  BR-CELL-HEALTH-STORED, BR-CELL-LIST-FILTERS, BR-TENANT-CELLS-HELD, BR-DEVELOPER-ACCOUNT-CALLER,
+  BR-ANOMALY-DEFAULTS-CONFIG, BR-API-CLIENT-CALLER, BR-API-VERSION-DEPRECATION, BR-API-CLIENT-ID (r14 catch-up, lane c:
+                   ADAM CR-562 to CR-566, CR-569 to CR-571; CHG-CR562-001 to CHG-CR571-001): the cell health reading,
+                   the cell list's filters, a tenant's cells, the public-api caller kinds on three more operations, the
+                   platform-default anomaly rules, the deprecation record and the client id, as lane_c_rules_r14 lists
+                   them.
   BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
                    version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
                    ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
@@ -2887,6 +2893,7 @@ def main() -> int:
     lane_w5_rules_r13(need, op, ops)
     lane_w3_rules_r13(need, op)
     lane_w1_rules_r13(need, op)
+    lane_c_rules_r14(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2931,7 +2938,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_C_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -4757,6 +4764,160 @@ def lane_w1_rules_r13(need, op):
          and "What a clone copies:" in words(clp.get("description"))
          and "`nameLocalised` null" in words(clp.get("description")),
          "cloneProduct does not take createProduct's code rules, refuse with 400, or state what a clone copies (CR-545)")
+
+
+R14_C_RULES = ["BR-CELL-HEALTH-STORED", "BR-CELL-LIST-FILTERS", "BR-TENANT-CELLS-HELD", "BR-DEVELOPER-ACCOUNT-CALLER",
+               "BR-ANOMALY-DEFAULTS-CONFIG", "BR-API-CLIENT-CALLER", "BR-API-VERSION-DEPRECATION", "BR-API-CLIENT-ID"]
+
+
+def lane_c_rules_r14(need, op):
+    """r14 catch-up, lane c: Control Plane cells and the public API (ADAM CR-562, CR-563, CR-564, CR-565, CR-566, CR-569,
+    CR-570, CR-571; decided and posted by Chinmay on 3 November 2026 under "Dont hold r13. approve them and rever tto the
+    devs"). Each fails on r13 as released (dffd024e) and passes once the posted decision is in.
+
+      BR-CELL-HEALTH-STORED       (CR-562) CellHealth is the reading stored in control.cell.health, not "polled";
+                                  getCellHealth reads control.cell alone and answers 400, 403 and a 404 for a cell with
+                                  no usable reading; the writer of the column is a declared job.
+      BR-CELL-LIST-FILTERS        (CR-563) listCells filters by regionId (a uuid) and a CellStatus status, has no region
+                                  parameter, and answers 400 validation.
+      BR-TENANT-CELLS-HELD        (CR-564) listTenantCells counts a cell while a cell_tenant row is provisioning, live,
+                                  suspended or draining, reads control.cell_tenant and control.cell, and has no 404.
+      BR-DEVELOPER-ACCOUNT-CALLER (CR-565) getDeveloperAccount follows the caller kinds: not self-scoped to the principal,
+                                  reads control.developer_account and control.developer_member, answers 401 and 403.
+      BR-ANOMALY-DEFAULTS-CONFIG  (CR-566) platform-default anomaly rules are the configuration key
+                                  ApiAnomalyRules:PlatformDefaults, never a row: control.api_anomaly_rule.tenant_id is
+                                  NOT NULL in storage while the wire field stays nullable; the list merges the defaults;
+                                  the write refuses a default's id; the monitor's precedence is stated.
+      BR-API-CLIENT-CALLER        (CR-569) createApiClient and revokeApiCredential state each caller kind, read the
+                                  caller's control.developer_member row, and answer 401 and 403 (createApiClient 404).
+      BR-API-VERSION-DEPRECATION  (CR-570) deprecateApiVersion stores the reason, leaves the notice to the declared
+                                  notice job, answers 404 and 422 notice-too-short, touches control.api_version alone;
+                                  version is unique.
+      BR-API-CLIENT-ID            (CR-571) ApiClient.clientId is the server-made tvc_live_/tvc_test_ value, NOT NULL and
+                                  unique; a replayed createApiClient carries no secret; the production client takes the
+                                  sandbox client's name; issueApiToken finds the client by it.
+    """
+    def words(x):
+        return " ".join(str(x or "").split()).replace("**", "")
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def tabs(o_, key):
+        return {str((r or {}).get("table")) for r in o_.get(key) or [] if isinstance(r, dict)}
+
+    def resp(o_):
+        return set((o_.get("responses") or {}).keys())
+
+    def params(o_):
+        return {p.get("name"): p for p in o_.get("parameters") or [] if isinstance(p, dict) and "name" in p}
+
+    sub = load("contracts/satellite/subscription.yaml")
+    ssch = (sub.get("components") or {}).get("schemas") or {}
+    pa = load("contracts/satellite/public-api.yaml")
+    psch = (pa.get("components") or {}).get("schemas") or {}
+    pjobs = pa.get("x-ticvai-jobs") or {}
+
+    # BR-CELL-HEALTH-STORED (CR-562)
+    ch = ssch.get("CellHealth") or {}
+    need("BR-CELL-HEALTH-STORED", "polled" not in str(ch.get("x-ticvai-persistence"))
+         and "control.cell.health" in str(ch.get("x-ticvai-persistence")),
+         "CellHealth still says it is polled, not stored (CR-562)")
+    gch = op("getCellHealth")[3]
+    gd = words(gch.get("description"))
+    need("BR-CELL-HEALTH-STORED", tabs(gch, "x-ticvai-reads") == {"control.cell"} and {"400", "403", "404"} <= resp(gch),
+         "getCellHealth does not read control.cell alone, or does not answer 400, 403 and 404 (CR-562)")
+    need("BR-CELL-HEALTH-STORED", "This cell has no health reading yet." in gd
+         and "lacks `isHealthy`, `schemaVersion` or `checkedAt` is treated as no reading" in gd
+         and "a value is never filled in" in gd,
+         "getCellHealth does not answer a null or incomplete reading 404 without filling a value in (CR-562)")
+    need("BR-CELL-HEALTH-STORED", "control.cell" in ((sub.get("x-ticvai-jobs") or {}).get("cellHealthWriter") or {})
+         .get("writes", []), "nothing declared writes control.cell.health (CR-562)")
+
+    # BR-CELL-LIST-FILTERS (CR-563)
+    lc = op("listCells")[3]
+    lp = params(lc)
+    need("BR-CELL-LIST-FILTERS", "region" not in lp
+         and ((lp.get("regionId") or {}).get("schema") or {}).get("format") == "uuid"
+         and str(((lp.get("status") or {}).get("schema") or {}).get("$ref", "")).endswith("/CellStatus"),
+         "listCells does not filter by a uuid regionId and a CellStatus status (CR-563)")
+    need("BR-CELL-LIST-FILTERS", "validation" in ptypes(lc, "400")
+         and "a uuid that matches no cell is an empty page, not 404" in words(lc.get("description")),
+         "listCells does not answer 400 validation, or a regionId matching nothing with an empty page (CR-563)")
+
+    # BR-TENANT-CELLS-HELD (CR-564)
+    ltc = op("listTenantCells")[3]
+    ld = words(ltc.get("description"))
+    need("BR-TENANT-CELLS-HELD", "whose `status` is `provisioning`, `live`, `suspended` or `draining`" in ld
+         and "Each cell appears once" in ld and "there is no 404" in ld,
+         "listTenantCells does not say which cell_tenant rows make a cell the tenant's (CR-564)")
+    need("BR-TENANT-CELLS-HELD", tabs(ltc, "x-ticvai-reads") == {"control.cell_tenant", "control.cell"}
+         and "404" not in resp(ltc), "listTenantCells does not read control.cell_tenant and control.cell alone, "
+         "or declares a 404 (CR-564)")
+
+    # BR-DEVELOPER-ACCOUNT-CALLER (CR-565)
+    gda = op("getDeveloperAccount")[3]
+    need("BR-DEVELOPER-ACCOUNT-CALLER", gda.get("x-ticvai-self-scoped") is None
+         and tabs(gda, "x-ticvai-reads") == {"control.developer_account", "control.developer_member"}
+         and {"401", "403", "404"} <= resp(gda) and "unauthenticated" in ptypes(gda, "401"),
+         "getDeveloperAccount is still self-scoped to the principal, or does not declare its reads, 401 and 403 (CR-565)")
+    need("BR-DEVELOPER-ACCOUNT-CALLER", "never from a permission" in words(gda.get("description"))
+         and "so ids cannot be probed" in words(gda.get("description")),
+         "getDeveloperAccount does not say who may call it by the token (CR-565)")
+
+    # BR-ANOMALY-DEFAULTS-CONFIG (CR-566)
+    ar = psch.get("ApiAnomalyRule") or {}
+    tid = (ar.get("properties") or {}).get("tenantId") or {}
+    need("BR-ANOMALY-DEFAULTS-CONFIG", tid.get("nullable") is True and tid.get("x-ticvai-column-nullable") is False
+         and "ApiAnomalyRules:PlatformDefaults" in words(ar.get("description")),
+         "a platform-default anomaly rule is not configuration, or control.api_anomaly_rule.tenant_id may be null (CR-566)")
+    ref = json.loads((ROOT / "handoff/schema-reference.json").read_text(encoding="utf-8"))
+    tcol = [c for c in (ref.get("cols") or {}).get("control.api_anomaly_rule") or [] if c.get("column") == "tenant_id"]
+    need("BR-ANOMALY-DEFAULTS-CONFIG", bool(tcol) and tcol[0].get("required") == "yes",
+         "the schema reference does not hold control.api_anomaly_rule.tenant_id NOT NULL (CR-566)")
+    lar, sar = op("listApiAnomalyRules")[3], op("setApiAnomalyRule")[3]
+    need("BR-ANOMALY-DEFAULTS-CONFIG", "runs across both sources" in words(lar.get("description"))
+         and "a platform default's `id` is 409 `anomaly-rule-id-mismatch`" in words(sar.get("description"))
+         and "else the platform default" in words((pjobs.get("anomalyMonitor") or {}).get("for")),
+         "the anomaly list, write and monitor do not treat the configured defaults as CR-566 states")
+
+    # BR-API-CLIENT-CALLER (CR-569)
+    cac, rac = op("createApiClient")[3], op("revokeApiCredential")[3]
+    for oid, o_ in (("createApiClient", cac), ("revokeApiCredential", rac)):
+        need("BR-API-CLIENT-CALLER", "control.developer_member" in tabs(o_, "x-ticvai-reads")
+             and {"401", "403"} <= resp(o_) and "Who may call it" in words(o_.get("description")),
+             f"{oid} does not read the caller's member row, or answer 401 and 403 (CR-569)")
+    cd = words(cac.get("description"))
+    need("BR-API-CLIENT-CALLER", "404" in resp(cac) and "`allowedTenantIds` is set to the caller's tenant alone" in cd
+         and "`DEVELOPER_ADMIN` marks nothing here" in cd,
+         "createApiClient does not say what tenant staff may create, or answers no 404 (CR-569)")
+    need("BR-API-CLIENT-CALLER", "Tenant staff: 403, because no tenant screen calls it" in words(rac.get("description")),
+         "revokeApiCredential does not refuse tenant staff (CR-569)")
+
+    # BR-API-VERSION-DEPRECATION (CR-570)
+    dav = op("deprecateApiVersion")[3]
+    dd = words(dav.get("description"))
+    av = psch.get("ApiVersion") or {}
+    need("BR-API-VERSION-DEPRECATION", "notice-too-short" in ptypes(dav, "422") and "404" in resp(dav)
+         and tabs(dav, "x-ticvai-reads") == {"control.api_version"} and tabs(dav, "x-ticvai-writes") == {"control.api_version"},
+         "deprecateApiVersion does not answer 404 and 422 notice-too-short, or touches more than control.api_version (CR-570)")
+    need("BR-API-VERSION-DEPRECATION", "It notifies nobody" in dd and "deprecationReason" in (av.get("properties") or {})
+         and ["version"] in [list(x) for x in av.get("x-ticvai-unique-together") or []]
+         and "deprecationNotifiedAt" in ((psch.get("ApiVersionNotice") or {}).get("properties") or {})
+         and "deprecateApiVersion" in ((pjobs.get("deprecationNotice") or {}).get("reliesOn") or []),
+         "the deprecation is not recorded with its reason and left to the notice job, or version is not unique (CR-570)")
+
+    # BR-API-CLIENT-ID (CR-571)
+    cid = ((psch.get("ApiClient") or {}).get("properties") or {}).get("clientId") or {}
+    need("BR-API-CLIENT-ID", cid.get("pattern") == "^tvc_(live|test)_[a-z0-9]{32}$" and cid.get("x-ticvai-column-nullable") is False
+         and ["clientId"] in [list(x) for x in (psch.get("ApiClient") or {}).get("x-ticvai-unique-together") or []],
+         "ApiClient.clientId is not the server-made, NOT NULL, unique tvc_ value (CR-571)")
+    need("BR-API-CLIENT-ID", "with `clientSecret` removed" in cd and "no `clientSecret`" in cd,
+         "createApiClient's replay may still carry the secret (CR-571)")
+    need("BR-API-CLIENT-ID", "the sandbox client's name as it stands at the decision"
+         in words(op("decideProductionAccess")[3].get("description"))
+         and "found by its `clientId`" in words(op("issueApiToken")[3].get("description")),
+         "the production client's name, or issueApiToken's lookup by clientId, is not stated (CR-571)")
 
 
 if __name__ == "__main__":
