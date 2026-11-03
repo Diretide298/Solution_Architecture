@@ -1,0 +1,69 @@
+id: CHG-CR550-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'One cart pricing rule, written on getCart and used by getCart, addCartLine, updateCartLine, removeCartLine,
+  applyCartPromoCode and checkoutCart: the unit price from catalogue#variantPriceRecords on the cart''s channel mapped to
+  the catalogue channel (with the transport, pass, deposit and override exceptions), tax from the tax step of
+  Catalogue''s price calculation component, totals in the venue''s currency, discountTotal 0 until promotions
+  evaluation (#28136). A line with no price: addCartLine 409 notSellableOnChannel, getCart isAvailable false with null
+  unitPrice and lineTotal, checkoutCart 409 naming the line. applyCartPromoCode answers 422
+  promotion-evaluation-unavailable meanwhile. The six operations declare both reads in process.'
+decision:
+  what: 'ADAM CR-550, posted on #30684: "Decided (Chinmay, 3 November 2026): one pricing rule for the cart, used by
+    getCart, addCartLine, updateCartLine, removeCartLine, applyCartPromoCode and checkoutCart. Build now: (1) Line unit
+    price: catalogue#variantPriceRecords in process ... (2) Tax: for each line amount, call the tax step of Catalogue''s
+    one price calculation component ... (3) Totals ... discountTotal 0 and appliedPromotionIds empty until promotions
+    evaluation (#28136) is built ... (4) No price: addCartLine refuses 409 notSellableOnChannel ... (5) Storage ... (6)
+    applyCartPromoCode: ... answer 422 promotion-evaluation-unavailable ... (7) Declare catalogue#variantPriceRecords
+    and finance#taxCodeRecords (in process) on all six operations. #30684, #31127, #31128 and #31129 are unblocked."
+    The lead''s instruction, 3 November 2026: "Dont hold r13. approve them and rever tto the devs", and "start on
+    1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-550 (Pranay Shinde, #30684 getCart): getCart, addCartLine, applyCartPromoCode and checkoutCart re-price the
+  cart but declared no price, tax or promotion read that exists, so the cart had no pricing rule.'
+keys_touched:
+  operations:
+  - getCart
+  - addCartLine
+  - updateCartLine
+  - removeCartLine
+  - applyCartPromoCode
+  - checkoutCart
+  schemas:
+  - CartLine
+  - CartProblem
+  tables:
+  - orders.cart
+  - orders.cart_line
+  files:
+  - contracts/spine/orders.yaml
+  - tools/check-business-rules.py
+root_class: a computed answer with no rule naming its sources
+tickets:
+  started:
+  - '31893 and 31895 (WEB-010 Shopping Cart build and tests, Chinmay Patkar, Ready for QA): a cart line may now answer
+    unitPrice and lineTotal null with isAvailable false, left out of the totals, and applyCartPromoCode answers 422
+    promotion-evaluation-unavailable until promotions evaluation is built; show the line as unavailable and the promo
+    refusal as the existing promo error.'
+  - '31742 (WEB-022 Membership Plans build, Chitrangi Mestry, Ready for QA) and 31784 (GST-007 Select Date & Time build,
+    Chitrangi Mestry, In progress): a cart line''s unitPrice and lineTotal may be null with isAvailable false.'
+  unstarted:
+  - '30684 (getCart), 31127 (addCartLine), 31128 (applyCartPromoCode), 31129 (checkoutCart), all On hold, Pranay Shinde:
+    unblocked, built to the rule as posted.'
+  - '28141 (removeCartLine, updateCartLine, Pranay Shinde): re-price by the same rule and write the line and cart
+    totals.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-550
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CART-PRICING-RULE
+status: open
+notes: 'Beyond the posted words: checkoutCart''s refusal of a line with no price is 409 notSellableOnChannel naming the
+  line (the posted text says only "refuses such a line, as it refuses a line whose units are gone"); getCart''s and
+  applyCartPromoCode''s promotion reads stay declared, marked not asked until #28136 is built; checkoutCart''s 409 and
+  422 and applyCartPromoCode''s 422 now name their problem types. CartLine.unitPrice and lineTotal become nullable
+  (the columns already were).'

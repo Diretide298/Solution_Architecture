@@ -494,6 +494,26 @@ And one rule per decision:
                    rule; no Marketing read.
   BR-BULK-PRICE-SKIPS (CR-544) bulkChangePrices' selection, skip reasons, escalates, 403 and 400.
   BR-CLONE-PRODUCT-RULES (CR-545) cloneProduct's code and name constraints, 400, and its copy list.
+  r14 catch-up, lane a (ADAM CR-546 to CR-578, decided 3 November 2026; lane_a_rules_r14), cart, orders and payments:
+  BR-EXCHANGE-ENTITLEMENT-READ (CR-546) exchangeOrderLines and modifyOrder ask access#entitlementRecords in process,
+                   and the exchange states its checks in order (400, line-redeemed, outside-exchange-window,
+                   replacement-unavailable).
+  BR-CART-PRICING-RULE (CR-550) one cart pricing rule on getCart; the six cart operations declare
+                   variantPriceRecords and taxCodeRecords in process; a line with no price reads null and unavailable;
+                   applyCartPromoCode answers 422 promotion-evaluation-unavailable; the line and cart totals are written.
+  BR-CLAIM-CART-MERGE (CR-553) the guest's open cart survives a merge; the holds move by Catalogue's in-process
+                   transferInventoryHolds on catalogue.inventory_reservation, which claimCart declares on x-ticvai-calls.
+  BR-RESEND-CONSUMER-RULES (CR-554) order.ticketsResent carries subjectId; Access's consumer states skip, row, attempt
+                   and destination rules; wallet answers 400 until issueWalletPass's step exists; reprintCount is over the
+                   lines answered.
+  BR-ORDER-ACCESS-COOKIE (CR-575) checkoutCart sets ticvai_order_access; getOrder, inquirePaymentStatus and
+                   createPayment accept it (and the latter two the header token).
+  BR-TERMS-ACCEPTED (CR-576) checkoutCart takes an optional termsAccepted, refuses 422 terms-version-not-current, and
+                   the order stores terms_version and terms_accepted_at; order.created carries termsVersion; the
+                   Checkout buttons of WEB-010 and GST-041 call no checkoutCart.
+  BR-QUOTE-EXPIRED (CR-577) createPayment re-quotes a lapsed rate lock and answers 409 quote-expired with the quote.
+  BR-PAYMENT-LINK-LINES (CR-578) getPaymentLink answers orderNumber and PaymentLinkLine (displayName, visitStartsAt),
+                   and its expired and paid 410s carry them too.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2887,6 +2907,7 @@ def main() -> int:
     lane_w5_rules_r13(need, op, ops)
     lane_w3_rules_r13(need, op)
     lane_w1_rules_r13(need, op)
+    lane_a_rules_r14(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2931,7 +2952,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_A_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -4757,6 +4778,196 @@ def lane_w1_rules_r13(need, op):
          and "What a clone copies:" in words(clp.get("description"))
          and "`nameLocalised` null" in words(clp.get("description")),
          "cloneProduct does not take createProduct's code rules, refuse with 400, or state what a clone copies (CR-545)")
+
+
+R14_A_RULES = ["BR-EXCHANGE-ENTITLEMENT-READ", "BR-CART-PRICING-RULE", "BR-CLAIM-CART-MERGE", "BR-RESEND-CONSUMER-RULES",
+               "BR-ORDER-ACCESS-COOKIE", "BR-TERMS-ACCEPTED", "BR-QUOTE-EXPIRED", "BR-PAYMENT-LINK-LINES"]
+
+
+def lane_a_rules_r14(need, op):
+    """r14 catch-up, lane a (ADAM CR-546, CR-550, CR-553, CR-554, CR-575 to CR-578; decided by Chinmay on 3 November
+    2026, posted on their tickets as "Build now"; the lead: "start on 1,2,3"). Each rule but BR-EXCHANGE-ENTITLEMENT-READ
+    fails on r13 as released (dffd024e); that one holds what CHG-R13INT-013 had already put in the package."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    def tables(o_, key):
+        return {str(x.get("table") if isinstance(x, dict) else x) for x in o_.get(key) or []}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def param(o_, name, where=None):
+        return next((x for x in o_.get("parameters") or [] if isinstance(x, dict) and x.get("name") == name
+                     and (where is None or x.get("in") == where)), {})
+
+    def body(o_):
+        return ((((o_.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema")
+                or {})
+
+    def ok_schema(o_, code):
+        return ((((o_.get("responses") or {}).get(code) or {}).get("content") or {}).get("application/json") or {}) \
+            .get("schema") or {}
+
+    def screen(rel, sid):
+        return next((x for x in load(rel).get("screens") or [] if isinstance(x, dict) and x.get("id") == sid), {})
+
+    def comps(scr):
+        out = []
+        for r in ((scr.get("layout") or {}).get("regions") or []):
+            out += [c for c in (r or {}).get("components") or [] if isinstance(c, dict)]
+        return out
+
+    orders = schemas("contracts/spine/orders.yaml")
+
+    # BR-EXCHANGE-ENTITLEMENT-READ (CR-546)
+    for oid in ("exchangeOrderLines", "modifyOrder"):
+        need("BR-EXCHANGE-ENTITLEMENT-READ", ("access#entitlementRecords", "in-process") in vias(op(oid)[3])
+             and ("access#entitlementRecords", "service") not in vias(op(oid)[3]),
+             f"{oid} does not ask access#entitlementRecords in process (CR-546)")
+    xd = words(op("exchangeOrderLines")[3].get("description"))
+    order = [xd.find(s) for s in ("`400 validation`", "`409 line-redeemed`", "`409 outside-exchange-window`",
+                                  "`409 replacement-unavailable`")]
+    need("BR-EXCHANGE-ENTITLEMENT-READ", "The checks, in this order" in xd and -1 not in order and order == sorted(order),
+         "exchangeOrderLines does not state its checks in the decided order (CR-546)")
+
+    # BR-CART-PRICING-RULE (CR-550)
+    gcd = words(op("getCart")[3].get("description"))
+    for frag in ("**The cart pricing rule**", "translated to the catalogue channel by the same map the price simulation",
+                 "a pass seat is zero", "Only the selected rate is used", "never copied",
+                 "`discountTotal` 0 and `appliedPromotionIds` empty until promotions evaluation (#28136)",
+                 "`getCart` computes and answers without writing"):
+        need("BR-CART-PRICING-RULE", frag in gcd, f"getCart does not say {frag!r} (CR-550)")
+    for oid in ("getCart", "addCartLine", "updateCartLine", "removeCartLine", "applyCartPromoCode", "checkoutCart"):
+        v = vias(op(oid)[3])
+        need("BR-CART-PRICING-RULE", ("catalogue#variantPriceRecords", "in-process") in v
+             and ("finance#taxCodeRecords", "in-process") in v,
+             f"{oid} does not declare catalogue#variantPriceRecords and finance#taxCodeRecords in process (CR-550)")
+    for oid in ("updateCartLine", "removeCartLine"):
+        need("BR-CART-PRICING-RULE", {"orders.cart", "orders.cart_line"} <= tables(op(oid)[3], "x-ticvai-writes"),
+             f"{oid} does not declare the line and cart totals it writes (CR-550)")
+    clp = (orders.get("CartLine") or {}).get("properties") or {}
+    need("BR-CART-PRICING-RULE", all((clp.get(k) or {}).get("nullable") is True for k in ("unitPrice", "lineTotal")),
+         "CartLine.unitPrice and lineTotal are not nullable for a line with no price (CR-550)")
+    need("BR-CART-PRICING-RULE", "promotion-evaluation-unavailable" in ptypes(op("applyCartPromoCode")[3], "422"),
+         "applyCartPromoCode does not answer 422 promotion-evaluation-unavailable (CR-550)")
+    need("BR-CART-PRICING-RULE", "not-sellable-on-channel" in ptypes(op("checkoutCart")[3], "409"),
+         "checkoutCart does not refuse a line with no price (CR-550)")
+
+    # BR-CLAIM-CART-MERGE (CR-553)
+    tq = (load("contracts/spine/catalogue.yaml").get("x-ticvai-queries") or {}).get("transferInventoryHolds") or {}
+    tr = words(tq.get("rule"))
+    need("BR-CLAIM-CART-MERGE", tq.get("table") == "catalogue.inventory_reservation" and tq.get("served") == ["in-process"]
+         and "UPDATE catalogue.inventory_reservation SET holder_cart_id = toCartId WHERE holder_kind = 'cart' AND "
+             "holder_cart_id = fromCartId AND status = 'active' AND expires_at > now() RETURNING id" in tr
+         and "There is no HTTP route" in tr,
+         "catalogue has no in-process transferInventoryHolds moving a cart's active holds in one statement on "
+         "catalogue.inventory_reservation (CR-553)")
+    ccl = op("claimCart")[3]
+    ccd = words(ccl.get("description"))
+    need("BR-CLAIM-CART-MERGE", "catalogue#transferInventoryHolds" in (ccl.get("x-ticvai-calls") or []),
+         "claimCart does not declare catalogue#transferInventoryHolds on x-ticvai-calls (CR-553)")
+    for frag in ("**Open** means `active`, `expiring` or `expired`", "at the same venue and on the same channel",
+                 "dropped with reason `duplicate`", "The anonymous cart becomes `abandoned`",
+                 "**Until the Catalogue command is merged**"):
+        need("BR-CLAIM-CART-MERGE", frag in ccd, f"claimCart does not say {frag!r} (CR-553)")
+
+    # BR-RESEND-CONSUMER-RULES (CR-554)
+    ev = load("events/order-ticketsResent.yaml")
+    need("BR-RESEND-CONSUMER-RULES", "subjectId" in [str((f or {}).get("field")) for f in ev.get("payload") or []],
+         "order.ticketsResent does not carry subjectId (CR-554)")
+    pur = words(" ".join(str((c or {}).get("purpose") or "") for c in ev.get("consumers") or []))
+    for frag in ("cancelled, expired or surrendered is skipped with no row", "recipient_role purchaser",
+                 "attempt = 1 + the number of earlier rows for that entitlement on that channel",
+                 "the most recent earlier row for that entitlement and channel", "subjectContactRecords",
+                 "'no recipient on file'"):
+        need("BR-RESEND-CONSUMER-RULES", frag in pur, f"order.ticketsResent's Access consumer does not say {frag!r} "
+             "(CR-554)")
+    rpd = words(op("reprintOrder")[3].get("description"))
+    need("BR-RESEND-CONSUMER-RULES", "'wallet passes are not available yet'" in rpd
+         and "over the lines this call answers" in rpd and "Only `print` increments the counts" in rpd,
+         "reprintOrder does not state the interim wallet 400 or reprintCount over the lines answered (CR-554)")
+
+    # BR-ORDER-ACCESS-COOKIE (CR-575)
+    co = op("checkoutCart")[3]
+    sc = ((((co.get("responses") or {}).get("201") or {}).get("headers") or {}).get("Set-Cookie") or {})
+    need("BR-ORDER-ACCESS-COOKIE", "ticvai_order_access" in words(sc.get("description"))
+         and "HttpOnly" in words(sc.get("description")),
+         "checkoutCart's answer does not set the ticvai_order_access HttpOnly cookie (CR-575)")
+    for oid in ("getOrder", "inquirePaymentStatus", "createPayment"):
+        o_ = op(oid)[3]
+        need("BR-ORDER-ACCESS-COOKIE", bool(param(o_, "ticvai_order_access", "cookie"))
+             and bool(param(o_, "X-Order-Access-Token", "header")),
+             f"{oid} does not accept the order access token from the cookie and the header (CR-575)")
+    need("BR-ORDER-ACCESS-COOKIE", "needs no `X-Device-Id`" in words(op("getOrder")[3].get("description"))
+         and "If both are present, the header is used" in words(op("getOrder")[3].get("description")),
+         "getOrder does not state how a cookie token is checked (CR-575)")
+
+    # BR-TERMS-ACCEPTED (CR-576)
+    cb = body(co)
+    ta = (cb.get("properties") or {}).get("termsAccepted") or {}
+    need("BR-TERMS-ACCEPTED", bool(ta) and "termsAccepted" not in (cb.get("required") or [])
+         and ((ta.get("properties") or {}).get("version") or {}).get("maxLength") == 40
+         and ((ta.get("properties") or {}).get("kind") or {}).get("enum") == ["termsAndConditions"],
+         "checkoutCart does not take an optional termsAccepted {kind termsAndConditions, version max 40} (CR-576)")
+    need("BR-TERMS-ACCEPTED", "terms-version-not-current" in ptypes(co, "422")
+         and ("white-label#policyRecords", "service") in vias(co),
+         "checkoutCart does not refuse a terms version not in force, or read the policy (CR-576)")
+    op_ = (orders.get("Order") or {}).get("properties") or {}
+    need("BR-TERMS-ACCEPTED", (op_.get("termsVersion") or {}).get("maxLength") == 40
+         and (op_.get("termsVersion") or {}).get("readOnly") is True
+         and (op_.get("termsAcceptedAt") or {}).get("readOnly") is True,
+         "Order does not store termsVersion and termsAcceptedAt, read-only (CR-576)")
+    oc = load("events/order-created.yaml")
+    need("BR-TERMS-ACCEPTED", "termsVersion" in [str((f or {}).get("field")) for f in oc.get("payload") or []],
+         "order.created does not carry termsVersion (CR-576)")
+    for rel, sid in (("screens/P01-guest-web-storefront.yaml", "WEB-010"), ("screens/P02-guest-mobile-app.yaml",
+                                                                              "GST-041")):
+        btn = [c for c in comps(screen(rel, sid)) if c.get("kind") == "primaryButton" and c.get("label") == "Checkout"]
+        need("BR-TERMS-ACCEPTED", bool(btn) and all(c.get("operation") != "checkoutCart" for c in btn),
+             f"{sid}'s Checkout button still calls checkoutCart, so the T&Cs tick never reaches the order (CR-576)")
+
+    # BR-QUOTE-EXPIRED (CR-577)
+    cp = op("createPayment")[3]
+    pp = orders.get("PaymentProblem") or {}
+    ppp = {}
+    for part in pp.get("allOf") or []:
+        ppp.update((part or {}).get("properties") or {})
+    need("BR-QUOTE-EXPIRED", "quote-expired" in ptypes(cp, "409") and "quoteExpired" in ((ppp.get("refusedReason") or {})
+                                                                                       .get("enum") or [])
+         and {"chargeCurrency", "chargeTotal", "chargeFxRate", "chargeRateLockedUntil"}
+         <= set(((ppp.get("quote") or {}).get("properties") or {}))
+         and "orders.sales_order" in tables(cp, "x-ticvai-writes"),
+         "createPayment does not re-quote a lapsed rate lock and answer 409 quote-expired with the quote (CR-577)")
+    need("BR-QUOTE-EXPIRED", "a replay of the old key returns the same `409`" in words(cp.get("description")),
+         "createPayment does not say the confirmed attempt is a new key (CR-577)")
+
+    # BR-PAYMENT-LINK-LINES (CR-578)
+    gpl = op("getPaymentLink")[3]
+    g200 = ok_schema(gpl, "200").get("properties") or {}
+    pll = orders.get("PaymentLinkLine") or {}
+    pllp = {}
+    for part in pll.get("allOf") or []:
+        pllp.update((part or {}).get("properties") or {})
+    need("BR-PAYMENT-LINK-LINES", "orderNumber" in g200
+         and str(((g200.get("lines") or {}).get("items") or {}).get("$ref", "")).endswith("/PaymentLinkLine")
+         and {"displayName", "visitStartsAt"} <= set(pllp),
+         "getPaymentLink does not answer orderNumber and PaymentLinkLine lines (CR-578)")
+    plp = {}
+    for part in (orders.get("PaymentLinkProblem") or {}).get("allOf") or []:
+        plp.update((part or {}).get("properties") or {})
+    need("BR-PAYMENT-LINK-LINES", {"orderNumber", "venueName", "lines", "amount"} <= set(plp),
+         "PaymentLinkProblem does not carry orderNumber, venueName, lines and amount for the 410s (CR-578)")
+    need("BR-PAYMENT-LINK-LINES", {("catalogue#productRecords", "in-process"), ("catalogue#variantRecords", "in-process"),
+                                   ("catalogue#performanceRecords", "in-process")} <= vias(gpl),
+         "getPaymentLink does not declare its in-process catalogue reads (CR-578)")
 
 
 if __name__ == "__main__":

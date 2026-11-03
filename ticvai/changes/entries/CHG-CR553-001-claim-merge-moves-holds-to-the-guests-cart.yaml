@@ -1,0 +1,61 @@
+id: CHG-CR553-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'claimCart''s merge: the guest''s own active or expiring cart at the same venue and channel survives; the
+  anonymous cart''s lines move into it (ids kept), lines whose hold did not move or expired are dropped as expired and a
+  second line for the same table booking or resource hold as duplicate; the anonymous cart becomes abandoned with its
+  token rotated. The holds move by a new in-process Catalogue command, catalogue#transferInventoryHolds, one guarded
+  UPDATE on catalogue.inventory_reservation, declared on claimCart''s x-ticvai-calls. Until it is merged the found case
+  answers 409 cart-not-open.'
+decision:
+  what: 'ADAM CR-553, posted on #30681: "Decided (Chinmay, 3 November 2026): when a guest claims an anonymous cart and
+    already has an open cart, the guest''s cart survives and the anonymous cart''s holds move to it without being
+    released. Build now: (1) ... ''Open'' means active, expiring or expired ... (5) Holds move by a new Catalogue
+    command, catalogue#transferInventoryHolds(fromCartId, toCartId), in process, in claimCart''s transaction ... one
+    statement, UPDATE catalogue.inventory_hold SET holder_cart_id = toCartId WHERE holder_kind = ''cart'' AND
+    holder_cart_id = fromCartId AND status = ''active'' AND expires_at > now() RETURNING id ... (7) Until the Catalogue
+    command is merged, ship the case with nothing to merge (step 3), and answer the found case with 409 cart-not-open
+    naming no lines, writing nothing." Correction posted on #30681 the same day: "step 5''s table is
+    catalogue.inventory_reservation (r8''s V0103a renamed catalogue.inventory_hold); columns unchanged." The lead''s
+    instruction, 3 November 2026: "Dont hold r13. approve them and rever tto the devs", and "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-553 (Pranay Shinde, #30681 claimCart): the merge promised by claimCart had no way to move a line''s held
+  stock to the guest''s cart and did not say which cart survives.'
+keys_touched:
+  operations:
+  - claimCart
+  schemas:
+  - CartMergeResult
+  tables:
+  - orders.cart
+  - orders.cart_line
+  - catalogue.inventory_reservation
+  other:
+  - catalogue#transferInventoryHolds
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: a promised merge with no mechanism and no survivor rule
+tickets:
+  started:
+  - '30696 (WEB-016 Login / Register build, Chitrangi Mestry, Ready for QA): an expired anonymous cart can now be
+    claimed, and until Catalogue''s transferInventoryHolds is merged a claim that would merge answers 409 cart-not-open
+    naming no lines (the declared refusal); show it as the existing not-open message and keep the guest signed in.'
+  unstarted:
+  - '30681 (claimCart, On hold, Pranay Shinde): built as posted, the found case refused 409 until the command is in.'
+  - 'New task under #28135 (Catalogue holds): catalogue#transferInventoryHolds, the in-process command.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-553
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CLAIM-CART-MERGE
+status: open
+notes: 'The command is declared in catalogue.yaml''s x-ticvai-queries (served in-process, reads and writes
+  catalogue.inventory_reservation), on the posted correction''s table. Beyond the posted words: claimCart declares the
+  cart pricing rule''s two reads (catalogue#variantPriceRecords, finance#taxCodeRecords) because it prices the
+  surviving cart by that rule, and its writes to orders.cart and orders.cart_line.'

@@ -2720,7 +2720,11 @@ screens:
         label: Terms and conditions
         operation: checkoutCart
         notes: '**After the code the guest goes straight to the T&Cs tick and completes** (W1): no second
-          name, email or phone form. The profile is created by `checkoutCart` and completed later.'
+          name, email or phone form. The profile is created by `checkoutCart` and completed later. Pay sends
+          `termsAccepted` (`kind` termsAndConditions, `version` the one the Read the terms panel shows) on
+          `checkoutCart`; on `422 termsVersionNotCurrent` the app reloads `listPublishedPolicies`, clears the tick
+          and leaves Pay disabled until the guest ticks the current version: the consent block''s existing
+          behaviour (ADAM CR-576, CHG-CR576-001).'
         provenance: decided 29 September 2026, W1
       - kind: detailPanel
         label: Read the terms
@@ -2763,9 +2767,12 @@ screens:
       - kind: primaryButton
         label: Pay
         operation: createPayment
-        notes: 'One Pay: checks the cart out (`checkoutCart`, with the T&Cs tick and the opt-in), which
-          creates the order, and takes the payment (`createPayment`). The provider token comes from the
-          gateway, never a form.'
+        notes: 'One Pay: checks the cart out (`checkoutCart`, with the T&Cs tick as `termsAccepted` and the
+          opt-in), which creates the order, and takes the payment (`createPayment`). The provider token comes from
+          the gateway, never a form. **On `409 quoteExpired`** (ADAM CR-577, CHG-CR577-001) the You pay in line is
+          replaced with the answer''s `quote` in its existing format (charge amount, base amount, rate, held until)
+          and the guest is asked to confirm; Pay then sends `createPayment` again with a new `Idempotency-Key`, so
+          nothing is charged that the guest has not seen.'
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   states:
     loading: The review payment, read by `getCart`.
@@ -9215,8 +9222,9 @@ screens:
         provenance: contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}
       - kind: primaryButton
         label: Checkout
-        operation: checkoutCart
-        notes: Checks the cart out (`checkoutCart`) and moves on to Review & Payment.
+        notes: 'Moves on to Review & Payment without calling `checkoutCart`: the order is made at Pay on GST-009, so
+          the T&Cs tick reaches the call that creates the order (ADAM CR-576, CHG-CR576-001). The button looks and
+          reads the same.'
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   states:
     loading: Terminal or gateway state, shown plainly
@@ -9245,10 +9253,6 @@ screens:
       signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided
       2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).'
     trigger: onLoad
-  - operationId: checkoutCart
-    contract: orders
-    purpose: Turn the cart into an order
-    trigger: onAction
   - operationId: abandonCart
     contract: orders
     purpose: Give the inventory back

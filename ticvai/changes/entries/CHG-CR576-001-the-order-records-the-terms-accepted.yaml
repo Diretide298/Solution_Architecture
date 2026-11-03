@@ -1,0 +1,71 @@
+id: CHG-CR576-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'checkoutCart takes an optional termsAccepted {kind termsAndConditions, version max 40}; a version that is not
+  the termsAndConditions policy in force (white-label#policyRecords, the version listPublishedPolicies returns) is 422
+  termsVersionNotCurrent and keeps the cart; a matching one is stored on orders.sales_order (terms_version,
+  terms_accepted_at; Order.termsVersion and termsAcceptedAt, read-only) and carried on order.created; omitted, nothing
+  is recorded. The order''s termsAccepted chargeback evidence names the order and its terms_version. WEB-012 and GST-009
+  send the tick; the Checkout buttons of WEB-010 and GST-041 move on without calling checkoutCart.'
+decision:
+  what: 'ADAM CR-576, posted on #31898: "Decided (Chinmay, 3 November 2026): option A, with the field optional in the
+    contract. The order itself records which terms the guest accepted. Build now: (1) checkoutCart ... takes an optional
+    body field termsAccepted: {kind: ''termsAndConditions'', version: string, max 40} ... (2) Storage: two new nullable
+    columns on orders.sales_order, terms_version text (max 40) and terms_accepted_at timestamptz ... (3) order.created
+    carries termsVersion when it is set (optional). (4) The order''s assembled chargeback evidence item of kind
+    termsAccepted refers to the order and its terms_version. (5) WEB-012 and GST-009 ... (6) ... The Checkout buttons on
+    WEB-010 and GST-041 move on to the next step without calling checkoutCart ... The buttons look and read the same."
+    The lead''s instruction, 3 November 2026: "Dont hold r13. approve them and rever tto the devs", and "start on
+    1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-576 (Chinmay Patkar, #31898 WEB-012): WEB-012''s T&Cs tick records "the version the consent records", but
+  no operation took or stored the accepted terms version.'
+keys_touched:
+  operations:
+  - checkoutCart
+  schemas:
+  - Order
+  - CartProblem
+  - Chargeback
+  tables:
+  - orders.sales_order
+  screens:
+  - WEB-010
+  - WEB-012
+  - GST-009
+  - GST-041
+  other:
+  - order.created
+  files:
+  - contracts/spine/orders.yaml
+  - events/order-created.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - tools/check-business-rules.py
+root_class: a consent shown on screen that no operation records
+tickets:
+  started:
+  - '31893 and 31895 (WEB-010 Shopping Cart build and tests, Chinmay Patkar, Ready for QA): the Checkout button no
+    longer calls checkoutCart; it moves on to the guest details (or straight to payment), and the order is made at Pay
+    now on WEB-012. The button looks and reads the same.'
+  unstarted:
+  - '31898 (WEB-012 build, Chinmay Patkar, In progress): its own posted decision.'
+  - '31129 (checkoutCart, On hold, Pranay Shinde): the optional termsAccepted field, the 422 and the two order columns.'
+  - '28236 (GST-009) and 28238 (GST-041), Chitrangi Mestry, New: as posted.'
+  - 'New migration task for the migration owner under the orders migration: orders.sales_order terms_version text
+    (max 40) and terms_accepted_at timestamptz, both nullable.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-576
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TERMS-ACCEPTED
+status: open
+notes: 'Beyond the posted words: the refusal''s refusedReason is termsVersionNotCurrent and its problem type the
+  package''s kebab form terms-version-not-current; the policy in force is read through white-label#policyRecords on the
+  service route; GST-041 no longer lists checkoutCart among its operations (its one binding was the Checkout button),
+  while WEB-010 keeps it for the transfer journey''s transition (F55). Database change: two nullable columns on
+  orders.sales_order (tenant); the release''s forward migration is written by the integration pass.'

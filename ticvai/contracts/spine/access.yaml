@@ -310,7 +310,9 @@ x-ticvai-jobs:
     - access.credential_exception
     - access.credential_issuance
     - access.entitlement
-    for: Access credential issuance, delivery and binding pipeline.
+    for: 'Access credential issuance, delivery and binding pipeline. A pending credential_delivery row with no destination
+      (the order.ticketsResent consumer found no recipient) moves to failed with failure_reason ''no recipient on
+      file'' (ADAM CR-554, CHG-CR554-001).'
     source:
     - states/access-credential-binding.yaml:27
     - states/access-credential-delivery.yaml:29
@@ -457,7 +459,12 @@ x-ticvai-jobs:
     reads: [access.entitlement, access.credential_delivery]
     writes: [access.credential_delivery]
     for: 'This module''s consumer of order.ticketsResent (ADAM CR-506, CHG-CR506-001): one pending credential delivery per
-      entitlement, as deliverCredential writes it (sms is smsLink), idempotent on the event id plus the entitlement id.'
+      entitlement, as deliverCredential writes it (sms is smsLink), idempotent on the event id plus the entitlement id.
+      Its rules are settled on ADAM CR-554 (CHG-CR554-001) and stated on the event''s consumer: cancelled, expired and
+      surrendered entitlements skipped, recipient_role purchaser, attempt counted per entitlement and channel, and the
+      destination from the event, else the latest earlier row, else the order subject''s primary contact through
+      identity#subjectContactRecords; with none, the row is written pending with no destination and the dispatch job
+      fails it with ''no recipient on file''.'
     source: ['events/order-ticketsResent.yaml']
 paths:
   /access/validate:
