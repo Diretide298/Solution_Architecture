@@ -9765,6 +9765,7 @@ components:
           - appleAppStore
           - googlePlay
         accountHolderName:
+          x-ticvai-data-class: business
           type: string
           maxLength: 200
           description: The client's legal entity as the store knows it.
@@ -11274,9 +11275,11 @@ components:
         '
       properties:
         phone:
+          x-ticvai-data-class: business
           type: string
           nullable: true
         email:
+          x-ticvai-data-class: business
           type: string
           format: email
           nullable: true
@@ -11284,6 +11287,7 @@ components:
           type: string
           nullable: true
         address:
+          x-ticvai-data-class: business
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
           nullable: true

@@ -1,0 +1,100 @@
+id: CHG-R14M-001
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'A natural person''s identifier is kept in pii.*, never as a column of a module''s table: 52 columns on 24
+  tenant tables (holders'', participants'', recipients'', contacts'', employees'' and applicants'' names, emails,
+  phones, birth dates, nationality, ID numbers and IP addresses) are marked x-ticvai-pii {store, subject}; derive-schema
+  gives them no column, each row gains (or names) its pii.subject id, and derive-ddl retires the columns and writes
+  their copy into pii.* for the migration owner. Identity owns the write (recordSubjectDetails), the read
+  (subjectDetails) and a new pii.subject_network_identifier. Every contract field named as a person''s identifier
+  carries a data class (153: personal, or business for an organisation''s). 100 operations answering personal fields
+  declare x-ticvai-personal-data (91 gated: null without GUEST_VIEW_PII; 9 self). Erasure and export reach every module:
+  26 contracts gain a subjectDataPart job on identity.privacyRequestRaised, Marketing''s part covers all its tables and
+  erases, Identity records every owner''s part (submitSubjectDataPart, identity.subject_erasure_part) and its erasure
+  job empties every pii.* row and waits for every owner. ai.message gains the subject id, and eraseSubject reaches
+  conversations, messages, activity prompts and answers, feedback, recommendations and the memory metadata.'
+decision:
+  what: 'The lead, 3 November 2026, on the r13 system review (findings B-01 and C-11): personal data, "Move the
+    columns" into pii.* (in r14, with "All four, one release"). As the r14 brief puts it: the personal-data columns move
+    into pii.* keyed by subject, the contract fields are marked personal, responses that return them need the PII
+    permission, erasure and export reach every module, ai.conversation and the AI messages get a subject id erasure
+    can find.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding B-01 of the r13 system review (3 November 2026, read at the r13 tag a8e06314): personal data outside pii.*,
+  unmarked, served under non-PII permissions and not reached by erasure; ADR-0023''s invariant did not hold for module
+  tables. Finding C-11: a guest''s erasure left their AI prompts, answers and messages. ADR-0023, ADR-0047, ADR-0055 rule
+  4, ADR-0063 section 5, CR-141 (the guest profile''s data classes), CHG-R11FXC-005 (Marketing''s export part),
+  CHG-R8ERA-002 (eraseSubject).'
+keys_touched:
+  operations: [recordSubjectDetails, submitSubjectDataPart, eraseSubject, writeSubjectDataExportPart,
+    deleteGuestAccount, exportSubjectData, checkoutCart, and the 100 operations given x-ticvai-personal-data]
+  tables: [access.entitlement, accreditation.holder, approvals.accreditation_badge, assets.share,
+    catalogue.waitlist_entry, fnb.table_reservation, identity.principal, identity.session, inventory.supplier,
+    marketing.booking_consent_record, marketing.form_submission, marketing.guest_profile, marketing.invitation,
+    marketing.waiver_signature, marketing.suppression, orders.group_customer_organisation_contact,
+    orders.group_participant, orders.invitation, orders.order_line, orders.reservation_line, rental.agreement_signature,
+    rental.participant, seating.group_request, seating.hold_pool, workforce.employee, ai.message,
+    pii.consent_identifier, pii.subject_network_identifier, identity.subject_erasure_part]
+  schemas: [SubjectNetworkIdentifier, SubjectErasurePart, SubjectDetailsWrite, SubjectDetails, AiMessage,
+    ConsentCaptureIdentifier, Suppression, and the 27 persisted schemas whose fields are kept in pii.*]
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/README.md
+  - events/identity-privacyRequestRaised.yaml
+  - docs/adr/0023-pii-separation.md
+  - docs/architecture/data-model.md
+  - docs/architecture/ai-system-design.md
+  - tools/personal_data.py
+  - tools/check-personal-data.py
+  - tools/derive-schema.py
+  - tools/derive-ddl.py
+  - tools/derive-subject-data-register.py
+  - tools/check-contract-storage.py
+  - tools/check-stored-request-fields.py
+  - tools/run-checks.py
+  other: [the jobs of 26 contracts (x-ticvai-jobs.subjectDataPart), identity x-ticvai-jobs guestErasure and
+      subjectExport, identity x-ticvai-queries.subjectDetails]
+root_class: 'personal data with no machine-readable mark, so where it was kept, who could read it and what erasure and
+  export had to reach could not be derived; a register keyed on one column name (subject_id)'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r14 review lane m (fix/r14-m), r13 system review findings B-01 and C-11, under the lead''s instruction of
+  3 November 2026 ("Move the columns")'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-personal-data.py
+status: open
+notes: 'Generator rules beside the check: derive-schema (x-ticvai-pii fields get no column; `personal` and `dataClass`
+  in the schema reference), derive-ddl (the moved columns retired with their copy in migration-review.md, "personal data
+  moved"), derive-subject-data-register (keyed on any subject column, x-ticvai-pii and kept personal columns; `owners`
+  by contract). Not settled here, for the lead: the control database''s people (B-02, ADR-0043: no pii schema and no
+  PII permission there yet; fields marked, not moved, responses not gated) and the ledger''s tax-document buyer names
+  (tax-law retention). Beyond the brief''s words: staff principals and sessions get a pii.subject (kind employee) to hold
+  the verified email and session IP; a suppression keeps an address hash so it outlives the erasure; report
+  recipients and supplier contacts kept in jsonb are erased by their module.'

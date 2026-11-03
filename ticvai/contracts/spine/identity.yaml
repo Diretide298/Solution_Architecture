@@ -378,6 +378,29 @@ x-ticvai-queries:
       It is asked in process by the access host for listDeviceBindingSession's holder name, display_name and no
       other column (ADAM CR-302, option A, 29 October 2026; XDR-010; CHG-CR302-001).
     served: [in-process, service]
+  subjectDetails:
+    module: identity
+    table: pii.subject
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject ids asked for: the subject columns of the asker''s rows (`subjectId`, `holderSubjectId`, ...).'}
+      fields: {type: array, items: {type: string}, description: 'The x-ticvai-pii stores the asker answers with (`subject.displayName`, `contact.email`, `document.number`, `identifier.ipAddress`, ...); only those come back.'}
+      source: {type: object, additionalProperties: true, description: 'For `identifier.ipAddress`: the asker''s table and row ids (`sourceTable`, `sourceIds`) whose network identifiers are asked for.'}
+    returns:
+      type: array
+      description: 'One entry per subject found, with the asked fields; an erased subject (is_erased) answers its id, `erased: true` and no field.'
+      items: {$ref: '#/components/schemas/SubjectDetails'}
+    rule: >-
+      **The owner's read of the personal fields the modules keep in pii.*** (r13 system review B-01; the lead, 3 November
+      2026, "Move the columns"; ADR-0023 as amended 3 November 2026; CHG-R14M-001). A module whose contract marks a field
+      `x-ticvai-pii: {store, subject}` holds only the subject's id on its row; it answers the field by asking this, in
+      process within commerce through the C# query interface Identity implements, and from another deployable through
+      Identity's service route (serviceAuth; POST /queries/subject-details, the rule for every served service query,
+      ADAM CR-438). Identity answers the fields from pii.subject, pii.subject_contact (the primary contact of each kind,
+      `contact.point` the primary email or mobile), pii.subject_document (the number decrypted through KERNEL-FIELD-ENC,
+      ADR-0063 section 5) and pii.subject_network_identifier, as the caller's scope lets it see them. It decides nothing:
+      **whether the caller may see a personal field is the asking operation's rule** (`x-ticvai-personal-data`, or its
+      PII permission), and a field the asker will not answer is not asked for.
+    served: [in-process, service]
   subjectBiometricRecords:
     module: identity
     table: pii.subject_biometric
@@ -515,10 +538,21 @@ x-ticvai-jobs:
     module: identity
     host: workers
     trigger: {kind: timer, every: P1D}
-    reads: [identity.subject_data_export, pii.subject]
-    writes: [pii.subject, identity.subject_data_export]
-    reliesOn: [deleteGuestAccount, eraseSubject]
-    for: Identity's guest erasure job and its daily sweep.
+    reads: [identity.subject_data_export, identity.subject_erasure_part, pii.consent_identifier, pii.subject]
+    writes: [pii.subject, pii.consent_identifier, pii.subject_biometric, pii.subject_contact, pii.subject_document,
+      pii.subject_identity, pii.subject_network_identifier, identity.subject_data_export]
+    reliesOn: [deleteGuestAccount, eraseSubject, submitSubjectDataPart]
+    for: 'Identity''s guest erasure job and its daily sweep. **It empties the subject and waits for every owner**
+      (r13 system review B-01 and C-11; the lead, 3 November 2026, "Move the columns": erasure reaches every module;
+      ADR-0023 as amended 3 November 2026; CHG-R14M-001). With the tombstone (is_erased, erased_at, erasure_request_id)
+      it deletes the subject''s rows in pii.subject_contact, pii.subject_document, pii.subject_biometric,
+      pii.subject_identity, pii.subject_network_identifier and pii.consent_identifier (by its subject_id) and clears pii.subject''s name, birth date, nationality
+      and language, so every field a module keeps in pii.* (x-ticvai-pii) is gone at once and the modules'' rows keep
+      only the subject''s id. Then it waits: the erasure is done only when every contract in
+      handoff/subject-data-register.json `owners` has recorded its part (identity.subject_erasure_part, through
+      submitSubjectDataPart; Marketing''s through its own consumer) and ai.eraseSubject answered nothing left. The daily
+      sweep names, in its log and alert, every tombstoned subject with an owner that has not answered 72 hours after the
+      tombstone; partiallyFailed is not a synonym for completed (ADR-0023).'
     source:
     - contracts/satellite/ai.yaml
     - contracts/spine/identity.yaml
@@ -595,13 +629,19 @@ x-ticvai-jobs:
     module: identity
     host: workers
     trigger: {kind: queue}
-    reads: [identity.subject_data_export, identity.subject_data_export_part, identity.subject_holding, pii.subject]
+    reads: [identity.subject_data_export, identity.subject_data_export_part, identity.subject_holding, pii.subject,
+      identity.delegated_access, identity.guest_credential, identity.guest_identity_verification, identity.guest_session,
+      identity.guest_upload_ref, identity.mfa_challenge, identity.mfa_method, identity.mfa_recovery_code,
+      identity.otp_challenge, identity.principal, identity.refresh_token, identity.session, identity.subject_erasure_part,
+      pii.consent_identifier, pii.subject_biometric, pii.subject_contact, pii.subject_document, pii.subject_identity,
+      pii.subject_network_identifier]
     writes: [identity.subject_data_export]
-    reliesOn: [exportSubjectData, recordSubjectDataExportPart, writeSubjectDataExportPart]
+    reliesOn: [exportSubjectData, recordSubjectDataExportPart, writeSubjectDataExportPart, submitSubjectDataPart]
     for: 'Identity''s subject-data export job: assemble the parts, write the file, delete it after 7 days. **Its rules,
       on a ticket of its own** (ADAM CR-512, Chinmay, 3 November 2026; CHG-CR512-001). It starts on approval.granted
       for subjectDataExport, or at once for a row exportSubjectData wrote running. It waits for a part from every
-      module that writes one on identity.privacyRequestRaised (today Marketing alone); if a part is not recorded 72
+      contract in handoff/subject-data-register.json `owners` (each writes one from its job on identity.privacyRequestRaised
+      and records it through submitSubjectDataPart, Marketing through its event; r13 review B-01, CHG-R14M-001); if a part is not recorded 72
       hours after the start, it ends the row failed and names the missing owner in failureReason. It reads Identity''s
       own subject tables and identity.subject_holding as they stand. Layouts: json is one object keyed by table, each
       an array of rows; csv is a zip of one file per table with a header row; pdf is one section per table, each row
@@ -888,6 +928,212 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/subjects/details:
+    post:
+      operationId: recordSubjectDetails
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Keep a person's personal fields in pii.* for a module's row
+      description: '**The owner''s write of the personal fields the modules keep in pii.*** (r13 system review B-01;
+        the lead, 3 November 2026, "Move the columns"; ADR-0023 as amended 3 November 2026; CHG-R14M-001; ADR-0055 rule
+        4). A module whose contract marks a field `x-ticvai-pii: {store, subject}` never stores the field on its own row:
+        in the same request that writes its row, it calls this with the subject its row names (or none) and the fields,
+        in process within commerce through the C# interface Identity implements, and over Identity''s service route from
+        another deployable (serviceAuth, cell-internal over mTLS), with the `Idempotency-Key` it was called with.
+
+
+        **The subject.** With `subjectId`, the fields are written to that subject; an erased subject (`is_erased`)
+        answers `410 subject-erased` and nothing is written. Without one, a new `pii.subject` of the given `kind`
+        (guest, employee, contact or applicant: the subject property''s `x-ticvai-subject-kind`) is created with a new
+        UUIDv7, and its id is answered, for the module to store in the subject column it named. A field sent null
+        clears it; a field not sent is left as it is.
+
+
+        **Where each field goes** (tools/personal_data.py, the stores): `subject.*` on `pii.subject` (`displayName`,
+        `givenName`, `familyName`, `dateOfBirth`, `nationality`, `preferredLanguage`); `contact.email`,
+        `contact.phone`, `contact.mobile` and `contact.point` (an email where the value holds `@`, else a mobile) as the
+        subject''s primary `pii.subject_contact` of that kind, normalised and hashed as registerGuest does, unverified;
+        `document.number` as a `pii.subject_document` (kind from `documentKind`, `other` when not sent), encrypted
+        into `number_ciphertext` through KERNEL-FIELD-ENC (ADR-0063 section 5) with `number_last4`;
+        `identifier.ipAddress` as a `pii.subject_network_identifier` naming the module''s `sourceTable` and `sourceId`.
+        Writes no event: an event would copy the fields into the outbox (CHG-XDW-005''s rule).'
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: lastWriterWins
+      x-ticvai-writes:
+      - table: pii.subject
+        for: 'the subject, created when none is named, and its `subject.*` fields (CHG-R14M-001)'
+      - table: pii.subject_contact
+        for: 'the subject''s primary contact of each kind sent (CHG-R14M-001)'
+      - table: pii.subject_document
+        for: 'the document number, encrypted (CHG-R14M-001)'
+      - table: pii.subject_network_identifier
+        for: 'the IP address a module''s row was made from (CHG-R14M-001)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectDetailsWrite'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Written; the subject the fields are kept for.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [subjectId]
+                properties:
+                  subjectId:
+                    type: string
+                    format: uuid
+                    description: The subject named, or the one created; the module stores it in its subject column.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '410':
+          description: The subject named is erased (`subject-erased`); nothing is written.
+          x-ticvai-problem-types:
+          - subject-erased
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/subject-data-parts:
+    post:
+      operationId: submitSubjectDataPart
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Record a module's part of a guest's export or erasure
+      description: '**Every module''s answer to a privacy request** (r13 system review B-01 and C-11; the lead, 3
+        November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). Each contract that
+        holds a subject''s data (`handoff/subject-data-register.json` `owners`) consumes `identity.privacyRequestRaised`
+        in a job of its own (`subjectDataPart`), and calls this over Identity''s service route (serviceAuth), or in
+        process within commerce, when its part is done. The calling module is the part''s `owner`, from its service
+        identity, never sent. Marketing keeps its event (`marketing.subjectDataPartWritten`, recorded by
+        `recordSubjectDataExportPart`, CHG-R11FXC-005).
+
+
+        **For `requestType` access**: `fileRef` names the object the module wrote to the tenant''s private storage
+        (every row of the subject in its tables, in the export''s format); recorded as a `SubjectDataExportPart` of the
+        export, as Marketing''s is, and the export job (`subjectExport`) assembles the file once every owner has one.
+        **For `deletion`**: no file; `rowsErased` counts the rows whose personal fields the module erased (the fields
+        it keeps outside pii.*, by its contracts'' marks); recorded as a `SubjectErasurePart`, and the erasure job
+        (`guestErasure`) holds the erasure done only when every owner has one. A module with nothing for the subject
+        still answers, with 0, so neither job waits for a part that will not come.
+
+
+        **Idempotent on the request and the owner**: a repeat finds the part recorded and returns it.'
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-writes:
+      - table: identity.subject_data_export_part
+        for: 'an owner''s part of an export, requestType access (CHG-R14M-001)'
+      - table: identity.subject_erasure_part
+        for: 'an owner''s erasure, requestType deletion (CHG-R14M-001)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              x-ticvai-persistence: none — request only; recorded as identity.subject_data_export_part or identity.subject_erasure_part
+              required:
+              - approvalRequestId
+              - subjectId
+              - requestType
+              - rowCount
+              properties:
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: The request the part answers (`identity.privacyRequestRaised` `approvalRequestId`).
+                subjectId:
+                  type: string
+                  format: uuid
+                  description: The guest the request is about.
+                requestType:
+                  type: string
+                  enum: [access, deletion]
+                  x-ticvai-persisted: false
+                  description: Which part this is; chooses the table it is recorded in.
+                fileRef:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: The part's object key, for access; null for deletion. Server only.
+                tables:
+                  type: array
+                  items: {type: string}
+                  description: The module's tables the part covers.
+                rowCount:
+                  type: integer
+                  minimum: 0
+                  description: Rows exported (access) or rows erased (deletion).
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The part, recorded now or already recorded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [approvalRequestId, owner, recordedAt]
+                properties:
+                  approvalRequestId:
+                    type: string
+                    format: uuid
+                  owner:
+                    type: string
+                    description: The module the part is recorded for.
+                  recordedAt:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /internal/guest-sessions/end-for-device:
@@ -6180,6 +6426,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
   /auth/sessions:
     get:
+      x-ticvai-personal-data: gated
       operationId: listActiveSessions
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
@@ -6314,6 +6561,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sessions/mine:
     get:
+      x-ticvai-personal-data: gated
       operationId: listOwnSessions
       x-ticvai-consumed-by:
         - "P09 ADM-699 My Account & Security"
@@ -6366,6 +6614,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: endOwnSession
       x-ticvai-consumed-by:
         - "P09 ADM-699 My Account & Security"
@@ -9196,6 +9445,7 @@ components:
             `marketing.device_consent.scope_path`; Identity may not read that table across deployables and so takes it
             from the caller, refusing a path outside the caller''s scope.'
         ipAddress:
+          x-ticvai-data-class: personal
           type: string
           maxLength: 45
           nullable: true
@@ -9261,6 +9511,7 @@ components:
       - email
       properties:
         email:
+          x-ticvai-data-class: personal
           type: string
           format: email
           maxLength: 256
@@ -9715,6 +9966,7 @@ components:
           - other
           description: The vocabulary of `pii.subject_document.kind`.
         documentNumber:
+          x-ticvai-data-class: personal
           type: string
           format: password
           writeOnly: true
@@ -12421,6 +12673,148 @@ components:
         linkedAt:
           type: string
           format: date-time
+    SubjectNetworkIdentifier:
+      type: object
+      x-ticvai-persistence: pii.subject_network_identifier
+      x-ticvai-index: [[sourceTable, sourceId]]
+      description: '**The IP address a person''s row was made from, kept apart from the row** (r13 system review B-01;
+        the lead, 3 November 2026, "Move the columns"; ADR-0023 as amended 3 November 2026; CHG-R14M-001). A form
+        submission, a waiver signature, a rental agreement signature or a staff session no longer holds its IP address:
+        `recordSubjectDetails` writes it here against the subject and the module''s row, `subjectDetails` reads it back,
+        and erasure deletes it with the subject''s other pii.* rows. Storage only, never returned by itself.'
+      required: [id, subjectId, sourceTable, sourceId, ipAddress, capturedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+          description: The person whose address it is.
+        sourceTable:
+          type: string
+          maxLength: 63
+          description: The module's table the row is in (`marketing.form_submission`, `rental.agreement_signature`, ...).
+        sourceId:
+          type: string
+          format: uuid
+          description: The id of that row.
+        ipAddress:
+          x-ticvai-data-class: personal
+          type: string
+          maxLength: 45
+          description: IPv4 or IPv6, as the request carried it.
+        capturedAt:
+          type: string
+          format: date-time
+    SubjectErasurePart:
+      type: object
+      x-ticvai-persistence: identity.subject_erasure_part
+      x-ticvai-unique-together:
+      - [requestId, owner]
+      description: '**One module''s answer to a guest''s erasure** (r13 system review B-01 and C-11; the lead, 3 November
+        2026, "Move the columns": erasure reaches every module; CHG-R14M-001). Recorded by `submitSubjectDataPart` for
+        `requestType` deletion. The erasure job (`guestErasure`) holds an erasure done only when every owner in
+        `handoff/subject-data-register.json` has a row here and `ai.eraseSubject` answered nothing left; until then the
+        tombstone on pii.subject is the record that it is owed.'
+      required: [requestId, subjectId, owner, rowsErased, erasedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        requestId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: 'The erasure request (`pii.subject.erasure_request_id`, the event''s `approvalRequestId`): the
+            approvals.request id, or the request''s own id where no approval route matched, so it is no key of either.'
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+        owner:
+          type: string
+          maxLength: 40
+          description: The module (contract) that answered, from its service identity.
+        rowsErased:
+          type: integer
+          minimum: 0
+        erasedAt:
+          type: string
+          format: date-time
+    SubjectDetailsWrite:
+      type: object
+      x-ticvai-persistence: none — request only; lands on pii.subject, pii.subject_contact, pii.subject_document and pii.subject_network_identifier
+      description: The personal fields a module keeps in pii.* for one of its rows (`recordSubjectDetails`, CHG-R14M-001).
+      required: [kind]
+      properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The subject the module's row already names; absent or null to create one.
+        kind:
+          type: string
+          enum: [guest, employee, contact, applicant]
+          description: The kind of a subject created here (the subject property's `x-ticvai-subject-kind`).
+        displayName: {type: string, maxLength: 200, nullable: true, x-ticvai-data-class: personal}
+        givenName: {type: string, maxLength: 100, nullable: true, x-ticvai-data-class: personal}
+        familyName: {type: string, maxLength: 100, nullable: true, x-ticvai-data-class: personal}
+        dateOfBirth: {type: string, format: date, nullable: true, x-ticvai-data-class: personal}
+        nationality: {type: string, minLength: 2, maxLength: 2, nullable: true, x-ticvai-data-class: personal}
+        preferredLanguage: {type: string, minLength: 2, maxLength: 2, nullable: true, x-ticvai-data-class: personal}
+        contacts:
+          type: array
+          description: The contacts to keep, one per kind; each becomes the primary of its kind.
+          items:
+            type: object
+            required: [kind, value]
+            properties:
+              kind: {type: string, enum: [email, phone, mobile, point]}
+              value: {type: string, maxLength: 320, x-ticvai-data-class: personal}
+        document:
+          type: object
+          nullable: true
+          properties:
+            documentKind: {type: string, maxLength: 30}
+            number: {type: string, maxLength: 64, x-ticvai-data-class: personal}
+        networkIdentifier:
+          type: object
+          nullable: true
+          required: [ipAddress, sourceTable, sourceId]
+          properties:
+            ipAddress: {type: string, maxLength: 45, x-ticvai-data-class: personal}
+            sourceTable: {type: string, maxLength: 63}
+            sourceId: {type: string, format: uuid}
+    SubjectDetails:
+      type: object
+      x-ticvai-persistence: none — projection over pii.subject, pii.subject_contact, pii.subject_document and pii.subject_network_identifier
+      description: One subject's personal fields, as `subjectDetails` answers them (CHG-R14M-001).
+      required: [subjectId, erased]
+      properties:
+        subjectId: {type: string, format: uuid}
+        erased: {type: boolean}
+        displayName: {type: string, nullable: true, x-ticvai-data-class: personal}
+        givenName: {type: string, nullable: true, x-ticvai-data-class: personal}
+        familyName: {type: string, nullable: true, x-ticvai-data-class: personal}
+        dateOfBirth: {type: string, format: date, nullable: true, x-ticvai-data-class: personal}
+        nationality: {type: string, nullable: true, x-ticvai-data-class: personal}
+        preferredLanguage: {type: string, nullable: true, x-ticvai-data-class: personal}
+        email: {type: string, nullable: true, x-ticvai-data-class: personal}
+        phone: {type: string, nullable: true, x-ticvai-data-class: personal}
+        mobile: {type: string, nullable: true, x-ticvai-data-class: personal}
+        documentNumber: {type: string, nullable: true, x-ticvai-data-class: personal}
+        networkIdentifiers:
+          type: array
+          items:
+            type: object
+            properties:
+              sourceTable: {type: string}
+              sourceId: {type: string, format: uuid}
+              ipAddress: {type: string, x-ticvai-data-class: personal}
     PrincipalExternalIdentity:
       type: object
       x-ticvai-persistence: identity.principal_external_identity
@@ -12740,6 +13134,12 @@ components:
       - startedAt
       - lastSeenAt
       properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: employee
+          description: '**The signed-in person (their principal''s subject), as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `ipAddress` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind employee; null while none is given.'
         status:
           allOf:
           - $ref: '#/components/schemas/SessionStatus'
@@ -12809,6 +13209,8 @@ components:
           format: uuid
           nullable: true
         ipAddress:
+          x-ticvai-pii: {store: identifier.ipAddress, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         deviceInfo:
@@ -13782,7 +14184,15 @@ components:
         developer account whose active `control.developer_member` has that email, and with no match it has no
         developer account. **Never returned by any operation**.
       properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: employee
+          description: '**The principal, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `email` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind employee; null while none is given.'
         email:
+          x-ticvai-pii: {store: contact.email, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           format: email
           maxLength: 320

@@ -118,6 +118,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ddl_forward  # noqa: E402
+import personal_data  # noqa: E402
 from release_baseline import baseline_commit, ls_tree, show  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -2163,6 +2164,7 @@ ARRAY_PROPS: set = set()     # `module.Schema.arrayProp`, every array property (
 ARRAY_UNIQUE: dict = {}      # `module.Schema.arrayProp` -> the unique column sets its child table takes (ADAM CR-510)
 EXACT_ITEM_SOURCES: set = set()  # `module.Schema.arrayProp[].member` an array's x-ticvai-unique-compare: exact keeps
 RETIRED: dict = {}
+PERSONAL_MOVED: dict = {}   # table -> the personal fields kept in pii.* (schema-reference `personal`, CHG-R14M-001)
 # **The tables whose contract says `x-ticvai-scope: none`** (CHG-R9MIG-001, ADAM CR-166 as the lead ruled it, 21
 # October 2026). Filled by main from table_marks; frozen mode hands it to ddl_forward.diff, which removes a scope_path,
 # its index and its scope policy that a forward migration gave such a table (V0108 gave platform.outbox_sequence all
@@ -2707,6 +2709,19 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
     safe_tag = re.sub(r"[^\w]+", "_", tag).strip("_") or "baseline"
 
     plans, extra = [], []
+    # **A natural person's column moves to pii.*** (r13 review B-01; the lead, 3 November 2026, "Move the columns";
+    # CHG-R14M-001). derive-schema gives an `x-ticvai-pii` field no column and records it as `personal`; the
+    # databases still hold the column and its rows. It is retired (the four-step drop) and its copy into pii.* is
+    # written out for the migration owner, one row per column, generated from the mark (tools/personal_data.py).
+    for t, rows in sorted(PERSONAL_MOVED.items()):
+        for r in rows:
+            RETIRED.setdefault(t, set()).add(r["column"])
+            extra.append(("tenant" if area(t.split(".")[0]) == "tenant" else CONTROL, "personal data moved",
+                          f"{t}.{r['column']}",
+                          f"`{r['field']}` is kept in {r['store']} for the subject in `{r['subjectColumn']}` "
+                          "(x-ticvai-pii; ADR-0023 as amended 3 November 2026), never as this column",
+                          personal_data.copy_steps(t, r["column"], r["store"], r["subjectColumn"],
+                                                   r.get("subjectKind"))))
     renames = declared_renames()
     # **The declared renames go first, in an early names file, and everything else is derived after them**
     # (CHG-R8WFM-001; r8 sample walk, table-rename-not-in-migrations). Pass 1 asks which declared renames the old side
@@ -2900,6 +2915,7 @@ def main() -> int:
 
     S = json.loads((ROOT / "handoff" / "schema-reference.json").read_text(encoding="utf-8"))
     cols = S["cols"]
+    PERSONAL_MOVED.update(S.get("personal") or {})
     storage = S.get("storage") or {}
     # **A table the schema reference stores somewhere else is not a Postgres table.** Until 17
     # September this took every name in `cols`, so `identity.session` and `identity.guest_session`

@@ -933,6 +933,15 @@ x-ticvai-jobs:
     for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
       as on the order-paid saga.'
     source: ['events/order-exchanged.yaml']
+  subjectDataPart:
+    module: catalogue
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [catalogue.waitlist_entry]
+    writes: []
+    for: 'catalogue''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /product-categories:
     get:
@@ -2063,6 +2072,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: reinstateEntitlement
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
@@ -2141,6 +2151,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: freezeEntitlement
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
@@ -2741,6 +2752,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist-entries:
     get:
+      x-ticvai-personal-data: gated
       operationId: listWaitlistEntries
       x-ticvai-consumed-by:
         - "P08 BO-017 Capacity Management"
@@ -2776,6 +2788,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: self
       operationId: joinWaitlist
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
@@ -2879,6 +2892,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: offerWaitlistCapacity
       x-ticvai-consumed-by:
         - "P08 BO-017 Capacity Management"
@@ -8643,6 +8657,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-trail-change:
     get:
+      x-ticvai-personal-data: gated
       operationId: listProductTrailChange
       x-ticvai-consumed-by:
         - "P08 ADM-136 Product Audit Trail & Change History"
@@ -26095,10 +26110,13 @@ components:
           format: uuid
           nullable: true
         subjectId:
+          x-ticvai-subject-kind: guest
           type: string
           format: uuid
           nullable: true
         contactPoint:
+          x-ticvai-pii: {store: contact.point, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           description: '**Where the offer goes.** An entry with no way to reach the guest is an entry
             that can never be honoured, so this is required even for an anonymous guest.
@@ -27225,10 +27243,12 @@ components:
       minProperties: 1
       properties:
         phone:
+          x-ticvai-data-class: business
           type: string
           maxLength: 32
           nullable: true
         email:
+          x-ticvai-data-class: business
           type: string
           format: email
           maxLength: 254
@@ -30887,6 +30907,7 @@ components:
           nullable: true
           properties:
             ipAddress:
+              x-ticvai-data-class: personal
               type: string
             userAgent:
               type: string

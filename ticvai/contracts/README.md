@@ -56,6 +56,18 @@ Operations without a permission fall into three groups, each marked explicitly:
 - `x-ticvai-self-scoped: principal \| subject` — 15 operations acting only on the caller's own resources. Supplying another identifier is never silently honoured: **a guest naming another guest's record gets 404, exactly as for a record that does not exist** (Pattern 4; Chinmay, 3 October 2026, CHG-GCF-002), so nothing reveals that the id exists; 403 is only for a staff caller without the permission (R8 blocker cause ORDERS-MONEY-C01, CHG-R8SPN-018)
 - `security: []` — genuinely public: login, OTP request, SSO discovery, maintenance status
 
+## Personal data (3 November 2026, ADR-0023 as amended; CHG-R14M-001)
+
+| Mark | Where | Means |
+|---|---|---|
+| `x-ticvai-data-class: personal` | a property | A natural person's data. Every property named as a person's identifier carries a class (`business` for an organisation's) |
+| `x-ticvai-pii: {store, subject}` | a property of a persisted schema | Kept in `pii.*` (the store, `tools/personal_data.py`) for the subject the named property holds; no column on the module's row. Written through identity `recordSubjectDetails`, read through `identity#subjectDetails` |
+| `x-ticvai-subject-kind` | the subject property | The kind of the `pii.subject` a row with none gets: guest, employee, contact, applicant |
+| `x-ticvai-personal-data: gated` | an operation | Each personal field in the answer is answered only to a caller holding `GUEST_VIEW_PII` at the row's scope, null to anyone else (a guest's own record included) |
+| `x-ticvai-personal-data: self` | an operation | Answers only the caller's own record |
+
+`tools/check-personal-data.py` holds them.
+
 ## Amended 13 Aug — decisions landed
 
 | Contract | Change |
