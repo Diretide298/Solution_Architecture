@@ -415,6 +415,7 @@ x-ticvai-jobs:
     trigger: {kind: timer}
     reads: [whitelabel.content_page]
     writes: [whitelabel.content_page, platform.audit_record]
+    reliesOn: [createContentPage, updateContentPage]
     for: 'The one-off re-save of pages stored before the sanitiser (ADAM CR-401, Chinmay, 3 November 2026, answering
       #30923; CHG-CR401-002): run once, when the release that ships the link rule is deployed, it puts every published
       page''s body through the shared sanitiser (LocalisedRichText''s allow-list) and stores the cleaned body where it
