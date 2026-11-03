@@ -445,3 +445,36 @@ items:
   owner: Chinmay
   added: '2026-11-03'
   change: CHG-CR534-001
+- id: LO-CR551-001
+  kind: deferred
+  platform: P02
+  screens: [GST-008, GST-046]
+  what: 'Tickets & Add-ons (GST-008) sends the guest to the waiting room (GST-046) when its Continue''s addCartLine is
+    refused 403 admission-required, with performanceId and waitingEntryId, and on admission brings them back to GST-008
+    with the chosen quantities kept, sending the admission token on addCartLine. GST-008''s record has no such edge yet;
+    GST-007''s edge to GST-046 stays for flows that add lines there.'
+  source: 'ADAM CR-551 (#31784 GST-007), decided by Chinmay on 3 November 2026: "The move from a refused addCartLine to
+    the waiting room happens on the tickets screen''s Continue; that is a separate ticket, so build nothing for it here";
+    CHG-CR551-001'
+  reason: 'the decision moves the waiting-room edge to a ticket of its own under GST-008 (#28159), and #31775 (GST-008''s
+    build) is Ready for QA, so its text stays as it is'
+  target: 'the new [FE] ticket under #28159 (a plan task the integration pass files)'
+  owner: Chinmay
+  added: '2026-11-03'
+  change: CHG-CR551-001
+- id: LO-CR552-001
+  kind: deferred
+  platform: P02
+  screens: [GST-007]
+  what: 'GST-007''s wireframe (wireframes/incoming/P02-mobile-v4/gst-007.html, the prototype capture) and page info
+    redrawn to the build in 614c7ee, which ADAM CR-552 accepted as the screen''s design: the Who''s coming? drawer as
+    folding person cards with the merged height bands, the equal black and white pills in the drawer and the waitlist
+    pop-up, and the waitlist confirmation card. The screen record says it now (notes, overlays eligibilityDeclaration
+    and joinWaitlist, the You''re on the waitlist! card, prototype.differences).'
+  source: 'ADAM CR-552 (#31784 GST-007), decided by Chinmay on 3 November 2026: "the package''s wireframe, screen record
+    and page info will be brought into line with it"; CHG-CR552-001'
+  reason: the frame is a capture of the client-verified prototype view; a redraw to the build is a design batch's work
+  target: 'the next design batch rebuild after r14'
+  owner: Chinmay
+  added: '2026-11-03'
+  change: CHG-CR552-001

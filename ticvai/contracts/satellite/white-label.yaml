@@ -5457,7 +5457,7 @@ paths:
 
         **Changed booking flows and the products they reach** (r8 walk of ticket 28337). The publish gate on
         CMS-103 says which flows changed and which products are affected, and it reads both here. `changes` has an
-        area `bookingFlows` with one entry per flow added, removed or modified (`path` is the flow key).
+        area `bookingFlows` with one entry per flow added, removed or modified (`path` is the flow''s `id`, ADAM CR-547).
         `affectedProducts` lists, for the flows that differ, each product the flow serves, found by the rule
         `Product.bookingFlowId` already states: the product''s own flow, else its category''s, else the venue''s
         default flow for the product''s kind. The server applies that rule on read; nothing is stored.
@@ -5486,7 +5486,7 @@ paths:
         (`features[guestCheckout].isEnabled`). Other arrays of objects are named by index (`[0]`). An array of plain
         values (`languages.languages`, `splashImageAssetRefs`, `customFontAssetRefs`, `enabledPaymentMethods`) is
         one value, compared whole with its order. `bookingFlows` keeps its rule: one entry per flow added, removed
-        or modified, `path` the flow key. (4) One entry per changed value. `modified`: `before` and `after` are the
+        or modified, `path` the flow''s `id` (ADAM CR-547, below). (4) One entry per changed value. `modified`: `before` and `after` are the
         value''s compact JSON text, a string written without its quotes. A value or keyed item present on one side
         only is `added` (`before` null) or `removed` (`after` null), and its JSON text is the whole item. A property
         that is null counts as absent. Entries are ordered by area as listed above, then by `path`. (5)
@@ -5496,6 +5496,27 @@ paths:
         Everything else, `bookingFlows` included, is `runtime`. (6) A `version` or `against` that names no
         config_version of the tenant answers 404 `not-found`. `affectedProducts` is unchanged. The CMS-014, CMS-015,
         CMS-103 and ADM-016 screens do not change.
+
+
+        **The flow key is the booking flow''s id** (ADAM CR-547, Chinmay, 3 November 2026; CHG-CR547-001). Wherever
+        this operation says "the flow key", it means `BookingFlow.id`, the uuid as text. (1) Matching flows: the
+        `bookingFlows` list of each side (a version''s stored snapshot, or the working draft in getTenantConfig''s
+        shape) is taken and the flows are paired by `id`. A flow''s `id` is the same in the draft and in every
+        published version, because publishing copies flows unchanged. (2) `changes` entries for `bookingFlows`: one
+        entry per flow, with area `bookingFlows` and `path` the flow''s `id` (for example `3f2a…-…`). A flow on one
+        side only is `added` (`before` null, `after` the whole flow as compact JSON) or `removed` (`before` the whole
+        flow, `after` null). A flow on both sides is `modified` when any of its editable properties differ:
+        `flowTypeKey`, `name`, `isDefaultForType`, `isEnabled`, `steps` (compared whole, in order) and `settings`.
+        The read-only `id`, `venueId`, `isValid`, `scopePath` and `updatedAt` are not compared, following the rule
+        that read-only properties are not edits. For a modified flow, `before` and `after` are the whole flow from
+        each side as compact JSON. Disabled flows are compared like any other. `bookingFlows` entries are ordered by
+        `path`, after the `bookingFlow` area and before `theme`. (3) `affectedProducts`: for every flow that has a
+        `bookingFlows` entry, each product that flow serves is listed, by the rule already stated (the product''s
+        own `bookingFlowId`, else its category''s, else the venue''s default flow for the product''s kind).
+        `flowKey` is that flow''s `id`. For a removed flow, the rule is resolved against the side that holds it. A
+        product appears once per changed flow that serves it. (4) Nothing else changes: the same response shape,
+        field names, 404 rule and change scope (`bookingFlows` is `runtime`). No migration. The screens that show
+        this diff do not change; a screen that shows a flow finds its name in the snapshot by the `id`.
 
         '
       tags:
@@ -13763,7 +13784,7 @@ components:
             properties:
               productId: { type: string, format: uuid }
               name: { type: string }
-              flowKey: { type: string, description: The changed flow that serves this product. }
+              flowKey: { type: string, description: 'The changed flow that serves this product: the flow''s `BookingFlow.id`, the uuid as text (ADAM CR-547). For a removed flow, the flow of the side that holds it.' }
         changes:
           type: array
           items:
@@ -13784,7 +13805,7 @@ components:
                 description: 'The property names below the part joined with `.`; a keyed array item by its key in
                   brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other
                   arrays of objects by index ([0]); an array of plain values is one value. For bookingFlows, the
-                  flow key (ADAM CR-500).'
+                  flow''s `BookingFlow.id`, the uuid as text (ADAM CR-500, CR-547).'
               changeKind:
                 type: string
                 enum:

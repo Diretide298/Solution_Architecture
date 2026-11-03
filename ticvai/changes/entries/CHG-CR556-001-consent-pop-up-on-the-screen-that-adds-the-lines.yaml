@@ -1,0 +1,71 @@
+id: CHG-CR556-001
+date: '2026-11-03'
+source: cr
+kind: spec
+summary: 'The consent pop-up opens once the cart holds this booking''s lines, on the screen that adds them: GST-007 only
+  right after its own addCartLine (none in the date-first and product-first flows); GST-008 after its addCartLine calls
+  succeed and before leaving the step, reading getCart (background) and recording with recordConsentAnswers (on action,
+  invalidates getCart); GST-041 when checkoutCart refuses 422 consentRequired or consentAnswerBlocks. Per-person questions
+  are asked for persons 0 to quantity minus 1 of each line in lineIds, named Adult 1, Child 2 (or Person n on a line
+  with a declaration); recordConsentAnswers counts personIndex over the line''s units and refuses 422 personRequired
+  without a cartLineId or at or above the quantity; Cart.consentQuestions[].answered is true when every such person has
+  an answer. Steps 5 and 6 (the venue time zone) are NOT built: the decision names PublishedTenantConfig.venues, which
+  does not exist (stopped, see notes).'
+decision:
+  what: 'ADAM CR-556, posted on #31784: "Decided (Chinmay, 3 November 2026): the consent pop-up opens once the cart holds
+    this booking''s lines, on the screen that adds them, and the booking screens show days in the venue''s time zone.
+    Build now: 1. Select Date & Time (#31784, #31785): open the consent pop-up only right after this screen''s own
+    addCartLine ... When this screen adds no line (date-first and product-first flows), it opens no pop-up and records
+    nothing ... 2. Tickets & Add-ons (GST-008, #31776): after its addCartLine calls succeed and before leaving the step,
+    read getCart. If any of its consentQuestions is unanswered, open the same consent pop-up component as GST-007 ...
+    Add getCart (background) and recordConsentAnswers (on action, invalidates getCart) to the screen''s operations. 3.
+    Checkout Entry (GST-041): when checkoutCart refuses 422 consentRequired or consentAnswerBlocks, open the same pop-up
+    there for the unanswered questions. 4. Marketing service (#27866): personIndex counts the line''s units from 0 to
+    quantity minus 1 ... 5. White-label service (new ticket): add timeZone ... to each entry of
+    PublishedTenantConfig.venues ... 6. Select Date & Time (#31784, #31785): take the zone from the picked venue''s
+    timeZone in the PublishedTenantConfig the app shell already loads ..." The lead, 3 November 2026: "Dont hold r13.
+    approve them and rever tto the devs" and "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-556 (#31784 GST-007): CR-493''s per-person consent questions (CHG-CR493-001) could not be answered on
+  GST-007, which adds no cart line and knows no person, and the calendar had no venue time zone.'
+keys_touched:
+  screens: [GST-007, GST-008, GST-041]
+  operations: [recordConsentAnswers, getCart, checkoutCart, addCartLine]
+  schemas: [RecordConsentAnswersRequest, Cart]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/orders.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-business-rules.py
+root_class: a screen action needs a value nothing on the screen supplies (screen-values)
+tickets:
+  started:
+  - '31784 (GST-007 build, In progress): through CR-556''s own posted comment (steps 1 and 6); nothing beyond it.'
+  unstarted:
+  - '31785 ([FE] GST-007 connect to API): the pop-up only after its own addCartLine.'
+  - '31776 ([FE] GST-008 connect to API): getCart after the lines, the same consent pop-up, one recordConsentAnswers.'
+  - '31941 / 31942 (GST-041 build and connect to API): the same pop-up on checkoutCart''s 422 (status not known to this
+    lane; if started, a follow-up comment, see notes).'
+  - '27866 (Marketing service) and 30998 (recordConsentAnswers): personIndex over the line''s units, 422 personRequired.'
+  - '30684 (getCart): consentQuestions[].answered over every person on every line in lineIds.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-556
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONSENT-WHERE-LINES-ADDED
+status: open
+notes: '**Stopped on steps 5 and 6 (the venue time zone).** The decision adds timeZone "to each entry of
+  PublishedTenantConfig.venues" and has GST-007 take it "from the picked venue''s timeZone in the PublishedTenantConfig
+  the app shell already loads". PublishedTenantConfig (getPublishedTenantConfig) has no venues property; the venues with
+  openingHoursToday, read through regionSettingsRecords, are TenantAppStatus.venues (getTenantAppStatus), which GST-001
+  already reads for its venue picker. Neither is built until the lead posts a correction naming the schema; the new
+  [BE] ticket under #27885 is not listed until then. **Design change logged:** GST-007''s consentQuestions trigger,
+  and the new consentQuestions overlays on GST-008 and GST-041 (the same pop-up accepted under CR-493), are in
+  docs/active/approved-ui-changes.yaml against ADAM CR-556. **Named beyond the posted words:** recordConsentAnswers
+  checks personIndex against the line''s quantity in the cart it already reads (orders#cartRecords), so no read is
+  added; RecordConsentAnswersRequest''s personName says it is the label shown; GST-041 declares recordConsentAnswers
+  (on action, invalidates getCart) for the pop-up step 3 places there.'

@@ -1,0 +1,57 @@
+id: CHG-CR552-001
+date: '2026-11-03'
+source: cr
+kind: spec
+summary: 'GST-007 Select Date & Time is specified as built in 614c7ee: the Who''s coming? drawer is a bottom sheet with
+  a guest-count badge and one folding card per person (age, height chips from the merged band edges, guardian tick,
+  Remove person; a folded person shows a green Completed badge and e.g. 8 years · Under 120 cm; the reason with the
+  product''s name stays under a folded card); Back / Continue and Cancel / Join are equal 48-high pills (black forward,
+  white with a light border back, a spinner, faded when disabled); after joining, the waitlist card (cream-to-amber
+  gradient, amber border, group icon, You''re on the waitlist!, WaitlistEntry.position large, or the fallback line).
+  Same operations, fields, errors and permissions. The frame is redrawn later (LO-CR552-001).'
+decision:
+  what: 'ADAM CR-552, posted on #31784: "Decided (Chinmay, 3 November 2026): your design change to GST-007 Select Date &
+    Time is accepted as built in 614c7ee, and the package''s wireframe, screen record and page info will be brought into
+    line with it. Build now: keep it as built. (1) The eligibility drawer ''Who''s coming?'' is a bottom sheet with the
+    title and a guest-count badge. There is one card per person ... (2) Back/Continue in the drawer and Cancel/Join in
+    the waitlist pop-up are equal pills 48 high ... (3) After joining, the waitlist confirmation card has the
+    cream-to-amber gradient ... The Queue position box shows WaitlistEntry.position large, from joinWaitlist''s answer
+    ... Keep the tokens waitlistColors and waitlistCardGradient in src/theme/tokens.ts. Operations, request and response
+    fields, errors and permissions stay unchanged." The lead, 3 November 2026: "Dont hold r13. approve them and rever
+    tto the devs" and "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-552 (#31784 GST-007, a Design change: CR): the build in 614c7ee restyles the eligibility drawer, the pop-up
+  buttons and the waitlist confirmation. The lead''s rule of 28 October 2026 lets a frontend developer change a screen''s
+  design and log it, after which the lead updates the screen''s UI (precedents CHG-CR493-001, CHG-CR534-001).'
+keys_touched:
+  screens: [GST-007]
+  operations: [joinWaitlist, checkBookingEligibility]
+  schemas: [WaitlistEntry]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/approved-ui-changes.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: a frontend design change logged after the build, brought back into the package's screen record
+tickets:
+  started:
+  - '31784 (GST-007 build; In progress at the CR-556 pull): through CR-552''s own posted comment (keep it as built).'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-552
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GST007-DRAWER-AS-BUILT
+status: open
+notes: '**Design change: GST-007''s eligibility drawer, pop-up pills and waitlist card as built in 614c7ee.** The screen
+  record''s notes say it as posted; the eligibilityDeclaration overlay''s body draws the folding person cards and pills;
+  a joinWaitlist overlay (Cancel / Join) and a You''re on the waitlist! banner bound to WaitlistEntry.position are added;
+  prototype.differences names the build. docs/active/approved-ui-changes.yaml records the three changed fields
+  (overlay:eligibilityDeclaration, overlay:joinWaitlist, region:collection) against ADAM CR-552. The frame stays the
+  prototype capture until the redraw (LO-CR552-001). The tokens waitlistColors and waitlistCardGradient are the guest
+  app''s, as the build added them; screens/_design-tokens.yaml is not changed. **Named beyond the posted words:** the
+  pop-up''s Cancel discards "the party size and the contact choice", the pop-up being where the screen already collected
+  them.'
