@@ -2832,6 +2832,9 @@ screens:
       from: deepLink
     - name: paymentId
       from: deepLink
+      optional: true
+      notes: Only on a link back to a payment already started; from the basket (GST-041) there is none, since Pay makes
+        the order and its payment here (ADAM CR-576).
     - name: token
       from: deepLink
     - name: venueId
