@@ -1,0 +1,43 @@
+id: CHG-R13PL-068
+date: '2026-11-03'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: KERNEL-TENANT-LIMITS (#27693, New) names the GET /internal/tenant-request-limits route (CR-491) and the platform
+  default under RequestLimits:Tenant:PlatformDefault (CR-490); R13-DB-IN-PROCESS-READ-GRANTS gains XDR-111's SELECT on approvals.rule
+  to operations (CR-520). getTenantRequestLimits' task comes from the formula (SVC-PLATFORM-PLAN-3).
+decision:
+  what: The lead, 3 November 2026, adding the 62 CRs of 2 November to r13 ("get the NEw CRs in the r13"), each decided and
+    posted on its ticket; the integration's final plan pass files the tasks the lanes listed. ADAM CR-490, CR-491 (lane
+    w5) and CR-520 (lane w3). Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026, for r13).
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: Lane w5 (ADAM CR-490, CR-491) and lane w3 (ADAM CR-520). Lane w5: KERNEL-TENANT-LIMITS still asked the query with no word of the key or the route; the r13 forward migration
+  grants XDR-111 with no task.'
+keys_touched:
+  tickets:
+  - KERNEL-TENANT-LIMITS (27693)
+  - R13-DB-IN-PROCESS-READ-GRANTS (not ticketed)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a decided change a plan task's text did not carry
+tickets:
+  started: []
+  unstarted:
+  - '27693 (KERNEL-TENANT-LIMITS, New, Pranay Shinde): its text gains the route and the key.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-491
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the text; a started
+  ticket''s text is not rewritten. A change-only [DB] task is `area: database` and its key does not end in -DB (CHG-R8MIG-016,
+  CHG-R12PL-008).'

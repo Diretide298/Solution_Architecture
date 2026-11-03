@@ -1,0 +1,41 @@
+id: CHG-R13PL-063
+date: '2026-11-03'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR513-LOGIN-SESSION-GRANT and CR513-SELECT-ROLE-SESSION-GRANT (Hrushikant Patkar): login and selectRole store
+  the session''s grant; named under #30674 and #30715, after the column task.'
+decision:
+  what: The lead, 3 November 2026, adding the 62 CRs of 2 November to r13 ("get the NEw CRs in the r13"), each decided and
+    posted on its ticket; the integration's final plan pass files the tasks the lanes listed. ADAM CR-513 (lane w4). Plan
+    change waived from the cooling-off by the lead ("1 waive", 2 November 2026, for r13).
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Lane w4 (CR-513): child tasks of #30674 (login) and #30715 (selectRole), both Ready for QA.'
+keys_touched:
+  tickets:
+  - CR513-LOGIN-SESSION-GRANT (new)
+  - CR513-SELECT-ROLE-SESSION-GRANT (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change to a started ticket's work, carried by no plan task
+tickets:
+  started:
+  - '30674 (login) and 30715 (selectRole), Ready for QA: not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-513
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the text; a started
+  ticket''s text is not rewritten. A change-only [DB] task is `area: database` and its key does not end in -DB (CHG-R8MIG-016,
+  CHG-R12PL-008).'

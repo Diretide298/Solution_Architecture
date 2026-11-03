@@ -793,7 +793,7 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Per-tenant request budgets: a token bucket per tenant and audience, and a load-aware share per replica",
-   "detail": "ADR-0064 (accepted 1 October), in the kernel middleware of the commerce, access and operations hosts: a token bucket per tenant and audience (guest/public, staff, service, partner) with counts shared through Azure Managed Redis, sustained rate and a 2x burst for 10 seconds from the tenant's plan, asked of Platform with the `subscription#tenantRequestLimits` service query (ADR-0064; the query's rule says what a tenant with no current contract gets), cached per tenant for 60 seconds; one tenant held to 25% of a replica's request slots only while the replica is above 70% of its limit; shedding guest and public first, staff and service last (ADR-0032); 429 with Retry-After and the RateLimit-* headers; if Redis is unavailable each replica falls back to its own in-process buckets (the limit divided by the replica count). Done when: in a test with two tenants on one replica, the busy tenant gets the whole replica while the other is quiet, is held to 25% of the slots once the replica passes 70% while the quiet tenant's requests still succeed, a guest burst never spends a till's staff budget, and stopping Redis leaves requests served under the in-process limits. Contract (4 October, CHG-FXP-005): the plan's limits are `Plan.requestLimits` in contracts/satellite/subscription.yaml, read through the `tenantRequestLimits` query of that contract over Platform's service route, never `subscription#getPlan` (the control database is not the cell's; r8 walk fix, CHG-R8WFC-008); the refusal is the shared `rate-limited` problem (429) of contracts/shared/common.yaml with `Retry-After` and the RateLimit-Limit, RateLimit-Remaining and RateLimit-Reset headers it defines.",
+   "detail": "ADR-0064 (accepted 1 October), in the kernel middleware of the commerce, access and operations hosts: a token bucket per tenant and audience (guest/public, staff, service, partner) with counts shared through Azure Managed Redis, sustained rate and a 2x burst for 10 seconds from the tenant's plan, asked of Platform with the `subscription#tenantRequestLimits` service query over its route GET /internal/tenant-request-limits?tenantId= (`getTenantRequestLimits`, serviceAuth; ADAM CR-491), cached per tenant for 60 seconds, a tenant with no current contract getting the platform default held as per-cell configuration under the key `RequestLimits:Tenant:PlatformDefault` (ADAM CR-490); one tenant held to 25% of a replica's request slots only while the replica is above 70% of its limit; shedding guest and public first, staff and service last (ADR-0032); 429 with Retry-After and the RateLimit-* headers; if Redis is unavailable each replica falls back to its own in-process buckets (the limit divided by the replica count). Done when: in a test with two tenants on one replica, the busy tenant gets the whole replica while the other is quiet, is held to 25% of the slots once the replica passes 70% while the quiet tenant's requests still succeed, a guest burst never spends a till's staff budget, and stopping Redis leaves requests served under the in-process limits. Contract (4 October, CHG-FXP-005): the plan's limits are `Plan.requestLimits` in contracts/satellite/subscription.yaml, read through the `tenantRequestLimits` query of that contract over Platform's service route, never `subscription#getPlan` (the control database is not the cell's; r8 walk fix, CHG-R8WFC-008); the refusal is the shared `rate-limited` problem (429) of contracts/shared/common.yaml with `Retry-After` and the RateLimit-Limit, RateLimit-Remaining and RateLimit-Reset headers it defines.",
    "builds": [
     "operation getPlan",
     "adr ADR-0032",
@@ -3166,8 +3166,8 @@
     "VM-MIG-WORKFORCE"
    ],
    "notBefore": "2026-11-02",
-   "subject": "The read grants of the in-process queries r13 moves off the service route (XDR-055, XDR-067, XDR-068, XDR-073 to XDR-078)",
-   "detail": "Spec: the r13 decisions on the in-process reads (ADAM CR-438, CR-472 to CR-478 and the rest of their class; docs/active/cross-deployable-writes.yaml XDR-073 to XDR-078), and the reads of CR-447 and CR-451 (the lead, 2 November 2026: \"yes for both\"; XDR-067: orders printTicketProof asks access#mediaTemplateRecords from commerce; XDR-068: the device-key sign-in, #37205, asks tenancy#deviceForApiKey from the operations host), and CR-439's and CR-455's category rate (XDR-055: catalogue#variantListingFacts, asked in process by addToWishlist and getWishlist in the operations host, reads catalogue.rate), in the contracts at the release tag in ADAM. Named under MIG-ORDERS (#27675) and MIG-PROMOTIONS (#27674), as CR-477's and CR-478's grants (#37210, #37211, XDR-071 and XDR-072) are, which this task does not repeat (orders.order_line, promotions.promotion and promotions.promotion_rule to operations, and USAGE on orders and promotions to operations, are theirs). One forward migration in the tenant database: GRANT SELECT, read only, to operations: accreditation.application, accreditation.credential, accreditation.holder, accreditation.validity, approvals.request, catalogue.channel_capacity, catalogue.product_eligibility_rule, catalogue.rate, catalogue.tax_profile, orders.cart, orders.cart_line, orders.deposit, orders.deposit_policy, orders.group_booking, orders.invitation, orders.order_fee, orders.order_line_discount, orders.payment, orders.refund, orders.refund_policy, orders.reservation, orders.sales_order, payments.instalment_policy, payments.provider, payments.provider_connection, platform.device, promotions.bundle, seating.seat, tenancy.data_retention_setting, tenancy.device_credential, workforce.shift; to access: approvals.request, approvals.rule, catalogue.product, catalogue.product_media, platform.region_settings, tenancy.data_retention_setting; to commerce: access.access_point, access.media_template; and USAGE on each of those schemas where the role does not hold it (accreditation, approvals, seating, tenancy and workforce to operations; approvals and tenancy to access). Each grant is guarded as derive-ddl writes the other cross-module grants (V0118, V0122): granted only where the role and the table exist and the grant is not already held. Row security still decides the rows. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. Test: each role reads each of its tables under the caller's row security and cannot write it. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "subject": "The read grants of the in-process queries r13 moves off the service route (XDR-055, XDR-067, XDR-068, XDR-073 to XDR-078, XDR-111)",
+   "detail": "Spec: the r13 decisions on the in-process reads (ADAM CR-438, CR-472 to CR-478 and the rest of their class; docs/active/cross-deployable-writes.yaml XDR-073 to XDR-078), and the reads of CR-447 and CR-451 (the lead, 2 November 2026: \"yes for both\"; XDR-067: orders printTicketProof asks access#mediaTemplateRecords from commerce; XDR-068: the device-key sign-in, #37205, asks tenancy#deviceForApiKey from the operations host), and CR-439's and CR-455's category rate (XDR-055: catalogue#variantListingFacts, asked in process by addToWishlist and getWishlist in the operations host, reads catalogue.rate), in the contracts at the release tag in ADAM. Named under MIG-ORDERS (#27675) and MIG-PROMOTIONS (#27674), as CR-477's and CR-478's grants (#37210, #37211, XDR-071 and XDR-072) are, which this task does not repeat (orders.order_line, promotions.promotion and promotions.promotion_rule to operations, and USAGE on orders and promotions to operations, are theirs). One forward migration in the tenant database: GRANT SELECT, read only, to operations: accreditation.application, accreditation.credential, accreditation.holder, accreditation.validity, approvals.request, approvals.rule, catalogue.channel_capacity, catalogue.product_eligibility_rule, catalogue.rate, catalogue.tax_profile, orders.cart, orders.cart_line, orders.deposit, orders.deposit_policy, orders.group_booking, orders.invitation, orders.order_fee, orders.order_line_discount, orders.payment, orders.refund, orders.refund_policy, orders.reservation, orders.sales_order, payments.instalment_policy, payments.provider, payments.provider_connection, platform.device, promotions.bundle, seating.seat, tenancy.data_retention_setting, tenancy.device_credential, workforce.shift; to access: approvals.request, approvals.rule, catalogue.product, catalogue.product_media, platform.region_settings, tenancy.data_retention_setting; to commerce: access.access_point, access.media_template; and USAGE on each of those schemas where the role does not hold it (accreditation, approvals, seating, tenancy and workforce to operations; approvals and tenancy to access). Each grant is guarded as derive-ddl writes the other cross-module grants (V0118, V0122): granted only where the role and the table exist and the grant is not already held. Row security still decides the rows. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. Test: each role reads each of its tables under the caller's row security and cannot write it. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
    "builds": [
     "table access.access_point",
     "table access.media_template",
@@ -3434,6 +3434,282 @@
     "service AiService",
     "adr ADR-0020",
     "adr ADR-0055"
+   ]
+  },
+  {
+   "key": "R13-DB-SESSION-GRANT-AND-PRINCIPAL-EMAIL",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-IDENTITY"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "identity.session keeps the grant it was opened through, and identity.principal a verified email (CR-513, CR-536)",
+   "detail": "Spec: ADAM CR-513 (the session stores its grant) and CR-536 (developer-portal sign-in with a verified principal email), the lead's decisions of 3 November 2026, in the contracts at the release tag in ADAM. The [DB] work of #30212 ([DB] identity.session) and #30206 ([DB] identity.principal), both Ready for QA and not rewritten. One guarded forward migration in the tenant database, additive: identity.session.grant_id uuid, nullable, its key to identity.delegated_access and its index; identity.principal.email text of at most 320 characters, nullable. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql and its names file, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table identity.session",
+    "table identity.principal"
+   ]
+  },
+  {
+   "key": "CR521-GUEST-DOCUMENT-UPLOAD-DB",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-MARKETING",
+    "MIG-IDENTITY"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "marketing.guest_document_upload: the upload the server issues before a guest document is attached, with its grant-holder policy (CR-521)",
+   "detail": "Spec: ADAM CR-521 (the guest document key is issued and checked by the server), the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (marketing-crm.yaml createGuestDocumentUpload, uploadGuestDocument #31168). The table's creating migration: CREATE TABLE marketing.guest_document_upload as the package derives it (its key to pii.subject and index, the unique key on lower(storage_ref)), and its grant-holder subject policy (platform.apply_grant_holder_subject_rls). marketing.guest_document's own policy change is R13-DB-GRANT-HOLDER-AND-SCOPE-POLICIES'. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql and its names file, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table marketing.guest_document_upload"
+   ]
+  },
+  {
+   "key": "R13-DB-GRANT-HOLDER-AND-SCOPE-POLICIES",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "VM-MIG-LEDGER",
+    "MIG-MARKETING",
+    "MIG-MARKETING-2",
+    "MIG-MARKETING-6",
+    "MIG-ORDERS-2",
+    "MIG-ORDERS-6",
+    "MIG-CATALOGUE-2"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "Row security for guest rows venue staff write, and scopes for rows written below the tenant (R13 review, CR-521)",
+   "detail": "Spec: the r13 review's row-security fixes (CHG-R13BO-001) and ADAM CR-521, in the contracts at the release tag in ADAM. The [DB] work of #33310 (marketing.guest_note), #32056 (orders.guest_credit_account), #32015 (ledger.deposit), #32050 (orders.membership_activation_action), #30538 (marketing.guest_document), #31798 (catalogue.plan_benefit) and #33328 (marketing.guest_extra_field), all Ready for QA and not rewritten. One guarded forward migration in the tenant database: the grant-holder-write policy (platform.apply_grant_holder_subject_rls) on marketing.guest_note, orders.guest_credit_account, ledger.deposit, orders.membership_activation_action and marketing.guest_document; catalogue.plan_benefit follows its plan (platform.apply_parent_rls through entitlement_template_id); marketing.guest_extra_field gains scope_path ltree with its gist index, filled with the tenant root's path, and the grant-holder-read policy on platform.in_scope(scope_path). Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql and its names file, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table ledger.deposit",
+    "table marketing.guest_note",
+    "table orders.guest_credit_account",
+    "table orders.membership_activation_action",
+    "table marketing.guest_document",
+    "table catalogue.plan_benefit",
+    "table marketing.guest_extra_field"
+   ]
+  },
+  {
+   "key": "R13-DB-ORDERS-AND-VENUE-SETTINGS-POLICIES",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-PLATFORM",
+    "MIG-ORDERS",
+    "R13-DB-SHOP-AND-DROP-AND-TRANSFER-POLICIES"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "Row security: every scoped session reads the tenant's venue-settings row, a sender writes its own ticket transfer, a guest appends its own ticketsResent order event (CR-487, CR-502, CR-506)",
+   "detail": "Spec: ADAM CR-487, CR-502 and CR-506, the lead's decisions of 2 and 3 November 2026, in the contracts at the release tag in ADAM. The [DB] work of #30342 (platform.venue_settings), #30488 (orders.ticket_transfer) and #30469 (orders.order_event), all Ready for QA and not rewritten. One guarded forward migration in the tenant database: platform.venue_settings' split policy, its tenant row (venue_id null) read by every scoped session; orders.ticket_transfer's split policy with the sender's write branch, replacing the one R13-DB-SHOP-AND-DROP-AND-TRANSFER-POLICIES applies; and the new helper platform.apply_split_insert_rls with orders.order_event's insert-only guest branch for ticketsResent. Each policy's down step returns to the one before it (V0120's for venue_settings). Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql and its names file, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table platform.venue_settings",
+    "table orders.ticket_transfer",
+    "table orders.order_event"
+   ]
+  },
+  {
+   "key": "R13-DB-CONTROL-PLAN-VERSION-KEYS",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-SUBSCRIPTION"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "control.plan is unique per code and version, and its modules and limits per version (CR-510)",
+   "detail": "Spec: ADAM CR-510 (plan versions numbered, one code per plan), the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM. The [DB] work of #27651 ([DB] Migration V0005__subscription.sql, Ready for QA, not rewritten) and its sub-tasks #36260, #36261 and #36262. One guarded forward migration in the control database: list any rows that share a key and, if there is one, stop with the count and ids and tell the lead; then the unique index (lower(code), version) on control.plan replacing plan_code_uniq (dropped, guarded, in the names file), (plan_id, plan_version, licensed_module) on control.plan_module and (plan_id, plan_version, metric) on control.plan_limit. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/control/V01nn__after_r1_<date>.sql and its names file, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table control.plan",
+    "table control.plan_module",
+    "table control.plan_limit"
+   ]
+  },
+  {
+   "key": "R13-DB-APPROVALS-RULE-CODE-INDEX-DROP",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-APPROVALS"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "approvals.rule's old matrix-and-code unique index is dropped from the repository's migrations: the versioned index is the key (CR-498)",
+   "detail": "Spec: ADAM CR-498 (the rule code's key is the versioned index), the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM. The [DB] work of #27658 ([DB] Migration V0010__approvals.sql, Ready for QA, not rewritten). One guarded forward migration in the repository's db/ folder: DROP INDEX IF EXISTS approvals.rule_matrix_id_code_uniq, as the release path's V0119 names file already does, so a database built from the repository has only the versioned key. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql and its names file, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table approvals.rule"
+   ]
+  },
+  {
+   "key": "CR495-BOOKING-FLOW-BY-EVENT",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "getPublishedBookingFlow resolves the booking flow from an event when no product is sent (CR-495)",
+   "detail": "Spec: ADAM CR-495, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (white-label.yaml getPublishedBookingFlow, \"Resolved from an event\"). A child of #27878 (SVC-WHITELABEL-BOOKINGFLOWS-1, Ready for QA, not rewritten): the plan has no task under a task, so this task names it. The eventId parameter and the event rule: with productId sent it is as built; with no productId the flow is resolved from the event's products (catalogue#productRecords where {venueId, eventId}, in process, XDR-051), and an eventId that is not an event of the path's venue is 404 (catalogue#eventRecords, XDR-110). Done when: GST-007 opened from an event gets that event's flow, a foreign eventId is 404, and the contract tests pass.",
+   "builds": [
+    "operation getPublishedBookingFlow"
+   ]
+  },
+  {
+   "key": "CR509-MFA-STEP-UP-QUERY",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Sanket Keluskar",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "Identity's in-process step-up check, identity#consumeMfaStepUp, built once for the operations that ask it (CR-509)",
+   "detail": "Spec: ADAM CR-509, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (identity.yaml x-ticvai-queries consumeMfaStepUp). Named under #27730 (SVC-IDENTITY-MFA-2, New): a query class gets no task from the operation formula. Identity builds the query class behind its query interface, as its entry's inputs, returns and rule say, registered in every host that asks it in process (approvals approveMatrixMultiLevel and approveRoleAuthorityDelegation among them). Done when: a step-up proof is consumed once and refused a second time, a proof for another principal or purpose is refused, and the askers' contract tests pass with the in-process call.",
+   "builds": [
+    "operation approveMatrixMultiLevel",
+    "operation approveRoleAuthorityDelegation"
+   ]
+  },
+  {
+   "key": "CR513-LOGIN-SESSION-GRANT",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "R13-DB-SESSION-GRANT-AND-PRINCIPAL-EMAIL"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "login stores the grant a direct sign-in opens the session through (CR-513)",
+   "detail": "Spec: ADAM CR-513, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (identity.yaml login: \"The session stores the grant it was opened through\"). A child of #30674 (login, Ready for QA, not rewritten). login writes identity.session.grant_id (the one grant a direct sign-in opens the session through) and the session registry entry carries it. Done when: a direct sign-in's session row and registry entry name the grant, and the contract tests pass.",
+   "builds": [
+    "operation login"
+   ]
+  },
+  {
+   "key": "CR513-SELECT-ROLE-SESSION-GRANT",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "R13-DB-SESSION-GRANT-AND-PRINCIPAL-EMAIL"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "selectRole stores the grant chosen, and a role held at several venues needs its grantId (CR-513)",
+   "detail": "Spec: ADAM CR-513, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (identity.yaml selectRole: \"The session stores the grant\"). A child of #30715 (selectRole, Ready for QA, not rewritten). selectRole writes identity.session.grant_id, the grant chosen, with venue_id and working_venue_id as now; a role held at several venues with no grantId is 422 grant-required, and a grantId not the caller's or not of roleId is 403. Done when: the session names the chosen grant, the two refusals answer as stated, and the contract tests pass.",
+   "builds": [
+    "operation selectRole"
+   ]
+  },
+  {
+   "key": "CR514-PWNED-PASSWORDS-CORPUS",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-ENV"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "The breached-password corpus: the Pwned Passwords range dataset on a volume the hosts read (CR-514)",
+   "detail": "In **ticvai-infra**. ADAM CR-514 (the breach corpus is the Pwned Passwords range dataset), the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (identity.yaml PasswordPolicy.requireBreachCheck). Named under #27625 (Foundation, Setup and environments). The downloaded range dataset on a read-only volume each identity host mounts, refreshed on a schedule, with the lookup by hash prefix the credential checks use; no call leaves the cell. Done when: a known breached password is found and a fresh one is not, from inside the cell, and the refresh replaces the dataset without a gap.",
+   "builds": [
+    "operation createPrincipal",
+    "operation resetPrincipalCredential"
+   ],
+   "area": "devops"
+  },
+  {
+   "key": "CR514-CREATE-PRINCIPAL-BREACH-CHECK",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "CR514-PWNED-PASSWORDS-CORPUS"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "createPrincipal holds initialCredential to the password policy, the breach check included (CR-514)",
+   "detail": "Spec: ADAM CR-514, in the contracts at the release tag in ADAM (identity.yaml createPrincipal: \"initialCredential is held to setPasswordPolicy, the breach check included\"). A child of #31235 (createPrincipal, Ready for QA, not rewritten). Where PasswordPolicy.requireBreachCheck is on, a credential found in the corpus is 400 validation (errors[] names requireBreachCheck). Done when: a breached initial credential is refused, a fresh one is accepted, and the contract tests pass.",
+   "builds": [
+    "operation createPrincipal"
+   ]
+  },
+  {
+   "key": "CR514-RESET-CREDENTIAL-BREACH-CHECK",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "CR514-PWNED-PASSWORDS-CORPUS"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "resetPrincipalCredential holds the new credential to the breach check (CR-514)",
+   "detail": "Spec: ADAM CR-514, in the contracts at the release tag in ADAM (identity.yaml resetPrincipalCredential). A child of #31238 (resetPrincipalCredential, Ready for QA, not rewritten). Where PasswordPolicy.requireBreachCheck is on, a new credential found in the corpus is 400 validation (errors[] names requireBreachCheck). Done when: a breached credential is refused, a fresh one is accepted, and the contract tests pass.",
+   "builds": [
+    "operation resetPrincipalCredential"
+   ]
+  },
+  {
+   "key": "CR536-DEVELOPER-PORTAL-SIGN-IN",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Surendra Loke",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "R13-DB-SESSION-GRANT-AND-PRINCIPAL-EMAIL"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "Developer-portal sign-in, and the verified principal email it signs a partner in by (CR-536)",
+   "detail": "Spec: ADAM CR-536 (public-api tells callers apart by the token), the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (public-api.yaml \"How public-api tells callers apart\"). Named under #28008 (SVC-PLATFORM-PUBLICAPI-10, New). The developer portal's sign-in issues a partner token for a principal whose email is verified (identity.principal.email, R13-DB-SESSION-GRANT-AND-PRINCIPAL-EMAIL), and the public API tells TICVAI staff, a partner and tenant staff apart by that token. Done when: a partner with a verified email signs in and reaches only its own account, an unverified one is refused, and the contract tests pass.",
+   "builds": [
+    "operation getDeveloperAccount",
+    "operation verifyDeveloper"
+   ]
+  },
+  {
+   "key": "CR525-ROLE-PERMISSION-RECORDS-ROUTE",
+   "epic": "PLATFORM",
+   "points": 1,
+   "depends": [
+    "PLATFORM-KERNEL",
+    "KERNEL-SERVICE-AUTH"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "Identity serves identity#rolePermissionRecords on its service route, POST /queries/role-permission-records (CR-525)",
+   "detail": "Spec: ADAM CR-525 (setRolePermissions is built in Identity) and CR-438's served-query rule, in the contracts at the release tag in ADAM (identity.yaml x-ticvai-queries rolePermissionRecords, served [in-process, service]). The service route is POST /queries/role-permission-records on the identity host, the query's declared inputs as the JSON body, 200 with its rows, 401 to a caller that is not a fellow deployable (serviceAuth), 400 validation when neither ids nor where is given; white-label asks it (the TENANT_PUBLISH grants). Done when: a fellow deployable reads the rows as the in-process query answers them, any other caller is 401, and the asker's contract tests pass.",
+   "builds": [
+    "service IdentityService"
+   ],
+   "pool": "backend"
+  },
+  {
+   "key": "CR518-REFUND-SHIFT",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "A cash refund records the shift that paid it out, so the shift's expected cash counts it (CR-518)",
+   "detail": "Spec: ADAM CR-518 (the expected cash is one formula), the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (shift.yaml submitShiftCount's expected cash: F, the cash refunds the shift paid out). Named under #31924 (createRefund, New). A cash refund at a till records the open shift it was paid from, so F counts it; until this lands F stays zero, as the decision says. The package has no column for it yet: where the shift is stored is a change request on orders.refund raised with this task, and the [DB] work it needs follows. Done when: a cash refund names its shift and the shift's expected cash takes it away.",
+   "builds": [
+    "operation createRefund"
    ]
   }
  ],

@@ -1,0 +1,41 @@
+id: CHG-R13PL-061
+date: '2026-11-03'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR495-BOOKING-FLOW-BY-EVENT (Hrushikant Patkar): getPublishedBookingFlow resolves the flow from an event; named
+  under #27878.'
+decision:
+  what: The lead, 3 November 2026, adding the 62 CRs of 2 November to r13 ("get the NEw CRs in the r13"), each decided and
+    posted on its ticket; the integration's final plan pass files the tasks the lanes listed. ADAM CR-495 (lane w3). Plan
+    change waived from the cooling-off by the lead ("1 waive", 2 November 2026, for r13).
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Lane w3 (CR-495): "through a new child task" of #27878, which has started.'
+keys_touched:
+  tickets:
+  - CR495-BOOKING-FLOW-BY-EVENT (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change to a started ticket's work, carried by no plan task
+tickets:
+  started:
+  - '27878 (SVC-WHITELABEL-BOOKINGFLOWS-1, Ready for QA): not rewritten.'
+  unstarted:
+  - '31784, 31785 (GST-007): send eventId when there is no productId.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-495
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the text; a started
+  ticket''s text is not rewritten. A change-only [DB] task is `area: database` and its key does not end in -DB (CHG-R8MIG-016,
+  CHG-R12PL-008).'

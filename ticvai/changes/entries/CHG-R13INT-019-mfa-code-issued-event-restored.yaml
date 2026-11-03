@@ -1,0 +1,33 @@
+id: CHG-R13INT-019
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'events/identity-mfaCodeIssued.yaml is restored from the committed contracts: lane w4 (eb4a3e65) wrote it empty,
+  so marketing-crm#mfaCodeSender had no event to rely on and the plan build stopped ("no planned operation relies on it").
+  Its emitters, payload and consumer are read from identity.yaml createMfaChallenge and enrolMfaMethod (CR-522) and marketing-crm.yaml
+  x-ticvai-jobs.mfaCodeSender.'
+decision:
+  what: 'The integration''s final plan pass of 3 November 2026: fix every finding at its source. ADAM CR-522 (Chinmay, 3
+    November 2026) as the contracts state it.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-522): tools/build-service-docs.py stopped with "x-ticvai-jobs: marketing-crm#mfaCodeSender: no planned
+  operation relies on it"; the event file and ten of lane w4''s change entries (CHG-CR497-001, -498, -509, -512, -513, -514,
+  -522, -525, -526, -536) were committed with no content.'
+keys_touched:
+  files:
+  - events/identity-mfaCodeIssued.yaml
+root_class: an authored input committed empty, which no check refused
+tickets:
+  started: []
+  unstarted:
+  - '30662 (createMfaChallenge) and CONS-MARKETING-CRM-MFA-CODE-SENDER: as the contracts say.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-522
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'The ten empty change entries are not rewritten here: their content is lane w4''s to restore.'
