@@ -908,6 +908,9 @@
     "PLATFORM-KERNEL",
     "KERNEL-TENANT-LIMITS"
    ],
+   "operations": [
+    "getWaitingRoomPosition"
+   ],
    "subject": "The on-sale waiting room: Redis positions, the cached page, the release controller, admission tokens",
    "detail": "ADR-0066 (accepted 1 October; B1, or Block A if an on-sale is booked in Block A): enterWaitingRoom gives a position from a Redis counter with no database write; the static branded waiting page is served from Front Door's cache and polls getWaitingRoomPosition; a release controller admits guests per second from the health of commerce (latency and the 429 rate, ADR-0064); an admitted guest gets a short-lived signed token (tenant, performance, expiry, unique id; key in Key Vault) that middleware checks by signature, with no database read, on addCartLine and acquireInventoryHold from guest channels only (till, kiosk and workstation holds are exempt, amendment of 1 October); activation follows the performance's onSaleFrom/onSaleTo or setWaitingRoomSetting. Done when: with the room on, a guest cart hold without a token is refused 403 admission-required, one with a valid token succeeds, a forged or expired token or one for another performance is refused, a till hold needs no token, and the release rate drops when commerce latency rises.",
    "module": "Foundation & Setup",
@@ -3710,6 +3713,73 @@
    "detail": "Spec: ADAM CR-518 (the expected cash is one formula), the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (shift.yaml submitShiftCount's expected cash: F, the cash refunds the shift paid out). Named under #31924 (createRefund, New). A cash refund at a till records the open shift it was paid from, so F counts it; until this lands F stays zero, as the decision says. The package has no column for it yet: where the shift is stored is a change request on orders.refund raised with this task, and the [DB] work it needs follows. Done when: a cash refund names its shift and the shift's expected cash takes it away.",
    "builds": [
     "operation createRefund"
+   ]
+  },
+  {
+   "key": "CR504-PRODUCT-HIGHLIGHT-AND-RATING",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Narayan Gaonkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "CR504-542-DB-CATALOGUE-PRODUCT-AND-IMPORT"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "Catalogue: Product's highlight badge and rating, written on create and update and answered by every read (CR-504)",
+   "detail": "Spec: ADAM CR-504, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (catalogue.yaml Product.highlightBadge and Product.rating). Named under #31739 (WEB-005's build, New, which binds both). The shared Product mapping the operations' tickets use, built once: highlightBadge is per-language text keyed by ISO 639-1, at most 20 characters each, nullable, stored in catalogue.product.highlight_badge (jsonb), set by createProduct (#31652) and updateProduct (#30950) and answered by every read of Product; rating ({average 1.0 to 5.0 to one decimal, count at least 1}) is readOnly, not stored, answered by listProducts (#27870) and null until its source is decided. Done when: a badge set on create or update is read back in each language by every Product read, an over-long or unkeyed badge is 400 validation, rating is null, and the contract tests pass.",
+   "builds": [
+    "operation createProduct",
+    "operation updateProduct",
+    "operation listProducts"
+   ]
+  },
+  {
+   "key": "CR504-542-DB-CATALOGUE-PRODUCT-AND-IMPORT",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-CATALOGUE"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "catalogue.product keeps its highlight badge; catalogue.import_job keeps its mode and counts, and its parsed rows are staged in catalogue.import_job_row (CR-504, CR-542)",
+   "detail": "Spec: ADAM CR-504 and CR-542, the lead's decisions of 3 November 2026, in the contracts at the release tag in ADAM. The [DB] work under MIG-CATALOGUE (#27671; its sub-tasks #30400 catalogue.product and #30395 catalogue.import_job; all Ready for QA, not rewritten). One guarded forward migration in the tenant database, additive: catalogue.product.highlight_badge jsonb, nullable; catalogue.import_job mode, applied_count and failed_count. The new table catalogue.import_job_row is CR542-IMPORT-JOB-ROW-DB's. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table catalogue.product",
+    "table catalogue.import_job"
+   ]
+  },
+  {
+   "key": "CR542-IMPORT-JOB-ROW-DB",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-CATALOGUE"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "catalogue.import_job_row: the parsed rows of a catalogue import, staged before they are committed (CR-542)",
+   "detail": "Spec: ADAM CR-542 (the catalogue import stages rows and commits them), the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (importProductCatalogue #31634 writes the rows, commitCatalogueImport #30972 applies them). The table's creating migration, named under MIG-CATALOGUE (#27671, Ready for QA, not rewritten): CREATE TABLE catalogue.import_job_row as the package derives it (id, import_job_id, scope_path, row_number, action, target_product_id, payload, is_excluded, outcome, failure, product_id; unique (import_job_id, row_number)), with its keys, indexes and row-level security. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table catalogue.import_job_row"
+   ]
+  },
+  {
+   "key": "CR543-DB-ENTITLEMENT-FREEZE-WINDOW",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-ACCESS"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "access.entitlement keeps a membership's stored freeze window, frozen_from and frozen_until (CR-543)",
+   "detail": "Spec: ADAM CR-543, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (GuestMembership's freeze window, written by freezeEntitlement #35279). The [DB] work under MIG-ACCESS (its sub-task #30503 [DB] access.entitlement, Ready for QA, not rewritten). One guarded forward migration in the tenant database, additive: access.entitlement frozen_from and frozen_until, both nullable dates. No backfill. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table access.entitlement"
    ]
   }
  ],

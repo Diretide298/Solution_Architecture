@@ -1,0 +1,40 @@
+id: CHG-R13INT-020
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'The first-release slice does not take the writers of catalogue.change_request, change_request_line and package_pricing
+  as setup for bulkChangePrices: CR-544 reads them only to skip what an open pricing change request or a fixed package price
+  names, so it needs none made first (tools/derive-delivery-slice.py LATER_BLOCK_OPERATIONS, as CR-403 did for createSeatMapTemplate).
+  Taken as setup, they pulled ADM-079, ADM-083, ADM-130, BO-443 and BO-637 into Block A behind command centres outside it
+  (5 C-REACH), and catalogue.approval_policy into the first release, so MIG-CATALOGUE-3 (#28092) left the plan (15 key renames).'
+decision:
+  what: 'The integration gate of 3 November 2026: fix every new finding at its source. ADAM CR-544 (Chinmay, 3 November
+    2026): the run leaves untouched, and names in skipped, a product an open pricing change request or a fixed package price
+    names.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-544, lane w1''s bisection): bulkChangePrices'' new reads made check-key-stability report 15 renames
+  of MIG-CATALOGUE-3 (#28092) and check-plan-closure 5 new C-REACH.'
+keys_touched:
+  operations:
+  - bulkChangePrices
+  - setPricingChangeRequest
+  - decidePricingChangeRequest
+  - approveReviewDecision
+  - publishPricingEffectiveDate
+  - setPackagePricingDefinition
+  files:
+  - tools/derive-delivery-slice.py
+root_class: a read that only tests for a row taken as a need for that row's writer
+tickets:
+  started: []
+  unstarted:
+  - '30970 (bulkChangePrices, New): unchanged; #28092 keeps its key.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-544
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py::C-REACH
+status: open

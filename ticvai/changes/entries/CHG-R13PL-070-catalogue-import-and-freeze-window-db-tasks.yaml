@@ -1,0 +1,44 @@
+id: CHG-R13PL-070
+date: '2026-11-03'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'Three [DB] tasks, Hrushikant Patkar: CR504-542-DB-CATALOGUE-PRODUCT-AND-IMPORT (product.highlight_badge; import_job
+  mode, applied_count, failed_count; under MIG-CATALOGUE #27671), CR542-IMPORT-JOB-ROW-DB (creates catalogue.import_job_row)
+  and CR543-DB-ENTITLEMENT-FREEZE-WINDOW (access.entitlement frozen_from and frozen_until, under MIG-ACCESS).'
+decision:
+  what: The lead, 3 November 2026, adding the 62 CRs of 2 November to r13 ("get the NEw CRs in the r13"), each decided and
+    posted on its ticket; the integration's plan pass files the tasks lane w1 listed. ADAM CR-504, CR-542 and CR-543 (lane
+    w1). Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026, for r13).
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: lane w1 (ADAM CR-542, CR-543) asked for the [DB] tasks under MIG-CATALOGUE and MIG-ACCESS, both started.'
+keys_touched:
+  tickets:
+  - CR504-542-DB-CATALOGUE-PRODUCT-AND-IMPORT (new)
+  - CR542-IMPORT-JOB-ROW-DB (new)
+  - CR543-DB-ENTITLEMENT-FREEZE-WINDOW (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change whose database work belongs to a started migration ticket, carried by no plan task
+tickets:
+  started:
+  - '27671 (MIG-CATALOGUE) with 30400 and 30395, and 30503 (MIG-ACCESS#access.entitlement), Ready for QA: not rewritten.'
+  unstarted:
+  - '30972, 31634 (the import), 35279 (freezeEntitlement), 30973 (getMyMemberships): once the migration lands.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-542
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-02'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: The plan has no task under a task or sub-task, so the ticket the work belongs to is named in the text; a started
+  ticket's text is not rewritten. A change-only [DB] task's key does not end in -DB; a task that creates a table does (CHG-R8MIG-016,
+  CHG-R12PL-008).

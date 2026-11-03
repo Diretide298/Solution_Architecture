@@ -123,6 +123,15 @@ LATER_BLOCK_OPERATIONS = {
     # its read of seating.seat_map_template needs no template made first; the slice keeps templates where r11 had
     # them (BO-962, wave 3) instead of pulling BO-962 into Block A behind BO-953 (CHG-R12INT-004)
     "createSeatMapTemplate": "makes an optional template on BO-962, wave 3: createSeatMap needs none (ADAM CR-403; CHG-R12INT-004)",
+    # ADAM CR-544 (3 November 2026): bulkChangePrices reads catalogue.change_request, change_request_line and
+    # package_pricing only to skip what an open pricing change request or a fixed package price names, so it needs none
+    # made first; their writers stay where r13 planned them instead of pulling ADM-078, ADM-128, BO-434 and BO-635's
+    # screens into Block A behind their command centres (check-plan-closure C-REACH; CHG-R13INT-021)
+    "setPricingChangeRequest": "raises a pricing change request; bulkChangePrices only skips a product one names (ADAM CR-544; CHG-R13INT-021)",
+    "decidePricingChangeRequest": "decides a pricing change request; bulkChangePrices only skips a product an open one names (ADAM CR-544; CHG-R13INT-021)",
+    "approveReviewDecision": "decides a review on a change request; bulkChangePrices needs none (ADAM CR-544; CHG-R13INT-021)",
+    "publishPricingEffectiveDate": "dates a pricing change request; bulkChangePrices needs none (ADAM CR-544; CHG-R13INT-021)",
+    "setPackagePricingDefinition": "defines a package price; bulkChangePrices only skips a fixed package price (ADAM CR-544; CHG-R13INT-021)",
 }
 LATER_BLOCK_SCREENS = {
     "BO-1191": "Organisation, Block B (CHG-R6-040)",
