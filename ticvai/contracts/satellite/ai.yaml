@@ -6092,6 +6092,7 @@ paths:
       - knowledge
       x-ticvai-permission: AI_USE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -8721,8 +8722,10 @@ paths:
                   type: string
                   format: uuid
                   nullable: true
-                  description: Known customer, where signed in. Taken from the guest session for a guest caller,
-                    never from the body.
+                  description: 'Known customer, where signed in. Taken from the guest session for a guest caller,
+                    never from the body. **An anonymous caller has no subject** (r13 system review C-06, CHG-R14H-003):
+                    a `subjectId` it sends is ignored and the slot is filled for no known customer, so nobody reads
+                    another guest''s recommendations by naming them. A staff caller may name one.'
                 sessionRef:
                   type: string
                   nullable: true

@@ -2004,6 +2004,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2033,6 +2034,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [accreditation-application-not-editable]
           description: The application is not draft or informationRequested
@@ -2080,6 +2083,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2096,6 +2100,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [accreditation-application-not-draft, accreditation-window-closed]
           description: Not a draft, or the programme's application window is closed
@@ -2152,6 +2158,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2203,6 +2210,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [accreditation-application-not-resubmittable, accreditation-window-closed]
           description: Not informationRequested or rejected, or the programme's window is closed
@@ -2253,6 +2262,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2287,6 +2297,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [accreditation-application-already-closed]
           description: The application is already decided, withdrawn or expired
@@ -2432,7 +2444,8 @@ paths:
 
 
         Issued under the same wallet issuer accounts as `orders.issueWalletPass`. Only the caller''s own
-        credential (`403`), and only one that is `issued` or `active` (`409`). Recorded as an
+        credential (another holder''s is the shared `404`, as one that does not exist: `x-ticvai-object-owner`, r13
+        system review C-03, CHG-R14H-003), and only one that is `issued` or `active` (`409`). Recorded as an
         `AccreditationCredentialDelivery` with channel `appleWallet` or `googleWallet`.
 
         '
@@ -2440,6 +2453,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - guest
       x-ticvai-scope-level: venue
@@ -2476,6 +2490,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [credential-not-mobile-or-qr, credential-not-issued-or-active]
           description: The credential is not a mobile or QR credential, or is not issued or active
@@ -2669,13 +2685,16 @@ paths:
 
         Only inside the renewal window (`renewalWindowDays` before `validTo`, or during a grace period) and
         only for an `active` or `expired` holder (`409`); a `revoked` holder applies afresh. A guest may renew
-        only their own accreditation (`403`).
+        only their own accreditation: another holder''s is the shared `404`, exactly as one that does not exist
+        (`x-ticvai-object-owner`; r13 system review C-03, CHG-R14H-003; it said `403`, which told the caller the
+        holder exists).
 
         '
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2715,6 +2734,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [outside-renewal-window, holder-not-renewable, renewal-already-open]
           description: Outside the renewal window, the holder is revoked, suspended or archived, or a renewal

@@ -1,0 +1,42 @@
+id: CHG-R14INT-002
+date: '2026-11-04'
+source: audit
+kind: spec
+summary: 'POS-000, EMP-001 and SCN-001 (the till, staff app and scanner sign-in, the device doors of CHG-R14H-001) say
+  "This device is not registered" in their existing error state when login answers 401 device-unauthenticated or 403
+  workstation-mismatch, rather than that the PIN or password is wrong: the device''s own credential was refused before
+  any PIN or password was checked, so no attempt is spent. No new state, control or layout; logged in
+  approved-ui-changes.yaml.'
+decision:
+  what: 'The coordinator''s decision for lane h at the r14 integration, taken overnight under the lead''s instruction of
+    4 November 2026 ("take the recommended decision unless its very very important"): the three device doors show
+    "This device is not registered" in their existing error state for 401 device-unauthenticated and 403
+    workstation-mismatch, logged as a design change.'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'CHG-R14H-001 (r13 system review C-04) makes a device door authenticate the device (deviceAuth) and answer 401
+  device-unauthenticated or 403 workstation-mismatch before any PIN or password is checked; the three sign-in screens
+  had no words for that answer, and their error state said only that Identity could not be reached.'
+keys_touched:
+  screens: [POS-000, EMP-001, SCN-001]
+  operations: [login]
+  files:
+  - screens/P04-point-of-sale.yaml
+  - screens/P06-staff-app.yaml
+  - screens/P07-staff-scanner.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: a new refusal with no words on the screen that receives it
+tickets:
+  started: []
+  unstarted:
+  - '27767 / 30747 / 30748 / 30749 ([FE] POS-000 Sign In, Pradnya Yeram, New): the words in the error state.'
+  - '27758 / 30732 / 30733 / 30734 ([FE] EMP-001 Sign in, Chitrangi Mestry, New): the same.'
+  - '27761 / 30735 / 30736 / 30737 ([FE] SCN-001 Sign in, Chitrangi Mestry, New): the same.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 system review finding C-04, lane h of r14, decided at the integration'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open

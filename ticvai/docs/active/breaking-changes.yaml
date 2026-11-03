@@ -2072,3 +2072,63 @@ changes:
     tag: r13
     producer-tickets: ['30970']
     consumer-tickets: [none-linked]
+  - id: BC-800
+    contract: identity
+    operation: login
+    operations: [login, completeSsoAuthorization, forceLogout, listActiveSessions]
+    change: "security changed"
+    reason: 'r13 system review C-04 (CHG-R14H-001): the device doors trusted a workstationId the caller typed, and the
+      till''s session-less supervisor step-up admitted a call with no credential ({}), so any internet caller who
+      learned a workstation id could try PINs, list and end sessions and lock every supervisor. A device door now
+      authenticates its device (deviceAuth) and the workstation is the device''s. login and completeSsoAuthorization
+      keep {} for the browser doors and add deviceAuth; forceLogout and listActiveSessions replace {} with deviceAuth.
+      Removing the unauthenticated door cannot be made additive.'
+    approved-by: 'Chinmay, 3 November 2026 ("All four, one release", on the triage of the r13 system review: device, guest and token access go into r14)'
+    tag: r14
+    producer-tickets: ['30674', '30729', '30721', '30746']
+    consumer-tickets: ['27758', '27761', '27767', '27772', '27783', '27785', '29045', '30732', '30733', '30734', '30735',
+      '30736', '30737', '30747', '30748', '30749', '30753', '30754', '30755', '30787', '30788', '30789', '30790', '30791',
+      '30792', '33754', '33755', '33756']
+  - id: BC-801
+    contract: orders
+    operation: captureStoredValue
+    operations: [captureStoredValue, relinquishStoredValue]
+    change: "security changed"
+    reason: 'r13 system review C-04 (CHG-R14H-001): a device took and released stored value under any device key
+      (apiKeyAuth), a signage display''s included. A device that moves stored value now authenticates as itself
+      (deviceAuth) and is one of the operation''s x-ticvai-device-kinds (the readers on a machine). A scheme removed
+      from security cannot be made additive.'
+    approved-by: 'Chinmay, 3 November 2026 ("All four, one release", on the triage of the r13 system review: device, guest and token access go into r14)'
+    tag: r14
+    producer-tickets: ['32272', '32268']
+    consumer-tickets: ['28642', '32915', '32916', '32917']
+  - id: BC-802
+    contract: games
+    operation: recordGamePlay
+    operations: [recordGamePlay, syncGamePlays]
+    change: "security changed"
+    reason: 'r13 system review C-04 (CHG-R14H-001): a machine''s reader deducts credits under any device key
+      (apiKeyAuth). It now authenticates as itself (deviceAuth), a cardReader, rfidReader or nfcReader
+      (x-ticvai-device-kinds). A scheme removed from security cannot be made additive.'
+    approved-by: 'Chinmay, 3 November 2026 ("All four, one release", on the triage of the r13 system review: device, guest and token access go into r14)'
+    tag: r14
+    producer-tickets: ['32996', '32997']
+    consumer-tickets: [none-linked]
+  - id: BC-803
+    contract: tenancy
+    operation: listWorkstations
+    operations: [listWorkstations, getWorkstation, configureWorkstation, listDevices, registerDevice, getDevice,
+      enrolDevice, approveDevice]
+    change: "gained enum value(s) ['workstationTerminal']"
+    reason: 'r13 system review C-04 (CHG-R14H-001): a till or kiosk computer had no device kind, so it could hold no
+      deviceAuth credential and the device doors could not authenticate it. DeviceKind gains workstationTerminal (the
+      computer a device door runs on, bound to its workstation). A value added to a response enum is breaking by the
+      compat rule: a client that switches on kind shows the new value as unknown until it is built.'
+    approved-by: 'Chinmay, 3 November 2026 ("All four, one release", on the triage of the r13 system review: device, guest and token access go into r14)'
+    tag: r14
+    producer-tickets: ['32814', '32812', '30794', '30798', '32815', '33989']
+    consumer-tickets: ['27793', '28753', '29006', '29103', '29110', '29113', '29114', '29116', '29117', '29118', '29119',
+      '29171', '29666', '30807', '30808', '30809', '33131', '33132', '33133', '33722', '33723', '33724', '33871', '33872',
+      '33873', '33886', '33887', '33888', '33895', '33896', '33897', '33898', '33899', '33900', '33904', '33905', '33906',
+      '33907', '33908', '33909', '33910', '33911', '33912', '33913', '33914', '33915', '34030', '34031', '34032', '35089',
+      '35090', '35091', '36340', '36341', '36342', '37014', '37040', '37041', '37042']

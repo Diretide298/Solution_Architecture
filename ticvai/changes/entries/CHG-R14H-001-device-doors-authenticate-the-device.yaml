@@ -1,0 +1,99 @@
+id: CHG-R14H-001
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'The device doors authenticate the device, never a workstationId the caller types. login and
+  completeSsoAuthorization admit deviceAuth beside {} (the browser doors), and forceLogout and listActiveSessions replace
+  {} with deviceAuth, so the till''s session-less supervisor step-up comes only from a registered device. The workstation
+  is the one the device is bound to (x-ticvai-workstation-from: device): a body workstationId that is not it is 403
+  workstation-mismatch, one sent without deviceAuth is 401 device-unauthenticated, both before any PIN is checked. Every
+  operation a device credential reaches lists the device kinds it accepts (x-ticvai-device-kinds; 403
+  device-kind-not-allowed), and the four that move stored value (captureStoredValue, relinquishStoredValue,
+  recordGamePlay, syncGamePlays) take deviceAuth instead of any device key. DeviceKind gains workstationTerminal, the
+  computer a till or kiosk door runs on.'
+decision:
+  what: 'The lead (Chinmay), 3 November 2026, on the triage of the r13 system review: "All four, one release" (device,
+    guest and token access go into r14 with the starters, gate integrity, tenant setup and stale docs). Review finding
+    C-04: the device doors trust a workstationId the caller types in, so PIN sign-in and the session-less till step-up
+    are open to any internet caller; require deviceAuth on the device-bound sign-in, on every session-less step-up and
+    on device money operations, bind the workstation to the authenticated device, add a per-device-kind allow-list, and
+    a check.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review finding C-04 (HIGH): login said "the device is what bounds a PIN" (ADR-0071 point 6) but took
+  the device as a body field; forceLogout and listActiveSessions admitted {} under a supervisor PIN, so anyone with a
+  workstation id could try PINs, list and end sessions and lock every supervisor (ADR-0071 point 5). deviceAuth existed
+  since CHG-R8SPN-030 and two of 2,866 operations used it. CHG-RUL-015 (the session-less step-up) predates it.'
+keys_touched:
+  operations:
+  - login
+  - completeSsoAuthorization
+  - forceLogout
+  - listActiveSessions
+  - captureStoredValue
+  - relinquishStoredValue
+  - recordGamePlay
+  - syncGamePlays
+  - reportReaderQueue
+  - getSignageQueueBoard
+  - getSignageQueueCalls
+  - submitQueueReading
+  - endKioskAssist
+  - reprintOrder
+  - recordDeviceHeartbeat
+  - recordDeviceTamperEvent
+  schemas:
+  - LoginRequest
+  - DeviceKind
+  tables:
+  - platform.device
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/README.md
+  - docs/adr/0071-credentials-are-stored-as-argon2id-phc-strings.md
+  - docs/active/breaking-changes.yaml
+  - tools/check-doors.py
+  other:
+  - 'BC-800 to BC-803 (security of the four door operations, of the four stored-value operations, and DeviceKind
+    workstationTerminal)'
+root_class: a device door that names its device instead of authenticating it
+tickets:
+  started:
+  - '#30674 login (Ready for QA, Hrushikant): text not rewritten; a device-bound method (pin, card, rfid) and any
+    workstationId need deviceAuth; the workstation is the device''s; 401 device-unauthenticated and 403
+    workstation-mismatch before the credential is checked.'
+  - '#30721 forceLogout (Ready for QA, Deep) and #30746 / #27766 listActiveSessions (Ready for QA, Chinmay Patkar): the
+    session-less call is deviceAuth, never {}; the same 401 and 403.'
+  - '#32268 relinquishStoredValue (In progress, Sanket): the device calls with deviceAuth (cardReader, rfidReader,
+    nfcReader), no longer apiKeyAuth.'
+  - '#30679 reprintOrder (In progress, Narayan): the kiosk''s device key is accepted only from a workstationTerminal.'
+  - '#30830 recordDeviceTamperEvent (Ready for QA, Pranay): any device kind (all); nothing to build beyond the shared
+    kind check.'
+  - '#27665 / #30329 [DB] platform.device (Ready for QA, Hrushikant): device_kind_chk gains workstationTerminal (a
+    forward migration, MIG child task).'
+  - '#30790 PTR-001 (Ready for QA, Surendra): browser door, unchanged; listed because it binds login.'
+  unstarted:
+  - '#30729 completeSsoAuthorization, #32272 captureStoredValue, #32996 recordGamePlay, #32997 syncGamePlays and the
+    device doors'' frontend tickets (POS-000, EMP-001, SCN-001): build to the contract at r14.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review finding C-04, lane h of r14 (the lead''s "All four, one release")'
+prevention:
+  type: check
+  ref: tools/check-doors.py::D-DEVICE-DOOR, D-DEVICE-KINDS, D-DEVICE-MONEY
+status: open
+notes: 'Beyond the review''s words, for the lead: DeviceKind gains workstationTerminal (a till or kiosk computer had no
+  device kind, so it could hold no deviceAuth credential); the device kinds per operation are this lane''s reading
+  (readers on a machine for stored value and plays, signageDisplay for the signage reads, camera for queue readings,
+  workstationTerminal for the kiosk''s reprint and assist end, all for heartbeat and tamper). getGameCard (the reader
+  path, apiKeyAuth, audience guest and staff, no device) is not given a kind list: its audience does not say a device
+  calls it. New tasks: a MIG child task for device_kind_chk; a kernel task for deviceAuth on the device doors and the
+  device-kind check (child of #27692); POS-000, EMP-001 and SCN-001 frontends enrol and present the device credential.
+  The forward migration derive-ddl wrote for device_kind_chk was deleted (the integration writes r14''s).'

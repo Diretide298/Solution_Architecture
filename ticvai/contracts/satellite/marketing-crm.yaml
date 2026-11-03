@@ -919,6 +919,7 @@ paths:
       - marketing
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - guest
       x-ticvai-scope-level: tenant
@@ -949,6 +950,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CaseDetail'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/conversations/{conversationId}:
@@ -1587,6 +1590,7 @@ paths:
       - marketing
       x-ticvai-permission: GUEST_MANAGE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -1618,6 +1622,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestPreferences'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /invitation-campaigns:
@@ -1671,6 +1677,7 @@ paths:
     parameters:
     - name: token
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -2133,6 +2140,7 @@ paths:
       - marketing
       x-ticvai-permission: GUEST_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2165,6 +2173,8 @@ paths:
                   expiringWithinDays:
                     type: integer
                     nullable: true
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-documents:
@@ -4113,6 +4123,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -4176,6 +4187,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConversationMessage'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/handover:
@@ -4198,6 +4211,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - guest
       summary: Pass an assistant conversation to a person
@@ -4266,6 +4280,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: '**No agent available.** Returns the reason and offers a case, rather than queuing
             a guest for somebody who is not there.
@@ -4616,6 +4632,7 @@ paths:
       operationId: endKioskAssist
       x-ticvai-consumed-by:
         - "P05 KSK-013 Call staff"
+      x-ticvai-device-kinds: [workstationTerminal]
       security:
       - apiKeyAuth: []
       - serviceAuth: []
@@ -4989,6 +5006,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -19779,6 +19797,7 @@ paths:
       parameters:
       - name: X-Consent-Key
         in: header
+        x-ticvai-secret: bearer
         required: true
         description: The key the visitor's browser or app holds
         schema:
@@ -19942,6 +19961,7 @@ paths:
           maxLength: 10
       - name: X-Consent-Key
         in: header
+        x-ticvai-secret: bearer
         required: false
         description: The key the visitor's browser or app holds, if any
         schema:
@@ -23782,7 +23802,9 @@ components:
           nullable: true
         token:
           type: string
-          description: '**Single-use and unguessable.** An invitation link forwarded to a group chat is
+          description: '**Single-use and unguessable**: at least 128 bits from a cryptographic random source (22 or more
+            base64url characters), never logged (`x-ticvai-secret: bearer` on the path; r13 system review C-13,
+            CHG-R14H-005). An invitation link forwarded to a group chat is
             the failure mode, and a token that survives its first use is one that ends up there.
 
             '

@@ -2225,6 +2225,7 @@ paths:
       - catalogue
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2290,6 +2291,8 @@ paths:
             application/json:
               schema:
                 $ref: ../spine/access.yaml#/components/schemas/Entitlement
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: 'Already `frozen`, or `suspended`, or ended as `expired` or `cancelled`; only an `active` one is frozen. Nothing changes.'
           x-ticvai-problem-types: [entitlement-already-frozen, entitlement-suspended, entitlement-ended]
@@ -2937,6 +2940,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - guest
       summary: Stop waiting
@@ -2954,6 +2958,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Left
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist-entries/{entryId}/offer:
@@ -19179,6 +19185,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-015 Branded Queue / Waiting Room"
         - "P02 GST-046 Branded Queue / Waiting Room"
+      x-ticvai-object-owner: [token]
       x-ticvai-audience:
       - anonymous
       - guest

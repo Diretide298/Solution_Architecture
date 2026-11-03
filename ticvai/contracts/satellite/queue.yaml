@@ -1369,6 +1369,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      x-ticvai-device-kinds: [camera]
       security:
         - apiKeyAuth: []
         - serviceAuth: []
@@ -1531,6 +1532,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-device-kinds: [signageDisplay]
       security:
         - apiKeyAuth: []
       parameters:
@@ -1584,6 +1586,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-device-kinds: [signageDisplay]
       security:
         - apiKeyAuth: []
       parameters:

@@ -128,3 +128,23 @@ device: the device would need the pepper. **The exception, and its limits:**
 The residual risk is the one ADR-0013's amendment states: a stolen, unlocked till's verifiers can be brute-forced,
 for that venue's signers, within their 24 hours. **Open: a security review of the device store and the package**
 (the one CHG-R8SPN-027 named for offline sign-in), before the first venue trades offline with it.
+
+## Amendment, 3 November 2026: a registered workstation is proven by its device credential
+
+**Decided by Chinmay, 3 November 2026** ("All four, one release", on the r13 system review's triage; review
+finding C-04; CHG-R14H-001). Point 6 says a PIN "is valid only on a registered workstation", and `login` said the
+device is what bounds a PIN; but the workstation was a `workstationId` the caller typed into the body, and the
+session-less supervisor step-up on the till (`listActiveSessions`, `forceLogout`) admitted a call with no credential
+at all. Anyone who learned a workstation id could try PINs from the internet, list who was signed in, end sessions
+and lock every supervisor's PIN at will (point 5's lockout used as denial of service).
+
+**The workstation is proven, never named.** A device door (the till, the shared handheld, the scanner) calls with
+`deviceAuth` (`contracts/shared/common.yaml`): the credential `enrolDevice` issued to the device it runs on, a
+`workstationTerminal` for a till or kiosk computer and the device's own `handheldScanner` credential for a handheld.
+The workstation is the one that device is bound to; a `workstationId` in the request that is not it is `403
+workstation-mismatch`, and one sent without `deviceAuth` is `401 device-unauthenticated`. Both are answered before any
+PIN or password is checked, so neither spends an attempt nor moves a lockout. A device-bound method (`pin`, `card`,
+`rfid`) without `deviceAuth` is `400 workstation-required`. An operation that takes its workstation this way says so
+with `x-ticvai-workstation-from: device`, and lists the device kinds it accepts in `x-ticvai-device-kinds`; a session-less
+step-up is never admitted by `{}`. `tools/check-doors.py` (D-DEVICE-DOOR, D-DEVICE-KINDS) fails an operation that names a
+workstation with no session and does not authenticate the device, or a device-reachable operation that lists no kinds.

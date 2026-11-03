@@ -1234,3 +1234,27 @@ changes:
   to: 1ed6e4283e0a9e04
   approval: 'Design change approved by the lead, 3 November 2026 ("Offline verifier" (the till keeps a verifier, re-checked at sync), on system review finding F-01): offline, a withdrawal is countersigned from the till''s own list and PIN check, the supervisorPinPrompt component''s offline state.'
   change: CHG-R14V-001
+- screen: POS-000
+  field: 'state:error'
+  to: 9ba43d52d7288d7c
+  approval: 'Decided overnight 4 November 2026 under the lead''s instruction ("take the recommended decision unless its
+    very very important"), on r14 lane h (r13 system review C-04, the lead''s "All four, one release"; CHG-R14H-001):
+    the device door''s existing error state says "This device is not registered" for 401 device-unauthenticated and
+    403 workstation-mismatch; no new state, control or layout.'
+  change: CHG-R14INT-002
+- screen: EMP-001
+  field: 'state:error'
+  to: fa91048edd015379
+  approval: 'Decided overnight 4 November 2026 under the lead''s instruction ("take the recommended decision unless its
+    very very important"), on r14 lane h (r13 system review C-04, the lead''s "All four, one release"; CHG-R14H-001):
+    the device door''s existing error state says "This device is not registered" for 401 device-unauthenticated and
+    403 workstation-mismatch; no new state, control or layout.'
+  change: CHG-R14INT-002
+- screen: SCN-001
+  field: 'state:error'
+  to: fa91048edd015379
+  approval: 'Decided overnight 4 November 2026 under the lead''s instruction ("take the recommended decision unless its
+    very very important"), on r14 lane h (r13 system review C-04, the lead''s "All four, one release"; CHG-R14H-001):
+    the device door''s existing error state says "This device is not registered" for 401 device-unauthenticated and
+    403 workstation-mismatch; no new state, control or layout.'
+  change: CHG-R14INT-002

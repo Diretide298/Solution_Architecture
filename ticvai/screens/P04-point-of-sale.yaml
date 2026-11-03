@@ -125,8 +125,11 @@ screens:
       is not there and the keypad is the whole screen. This is the state on the morning a terminal is
       first plugged in, and it is the one a venue sees when it opens - not a fault, and it must not read
       as one.'
-    error: Identity could not be reached. **Says so rather than saying the PIN is wrong** -- telling an
-      operator their PIN failed when the network did sends them to a supervisor with the wrong question.
+    error: 'Identity could not be reached. **Says so rather than saying the PIN is wrong** -- telling an
+      operator their PIN failed when the network did sends them to a supervisor with the wrong question. **On
+      `401 device-unauthenticated` or `403 workstation-mismatch` it says "This device is not registered"**
+      rather than that the PIN is wrong: the device''s own credential was refused before any PIN was checked, so
+      no attempt is spent (ADR-0071 amendment of 3 November 2026, CHG-R14H-001; CHG-R14INT-002).'
     denied: The employee number and PIN do not match, or the account is locked. Names which, and how many
       attempts remain before the lock.
     emptyNoAccess: Authentication succeeded and the operator holds no role on this workstation. **A real

@@ -8786,6 +8786,7 @@ paths:
       - fnb
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest

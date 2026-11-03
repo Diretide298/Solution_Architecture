@@ -228,7 +228,15 @@ done
 #     platform.scope forces row security, so the insert runs in a transaction that grants the session the root
 #     path first (SET LOCAL ticvai.scope_paths); without it only a superuser could write the row, and on a
 #     managed server provisioning would stop after createdb.
-ROOT_PATH="t_$(printf '%s' "$SLUG" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_' '_')"
+# **The label is the tenant's id** (r13 system review finding C-05, CHG-R14H-002): `t_` and the uuid's 32 hex digits,
+#     one label per tenant by construction. The slug made a label was lossy (`acme-1` and `acme_1` both gave
+#     `t_acme_1`), and a cell holds many tenants. A database with no tenant id (a local one, never registered) keeps
+#     the slug's label.
+if [ -n "$TENANT_ID" ]; then
+  ROOT_PATH="t_$(printf '%s' "$TENANT_ID" | tr '[:upper:]' '[:lower:]' | tr -d -c '0-9a-f')"
+else
+  ROOT_PATH="t_$(printf '%s' "$SLUG" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9_' '_')"
+fi
 psql -v ON_ERROR_STOP=1 -d "$SLUG" <<SQL >/dev/null
   BEGIN;
   SET LOCAL ticvai.scope_paths = '$ROOT_PATH';

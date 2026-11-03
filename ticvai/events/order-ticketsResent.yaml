@@ -24,8 +24,11 @@ payload:
 - field: destination
   type: string
   required: false
+  x-ticvai-secret: field-encrypted
   notes: Where to send; null means the recipient already on each credential (the order holds no plain contact),
-    found by the consumer as its purpose states (ADAM CR-554)
+    found by the consumer as its purpose states (ADAM CR-554). An email address or phone number, so field-encrypted
+    through IFieldEncryption by the publisher and decrypted by the access consumer when it records the delivery,
+    never in clear in the outbox or the broker (r13 system review C-16, CHG-R14H-004)
 - field: subjectId
   type: uuid
   required: false

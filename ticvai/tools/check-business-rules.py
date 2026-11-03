@@ -128,6 +128,10 @@ And one rule per decision:
                    operations it named: a unique key behind a keyed upsert, the transfer rules' version, row security
                    for the guest an operation names, reprintOrder for a guest-checkout buyer, the tables and reads a
                    text uses, a column for each field kept, and one rule where a text contradicted itself.
+  BR-TOKEN-TENANT, BR-ROOT-LABEL (r14 review lane h, the r13 system review's C-05; Chinmay, 3 November 2026: "All
+                   four, one release"; CHG-R14H-002): bearerAuth and guestAuth, and the permission spec's section 7,
+                   refuse a token whose tenant is not the host's tenant before anything is read; provision-tenant.sh
+                   makes the tenant's root scope label from the tenant id, never from the lossy slug.
   BR-VENUE-LIMIT-DEFAULT, BR-ENROL-FIELDS, BR-CART-ANONYMOUS, BR-TENANT-ROW-READ, BR-TAMPER-DETECTED-AT,
   BR-TRANSFER-GUEST-WRITE, BR-RESEND-THROUGH-ACCESS, BR-HELD-LEASES-NOOP, BR-EXPECTED-CASH, BR-QUEUE-EVENT-READS,
   BR-HOST-IDEMPOTENCY (r13 second CR round, lane w2: ADAM CR-484 to CR-527, CHG-CR484-001 to CHG-CR527-001): a
@@ -592,8 +596,9 @@ And one rule per decision:
                    investigating with a reason; each change logged. Checked in the contract and `states/incident.yaml`.
   BR-FARE          (CHG-RUL-012) Fare tables are versioned by `effectiveFrom`: a future table sits beside the
                    current one (`FareTable.upcoming`) and a quote prices at travel time (`travelAt`).
-  BR-SESSIONS-DOOR (CHG-RUL-015) `listActiveSessions` and `forceLogout` admit a call with no session (`{}`) and
-                   carry the supervisor's PIN step-up themselves.
+  BR-SESSIONS-DOOR (CHG-RUL-015) `listActiveSessions` and `forceLogout` admit a call with no session and
+                   carry the supervisor's PIN step-up themselves; since r14 that call is the till's device
+                   (`deviceAuth`), never `{}` (r13 system review C-04, CHG-R14H-001).
   BR-ATTENDANCE    (CHG-RUL-016) `recordAttendance` acts on the caller (`x-ticvai-self-scoped: principal`, no
                    person in the body); `amendAttendance` is the supervisor's correction.
   BR-AI-CURRENCY   (CHG-RUL-017) The AI spend ceiling defaults to the tenant's billing currency, never USD.
@@ -898,7 +903,11 @@ def main() -> int:
     # -------------------------------------------------------------- BR-SESSIONS-DOOR
     for oid in ("listActiveSessions", "forceLogout"):
         o = op(oid)[3]
-        need("BR-SESSIONS-DOOR", {} in (o.get("security") or []), f"{oid} does not admit a call with no session")
+        # The session-less call is the till's device since r14 (r13 system review C-04, CHG-R14H-001): deviceAuth,
+        # never {} (an unauthenticated caller), so the door stays usable and is no longer open to the internet.
+        sec = o.get("security") or []
+        need("BR-SESSIONS-DOOR", {"deviceAuth": []} in sec and {} not in sec,
+             f"{oid} does not admit the till's session-less call as its device (deviceAuth, never {{}})")
         need("BR-SESSIONS-DOOR", bool(o.get("x-ticvai-step-up-carrier")), f"{oid} carries no supervisor step-up")
 
     # -------------------------------------------------------------- BR-ATTENDANCE
@@ -2963,6 +2972,7 @@ def main() -> int:
     lane_d_rules_r14(need, op)
     lane_a_rules_r14(need, op)
     lane_f_rules_r14(need, op)
+    review_h_rules_r14(need)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -3007,7 +3017,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_E_RULES + R14_D_RULES + R14_A_RULES + R14_F_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_E_RULES + R14_D_RULES + R14_A_RULES + R14_F_RULES + R14_H_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -5473,6 +5483,33 @@ def lane_f_rules_r14(need, op):
          and "not `PublishedTenantConfig`" in words(g7.get("notes")),
          "TenantAppStatus.venues carries no timeZone, or GST-007 does not take the zone from it (CR-556 as "
          "corrected)")
+
+
+
+R14_H_RULES = ["BR-TOKEN-TENANT", "BR-ROOT-LABEL"]
+
+
+def review_h_rules_r14(need):
+    """r14 review lane h (the r13 system review's C-05; Chinmay, 3 November 2026: "All four, one release";
+    CHG-R14H-002). Each rule fails on 9b572f8f and passes on the change."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    schemes = ((load("contracts/shared/common.yaml").get("components") or {}).get("securitySchemes") or {})
+    for name in ("bearerAuth", "guestAuth"):
+        d = words((schemes.get(name) or {}).get("description"))
+        need("BR-TOKEN-TENANT", "`tenant` claim is not" in d and "401 unauthenticated" in d
+             and ("host" in d or "bearerAuth" in d),
+             f"{name} does not refuse (401 unauthenticated) a token whose tenant claim is not the host's tenant (C-05)")
+    spec = words((ROOT / "docs/architecture/specs/permission-resolution.md").read_text(encoding="utf-8"))
+    need("BR-TOKEN-TENANT", "the token's tenant is the request's tenant" in spec.lower()
+         and "names a session registry entry of another tenant" in spec,
+         "permission-resolution.md section 7 does not bind the token's tenant (and its sid's registry entry) to the "
+         "host's tenant (C-05)")
+    prov = (ROOT / "backend/provision-tenant.sh").read_text(encoding="utf-8")
+    need("BR-ROOT-LABEL", 'ROOT_PATH="t_$(printf \'%s\' "$TENANT_ID"' in prov,
+         "provision-tenant.sh does not make the root scope label from the tenant id: a slug's label is lossy and two "
+         "tenants of one cell can share a root path (C-05)")
 
 
 if __name__ == "__main__":

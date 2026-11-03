@@ -1196,6 +1196,7 @@ paths:
       - wallet
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -1217,6 +1218,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/SharedWalletMember'
       responses:
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
@@ -2282,6 +2285,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -2947,6 +2951,7 @@ paths:
     parameters:
       - name: cardCode
         in: path
+        x-ticvai-secret: bearer
         required: true
         schema: { type: string }
     get:
@@ -2998,6 +3003,7 @@ paths:
     parameters:
       - name: cardCode
         in: path
+        x-ticvai-secret: bearer
         required: true
         schema: { type: string }
     post:
@@ -3177,6 +3183,7 @@ paths:
     parameters:
     - name: cardCode
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -3305,6 +3312,7 @@ paths:
     parameters:
     - name: cardCode
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -4263,6 +4271,7 @@ paths:
       - wallet
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -4321,6 +4330,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
@@ -4361,6 +4371,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
@@ -4428,6 +4439,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: primary
@@ -4480,6 +4492,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false

@@ -19137,7 +19137,9 @@ components:
             (`provision-tenant.sh`), written then and never changed. It sits here because the path belongs to one
             database. The migrator and the fan-out read it with `databaseName`, and `tenant.suspended` carries it
             as its scope path. **Never derived from `control.tenant.code`**, whose pattern allows hyphens a scope
-            label does not.'
+            label does not. **Made from the tenant''s id** (r13 system review finding C-05, CHG-R14H-002): `t_` and
+            the id''s 32 hex digits, so two tenants never share a root path; a root written before 3 November 2026
+            keeps its slug label, as written.'
         cellId:
           x-ticvai-references: control.cell
           type: string

@@ -48,7 +48,35 @@ Four schemes, defined in `shared/common.yaml`:
 | `bearerAuth` | Staff sessions. Carries `sid`, validated against the session registry |
 | `guestAuth` | Guest sessions. No workstation, no role selection, no single-session rule |
 | `serviceAuth` | **Cell-to-cell and cell-to-Control-Plane.** mTLS plus a cell-identity token — the token says which cell, the certificate proves it |
-| `apiKeyAuth` | Partner and developer. Deferred pending the Developer & API workshop |
+| `apiKeyAuth` | Partner and developer. Deferred pending the Developer & API workshop. Also a device key (ADAM CR-451) |
+| `deviceAuth` | **A registered device as itself** (CHG-R8SPN-030). The device doors (till, handheld, scanner) sign in and take the till's session-less step-up with it, and the workstation is the device's, never one the body names (r13 system review C-04, CHG-R14H-001) |
+
+**Every token is bound to the host's tenant** (r13 system review C-05, CHG-R14H-002): a cell signs every tenant's tokens
+with one key, so a token whose `tenant` (or whose `sid`'s registry entry) is not the tenant the request's host resolves to
+is `401` before anything is read (`docs/architecture/specs/permission-resolution.md` section 7).
+
+**Access markers added 3 November 2026** (r13 system review C-03, C-04, C-13; the lead: "All four, one release"):
+
+- `x-ticvai-object-owner: [subject | share | delegation | session | token]` — on every operation a guest can call that
+  is addressed by a per-object path id (not a published one: a venue, product, event, performance, map and the like),
+  unless it is `x-ticvai-self-scoped`. Who, among guest callers, the object answers to: `subject` the guest whose record
+  it is; `share` a guest it is shared with (an entitlement share not revoked); `delegation` a guest holding an active
+  delegation over the subject that grants the operation's permission (`grantDelegation`'s guest-delegable list);
+  `session` the guest session, anonymous included, that created it (a hold, a visit plan); `token` whoever holds the
+  object's own unguessable id or token (an anonymous waiting-room entry). **Any other guest gets the shared `404`,
+  exactly as for an id that does not exist**, as `x-ticvai-self-scoped` (CHG-GCF-002); staff are decided by the
+  permission as before. `x-ticvai-guest-callable` (a guest may call it within their own session, needing no
+  permission) does not say whose object it is: `check-contract-shapes` C-GUEST-OWNER fails an operation that leaves
+  the owner unsaid, and C-SELF-404 an owned one without the `404`.
+- `x-ticvai-workstation-from: device` — the operation's workstation is the one its `deviceAuth` device is bound to;
+  a `workstationId` the request sends must equal it (`403 workstation-mismatch`), and one sent without `deviceAuth` is
+  `401 device-unauthenticated` (`check-doors` D-DEVICE-DOOR).
+- `x-ticvai-device-kinds: [<DeviceKind> ... | all]` — the device kinds whose credential (`deviceAuth`, or a device
+  key on `apiKeyAuth`) the operation accepts; any other kind is `403 device-kind-not-allowed` (`check-doors`
+  D-DEVICE-KINDS). A device that moves stored value authenticates by `deviceAuth`, never a device key (D-DEVICE-MONEY).
+- `x-ticvai-secret: bearer` on a path or header parameter — the value is a credential (a payment-link or invitation
+  token, a gift or game card code, a supervisor PIN): logs, traces and the edge record the route template and never
+  the value (`docs/architecture/observability.md`, "Credentials in requests"; `check-contract-shapes` C-SECRET-PARAM).
 
 Operations without a permission fall into three groups, each marked explicitly:
 

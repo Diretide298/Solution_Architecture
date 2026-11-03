@@ -199,6 +199,25 @@ def ref_name(ref: str) -> str:
     return str(ref).rsplit("/", 1)[-1]
 
 
+# **Whose object a guest may name** (r13 system review C-03, CHG-R14H-003). A path id that names something published
+# (a venue, product, event, performance, map, route, ...) is anybody's to read; one that names a cart or its line is the
+# session's own (CHG-SEED-013); one that IS a credential (a link token, a card code) is the bearer's (C-13,
+# x-ticvai-secret: bearer). Any other path id names somebody's object, and an operation a guest reaches by it says
+# whose (x-ticvai-object-owner, or x-ticvai-self-scoped).
+PUBLIC_PATH_IDS = frozenset({
+    "venueId", "outletId", "productId", "eventId", "performanceId", "mapId", "routeId", "departureId", "templateId",
+    "promotionId", "bundleId", "formId", "resourceId", "providerId"})
+SESSION_PATH_IDS = frozenset({"cartId", "lineId"})
+BEARER_PATH_IDS = frozenset({"token", "cardCode", "code"})
+OBJECT_OWNERS = ("subject", "share", "delegation", "session", "token")
+
+
+def private_path_ids(path: str) -> list:
+    """The path ids of `path` that name somebody's object: not published, not a cart's, not a credential."""
+    return [p for p in re.findall(r"\{(\w+)\}", str(path))
+            if p not in PUBLIC_PATH_IDS | SESSION_PATH_IDS | BEARER_PATH_IDS]
+
+
 def head_commit() -> str:
     try:
         return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True,
