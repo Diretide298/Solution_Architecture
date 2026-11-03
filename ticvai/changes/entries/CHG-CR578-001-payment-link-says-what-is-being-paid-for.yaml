@@ -1,0 +1,56 @@
+id: CHG-CR578-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'getPaymentLink answers what the guest is paying for: orderNumber, and lines as PaymentLinkLine (OrderLine plus
+  displayName, product and variant names joined by a middle dot in the request''s language or the venue''s default, and
+  visitStartsAt, the performance''s start, else the booked window''s, else null), reading product, variant and
+  performance in process; the linkExpired and linkPaid 410s carry orderNumber, venueName and lines too, linkPaid the
+  amount the link charged. WEB-014 draws them as its frame shows.'
+decision:
+  what: 'ADAM CR-578, posted on #31901: "Decided (Chinmay, 3 November 2026): getPaymentLink answers what the guest is
+    paying for, in the 200 and in the expired and already-paid 410s, so the page stays one anonymous read. Build now: 1.
+    getPaymentLink (#28045), 200: add orderNumber ... lines become PaymentLinkLine: OrderLine plus displayName ... and
+    visitStartsAt ... 2. The 410 for linkExpired and linkPaid also carries orderNumber, venueName and lines
+    (PaymentLinkLine). linkPaid also carries amount ... 3. Nothing else is added ... 4. WEB-014 (#31901): draw each
+    line by displayName ... Until the backend ships, stub these fields." The lead''s instruction, 3 November 2026:
+    "Dont hold r13. approve them and rever tto the devs", and "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-578 (Chitrangi Mestry, #31901 WEB-014): getPaymentLink''s lines carried no product name, visit date or
+  order reference, so WEB-014 could not show what the guest is paying for.'
+keys_touched:
+  operations:
+  - getPaymentLink
+  - payByLink
+  schemas:
+  - PaymentLinkLine
+  - PaymentLinkProblem
+  screens:
+  - WEB-014
+  files:
+  - contracts/spine/orders.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - tools/check-business-rules.py
+root_class: a screen value no operation it calls answers
+tickets:
+  started: []
+  unstarted:
+  - '28045 (getPaymentLink, Pranay Shinde, New): the answer as posted.'
+  - '31901 (WEB-014, Chitrangi Mestry, New): its own posted decision; stub the fields until the backend ships.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-578
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PAYMENT-LINK-LINES
+status: open
+notes: 'Beyond the posted words: the package keeps the default language per tenant (white-label LanguageConfig
+  .defaultLanguage), so "the venue''s default language" is read through white-label#tenantLanguageRecords (service), and
+  the venue''s offset comes from its region''s time zone (tenancy#regionSettingsRecords); the 410 names its four problem
+  types; getPaymentLink also declares access#entitlementRecords for the lines'' entitlementIds. payByLink shares
+  PaymentLinkProblem, so it declares the catalogue product and performance reads and access#entitlementRecords for the
+  lines that shape can carry (check-cross-module-reads XR-FACT, check-error-sources E-SCHEMA-READ-VIA), though only
+  getPaymentLink fills them; a problem schema of getPaymentLink''s own would avoid that, if the lead prefers it. GST-009 also shows a payment link through
+  getPaymentLink; it gains the fields without a change to its record. No screen changes: WEB-014''s notes only.'

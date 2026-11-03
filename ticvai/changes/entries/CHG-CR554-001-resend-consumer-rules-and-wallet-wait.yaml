@@ -1,0 +1,57 @@
+id: CHG-CR554-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'reprintOrder after CR-506, settled: delivery wallet answers 400 ''wallet passes are not available yet'' until
+  issueWalletPass''s step (#28045) exists; order.ticketsResent carries subjectId; Access''s consumer skips cancelled,
+  expired and surrendered entitlements, writes one pending credential_delivery per other entitlement (recipient_role
+  purchaser, attempt counted per entitlement and channel) and takes the destination from the event, else the latest
+  earlier row, else the order subject''s primary contact through identity#subjectContactRecords, failing it ''no
+  recipient on file'' when none; reprintCount is the sum over the lines answered and only print increments it.'
+decision:
+  what: 'ADAM CR-554, posted on #30679: "Decided (Chinmay, 3 November 2026): Build now: #30679 builds reprintOrder as
+    decided on 3 November, with these points settled. 1. Wallet: #30679 does not sign passes ... 2. Orders adds
+    subjectId ... to the order.ticketsResent payload ... 3. Access''s consumer of order.ticketsResent ... 4.
+    Destination ... 5. reprintCount is the sum of lines[].reprintCount over the lines this call answers ... 6. A
+    signed-in guest''s email, sms or whatsapp resend needs orders.order_event''s insert-only guest branch for
+    ticketsResent ..." The lead''s instruction, 3 November 2026: "Dont hold r13. approve them and rever tto the devs",
+    and "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-554 (Narayan Gaonkar, #30679 reprintOrder): after CR-506 (CHG-CR506-001) the wallet step was not built,
+  the consumer''s rules (skips, row id, attempt, recipient) were never written, and reprintCount''s scope was unclear.'
+keys_touched:
+  operations:
+  - reprintOrder
+  other:
+  - order.ticketsResent
+  - access#orderTicketsResent
+  - access#credentialPipeline
+  tables:
+  - access.credential_delivery
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/access.yaml
+  - events/order-ticketsResent.yaml
+  - tools/check-business-rules.py
+root_class: a decided event flow whose consumer rules were never written down
+tickets:
+  started:
+  - '30689 and 30691 (WEB-013 Booking Confirmation build and tests, Chinmay Patkar, Ready for QA), 30699 (GST-010
+    Booking Confirmation build, Chinmay Patkar, Ready for QA): Add to wallet answers 400 with detail ''wallet passes are
+    not available yet'' until #28045''s issueWalletPass step lands; show the existing error state for the button.'
+  unstarted:
+  - '30679 (reprintOrder, Narayan Gaonkar, In progress): its own posted decision; no further change.'
+  - '37427 (AccessService consumer access#orderTicketsResent, Pranay Shinde, New): the consumer task r13 made; its rules
+    are now on the event''s consumer and the job.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-554
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-RESEND-CONSUMER-RULES
+status: open
+notes: 'The consumer''s own ticket already exists (#37427, made by r13), so no new task. Beyond the posted words: the
+  credential pipeline job (access#credentialPipeline, the dispatch job) states the pending-to-failed move for a row
+  with no destination.'

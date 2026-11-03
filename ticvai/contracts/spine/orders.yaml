@@ -1529,7 +1529,42 @@ paths:
         Returns the lines, the total and the deadline. **Never the guest''s other orders**, never their
         profile, and never enough to identify them beyond what they already know.
 
+
+        **What the guest is paying for** (ADAM CR-578, Chinmay, 3 November 2026: "getPaymentLink answers what the guest
+        is paying for, in the 200 and in the expired and already-paid 410s, so the page stays one anonymous read";
+        CHG-CR578-001). The 200 carries `orderNumber` (`Order.orderNumber` of the link''s order), and its `lines` are
+        `PaymentLinkLine`: the order line plus `displayName` (the product name and the variant name joined by a middle
+        dot, from the catalogue in the request''s `Accept-Language`, falling back to the venue''s default language) and
+        `visitStartsAt` (date-time with the venue''s offset: the performance''s `startsAt` where `performanceId` is set,
+        else `bookedWindow.startsAt`, else null). The `410` for `linkExpired` and `linkPaid` also carries
+        `orderNumber`, `venueName` and `lines` (`PaymentLinkLine`), and `linkPaid` also `amount`, what the link
+        charged; `linkSuperseded` and `linkCancelled` are unchanged. Nothing else is added: no holder name, contact,
+        payment card or other orders. The answer stays within what the guest already knows.
+
         '
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'each line''s product name, in the request''s Accept-Language else the venue''s default language, for
+          PaymentLinkLine.displayName (ADAM CR-578)'
+      - query: catalogue#variantRecords
+        route: in-process
+        for: 'each line''s variant name, for PaymentLinkLine.displayName (ADAM CR-578)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'the performance''s startsAt where a line''s performanceId is set, for PaymentLinkLine.visitStartsAt (ADAM
+          CR-578)'
+      - query: white-label#tenantLanguageRecords
+        route: service
+        for: 'the default language the venue''s guest pages use, the published LanguageConfig.defaultLanguage, for
+          displayName when the catalogue has no text in the request''s Accept-Language (ADAM CR-578)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the venue''s time zone (RegionSettings.timeZone), for visitStartsAt''s offset (ADAM CR-578)'
+      - query: access#entitlementRecords
+        route: in-process
+        for: 'the entitlements each line issued (OrderLine.entitlementIds), for the lines the 200 and the linkExpired and
+          linkPaid 410s answer (ADAM CR-578)'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -1557,10 +1592,14 @@ paths:
                       holding nothing but the token.
 
                       '
+                  orderNumber:
+                    type: string
+                    description: '`Order.orderNumber` of the link''s order, the reference the guest reads (ADAM CR-578).'
                   lines:
                     type: array
+                    description: The order's lines, each with what it is and when the visit is (ADAM CR-578).
                     items:
-                      $ref: '#/components/schemas/OrderLine'
+                      $ref: '#/components/schemas/PaymentLinkLine'
                   amountDue:
                     $ref: ../shared/common.yaml#/components/schemas/Money
                   venueName:
@@ -1590,7 +1629,12 @@ paths:
             **404 is never returned for a real token.** Telling somebody their booking does not exist
             when it expired is how a support call starts.
 
+            **The expired and already-paid views show what the link was for** (ADAM CR-578): with `linkExpired` and
+            `linkPaid` the problem also carries `orderNumber`, `venueName` and `lines` (`PaymentLinkLine`), and with
+            `linkPaid` the `amount` the link charged. `linkSuperseded` and `linkCancelled` carry none of them.
+
             '
+          x-ticvai-problem-types: [link-expired, link-paid, link-superseded, link-cancelled]
           content:
             application/problem+json:
               schema:
@@ -1615,6 +1659,19 @@ paths:
       x-ticvai-write-via:
       - table: access.entitlement
         event: order.paid
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'what its text calls "performance''s startsAt": catalogue.performance, Catalogue''s data, for the lines its 410
+          shares with getPaymentLink (PaymentLinkProblem, ADAM CR-578; CHG-R10GEN-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data, for the
+          lines its 410 shares with getPaymentLink (PaymentLinkProblem, ADAM CR-578; CHG-R10GEN-001)'
+      - query: access#entitlementRecords
+        route: in-process
+        for: 'the entitlements each line issued (OrderLine.entitlementIds), for the lines its 410 shares with
+          getPaymentLink (PaymentLinkProblem, ADAM CR-578)'
       security:
       - guestAuth: []
       - {}
@@ -4144,13 +4201,21 @@ paths:
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       - query: promotions#promotionRecords
         route: in-process
-        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001); not asked until promotions evaluation
+          (#28136) is built, by the cart pricing rule (ADAM CR-550)'
       - query: white-label#bookingFlowRecords
         route: service
         for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Cart.discountTotal, Cart.subtotal, Cart.taxTotal, Cart.total and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'each line''s unit price at the cart''s venue on its channel, at now: the cart pricing rule (ADAM CR-550)'
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the rates of the tax codes the tax step of Catalogue''s price calculation component applies to each line:
+          the cart pricing rule (ADAM CR-550)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-latency-budget-ms: 200
       parameters:
@@ -4178,6 +4243,31 @@ paths:
 
         Returns the conflicts (2.9.5) and the leases with their remaining time, so the interface can say
         *"your seats are held for 6 minutes"* rather than discovering it at checkout.
+
+
+        **The cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026: "one pricing rule for the cart"; CHG-CR550-001).
+        One rule prices the cart, used by `getCart`, `addCartLine`, `updateCartLine`, `removeCartLine`,
+        `applyCartPromoCode` and `checkoutCart`. (1) **Line unit price**: `catalogue#variantPriceRecords`, in process, for
+        the line''s variant at the cart''s venue, on the cart''s channel translated to the catalogue channel by the same
+        map the price simulation uses (`guestWeb` to `web`, `guestApp` to `mobile`, `partner` to `b2b`, the rest by
+        name; `api` and `backOffice` have none), at now. Exceptions: a transport line keeps
+        `transport.quoteTransportFare`; a pass seat is zero; a table deposit line takes the booking''s deposit amount; a
+        staff line with `overridePrice` uses it. `lineTotal` = quantity x unit price. Only the selected rate is used: no
+        member or dynamic adjustment and no fee rules in the cart, as the order exchange quotes price. (2) **Tax**: for
+        each line amount, the tax step of Catalogue''s one price calculation component is called (the code
+        `simulatePriceBreakdownCalculation` uses: the matching tax rule first, else the price''s tax code, rates through
+        `finance#taxCodeRecords`, its rounding), in process, never copied; no calculation profile is needed for this
+        step. If Orders cannot call it yet, that is said on the simulation ticket, never written again in Orders. (3)
+        **Totals** in the venue''s currency and scale (`tenancy#venueSettingsRecords`): `subtotal` = the sum of
+        `lineTotal`; `taxTotal` = the sum of tax; `total` = `subtotal` + exclusive tax; `discountTotal` 0 and
+        `appliedPromotionIds` empty until promotions evaluation (#28136) is built. No promotion, coupon campaign or
+        coupon code record is read meanwhile. (4) **No price** (`variantPriceRecords` answers a null amount):
+        `addCartLine` refuses `409 notSellableOnChannel` and holds nothing; `getCart` marks the line `isAvailable` false
+        with `unitPrice` and `lineTotal` null and leaves it out of the totals; `checkoutCart` refuses such a line, as it
+        refuses a line whose units are gone, and keeps the cart. (5) **Storage**: the changing operations write
+        `unit_price` and `line_total` on each `orders.cart_line` and `net_amount`, `discount_total`, `tax_total` and
+        `gross_amount` on `orders.cart`. `getCart` computes and answers without writing. `checkoutCart` prices afresh by
+        this rule and writes the order from that pricing; with no promotions applied, `droppedPromotions` is empty.
 
         '
       tags:
@@ -4407,6 +4497,12 @@ paths:
         caller''s channel (`pos` at a till), rather than reading `catalogue.variant` and `catalogue.product`
         itself; a variant that fails it is `409 notSellableOnChannel`.
 
+        **Priced by the cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the rule is on
+        `getCart`). The new line''s unit price is `catalogue#variantPriceRecords` at the cart''s venue on its channel at
+        now (its exceptions as the rule states), each line''s tax comes from the tax step of Catalogue''s price
+        calculation component, and the call writes `unit_price` and `line_total` on the line and the cart''s totals.
+        A variant with no price is refused `409 notSellableOnChannel` and nothing is held.
+
         '
       tags:
       - cart
@@ -4418,6 +4514,14 @@ paths:
         - query: catalogue#variantsSellableAt
           route: in-process
           for: "the line's variantId on the caller's channel (409 notSellableOnChannel)"
+        - query: catalogue#variantPriceRecords
+          route: in-process
+          for: 'the line''s unit price at the cart''s venue on its channel, at now; none is 409 notSellableOnChannel:
+            the cart pricing rule (ADAM CR-550)'
+        - query: finance#taxCodeRecords
+          route: in-process
+          for: 'the rates of the tax codes the tax step of Catalogue''s price calculation component applies to each
+            line: the cart pricing rule (ADAM CR-550)'
         - query: marketing-crm#consentQuestionRecords
           route: service
           for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
@@ -4457,7 +4561,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/AdmissionRequired
         '409':
           x-ticvai-problem-types: [not-sellable-on-channel, sold-out-for-session, sold-out-for-day, window-unavailable, product-info-only, resource-hold-invalid]
-          description: 'No capacity, or the product is not sellable on this channel (`notSellableOnChannel`).
+          description: 'No capacity, or the product is not sellable on this channel (`notSellableOnChannel`), which
+            includes a variant `catalogue#variantPriceRecords` prices at no amount there (ADAM CR-550).
             **The reason is specific** — sold out for this session (`soldOutForSession`) reads differently
             from sold out for the day (`soldOutForDay`), and no room of the type free for the booked window
             (`windowUnavailable`, REV3-13) from both. An information-only product (`productInfoOnly`, problem
@@ -4507,7 +4612,19 @@ paths:
         - "P01 WEB-022 Membership Plans"
         - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-writes:
+      - table: orders.cart_line
+        for: 'the line''s quantity, and unit_price and line_total by the cart pricing rule (ADAM CR-550)'
+      - table: orders.cart
+        for: 'net_amount, discount_total, tax_total and gross_amount, by the cart pricing rule (ADAM CR-550)'
       x-ticvai-read-via:
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'each line''s unit price at the cart''s venue on its channel, at now: the cart pricing rule (ADAM CR-550)'
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the rates of the tax codes the tax step of Catalogue''s price calculation component applies to each line:
+          the cart pricing rule (ADAM CR-550)'
       - query: catalogue#channelCapacityRecords
         route: in-process
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
@@ -4553,6 +4670,10 @@ paths:
 
         **A quantity of 0 removes the line**, exactly as `removeCartLine` does: its lease is released and
         the line is gone from the returned cart (decided 28 September, audit R123 (1)).
+
+        **The cart is re-priced by the cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the
+        rule is on `getCart`): the call writes `unit_price` and `line_total` on each line and `net_amount`,
+        `discount_total`, `tax_total` and `gross_amount` on the cart.
 
         '
       tags:
@@ -4606,7 +4727,19 @@ paths:
         - "P01 WEB-022 Membership Plans"
         - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-writes:
+      - table: orders.cart_line
+        for: 'the line removed, and unit_price and line_total of the lines left, by the cart pricing rule (ADAM CR-550)'
+      - table: orders.cart
+        for: 'net_amount, discount_total, tax_total and gross_amount, by the cart pricing rule (ADAM CR-550)'
       x-ticvai-read-via:
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'each line''s unit price at the cart''s venue on its channel, at now: the cart pricing rule (ADAM CR-550)'
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the rates of the tax codes the tax step of Catalogue''s price calculation component applies to each line:
+          the cart pricing rule (ADAM CR-550)'
       - query: marketing-crm#consentQuestionRecords
         route: service
         for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
@@ -4643,7 +4776,13 @@ paths:
       - guest
       - partner
       summary: Take something out
-      description: Releases its lease immediately.
+      description: 'Releases its lease immediately.
+
+        **The cart is re-priced by the cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the
+        rule is on `getCart`): the call writes `unit_price` and `line_total` on each line left and `net_amount`,
+        `discount_total`, `tax_total` and `gross_amount` on the cart.
+
+        '
       tags:
       - cart
       x-ticvai-permission: null
@@ -4794,6 +4933,21 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Cart.discountTotal, Cart.subtotal, Cart.taxTotal, Cart.total and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'the surviving cart''s line prices after a merge, by the cart pricing rule (ADAM CR-553, CR-550)'
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the tax codes'' rates for the surviving cart''s tax, by the cart pricing rule (ADAM CR-553, CR-550)'
+      x-ticvai-writes:
+      - table: orders.cart
+        for: 'the anonymous cart''s subject_id and rotated token, or, on a merge, the anonymous cart abandoned with its
+          token rotated and the surviving cart''s expiresAt and totals (ADAM CR-553)'
+      - table: orders.cart_line
+        for: 'on a merge, every line moved to the surviving cart (cart_id changed, ids kept), dropped lines left on
+          the anonymous cart (ADAM CR-553)'
+      x-ticvai-calls:
+      - catalogue#transferInventoryHolds
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -4833,6 +4987,33 @@ paths:
         cart and its lines; then the caller''s grant is put back before anything else runs,
         `identity#endAnonymousGuestSession` included. Nothing else runs under the root grant. No migration.
 
+
+        **Which cart survives a merge, and how its holds move** (ADAM CR-553, Chinmay, 3 November 2026: "when a guest claims
+        an anonymous cart and already has an open cart, the guest''s cart survives and the anonymous cart''s holds move to
+        it without being released"; CHG-CR553-001). (1) The checks are as above: not found `404`; `checkedOut` or
+        `abandoned` `409 cart-not-open`; claimed by another guest `409 cart-already-claimed`; token missing or wrong
+        `403 cart-token-mismatch`. **Open** means `active`, `expiring` or `expired`: an expired anonymous cart can be
+        claimed. (2) Under the caller''s grant, claimCart looks for the guest''s own cart with status `active` or
+        `expiring` at the same venue and on the same channel as the anonymous cart. (3) **None found** (none at all,
+        or only at another venue or channel, or only expired): the anonymous cart becomes the guest''s: `subject_id`
+        set and the token rotated; `mergedLineCount` 0; `droppedLines` empty. (4) **Found**: every anonymous cart line
+        moves into it (the same rows, `cart_id` changed, ids kept), except: a line whose inventory hold did not move
+        is dropped with reason `expired`; a line whose resource hold has expired, been converted or been released is
+        dropped with reason `expired`; a line with the same `tableReservationId` or `resourceHoldId` as a line already
+        in the surviving cart is dropped with reason `duplicate`. Lines with no hold (stock products) always move.
+        Dropped lines stay on the anonymous cart and are named in `droppedLines` (`productName`, `reason`);
+        `mergedLineCount` is the number of lines moved. The anonymous cart becomes `abandoned` and its token is
+        rotated. Abandoned sends no recovery email: `cart.abandoned` is sent only on expiry. The surviving cart''s
+        `expiresAt` is recomputed (the earliest lease) and it is priced by the cart pricing rule (`getCart`, ADAM
+        CR-550); it is answered as `CartMergeResult.cart`. (5) **The holds move by Catalogue''s
+        `catalogue#transferInventoryHolds(fromCartId, toCartId)`**, in process, in claimCart''s transaction, called the
+        way `addCartLine` calls `acquireInventoryHold` for a cart, after the root-grant statements. It moves every
+        active, unexpired hold the anonymous cart holds in one statement (its rule is in catalogue.yaml), moves no
+        units, locks no capacity row, and answers the moved hold ids; running it twice moves nothing more. (6)
+        Identity''s `endAnonymousGuestSession` runs as now, under the caller''s grant. (7) **Until the Catalogue
+        command is merged**, the case with nothing to merge (3) ships, and the found case (4) answers `409
+        cart-not-open` naming no lines, writing nothing; that refusal is removed once the command is in.
+
         '
       tags:
       - cart
@@ -4857,7 +5038,10 @@ paths:
                     Without it, or with another, the claim is refused 403.
       responses:
         '409':
-          description: 'The cart is `checkedOut` or `abandoned` (`cart-not-open`), or already belongs to another guest (`cart-already-claimed`). Nothing is attached or merged.'
+          description: 'The cart is `checkedOut` or `abandoned` (`cart-not-open`; an `expired` anonymous cart is open and
+            can be claimed, ADAM CR-553), or already belongs to another guest (`cart-already-claimed`). Nothing is
+            attached or merged. Until `catalogue#transferInventoryHolds` is merged, a claim that would merge into the
+            guest''s open cart is also `cart-not-open`, naming no lines and writing nothing (ADAM CR-553).'
           x-ticvai-problem-types: [cart-not-open, cart-already-claimed]
           content:
             application/problem+json:
@@ -4917,6 +5101,18 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "VenueSettings.cartLeaseSeconds": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'each line''s unit price at the cart''s venue on its channel, at now, priced afresh: the cart pricing rule
+          (ADAM CR-550)'
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the rates of the tax codes the tax step of Catalogue''s price calculation component applies to each line:
+          the cart pricing rule (ADAM CR-550)'
+      - query: white-label#policyRecords
+        route: service
+        for: 'the termsAndConditions policy in force, the version listPublishedPolicies returns, compared with
+          termsAccepted.version (422 termsVersionNotCurrent; ADAM CR-576)'
       x-ticvai-write-via:
       - table: marketing.consent_record
         event: order.created
@@ -5030,13 +5226,44 @@ paths:
         ledger posts in base currency; the order carries the charge currency, the rate used, its
         source and the converted total, locked until `chargeRateLockedUntil` (the cart lease,
         `VenueSettings.cartLeaseSeconds`). A payment started after the lock lapses is re-quoted at
-        the rate then in force and the guest sees the new amount before confirming.
+        the rate then in force and the guest sees the new amount before confirming (`createPayment`''s `409
+        quoteExpired`, ADAM CR-577).
 
 
         **The order access token is minted here** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004), as
         `Order.orderAccessToken` describes: bound to the new order and to the device in `X-Device-Id` (the device that
         built the cart). Without `X-Device-Id` no token is minted and `orderAccessToken` is null; the order is read
         with a session as before.
+
+
+        **The token also travels in a cookie the API sets itself** (ADAM CR-575, Chinmay, 3 November 2026: "the guest web
+        keeps a visitor''s access to the order they just checked out across the card round trip ... in an HttpOnly
+        cookie the API sets itself, as the waiting room''s admission cookie does"; CHG-CR575-001). When it mints
+        `orderAccessToken` on a guest web call, the answer also sends `Set-Cookie: ticvai_order_access` = that same
+        token; `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, host-only on the API host the guest web calls,
+        `Max-Age` = the seconds left until the token''s `exp`. A later checkout replaces it. The JSON field is unchanged
+        and the app keeps using the header. Nothing goes into browser storage or a URL. No cookie is set for the
+        anonymous cart session. The cookie only works when the API is same-site with the guest web page, which the
+        waiting-room cookie already depends on.
+
+
+        **Priced afresh by the cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the rule is on
+        `getCart`). Checkout prices every line again by the rule and writes the order from that pricing; with no
+        promotions applied (until promotions evaluation, #28136, is built), `droppedPromotions` is empty and the budget
+        rule above has nothing to drop. A line with no price is refused `409 notSellableOnChannel`, naming it in
+        `lineIds`, as a line whose units are gone is refused, and the cart is kept.
+
+
+        **The order records which terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026: "option A, with the
+        field optional in the contract"; CHG-CR576-001). The optional body field `termsAccepted`
+        (`{kind: termsAndConditions, version}`) is compared, when it is sent, with the `termsAndConditions` policy in
+        force for the venue (the version `listPublishedPolicies` returns, read through `white-label#policyRecords`). If
+        they differ the call is refused `422 termsVersionNotCurrent` and the cart is kept; nothing else changes. When
+        they match, the order is written with the version (`orders.sales_order.terms_version`) and the time of
+        acceptance (`terms_accepted_at`), and `order.created` carries `termsVersion`. When it is omitted, the order
+        records no terms version; it is never filled in from the policy in force. **The order is made at Pay now**, as
+        WEB-011 and WEB-012 (and GST-009 on the app) say: the Checkout buttons on WEB-010 and GST-041 move on without
+        calling this, so the tick reaches the call that creates the order.
 
         '
       tags:
@@ -5129,6 +5356,27 @@ paths:
                         description: A `CartLine.id` in this cart.
                       holderName:
                         type: string
+                termsAccepted:
+                  type: object
+                  description: '**The terms the guest ticked** (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001).
+                    Optional. When sent, `version` must be the `termsAndConditions` policy in force for the venue (the
+                    version `listPublishedPolicies` returns), else `422 termsVersionNotCurrent` and the cart is kept;
+                    the order then keeps the version and the time of acceptance (`Order.termsVersion`,
+                    `Order.termsAcceptedAt`). Omitted, the order records no terms version, never one filled in from
+                    the policy in force. WEB-012 and GST-009 send it with the version their Read the terms panel shows.'
+                  x-ticvai-stored-as: orders.sales_order.terms_version
+                  required:
+                  - kind
+                  - version
+                  properties:
+                    kind:
+                      type: string
+                      enum:
+                      - termsAndConditions
+                    version:
+                      type: string
+                      maxLength: 40
+                      description: The `PublishedPolicy.version` shown; kept as `orders.sales_order.terms_version`.
       responses:
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
@@ -5138,6 +5386,13 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            Set-Cookie:
+              description: 'On a guest web call that mints `orderAccessToken` only (ADAM CR-575): `ticvai_order_access`
+                = that same token, `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, host-only on the API host,
+                `Max-Age` the seconds left until the token''s `exp`; sent by the API itself, as the waiting room''s
+                admission cookie is. A later checkout replaces it.'
+              schema:
+                type: string
           description: An order, pending payment
           content:
             application/json:
@@ -5156,8 +5411,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartProblem'
         '409':
+          x-ticvai-problem-types: [lease-expired, resource-hold-invalid, not-sellable-on-channel]
           description: 'A lease expired between the last read and checkout (`leaseExpired`), or a resource
-            hold did (`resourceHoldInvalid`, rev 3 REV3-15). **Names which line** in `lineIds`, so the
+            hold did (`resourceHoldInvalid`, rev 3 REV3-15), or a line has no price on the cart''s channel any more
+            (`notSellableOnChannel`, the cart pricing rule, ADAM CR-550). **Names which line** in `lineIds`, so the
             guest loses one thing rather than the cart.
 
             '
@@ -5175,9 +5432,11 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [consent-required, consent-answer-blocks, terms-version-not-current]
           description: 'A required consent question is unanswered (`consentRequired`), or an answer blocks
             the booking (`consentAnswerBlocks`), with the lines in `lineIds` (decided 29 September, rev 3
-            REV3-26). The cart is kept.
+            REV3-26). `termsAccepted.version` is not the `termsAndConditions` policy in force
+            (`termsVersionNotCurrent`, problem type `terms-version-not-current`; ADAM CR-576). The cart is kept.
 
             '
           content:
@@ -5933,6 +6192,15 @@ paths:
         schema:
           type: string
       - $ref: ../shared/common.yaml#/components/parameters/DeviceId
+      - name: ticvai_order_access
+        in: cookie
+        required: false
+        description: '**The order access token the API set as a cookie on the guest web''s checkout** (ADAM CR-575;
+          `checkoutCart`''s `Set-Cookie`). Accepted as `X-Order-Access-Token` is, with the same checks, and needs no
+          `X-Device-Id`. When the header is also sent, the header is used. Any failure is `404`.'
+        x-ticvai-persisted: false
+        schema:
+          type: string
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5976,6 +6244,15 @@ paths:
         `orderId` and `tid` the routed tenant, and that `did` equals `X-Device-Id`; any failure is `404`. A verified
         token reads that one order (its lines, payments, discounts and eligibility rows) under the routed tenant's
         root grant, as the payment webhook does (ITenantRootGrant), and nothing else in the same transaction.
+
+
+        **Or from the order access cookie** (ADAM CR-575, Chinmay, 3 November 2026; CHG-CR575-001). getOrder accepts the
+        token from the `ticvai_order_access` cookie `checkoutCart` sets on a guest web checkout, as it accepts
+        `X-Order-Access-Token`, with the same checks (signature, `exp`, `oid` the path's order, `tid` the routed
+        tenant). A token that arrives in the cookie needs no `X-Device-Id`: only the browser that checked out holds
+        the cookie, and no script can read it. A token sent in the header still needs `X-Device-Id`. If both are
+        present, the header is used. Any failure is `404`. This is how the guest web reads the order back after the
+        card round trip (3-D Secure or a hosted page), when the anonymous session is gone.
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
@@ -7404,13 +7681,19 @@ paths:
         for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
       - query: finance#fxRateRecords
         route: in-process
-        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001); the region''s tender rate in force when the
+          order''s rate lock has lapsed (409 quoteExpired; ADAM CR-577)'
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s settings for the cash receipt: its region and trading currency (ADAM CR-168)'
+        for: 'the venue''s settings for the cash receipt: its region and trading currency (ADAM CR-168); and
+          cartLeaseSeconds for the new chargeRateLockedUntil, as checkoutCart reads it (ADAM CR-577)'
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'the region''s settings for the cash receipt: the region''s account mappings and fiscal setup (ADAM CR-168)'
+      x-ticvai-writes:
+      - table: orders.sales_order
+        for: 'the re-locked quote after chargeRateLockedUntil: chargeFxRate, chargeFxRateId, chargeTotal and
+          chargeRateLockedUntil, kept even when the answer is 409 quoteExpired (ADAM CR-577)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment
@@ -7449,6 +7732,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      - {}
       x-ticvai-audience:
       - staff
       - guest
@@ -7513,6 +7797,26 @@ paths:
         only on an order of the partner''s own channel (`Order.channelProfileId` the session''s); any other order is
         answered as one that does not exist. `ORDER_CREATE` is what the partner user must hold.
 
+        **Or with the order''s access token** (ADAM CR-575, Chinmay, 3 November 2026; CHG-CR575-001). A guest web visitor
+        who lost the anonymous session on the card round trip pays again after a decline with the order access token:
+        from the `ticvai_order_access` cookie `checkoutCart` set, or from `X-Order-Access-Token` with `X-Device-Id`,
+        checked as `getOrder` checks it (with the header used when both are sent). It reaches a payment on that order
+        only, under the routed tenant''s root grant, as `getOrder`''s token read reaches that one order; any other order
+        is `404`.
+
+
+        **The quote is re-taken after the rate lock lapses** (ADAM CR-577, Chinmay, 3 November 2026: "after the rate lock
+        lapses, createPayment re-quotes before charging, and the guest sees and confirms any new amount";
+        CHG-CR577-001). For a card or wallet payment on an order whose `chargeCurrency` is set and differs from its
+        `currency`, when now is past `chargeRateLockedUntil`, the call first takes the region''s tender rate in force, as
+        `checkoutCart` does, and recomputes `chargeTotal`. It writes `chargeFxRate`, `chargeFxRateId`, `chargeTotal` and
+        `chargeRateLockedUntil` (now plus `cartLeaseSeconds`, read as `checkoutCart` reads it) to the order. If the new
+        `chargeTotal` equals the old one, the payment carries on as normal. Otherwise the answer is `409 quoteExpired`
+        with a `quote` (`chargeCurrency`, `chargeTotal`, `chargeFxRate`, `chargeRateLockedUntil`): no provider call is
+        made and no `orders.payment` or `payments.payment_attempt` row is written, but the re-lock is kept. The guest''s
+        confirmed attempt is a new call with a new `Idempotency-Key` (a replay of the old key returns the same `409`),
+        paid at the newly locked quote under the existing rules, including re-acquiring a lapsed inventory hold.
+
         '
       tags:
       - payment
@@ -7532,6 +7836,24 @@ paths:
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: X-Order-Access-Token
+        in: header
+        required: false
+        description: '`Order.orderAccessToken`, in place of a session, for a payment on that order only (ADAM CR-575),
+          checked as getOrder checks it; with `X-Device-Id`. A token for another order, expired, forged or from
+          another device is `404`.'
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/DeviceId
+      - name: ticvai_order_access
+        in: cookie
+        required: false
+        description: 'The order access token from the cookie `checkoutCart` sets on a guest web checkout (ADAM CR-575),
+          accepted as getOrder accepts it, with no `X-Device-Id`; the header is used when both are sent. Any failure
+          is `404`.'
+        x-ticvai-persisted: false
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -7556,11 +7878,18 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/PaymentProblem'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [tender-unavailable-offline, exceeds-balance-due, tender-not-allowed-on-channel,
+            cash-not-on-handheld, quote-expired]
           description: Tender unavailable offline (`tenderUnavailableOffline`), amount exceeds the
             balance due (`exceedsBalanceDue`), or a guest channel sent a tender other than card or wallet
             (`tenderNotAllowedOnChannel`, audit R080), or cash from a session with no till
-            (`cashNotOnHandheld`, DEC-200; CHG-CSP-039).
+            (`cashNotOnHandheld`, DEC-200; CHG-CSP-039). Or the order's rate lock had lapsed and the re-taken
+            quote changed `chargeTotal` (`quoteExpired`, ADAM CR-577), with the new `quote` (`chargeCurrency`,
+            `chargeTotal`, `chargeFxRate`, `chargeRateLockedUntil`); nothing is charged and no payment or payment
+            attempt row is written, but the re-lock is kept, and the guest confirms with a new `Idempotency-Key`.
           content:
             application/problem+json:
               schema:
@@ -7590,6 +7919,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      - {}
       x-ticvai-audience:
       - staff
       - guest
@@ -7620,6 +7950,13 @@ paths:
         only on an order of the partner''s own channel (`Order.channelProfileId` the session''s); any other order is
         answered as one that does not exist. `ORDER_CREATE` is what the partner user must hold.
 
+        **Or with the order''s access token** (ADAM CR-575, Chinmay, 3 November 2026; CHG-CR575-001). The guest web, back
+        from the card round trip (3-D Secure or a hosted page) without its anonymous session, asks with the order
+        access token: from the `ticvai_order_access` cookie `checkoutCart` set, or from `X-Order-Access-Token` with
+        `X-Device-Id`, checked as `getOrder` checks it (with the header used when both are sent). It reaches a payment
+        of that order only, under the routed tenant''s root grant, as `getOrder`''s token read reaches that one order;
+        any other order or payment is `404`.
+
         '
       tags:
       - payment
@@ -7631,6 +7968,24 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: X-Order-Access-Token
+        in: header
+        required: false
+        description: '`Order.orderAccessToken`, in place of a session, for a payment of that order only (ADAM CR-575),
+          checked as getOrder checks it; with `X-Device-Id`. A token for another order, expired, forged or from
+          another device is `404`.'
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/DeviceId
+      - name: ticvai_order_access
+        in: cookie
+        required: false
+        description: 'The order access token from the cookie `checkoutCart` sets on a guest web checkout (ADAM CR-575),
+          accepted as getOrder accepts it, with no `X-Device-Id`; the header is used when both are sent. Any failure
+          is `404`.'
+        x-ticvai-persisted: false
+        schema:
+          type: string
       responses:
         '200':
           headers:
@@ -8949,6 +9304,23 @@ paths:
         that one row under the routed tenant''s root grant, the one-order reach the verified token gives; staff and
         devices write under their venue grant.
 
+
+        **Settled on 3 November 2026** (ADAM CR-554, Chinmay: "#30679 builds reprintOrder as decided on 3 November, with
+        these points settled"; CHG-CR554-001). **Wallet**: this operation does not sign passes. It calls
+        `issueWalletPass`''s own step in the orders module, which #28045 builds on the planned wallet pass adapter (Apple
+        signing with the store account''s certificate, Google Wallet). Until that step exists, delivery `wallet` with a
+        valid `walletPlatform` answers the declared `400` with detail ''wallet passes are not available yet'' and writes
+        nothing; once it lands, that branch calls the step, appends the `ticketsResent` `order_event` row and answers
+        `walletPasses`. **The event** carries `subjectId` too (the order''s `orders.sales_order.subject_id`, null when
+        none), beside the fields above; Access''s consumer (`x-ticvai-jobs` `orderTicketsResent` in access.yaml) writes
+        the delivery rows and picks the destination as `events/order-ticketsResent.yaml` states. **`reprintCount`** is
+        the sum of `lines[].reprintCount` over the lines this call answers: the lines named in `lineIds`, or every line.
+        Only `print` increments the counts; for `email`, `sms`, `whatsapp` and `wallet` the counts are read and
+        returned unchanged. **A signed-in guest''s email, SMS or WhatsApp resend** needs `orders.order_event`''s
+        insert-only guest branch for `ticketsResent`, which the planned row-security migration task for the orders
+        module (Hrushikant Patkar) builds; it is built and tested against that branch locally until the migration is applied. Callers
+        with an order-access token, staff and devices do not wait on it.
+
         '
       tags:
       - order
@@ -8999,7 +9371,9 @@ paths:
                   - google
                   x-ticvai-persisted: false
                   description: 'Required with delivery `wallet`, `400` otherwise: which wallet the passes are issued for,
-                    through `issueWalletPass`''s step (ADAM CR-506).'
+                    through `issueWalletPass`''s step (ADAM CR-506). Until that step exists (#28045), a valid
+                    `walletPlatform` is answered `400` with detail ''wallet passes are not available yet'' and nothing
+                    is written (ADAM CR-554).'
                 lineIds:
                   type: array
                   description: Omit to reprint every line.
@@ -9031,10 +9405,13 @@ paths:
                 properties:
                   reprintCount:
                     type: integer
-                    description: The order's total, the sum of `lines[].reprintCount`.
+                    description: The sum of `lines[].reprintCount` over the lines this call answers, the lines named
+                      in `lineIds` or every line (ADAM CR-554). Only `print` increments the counts.
                   lines:
                     type: array
-                    description: The count per reprinted line, as recorded on `OrderLine.reprintCount`.
+                    description: The count per line answered (the lines named in `lineIds`, or every line), as
+                      recorded on `OrderLine.reprintCount`; read and returned unchanged for email, sms, whatsapp and
+                      wallet (ADAM CR-554).
                     items:
                       type: object
                       required:
@@ -15913,13 +16290,23 @@ paths:
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       - query: promotions#promotionRecords
         route: in-process
-        for: 'its lookup of a promotion''s own code, promotions.promotion, Promotions'' data (ORDERS-MONEY-C11; CHG-R8SPN-026)'
+        for: 'its lookup of a promotion''s own code, promotions.promotion, Promotions'' data (ORDERS-MONEY-C11; CHG-R8SPN-026);
+          not asked until promotions evaluation (#28136) is built (ADAM CR-550)'
       - query: promotions#couponCampaignRecords
         route: in-process
-        for: 'its read of promotions.coupon_campaign, Catalogue''s data (CHG-MOD-001)'
+        for: 'its read of promotions.coupon_campaign, Catalogue''s data (CHG-MOD-001); not asked until promotions
+          evaluation (#28136) is built (ADAM CR-550)'
       - query: promotions#couponCodeRecords
         route: in-process
-        for: 'its read of promotions.coupon_code, Catalogue''s data (CHG-MOD-001)'
+        for: 'its read of promotions.coupon_code, Catalogue''s data (CHG-MOD-001); not asked until promotions evaluation
+          (#28136) is built (ADAM CR-550)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'each line''s unit price at the cart''s venue on its channel, at now: the cart pricing rule (ADAM CR-550)'
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the rates of the tax codes the tax step of Catalogue''s price calculation component applies to each line:
+          the cart pricing rule (ADAM CR-550)'
       - query: catalogue#productRecords
         route: in-process
         for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
@@ -15958,6 +16345,13 @@ paths:
         An automatic promotion needs no call: `evaluatePromotions` already applies it at the basket, and the
         button only returns to the list. No new cart field.
 
+
+        **Until promotions evaluation (#28136) is built** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the cart
+        pricing rule is on `getCart`): after the cart checks (`404`, `410 cartExpired`), the call answers `422
+        promotion-evaluation-unavailable`, stores nothing and leaves `couponCodes` unchanged, as the price simulation
+        does with a promotion code. It reads no promotion, coupon campaign or coupon code record meanwhile. Once
+        evaluation is built, the rules above apply and the cart is priced by the cart pricing rule.
+
         '
       tags:
       - cart
@@ -15994,7 +16388,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartProblem'
         '422':
-          description: 'The code is not accepted: no such code, voided or used up (`promoCodeInvalid`), or a
+          x-ticvai-problem-types: [promotion-evaluation-unavailable, promo-code-invalid, promo-code-not-applicable]
+          description: 'Until promotions evaluation (#28136) is built, every code answers
+            `promotion-evaluation-unavailable` (`promotionEvaluationUnavailable`) and nothing is stored (ADAM CR-550).
+            Then: the code is not accepted: no such code, voided or used up (`promoCodeInvalid`), or a
             real code that nothing in this cart qualifies for (`promoCodeNotApplicable`). The two read
             differently to a guest, so they are separate reasons.
 
@@ -23384,6 +23781,8 @@ components:
                 - other
               reference:
                 type: string
+                description: What the item points at. For kind `termsAccepted`, the order and its
+                  `orders.sales_order.terms_version`, the terms the guest accepted at checkout (ADAM CR-576).
         outcomeAt:
           type: string
           format: date-time
@@ -25252,9 +25651,17 @@ components:
 
             '
         unitPrice:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: 'By the cart pricing rule (`getCart`; ADAM CR-550): `catalogue#variantPriceRecords` for the
+            variant at the cart''s venue on its channel at now, or the rule''s exceptions. Null, with `isAvailable`
+            false, when no price list prices the variant there.'
         lineTotal:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: 'quantity x `unitPrice` (ADAM CR-550); null when `unitPrice` is.'
         inventoryHoldId:
           x-ticvai-column: inventory_reservation_id
           x-ticvai-references: catalogue.inventory_reservation
@@ -25276,7 +25683,9 @@ components:
           type: boolean
           readOnly: true
           description: 'Re-checked on every read. **A line can become unavailable while the cart sits**
-            — a lease expiring is not the same as the product selling out, and both land here.
+            — a lease expiring is not the same as the product selling out, and both land here. So does a line
+            that has no price any more (ADAM CR-550): its `unitPrice` and `lineTotal` are null and it is left out of
+            the cart''s totals.
 
             '
     BookedWindow:
@@ -25681,12 +26090,18 @@ components:
       properties:
         cart:
           $ref: '#/components/schemas/Cart'
+          description: 'The surviving cart (ADAM CR-553): the guest''s own open cart after a merge, else the claimed
+            cart; priced by the cart pricing rule.'
         mergedLineCount:
           type: integer
+          description: The lines moved into the guest's cart; 0 when there was nothing to merge (ADAM CR-553).
         droppedLines:
           type: array
           description: '**Reported, never silent.** Lines that could not be re-leased on merge are named,
-            so a guest signing in is told what they lost rather than discovering it at checkout.
+            so a guest signing in is told what they lost rather than discovering it at checkout. They stay on the
+            anonymous cart, which becomes `abandoned` (ADAM CR-553): `expired` for an inventory hold that did not move
+            or a resource hold that expired, was converted or was released; `duplicate` for a table booking or
+            resource hold a line of the surviving cart already holds.
 
             '
           items:
@@ -25903,7 +26318,24 @@ components:
           readOnly: true
           description: >-
             The quote holds until then (the cart lease). After it, the next payment attempt re-quotes
-            at the rate then in force and the guest confirms the new amount (CHG-FIN-001).
+            at the rate then in force and the guest confirms the new amount (CHG-FIN-001): `createPayment` re-locks
+            the quote on the order and, when `chargeTotal` changed, answers `409 quoteExpired` with the new quote
+            before charging anything (ADAM CR-577).
+        termsVersion:
+          type: string
+          maxLength: 40
+          nullable: true
+          readOnly: true
+          description: '**The terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the
+            `termsAndConditions` version `checkoutCart` took in `termsAccepted`, checked against the policy in force.
+            Null when the checkout sent none; never filled in from the policy in force.'
+        termsAcceptedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the guest accepted `termsVersion`, the time `checkoutCart` wrote the order (ADAM CR-576).
+            Null with `termsVersion`.
         droppedPromotions:
           type: array
           readOnly: true
@@ -26997,6 +27429,31 @@ components:
           format: date-time
         releaseHoldOnExpiry:
           type: boolean
+    PaymentLinkLine:
+      x-ticvai-persistence: none — computed on read; an orders.order_line with what it is and when the visit is
+      description: '**A line of the order a payment link pays for, as its holder reads it** (ADAM CR-578, Chinmay, 3
+        November 2026; CHG-CR578-001): the `OrderLine` plus its display name and visit time, so WEB-014 shows what the
+        guest is paying for. Answered by `getPaymentLink`, in its 200 and in the `linkExpired` and `linkPaid` 410s.'
+      allOf:
+      - $ref: '#/components/schemas/OrderLine'
+      - type: object
+        required:
+        - displayName
+        properties:
+          displayName:
+            type: string
+            readOnly: true
+            x-ticvai-persisted: false
+            description: The product name and the variant name joined by a middle dot, from the catalogue in the request's `Accept-Language`, falling back to the venue's default language
+              (catalogue#productRecords, catalogue#variantRecords, in process).
+          visitStartsAt:
+            type: string
+            format: date-time
+            nullable: true
+            readOnly: true
+            x-ticvai-persisted: false
+            description: With the venue's offset. The performance's `startsAt` where `performanceId` is set
+              (catalogue#performanceRecords, in process), else `bookedWindow.startsAt`, else null.
     PaymentLinkProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -27013,6 +27470,23 @@ components:
             - linkSuperseded     # getPaymentLink 410, payByLink 410: resendPaymentLink retired it
             - linkCancelled      # getPaymentLink 410, payByLink 410
             - linesUnavailable   # payByLink 409: the hold went while the guest was paying
+          orderNumber:
+            type: string
+            description: With `linkExpired` and `linkPaid` from getPaymentLink, `Order.orderNumber` of the link's order
+              (ADAM CR-578).
+          venueName:
+            type: string
+            description: With `linkExpired` and `linkPaid` from getPaymentLink, the venue's name (ADAM CR-578).
+          lines:
+            type: array
+            description: With `linkExpired` and `linkPaid` from getPaymentLink, the order's lines as the 200 answers them
+              (ADAM CR-578).
+            items:
+              $ref: '#/components/schemas/PaymentLinkLine'
+          amount:
+            allOf:
+            - $ref: ../shared/common.yaml#/components/schemas/Money
+            description: With `linkPaid` from getPaymentLink, what the link charged (ADAM CR-578).
           unavailableLines:
             type: array
             description: With `linesUnavailable`, the lines no longer available.
@@ -27364,10 +27838,37 @@ components:
             - chargebackClosed             # respondToChargeback
             - paymentNotCleanable          # cleanupFailedPayment: captured, refunded, or the action does not fit the status
             - cashNotOnHandheld            # createPayment: cash from a session with no till (DEC-200; CHG-CSP-039)
+            - quoteExpired                 # createPayment 409: the lapsed rate lock re-quoted to a new chargeTotal (ADAM CR-577)
           balanceDue:
             allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money
             description: With `exceedsBalanceDue`, what the order still owes.
+          quote:
+            type: object
+            description: 'With `quoteExpired` (ADAM CR-577, CHG-CR577-001): the quote `createPayment` has just locked on
+              the order, which the guest sees and confirms before a new attempt with a new `Idempotency-Key`.'
+            required:
+            - chargeCurrency
+            - chargeTotal
+            - chargeFxRate
+            - chargeRateLockedUntil
+            properties:
+              chargeCurrency:
+                type: string
+                pattern: ^[A-Z]{3}$
+                description: The currency the guest is charged in, as the order holds it.
+              chargeTotal:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: The new charge total the order now holds, in the charge currency.
+              chargeFxRate:
+                allOf:
+                - $ref: '#/components/schemas/ExchangeRateDecimal'
+                description: The new rate the order now holds, the region's tender rate in force.
+              chargeRateLockedUntil:
+                type: string
+                format: date-time
+                description: Until when the new quote holds, now plus the venue's cart lease.
     InvitationRefusedProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -27439,6 +27940,8 @@ components:
             - transportFareUnavailable # addCartLine 422: transport.quoteTransportFare refused (REV3-21)
             - passNotValidForTrip    # addCartLine 422: the owned pass does not cover the stations, has no entry left or is outside its validity (REV3-21)
             - attendeesOverCapacity  # addCartLine 422: more attendees than the meeting room type holds (GPS-C28, CHG-R8SPN-034)
+            - promotionEvaluationUnavailable # applyCartPromoCode 422 until promotions evaluation (#28136) is built (ADAM CR-550)
+            - termsVersionNotCurrent # checkoutCart 422: termsAccepted.version is not the terms in force (ADAM CR-576)
           lineIds:
             type: array
             description: The cart lines the refusal is about, where it is about lines.

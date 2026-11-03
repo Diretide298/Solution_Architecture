@@ -1,0 +1,43 @@
+id: CHG-CR546-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'exchangeOrderLines (and modifyOrder) read access#entitlementRecords in process, as the package has said since
+  CHG-R13INT-013: no contract text changes. A business rule now holds the in-process route on both operations and the
+  exchange''s check order (400 validation, line-redeemed, outside-exchange-window, replacement-unavailable), so the
+  service-route wording cannot come back.'
+decision:
+  what: 'ADAM CR-546, posted on #30685: "Decided (Chinmay, 3 November 2026): already settled in the package; nothing
+    changes in the contract. Build now: exchangeOrderLines checks whether an outgoing line''s entitlement is redeemed
+    by reading access#entitlementRecords in process, through the C# query interface Access implements
+    (IEntitlementRecordsQuery, which the commerce host already registers), in the request''s own transaction and under
+    the caller''s own scope, exactly as getMediaEntitlements does ... Build no Access endpoint, no Orders HTTP client
+    and no service-route test for this read. modifyOrder reads it the same way ..." The lead''s instruction, 3 November
+    2026: "Dont hold r13. approve them and rever tto the devs", "check any open CRs and close them out as well", and
+    "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-546 (Pranay Shinde, #30685 exchangeOrderLines): the developer read the earlier exchange decision''s "route
+  service" against the query''s in-process rule (CR-196); CHG-R13INT-013 had already put the read in process.'
+keys_touched:
+  operations:
+  - exchangeOrderLines
+  - modifyOrder
+  files:
+  - tools/check-business-rules.py
+root_class: a superseded route in an earlier decision's wording
+tickets:
+  started: []
+  unstarted:
+  - '30685 (exchangeOrderLines, Pranay Shinde): nothing changes in the package; build the in-process read as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-546
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-EXCHANGE-ENTITLEMENT-READ
+status: open
+notes: 'No contract change: exchangeOrderLines (orders.yaml, x-ticvai-read-via access#entitlementRecords in-process, and
+  its "checks, in this order" paragraph) and modifyOrder already say what the posted decision says. ADAM shows #30685
+  Ready for QA (links read 3 November 2026 08:08Z); the lane input says New.'

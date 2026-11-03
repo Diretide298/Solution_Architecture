@@ -1206,8 +1206,21 @@ changes:
   to: 19e98ce7a9611e9d
   approval: 'ADAM CR-556 (raised on #31784 GST-007; settled 3 November 2026 by Chinmay, the lead''s decision): the consent pop-up accepted under CR-493 opens once the cart holds this booking''s lines, on the screen that adds them, and at Checkout Entry when checkoutCart refuses for unanswered consent; the pop-up''s look stays as built. On Tickets & Add-ons it opens after the step''s addCartLine calls succeed, before leaving the step, when a question is unanswered.'
   change: CHG-CR556-001
-- screen: GST-041
+- screen: GST-009
   field: 'overlay:consentQuestions'
-  to: 0670fc6a80e1326a
-  approval: 'ADAM CR-556 (raised on #31784 GST-007; settled 3 November 2026 by Chinmay, the lead''s decision): the consent pop-up accepted under CR-493 opens once the cart holds this booking''s lines, on the screen that adds them, and at Checkout Entry when checkoutCart refuses for unanswered consent; the pop-up''s look stays as built. On Checkout Entry it opens when checkoutCart refuses 422 consentRequired or consentAnswerBlocks.'
-  change: CHG-CR556-001
+  to: 56a0c79b982f01f7
+  approval: 'ADAM CR-556 with ADAM CR-576 (both settled 3 November 2026 by Chinmay, the lead''s decisions; the two
+    meet at Checkout Entry, resolved overnight 4 November 2026 under the lead''s "take the recommended decision unless
+    its very very important", CHG-R14INT-001): CR-576 moves checkoutCart off Checkout Entry to the payment step, so
+    the consent pop-up CR-556 opened at Checkout Entry for checkoutCart''s 422 moves with it; the pop-up''s look stays as
+    accepted. On Review & Payment it opens when Pay''s checkoutCart refuses 422 consentRequired or consentAnswerBlocks (the pop-up of GST-007 and GST-008).'
+  change: CHG-R14INT-001
+- screen: WEB-012
+  field: 'overlay:consentQuestions'
+  to: 442a75c02d9a2047
+  approval: 'ADAM CR-556 with ADAM CR-576 (both settled 3 November 2026 by Chinmay, the lead''s decisions; the two
+    meet at Checkout Entry, resolved overnight 4 November 2026 under the lead''s "take the recommended decision unless
+    its very very important", CHG-R14INT-001): CR-576 moves checkoutCart off Checkout Entry to the payment step, so
+    the consent pop-up CR-556 opened at Checkout Entry for checkoutCart''s 422 moves with it; the pop-up''s look stays as
+    accepted. On Checkout - Payment it opens when Pay now''s checkoutCart refuses 422 consentRequired or consentAnswerBlocks (the pop-up of WEB-006).'
+  change: CHG-R14INT-001

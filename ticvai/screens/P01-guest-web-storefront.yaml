@@ -2832,9 +2832,11 @@ screens:
         provenance: contract orders.yaml DELETE /carts/{cartId}
       - kind: primaryButton
         label: Checkout
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        operation: checkoutCart
-        notes: Checks the cart out (`checkoutCart`) and moves on to the guest details.
+        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); ADAM CR-576 (3 November
+          2026)
+        notes: 'Moves on to the guest details (or straight to payment) without calling `checkoutCart`: the order is
+          made at Pay now on WEB-012, so the T&Cs tick reaches the call that creates the order (ADAM CR-576,
+          CHG-CR576-001). The button looks and reads the same.'
   overlays:
   - id: confirmRemoveCartLine
     component: confirmDialog
@@ -2890,7 +2892,8 @@ screens:
     trigger: onAction
   - operationId: checkoutCart
     contract: orders
-    purpose: Turn the cart into an order
+    purpose: 'Turn the cart into an order: only on the transfer journey (F55); the Checkout button moves on without
+      it, and the order is made at Pay now on WEB-012 (ADAM CR-576)'
     trigger: onAction
   - operationId: abandonCart
     contract: orders
@@ -3400,7 +3403,13 @@ screens:
 
     Build note (r8 second round, IDENTITY-C28, from the core lane): the no-access state is the 404 of
     the guest''s own order lookup (an order that is not theirs answers as one that does not exist); the
-    visible text is unchanged.'
+    visible text is unchanged.
+
+
+    **Unanswered consent at Pay now** (ADAM CR-556 with CR-576, CHG-R14INT-001): WEB-011 is skipped when the
+    cart needs no forms, so Pay now''s `checkoutCart` can still refuse `422 consentRequired` or
+    `consentAnswerBlocks`; it then opens the same consent pop-up (overlay `consentQuestions`, as WEB-006 asks
+    them) for the unanswered questions, then `recordConsentAnswers` and `checkoutCart` once more.'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -3445,7 +3454,11 @@ screens:
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: consentBlock
         label: Terms and conditions
-        notes: Pay now is enabled only when ticked; the version shown is the one in force (listPublishedPolicies).
+        notes: 'Pay now is enabled only when ticked; the version shown is the one in force (listPublishedPolicies).
+          Pay now sends `termsAccepted` (`kind` termsAndConditions, `version` the one the Read the terms panel shows)
+          on `checkoutCart`. On `422 termsVersionNotCurrent` the screen reloads `listPublishedPolicies`, clears the
+          tick and leaves Pay now disabled until the guest ticks the current version: the consent block''s existing
+          behaviour, nothing new on screen (ADAM CR-576, CHG-CR576-001).'
         provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: detailPanel
         label: Read the terms
@@ -3468,7 +3481,12 @@ screens:
         label: Checking your payment
         operation: inquirePaymentStatus
         notes: 'Only in the unknown-outcome state: the screen asks the provider by itself (`inquirePaymentStatus`)
-          and never offers to pay again.'
+          and never offers to pay again. **Back from the card round trip** (3-D Secure or a hosted page; ADAM CR-575,
+          CHG-CR575-001): the page opens on `returnUrl`, this screen''s route with `?orderId=<the order id>`, never a
+          token; it calls `getOrder` with credentials included (the API''s `ticvai_order_access` cookie), finds the
+          `pendingConfirmation` payment among the order''s payments, shows this banner and calls
+          `inquirePaymentStatus`; it never offers to pay again while the payment is pending. The page never reads,
+          copies or stores the cookie.'
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
     - name: actionBar
       slot: rowActions
@@ -3477,8 +3495,14 @@ screens:
         label: Pay now
         provenance: defined 4 October 2026 (CHG-FXS-003)
         operation: createPayment
-        notes: checkoutCart (once; its idempotency key is the cart's), then createPayment against the
-          order it returns; an unknown payment outcome has the order to attach to.
+        notes: 'checkoutCart (once; its idempotency key is the cart''s), with `termsAccepted` from the T&Cs tick
+          (ADAM CR-576), then createPayment against the order it returns; an unknown payment outcome has the order
+          to attach to. A card payment sends `returnUrl` = this screen''s route with `?orderId=<the order id>`, never
+          a token (ADAM CR-575). After a decline, Pay now calls `createPayment` again with a new `Idempotency-Key`.
+          **On `409 quoteExpired`** (ADAM CR-577, CHG-CR577-001) the total line is replaced with the answer''s
+          `quote` in the screen''s existing format (charge amount, base amount, rate, held until) and the guest is
+          asked to confirm; Pay now then sends `createPayment` again with a new key. Nothing is charged that the
+          guest has not seen. The states and text are unchanged.'
   states:
     loading: The checkout payment, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the checkout payment untouched.
@@ -3521,6 +3545,12 @@ screens:
       names (attendees) and opt-ins (marketingConsents) from WEB-011 when it ran'
     trigger: onAction
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: recordConsentAnswers
+    contract: marketing-crm
+    purpose: 'Record the answers to the questions Pay now''s checkoutCart refused for (422 consentRequired or
+      consentAnswerBlocks), once, after the last question (ADAM CR-556 with CR-576)'
+    trigger: onAction
+    provenance: ADAM CR-556, 3 November 2026; ADAM CR-576 (CHG-R14INT-001)
   entryState:
     params:
     - name: cartId
@@ -3528,8 +3558,9 @@ screens:
     - name: orderId
       from: deepLink
       optional: true
-      notes: A link to an order already pending payment opens it; otherwise checkoutCart makes the order
-        from the cart.
+      notes: 'A link to an order already pending payment opens it; otherwise checkoutCart makes the order
+        from the cart. Also the card round trip''s return: `returnUrl` is this route with `?orderId=`, and the
+        order is read back with the order access cookie (ADAM CR-575).'
     - name: paymentId
       from: navigation
       optional: true
@@ -3577,6 +3608,32 @@ screens:
     why: Transfers happen after purchase from the tickets (WEB-030); on the payment screen it offered
       to give away tickets not yet paid for (F55 step 4).
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  overlays:
+  - id: consentQuestions
+    component: modal
+    trigger: Pay now's checkoutCart refuses 422 consentRequired or consentAnswerBlocks
+    body: '**The same consent pop-up as WEB-006, for the questions still unanswered** (ADAM CR-556 with CR-576,
+      CHG-R14INT-001; then Pay now sends `checkoutCart` once more). **The venue''s consent questions for this
+      booking**, e.g. *Are you able to swim?*, *Do you
+      hold a scuba certification?*, *I accept the risk*: one or several, in the order `Cart.consentQuestions`
+      gives (the booking flow''s `BookingFlowLevelSettings.consentQuestionIds` and every cart product''s
+      `consentQuestionIds`, each question once). A question asked **per person** is asked for each member
+      of the party; one asked **per booking** once. Themed as the prototype''s pop-up (Yes / No, Next).
+      Next sends the answers to `recordConsentAnswers`, which stores each as a consent record (question
+      version, answer, who answered, when). **A blocking answer** (e.g. *No* to the swim question) marks
+      the lines it blocks and says so; the guest removes them or answers again. There is no tenant on/off
+      toggle: a question is attached to a product or a flow by the venue (decided 29 September, rev 3
+      REV3-26).'
+    bindsTo: ConsentQuestion
+    confirm:
+      label: Next
+      operation: recordConsentAnswers
+    dismiss:
+      label: Back
+      discards:
+      - answers
+    provenance: 'the pop-up as WEB-006 has it (client-verified), opened on this screen for checkoutCart''s 422
+      (ADAM CR-556 with CR-576, 3 November 2026; CHG-R14INT-001)'
 - id: WEB-013
   name: Booking Confirmation
   module: Cart & Checkout
@@ -3896,8 +3953,13 @@ screens:
         provenance: contract orders.yaml GET /payment-links/{token}
       - kind: detailPanel
         bindsTo: PaymentLinkView
-        notes: Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked
-          by phone may not recognise a reference number.
+        notes: 'Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked
+          by phone may not recognise a reference number. **As the frame shows** (ADAM CR-578, CHG-CR578-001): each
+          line is drawn by `PaymentLinkLine.displayName`, the visit from the earliest `visitStartsAt` and the
+          reference from `orderNumber`, in the main view and in the expired and already-paid views (the `410`
+          `linkExpired` and `linkPaid` carry `orderNumber`, `venueName`, `lines` and, paid, `amount`). Guest count
+          and subtotal come from the lines'' quantities and amounts. Until the backend ships, these fields are
+          stubbed.'
         provenance: carried from the previous definition
       - kind: banner
         notes: The deadline, counted in time remaining rather than as a timestamp. **Expires in 46 minutes**

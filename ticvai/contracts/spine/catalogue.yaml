@@ -257,6 +257,38 @@ x-ticvai-queries:
       variantListingFacts query answer a null price, and simulatePriceBreakdownCalculation answers 422
       no-selected-rate. Read-only, under the caller's row-level security, asked in process within commerce.
     served: [in-process]
+  # **A cart's holds move to another cart without being released** (ADAM CR-553, decided 3 November 2026 on #30681;
+  # CHG-CR553-001). claimCart's merge keeps the capacity the anonymous cart holds, as checkoutCart keeps its holds,
+  # rather than releasing and re-acquiring them.
+  transferInventoryHolds:
+    module: catalogue
+    table: catalogue.inventory_reservation
+    decision_owner: Chinmay
+    notes: 'Declared by the lead''s decision on ADAM CR-553 (3 November 2026, #30681), with the correction posted the
+      same day (the table is catalogue.inventory_reservation, which r8''s V0103a renamed from catalogue.inventory_hold;
+      columns unchanged). Built once in Catalogue by its own new task; claimCart answers its found case 409
+      cart-not-open until it is merged.'
+    inputs:
+      fromCartId: {type: string, format: uuid, description: 'The anonymous cart claimCart merges away.'}
+      toCartId: {type: string, format: uuid, description: 'The guest''s own open cart, which survives.'}
+    returns:
+      type: object
+      required: [movedHoldIds]
+      properties:
+        movedHoldIds:
+          type: array
+          items: {type: string, format: uuid}
+          description: The catalogue.inventory_reservation ids now held by toCartId; empty when none moved.
+    reads: [catalogue.inventory_reservation]
+    writes: [catalogue.inventory_reservation]
+    rule: >-
+      The lead's decision on ADAM CR-553 (3 November 2026). A command, not a read: one statement, UPDATE
+      catalogue.inventory_reservation SET holder_cart_id = toCartId WHERE holder_kind = 'cart' AND holder_cart_id =
+      fromCartId AND status = 'active' AND expires_at > now() RETURNING id. No units move and no capacity row is
+      locked; running it twice moves nothing more. It answers the moved hold ids. Called by orders.claimCart only, in
+      process, in claimCart's transaction, the way addCartLine calls acquireInventoryHold for a cart, after claimCart's
+      root-grant statements. There is no HTTP route and no screen.
+    served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.

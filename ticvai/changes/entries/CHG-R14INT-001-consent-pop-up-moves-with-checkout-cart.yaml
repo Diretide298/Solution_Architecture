@@ -1,0 +1,53 @@
+id: CHG-R14INT-001
+date: '2026-11-04'
+source: cr
+kind: spec
+summary: 'Where ADAM CR-556 and CR-576 meet: CR-576 takes checkoutCart off GST-041 (the order is made at Pay on GST-009
+  and at Pay now on WEB-012), while CR-556 step 3 opened the consent pop-up on GST-041 when checkoutCart refuses 422
+  consentRequired or consentAnswerBlocks. CR-576 wins on where checkoutCart is called; the same approved consent pop-up
+  (overlay consentQuestions) and recordConsentAnswers move with checkoutCart to the screen that now calls it: GST-009 on
+  the app (the GST-007/GST-008 pop-up, recordConsentAnswers on action, invalidates getCart) and WEB-012 on the web (the
+  WEB-006 pop-up; WEB-011, which asks the questions first, is skipped when the cart needs no forms). GST-041 keeps
+  neither; its note says where they went. BR-CONSENT-WHERE-LINES-ADDED checks the new places.'
+decision:
+  what: 'The r14 integration merge of lanes a (CR-576) and d (CR-556) conflicted on GST-041''s operations. The
+    coordinator''s resolution, under the lead''s instruction of 4 November 2026 ("take the recommended decision unless
+    its very very important"): CR-576 wins on where checkoutCart is called; the consent pop-up and recordConsentAnswers
+    move with checkoutCart to GST-009 (app) and WEB-012 (web).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Two decisions settled the same day: CR-556 step 3 ("Checkout Entry (GST-041): when checkoutCart refuses 422
+  consentRequired or consentAnswerBlocks, open the same pop-up there") and CR-576 (6) ("The Checkout buttons on WEB-010
+  and GST-041 move on to the next step without calling checkoutCart"). Kept together, GST-041 would open a pop-up for a
+  call it no longer makes, and the screens that call checkoutCart would have no answer to its 422.'
+keys_touched:
+  screens: [GST-041, GST-009, WEB-012]
+  operations: [checkoutCart, recordConsentAnswers]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-business-rules.py
+root_class: two decisions settled the same day on the same screen, each built in its own lane
+tickets:
+  started:
+  - '31898 ([FE] WEB-012 build with all states, Chinmay Patkar, In progress): a follow-up comment (the consent pop-up of
+    WEB-006 on Pay now''s 422, then checkoutCart once more); its text is not rewritten.'
+  unstarted:
+  - '31941 / 31942 ([FE] GST-041 build and connect to API, Chitrangi Mestry, New): no consent pop-up and no
+    recordConsentAnswers here.'
+  - '28236 ([FE] GST-009 Review & Payment, Chitrangi Mestry, New): the consent pop-up on Pay''s 422 and
+    recordConsentAnswers.'
+  - '31899 ([FE] WEB-012 connect to API, Chinmay Patkar, New): recordConsentAnswers after the pop-up, then checkoutCart
+    again.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-576
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONSENT-WHERE-LINES-ADDED
+status: open
+notes: 'Design change logged in docs/active/approved-ui-changes.yaml (GST-009 and WEB-012 overlay:consentQuestions);
+  the GST-041 entry CR-556 had made is gone with the overlay, which the approved snapshot never held. CHG-CR556-001 and
+  CHG-CR576-001 are left as their lanes wrote them; this entry is the later word on GST-041.'

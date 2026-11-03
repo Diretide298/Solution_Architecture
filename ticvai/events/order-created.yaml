@@ -38,6 +38,11 @@ payload:
   required: false
   notes: checkoutCart marketingConsents[] as the guest left them (channel, purpose, granted, noticeVersion); never
     defaulted to granted (M18-15, added 30 September)
+- field: termsVersion
+  type: string
+  required: false
+  notes: The termsAndConditions version the guest accepted (Order.termsVersion), when checkoutCart took termsAccepted;
+    absent otherwise (ADAM CR-576, CHG-CR576-001)
 consumers:
 - context: marketing
   purpose: Abandoned-payment journeys when no order.paid follows

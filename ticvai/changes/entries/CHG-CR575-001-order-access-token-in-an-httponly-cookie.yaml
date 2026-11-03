@@ -1,0 +1,57 @@
+id: CHG-CR575-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'The guest web keeps access to the order it just checked out across the card round trip: checkoutCart sets
+  ticvai_order_access (HttpOnly, Secure, SameSite=Lax, host-only, Max-Age to the token''s exp) on a guest web call that
+  mints orderAccessToken; getOrder, inquirePaymentStatus and createPayment accept it as they accept the header, with
+  no X-Device-Id, the header winning when both are sent; inquirePaymentStatus and createPayment also take the header
+  token with X-Device-Id, for that one order. WEB-012''s return reads the order back by orderId and asks the pending
+  payment.'
+decision:
+  what: 'ADAM CR-575, posted on #31898: "Decided (Chinmay, 3 November 2026): the guest web keeps a visitor''s access to
+    the order they just checked out across the card round trip (3-D Secure or hosted page) in an HttpOnly cookie the
+    API sets itself, as the waiting room''s admission cookie does. Nothing goes into browser storage or a URL. Build
+    now: 1. checkoutCart (#27910) ... Set-Cookie ticvai_order_access ... 2. getOrder (#27736): accepts the token from
+    this cookie ... 3. inquirePaymentStatus and createPayment (#28144): also accept the order access token ... 4.
+    WEB-012 (#31898 against stubs, #31899 against the API): set returnUrl to this screen''s route with ?orderId= ...
+    5. Not built: no cookie for the anonymous cart session." The lead''s instruction, 3 November 2026: "Dont hold r13.
+    approve them and rever tto the devs", and "start on 1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-575 (Chinmay Patkar, #31898 WEB-012): a guest web visitor lost the anonymous session and the order access
+  token on the 3-D Secure or hosted page round trip, so could not read their own payment on return.'
+keys_touched:
+  operations:
+  - checkoutCart
+  - getOrder
+  - inquirePaymentStatus
+  - createPayment
+  screens:
+  - WEB-012
+  files:
+  - contracts/spine/orders.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - tools/check-business-rules.py
+root_class: a credential that does not survive a redirect the flow requires
+tickets:
+  started:
+  - '30687 (getOrder, Pranay Shinde, Ready for QA): getOrder also accepts the order access token from the
+    ticvai_order_access cookie, with the same checks and no X-Device-Id; the header wins when both are sent; any
+    failure is 404.'
+  unstarted:
+  - '31898 (WEB-012 build, Chinmay Patkar, In progress): its own posted decision.'
+  - '27910 (checkoutCart), 27736 (getOrder), 28144 (createPayment, inquirePaymentStatus), New, Pranay Shinde: as
+    posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-575
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ORDER-ACCESS-COOKIE
+status: open
+notes: 'Beyond the posted words: checkoutCart''s success answer is 201, so the Set-Cookie header is on the 201 (the post
+  says "the 200"); inquirePaymentStatus and createPayment gain the anonymous security entry ({}) beside guestAuth and
+  bearerAuth, as getOrder has, so a caller holding only the token can reach them, and createPayment declares the
+  shared 404 its token failure answers. No screen changes: WEB-012''s notes only.'

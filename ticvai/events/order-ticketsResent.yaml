@@ -24,7 +24,13 @@ payload:
 - field: destination
   type: string
   required: false
-  notes: Where to send; null means the recipient already on each credential (the order holds no plain contact)
+  notes: Where to send; null means the recipient already on each credential (the order holds no plain contact),
+    found by the consumer as its purpose states (ADAM CR-554)
+- field: subjectId
+  type: uuid
+  required: false
+  notes: The order's orders.sales_order.subject_id, null when none, so Access can find the purchaser's contact
+    (ADAM CR-554, CHG-CR554-001)
 - field: scopePath
   type: string
 - field: tenantId
@@ -33,8 +39,18 @@ payload:
   type: timestamp
 consumers:
 - context: access
-  purpose: Deliver each credential as deliverCredential does, one pending access.credential_delivery row per
-    entitlement (sms is smsLink), so Orders sends nothing itself (ADAM CR-506)
+  purpose: 'Deliver each credential as deliverCredential does, one pending access.credential_delivery row per
+    entitlement (sms is smsLink), so Orders sends nothing itself (ADAM CR-506). Settled on ADAM CR-554 (Chinmay, 3
+    November 2026; CHG-CR554-001): each entitlementId is handled in one transaction per event. An entitlement whose
+    status is cancelled, expired or surrendered is skipped with no row, as deliverCredential refuses those. Every other
+    entitlement gets one row: id derived from the event id plus the entitlement id, so a redelivered event writes
+    nothing new; entitlement_id; channel email, smsLink for sms, or whatsapp; recipient_role purchaser; attempt = 1 +
+    the number of earlier rows for that entitlement on that channel; status pending; requested_at = the event''s at;
+    venue_id and scope_path from the entitlement; requested_by_principal_id null. Destination: the event''s destination
+    when it is given; when it is null, the destination of the most recent earlier row for that entitlement and channel;
+    failing that, the order subject''s (subjectId) primary contact, read through Identity''s subjectContactRecords: the
+    email kind for email, the phone kind for sms and whatsapp. If none is found, the row is still written pending with
+    no destination, and the dispatch job moves it to failed with failure reason ''no recipient on file''.'
   writes:
   - access.credential_delivery
   idempotencyKey: eventId + entitlementId

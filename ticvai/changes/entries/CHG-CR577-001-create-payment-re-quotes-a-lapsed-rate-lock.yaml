@@ -1,0 +1,56 @@
+id: CHG-CR577-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'createPayment re-quotes before charging when a card or wallet payment''s order has a foreign chargeCurrency and
+  now is past chargeRateLockedUntil: it takes the region''s tender rate in force, recomputes chargeTotal and re-locks
+  the quote on the order (now plus cartLeaseSeconds); an unchanged total pays as normal, a changed one answers 409
+  quoteExpired with the quote and charges nothing, keeping the re-lock. PaymentProblem gains quoteExpired and quote.
+  WEB-012 and GST-009 show the quote in their existing total line and pay again with a new Idempotency-Key.'
+decision:
+  what: 'ADAM CR-577, posted on #31898: "Decided (Chinmay, 3 November 2026): after the rate lock lapses, createPayment
+    re-quotes before charging, and the guest sees and confirms any new amount. Build now: 1. createPayment (#28144): ...
+    Otherwise answer 409 with refusedReason quoteExpired and a quote object (chargeCurrency, chargeTotal, chargeFxRate,
+    chargeRateLockedUntil). Make no provider call and write no payment or payment_attempt row, but keep the re-lock.
+    Add quoteExpired and quote to PaymentProblem and to the 409''s description. 2. The guest''s confirmed attempt is a
+    new call with a new Idempotency-Key ... 3. WEB-012 ... GST-009 in the app handles the same answer the same way."
+    The lead''s instruction, 3 November 2026: "Dont hold r13. approve them and rever tto the devs", and "start on
+    1,2,3".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-577 (Chinmay Patkar, #31898 WEB-012): after chargeRateLockedUntil the next payment "re-quotes and the
+  guest confirms the new amount" (CHG-FIN-001), but nothing told the screen the new amount before it charged.'
+keys_touched:
+  operations:
+  - createPayment
+  schemas:
+  - PaymentProblem
+  - Order
+  tables:
+  - orders.sales_order
+  screens:
+  - WEB-012
+  - GST-009
+  files:
+  - contracts/spine/orders.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - tools/check-business-rules.py
+root_class: a promised confirmation with no answer to carry it
+tickets:
+  started: []
+  unstarted:
+  - '28144 (createPayment, Pranay Shinde, New): the re-quote and the 409 as posted.'
+  - '31898 (WEB-012 build, Chinmay Patkar, In progress): its own posted decision.'
+  - '28236 (GST-009, Chitrangi Mestry, New): the same answer handled the same way.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-577
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-QUOTE-EXPIRED
+status: open
+notes: 'Beyond the posted words: createPayment''s 409 now names its problem types (tender-unavailable-offline,
+  exceeds-balance-due, tender-not-allowed-on-channel, cash-not-on-handheld, quote-expired), and it declares its write of
+  the re-locked quote to orders.sales_order. No screen changes: notes only.'
