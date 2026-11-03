@@ -644,7 +644,7 @@ paths:
         **The client id** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001). The server makes `clientId` (see
         `ApiClient.clientId`) whenever it creates a client; an insert that hits its unique index retries once with a
         fresh value. **A replay never carries a secret**: the first answer is 201 `{client, clientSecret}`, and what is
-        written to `platform.idempotency_record` is that answer with `clientSecret` removed, so a request repeating the
+        kept as the Idempotency-Key's stored answer is that answer with `clientSecret` removed, so a request repeating the
         key gets 201 with the same client and no `clientSecret`, and nothing is written a second time. The secret exists
         only as its keyed hash in `control.api_client_secret`; a caller who lost the first answer takes a new secret
         with `rotateApiCredential`.
