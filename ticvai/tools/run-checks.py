@@ -256,6 +256,11 @@ CHECKS = [
     # owner sends. Here it runs bare: its self-test (fixture snapshots, no Docker), and the package inputs it judges by
     # (migration-review.md, MIGRATIONS.md, backend/) still parse and every review kind has a rule. Never baselined.
     "check-schema-drift",
+    # 3 November (r13 system review A-12 and F-13; the lead: "All four, one release"; CHG-R14J-040, CHG-R14J-041): the
+    # ADR index says what each ADR's own Status line says (ADR-0065 was Accepted in its file, Proposed in the index), and
+    # the landing pages carry no figure the package contradicts, with OVERVIEW.md exactly what derive-overview renders.
+    "check-adr-index",
+    "check-landing-figures",
 ]
 
 # Arguments a checker is run with here, when its bare form is not the one a gate run needs (CHG-R8GEN-002).

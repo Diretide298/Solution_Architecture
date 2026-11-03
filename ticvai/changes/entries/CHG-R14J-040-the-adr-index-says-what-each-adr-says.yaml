@@ -1,0 +1,49 @@
+id: CHG-R14J-040
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'The ADR index says what each ADR file says about itself, and a check holds it. ADR-0065 (browse availability
+  from a one-second cache; the hold decides) was Accepted on 1 October in its own Status line and still "Proposed,
+  waiting on Chinmay" in docs/adr/README.md; its row now reads Accepted, the index note says it was accepted, the ADR''s
+  Decision no longer opens with "Proposed:" and its open question carries the answer, and deploy/variants/B-read-cache.yml
+  no longer says caching availability "is how two people buy the same seat" (the decision is unchanged: the hold
+  decides). The two decisions still waiting on the client are on the left-out list: ADR-0057 the cloud broker
+  (LO-R14J-002, its 12 October deadline passed) and ADR-0060 the availability targets and HA (LO-R14J-003).'
+decision:
+  what: 'r13 system review finding A-12 (NFR-bearing decisions open or inconsistently stated: 0057 and 0060 Proposed,
+    0065 Accepted in its file and Proposed in the index). The lead, 3 November 2026: "All four, one release" (the review
+    fixes go into r14 together). No ADR''s decision changes: the index and the variant comment are brought to what the
+    ADRs already say, and the two open ones are recorded under the left-out rule with who answers and the release they
+    wait for (the release after the client answers; not scheduled). tools/check-adr-index.py (AI-STATUS, AI-MISSING,
+    self-test), registered in run-checks, fails when an index row leads with another state than its file''s Status
+    line, names other successors for a superseded ADR, or when a file has no row or a row no file; on the r13 tree it
+    fails exactly ADR-0065. changes/schema.yaml gains the R14J id block (10) for the lane''s parallel parts.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding A-12 (architecture): the ADR index is hand-maintained and
+  check-package rule 10 checks only the status vocabulary, so the index and the file could disagree; the
+  client-dependent decisions had no record after their deadline passed (the left-out rule of 20 October 2026).'
+keys_touched:
+  files:
+  - docs/adr/README.md
+  - docs/adr/0065-on-sale-availability-is-read-from-a-short-cache.md
+  - deploy/variants/B-read-cache.yml
+  - docs/active/left-out.yaml (LO-R14J-002, LO-R14J-003)
+  - tools/check-adr-index.py
+  - tools/run-checks.py
+  - changes/schema.yaml (id_blocks R14J)
+root_class: a hand-maintained index restating what its files say, with nothing comparing the two
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-adr-index.py
+status: open
+notes: 'For the lead: ADR-0057 asked for the client''s broker answer by 12 October and ADR-0060 for the 99.99% scope,
+  per-tier SLO and HA cost; both are overdue and have no escalation date. The left-out entries say the lead escalates;
+  the date is the lead''s to set.'

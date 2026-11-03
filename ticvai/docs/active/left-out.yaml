@@ -447,6 +447,7 @@ items:
   change: CHG-CR534-001
 - id: LO-R14J-001
   kind: deferred
+  platform: all (the backend and the event contracts; no screen)
   what: 'The two emitter declarations agreeing everywhere: 111 (event, operation) pairs on 105 operations name the
     operation in the event''s emittedBy while the operation declares no x-ticvai-emits (and postOrderRevenue declares
     ledger.journalPosted, whose event does not name it). Lineage already unions the two, so every one of these
@@ -463,3 +464,36 @@ items:
   owner: Chinmay
   added: '2026-11-03'
   change: CHG-R14J-010
+# ---------------------------------------------------------------- r14: decisions waiting on the client (review A-12)
+- id: LO-R14J-002
+  kind: deferred
+  platform: all (the backend and the infrastructure; no screen)
+  what: 'The cloud event broker, ADR-0057 (Proposed): RabbitMQ or Kafka in the cloud. Everything else in the ADR is
+    decided (the kernel interfaces, the envelope, per-aggregate ordering, the dead-letter drain, the inbox) and local
+    development runs RabbitMQ; the relay and the HA and throughput figures of ADR-0058 and ADR-0060 assume one of the
+    two. The ADR asked for the answer before sprint 1 week 2 (Monday 12 October 2026), and it has not come.'
+  source: 'docs/adr/0057-events-travel-on-rabbitmq-or-kafka.md (Status: Proposed); docs/active/development-plan.md
+    "broker: client"; r13 system review of 3 November 2026, finding A-12; CHG-R14J-040'
+  reason: 'the client chooses the cloud broker (ADR-0057); the package does not choose it for them, and its 12 October
+    deadline has passed with no answer'
+  target: 'the release after the client answers (not scheduled): the lead escalates the overdue answer to the client;
+    until then the relay is built against RabbitMQ behind IBrokerPublisher, as the ADR says'
+  owner: Chinmay, to the client
+  added: '2026-11-03'
+  change: CHG-R14J-040
+- id: LO-R14J-003
+  kind: deferred
+  platform: all (the backend and the infrastructure; no screen)
+  what: 'The availability targets and how they are met, ADR-0060 (Proposed): which services the 99.99% agreed on
+    31 July covers, whether the client accepts an SLO per tier (99.99% venue operations locally, 99.95% cloud
+    commerce) and the cost of zone-redundant HA, the one production HA mode for PostgreSQL, and UAE Central access
+    for the DR module. Until then ADR-0061''s Stage 1 runs one replica per deployable and a node or zone loss is an
+    outage.'
+  source: 'docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md (Status: Proposed, "What is
+    open, and who answers"); r13 system review of 3 November 2026, finding A-12; CHG-R14J-040'
+  reason: 'the coverage of the 99.99%, the per-tier SLO and the HA cost are the client''s answers; the HA mode and the
+    DR region access follow them'
+  target: 'the release after the client answers (not scheduled): the lead escalates; ADR-0060 moves to Accepted then'
+  owner: Chinmay, to the client (Dinesh for the UAE Central access)
+  added: '2026-11-03'
+  change: CHG-R14J-040

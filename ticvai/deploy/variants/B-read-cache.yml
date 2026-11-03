@@ -9,8 +9,11 @@
 # can change. **A TTL here
 # would be re-fetching data that is guaranteed identical.**
 #
-# **What this does not touch**: getAvailability and the hold path. Availability is the number that
-# changes with every sale, and caching it is how two people buy the same seat.
+# **What this does not touch**: getAvailability and the hold path. Browse availability has its own
+# one-second cache (ADR-0065, accepted 1 October 2026), labelled with `asOf`, and the hold decides:
+# the guarded decrement at hold is the only correctness check, so a browse figure one second old costs
+# a guest a "just sold out" message, never a second sale of the same seat. Neither is this variant's
+# lever, which is the catalogue snapshot alone.
 #
 # **Measure**: database statements per second, and p95 on the read path. **Expect the lease number
 # to be unchanged** - that is the point of running it beside C.

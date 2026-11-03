@@ -1,5 +1,9 @@
 # TICVAI design package — what is in this drop
 
+> **Historical: the note of the 10 September 2026 drop, kept as the record of that day.** Its figures, layout and
+> check list are that drop's; some were machine-updated until 3 November 2026 and are frozen since (r13 system review
+> F-13, CHG-R14J-041). **Today's figures are in [OVERVIEW.md](OVERVIEW.md)**, derived on every refresh.
+
 **10 September 2026. Fifteen of seventeen checks pass; the two that do not are named below.**
 
 ```
