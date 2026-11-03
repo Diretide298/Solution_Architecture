@@ -2155,12 +2155,6 @@ screens:
       sent `{ productId }` when the screen has one, else `{ eventId }` from the entry, never an empty
       query; a 404 renders date, time, tickets with the defaults, a 400 is the error state (ADAM CR-495)'
     trigger: onLoad
-  - operationId: getTenantAppStatus
-    contract: white-label
-    purpose: 'The picked venue''s `timeZone` (`TenantAppStatus.venues`), the zone the venue day is worked out in;
-      the answer GST-001 already loaded (ADAM CR-556 as corrected)'
-    trigger: onLoad
-    provenance: ADAM CR-556 (as corrected, 3 November 2026)
     provenance: decided 29 September 2026, W12; ADAM CR-495, 3 November 2026
   entryState:
     params:

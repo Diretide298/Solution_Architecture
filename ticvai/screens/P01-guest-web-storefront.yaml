@@ -3441,12 +3441,6 @@ screens:
         provenance: contract orders.yaml GET /orders/{orderId}
       - kind: cartPanel
         bindsTo: Cart
-        columns:
-        - Cart.lines
-        - Cart.subtotal
-        - Cart.discountTotal
-        - Cart.taxTotal
-        - Cart.total
         operation: getCart
         notes: 'Order summary stays visible throughout. Never collapsed behind a link. **Filled from the cart it is
           about to pay for** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), as GST-009 already does: on load
@@ -3454,8 +3448,9 @@ screens:
           Until Pay now the panel shows the cart''s lines (product name, quantity, line total, add-ons under their
           parent line) and its subtotal, discount, tax and total. It stays open on every state. Opened with an
           `orderId` from a link, the screen calls `getOrder` instead of `getCart` and fills the same panel from the
-          order''s lines and totals; after Pay now has made the order, it keeps showing the order. Nothing visible
-          changes.'
+          order''s lines and totals; after Pay now has made the order, it keeps showing the order. Loading reads
+          `getCart`, or `getOrder` when an `orderId` came with the link; if the cart has no lines and there is no
+          order, the guest is sent back to the cart (WEB-010). Nothing visible changes.'
         provenance: carried from the previous definition; data from ADAM CR-590 (3 November 2026)
       - kind: progressIndicator
         label: Booking steps
@@ -3510,8 +3505,7 @@ screens:
         notes: checkoutCart (once; its idempotency key is the cart's), then createPayment against the
           order it returns; an unknown payment outcome has the order to attach to.
   states:
-    loading: 'The checkout payment: `getCart`, or `getOrder` when an `orderId` came with the link (ADAM CR-590). If
-      the cart has no lines and there is no order, the guest is sent back to the cart (WEB-010).'
+    loading: The checkout payment, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the checkout payment untouched.
     emptyFirstRun: No checkout payment yet. Offers Create order (`createOrder`).
     emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen,

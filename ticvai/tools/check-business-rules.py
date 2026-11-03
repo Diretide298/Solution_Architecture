@@ -4955,7 +4955,7 @@ def lane_f_rules_r14(need, op):
     vitem = ((tas.get("venues") or {}).get("items") or {}).get("properties") or {}
     g7 = screen("screens/P02-guest-mobile-app.yaml", "GST-007")
     need("BR-VENUE-TIME-ZONE", (vitem.get("timeZone") or {}).get("nullable") is True
-         and any(a.get("operationId") == "getTenantAppStatus" for a in g7.get("apis") or [])
+         and any("TenantAppStatus.venues" in str(x) for x in (g7.get("entryState") or {}).get("preloaded") or [])
          and "not `PublishedTenantConfig`" in words(g7.get("notes")),
          "TenantAppStatus.venues carries no timeZone, or GST-007 does not take the zone from it (CR-556 as "
          "corrected)")

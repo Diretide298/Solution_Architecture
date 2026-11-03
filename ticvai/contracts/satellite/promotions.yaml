@@ -391,8 +391,8 @@ paths:
         holds; the deepest of the caller''s scope paths is not used. (2) In the same transaction the promotion''s
         existing variant rows are deleted, the new set is inserted, and `promotions.promotion.version` goes up by one
         (`update ... set version = version + 1 returning version`, on the row locked for the write). Every successful
-        PUT counts as a saved change. `promotions.promotion_channel_publication` is not touched: its
-        `published_version` keeps naming the version last pushed. (3) In the same transaction, one
+        PUT counts as a saved change. The promotion''s channel publications are not touched: each keeps naming
+        the version last pushed. (3) In the same transaction, one
         `promotions.promotion_audit` row: `venue_id` the promotion''s `venue_id`, `entity_type` `promotion`,
         `entity_id` and `promotion_id` the promotion''s id, `event_type` `promotionEdited`, `promotion_version` the new
         version from (2), `previous_value` `{"variants": [...]}` with the set stored before (an empty list when there
