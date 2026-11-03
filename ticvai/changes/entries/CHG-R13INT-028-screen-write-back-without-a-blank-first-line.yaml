@@ -1,0 +1,29 @@
+id: CHG-R13INT-028
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'tools/link-screens-contracts.py no longer writes a screen file with a leading empty line when the file has no
+  header comment (head + newline with head empty): when CR-525 moved setRolePermissions from tenancy to identity, it wrote
+  the new contract into P08''s apis that way, the next YAML writer dropped the line, and the chain was no fixed point.'
+decision:
+  what: 'The r13 integration gate after every lane merged (3 November 2026): fix every new finding at its source.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-525): check-regenerate-twice RT-CHAIN, "screens/P08-venue-back-office.yaml: the chain changed it
+  (derive-transitions-from-flows, derive-carries-from-entrystate)", reproduced by running link-screens-contracts on HEAD''s
+  P08.'
+keys_touched:
+  files:
+  - tools/link-screens-contracts.py
+root_class: a generator that writes what the next generator rewrites, seen only when its write-back fires
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-525
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-regenerate-twice.py::RT-CHAIN
+status: open

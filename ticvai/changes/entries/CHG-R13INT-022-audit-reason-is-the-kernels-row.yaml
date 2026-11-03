@@ -5,7 +5,7 @@ kind: process
 summary: 'restoreWalletConfigurationVersion no longer declares platform.audit_record as its write: the audit interceptor
   writes the reason (ADAM CR-376), so the declared write made check-write-lineage read the operation as writing its own
   audit row (W-AUDIT); check-request-fields-stored accepts x-ticvai-stored-as platform.audit_record.<column> for an operation
-  that does not write its own audit row.'
+  that does not write its own audit row. check-stored-request-fields reads the named audit column the same way.'
 decision:
   what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
     new finding at its source, never by baselining, acknowledging or exempting. ADAM CR-376 (the audit interceptor writes
@@ -20,6 +20,7 @@ keys_touched:
   files:
   - contracts/satellite/wallet.yaml
   - tools/check-request-fields-stored.py
+  - tools/check-stored-request-fields.py
 root_class: one fact (the kernel writes the audit row) declared in a way a second check reads the other way
 tickets:
   started: []

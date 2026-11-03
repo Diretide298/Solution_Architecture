@@ -5,7 +5,7 @@ kind: process
 summary: 'The forward migrations after V0126, written once by the refresh on the merged tree (backend/tenant/V0127__after_r1_20261103.sql;
   backend/control/V0127__after_r1_20261103.sql and V0128__names_after_r1_20261103.sql), and ADAM''s ticket links rebuilt
   from the same refreshed tree (tools/adam-links.py, no token: statuses carried), so setRolePermissions links identity#setRolePermissions,
-  are committed as CHG-R13INT-008 did.'
+  are committed as CHG-R13INT-008 did. handoff/cross-deployable-writes.md is rewritten by its check on the same tree (X-DOC).'
 decision:
   what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
     new finding at its source, never by baselining, acknowledging or exempting. The lane brief: "the integration refresh
@@ -21,6 +21,7 @@ keys_touched:
   - backend/control/V0127__after_r1_20261103.sql
   - backend/control/V0128__names_after_r1_20261103.sql
   - handoff/service-docs/adam-links.json
+  - handoff/cross-deployable-writes.md
 root_class: release-time outputs the refresh does not write, judged by the gate before they are made
 tickets:
   started: []
