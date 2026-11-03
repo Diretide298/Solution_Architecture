@@ -321,4 +321,4 @@ sign-in and held by the till; it involves no supervisor and no verifier. Sign-in
 **The cost, stated.** A 4-digit PIN has 10,000 values, so a verifier taken from a stolen, unlocked till can be
 reversed offline (ADR-0071's context). The server-side copy is encrypted and the package is served only to a
 registered device, so the exposure is one venue's signers for at most 24 hours from one device, and every PIN
-checked offline is checked again by the server at sync. ADR-0071 records the exception.
+checked offline is checked again by the server at sync. ADR-0071, as amended 3 November 2026, records the exception.

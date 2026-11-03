@@ -109,12 +109,13 @@ x-ticvai-jobs:
     module: reporting
     host: workers
     trigger: {kind: event}
-    consumes: [apiClient.anomalyDetected, device.tamperDetected]
+    consumes: [apiClient.anomalyDetected, device.tamperDetected, identity.offlineStepUpRefused]
     reads: [reporting.alert_rule]
     writes: [reporting.alert]
-    for: 'Reporting''s alert consumers: raise an API anomaly to the tenant''s and TICVAI''s API administrators (ADM-015, DEV-006)
-      and a device tamper alert to the venue''s security roles.'
-    source: ['events/apiClient-anomalyDetected.yaml', 'events/device-tamperDetected.yaml']
+    for: 'Reporting''s alert consumers: raise an API anomaly to the tenant''s and TICVAI''s API administrators (ADM-015, DEV-006),
+      a device tamper alert to the venue''s security roles, and an offline supervisor step-up the server did not confirm at
+      sync to the venue''s managers (the roles that hold the act''s permission there; POS-020, BO-133; CHG-R14V-001).'
+    source: ['events/apiClient-anomalyDetected.yaml', 'events/device-tamperDetected.yaml', 'events/identity-offlineStepUpRefused.yaml']
   execution:
     module: reporting
     host: workers

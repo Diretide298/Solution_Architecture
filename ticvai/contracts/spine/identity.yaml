@@ -67,7 +67,7 @@ x-ticvai-queries:
       scopePath: ltree, the scope the asking operation acts at (its venue or workstation)
       reversedPrincipalId: uuid or null, whose act is being reversed, where the asking operation forbids self-approval
       offline: OfflineStepUpEvidence or null, SupervisorStepUp.offline, sent only by a call queued offline (CHG-R14V-001)
-      operationId: string, the asking operation's operationId (kept on the offline step-up's record)
+      askingOperation: string, the asking operation's operationId (kept on the offline step-up's record)
       actId: uuid, the id of the act the step-up signs (the asking request's `id`, its idempotency key)
       callerPrincipalId: uuid, the principal whose session made the asking call
       workstationId: uuid, the workstation the call came from (the session's, or the device's under deviceAuth)
@@ -10903,7 +10903,7 @@ components:
           format: uuid
           nullable: true
           description: Whose act is being reversed, where the asking operation forbids the same person signing it.
-        operationId:
+        askingOperation:
           type: string
           maxLength: 100
           nullable: true
@@ -11059,6 +11059,7 @@ components:
         principalId:
           type: string
           format: uuid
+          x-ticvai-references: identity.principal
         venueId:
           type: string
           format: uuid
@@ -11124,9 +11125,11 @@ components:
         callerPrincipalId:
           type: string
           format: uuid
+          x-ticvai-references: identity.principal
         signerPrincipalId:
           type: string
           format: uuid
+          x-ticvai-references: identity.principal
         packageId:
           type: string
           format: uuid

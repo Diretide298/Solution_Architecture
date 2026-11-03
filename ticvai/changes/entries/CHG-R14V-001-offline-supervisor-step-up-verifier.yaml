@@ -63,17 +63,20 @@ keys_touched:
   - 'contract extension x-ticvai-offline-step-up (verifier | refused, new)'
   - 'query identity#verifySupervisorStepUp inputs, returns and rule'
   - 'component supervisorPinPrompt: state offline'
+  - 'job reporting.alertRaising consumes identity.offlineStepUpRefused'
   files:
   - contracts/shared/common.yaml
   - contracts/spine/identity.yaml
   - contracts/spine/orders.yaml
   - contracts/spine/shift.yaml
+  - contracts/satellite/reporting.yaml
   - events/identity-offlineStepUpRefused.yaml
   - screens/_components.yaml
   - screens/P04-point-of-sale.yaml
   - docs/adr/0013-local-first-point-of-sale.md
   - docs/adr/0022-conflict-policy.md
   - docs/adr/0071-credentials-are-stored-as-argon2id-phc-strings.md
+  - docs/adr/0063-encryption-keys-and-biometric-templates.md
   - docs/active/approved-ui-changes.yaml
   - tools/check-step-up.py
 root_class: an operation is offline-capable and demands a step-up only the server can check, and declares nothing about
@@ -85,7 +88,7 @@ tickets:
     the response does not change. A follow-up comment carries this to the developer.'
   unstarted:
   - '30981 ([BE] voidOrder), 30861 ([BE] recordNoSale), 32651 ([BE] withdrawFromDepositBox): pass offline evidence,
-    operationId, actId, callerPrincipalId, workstationId and recordedAt to verifySupervisorStepUp; record the act on
+    askingOperation, actId, callerPrincipalId, workstationId and recordedAt to verifySupervisorStepUp; record the act on
     refusedAtSync and send X-Ticvai-Step-Up-Verdict; never 403 an offline step-up.'
   - '35730 / 35914 ([BE] verifySupervisorStepUp): the offline rule (as at recordedAt, history row, no attempt counted),
     the identity.offline_step_up row, the identity.offlineStepUpRefused event, and minting verifiers on a correct online
