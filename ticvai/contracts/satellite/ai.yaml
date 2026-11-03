@@ -600,6 +600,22 @@ x-ticvai-jobs:
     - events/ai-riskCaseClosed.yaml
     - events/cart-abandoned.yaml
     - events/device-statusChanged.yaml
+  spendMetering:
+    # **The metering job the event names** (r13 system review B-09; CHG-R14J-010). ai.ceilingApproaching's notes say
+    # "the metering job evaluates spend against AiPolicy.monthlyTokenCeiling and fires", and no job was declared, so
+    # the event's critical consumer (the venue manager's notice) waited for an event nothing wrote.
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: timer}
+    reads: [ai.activity, ai.spend_ceiling, ai.policy]
+    emits: [ai.ceilingApproaching]
+    reliesOn: [setAiSpendCeiling]
+    for: 'AI''s spend metering: the period''s metered spend per scope (ai.activity) against its ceiling
+      (ai.spend_ceiling, ai.policy ceilingWarningPercent); ai.ceilingApproaching once at the warning threshold and
+      once at 100% per scope and period (the consumers'' key scopePath+percentOfCeiling+period).'
+    source:
+    - contracts/satellite/ai.yaml
+    - events/ai-ceilingApproaching.yaml
 paths:
   /ai/translate:
     post:

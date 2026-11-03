@@ -81,6 +81,9 @@ CHECKS = [
     # only on a member not in handoff/audit-baseline.json; --update-baseline after a fix tightens it.
     "check-ticket-text", "check-screen-wiring", "check-navigation", "check-contract-shapes",
     "check-ddl-conventions", "check-contract-storage", "check-starter-fit", "check-glossary-terms",
+    # 3 November (r13 system review A-13, CHG-R14J-011): a Control Plane actor a PLATFORM_* staff operation writes is a
+    # control.platform_operator (ADR-0072), never a tenant identity.principal.
+    "check-control-actors",
     "check-wireframe-coverage",
     # 14 October (ADAM CR-065..CR-074, batch DDL, CHG-DDL-001..008): what an operation promises about storage, the
     # derived DDL keeps -- an array a slice operation takes is stored, a 409 for a duplicate code has its unique

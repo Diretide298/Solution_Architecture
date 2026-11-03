@@ -1,0 +1,69 @@
+id: CHG-R14J-011
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'The Control Plane''s actor fields reference control.platform_operator (ADR-0072), not a tenant''s
+  identity.principal: thirteen columns on nine control tables (credit_note.issued_by, licence_add_on.removed_by,
+  migration_run.started_by, outbox_republish.requested_by, production_access_request.decided_by, release.created_by,
+  status_changed_by and withdrawal_approved_by, rollout.started_by and approved_by, support_notice.published_by,
+  tenant.account_manager and termination_requested_by), by x-ticvai-references on their contract fields. They are now
+  foreign keys inside the control database. backend/990-cross-database-references.sql, applied to neither database, is
+  written by derive-ddl at every run (it was frozen at r1 with r1''s sixteen rules); it now lists the eight references
+  that still cross. New check tools/check-control-actors.py CA-OPERATOR fails a control column that references
+  identity.principal on a table only PLATFORM_* staff operations write.'
+decision:
+  what: 'r13 system review finding A-13 (cross-database references point at tables that cannot be their target; the
+    platform actor is control.platform_operator, never a tenant identity.principal, ADR-0072). The lead, 3 November
+    2026: "All four, one release". The region half of A-13 (control.cell.region_id and control.cell_cluster.region_id
+    pointing at a tenant''s platform.scope) is not changed: it needs the lead (notes).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding A-13 (architecture); ADR-0072 2 and 3
+  (sub is control.platform_operator.id, an operator never has a principal in a tenant database); R203 (PLATFORM_*
+  rides only the platform token); permissions.yaml (DEVELOPER_ADMIN is TICVAI-side only).'
+keys_touched:
+  tables: [control.credit_note, control.licence_add_on, control.migration_run, control.outbox_republish,
+    control.production_access_request, control.release, control.rollout, control.support_notice, control.tenant]
+  files:
+  - contracts/satellite/platform-ops.yaml (x-ticvai-references on MigrationRun, Rollout, SupportNotice, Release and
+    OutboxRepublish actor fields)
+  - contracts/satellite/public-api.yaml (ProductionAccessRequest.decidedByPrincipalId)
+  - contracts/satellite/subscription.yaml (Tenant, SubscriptionCreditNote, LicenceAddOn actor fields)
+  - tools/derive-ddl.py (frozen mode writes 990-cross-database-references.sql)
+  - tools/check-migration-freeze.py (NOT_APPLIED: 990 is not a migration)
+  - tools/check-control-actors.py (new, CA-OPERATOR, self-test)
+  - tools/check-ddl-conventions.py (FK_ALIASES: a principal key may reference control.platform_operator, ADR-0072 3)
+  - tools/run-checks.py (registers check-control-actors)
+  - changes/schema.yaml (id_blocks R14J: 10, the lane's parallel parts number in blocks of ten)
+  other:
+  - 'derived on the next refresh: handoff/schema-reference.json, relationship-graph.json, relationships.csv,
+    ddl-column-types.json, backend/990-cross-database-references.sql, and r14''s control forward migration (13 guarded
+    NOT VALID foreign keys to control.platform_operator, written once by the integration)'
+root_class: a naming convention (`*PrincipalId` is identity.principal) outliving the decision that made a second kind
+  of principal
+tickets:
+  started:
+  - '#27700 republish from the outbox, #30756 createTenant, #30837 addLicenceAddOn, #31277 removeLicenceAddOn, #31296
+    decideProductionAccess, #34126 rejectRelease (Ready for QA): write the operator id from the verified platform
+    caller and never resolve it in a tenant database'
+  - '#30158, #30165, #30167, #31322, #31325, #31329, #31359, #34047, #34048, #37176 (the [DB] tickets of these control
+    tables, Ready for QA): r14''s control migration adds the 13 foreign keys NOT VALID; nothing to rebuild'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-control-actors.py
+status: open
+notes: 'Stopped, for the lead: control.cell.region_id and control.cell_cluster.region_id are declared references to
+  platform.scope, a table in each tenant''s database. Under ADR-0038 a cell is a hosting region holding many tenants,
+  so no one tenant''s scope tree can be its region; provisionCell''s own text ("Provision a cell for a region. Every
+  region is its own cell", 409 region-cell-exists, scope tenant) is the ADR-0014 model. What the hosting region is
+  (the cell itself, named by cloudRegion and countryCode, or a control-plane region row a cluster of cells shares) is
+  the open question of review finding A-11 (two region-growth models). Recommendation: decide A-11 first; then either
+  drop Cell.regionId/regionName and CellCluster.regionId (the cell is the region), or add a control.region the cluster
+  and its cells reference. Not judged by CA-OPERATOR: the partner tables (a partner''s users are tenant principals),
+  and two partner-facing writers that carry a PLATFORM_* permission (approveBookingLimitCommercial,
+  setAgreementContractTerm), which are review finding F-02''s.'

@@ -2624,6 +2624,7 @@ components:
           status:
             $ref: '#/components/schemas/ReleaseStatus'
           createdByPrincipalId:
+            x-ticvai-references: control.platform_operator
             type: string
             format: uuid
           createdAt:
@@ -2644,6 +2645,7 @@ components:
             description: The reason given by the last `rejectRelease` or `withdrawRelease` (ADAM CR-356). The
               control audit row keeps each move's reason, so an earlier one is not lost.
           statusChangedByPrincipalId:
+            x-ticvai-references: control.platform_operator
             type: string
             format: uuid
             nullable: true
@@ -2656,6 +2658,7 @@ components:
             readOnly: true
             description: When the last `rejectRelease` or `withdrawRelease` was made (ADAM CR-356).
           withdrawalApprovedByPrincipalId:
+            x-ticvai-references: control.platform_operator
             type: string
             format: uuid
             nullable: true
@@ -2754,9 +2757,11 @@ components:
         cellsFailed:
           type: integer
         startedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
         approvedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           nullable: true
@@ -3263,6 +3268,7 @@ components:
         cellsFailed:
           type: integer
         startedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
         startedAt:
@@ -3431,6 +3437,7 @@ components:
             type: string
             format: uuid
         publishedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
         publishedAt:
@@ -3848,6 +3855,7 @@ components:
           nullable: true
           readOnly: true
         requestedBy:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           readOnly: true

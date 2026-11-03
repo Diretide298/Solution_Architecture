@@ -2522,7 +2522,7 @@ components:
           format: uuid
           nullable: true
           readOnly: true
-          x-ticvai-references: identity.principal
+          x-ticvai-references: control.platform_operator
         decidedAt: { type: string, format: date-time, nullable: true, readOnly: true }
         reason: { type: string, nullable: true, readOnly: true }
         productionClientId:

@@ -2869,6 +2869,13 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
                 dest = OUT / name
                 dest.write_text(text, encoding="utf-8")
                 dest.chmod(0o755)
+        # **The cross-database rules are written at every run, frozen or not** (r13 system review A-13; CHG-R14J-011).
+        # 990 is applied to neither database (its own header says so): it is the rule each caller keeps, not a
+        # migration, so freezing it at r1 kept r1's sixteen rules after the contracts moved them (the Control Plane
+        # actors now reference control.platform_operator, inside the control database). The freeze protects what a
+        # database applies; check-migration-freeze NOT_APPLIED names this one file.
+        xdb = OUT / "990-cross-database-references.sql"
+        xdb.write_text(files["990-cross-database-references.sql"], encoding="utf-8")
         REVIEW.write_text(review, encoding="utf-8")
 
     n_review = sum(len(p.review) for p in plans) + len(extra)

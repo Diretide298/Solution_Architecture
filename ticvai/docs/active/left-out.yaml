@@ -445,3 +445,21 @@ items:
   owner: Chinmay
   added: '2026-11-03'
   change: CHG-CR534-001
+- id: LO-R14J-001
+  kind: deferred
+  what: 'The two emitter declarations agreeing everywhere: 111 (event, operation) pairs on 105 operations name the
+    operation in the event''s emittedBy while the operation declares no x-ticvai-emits (and postOrderRevenue declares
+    ledger.journalPosted, whose event does not name it). Lineage already unions the two, so every one of these
+    operations writes platform.outbox in its lineage; what is missing is the operation''s own x-ticvai-emits line, which
+    ADAM and the screen design specs show. The five events r14 gave emitters (review B-09) are declared in emittedBy
+    and job emits only, for the same reason.'
+  source: 'r13 system review of 3 November 2026, finding B-09 (the 111 pairs); CHG-R14J-010'
+  reason: 'deriving x-ticvai-emits into the contracts would be a derive step writing authored files, which review
+    finding E-03 (lane i) removes; adding the line by hand is 105 contract edits reaching 36 started tickets, and
+    check-contract-compat counts each added x-ticvai-emits as a breaking change needing its own approval. A check that
+    the two agree would fail on all 111 until then and cannot be baselined.'
+  target: 'the next contract sweep after r14 (not scheduled): add x-ticvai-emits to the 105 operations, then a
+    check-jobs rule that emittedBy and x-ticvai-emits agree'
+  owner: Chinmay
+  added: '2026-11-03'
+  change: CHG-R14J-010

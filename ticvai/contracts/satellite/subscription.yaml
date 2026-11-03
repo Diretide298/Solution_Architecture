@@ -12419,6 +12419,7 @@ components:
           format: date-time
           readOnly: true
         issuedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           readOnly: true
@@ -17950,6 +17951,7 @@ components:
           maxLength: 1000
           nullable: true
         terminationRequestedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           nullable: true
@@ -18021,6 +18023,7 @@ components:
           description: Accepted by `createTenant` and `updateTenant`; stored here so the response can
             return what was sent.
         accountManagerPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           nullable: true
@@ -18545,6 +18548,7 @@ components:
             force. A removed add-on is kept, not deleted, as the record of the removal; it counts in no
             `LicencePosition` and blocks no new add-on for the module (`add-on-already-active`).'
         removedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           nullable: true

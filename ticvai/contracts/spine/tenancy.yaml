@@ -496,6 +496,24 @@ x-ticvai-jobs:
     - contracts/spine/tenancy.yaml
     - states/configuration-profile.yaml:45
     - states/profile-deployment.yaml:31
+  firmwareRollout:
+    # **The rollout job the event names** (r13 system review B-09; CHG-R14J-010). device.firmwareRolloutCompleted said
+    # "the emit sits on the rollout job and on rollbackDeviceFirmware", and no rollout job was declared, so the
+    # completed and halted outcomes had no emitter. startDeviceFirmwareRollout starts it; it pushes the waves inside
+    # the rollout's window, reads each device's result from its telemetry, halts on the failure threshold and
+    # finishes the rollout.
+    module: tenancy
+    host: workers
+    trigger: {kind: queue}
+    reads: [tenancy.device_rollout, tenancy.device_firmware, tenancy.device_telemetry, platform.device]
+    writes: [tenancy.device_rollout]
+    emits: [device.firmwareRolloutCompleted]
+    reliesOn: [startDeviceFirmwareRollout]
+    for: 'Tenancy''s firmware rollout: the waves of a started rollout in its window, completed when the last wave is
+      done or halted on its failure threshold, each outcome written to the outbox as device.firmwareRolloutCompleted.'
+    source:
+    - contracts/spine/tenancy.yaml
+    - events/device-firmwareRolloutCompleted.yaml
 paths:
   /tenant-domains/{hostname}:
     parameters:

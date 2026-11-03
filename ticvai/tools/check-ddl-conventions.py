@@ -716,7 +716,11 @@ def check_recorded_grants(guard, db: str, body: str) -> None:
 _cache: dict = {}
 # A key may name its target's concept rather than its table (ADR-0056 venue keys, principal actors).
 FK_ALIASES = {"venue": "scope", "region": "scope", "department": "scope", "org_unit": "scope",
-              "scope": "scope", "parent": "", "principal": "principal", "subject": "subject",
+              "scope": "scope", "parent": "", "subject": "subject",
+              # a principal is a tenant's identity.principal or, in the Control Plane, a platform operator: ADR-0072 3,
+              # "Operators are Control Plane principals" (`control.platform_operator`); the Control Plane's
+              # `*_by_principal_id` actors reference it (r13 system review A-13, CHG-R14J-011; check-control-actors)
+              "principal": ("principal", "platform_operator"),
               # a tenant's subscription is its contract: `control.subscription` became `subscription.contract` on
               # 20 September ("contract rather than subscription.subscription"), and the contract moved to control
               # with the plan catalogue on 18 October (ADAM CR-150; CHG-CRA-003), so `control.tenant.subscription_id`

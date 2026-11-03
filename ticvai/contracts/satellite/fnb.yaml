@@ -255,6 +255,24 @@ x-ticvai-jobs:
     - states/restaurant-waitlist.yaml:32
     - states/table-reservation.yaml:26
     - states/table.yaml:52
+  menuSchedule:
+    # **A scheduled menu goes live at its outlet's local midnight, and something has to make it live** (r13 system
+    # review B-09; the lead, 3 November 2026, "All four, one release"; CHG-R14J-010). publishMenu with an effectiveAt
+    # and scheduleMenuPublish write a scheduled MenuVersion; nothing declared made it live or published
+    # fnb.menuPublished, the event that carries allergen changes to two critical consumers (the AI index and the answer
+    # cache). This timer does both, per outlet zone (RegionSettings.timeZone).
+    module: fnb
+    host: workers
+    trigger: {kind: timer}
+    reads: [fnb.menu_schedule, fnb.menu_version, fnb.menu]
+    writes: [fnb.menu_schedule, fnb.menu_version, fnb.menu]
+    emits: [fnb.menuPublished]
+    reliesOn: [publishMenu, scheduleMenuPublish]
+    for: 'F&B''s scheduled menu publish: at the outlet''s local midnight the scheduled MenuVersion becomes live, the
+      previous live one superseded, and fnb.menuPublished is written to the outbox in the same transaction.'
+    source:
+    - contracts/satellite/fnb.yaml
+    - events/fnb-menuPublished.yaml
 paths:
   /reservation-policy:
     get:
