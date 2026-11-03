@@ -324,6 +324,12 @@ python3 tools/build-package-report.py --apply
 # Called bare rather than with `2>/dev/null || true` like the two workbook builders above it.
 # Discarding an exit code is the habit the gate was restored to break, and openpyxl is present.
 python3 tools/build-readiness-workbook.py
+# **The known findings by artefact, for ADAM's pull** (r14 lane k, CHG-R14PUL-001; the lead, 3 November 2026: "a
+# ticket's pull lists the package checks it already fails, so developers stop raising change requests for gaps we
+# already know about"). Runs the baselined guards and the refresh-safe-baseline checkers once, after every step they
+# read and before derive-mirrors (which copies handoff/ into the mirrors), and writes handoff/known-findings.json;
+# check-known-findings (run-checks) holds it complete and current.
+python3 tools/build-known-findings.py
 python3 tools/derive-mirrors.py
 
 echo
@@ -373,11 +379,6 @@ echo
 # **The change log's index is derived** (council of 2 October): one entry file per change in changes/entries/,
 # so parallel branches never conflict, and the index is written here rather than committed from a branch.
 python3 tools/build-changelog-index.py
-# **The known findings by artefact, for ADAM's pull** (r14 lane k, CHG-R14PUL-001; the lead, 3 November 2026: "a
-# ticket's pull lists the package checks it already fails, so developers stop raising change requests for gaps we
-# already know about"). Runs the baselined guards and the refresh-safe-baseline checkers once, after every step they
-# read, and writes handoff/known-findings.json; check-known-findings (run-checks) holds it complete and current.
-python3 tools/build-known-findings.py
 # **What a pull serves is gated, not only what the package says** (14 October 2026, CHG-GRD-001..003): the run-checks
 # list includes check-ticket-links (reads adam-links.json, what ADAM loads; adam-links.py writes it per release, not
 # here, so the release gate runs adam-links.py first: docs/active/release-runbook.md section 4) and
