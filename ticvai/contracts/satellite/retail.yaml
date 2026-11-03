@@ -315,6 +315,11 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestMerchandiseItem.price, MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlets of the venue being browsed (where {venueId}), whose rows are the only retail.merchandise rows
+          listed, and so each item''s venue (platform.outlet.venue_id), whose venueSettingsRecords price the page: a
+          merchandise item reaches its venue only through its outlet (ADAM CR-574; XDR-004)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -343,6 +348,16 @@ paths:
         not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
         **Order.** Sorted by `name` ascending, then by `id`.
+
+
+        **The venue, through the outlets** (ADAM CR-574, Chinmay, 3 November 2026; CHG-CR574-001): a merchandise item
+        reaches its venue only through its outlet, so Tenancy's outlets are read in process
+        (`tenancy#outletRecords`, inside the operation's own transaction), the same rule F&B's menus follow. The venue
+        is `X-Venue-Id` for a guest or visitor, and the session's venue for staff. `outletRecords` is asked with where
+        {venueId}, and only `retail.merchandise` rows whose `outlet_id` is one of those outlets are listed. An
+        `outletId` that is not one of them answers an empty page, never another venue's items. Every row is priced in
+        that venue's currency, with one `venueSettingsRecords` read per page. All other filters, the order and the
+        guest view stay as they are. `retail.merchandise` gets no venue column.
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-guest-callable: true
@@ -357,7 +372,8 @@ paths:
       parameters:
         - name: outletId
           in: query
-          description: Exact match. Items of this outlet only. Omit for every outlet in the venue.
+          description: Exact match. Items of this outlet only. Omit for every outlet in the venue. An outlet that is
+            not one of the venue's answers an empty page (ADAM CR-574).
           schema: { type: string, format: uuid }
         - name: categoryId
           in: query
@@ -413,12 +429,40 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the item''s outlet (ids [outletId]): not found, or of a venue other than the caller''s, is 400 validation
+          on outletId; its venueId is the venue the price is asked at and the 201 is priced in (ADAM CR-559, CR-574;
+          XDR-004)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'list_price, copied from the catalogue variant: variantId, the outlet''s venueId, channel pos, at now and
+          no customerSegment; a null amount is 409 variantNotPriced (ADAM CR-559; XDR-150)'
       x-ticvai-audience: [staff]
       summary: Create a merchandise item
       description: >
         Links a sellable catalogue variant to an inventory item. That link is what makes a
         sale deplete stock — merchandise without it sells but never runs out, which is how a
         shop discovers its stock figures are fiction.
+
+
+        **The price is copied from the catalogue variant, never typed in** (ADAM CR-559 and CR-574, Chinmay, 3
+        November 2026; CHG-CR559-001). The approved Retail Products screen has no price field, and a till sale charges
+        the price Orders took from the catalogue. (1) **Venue:** the item's outlet is read with
+        `tenancy#outletRecords`, in process (ids [outletId]). An outlet that is not found, or belongs to a venue other
+        than the caller's, is `400 validation` on `outletId`. That outlet's `venueId` is the venue in (2) and the 201.
+        (2) **Price:** `catalogue#variantPriceRecords` is asked in process (the operations host already reads
+        Catalogue's price tables for the wishlist, so no new grant) with `variantId`, that `venueId`, channel `pos`,
+        `at` now and no `customerSegment`. The amount is stored as `list_price`. A null amount is `409` with
+        `refusedReason` `variantNotPriced`, and nothing is written. `price` is answered as Money in the venue's
+        currency and scale from `tenancy#venueSettingsRecords`. (3) **Stock:** `on_hand` is written 0. The request
+        takes no stock figure; stock arrives through Inventory's movements. (4) **SKU in use:** before inserting,
+        another item at the same `outletId` whose lower(`sku`) equals the lowercased requested `sku` is looked for; if
+        one exists the answer is `409` `refusedReason` `skuInUse` with `conflictingMerchandiseId` set to that item. A
+        unique violation on `merchandise_outlet_id_sku_uniq` (a race) is the same `409`, and one on
+        `merchandise_outlet_id_barcode_uniq` is `barcodeInUse`, never a `500`. (5) BO-048 and BO-007 do not change: the
+        forms send what they send today, and a `409` shows in the form's existing error message, worded by its
+        `refusedReason`.
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
@@ -442,7 +486,11 @@ paths:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
-          description: Barcode already in use by another item with the same `outletId` (ADAM CR-104). `refusedReason` is `barcodeInUse`.
+          description: Barcode already in use by another item with the same `outletId` (ADAM CR-104), `refusedReason`
+            `barcodeInUse`; the SKU already used by another item at the same `outletId`, compared lowercased,
+            `skuInUse`; or the catalogue variant has no price at the outlet's venue on channel pos now,
+            `variantNotPriced`, with nothing written (ADAM CR-559).
+          x-ticvai-problem-types: [barcode-in-use, sku-in-use, variant-not-priced]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
@@ -464,8 +512,24 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the item''s stored outlet (ids [the stored outlet_id]) and its venue, for the venue the price is asked at
+          and the 200''s currency (ADAM CR-559, CR-574; XDR-004)'
+      - query: catalogue#variantPriceRecords
+        route: in-process
+        for: 'list_price again on every successful update: the item''s variant, its venue, channel pos, at now and no
+          customerSegment; a null amount keeps the stored list_price (ADAM CR-559; XDR-150)'
       x-ticvai-audience: [staff]
       summary: Amend a merchandise item
+      description: >
+        **The price follows the catalogue** (ADAM CR-559 and CR-574, Chinmay, 3 November 2026; CHG-CR559-001). The
+        item's stored outlet is read with `tenancy#outletRecords` in process (ids [the stored `outlet_id`]); its venue
+        prices the 200. Every successful update asks `catalogue#variantPriceRecords` again, in process, for the item's
+        variant and that venue (channel `pos`, `at` now, no `customerSegment`), and stores the amount as `list_price`
+        when there is one. A null amount keeps the stored `list_price` and refuses nothing. The body has no price field.
+        `sku` cannot change here, so `skuInUse` is create only; a unique violation on
+        `merchandise_outlet_id_barcode_uniq` is the `409` `barcodeInUse`, never a `500`. BO-048 does not change.
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue
@@ -518,7 +582,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
         '409':
-          description: The new barcode is already in use by another item with the same `outletId` (ADAM CR-104). `refusedReason` is `barcodeInUse`.
+          description: The new barcode is already in use by another item with the same `outletId` (ADAM CR-104). `refusedReason` is `barcodeInUse` (`skuInUse` is create only; ADAM CR-559).
+          x-ticvai-problem-types: [barcode-in-use]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
@@ -2123,7 +2188,9 @@ components:
         variantId:
           type: string
           format: uuid
-          description: The catalogue variant sold. Price and tax come from there.
+          description: 'The catalogue variant sold. Price and tax come from there: `price` is copied from it, never
+            typed in, by `catalogue#variantPriceRecords` at the outlet''s venue on channel pos, at create and on every
+            successful update (ADAM CR-559).'
         inventoryItemId:
           type: string
           format: uuid
@@ -2132,7 +2199,10 @@ components:
             The stock item depleted on sale. Null means the item sells but never runs out,
             which is almost always a configuration error.
         price: { $ref: '../shared/common.yaml#/components/schemas/Money', x-ticvai-column: list_price }
-        onHand: { type: number }
+        onHand:
+          type: number
+          description: '0 at create; the request takes no stock figure, and stock arrives through Inventory''s movements
+            (ADAM CR-559).'
         isReturnable: { type: boolean, default: true }
         returnWindowDays: { type: integer, nullable: true }
         requiresSerialNumber: { type: boolean, default: false }
@@ -2202,11 +2272,13 @@ components:
           properties:
             refusedReason:
               type: string
-              enum: [barcodeInUse]
+              enum: [barcodeInUse, skuInUse, variantNotPriced]
+              description: barcodeInUse and skuInUse, another item at the same outlet carries it; variantNotPriced, the
+                catalogue variant has no price at the outlet's venue on channel pos now (ADAM CR-559).
             conflictingMerchandiseId:
               type: string
               format: uuid
-              description: The item that already carries the barcode.
+              description: The item that already carries the barcode or SKU; absent for variantNotPriced (ADAM CR-559).
 
     CreateMerchandiseRequest:
       x-ticvai-persistence: "none — request only"

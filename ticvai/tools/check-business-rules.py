@@ -494,6 +494,23 @@ And one rule per decision:
                    rule; no Marketing read.
   BR-BULK-PRICE-SKIPS (CR-544) bulkChangePrices' selection, skip reasons, escalates, 403 and 400.
   BR-CLONE-PRODUCT-RULES (CR-545) cloneProduct's code and name constraints, 400, and its copy list.
+  BR-BULK-PRICE-AUDIT (CR-580, superseding CR-558) bulkChangePrices and setPrices write one catalogue.audit_entry
+                   per changed price and no version rows (no product_version, no price_list_version).
+  BR-MERCH-PRICE-SOURCE (CR-559) createMerchandise and updateMerchandise copy list_price from
+                   catalogue#variantPriceRecords in process (XDR-150) at the outlet's venue; on_hand 0 at create; the
+                   409's refusedReason is barcodeInUse, skuInUse or variantNotPriced; no price in either body.
+  BR-MERCH-OUTLET-VENUE (CR-574) listMerchandise, createMerchandise and updateMerchandise read Tenancy's outlets in
+                   process for the item's venue; an outletId not of the venue lists an empty page.
+  BR-OUTLET-VENUE-PATH (CR-561) an outlet's settings rows (course rules, table combinations, kitchen routing) carry
+                   the path of the outlet's venue; setCourseRules looks the outlet up (404).
+  BR-EXPIRING-RIGHTS (CR-573) getExpiringRights' window, 400 for a bad withinDays, the fields, the total order and
+                   no paging.
+  BR-PERFORMANCE-SOLD (CR-579) updatePerformance reads catalogue.channel_capacity for sold tickets, never writes it,
+                   and answers 400 validation for an admissionRulesId the foreign key refuses.
+  BR-PRODUCT-DISPLAY-ORDER (CR-581) Product.displayOrder (nullable, default 100, indexed with venue and id) on create
+                   and update, and listProducts' total order on it with no displayOrder last.
+  BR-APPROVAL-DEPT-DRAFT (CR-582) a department queue is eligible inside the request's scope (platform.scope read);
+                   a draft is 409 not-submitted on assignApprovalRequest and cancelApprovalRequest.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2887,6 +2904,7 @@ def main() -> int:
     lane_w5_rules_r13(need, op, ops)
     lane_w3_rules_r13(need, op)
     lane_w1_rules_r13(need, op)
+    lane_e_rules_r14(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2931,7 +2949,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_E_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -4757,6 +4775,144 @@ def lane_w1_rules_r13(need, op):
          and "What a clone copies:" in words(clp.get("description"))
          and "`nameLocalised` null" in words(clp.get("description")),
          "cloneProduct does not take createProduct's code rules, refuse with 400, or state what a clone copies (CR-545)")
+
+
+R14_E_RULES = ["BR-BULK-PRICE-AUDIT", "BR-MERCH-PRICE-SOURCE", "BR-MERCH-OUTLET-VENUE", "BR-OUTLET-VENUE-PATH",
+               "BR-EXPIRING-RIGHTS", "BR-PERFORMANCE-SOLD", "BR-PRODUCT-DISPLAY-ORDER", "BR-APPROVAL-DEPT-DRAFT"]
+
+
+def lane_e_rules_r14(need, op):
+    """r14 catch-up, lane e (ADAM CR-558/580, CR-559, CR-561, CR-573, CR-574, CR-579, CR-581, CR-582, decided by
+    Chinmay on 3 November 2026: "Dont hold r13. approve them and rever tto the devs"). Each rule fails on r13 as
+    released (dffd024e)."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    def tables(o_, key):
+        return {str(x.get("table") if isinstance(x, dict) else x) for x in o_.get(key) or []}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def resp(o_, code):
+        return (o_.get("responses") or {}).get(code) or {}
+
+    def body(o_):
+        return ((((o_.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema")
+                or {})
+
+    def sprops(doc, name):
+        return (doc.get(name) or {}).get("properties") or {}
+
+    cat = schemas("contracts/spine/catalogue.yaml")
+    ret = schemas("contracts/satellite/retail.yaml")
+    fnb = schemas("contracts/satellite/fnb.yaml")
+    ast = schemas("contracts/satellite/assets.yaml")
+    apr = schemas("contracts/spine/approvals.yaml")
+    versions = {"catalogue.product_version", "catalogue.price_list_version"}
+
+    # BR-BULK-PRICE-AUDIT (CR-580, superseding CR-558)
+    bcp, stp = op("bulkChangePrices")[3], op("setPrices")[3]
+    need("BR-BULK-PRICE-AUDIT", "catalogue.audit_entry" in tables(bcp, "x-ticvai-writes")
+         and not versions & tables(bcp, "x-ticvai-writes")
+         and "one `catalogue.audit_entry` per changed price" in words(bcp.get("description"))
+         and "writes no version rows" in words(bcp.get("description"))
+         and "write no audit entry" in words(bcp.get("description")),
+         "bulkChangePrices does not write one audit entry per changed price and no version rows (CR-580)")
+    need("BR-BULK-PRICE-AUDIT", "catalogue.audit_entry" in tables(stp, "x-ticvai-writes")
+         and not versions & tables(stp, "x-ticvai-writes"),
+         "setPrices does not follow bulkChangePrices' rule: an audit entry per changed price, no version rows (CR-580)")
+
+    # BR-MERCH-PRICE-SOURCE (CR-559) and BR-MERCH-OUTLET-VENUE (CR-574)
+    lm, cm, um = op("listMerchandise")[3], op("createMerchandise")[3], op("updateMerchandise")[3]
+    price_q = ("catalogue#variantPriceRecords", "in-process")
+    outlet_q = ("tenancy#outletRecords", "in-process")
+    for oid, o_ in (("createMerchandise", cm), ("updateMerchandise", um)):
+        need("BR-MERCH-PRICE-SOURCE", price_q in vias(o_),
+             f"{oid} does not copy list_price from catalogue#variantPriceRecords in process (CR-559)")
+        need("BR-MERCH-PRICE-SOURCE", not {"price", "listPrice", "onHand"} & set((body(o_).get("properties") or {})),
+             f"{oid}'s body takes a price or a stock figure (CR-559)")
+    need("BR-MERCH-PRICE-SOURCE", not {"price", "listPrice", "onHand"} & set(sprops(ret, "CreateMerchandiseRequest")),
+         "CreateMerchandiseRequest takes a price or a stock figure (CR-559)")
+    cmd = words(cm.get("description"))
+    need("BR-MERCH-PRICE-SOURCE", "`on_hand` is written 0" in cmd and "`variantNotPriced`" in cmd
+         and "`skuInUse`" in cmd and "never a `500`" in cmd,
+         "createMerchandise does not state the stock at create, the unpriced variant and the SKU refusal (CR-559)")
+    mcp = ((((ret.get("MerchandiseConflictProblem") or {}).get("allOf") or [{}, {}])[-1].get("properties") or {})
+           .get("refusedReason") or {})
+    need("BR-MERCH-PRICE-SOURCE", mcp.get("enum") == ["barcodeInUse", "skuInUse", "variantNotPriced"],
+         "MerchandiseConflictProblem.refusedReason is not [barcodeInUse, skuInUse, variantNotPriced] (CR-559)")
+    for oid, o_ in (("listMerchandise", lm), ("createMerchandise", cm), ("updateMerchandise", um)):
+        need("BR-MERCH-OUTLET-VENUE", outlet_q in vias(o_),
+             f"{oid} does not read Tenancy's outlets in process for the item's venue (CR-574)")
+    need("BR-MERCH-OUTLET-VENUE", "answers an empty page, never another venue's items" in words(lm.get("description")),
+         "listMerchandise does not keep a browse to the venue's outlets (CR-574)")
+
+    # BR-OUTLET-VENUE-PATH (CR-561)
+    venue_path = "the server writes the scope path of the venue the outlet belongs to"
+    for sch in ("CourseRules", "TableCombination", "KitchenRoutingRules"):
+        need("BR-OUTLET-VENUE-PATH", venue_path in words((sprops(fnb, sch).get("scopePath") or {}).get("description")),
+             f"{sch}.scopePath does not say the outlet's venue path is written (CR-561)")
+    scr = op("setCourseRules")[3]
+    need("BR-OUTLET-VENUE-PATH", outlet_q in vias(scr) and ("tenancy#scopeRecords", "in-process") in vias(scr)
+         and "404" in (scr.get("responses") or {}),
+         "setCourseRules does not look the outlet up (404) and its venue's path (CR-561)")
+    for oid in ("setTableCombinations", "setKitchenRoutingRules"):
+        need("BR-OUTLET-VENUE-PATH", ("tenancy#scopeRecords", "in-process") in vias(op(oid)[3]),
+             f"{oid} does not read the outlet's venue path (CR-561)")
+
+    # BR-EXPIRING-RIGHTS (CR-573)
+    ger = op("getExpiringRights")[3]
+    wd = next((x for x in ger.get("parameters") or [] if isinstance(x, dict) and x.get("name") == "withinDays"), {})
+    gd = words(ger.get("description"))
+    need("BR-EXPIRING-RIGHTS", (wd.get("schema") or {}).get("minimum") == 0 and "400" in (ger.get("responses") or {}),
+         "getExpiringRights' withinDays is not 0 or more with a 400 (CR-573)")
+    need("BR-EXPIRING-RIGHTS", "liveUsageCount" in ((ast.get("ExpiringMedia") or {}).get("required") or []),
+         "ExpiringMedia.liveUsageCount is not always sent (CR-573)")
+    for frag in ("an asset whose `validTo` is today is expiring, not expired", "Every status is listed",
+                 "Within each group, `validTo` earliest first, then `assetId`", "never a first 50"):
+        need("BR-EXPIRING-RIGHTS", frag in gd, f"getExpiringRights does not say {frag!r} (CR-573)")
+
+    # BR-PERFORMANCE-SOLD (CR-579)
+    upf = op("updatePerformance")[3]
+    need("BR-PERFORMANCE-SOLD", "catalogue.channel_capacity" in tables(upf, "x-ticvai-reads")
+         and "catalogue.channel_capacity" not in tables(upf, "x-ticvai-writes")
+         and "validation" in ptypes(upf, "400")
+         and "a value equal to the stored one is not a change" in words(upf.get("description")),
+         "updatePerformance does not read sold tickets from channel_capacity, refuse a bad admissionRulesId with 400, "
+         "or say what a timing change is (CR-579)")
+
+    # BR-PRODUCT-DISPLAY-ORDER (CR-581)
+    pdo = sprops(cat, "Product").get("displayOrder") or {}
+    need("BR-PRODUCT-DISPLAY-ORDER", pdo.get("type") == "integer" and pdo.get("nullable") is True
+         and pdo.get("default") == 100
+         and ["venueId", "displayOrder", "id"] in ((cat.get("Product") or {}).get("x-ticvai-index") or []),
+         "Product.displayOrder is not a nullable integer defaulting to 100, indexed with venueId and id (CR-581)")
+    need("BR-PRODUCT-DISPLAY-ORDER", "displayOrder" in sprops(cat, "CreateProductRequest")
+         and "displayOrder" in sprops(cat, "UpdateProductRequest"),
+         "createProduct or updateProduct does not take displayOrder (CR-581)")
+    need("BR-PRODUCT-DISPLAY-ORDER", "A product with no displayOrder sorts after those that have one"
+         in words(op("listProducts")[3].get("description")),
+         "listProducts does not place a product with no displayOrder (CR-581)")
+
+    # BR-APPROVAL-DEPT-DRAFT (CR-582)
+    aar, car = op("assignApprovalRequest")[3], op("cancelApprovalRequest")[3]
+    need("BR-APPROVAL-DEPT-DRAFT", "platform.scope" in tables(aar, "x-ticvai-reads")
+         and "not-submitted" in ptypes(aar, "409")
+         and "whose path equals the request's `scopePath` or lies under it"
+         in words(aar.get("description")),
+         "assignApprovalRequest does not state department eligibility or refuse a draft 409 not-submitted (CR-582)")
+    asp = (((apr.get("ApprovalStateProblem") or {}).get("allOf") or [{}, {}])[-1].get("properties") or {})
+    need("BR-APPROVAL-DEPT-DRAFT", "not-submitted" in ptypes(car, "409")
+         and "notSubmitted" in ((asp.get("refusedReason") or {}).get("enum") or []),
+         "cancelApprovalRequest does not refuse a draft 409 notSubmitted (CR-582)")
 
 
 if __name__ == "__main__":

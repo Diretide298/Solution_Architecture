@@ -791,3 +791,22 @@ reads:
     transaction under the caller''s row-level security, never over the service route (tools/check-cross-module-reads.py
     XR-INPROCESS-HOST). SELECT on approvals.rule is the one the operations role lacked; the write still goes to
     approvals'' setApprovalMatrix as an operation.'
+- id: XDR-150
+  reader: operations
+  tables: [catalogue.variant, catalogue.product, catalogue.price, catalogue.price_list, catalogue.price_assignment,
+    catalogue.rate]
+  privileges: [SELECT]
+  queries: [catalogue#variantPriceRecords]
+  operations: [createMerchandise, updateMerchandise]
+  narrow: true
+  added: '2026-11-03'
+  decision_ref: 'ADAM CR-559, Chinmay, 3 November 2026 (posted on #30874 and #30876: "ask catalogue#variantPriceRecords
+    in process (the operations host already reads Catalogue''s price tables for the wishlist, so no new grant)"),
+    settled under the lead''s "Dont hold r13. approve them and rever tto the devs" of the same day'
+  why: 'retail createMerchandise and updateMerchandise (operations host, #30874, #30876) copy a merchandise item''s
+    list_price from its catalogue variant, never typed in: catalogue#variantPriceRecords with variantId, the outlet''s
+    venueId, channel pos, at now and no customerSegment, asked in process through Catalogue''s own query class in the
+    caller''s transaction under the caller''s row-level security, as variantListingFacts asks it for the wishlist. The
+    SELECT on the six tables the query reads is the one XDR-007 (variant, product, price, price_list,
+    price_assignment) and XDR-055 (rate) already grant the operations role; no grant or migration is added. Only
+    these two operations ask it under this entry.'

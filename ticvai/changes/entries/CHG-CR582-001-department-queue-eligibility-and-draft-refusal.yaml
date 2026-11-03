@@ -1,0 +1,57 @@
+id: CHG-CR582-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'assignApprovalRequest: a department queue is eligible when it names a platform.scope row of kind department
+  (level), in the request''s tenant, whose path equals the request''s scopePath or lies under it (the read declared);
+  anything else is 422 assignee-not-eligible; a principal is eligible as now; a department only routes, never grants
+  a decision, and a chain approver may still claim; a draft is 409 not-submitted. cancelApprovalRequest: a draft is
+  409 ApprovalStateProblem notSubmitted (added to refusedReason), and is never answered 404.'
+decision:
+  what: 'ADAM CR-582, posted on #30899: "Decided (Chinmay, 3 November 2026): a department queue is eligible when it is a
+    department of the request''s tenant inside the request''s scope, and a draft is refused with 409 notSubmitted by both
+    operations. Build now: assignApprovalRequest (#30899): 1. Read platform.scope (your service''s own table; declare
+    the read on the operation) ... Remove the code that refuses every department. 2. assigneePrincipalId is eligible as
+    now ... 3. A department assignment only routes the request ... 4. A request at draft: 409, problem type
+    not-submitted, the response schema unchanged ... cancelApprovalRequest (#30900): 5. A request at draft: 409
+    ApprovalStateProblem with refusedReason notSubmitted and currentStatus draft, problem type not-submitted. Add
+    notSubmitted to the refusedReason enum ... Remove the 404 for drafts." The lead''s instruction, 3 November 2026:
+    "Dont hold r13. approve them and rever tto the devs".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-582 (Narayan Gaonkar, #30899 assignApprovalRequest): "eligible approvers" was defined only for principals
+  (the chain holds principals), so when a department qualifies was undefined, and neither operation said how a draft
+  is refused; ApprovalStateProblem had no value for it. The decision follows submitApprovalRequest''s notDraft pattern
+  and DI-723''s department queue.'
+keys_touched:
+  operations:
+  - assignApprovalRequest
+  - cancelApprovalRequest
+  schemas:
+  - ApprovalStateProblem
+  tables:
+  - platform.scope
+  - approvals.request
+  - approvals.request_approver
+  files:
+  - contracts/spine/approvals.yaml
+  - tools/check-business-rules.py
+root_class: an undecided rule over who an assignee may be
+tickets:
+  started: []
+  unstarted:
+  - '30899 (assignApprovalRequest, Narayan Gaonkar, New): department eligibility by scope, the draft 409, as posted.'
+  - '30900 (cancelApprovalRequest, Narayan Gaonkar, New): the draft 409 notSubmitted, as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-582
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-APPROVAL-DEPT-DRAFT
+status: open
+notes: 'For a follow-up comment: the posted "a platform.scope row of kind department" is the row''s level column
+  (platform.scope has level, whose values include department; there is no kind column); the package says "of kind
+  department (its level)". Beside platform.scope the operation now also declares its reads of approvals.request and
+  approvals.request_approver, which its lineage already listed. The posted decision does not touch
+  decideApprovalRequest or withdrawApprovalRequest, which also state no draft refusal; neither does the package.'

@@ -1,0 +1,52 @@
+id: CHG-CR573-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'getExpiringRights states the readings as built, with their edges: which assets (a validTo earlier than today,
+  or within today to today plus withinDays, UTC; a licence valid through its validTo day; none without a validTo; every
+  status), withinDays a whole number 0 or more, default 60, no upper bound, a bad value 400 validation (declared);
+  isExpired worked out from validTo on every read; daysRemaining left out when expired; liveUsageCount always sent
+  (required); the total order (expired in use, expired, expiring in use, expiring; then validTo, then assetId); a plain
+  array with no paging. Until something writes assets.media_usage every asset reads as not in use. No screen changes.'
+decision:
+  what: 'ADAM CR-573, posted on #30914: "Decided (Chinmay, 3 November 2026): the readings as built stand, with the edges
+    below. Build now: GET /media/rights-expiring (getExpiringRights). Which assets: ... withinDays: a whole number, 0
+    or more, default 60, no upper bound ... A negative or non-whole value is refused with the service''s usual 400 for
+    a bad query parameter; declare that 400 on the operation ... Fields: ... liveUsageCount ... always send it, 0 when
+    there are none ... Order, total: expired and in use; expired and not in use; expiring and in use; expiring and not
+    in use. Within each group, validTo earliest first, then assetId. The answer is a plain array with no paging ...
+    Dependency: nothing writes assets.media_usage yet ... That is correct behaviour, not a defect ... nothing on them
+    changes visibly." The lead''s instruction, 3 November 2026: "Dont hold r13. approve them and rever tto the devs".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-573 (Chinmay Patkar, #30914 getExpiringRights): the contract stated only "Expired assets in active use
+  sort first": the rest of the order, the window''s bounds and today, daysRemaining for an expired asset, which
+  statuses are listed, and a bad withinDays (no 400 declared) were undefined.'
+keys_touched:
+  operations:
+  - getExpiringRights
+  schemas:
+  - ExpiringMedia
+  tables:
+  - assets.media_asset
+  - assets.media_usage
+  files:
+  - contracts/satellite/assets.yaml
+  - tools/check-business-rules.py
+root_class: a list's order and window not stated, or not total
+tickets:
+  started:
+  - '30914 (getExpiringRights, Chinmay Patkar, Ready for QA): the decision keeps the readings as built. The package now
+    also declares the 400 for a bad withinDays and makes liveUsageCount required (always sent), both in the posted text;
+    check the build answers them and returns every match, not a first 50.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-573
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-EXPIRING-RIGHTS
+status: open
+notes: 'Not built here, as posted: nothing writes assets.media_usage yet, and the decision treats that as correct
+  behaviour, not a defect; no task is added for a writer.'
