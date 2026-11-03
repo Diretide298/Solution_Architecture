@@ -56,6 +56,25 @@ Operations without a permission fall into three groups, each marked explicitly:
 - `x-ticvai-self-scoped: principal \| subject` — 15 operations acting only on the caller's own resources. Supplying another identifier is never silently honoured: **a guest naming another guest's record gets 404, exactly as for a record that does not exist** (Pattern 4; Chinmay, 3 October 2026, CHG-GCF-002), so nothing reveals that the id exists; 403 is only for a staff caller without the permission (R8 blocker cause ORDERS-MONEY-C01, CHG-R8SPN-018)
 - `security: []` — genuinely public: login, OTP request, SSO discovery, maintenance status
 
+### Callers with no workstation: the guest and partner variants
+
+A `x-ticvai-scope-level: workstation` operation is called from a session that signed a workstation in (R100). Two
+markers say that the same operation also has a variant for a caller that signs none in; `check-screen-wiring`
+S-WORKSTATION-OP accepts a workstation operation on such a platform only through them:
+
+- `x-ticvai-guest-callable: true` — a guest (guestAuth) on the guest web, app or kiosk (P01, P02, P05), acting only
+  for themselves in their own session; no permission (CHG-GCF-003, CHG-SCR-012).
+- `x-ticvai-partner-callable: true` — a partner user (bearerAuth, no workstation; CHG-DOOR-001) on the partner portal
+  (P10) (the lead, 3 November 2026; CHG-R14BO-005). **Who:** the operation's `x-ticvai-audience` includes `partner`.
+  **Checked against:** the operation's own `x-ticvai-permission`, which the partner user must hold, at the session's
+  venue grant, the venue of the record acted on, instead of a workstation (as partner carts and orders are written,
+  ADAM CR-184). **How it answers:** only on records of the partner's own channel (`Order.channelProfileId` the
+  session's); another channel's record is 404, exactly as one that does not exist (Pattern 4), and a partner user
+  without the permission is 403. The operation's description carries the paragraph that says this and names the
+  marker. The checker takes the marker only when all of that holds (audience, permission, the paragraph) and only on
+  P10; an unmarked workstation operation on the partner portal is still a finding. On createPayment and
+  inquirePaymentStatus.
+
 ## Amended 13 Aug — decisions landed
 
 | Contract | Change |

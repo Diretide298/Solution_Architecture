@@ -167,12 +167,23 @@ GUEST_CODES = ("P01", "P02", "P05")
 PARTNER_CODES = ("P10",)
 
 
+def partner_variant(op: dict) -> bool:
+    """Whether an operation meets the definition of `x-ticvai-partner-callable` (contracts/README.md, "Callers with no
+    workstation"; CHG-R14BO-005): marked true, a partner is in its audience, it names the permission a partner user is
+    checked against, and its description says how it answers a partner caller (the paragraph naming the marker). A
+    marker without the rest is no variant, so the workstation rule still fails it."""
+    return (op.get("x-ticvai-partner-callable") is True
+            and "partner" in (op.get("x-ticvai-audience") or [])
+            and bool(op.get("x-ticvai-permission"))
+            and "x-ticvai-partner-callable" in str(op.get("description") or ""))
+
+
 def variant_here(op: dict, plat: str) -> bool:
     """Whether a workstation-scoped operation has the variant this platform calls with no workstation: the guest
     variant on a guest platform (CHG-SCR-012), the partner variant on the partner portal (CHG-R14BO-005)."""
     plat = str(plat)
     return bool((plat.startswith(GUEST_CODES) and op.get("x-ticvai-guest-callable"))
-                or (plat.startswith(PARTNER_CODES) and op.get("x-ticvai-partner-callable")))
+                or (plat.startswith(PARTNER_CODES) and partner_variant(op)))
 FILE_REF = re.compile(r"^(storageRef|fileRef|fileReference|documentRef|imageRef|assetRef|attachmentRef|"
                       r"uploadRef|storageKey|fileKey|blobRef|mediaAssetId|photoRef)s?$")
 
@@ -273,10 +284,20 @@ def self_test():
     ]
     bad = []
     # the guest and partner variants of a workstation operation, each only on its own platform (CHG-R14BO-005)
+    defined = {"x-ticvai-partner-callable": True, "x-ticvai-audience": ["staff", "partner"],
+               "x-ticvai-permission": "ORDER_CREATE",
+               "description": "**A partner does this ...** (`x-ticvai-partner-callable`): under the venue grant."}
     for op, plat, ok in (({"x-ticvai-guest-callable": True}, "P01-guest-web-storefront", True),
-                         ({"x-ticvai-partner-callable": True}, "P10-partner-reseller-portal", True),
-                         ({"x-ticvai-partner-callable": True}, "P07-staff-scanner", False),
+                         (defined, "P10-partner-reseller-portal", True),
+                         (defined, "P07-staff-scanner", False),
                          ({"x-ticvai-guest-callable": True}, "P10-partner-reseller-portal", False),
+                         # a staff-only operation, unmarked, on the partner portal: still a finding
+                         ({"x-ticvai-audience": ["staff"], "x-ticvai-permission": "ORDER_CREATE"},
+                          "P10-partner-reseller-portal", False),
+                         # the marker alone is not the definition: no partner audience, no permission, or no answer
+                         (dict(defined, **{"x-ticvai-audience": ["staff"]}), "P10-partner-reseller-portal", False),
+                         (dict(defined, **{"x-ticvai-permission": None}), "P10-partner-reseller-portal", False),
+                         (dict(defined, description="Take a payment."), "P10-partner-reseller-portal", False),
                          ({}, "P10-partner-reseller-portal", False)):
         if variant_here(op, plat) != ok:
             bad.append(f"variant_here: {sorted(op)} on {plat[:3]}: expected {ok}")
