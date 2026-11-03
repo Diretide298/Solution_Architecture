@@ -5396,7 +5396,9 @@ paths:
                 discardDraftChanges:
                   type: boolean
                   default: false
-                  description: True overwrites unpublished changes in the draft.
+                  x-ticvai-persisted: false
+                  description: True overwrites unpublished changes in the draft. The caller's answer to the 409, not a
+                    fact about the configuration, so it is not stored (r13 gate, CHG-R13BO-002).
       responses:
         '200':
           headers:
@@ -7345,7 +7347,9 @@ paths:
                 discardDraftChanges:
                   type: boolean
                   default: false
-                  description: True overwrites unpublished changes in the draft.
+                  x-ticvai-persisted: false
+                  description: True overwrites unpublished changes in the draft. The caller's answer to the 409, not a
+                    fact about the configuration, so it is not stored (r13 gate, CHG-R13BO-002).
       responses:
         '200':
           headers:

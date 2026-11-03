@@ -15955,6 +15955,8 @@ screens:
         provenance: contract catalogue.yaml PATCH /products/{productId}
       - kind: secondaryButton
         label: Assign to category
+        reads:
+        - listProductCategories
         operation: setProductCategories
         provenance: contract catalogue.yaml PUT /product-categories
       - kind: secondaryButton

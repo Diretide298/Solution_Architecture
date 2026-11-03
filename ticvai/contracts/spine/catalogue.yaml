@@ -8965,7 +8965,6 @@ paths:
     get:
       operationId: listChannelSaleSchedule
       x-ticvai-consumed-by:
-        - "P08 ADM-258 Sales Channel Command Center"
         - "P08 ADM-263 Channel Sales Schedule & Availability Windows"
       x-ticvai-reads:
       - table: catalogue.product_channel_assignment
@@ -43754,6 +43753,7 @@ components:
           type: boolean
           default: false
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setConfigurationTemplate saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           allOf:
           - $ref: '#/components/schemas/CatalogueConfigStatus'
           default: draft
@@ -45244,6 +45244,7 @@ components:
           - componentAndSaving
           default: packageTotalOnly
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setPackagePricingDefinition saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           allOf:
           - $ref: '#/components/schemas/CatalogueConfigStatus'
           default: draft
@@ -45540,6 +45541,7 @@ components:
           format: date-time
           nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setFeeDefinition saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           allOf:
           - $ref: '#/components/schemas/CatalogueConfigStatus'
           default: draft
@@ -45981,6 +45983,7 @@ components:
           format: date-time
           nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setPriceCalculationPolicy saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           allOf:
           - $ref: '#/components/schemas/CatalogueConfigStatus'
           default: draft
@@ -46150,6 +46153,7 @@ components:
           type: number
           nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setCurrencyRoundingRule saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           allOf:
           - $ref: '#/components/schemas/CatalogueConfigStatus'
           default: active

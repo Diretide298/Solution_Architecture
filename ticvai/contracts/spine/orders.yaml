@@ -19429,7 +19429,7 @@ components:
           nullable: true
           description: Required for `block` and `escalate`.
     MembershipActivationView:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by resolveMembershipActivation
+      x-ticvai-rls: grant-holder-write   # r13 gate (CHG-R13BO-001): resolveMembershipActivation at a venue, the rule CHG-R11FXC-003 settled for a guest's row with no scope; any staff grant reads and writes, the guest its own; was grant-holder-read (MOD audit, CHG-MOD-007)
       type: object
       x-ticvai-persistence: orders.membership_activation_action
       description: '**One action taken on a membership in the activation queue.** Written by
@@ -27004,6 +27004,7 @@ components:
           format: date
           description: When the new validity period starts — `startFrom`, or today where it was omitted.
     GuestCreditAccount:
+      x-ticvai-rls: grant-holder-write   # r13 gate (CHG-R13BO-001): openGuestCreditAccount at a venue, the rule CHG-R11FXC-003 settled for a guest's row with no scope; any staff grant reads and writes, the guest its own
       type: object
       x-ticvai-persistence: orders.guest_credit_account
       description: 'A credit limit opened for an individual guest (BL-051). The request''s terms, as opened.

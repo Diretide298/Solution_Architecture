@@ -1704,6 +1704,9 @@ paths:
                   enum:
                   - accept
                   - decline
+                  x-ticvai-stored-as: marketing.invitation.status
+                  description: Stored as the invitation's `status`, `accepted` or `declined`, with `respondedAt` (r13
+                    gate, CHG-R13BO-002).
                 plusOnes:
                   type: integer
                   default: 0
@@ -6508,6 +6511,7 @@ paths:
                 token:
                   type: string
                   maxLength: 512
+                  x-ticvai-stored-as: marketing.guest_device.token_ciphertext   # GuestDevice.tokenRef, field-encrypted (r13 gate, CHG-R13BO-002)
                   description: The provider's push token. Stored only encrypted (`GuestDevice.tokenRef`) and as a
                     keyed hash (`GuestDevice.tokenFingerprint`); never stored or logged as sent (CHG-MKT-001).
                 installationId:
@@ -22023,6 +22027,7 @@ components:
           maxLength: 1000
           nullable: true
     MarketingGuestExtraField:
+      x-ticvai-rls: grant-holder-read   # r13 gate (CHG-R13BO-001): read and set below the tenant by listGuestExtraFields and setGuestExtraFields, as its options and values are (MOD audit, CHG-MOD-007)
       type: object
       x-ticvai-persistence: marketing.guest_extra_field
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines an extra field that Admin wants to add to the customer form, such as Date of Birth, Emergency Contact, or Jersey Size.'
@@ -22034,7 +22039,12 @@ components:
       - displayOrder
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the venue whose set it is (setGuestExtraFields replaces the caller''s venue''s set), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes its own fields, as its options and values already carry it (MOD audit, CHG-MOD-007; r13 gate, CHG-R13BO-001).'
         id:
           type: string
           format: uuid
@@ -27131,6 +27141,7 @@ components:
           performance:
             $ref: '#/components/schemas/CampaignPerformance'
     GuestNote:
+      x-ticvai-rls: grant-holder-write   # r13 gate (CHG-R13BO-001): addGuestNote and getGuestTimeline at a venue, the rule CHG-R11FXC-003 settled for a guest's row with no scope; any staff grant reads and writes, the guest its own
       type: object
       x-ticvai-persistence: marketing.guest_note
       description: 'A note on a guest, written by staff (`addGuestNote`). **Attributed and personal data**,
@@ -28733,6 +28744,7 @@ components:
           minimum: 1
           description: Order among providers with the same role and selectors; 1 is tried first.
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setChannelProvider saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
             - active
@@ -28847,6 +28859,7 @@ components:
             - production
             - sandbox
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setSenderIdentityDomain saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
             - pendingVerification
@@ -30000,6 +30013,7 @@ components:
           format: date-time
           nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setDataProcessingPurpose saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - draft
@@ -30244,6 +30258,7 @@ components:
           default: manual
           readOnly: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setTrackingTechnology saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - detected
@@ -31291,6 +31306,7 @@ components:
                 maxLength: 200
                 nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setPrivacyRequestTypes saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - active
@@ -35461,6 +35477,7 @@ components:
           - human
           - ai
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setQualityEvaluation saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - draft
@@ -36249,6 +36266,7 @@ components:
           type: boolean
           default: false
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setContactAutomation saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - draft
@@ -37150,6 +37168,7 @@ components:
               format: uuid
               nullable: true
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setWaiverAssociation saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - active
@@ -37313,6 +37332,7 @@ components:
                 items:
                   $ref: '#/components/schemas/MessageChannel'
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setWaiverTriggerRule saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - active
@@ -39118,6 +39138,7 @@ components:
           nullable: true
           description: The supervisor asked to decide.
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setWaiverException saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - requested
@@ -40118,6 +40139,7 @@ components:
           - locationServicesNotice
           - other
         status:
+          x-ticvai-caller-sets: 'The caller moves it (setPrivacyNoticePolicyGovernance saves it as sent): kept writable by CHG-SHP-005, 14 October 2026; r13 gate, CHG-R13BO-003.'
           type: string
           enum:
           - draft

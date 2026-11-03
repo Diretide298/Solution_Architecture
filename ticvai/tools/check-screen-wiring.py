@@ -216,6 +216,25 @@ def overlay_refs(o: dict) -> set:
     return out
 
 
+def form_also_calls(overlays: list) -> set:
+    """The writes a form's confirm also sends (`confirm.alsoCalls`), whose bodies the form therefore collects
+    (S-BUTTON-FORM; r13 gate, CHG-R13BO-004)."""
+    out = set()
+    for o in overlays:
+        v = o.get("confirm") if isinstance(o, dict) else None
+        if isinstance(v, dict):
+            out |= {x for x in (v.get("alsoCalls") or []) if isinstance(x, str) and x}
+    return out
+
+
+def session_source(src: str) -> bool:
+    """`inputSources` naming the signed-in session's own id (`session.subjectId`; r13 gate, CHG-R13BO-004): GST-015's
+    grant is over the account holder's own account, the session's subject, which no read answers. Only the ids a
+    session carries (SESSION_IDS)."""
+    head, _, field = str(src or "").partition(".")
+    return head == "session" and field in SESSION_IDS
+
+
 def self_test():
     """shown_in_prototype on made-up screens (CHG-R8INT-008): exact and view-naming partial prototypes accept a
     quoted string they hold; a partial without a view, a generated layout and an absent string are refused."""
@@ -246,6 +265,16 @@ def self_test():
         bad.append(f"overlay_refs: a form's picker read is not reached: {overlay_refs(form)}")
     if overlay_refs({"id": "x", "confirm": {"label": "OK"}}) != set():
         bad.append("overlay_refs: an overlay with no operation reached something")
+    # a form's confirm.alsoCalls is collected by that form; an overlay with none collects nothing more (CHG-R13BO-004)
+    if form_also_calls([{"id": "f", "confirm": {"operation": "verifyMfaEnrolment", "alsoCalls": ["enrolMfaMethod"]}}])             != {"enrolMfaMethod"}:
+        bad.append("form_also_calls: a form's alsoCalls write is not collected")
+    if form_also_calls([{"id": "f", "confirm": {"operation": "x"}}, {"id": "g", "reads": ["listY"]}]):
+        bad.append("form_also_calls: collected a write no form sends")
+    # inputSources may name the session's own ids, and nothing else of the session (CHG-R13BO-004)
+    for src, ok in (("session.subjectId", True), ("session.principalId", True), ("session.guestName", False),
+                    ("getMyMemberships.subjectId", False), ("", False)):
+        if session_source(src) != ok:
+            bad.append(f"session_source: {src!r} expected {'taken' if ok else 'refused'}")
     # a fileUpload on createUpload reaches a declared completeUpload; a button on createUpload does not ("Teach the check")
     up = [{"kind": "fileUpload", "operation": "createUpload"}]
     if upload_completes(up, {"createUpload", "completeUpload"}) != {"completeUpload"}:
@@ -436,6 +465,10 @@ def main() -> int:
         # --- R264 a button is not a form -------------------------------------------------------
         collected = {((o.get("confirm") or {}).get("operation")) for o in overlays
                      if isinstance(o.get("confirm"), dict)}
+        # **...and the other writes the same form sends** (`alsoCalls`, r13 gate, CHG-R13BO-004): GST-073's two-step
+        # form collects what enrolMfaMethod sends, then the first code for verifyMfaEnrolment, its confirm. A form that
+        # sends a write collects that write's body.
+        collected |= form_also_calls(overlays)
         has_inputs = bool(kinds & INPUTS)
         # A button may name the list whose rows collect its body (collectedBy, 29 October 2026): taken only when a
         # list, card list or table of that label is on the screen and is filled by a read the screen declares.
@@ -690,6 +723,8 @@ def body_named(a: dict, on_screen: set, ops: dict, by_schema, answers=None) -> t
         src = str(named.get(n) or "")
         if not src:
             return False, f"its required {n} has no inputSources entry"
+        if session_source(src):
+            continue
         op_name, _, field = src.partition(".")
         if op_name not in on_screen or op_name not in ops:
             return False, f"inputSources names {n} from {op_name}, which is not on the screen"
@@ -768,7 +803,7 @@ def input_sources(guard, all_screens, ops, by_schema) -> None:
                 src = str(named.get(n) or "")
                 if src:
                     op_name, _, field = src.partition(".")
-                    if field in answers.get(op_name, set()):
+                    if field in answers.get(op_name, set()) or session_source(src):
                         continue
                     guard.add("S-INPUT-SOURCE", f"{sid}:{a['operationId']}:{n}",
                               f"{sid} ({plat[:3]}): {a['operationId']} names {n}'s source as {src}, but "

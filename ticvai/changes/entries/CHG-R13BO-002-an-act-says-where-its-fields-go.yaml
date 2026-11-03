@@ -1,0 +1,46 @@
+id: CHG-R13BO-002
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'Seven request fields of acts said nowhere where they go; each now says it on the field: publishWalletConfiguration.mode,
+  restoreConfigVersion.discardDraftChanges, restoreKioskConfigVersion.discardDraftChanges and verifyMfaEnrolment.code are not
+  stored (x-ticvai-persisted: false, with why); registerGuestDevice.token is stored as marketing.guest_device.token_ciphertext
+  and respondToInvitation.response as marketing.invitation.status (x-ticvai-stored-as); restoreWalletConfigurationVersion.reason
+  goes to the audit row''s reason as ADAM CR-376 settled, and the operation declares the platform.audit_record write.'
+decision:
+  what: 'The lead, 3 November 2026: "why are these coming back again and again?", "you get the rest sorted"; fix at the
+    source. Each mark states what the operation''s own text already says (the token stored only encrypted, the response
+    recorded as the status, the discard flag answering the 409); the wallet reason takes the CR-376 rule (the audit
+    interceptor writes the reason on the request''s audit context to platform.audit_record.reason).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: r13 release gate (run 20261103-023619-14406), check-request-fields-stored RF-ACTION-NOT-STORED, 7 known findings
+  built on by started tickets #30856, #37050, #33271, #30775, #35597, #35620, #30857 (CHG-R8WFC-002); ADAM CR-376
+  (CHG-CR376-001) for the reason.'
+keys_touched:
+  operations: [publishWalletConfiguration, registerGuestDevice, respondToInvitation, restoreConfigVersion,
+    restoreKioskConfigVersion, restoreWalletConfigurationVersion, verifyMfaEnrolment]
+  tables: [marketing.guest_device, marketing.invitation, platform.audit_record]
+  files:
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/identity.yaml
+root_class: an act's request field whose destination is stated only in prose, or nowhere
+tickets:
+  started:
+  - '30857 (restoreWalletConfigurationVersion, Pranay Shinde, In progress): put the body''s reason on the request''s audit
+    context so the audit row''s reason holds it.'
+  - '33271 (WEB-017, Chitrangi Mestry): no change; response becomes the invitation''s status.'
+  - '30856, 37050, 30775, 35597, 35620: no change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 gate fix lane y (fix/r13-y), started-ticket findings, under the lead''s instruction of 3 November 2026'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open
+notes: 'Beyond the operations'' own words: only the wallet reason''s destination (the audit row) is new, by CR-376''s rule; the
+  restore writes no other row (its own text). No migration.'

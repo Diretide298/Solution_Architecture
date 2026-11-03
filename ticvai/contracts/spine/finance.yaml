@@ -4320,7 +4320,6 @@ paths:
         - "P02 GST-019 Order History"
         - "P04 POS-026 Receipt & Reprint"
         - "P08 BO-022 Order Detail"
-        - "P08 BO-1081 Finance Dashboard"
         - "P16 ANL-072 Finance Dashboard"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
@@ -4680,7 +4679,6 @@ paths:
         - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
         - "P08 BO-023 Refunds & Exchanges"
-        - "P08 BO-1081 Finance Dashboard"
         - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
@@ -6335,7 +6333,7 @@ components:
               actual:
                 $ref: ../shared/common.yaml#/components/schemas/Money
     Deposit:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by recordDeposit, settleDeposit
+      x-ticvai-rls: grant-holder-write   # r13 gate (CHG-R13BO-001): recordDeposit and settleDeposit at a venue, the rule CHG-R11FXC-003 settled for a guest's row with no scope; any staff grant reads and writes, the guest its own; was grant-holder-read (MOD audit, CHG-MOD-007)
       type: object
       x-ticvai-persistence: ledger.deposit
       description: '**Money taken before the sale is complete.** Not deferred revenue — that is a sold

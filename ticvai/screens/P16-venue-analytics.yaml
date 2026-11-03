@@ -3215,6 +3215,8 @@ screens:
       components:
       - kind: dataTable
         label: Every customer membership loyalty
+        reads:
+        - getDashboard
         columns:
         - Unique Customers
         - New Customers
@@ -10249,6 +10251,7 @@ screens:
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure
       - kind: selectField
         label: Default Dashboard
+        operation: listDashboards
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 131 §Configure
       - kind: selectField
         label: Mobile behavior
