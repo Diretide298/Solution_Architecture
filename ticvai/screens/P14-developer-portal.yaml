@@ -65,7 +65,6 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 1
-  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/reference

@@ -162,7 +162,9 @@ def gone(name, out, doc):
 def verdict_line(n_fail, n_allow):
     if n_fail:
         return "FAIL"
-    return "PASS with %d allowlisted failure(s)" % n_allow if n_allow else "PASS"
+    if not n_allow:
+        return "PASS"
+    return "PASS with %d allowlisted failure%s" % (n_allow, "" if n_allow == 1 else "s")
 
 
 def self_test():
@@ -190,7 +192,8 @@ def self_test():
         (judge("c", 1, "  FAIL SP-NOACCESS   P14 DEV-001: x\nFAIL - 1\n",
                {"checkers": {"c": dict(good, expires="2026-11-02")}}, t)[0] == "fail", "an expired entry lets nothing"),
         (judge("d", 1, "  FAIL x\nFAIL - 1\n", doc, t)[0] == "fail", "a checker with no entry"),
-        (verdict_line(0, 2) == "PASS with 2 allowlisted failure(s)", "the verdict names the allowlisted"),
+        (verdict_line(0, 2) == "PASS with 2 allowlisted failures", "the verdict names the allowlisted"),
+        (verdict_line(0, 1) == "PASS with 1 allowlisted failure", "one allowlisted failure"),
     ]
     for ok, what in cases:
         if not ok:

@@ -1,5 +1,5 @@
 {
- "note": "The release gate's allowlist: a gating checker (run-checks.py CHECKS minus REPORT_ONLY) may fail at a release only when this file names every finding line it prints. run-checks.py applies it itself (tools/gate_allowlist.py), so a bare `python tools/run-checks.py` and refresh-safe.sh give the same verdict, and a pass over an allowlisted failure says `PASS with N allowlisted failure(s)`, never a bare PASS. Since r14 (3 November 2026, CHG-R14I-001; the r13 system review E-01, E-02, E-04): an entry carries `added`, `expires` (at most 14 days after `added`, CLAUDE.md rule 15), `approved_by` (the lead), `change` (the CHG-/CR- id) and `why`; each `known` pattern (Python regex, re.search) names ONE finding, never a count or a verdict line; a checker that crashed is never let through. An undated, unapproved, expired or count-pinned entry fails the gate itself (run-checks.py, and check-baseline-ratchet.py on every run). Emptied at r14: the three checkers listed until r13 (check-authored-inputs, check-screen-patterns, check-screen-permissions) had undated entries 14 to 33 days old; they are fixed, or what is left is with the lead.",
+ "note": "The release gate's allowlist: a gating checker (run-checks.py CHECKS minus REPORT_ONLY) may fail at a release only when this file names every finding line it prints. run-checks.py applies it itself (tools/gate_allowlist.py), so a bare `python tools/run-checks.py` and refresh-safe.sh give the same verdict, and a pass over an allowlisted failure says `PASS with N allowlisted failure(s)`, never a bare PASS. Since r14 (3 November 2026, CHG-R14I-001; the r13 system review E-01, E-02, E-04): an entry carries `added`, `expires` (at most 14 days after `added`, CLAUDE.md rule 15), `approved_by` (the lead), `change` (the CHG-/CR- id) and `why`; each `known` pattern (Python regex, re.search) names ONE finding, never a count or a verdict line; a checker that crashed is never let through. An undated, unapproved, expired or count-pinned entry fails the gate itself (run-checks.py, and check-baseline-ratchet.py on every run). Emptied at r14: the three checkers listed until r13 (check-authored-inputs, check-screen-patterns, check-screen-permissions) had undated entries 14 to 33 days old and are fixed; the one entry since is the lead's dated exception of 3 November 2026 for the NP ratchet (CHG-R14I-012).",
  "format": {
   "checkers": {
    "<checker name>": {
@@ -8,12 +8,36 @@
     "approved_by": "the lead",
     "change": "CHG-XXX-nnn or CR-nnn",
     "why": "what fails and why it may ship once",
-    "known": ["one pattern per finding line"]
+    "known": [
+     "one pattern per finding line"
+    ]
    }
   },
-  "refresh_tools_coverage": {"known_unexcused": [{"name": "<tool>", "added": "", "expires": "", "approved_by": "", "change": "", "why": ""}]}
+  "refresh_tools_coverage": {
+   "known_unexcused": [
+    {
+     "name": "<tool>",
+     "added": "",
+     "expires": "",
+     "approved_by": "",
+     "change": "",
+     "why": ""
+    }
+   ]
+  }
  },
- "checkers": {},
+ "checkers": {
+  "check-screen-patterns": {
+   "added": "2026-11-03",
+   "expires": "2026-11-17",
+   "approved_by": "Chinmay",
+   "change": "CHG-R14I-012",
+   "why": "279 later-sprint screens wait for a person to define them (back-office wireframes not yet signed; held tasks). The lead, 3 November 2026, on lane i's stop: \"Dated exception, 14 days\". Only the NP ratchet's one finding at exactly 312 over the ceiling of 191 is let through: one more later-sprint screen that needs a person is a new line and fails.",
+   "known": [
+    "^NP-CEILING\\s+312 > 191 NP findings in Sprints 3 and later above the ceiling: "
+   ]
+  }
+ },
  "refresh_tools_coverage": {
   "why": "refresh.sh ends by failing when tools/ holds a .py it neither runs nor names in _EXCLUDED; refresh-safe.sh runs the block and fails on a name not allowlisted here (entries as above). Empty since 1 October: every tool is run or excused in _EXCLUDED.",
   "known_unexcused": []

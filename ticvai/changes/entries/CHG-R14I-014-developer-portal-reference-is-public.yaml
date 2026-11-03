@@ -1,0 +1,30 @@
+id: CHG-R14I-014
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'DEV-001, the API reference, declares no screen permission: its reads (listApiVersions, listApiScopes) are public,
+  so an anonymous developer can open it.'
+decision:
+  what: 'The lead, 3 November 2026, on lane i''s report: "Make it public": remove DEV-001''s screen permission (DEVELOPER_VIEW).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'The r13 system review, finding F-12: DEV-001, the public API reference, was gated on a permission an anonymous developer
+  does not hold (its reads became public in r8, CHG-R8SAT-001).'
+keys_touched:
+  screens:
+  - DEV-001
+  files:
+  - screens/P14-developer-portal.yaml
+root_class: a screen gated on a permission its operations no longer require
+tickets:
+  started: []
+  unstarted:
+  - '#27982, #31300, #31301, #31302 (FE DEV-001, New)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s own answer of 3 November 2026 to r14 review lane i''s stops'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-permissions.py
+status: open

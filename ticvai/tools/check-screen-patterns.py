@@ -378,7 +378,8 @@ def main() -> int:
     if len(show) < len(bad):
         print(f"  … and {len(bad) - len(show)} more (--list shows all)")
     if bad:
-        print(f"FAIL {len(bad)} finding(s): " + ", ".join(f"{k} {v}" for k, v in sorted(by.items())))
+        # the closing verdict, `FAIL - ...` like every checker's, so no allowlist can take it for a finding (r14)
+        print(f"FAIL - {len(bad)} finding(s): " + ", ".join(f"{k} {v}" for k, v in sorted(by.items())))
         return 1
     print(f"ok: no screen asks for a readOnly field, dumps a schema, names the wrong permission, "
           f"needs a parameter nothing carries, wears another screen's route, says a Block A screen "

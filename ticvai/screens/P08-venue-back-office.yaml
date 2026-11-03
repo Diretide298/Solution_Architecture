@@ -163406,6 +163406,8 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions
       - kind: secondaryButton
         label: Correct mapping
+        reads:
+        - getWalletIntegrationMapping
         operation: setWalletIntegrationMapping
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions
       - kind: secondaryButton
@@ -163449,6 +163451,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getWalletIntegrationMapping
+    contract: wallet
+    purpose: The mapping Correct mapping opens on
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: listWalletDisputes
     contract: wallet
     purpose: Integration exceptions
@@ -194619,6 +194626,8 @@ screens:
       components:
       - kind: primaryButton
         label: Create
+        reads:
+        - getChannelProfile
         provenance: contract operation createChannelProfile
   states:
     loading: The channel creation profile configuration as saved.
@@ -194628,6 +194637,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getChannelProfile
+    contract: catalogue
+    purpose: The channel profile as saved, when the screen opens on a channel
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: createChannelProfile
     contract: catalogue
     purpose: Channel Creation & Profile Configuration
@@ -194641,11 +194655,7 @@ screens:
     bound to a contract property; 14 of 42 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of a channel profile (createChannelProfile
-      has no get or list).'
-    source: contracts/spine/catalogue.yaml#createChannelProfile | screens/P08-venue-back-office.yaml#ADM-259
+  gaps: []
 - id: ADM-260
   name: Product & Catalogue Assignment
   module: Commercial
@@ -194687,15 +194697,11 @@ screens:
   purpose: Control exactly which products are available through each sales channel.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Assign
+    why: '**The pack names 6 actions on this screen and the screen declares 2 operations** (setProductCatalogue and its read getProductCatalogue). Unserved: Assign
       Products, Remove Products, Disable, Copy Assignment, Import Assignment. Each needs an operation,
       or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
       rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 7 §Support
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of product-to-channel catalogue
-      assignments.'
-    source: contracts/spine/catalogue.yaml#setProductCatalogue | screens/P08-venue-back-office.yaml#ADM-260
   layout:
     template: split
     regions:
@@ -194704,6 +194710,8 @@ screens:
       components:
       - kind: dataTable
         label: Every product catalogue
+        reads:
+        - getProductCatalogue
         columns:
         - ProductCatalogueAssignmentView.product
         - ProductCatalogueAssignmentView.productType
@@ -194785,6 +194793,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getProductCatalogue
+    contract: catalogue
+    purpose: 'The channel''s product assignment as saved'
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setProductCatalogue
     contract: catalogue
     purpose: Product & Catalogue Assignment
@@ -194856,10 +194869,6 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Sales_Channel_Management_Reference.pdf, page 8
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel pricing and commercial
-      profile assignments.'
-    source: contracts/spine/catalogue.yaml#setChannelPricingCommercial | screens/P08-venue-back-office.yaml#ADM-261
   layout:
     template: split
     regions:
@@ -194868,6 +194877,8 @@ screens:
       components:
       - kind: primaryButton
         label: Save changes
+        reads:
+        - getChannelPricingCommercial
         provenance: contract operation setChannelPricingCommercial
     - name: contentBody
       components:
@@ -194886,6 +194897,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getChannelPricingCommercial
+    contract: catalogue
+    purpose: 'The channel''s pricing and commercial profile as saved'
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setChannelPricingCommercial
     contract: catalogue
     purpose: Channel Pricing & Commercial Profile Assignment
@@ -195601,6 +195617,8 @@ screens:
       components:
       - kind: primaryButton
         label: Save changes
+        reads:
+        - getChannelFeePayment
         provenance: contract operation setChannelFeePayment
   states:
     loading: The channel fees payment configuration as saved.
@@ -195610,6 +195628,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getChannelFeePayment
+    contract: catalogue
+    purpose: 'The channel''s fees, payment and fulfilment as saved'
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setChannelFeePayment
     contract: catalogue
     purpose: Channel Fees, Payment & Fulfillment Configuration
@@ -195623,11 +195646,7 @@ screens:
     bound to a contract property; 11 of 42 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel fee, payment and fulfilment
-      configuration.'
-    source: contracts/spine/catalogue.yaml#setChannelFeePayment | screens/P08-venue-back-office.yaml#ADM-266
+  gaps: []
 - id: ADM-267
   name: Channel Publication, Readiness & AI Validation
   module: Commercial
@@ -195689,6 +195708,8 @@ screens:
         provenance: pack Sales_Channel_Management_Reference.pdf, page 16 §Authorized users can
       - kind: publishGate
         label: What publishing changes
+        reads:
+        - getChannelReadinessValidation
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
           one somebody presses meaning to save.'
         provenance: authored — required by check-screens for publishChannelReadinessValidation
@@ -195701,6 +195722,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getChannelReadinessValidation
+    contract: catalogue
+    purpose: 'The channel''s readiness checklist and status'
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: publishChannelReadinessValidation
     contract: catalogue
     purpose: Channel Publication, Readiness & AI Validation
@@ -195714,11 +195740,7 @@ screens:
     bound to a contract property; 8 of 88 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel readiness and validation
-      results.'
-    source: contracts/spine/catalogue.yaml#publishChannelReadinessValidation | screens/P08-venue-back-office.yaml#ADM-267
+  gaps: []
 - id: ADM-268
   name: Channel Operations Command Center
   module: Commercial
@@ -208537,6 +208559,11 @@ screens:
           “Partial Payment States”, “Timeout”, “Partially Paid”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card
         operation: getDunningPolicy
+      - kind: detailPanel
+        label: Which tenders may be combined, and in what order
+        bindsTo: MixedTenderRules
+        operation: getMixedTenderRules
+        provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules on ADM-606)'
   states:
     loading: The partial payment failure list.
     error: Could not load. Names which read failed and leaves the partial payment failure untouched.
@@ -208547,6 +208574,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getMixedTenderRules
+    contract: payments
+    purpose: The tender rules this screen edits, as saved
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules on ADM-606)'
   - operationId: setMixedTenderRules
     contract: payments
     purpose: Partial payment and recovery

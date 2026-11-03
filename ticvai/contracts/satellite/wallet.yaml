@@ -4062,6 +4062,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-integration-mappings:
+    get:
+      operationId: getWalletIntegrationMapping
+      x-ticvai-audience:
+        - staff
+      summary: How one integration's fields, currencies, statuses and credit types map, as saved
+      description: '**The read of what `setWalletIntegrationMapping` saves** (r14, CHG-R14I-013; the lead, 3 November 2026: "Add the six
+        reads"). The screen that edits it opens on the saved record: BO-1179''s Correct mapping opens on the mapping it corrects. One record per `apiClientId` within the caller''s
+        tenant, the same key the write takes in its body; an `apiClientId` with nothing saved yet is `404 not-found`, and the
+        screen opens empty for a first save.'
+      tags:
+        - drafted
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: apiClientId
+          in: query
+          required: true
+          description: The `public-api` client the integration authenticates as.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: How one integration's fields, currencies, statuses and credit types map, as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletIntegrationMapping'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletIntegrationMapping
       x-ticvai-consumed-by:

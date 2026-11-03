@@ -30,4 +30,6 @@ prevention:
   ref: tools/check-baseline-ratchet.py
 status: open
 notes: 'The class is closed by tools/gate_allowlist.py rule 2 (a count or verdict pattern is refused), run by run-checks.py
-  and check-baseline-ratchet. NP-CEILING (312 > 191) and READ (7) still fail: they need the lead (lane i report).'
+  and check-baseline-ratchet. The closing line is now `FAIL - N finding(s)`, a verdict, never a finding. What was left after
+  the fix went to the lead: NP-CEILING (312 > 191) is a dated exception (CHG-R14I-012) and READ 7 are fixed by the six reads
+  (CHG-R14I-013).'

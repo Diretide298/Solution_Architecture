@@ -38,6 +38,5 @@ prevention:
   type: check
   ref: tools/check-screen-permissions.py
 status: open
-notes: 'Design change (the lead, 3 November 2026, r14 gate integrity): the no-access text of two approved screens. DEV-001
-  still declares permission DEVELOPER_VIEW for the screen, a gate on a public page the review notes; left to the lead (lane
-  i report).'
+notes: 'Design change (the lead, 3 November 2026, r14 gate integrity): the no-access text of two approved screens. DEV-001''s
+  screen permission is removed by the lead''s later answer, "Make it public" (CHG-R14I-014).'

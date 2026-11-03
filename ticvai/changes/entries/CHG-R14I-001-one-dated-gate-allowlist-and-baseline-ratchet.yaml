@@ -47,5 +47,6 @@ prevention:
   type: check
   ref: tools/check-baseline-ratchet.py
 status: open
-notes: The 5,961 audit-baseline entries known at r13 carry no expiry; whether they should is left to the lead (lane i report).
-  A bare checker and the gate agree whenever the allowlist is empty, as it is at r14.
+notes: 'The 5,961 audit-baseline entries known at r13 carry no expiry, by the lead''s answer of 3 November 2026 to lane
+  i: "No expiry, ratchet only" (check-baseline-ratchet holds growth). A bare checker and the gate agree whenever the allowlist
+  is empty; at r14 it holds one dated entry (CHG-R14I-012).'
