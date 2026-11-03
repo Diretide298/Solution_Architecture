@@ -1,0 +1,35 @@
+id: CHG-R14PL-010
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR581-DB-PRODUCT-DISPLAY-ORDER (Hrushikant Patkar, after MIG-CATALOGUE): catalogue.product.display_order integer
+  default 100 and the index (venue_id, display_order, id).'
+decision:
+  what: 'ADAM CR-581, decided by Chinmay on 3 November 2026; lane e listed the [DB] task (integration inputs); the lead, 4
+    November 2026: "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: CR-581 adds a column and an index to catalogue.product, whose migration #27671 (MIG-CATALOGUE) is Ready for
+  QA.'
+keys_touched:
+  tickets:
+  - CR581-DB-PRODUCT-DISPLAY-ORDER (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change that adds columns to a table whose migration ticket has started, carried by no plan task
+tickets:
+  started:
+  - '27671 (MIG-CATALOGUE, Ready for QA): not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-581
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: A change-only [DB] task (area database; its key does not end in -DB, so it does not count as creating its tables),
+  owner the migration owner (team.json migrations, Hrushikant Patkar). The release's forward migration is written once by
+  the r14 integration; the task copies its statements.

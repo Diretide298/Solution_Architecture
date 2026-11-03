@@ -1,0 +1,36 @@
+id: CHG-R14PL-020
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'KERNEL-ID-OFFLINE-CORE (Pradnya Yeram, [FE] POS, after SETUP-CLIENTS): the UUIDv7 generator in offline-core, split
+  off #27689 (KERNEL-ID), which keeps the backend half and the round-trip test.'
+decision:
+  what: 'The coordinator''s plan pass (3 November 2026): "split #27689''s frontend half (UUIDv7 in packages/offline-core)
+    to a new [FE] task for Pradnya Yeram"; the lead, 4 November 2026: "take the recommended decision unless its very very
+    important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: #27689 (In progress, Pranay Shinde) holds a backend and a frontend half; the frontend half is offline-core,
+  Pradnya Yeram''s (owner of #27705).'
+keys_touched:
+  tickets:
+  - KERNEL-ID-OFFLINE-CORE (new)
+  - KERNEL-ID (27689)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: one ticket holding two owners' work
+tickets:
+  started:
+  - '27689 (KERNEL-ID, In progress, Pranay Shinde): its text is not rewritten; a follow-up comment says the frontend half
+    moved to KERNEL-ID-OFFLINE-CORE.'
+  unstarted:
+  - '27705 (OFFLINE-JOURNAL, New): its ids come from the new task.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the coordinator''s plan pass under the lead''s instruction'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

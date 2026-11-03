@@ -1,0 +1,32 @@
+id: CHG-R14PL-012
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'R14G-FRONTEND-REPO-PIPELINES (Hrushikant Patkar, devops, after SETUP-CI): one GitLab pipeline in each of the six
+  per-app frontend repositories, from the frontend starter''s .gitlab-ci.yml.'
+decision:
+  what: 'The lead, 3 November 2026: "All four, one release" (the r13 system review, G-04 and G-05); lane g named the task
+    (CHG-R14G-005); the lead, 4 November 2026: "take the recommended decision unless its very very important" (the r14 integration,
+    overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: CHG-R14G-005: "The six per-app frontend repositories need their own pipelines (a new task)."'
+keys_touched:
+  tickets:
+  - R14G-FRONTEND-REPO-PIPELINES (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: infrastructure work a review names, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - '27626 (SETUP-CI, New): starts from the starters'' pipelines for ticvai-backend.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

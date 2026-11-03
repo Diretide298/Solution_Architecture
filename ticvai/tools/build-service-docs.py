@@ -3557,6 +3557,13 @@ def main() -> int:
                name="AI engine · Block A2: the AI work moved out of A1 (" + ", ".join(
                    sorted(k.replace("AI-ENGINE-", "").lower() for k, v in ai_drop.items() if v == "A2")) + ")")
 
+    extra_screen_of = {}
+    if EXTRA.exists():
+        for e_ in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []:
+            s_ = next((b_.split(" ", 1)[1] for b_ in e_.get("builds") or [] if b_.startswith("screen ")), None)
+            if s_ and e_.get("area") not in (None, "backend", "database", "devops"):
+                extra_screen_of[e_["key"]] = s_
+
     def foundation_am(k):
         if k.startswith("SETUP-"):
             return "AM-FOUNDATION-SETUP"
@@ -3585,7 +3592,12 @@ def main() -> int:
         if f_:
             am_of[k] = f_
         elif t_["track"] == "Frontend":
-            sid = key_identity(k)[1]
+            # **A hand-written [FE] task beside a screen's own ticket** (r14 plan pass, CHG-R14PL-001: CR-551's waiting-room
+            # move under GST-008) has no screen key: it lands in the app-module of the first screen its `builds` names
+            ident_ = key_identity(k)
+            sid = ident_[1] if ident_ else extra_screen_of.get(k)
+            if not sid:
+                raise SystemExit(f"block-a-extra-tasks.json {k}: a frontend task with no screen key names no screen in builds")
             mod, pf = screen_module(sid), plat_of(sid)
             if k.startswith("APP-SETUP-"):
                 am_of[k] = setup_am(sid)
@@ -3660,7 +3672,7 @@ def main() -> int:
             return "ai"
         if t_["track"] == "Frontend":
             ident = key_identity(t_["key"]) or (None, None)
-            sid = ident[1] if ident[0] == "screen" else re.sub(r"-REST$", "", t_["key"]).split("-", 2)[-1]
+            sid = ident[1] if ident[0] == "screen" else extra_screen_of.get(t_["key"]) or                 re.sub(r"-REST$", "", t_["key"]).split("-", 2)[-1]
             return sp.POOL_OF_PLATFORM.get(plat_of(sid), "web") if sid in screens else "web"
         if t_["track"] == "Onboarding":
             return "web"

@@ -3781,6 +3781,436 @@
    "builds": [
     "table access.entitlement"
    ]
+  },
+  {
+   "key": "CR551-GST008-WAITING-ROOM",
+   "epic": "FRONTEND-FOUNDATION",
+   "area": "MOB",
+   "points": 2,
+   "assignee": "Chitrangi Mestry",
+   "depends": [
+     "APP-MOB-GST-008",
+     "SETUP-CLIENTS",
+     "SVC-CATALOGUE-CATALOGUE-2",
+     "SVC-CATALOGUE-PRODUCT-2",
+     "SVC-MARKETING-CONSENT-3",
+     "SVC-ORDER-CART-1",
+     "SVC-ORDER-CART-2",
+     "SVC-WHITELABEL-BOOKINGFLOWS-1",
+     "SVC-WHITELABEL-CONTENT-3",
+     "APP-MOB-GST-046",
+     "EDGE-WAITING-ROOM",
+     "SETUP-MOCK-API",
+     "SETUP-SHELL-GUEST-APP",
+     "SVC-CATALOGUE-EVENT-1"
+    ],
+   "notBefore": "2026-11-04",
+   "subject": "GST-008 sends the guest to the waiting room (GST-046) on a refused addCartLine and back with the quantities kept (CR-551)",
+   "detail": "Spec: ADAM CR-551, the lead's decision of 3 November 2026 (posted on #31784: \"The move from a refused addCartLine to the waiting room happens on the tickets screen's Continue; that is a separate ticket\"), in the screens at the release tag in ADAM (P02 GST-008, GST-046; left-out list LO-CR551-001). Named under #28159 ([FE] GST-008 Tickets & Add-ons, New); #31775 (GST-008's build) is Ready for QA and its text is not rewritten, so the plan has this task beside it. When Continue's addCartLine is refused 403 admission-required, the app opens GST-046 with performanceId and waitingEntryId, and on admission returns to GST-008 with the chosen quantities kept and sends the admission token on addCartLine. Done when: with the waiting room on, a refused Continue reaches GST-046, an admitted guest is back on GST-008 with the same quantities, and the next addCartLine carries the token and succeeds.",
+   "builds": [
+    "screen GST-008",
+    "screen GST-046",
+    "operation addCartLine"
+   ]
+  },
+  {
+   "key": "CR553-TRANSFER-INVENTORY-HOLDS",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Deep Khanvilkar",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "SVC-CATALOGUE-LEASE-1"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "Catalogue's in-process command transferInventoryHolds: a claimed cart's holds move to the guest's cart (CR-553)",
+   "detail": "Spec: ADAM CR-553, the lead's decision of 3 November 2026 (posted on #30681), in the contracts at the release tag in ADAM (catalogue.yaml x-ticvai-queries transferInventoryHolds; orders.yaml claimCart's x-ticvai-calls). Named under #28135 ([BE] CatalogueService holds: acquireInventoryHold, convertInventoryHold, listInventoryHolds; New). One guarded UPDATE on catalogue.inventory_reservation, served in process to Orders: the anonymous cart's active holds are re-pointed to the surviving guest cart, a hold that is no longer active is left and reported, and nothing else changes. Until it is merged claimCart (#30681) answers the found case 409 cart-not-open, as posted. Done when: a claim that merges two carts keeps every active hold on the guest's cart, an expired hold is reported and its line dropped by claimCart, a second call changes nothing, and the contract tests pass.",
+   "builds": [
+    "table catalogue.inventory_reservation",
+    "operation claimCart"
+   ]
+  },
+  {
+   "key": "CR576-DB-SALES-ORDER-TERMS",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-ORDERS"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "orders.sales_order keeps the terms the guest accepted: terms_version and terms_accepted_at (CR-576)",
+   "detail": "Spec: ADAM CR-576, the lead's decision of 3 November 2026 (posted on #31898), in the contracts at the release tag in ADAM (Order.termsVersion, termsAcceptedAt; checkoutCart's termsAccepted). The [DB] work under MIG-ORDERS (#27675, Ready for QA, not rewritten). One guarded forward migration in the tenant database, additive: orders.sales_order terms_version text (at most 40) and terms_accepted_at timestamptz, both nullable. No backfill: an order made before r14 recorded no terms. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/<area>/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table orders.sales_order"
+   ]
+  },
+  {
+   "key": "CR583-MARKETING-BOOKING-CONSENT-RECORDS",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "Marketing serves bookingConsentRecords on the service route: a cart's current consent answers (CR-583)",
+   "detail": "Spec: ADAM CR-583, the lead's decision of 3 November 2026 (\"Approve them\"), in the contracts at the release tag in ADAM (marketing-crm.yaml x-ticvai-queries bookingConsentRecords). Named under #27866 ([BE] MarketingService: recordConsentAnswers and the consent operations; New). The service query: input cartId, returns the current marketing.booking_consent_record rows of that cart (superseded rows excluded), served on the service route to Orders. Done when: Orders' getCart reads a cart's answers through it, a superseded answer is not returned, another venue's cart answers nothing, and the contract tests pass.",
+   "builds": [
+    "table marketing.booking_consent_record",
+    "operation recordConsentAnswers"
+   ]
+  },
+  {
+   "key": "CR583-CART-CONSENT",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "SVC-ORDER-CART-2",
+    "CR583-MARKETING-BOOKING-CONSENT-RECORDS"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "getCart's consent part: consentQuestions answered and consentBlocksBooking worked out from Marketing's answers (CR-583)",
+   "detail": "Spec: ADAM CR-583, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (orders.yaml getCart, Cart.consentQuestions, rules 6 to 10). Named under #30684 (getCart, On hold): its first build ships the two conflict kinds with consentQuestions [] and no consentBlocksBooking; this task adds the consent part. getCart reads catalogue#productRecords in process and marketing-crm#bookingConsentRecords on the service route, and works out answered (every person on every line in lineIds, CR-556) and consentBlocksBooking by the posted rules; checkoutCart's consent checks read only those computed fields, so checkoutCart (#31129) is not released before this task. Done when: a cart with an unanswered required question reports it and checkoutCart refuses 422 consentRequired; a blocking answer sets consentBlocksBooking and checkoutCart refuses 422 consentAnswerBlocks; answered questions clear both; the contract tests pass.",
+   "builds": [
+    "operation getCart",
+    "operation checkoutCart"
+   ]
+  },
+  {
+   "key": "CR584-DB-CONTRACT-PENDING-PRORATION",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-CONTROL"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "control.contract keeps an upgrade's pending proration: pending_proration numeric(18,4) (CR-584)",
+   "detail": "Spec: ADAM CR-584, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (SubscriptionPendingProration; setSubscription, generateInvoice, issueInvoice). The [DB] work under MIG-CONTROL (#27647, Ready for QA, not rewritten). One guarded forward migration in the control database, additive: control.contract.pending_proration numeric(18,4), nullable. No backfill. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/<area>/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table control.contract"
+   ]
+  },
+  {
+   "key": "CR590-DB-LINE-PRODUCT",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-ORDERS"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "orders.cart_line and orders.order_line keep their product: product_id, and the old order lines filled from their variant's product (CR-590)",
+   "detail": "Spec: ADAM CR-590, the lead's decision of 3 November 2026 (posted on #31898), in the contracts at the release tag in ADAM (CartLine.productId, OrderLine.productId). The [DB] work under MIG-ORDERS (#27675, Ready for QA, not rewritten). One guarded forward migration in the tenant database: orders.cart_line.product_id and orders.order_line.product_id uuid, nullable, each with its foreign key to catalogue.product (NOT VALID) and an index; then the old order lines take the product of their variant (catalogue.product_variant.product_id) where product_id is null. A cart line is short-lived and is set when it is added: no cart backfill. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/<area>/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table orders.cart_line",
+    "table orders.order_line"
+   ]
+  },
+  {
+   "key": "CR591-PUBLISHED-BOOKING-FLOW-STEPS",
+   "epic": "PLATFORM",
+   "points": 2,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "White-label serves publishedBookingFlowSteps on the service route: the resolved flow type and enabled steps of a venue's products (CR-591)",
+   "detail": "Spec: ADAM CR-591, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (white-label.yaml x-ticvai-queries publishedBookingFlowSteps). Named under #27878 (SVC-WHITELABEL-BOOKINGFLOWS-1, Ready for QA); #31033 (getPublishedBookingFlow, Ready for QA) keeps its text: the rule it built is exposed as this query, not rebuilt. Input: a venue and product ids; answer per product: resolved, the flow type and its enabled step keys in sortOrder; a product with no flow answers resolved false with the type the kind rule picks and its default order. Catalogue's listProducts, getProduct and searchCatalogue ask it once per page for bookingEntry. Done when: a product with a flow gets its flow's steps, one with none gets the kind's default and resolved false, the answer matches getPublishedBookingFlow for the same product, and the contract tests pass.",
+   "builds": [
+    "operation getPublishedBookingFlow",
+    "operation listProducts"
+   ]
+  },
+  {
+   "key": "CR592-DB-APPROVAL-REQUEST-PLATFORM-RULE",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-APPROVALS"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "approvals.request keeps a platform rule's approver permission and minimum: platform_approver_permission and platform_minimum_approvals (CR-592)",
+   "detail": "Spec: ADAM CR-592, the lead's decision of 3 November 2026 (posted on #30848), in the contracts at the release tag in ADAM (ApprovalRequestPlatformRule). The [DB] work under MIG-APPROVALS (#27658, Ready for QA, not rewritten). One guarded forward migration in the tenant database, additive: approvals.request platform_approver_permission text and platform_minimum_approvals integer, both nullable. No backfill: a request made before r14 has its request_approver rows. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/<area>/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table approvals.request"
+   ]
+  },
+  {
+   "key": "CR556-TENANT-APP-STATUS-TIME-ZONE",
+   "epic": "PLATFORM",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "getTenantAppStatus answers each venue's time zone: TenantAppStatus.venues[].timeZone (CR-556)",
+   "detail": "Spec: ADAM CR-556 steps 5 and 6 as corrected (the lead, 3 November 2026, posted on #31784 and #31785), in the contracts at the release tag in ADAM (white-label.yaml TenantAppStatus.venues[].timeZone). Named under #27885 (WhiteLabelService: getTenantAppStatus and the overview reads, Ready for QA, not rewritten). Each venue entry gains timeZone, the IANA name of the venue's RegionSettings.timeZone read through regionSettingsRecords (the zone openingHoursToday already uses), null when unset. GST-007 (#31785) takes the zone from it. Done when: every venue entry carries its region's zone, an unset zone is null, and the contract tests pass.",
+   "builds": [
+    "operation getTenantAppStatus"
+   ]
+  },
+  {
+   "key": "CR581-DB-PRODUCT-DISPLAY-ORDER",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-CATALOGUE"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "catalogue.product keeps its display order: display_order integer default 100, indexed with venue and id (CR-581)",
+   "detail": "Spec: ADAM CR-581, the lead's decision of 3 November 2026, in the contracts at the release tag in ADAM (Product.displayOrder; listProducts' order). The [DB] work under MIG-CATALOGUE (#27671, Ready for QA, not rewritten). One guarded forward migration in the tenant database, additive: catalogue.product.display_order integer DEFAULT 100, nullable, and the index (venue_id, display_order, id). Rows already there take the default. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/<area>/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table catalogue.product"
+   ]
+  },
+  {
+   "key": "R14S-DB-INTEGRATION-LISTING-NOTES",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-CONTROL"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "control.integration_listing keeps a certification's notes: certification_notes text (CHG-R14BO-006)",
+   "detail": "Spec: the lead's \"Approve all 28 as recommended\" (3 November 2026) and CHG-R14BO-006, in the contracts at the release tag in ADAM (IntegrationListing.certificationNotes; certifyIntegration #31294, Ready for QA, not rewritten). The [DB] work under MIG-CONTROL (#27647, Ready for QA, not rewritten). One guarded forward migration in the control database, additive: control.integration_listing.certification_notes text, nullable. No backfill. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/<area>/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table control.integration_listing"
+   ]
+  },
+  {
+   "key": "R14G-FRONTEND-REPO-PIPELINES",
+   "epic": "PLATFORM",
+   "area": "devops",
+   "points": 2,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-CI"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "A GitLab pipeline in each of the six per-app frontend repositories, from the frontend starter's .gitlab-ci.yml (r13 review G-05)",
+   "detail": "Spec: the r13 system review (G-04, G-05; the lead: \"All four, one release\"), CHG-R14G-005, and the frontend starter at the release tag in ADAM (viewer/mcp/setup/starters/frontend/.gitlab-ci.yml: node 22, corepack pnpm, nx affected against the merge request's base, run-many on the default branch and tags). #27626 (SETUP-CI, New) starts from the starters' pipelines for ticvai-backend; this task carries the six app repositories of the ticvai-frontend group (docs/active/frontend-repos.yaml), one pipeline each, with the lint constraints (scope:ui, scope:offline-core, type:package) and tests that fail a package that runs none. Done when: a merge request to each of the six repositories runs lint, type check and tests and blocks on a failure, and a push to the default branch runs them all.",
+   "linksNothingBecause": "CI pipelines in the six app repositories: infrastructure, not a package artefact; its text names the file",
+   "builds": [
+    "file docs/active/frontend-repos.yaml"
+   ]
+  },
+  {
+   "key": "R14G-KERNEL-PORT",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "Port the r14 backend starter's kernel into ticvai-backend: scoped permission check, tenant bound to the token, durable idempotency, Money with scale (r13 review G-01 to G-07)",
+   "detail": "Spec: the r13 system review's starter findings (G-01, G-03, G-06, G-07, D-07, D-15; the lead: \"All four, one release\"), CHG-R14G-001, -003, -006 and -007, and the backend starter at the release tag in ADAM (viewer/mcp/setup/starters/backend). Named beside #27692 (the request kernel, Ready for QA, not rewritten). In ticvai-backend: ResolvedAuthority and ICurrentPrincipal.Permits(permission, scopePath) in place of Has (all 22 vectors of the permission-resolution spec pass); the host-resolved tenant with JWT tenant binding (a token or session of another tenant is 401) and SET LOCAL scope per transaction; IdempotentExecution with PostgresIdempotencyStore (a conflicting replay is 409 idempotency-conflict, the record commits with the change); Money(amount, currency, scale) with the ISO 4217 minor units and the string wire form; /health 503 when a tenant database does not answer; ModuleBoundaryTests over ADR-0055's 16 modules. Done when: every operation built so far decides permission through Permits at its scope, the starter's integration tests pass in ticvai-backend's pipeline against PostgreSQL 16, and no Has(...) or flat EffectivePermissions check decides an operation.",
+   "builds": [
+     "table platform.idempotency_record",
+     "operation resolvePermissions",
+     "adr ADR-0025",
+     "adr ADR-0055",
+     "adr ADR-0056"
+    ]
+  },
+  {
+   "key": "R14H-DB-DEVICE-KIND-WORKSTATION",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-PLATFORM"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "platform.device's device kind check takes workstationTerminal, a till or kiosk computer (CHG-R14H-001)",
+   "detail": "Spec: the r13 system review finding C-04 (the lead: \"All four, one release\"), CHG-R14H-001, in the contracts at the release tag in ADAM (DeviceKind workstationTerminal; BC-803). The [DB] work under MIG-PLATFORM (#27665 and its sub-task #30329 [DB] platform.device, Ready for QA, not rewritten). One guarded forward migration in the tenant database: drop and re-add platform.device's device_kind_chk with workstationTerminal among its values (NOT VALID, then validated: every row already there holds an old value). Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/<area>/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table platform.device"
+   ]
+  },
+  {
+   "key": "R14H-DEVICE-DOORS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "KERNEL-DEVICE-AUTH"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "The device doors authenticate the device: deviceAuth on login, the session-less step-up and the device operations, and the device-kind check (CHG-R14H-001)",
+   "detail": "Spec: the r13 system review finding C-04 (the lead: \"All four, one release\"), CHG-R14H-001 and the ADR-0071 amendment of 3 November 2026, in the contracts at the release tag in ADAM (x-ticvai-workstation-from: device, x-ticvai-device-kinds). Named beside #27692 (the request kernel) and #37053 (KERNEL-DEVICE-AUTH, deviceAuth validation), both Ready for QA and not rewritten. The kernel part: an operation marked x-ticvai-workstation-from: device takes its workstation from the authenticated device's binding, never the body; a workstationId in the request that is not the device's is 403 workstation-mismatch, one sent without deviceAuth is 401 device-unauthenticated, both before any PIN or password is checked (no attempt spent, no lockout moved); a device-bound method (pin, card, rfid) without deviceAuth is 400 workstation-required; the device's kind must be one the operation lists in x-ticvai-device-kinds. login (#30674), listActiveSessions and forceLogout (#30746, #30721) build on it through their own follow-up comments. Done when: each of the four errors is answered as stated with no attempt counted, a device of a kind an operation does not list is refused, and the contract tests pass.",
+   "builds": [
+    "operation login",
+    "operation listActiveSessions",
+    "operation forceLogout",
+    "adr ADR-0071"
+   ]
+  },
+  {
+   "key": "R14H-EDGE-LOG-SCRUB",
+   "epic": "PLATFORM",
+   "area": "devops",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-FRONT-DOOR"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "Front Door and WAF logs scrub the bearer secrets that travel in request paths and headers (CHG-R14H-005)",
+   "detail": "Spec: the r13 system review (CHG-R14H-005; the coordinator's decision of 4 November 2026 under the lead's \"take the recommended decision unless its very very important\": the six token-in-path routes stay in r14 and the edge scrubs them), docs/architecture/observability.md and the x-ticvai-secret: bearer marks in the contracts at the release tag in ADAM. In ticvai-infra: the Front Door and WAF diagnostic logs keep the route template, never the raw path, for the operations whose path parameter is marked bearer (payment-link and invitation tokens, gift and game card codes), and never log Authorization, X-Api-Key or a marked header (X-Order-Access-Token, X-Supervisor-Pin, the consent key, the admission token). #27691 (observability, New) builds the same rule in the application. Done when: a request to each marked route leaves no token in the edge's logs, and a test request with each marked header leaves none either.",
+   "linksNothingBecause": "edge log settings in the infrastructure repository, not a package artefact; its text names the file and the marks",
+   "builds": [
+    "file docs/architecture/observability.md"
+   ]
+  },
+  {
+   "key": "R14H-POS-000-DEVICE-CREDENTIAL",
+   "epic": "FRONTEND-FOUNDATION",
+   "area": "POS",
+   "points": 1,
+   "assignee": "Pradnya Yeram",
+   "depends": [
+     "APP-POS-POS-000",
+     "SETUP-CLIENTS",
+     "SETUP-MOCK-API",
+     "SETUP-SHELL-POS",
+     "SVC-IDENTITY-IDENTITY-1",
+     "SVC-IDENTITY-IDENTITY-2",
+     "SVC-IDENTITY-IDENTITY-17",
+     "SVC-IDENTITY-MFA-3",
+     "SVC-IDENTITY-MFA-1",
+     "SVC-IDENTITY-SESSION-1"
+    ],
+   "notBefore": "2026-11-04",
+   "subject": "POS-000: sign in as the device: enrol, keep and present the deviceAuth credential, and say \"This device is not registered\" (CHG-R14H-001)",
+   "detail": "Spec: the r13 system review finding C-04 (the lead: \"All four, one release\"), CHG-R14H-001 and CHG-R14INT-002, in the contracts and screens at the release tag in ADAM. In the till (ticvai-pos): the device's enrolment credential (enrolDevice) is kept in the device's secure store and sent as deviceAuth on login and on every device operation; the request names no workstation of its own. The existing error state says \"This device is not registered\" on 401 device-unauthenticated or 403 workstation-mismatch, rather than that the PIN or password is wrong. Done when: an enrolled device signs in with no workstation typed, a device whose credential is revoked shows the not-registered text and spends no attempt, and the screen's states are as approved.",
+   "builds": [
+    "screen POS-000",
+    "operation login"
+   ]
+  },
+  {
+   "key": "R14H-EMP-001-SCN-001-DEVICE-CREDENTIAL",
+   "epic": "FRONTEND-FOUNDATION",
+   "area": "P06",
+   "points": 1,
+   "assignee": "Chitrangi Mestry",
+   "depends": [
+     "APP-STAFF-EMP-001",
+     "SETUP-CLIENTS",
+     "SETUP-MOCK-API",
+     "SETUP-SHELL-EMPLOYEE-APP",
+     "SVC-IDENTITY-IDENTITY-1",
+     "SVC-IDENTITY-IDENTITY-2",
+     "SVC-IDENTITY-IDENTITY-17",
+     "SVC-IDENTITY-MFA-3",
+     "SVC-IDENTITY-MFA-1",
+     "SVC-IDENTITY-SSO-3",
+     "APP-SCANNER-SCN-001"
+    ],
+   "notBefore": "2026-11-04",
+   "subject": "EMP-001 and SCN-001: sign in as the device: enrol, keep and present the deviceAuth credential, and say \"This device is not registered\" (CHG-R14H-001)",
+   "detail": "Spec: the r13 system review finding C-04 (the lead: \"All four, one release\"), CHG-R14H-001 and CHG-R14INT-002, in the contracts and screens at the release tag in ADAM. In the staff app and the scanner (ticvai-employee-app, one sign-in for both): the device's enrolment credential (enrolDevice) is kept in the device's secure store and sent as deviceAuth on login and on every device operation; the request names no workstation of its own. The existing error state says \"This device is not registered\" on 401 device-unauthenticated or 403 workstation-mismatch, rather than that the PIN or password is wrong. Done when: an enrolled device signs in with no workstation typed, a device whose credential is revoked shows the not-registered text and spends no attempt, and the screen's states are as approved.",
+   "builds": [
+    "screen EMP-001",
+    "screen SCN-001",
+    "operation login"
+   ]
+  },
+  {
+   "key": "R14V-OFFLINE-STEP-UP-DB",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 2,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-IDENTITY"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "identity.offline_pin_verifier and identity.offline_step_up: the offline supervisor verifiers and the step-ups checked offline (CHG-R14V-001)",
+   "detail": "Spec: the r13 system review finding F-01 (the lead, 3 November 2026: \"Offline verifier\"), CHG-R14V-001 and the ADR-0013 and ADR-0071 amendments of 3 November 2026, in the contracts at the release tag in ADAM. The tables' creating migration, named under MIG-IDENTITY (#27657, Ready for QA, not rewritten): CREATE TABLE identity.offline_pin_verifier (verifier_hash field-encrypted) and identity.offline_step_up as the package derives them, with their keys, the seven indexes and row-level security. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/<area>/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table identity.offline_pin_verifier",
+    "table identity.offline_step_up"
+   ]
+  },
+  {
+   "key": "OFFLINE-STEP-UP-CLIENT",
+   "epic": "OFFLINE",
+   "points": 3,
+   "assignee": "Pradnya Yeram",
+   "depends": [
+    "OFFLINE-JOURNAL"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "offline-core checks a supervisor's PIN offline: fetch and keep the step-up package, verify locally, count attempts, show refusedAtSync (CHG-R14V-001)",
+   "detail": "Spec: the r13 system review finding F-01 (the lead, 3 November 2026: \"Offline verifier\"), CHG-R14V-001 and the ADR-0013 amendment of 3 November 2026, in the contracts at the release tag in ADAM (identity getOfflineStepUpPackage under deviceAuth; verifySupervisorStepUp's offline evidence). In the till's offline-core: fetch the venue's package at each sync and replace it whole, keep it in the device's encrypted local store for at most its 24 hours, verify a supervisor's PIN against the Argon2id verifier with no network, count attempts and lock a signer out locally as the server would, send the offline evidence with the act at replay, and show the refusedAtSync toast when the server refuses an offline step-up at sync. The FE tickets of POS-014, POS-018, POS-006 and EMP-034 (the supervisorPinPrompt offline state) build on it. Done when: with the network off a correct PIN passes and a wrong one counts an attempt, the lockout holds across restarts, an expired package is not used, and a step-up the server refuses at sync shows the toast.",
+   "builds": [
+    "operation getOfflineStepUpPackage",
+    "operation verifySupervisorStepUp",
+    "adr ADR-0013"
+   ],
+   "area": "POS"
+  },
+  {
+   "key": "KERNEL-ID-OFFLINE-CORE",
+   "epic": "OFFLINE",
+   "points": 1,
+   "assignee": "Pradnya Yeram",
+   "depends": [
+    "SETUP-CLIENTS"
+   ],
+   "notBefore": "2026-11-04",
+   "subject": "offline-core makes UUIDv7 ids as the kernel's Id.New() does, so a till's offline id and a server id sort together (ADR-0056)",
+   "detail": "The frontend half of #27689 (KERNEL-ID, In progress, Pranay Shinde; its text is not rewritten), split off in r14 (the coordinator's plan pass of 3 November 2026; the lead, 4 November 2026: \"take the recommended decision unless its very very important\"). #27689 keeps the backend half (Id.New() in the kernel, no ULID or UUIDv4 minted anywhere) and the .NET-to-TypeScript round-trip test; this task is the same generator in packages/offline-core of each app repository whose app creates ids offline (docs/active/frontend-repos.yaml): a UUIDv7 (RFC 9562), written big-endian, from the device clock, monotonic within a millisecond. The ids the offline journal (#27705) records come from it. Done when: ids made offline on a till sort by creation time with the server's in PostgreSQL, #27689's round-trip test agrees byte for byte, and no ULID or UUIDv4 is made in offline-core.",
+   "linksNothingBecause": "the id generator in offline-core; its text names the files",
+   "builds": [
+    "adr ADR-0056"
+   ],
+   "area": "POS"
+  },
+  {
+   "key": "CR534-WEB022-PASSHOLDERS",
+   "epic": "FRONTEND-FOUNDATION",
+   "area": "WEB",
+   "points": 2,
+   "assignee": "Chitrangi Mestry",
+   "depends": [
+     "APP-WEB-WEB-022",
+     "SETUP-CLIENTS",
+     "SVC-CATALOGUE-CATALOGUE-1",
+     "SVC-CATALOGUE-CATALOGUE-17",
+     "SVC-CATALOGUE-CATALOGUE-18",
+     "SVC-CATALOGUE-PRODUCT-1",
+     "SVC-CATALOGUE-PRODUCT-2",
+     "SVC-ORDER-CART-1",
+     "SVC-ORDER-CART-2",
+     "SVC-ORDER-CART-3",
+     "SVC-WHITELABEL-BOOKINGFLOWS-1"
+    ],
+   "notBefore": "2026-11-04",
+   "subject": "WEB-022's Passholders section: the Adult and Child pass steppers, bound to the plan's variants (CR-534)",
+   "detail": "Spec: ADAM CR-534, the lead's decision of 3 November 2026 (posted on #31742: \"Leave the Passholders section ... out of this build. It is client-approved and comes back on its own follow-up ticket under this one\"), and the client-approved frame of WEB-022 at the release tag in ADAM (left-out list LO-CR534-002). Named under #31742 ([FE] WEB-022 Membership Plans build, Ready for QA, not rewritten). The Passholders section with its Adult and Child steppers, bound to the plan's variants as Ticket Type Selection's guest counters are (listProductVariants). Done when: the section matches the approved frame, each stepper is one of the plan's variants, and the quantities reach the cart as the counters' do.",
+   "builds": [
+    "screen WEB-022",
+    "operation listProductVariants"
+   ]
   }
  ],
  "blockA1Operations": {

@@ -1,0 +1,33 @@
+id: CHG-R14PL-009
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR556-TENANT-APP-STATUS-TIME-ZONE (Hrushikant Patkar, after PLATFORM-KERNEL): TenantAppStatus.venues[].timeZone
+  on getTenantAppStatus; named under #27885.'
+decision:
+  what: 'ADAM CR-556 steps 5 and 6 as the lead corrected them on 3 November 2026 (posted on #31784 and #31785); lane f listed
+    the task (CHG-CR556-002); the lead, 4 November 2026: "take the recommended decision unless its very very important" (the
+    r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: getTenantAppStatus''s ticket #27885 is Ready for QA, so the new field is a task beside it.'
+keys_touched:
+  tickets:
+  - CR556-TENANT-APP-STATUS-TIME-ZONE (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change to a started operation, carried by no plan task
+tickets:
+  started:
+  - '27885 (WhiteLabelService overview reads, Ready for QA): not rewritten.'
+  unstarted:
+  - '31785 ([FE] GST-007 connect to API): the zone from getTenantAppStatus.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-556
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

@@ -1,0 +1,34 @@
+id: CHG-R14PL-015
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'R14H-DEVICE-DOORS (Pranay Shinde, after KERNEL-DEVICE-AUTH): the device doors take their workstation from the authenticated
+  device (401 device-unauthenticated, 403 workstation-mismatch, 400 workstation-required, the device-kind check).'
+decision:
+  what: 'The lead, 3 November 2026: "All four, one release" (r13 system review C-04); lane h named the kernel task beside
+    #27692 (CHG-R14H-001); the lead, 4 November 2026: "take the recommended decision unless its very very important" (the
+    r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the doors'' rule spans login, listActiveSessions, forceLogout and the device operations, and the kernel tickets
+  that would carry it (#27692, #37053) are Ready for QA.'
+keys_touched:
+  tickets:
+  - R14H-DEVICE-DOORS (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a rule spanning several started operations, carried by no plan task
+tickets:
+  started:
+  - '27692 (request kernel) and 37053 (KERNEL-DEVICE-AUTH), Ready for QA, Pranay Shinde: not rewritten.'
+  - '30674 (login), 30721 (forceLogout), 30746 (listActiveSessions), Ready for QA: follow-up comments.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 system review finding C-04, lane h of r14'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

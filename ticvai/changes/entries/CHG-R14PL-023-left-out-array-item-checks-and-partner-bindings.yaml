@@ -1,0 +1,32 @@
+id: CHG-R14PL-023
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'Two left-out entries, target r15: LO-R14PL-001, 78 array item columns with no enum CHECK (lane l), and LO-R14PL-002,
+  ten partner-portal bindings to staff-only operations (createOrder, holdOrder, resumeOrder on PTR-002, PTR-008, PTR-015;
+  capturePayment on PTR-012; lane s).'
+decision:
+  what: 'The coordinator''s plan pass: "Left-out list entries (target r15): the 78 array-item columns (lane l), the 10 partner-portal
+    findings (lane s)"; the lead, 4 November 2026: "take the recommended decision unless its very very important" (the r14
+    integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: both classes were named in lane reports and change notes only; a deferral exists only on the left-out list
+  (the left-out rule, 20 October 2026).'
+keys_touched:
+  tickets: []
+  files:
+  - docs/active/left-out.yaml
+root_class: a deferral written only in a report
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: template-field
+  ref: docs/active/left-out.yaml::items
+status: open
