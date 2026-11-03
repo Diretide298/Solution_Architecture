@@ -14,9 +14,12 @@ Requires Node 22 and pnpm 9 or newer.
 pnpm install
 pnpm lint          # nx run-many -t lint
 pnpm typecheck
-pnpm test          # vitest per project
+pnpm test          # vitest per project (offline-core's need Node 22.5+, for node:sqlite)
 pnpm nx graph
 ```
+
+`.gitlab-ci.yml` runs lint, typecheck and test on GitLab: a merge request runs `nx affected` against
+its diff base; the default branch and tags run every project.
 
 ## Layout
 
@@ -55,7 +58,8 @@ in the ADAM repo scaffolds it here. Do not create an app folder by hand - it wou
 
 ## Rules of this workspace
 
-- Apps depend only on packages (`.eslintrc.cjs` enforces it). A package never imports an app.
+- Apps depend only on packages (`.eslintrc.cjs` enforces it). A package never imports an app;
+  `design-tokens`, `api-client` and `offline-core` import no other package, and `ui` only `design-tokens`.
 - **No app talks to SQLite or does its own sync.** Everything offline goes through `@ticvai/offline-core`.
 - Ids created on a device come from `newId()` in `@ticvai/offline-core`.
 - `packages/api-client` is filled from the contracts by the `SETUP-CLIENTS` ticket. What is there

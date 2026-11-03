@@ -106,7 +106,10 @@ repository keeps the equivalent; ask when it has none.
 
 - **The screen and its API calls come from ADAM:** build what the screen and the contract say, to the look of
   the wireframe frame ADAM wrote for it.
-- Clients never compute permissions; they read `effectivePermissions` from the session.
+- Clients never compute permissions (CR-367). `effectivePermissions` from the session is for coarse
+  filtering only (a menu, a first gate). For a node, look it up in `Session.permissionsByScope` by the
+  entry of the deepest listed path that contains the node; never union ancestors' entries, never apply
+  a deny yourself.
 - Ids created on a device are UUIDv7, the format the server mints; human codes people read or type
   (order numbers, ticket codes) are separate fields.
 - Function components with hooks, named exports, no `any`.

@@ -1,0 +1,52 @@
+# The frontend workspace's pipeline. The team repositories are on GitLab
+# (gitlab.softlabsgroup.in), so this is the file that runs; GitLab never reads .github/.
+#
+# lint is where enforce-module-boundaries runs: it is what stops an app writing its own
+# sync layer around offline-core, or a package reaching into an app.
+#
+#   merge request        nx affected, against the merge request's diff base
+#   default branch, tag  nx run-many over every project, so main is never green because
+#                        nothing was compared (affected against itself runs nothing)
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+variables:
+  # Full history: nx affected needs the merge request's base commit.
+  GIT_DEPTH: '0'
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+  NX_NO_CLOUD: 'true'
+  NX_DAEMON: 'false'
+
+.pnpm:
+  # Node 22, as setup requires; the full image, because nx affected needs git.
+  image: node:22
+  cache:
+    key:
+      files: [pnpm-lock.yaml]
+    paths: [.pnpm-store]
+  before_script:
+    - corepack enable
+    # pnpm at the version package.json's packageManager names.
+    - corepack install
+    - pnpm --version
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+
+verify:affected:
+  extends: .pnpm
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - pnpm nx affected -t lint typecheck test --base="$CI_MERGE_REQUEST_DIFF_BASE_SHA" --head="$CI_COMMIT_SHA"
+
+verify:all:
+  extends: .pnpm
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - pnpm nx run-many -t lint typecheck test
