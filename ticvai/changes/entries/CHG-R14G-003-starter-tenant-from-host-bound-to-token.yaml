@@ -35,7 +35,7 @@ keys_touched:
   - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Extensions/ApplicationBuilderExtensions.cs
   - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Extensions/ServiceCollectionExtensions.cs
   - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Program.cs
-  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/TICVAI.Api.csproj
+  - 'viewer/mcp/setup/starters/backend/src/TICVAI.Api/ (its csproj: the JwtBearer package)'
   - viewer/mcp/setup/starters/backend/src/TICVAI.Api/appsettings.json
   - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/ITenantContext.cs
   - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/ITenantDirectory.cs
@@ -46,7 +46,7 @@ keys_touched:
   - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/Persistence/EfTransactionRunner.cs
   - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs
   - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/TICVAI.Infrastructure.csproj
-  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/Configuration/DatabaseOptions.cs (removed)
+  - 'removed: DatabaseOptions.cs (TICVAI.Infrastructure/Configuration), the one connection string'
   - viewer/mcp/setup/starters/backend/tests/TICVAI.UnitTests/Security/TenantBindingTests.cs
   - viewer/mcp/setup/starters/backend/tests/TICVAI.IntegrationTests/
   - viewer/mcp/setup/starters/backend/README.md

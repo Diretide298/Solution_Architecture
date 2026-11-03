@@ -23,7 +23,7 @@ keys_touched:
   files:
   - viewer/mcp/setup/starters/backend/.gitlab-ci.yml
   - viewer/mcp/setup/starters/frontend/.gitlab-ci.yml
-  - viewer/mcp/setup/starters/frontend/.github/workflows/ci.yml (removed)
+  - 'removed: the frontend starter .github/workflows/ci.yml'
   - viewer/mcp/setup/starters/frontend/.eslintrc.cjs
   - viewer/mcp/setup/starters/frontend/.gitignore
   - viewer/mcp/setup/starters/backend/tests/TICVAI.ArchitectureTests/ModuleBoundaryTests.cs
