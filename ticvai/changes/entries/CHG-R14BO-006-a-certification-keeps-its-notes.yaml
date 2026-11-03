@@ -1,0 +1,39 @@
+id: CHG-R14BO-006
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'certifyIntegration''s notes are kept: IntegrationListing gains certificationNotes (readOnly, nullable), stored in
+  a new nullable column control.integration_listing.certification_notes, which certifyIntegration sets from the body''s
+  notes on every decision (null when none is sent) and every read of the listing returns.'
+decision:
+  what: 'The lead, 3 November 2026, on certifyIntegration.notes (marked not stored in CHG-R14BO-002 because no column held
+    it): "Keep them", a nullable notes column on the certification record that the developer stores. Storage only: the
+    notes'' validation is lane c''s (ADAM CR-572: notes over 1000 characters answer 400) and is not touched here.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: check-request-fields-stored RF-ACTION-NOT-STORED certifyIntegration.notes, built on by started ticket
+  #31294 (CHG-R14BO-002); the lead''s decision on the r14 lane s list.'
+keys_touched:
+  operations: [certifyIntegration]
+  schemas: [IntegrationListing]
+  tables: [control.integration_listing]
+  files:
+  - contracts/satellite/public-api.yaml
+root_class: an act's request field with nowhere to go
+tickets:
+  started:
+  - '31294 (certifyIntegration, Narayan Gaonkar, Ready for QA): store the body''s notes in
+    control.integration_listing.certification_notes on each decision (null when absent); the listing returns it as
+    certificationNotes. The column comes in the r14 control forward migration.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open
+notes: 'Database change: one nullable text column, ALTER TABLE control.integration_listing ADD COLUMN IF NOT EXISTS
+  certification_notes text, in the integration''s r14 control forward migration (derive-ddl wrote it as control V0129 in
+  this lane, deleted before commit). Additive: an IntegrationListing response gains one optional field.'

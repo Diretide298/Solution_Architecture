@@ -8,8 +8,8 @@ summary: 'Of check-screen-wiring''s 38 started-ticket findings, 10 are fixed in 
   mapped them; ADM-329''s two headline counts to listApprovalMatrices; BO-1173''s Retry Failed Event to replayEvents, as
   that close-out mapped it); ADM-342 no longer declares listMfaMethods, which answers only the caller''s own methods and
   which nothing showed; WEB-033''s Pay names its order as the one checkoutCart returns, and KSK-007 takes orderId from
-  the screen that made the order. 28 that would change what an approved screen shows or does, or need a contract
-  decision, are brought to the lead.'
+  the screen that made the order. The 28 that would change what an approved screen shows or does, or need a contract
+  decision, went to the lead, who approved them as recommended (CHG-R14BO-004, CHG-R14BO-005).'
 decision:
   what: 'The lead, 3 November 2026, on r14: "start on 1,2,3"; fix at the source, never acknowledge, baseline or exempt;
     approved UI is fixed, so what needs a visible element or a product decision is brought back (the lead''s rule of 14
@@ -45,7 +45,8 @@ prevention:
   type: check
   ref: tools/check-screen-wiring.py
 status: open
-notes: 'Left for the lead (approved UI or a contract decision), each with its recommendation in the lane report:
+notes: 'Brought to the lead (approved UI or a contract decision), and approved as recommended on 3 November 2026
+  (built in CHG-R14BO-004 and CHG-R14BO-005):
   setApprovalMatrix on ADM-331, ADM-333, ADM-334, ADM-335 and BO-639 (a Save button and nothing that collects a matrix);
   createApprovalRequest on BO-718, BO-771, BO-922, BO-1010, BO-1031, BO-1080 (a Create approval request button and no
   form), BO-243, BO-301, BO-1181 and ADM-567 (no element); enrolDevice on ADM-581; inquirePaymentStatus on ADM-595,

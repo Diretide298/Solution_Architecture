@@ -966,3 +966,218 @@ changes:
   to: 5c200503a5dfb84f
   approval: 'Design change approved by the lead, 3 November 2026 ("approve all", on the 20 screen findings on started tickets and their recommendations): Issue tax invoice with its form, which the approved empty state promises.'
   change: CHG-R13INT-029
+- screen: ADM-331
+  field: 'overlay:formSetApprovalMatrix'
+  to: 46fa5efd33db0a54
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: ADM-331
+  field: 'region:-'
+  to: 9003aa56e7088ca7
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: ADM-333
+  field: 'overlay:formSetApprovalMatrix'
+  to: 46fa5efd33db0a54
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: ADM-333
+  field: 'region:-'
+  to: 9003aa56e7088ca7
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: ADM-334
+  field: 'overlay:formSetApprovalMatrix'
+  to: 46fa5efd33db0a54
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: ADM-334
+  field: 'region:-'
+  to: 9003aa56e7088ca7
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: ADM-335
+  field: 'overlay:formSetApprovalMatrix'
+  to: 46fa5efd33db0a54
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: ADM-335
+  field: 'region:-'
+  to: 9003aa56e7088ca7
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: ADM-567
+  field: 'overlay:formCreateApprovalRequest'
+  to: 80cb5d603bee5777
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Send for approval action with its form (createApprovalRequest), the amended payment rules as its subject.'
+  change: CHG-R14BO-004
+- screen: ADM-567
+  field: 'region:publish'
+  to: 9165f67a6f6e9590
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Send for approval action with its form (createApprovalRequest), the amended payment rules as its subject.'
+  change: CHG-R14BO-004
+- screen: ADM-581
+  field: 'overlay:formEnrolDevice'
+  to: 4cd49ff5e154d4ff
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): an Activate terminal action with its form (enrolDevice).'
+  change: CHG-R14BO-004
+- screen: ADM-581
+  field: 'region:publish'
+  to: bd649d357f34aee2
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): an Activate terminal action with its form (enrolDevice).'
+  change: CHG-R14BO-004
+- screen: ADM-595
+  field: 'region:rowActions'
+  to: fbdd5bf6f24cc72b
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Check status row action (inquirePaymentStatus), as on BO-024.'
+  change: CHG-R14BO-004
+- screen: ADM-597
+  field: 'layout'
+  to: 861f8ad2180185ac
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Check status row action (inquirePaymentStatus), as on BO-024.'
+  change: CHG-R14BO-004
+- screen: ADM-597
+  field: 'region:rowActions'
+  to: 483903c317a469eb
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Check status row action (inquirePaymentStatus), as on BO-024.'
+  change: CHG-R14BO-004
+- screen: ADM-615
+  field: 'layout'
+  to: 861f8ad2180185ac
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Check status row action (inquirePaymentStatus), as on BO-024.'
+  change: CHG-R14BO-004
+- screen: ADM-615
+  field: 'region:rowActions'
+  to: 483903c317a469eb
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Check status row action (inquirePaymentStatus), as on BO-024.'
+  change: CHG-R14BO-004
+- screen: BO-1010
+  field: 'overlay:formCreateApprovalRequest'
+  to: 1820abfbc7b3cb2b
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Create approval request opening its form (createApprovalRequest), as Request approval does on BO-045.'
+  change: CHG-R14BO-004
+- screen: BO-1031
+  field: 'overlay:formCreateApprovalRequest'
+  to: 1820abfbc7b3cb2b
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Create approval request opening its form (createApprovalRequest), as Request approval does on BO-045.'
+  change: CHG-R14BO-004
+- screen: BO-1049
+  field: 'overlay:formSimulatePriceBreakdownCalculation'
+  to: 84f66a22c511f192
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the primary action named Run simulation, opening its form (simulatePriceBreakdownCalculation).'
+  change: CHG-R14BO-004
+- screen: BO-1049
+  field: 'region:-'
+  to: c7e315d105f48f20
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the primary action named Run simulation, opening its form (simulatePriceBreakdownCalculation).'
+  change: CHG-R14BO-004
+- screen: BO-1080
+  field: 'overlay:formCreateApprovalRequest'
+  to: 1820abfbc7b3cb2b
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Create approval request opening its form (createApprovalRequest), as Request approval does on BO-045.'
+  change: CHG-R14BO-004
+- screen: BO-1179
+  field: 'overlay:formReplayEvents'
+  to: d7151ef34f818456
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Retry and Replay opening the replay form (replayEvents: from, to, event types).'
+  change: CHG-R14BO-004
+- screen: BO-1179
+  field: 'overlay:formRetryReplayEvents'
+  to: 2cb993bb767782fb
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Retry and Replay opening the replay form (replayEvents: from, to, event types).'
+  change: CHG-R14BO-004
+- screen: BO-1181
+  field: 'layout'
+  to: b56300df9ace9e2c
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Send for approval action with its form (createApprovalRequest) beside the publish gate.'
+  change: CHG-R14BO-004
+- screen: BO-1181
+  field: 'overlay:formCreateApprovalRequest'
+  to: 80cb5d603bee5777
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Send for approval action with its form (createApprovalRequest) beside the publish gate.'
+  change: CHG-R14BO-004
+- screen: BO-1181
+  field: 'region:publish'
+  to: 0a36bcdca45a56b0
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Send for approval action with its form (createApprovalRequest) beside the publish gate.'
+  change: CHG-R14BO-004
+- screen: BO-143
+  field: 'overlay:formDisposeShopAndDrop'
+  to: e0105eb3d8f1ac5e
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Find dropped goods search with the goods found and a Dispose of dropped goods action with its form.'
+  change: CHG-R14BO-004
+- screen: BO-143
+  field: 'region:record'
+  to: fe689fdf16cc6b27
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Find dropped goods search with the goods found and a Dispose of dropped goods action with its form.'
+  change: CHG-R14BO-004
+- screen: BO-143
+  field: 'region:rowActions'
+  to: 9109e293dd0078ab
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Find dropped goods search with the goods found and a Dispose of dropped goods action with its form.'
+  change: CHG-R14BO-004
+- screen: BO-243
+  field: 'overlay:formCreateApprovalRequest'
+  to: 2110f802fc13db5f
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Submit for approval action with its form (createApprovalRequest) for the selected policy version.'
+  change: CHG-R14BO-004
+- screen: BO-243
+  field: 'region:rowActions'
+  to: 1f1d322f3923769d
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Submit for approval action with its form (createApprovalRequest) for the selected policy version.'
+  change: CHG-R14BO-004
+- screen: BO-301
+  field: 'overlay:formCreateApprovalRequest'
+  to: f95bc8282f30668b
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Request approval action with its form (createApprovalRequest), raised before the member exception.'
+  change: CHG-R14BO-004
+- screen: BO-301
+  field: 'region:rowActions'
+  to: b1986b307e228336
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): a Request approval action with its form (createApprovalRequest), raised before the member exception.'
+  change: CHG-R14BO-004
+- screen: BO-639
+  field: 'overlay:formSetApprovalMatrix'
+  to: 46fa5efd33db0a54
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: BO-639
+  field: 'region:-'
+  to: 9003aa56e7088ca7
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the approval matrices listed, and Save approval matrix opening its form (setApprovalMatrix), the matrix picked from the list as on ADM-243.'
+  change: CHG-R14BO-004
+- screen: BO-718
+  field: 'overlay:formCreateApprovalRequest'
+  to: 1820abfbc7b3cb2b
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Create approval request opening its form (createApprovalRequest), as Request approval does on BO-045.'
+  change: CHG-R14BO-004
+- screen: BO-771
+  field: 'overlay:formCreateApprovalRequest'
+  to: 1820abfbc7b3cb2b
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Create approval request opening its form (createApprovalRequest), as Request approval does on BO-045.'
+  change: CHG-R14BO-004
+- screen: BO-842
+  field: 'overlay:formSetSeoMetadata'
+  to: 294164f177ca6c40
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Save SEO metadata opening its form (setSeoMetadata), as on CMS-013.'
+  change: CHG-R14BO-004
+- screen: BO-922
+  field: 'overlay:formCreateApprovalRequest'
+  to: 1820abfbc7b3cb2b
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): Create approval request opening its form (createApprovalRequest), as Request approval does on BO-045.'
+  change: CHG-R14BO-004
+- screen: KIT-009
+  field: 'overlay:formSetKitchenSla'
+  to: 6deda122431be891
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): an Edit targets action with its form (setKitchenSla).'
+  change: CHG-R14BO-004
+- screen: KIT-009
+  field: 'region:publish'
+  to: a33580811b965635
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): an Edit targets action with its form (setKitchenSla).'
+  change: CHG-R14BO-004
+- screen: POS-012
+  field: 'state:offline'
+  to: 752a5436e442ab9f
+  approval: 'Design change approved by the lead, 3 November 2026 ("Approve all 28 as recommended", on the 28 screen findings on started tickets and their recommendations): the offline state says Hand over dropped goods (collectShopAndDrop) is disabled offline.'
+  change: CHG-R14BO-004

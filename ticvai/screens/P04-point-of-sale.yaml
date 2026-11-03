@@ -5858,7 +5858,8 @@ screens:
       with the wrong question. A caller who can see the screen but lacks what an action needs sees that
       action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`; `ORDER_MODIFY`
       for `recordOrderHandover`, `collectShopAndDrop`.'
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
+    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.
+      Hand over dropped goods (`collectShopAndDrop`) waits for the connection: it is disabled offline.'
   apis:
   - operationId: listOrders
     contract: orders

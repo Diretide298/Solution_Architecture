@@ -2970,6 +2970,7 @@ paths:
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-048 Retail Products"
         - "P08 BO-094 Map Editor & Publish"
+        - "P08 BO-1049 Scenario & What-If Planning"
         - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-877 Qualification & Assignment Rule Engine"
@@ -3996,6 +3997,7 @@ paths:
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
         - "P08 BO-048 Retail Products"
+        - "P08 BO-1049 Scenario & What-If Planning"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
@@ -4410,6 +4412,7 @@ paths:
         - "P02 GST-005 What's On"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-1049 Scenario & What-If Planning"
         - "P08 BO-694 Event Catalogue Command Center"
         - "P13 CMS-101 Help Me Choose"
       description: '**The venue''s programme, for a guest too** (decided 20 October 2026, Chinmay, R8 blocker cause

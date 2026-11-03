@@ -1686,9 +1686,10 @@ paths:
                 notes:
                   type: string
                   nullable: true
-                  x-ticvai-persisted: false
-                  description: Not stored (r14 gate, CHG-R14BO-002). The listing keeps the decision as its `status`
-                    and `certifiedUntil`; no column of control.integration_listing holds a reviewer's note.
+                  x-ticvai-stored-as: control.integration_listing.certification_notes
+                  description: Stored as the listing's `certificationNotes` (control.integration_listing
+                    certification_notes, nullable), replacing the note of an earlier decision; a decision with no
+                    notes stores null (the lead, 3 November 2026, "Keep them"; r14 gate, CHG-R14BO-006).
       responses:
         '200':
           headers:
@@ -3169,6 +3170,13 @@ components:
             **Certification expires.** An integration certified against v1 and still listed after v3
             is TICVAI vouching for something it has not looked at in two years.
         certifiedAgainstVersion: { type: string, nullable: true, readOnly: true }
+        certificationNotes:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The reviewer's note on the latest certification decision, as `certifyIntegration` sent it in
+            `notes`; null when it sent none. Set only by `certifyIntegration` (the lead, 3 November 2026, "Keep them";
+            r14 gate, CHG-R14BO-006).
         listingFeeModel: { type: string, enum: [none, flat, revenueShare], nullable: true }
         visibility:
           type: string

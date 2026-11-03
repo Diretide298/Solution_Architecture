@@ -2538,7 +2538,6 @@ paths:
       operationId: topUpWallet
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
-        - "P08 BO-488 Self-Service Wallet Top-Up"
       x-ticvai-names-for-context: [platform.scope]
       x-ticvai-read-via:
       - query: orders#paymentRecords

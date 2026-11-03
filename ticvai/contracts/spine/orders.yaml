@@ -7506,11 +7506,19 @@ paths:
         cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
         do it for a guest at a till or in the back office (ADR-0025).
 
+        **A partner does this from the partner portal, with no workstation** (the lead, 3 November 2026, "Approve all
+        28 as recommended", on PTR-012; CHG-R14BO-005; `x-ticvai-partner-callable`): the partner variant, as the guest
+        variant above is a guest''s. A partner user signs in no workstation (CHG-DOOR-001), so the call runs under the
+        session''s venue grant, the venue of the order, as a partner''s cart and order are written (ADAM CR-184), and
+        only on an order of the partner''s own channel (`Order.channelProfileId` the session''s); any other order is
+        answered as one that does not exist. `ORDER_CREATE` is what the partner user must hold.
+
         '
       tags:
       - payment
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-guest-callable: true
+      x-ticvai-partner-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
       x-ticvai-offline-apps: [P04]
@@ -7605,11 +7613,19 @@ paths:
         cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
         do it for a guest at a till or in the back office (ADR-0025).
 
+        **A partner does this from the partner portal, with no workstation** (the lead, 3 November 2026, "Approve all
+        28 as recommended", on PTR-012; CHG-R14BO-005; `x-ticvai-partner-callable`): the partner variant, as the guest
+        variant above is a guest''s. A partner user signs in no workstation (CHG-DOOR-001), so the call runs under the
+        session''s venue grant, the venue of the order, as a partner''s cart and order are written (ADAM CR-184), and
+        only on an order of the partner''s own channel (`Order.channelProfileId` the session''s); any other order is
+        answered as one that does not exist. `ORDER_CREATE` is what the partner user must hold.
+
         '
       tags:
       - payment
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-guest-callable: true
+      x-ticvai-partner-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins

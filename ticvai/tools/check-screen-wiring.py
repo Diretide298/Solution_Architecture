@@ -161,6 +161,18 @@ PURPOSE_BOILERPLATE = re.compile(
     r"|from the client design board"
     r"|^The screen this app sits on", re.I)
 GUEST_CODES = ("P01", "P02", "P05")
+# The partner portal: a partner user signs in no workstation (CHG-DOOR-001). A workstation-scoped operation marked
+# `x-ticvai-partner-callable` is its partner variant there, run under the session's venue grant (the lead, 3 November
+# 2026, "Approve all 28 as recommended", on PTR-012; CHG-R14BO-005), as `x-ticvai-guest-callable` is the guest's.
+PARTNER_CODES = ("P10",)
+
+
+def variant_here(op: dict, plat: str) -> bool:
+    """Whether a workstation-scoped operation has the variant this platform calls with no workstation: the guest
+    variant on a guest platform (CHG-SCR-012), the partner variant on the partner portal (CHG-R14BO-005)."""
+    plat = str(plat)
+    return bool((plat.startswith(GUEST_CODES) and op.get("x-ticvai-guest-callable"))
+                or (plat.startswith(PARTNER_CODES) and op.get("x-ticvai-partner-callable")))
 FILE_REF = re.compile(r"^(storageRef|fileRef|fileReference|documentRef|imageRef|assetRef|attachmentRef|"
                       r"uploadRef|storageKey|fileKey|blobRef|mediaAssetId|photoRef)s?$")
 
@@ -260,6 +272,14 @@ def self_test():
         ("none", sc("none", "x"), "Invoice", False),
     ]
     bad = []
+    # the guest and partner variants of a workstation operation, each only on its own platform (CHG-R14BO-005)
+    for op, plat, ok in (({"x-ticvai-guest-callable": True}, "P01-guest-web-storefront", True),
+                         ({"x-ticvai-partner-callable": True}, "P10-partner-reseller-portal", True),
+                         ({"x-ticvai-partner-callable": True}, "P07-staff-scanner", False),
+                         ({"x-ticvai-guest-callable": True}, "P10-partner-reseller-portal", False),
+                         ({}, "P10-partner-reseller-portal", False)):
+        if variant_here(op, plat) != ok:
+            bad.append(f"variant_here: {sorted(op)} on {plat[:3]}: expected {ok}")
     for name, s, shown, ok in cases:
         why = shown_in_prototype(s, shown, text_of)
         if (why is None) != ok:
@@ -372,7 +392,8 @@ def main() -> int:
             f = ops.get(o)
             # A workstation-scoped operation a guest may call in its own session (`x-ticvai-guest-callable`, CHG-GCF-003:
             # createPayment, inquirePaymentStatus) is the guest variant on a guest platform (CHG-SCR-012).
-            if f and plat.startswith(GUEST_CODES) and f["op"].get("x-ticvai-guest-callable"):
+            # The partner portal's own variant likewise (`x-ticvai-partner-callable`, CHG-R14BO-005).
+            if f and variant_here(f["op"], plat):
                 continue
             if f and f["op"].get("x-ticvai-scope-level") == "workstation" and plat not in ws_platforms:
                 guard.add("S-WORKSTATION-OP", f"{sid}:{o}",
