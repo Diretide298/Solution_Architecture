@@ -54,6 +54,20 @@ approving a journal entry need a second factor?* has to be one answer and not th
   includes `mfa`), never from a tenant session or an `identity.mfa_challenge` row. Such an operation's 403 names
   `ticvai_step_up` and never `verifyMfaChallenge`.
 
+- **SU-OFFLINE: an offline-capable step-up that does not say what happens offline** (decided 3 November 2026,
+  Chinmay, on system review finding F-01: "Offline verifier" (the till keeps a verifier, re-checked at sync); ADR-0013
+  amendment of 3 November 2026; CHG-R14V-001). At r13 `voidOrder`, `recordNoSale` and `withdrawFromDepositBox` were
+  offline-capable with a PIN only the server could check, and the contracts gave two contradictory answers. Every
+  operation with `x-ticvai-step-up` and `x-ticvai-offline-capable: true` now declares `x-ticvai-offline-step-up`:
+  `verifier` (the till checks the PIN against its offline verifier and the server re-checks it at sync) or `refused`
+  (the act needs a connection, and its `x-ticvai-offline-note` says so). `verifier` is for a `pin` step-up only (an
+  MFA or rule-dependent factor is checked by the server), and needs everything the verifier path stands on: a body
+  carrier that is a `SupervisorStepUp`, the `identity#verifySupervisorStepUp` read-via, the
+  `X-Ticvai-Step-Up-Verdict` header on its success response, its permission named in identity
+  `getOfflineStepUpPackage` (a witness step-up, `witnessStepUp`, needs `witness` there), that operation under
+  `deviceAuth`, `SupervisorStepUp.offline`, and the `offline` state of the `supervisorPinPrompt` component. The
+  declaration on an operation that is not an offline-capable step-up is refused too, so it cannot linger.
+
 **And what it reports without refusing:** a screen calling a step-up operation that declares no way
 to present the challenge. That is authoring work on real screens rather than a defect in the
 contract, and failing the package for it would only teach people to run the pipeline less.
@@ -175,7 +189,148 @@ def platform_step_up_problems(oid: str, op: dict) -> list:
             "(ADR-0072 point 4; CHG-R13ID-001)"]
 
 
+OFFLINE_STEP_UP = ("verifier", "refused")
+VERDICT_HEADER = "X-Ticvai-Step-Up-Verdict"
+PACKAGE_OP = "getOfflineStepUpPackage"
+
+
+def _offline_capable(op: dict) -> bool:
+    return op.get("x-ticvai-offline-capable") in (True, "true")
+
+
+def _carrier_schema(op: dict, doc: dict) -> dict:
+    """The request-body property the step-up travels in (`body:<prop>`), as written (not resolved)."""
+    kind, _, prop = str(op.get("x-ticvai-step-up-carrier") or "").partition(":")
+    if kind != "body":
+        return {}
+    schema = (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+    ref = schema.get("$ref")
+    if isinstance(ref, str) and ref.startswith("#/components/schemas/"):
+        schema = ((doc.get("components") or {}).get("schemas") or {}).get(ref.rsplit("/", 1)[1]) or {}
+    return (schema.get("properties") or {}).get(prop) or {}
+
+
+def _is_supervisor_step_up(node: dict) -> bool:
+    refs = [node.get("$ref")] + [p.get("$ref") for p in node.get("allOf") or [] if isinstance(p, dict)]
+    return any(str(r or "").endswith("/SupervisorStepUp") for r in refs)
+
+
+def offline_problems(oid: str, op: dict, doc: dict, ctx: dict) -> list:
+    """SU-OFFLINE: an offline-capable step-up declares its offline behaviour, and `verifier` has what it stands on
+    (CHG-R14V-001). `ctx`: {"package": the getOfflineStepUpPackage operation or None, "offline_prop": bool,
+    "prompt_offline": bool}."""
+    decl = op.get("x-ticvai-offline-step-up")
+    stepped = bool(op.get("x-ticvai-step-up"))
+    if not (stepped and _offline_capable(op)):
+        if decl is not None:
+            return [f"{oid}: SU-OFFLINE declares x-ticvai-offline-step-up but is not an offline-capable step-up "
+                    "operation -- the declaration says nothing true (CHG-R14V-001)"]
+        return []
+    if decl not in OFFLINE_STEP_UP:
+        return [f"{oid}: SU-OFFLINE is offline-capable and demands a step-up, and does not say what happens offline "
+                f"(x-ticvai-offline-step-up: verifier or refused; got {decl!r}) -- a till cannot be built safely "
+                "on a PIN nothing can check (system review F-01, CHG-R14V-001)"]
+    if decl == "refused":
+        if not str(op.get("x-ticvai-offline-note") or "").strip():
+            return [f"{oid}: SU-OFFLINE refuses its step-up offline and its x-ticvai-offline-note does not say so"]
+        return []
+    out = []
+    if op.get("x-ticvai-step-up") != "pin":
+        out.append(f"{oid}: SU-OFFLINE an offline verifier checks a PIN; a {op.get('x-ticvai-step-up')} step-up is "
+                   "checked by the server, so it can only be `refused` offline")
+    carrier = _carrier_schema(op, doc)
+    if not _is_supervisor_step_up(carrier):
+        out.append(f"{oid}: SU-OFFLINE `verifier` needs a body carrier that is a SupervisorStepUp (the offline "
+                   "evidence travels in it)")
+    vias = {str(v.get("query")) for v in op.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+    if "identity#verifySupervisorStepUp" not in vias:
+        out.append(f"{oid}: SU-OFFLINE `verifier` is re-checked at sync by identity#verifySupervisorStepUp, which its "
+                   "x-ticvai-read-via does not name")
+    ok = [r for c, r in (op.get("responses") or {}).items() if str(c).startswith("2") and isinstance(r, dict)]
+    if not ok or not all(VERDICT_HEADER in (r.get("headers") or {}) for r in ok):
+        out.append(f"{oid}: SU-OFFLINE `verifier` must answer its success with {VERDICT_HEADER} (common.yaml "
+                   "StepUpVerdict), how the till learns a step-up was refused at sync")
+    pkg = ctx.get("package")
+    if not pkg:
+        out.append(f"{oid}: SU-OFFLINE `verifier` and identity has no {PACKAGE_OP} to give the till its verifiers")
+    else:
+        text = " ".join(str(pkg.get("description") or "").split())
+        prop = str(op.get("x-ticvai-step-up-carrier") or "").partition(":")[2]
+        need = "witness" if prop == "witnessStepUp" else str(op.get("x-ticvai-permission") or "")
+        if need and f"`{need}`" not in text:
+            out.append(f"{oid}: SU-OFFLINE `verifier` and {PACKAGE_OP}'s description does not name `{need}`, so its "
+                       "signers are not in the till's package")
+        if (pkg.get("security") or []) != [{"deviceAuth": []}]:
+            out.append(f"{oid}: SU-OFFLINE {PACKAGE_OP} must be under deviceAuth alone: verifiers go to a registered "
+                       "device, never to a person's session")
+    if not ctx.get("offline_prop"):
+        out.append(f"{oid}: SU-OFFLINE `verifier` and common.yaml SupervisorStepUp has no `offline` evidence")
+    if not ctx.get("prompt_offline"):
+        out.append(f"{oid}: SU-OFFLINE `verifier` and screens/_components.yaml supervisorPinPrompt has no `offline` "
+                   "state")
+    return out
+
+
+def _offline_context() -> dict:
+    """What SU-OFFLINE's `verifier` stands on, read from the package (CHG-R14V-001)."""
+    ctx = {"package": None, "offline_prop": False, "prompt_offline": False}
+    try:
+        ident = yaml.safe_load((ROOT / "contracts" / "spine" / "identity.yaml").read_text(encoding="utf-8")) or {}
+        for item in (ident.get("paths") or {}).values():
+            for op in (item or {}).values() if isinstance(item, dict) else []:
+                if isinstance(op, dict) and op.get("operationId") == PACKAGE_OP:
+                    ctx["package"] = op
+        common = yaml.safe_load((ROOT / "contracts" / "shared" / "common.yaml").read_text(encoding="utf-8")) or {}
+        sus = ((common.get("components") or {}).get("schemas") or {}).get("SupervisorStepUp") or {}
+        ctx["offline_prop"] = "offline" in (sus.get("properties") or {})
+        comps = yaml.safe_load((ROOT / "screens" / "_components.yaml").read_text(encoding="utf-8")) or {}
+        for c in comps.get("components") or []:
+            if isinstance(c, dict) and c.get("kind") == "supervisorPinPrompt":
+                ctx["prompt_offline"] = "offline" in (c.get("states") or [])
+    except (OSError, yaml.YAMLError):
+        pass
+    return ctx
+
+
+def _self_test_offline() -> bool:
+    good_pkg = {"security": [{"deviceAuth": []}], "description": "today `ORDER_VOID` (`voidOrder`) and `witness`"}
+    ctx = {"package": good_pkg, "offline_prop": True, "prompt_offline": True}
+    body = {"content": {"application/json": {"schema": {"properties": {"supervisorStepUp": {
+        "allOf": [{"$ref": "../shared/common.yaml#/components/schemas/SupervisorStepUp"}]}}}}}}
+    good = {"x-ticvai-step-up": "pin", "x-ticvai-offline-capable": True, "x-ticvai-permission": "ORDER_VOID",
+            "x-ticvai-step-up-carrier": "body:supervisorStepUp", "x-ticvai-offline-step-up": "verifier",
+            "requestBody": body,
+            "x-ticvai-read-via": [{"query": "identity#verifySupervisorStepUp"}],
+            "responses": {"200": {"headers": {VERDICT_HEADER: {"$ref": "x"}}}, "403": {}}}
+    d = {}
+    cases = [
+        (good, ctx, 0),
+        (dict(good, **{"x-ticvai-offline-step-up": None}), ctx, 1),          # r13's three operations
+        (dict(good, **{"x-ticvai-offline-step-up": "maybe"}), ctx, 1),
+        (dict(good, responses={"200": {}}), ctx, 1),                         # no verdict header
+        (dict(good, **{"x-ticvai-read-via": []}), ctx, 1),                   # nothing re-checks at sync
+        (dict(good, **{"x-ticvai-step-up": "mfa"}), ctx, 1),                 # an MFA factor cannot be checked offline
+        (dict(good, **{"x-ticvai-permission": "CASH_NO_SALE"}), ctx, 1),     # not in the package
+        (good, dict(ctx, package=None), 1),
+        (good, dict(ctx, package=dict(good_pkg, security=[{"bearerAuth": []}])), 1),
+        (good, dict(ctx, prompt_offline=False), 1),
+        (good, dict(ctx, offline_prop=False), 1),
+        (dict(good, **{"x-ticvai-offline-step-up": "refused"}), ctx, 1),     # refused with no note
+        (dict(good, **{"x-ticvai-offline-step-up": "refused", "x-ticvai-offline-note": "needs a connection"}), ctx, 0),
+        (dict(good, **{"x-ticvai-offline-capable": False}), ctx, 1),         # a stale declaration
+        (dict(good, **{"x-ticvai-offline-capable": False, "x-ticvai-offline-step-up": None}), ctx, 0),
+    ]
+    for i, (op, c, want) in enumerate(cases):
+        got = len(offline_problems(f"case{i}", op, d, c))
+        if got != want:
+            print(f"self-test FAIL (SU-OFFLINE case {i}: {got} problem(s), wanted {want})")
+            return False
+    return True
+
+
 def _self_test() -> int:
+    if not _self_test_offline():
+        return 1
     plat = {"x-ticvai-step-up": "mfa", "x-ticvai-permission": "PLATFORM_CELL_MANAGE"}
     ok_plat = (platform_step_up_problems("p1", dict(plat, responses={"403": {
                    "description": "the caller's session ... by the rule in identity `verifyMfaChallenge`"}}))
@@ -212,6 +367,7 @@ def main() -> int:
     guarded: dict = {}          # operationId -> (strength, reason, scopeLevel, file)
     policy_ops: dict = {}       # operationId -> config-scope
     carrier_errors: list = []   # SU-CARRIER (CHG-RUL-014)
+    offline_ctx = _offline_context()
     for f in sorted((ROOT / "contracts").rglob("*.yaml")):
         try:
             doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
@@ -224,6 +380,7 @@ def main() -> int:
                 if not isinstance(op, dict) or not op.get("operationId"):
                     continue
                 oid = op["operationId"]
+                carrier_errors += offline_problems(oid, op, doc, offline_ctx)
                 if op.get("x-ticvai-step-up"):
                     guarded[oid] = (op["x-ticvai-step-up"],
                                     op.get("x-ticvai-step-up-reason"),

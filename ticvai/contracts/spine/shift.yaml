@@ -895,9 +895,22 @@ paths:
         client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`). The step-up's
         principal must be `witnessPrincipalId`; it is the witness's PIN, not a supervisor's, so the field is named
         for the witness.
+
+        **Offline, the witness signs against the till's offline verifier** (decided 3 November 2026, Chinmay, on
+        system review finding F-01: "Offline verifier" (the till keeps a verifier, re-checked at sync); ADR-0013
+        amendment of 3 November 2026; CHG-R14V-001). r13 queued the witness's PIN unchecked ("captured offline, it is
+        verified when the withdrawal syncs"), so the cash left the box on a PIN nothing had checked. Now the prompt
+        offers the signers of the till's offline step-up package (identity `getOfflineStepUpPackage`) marked
+        `witness` (a shift open at the venue), the PIN is checked on the till before the box opens, and the
+        withdrawal is queued with `witnessStepUp.offline`. **At sync** Identity re-checks the step-up as at
+        `recordedAt` (`verifySupervisorStepUp`): the withdrawal is recorded either way, because the cash has left the
+        box, so the expected close figure falls as it did at the till, and the `201` carries
+        `X-Ticvai-Step-Up-Verdict` (`confirmed` or `refusedAtSync`); a `refusedAtSync` withdrawal keeps the witness as
+        sent, and Identity's `identity.offlineStepUpRefused` raises the alert to the venue's managers.
       tags: [shift]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-step-up: pin
+      x-ticvai-offline-step-up: verifier
       x-ticvai-read-via:
       - query: identity#verifySupervisorStepUp
         route: in-process
@@ -944,12 +957,16 @@ paths:
                   description: >
                     The witnessing cashier's countersignature on this device (CHG-RUL-019): `principalId` is
                     `witnessPrincipalId`, `credential` their PIN. Refused without it (`403
-                    supervisor-step-up-refused`). Captured offline, it is verified when the withdrawal syncs.
+                    supervisor-step-up-refused`). Captured offline, it is checked on the device against the
+                    witness's offline verifier and carries `offline`; the server checks it again when the
+                    withdrawal syncs (CHG-R14V-001).
       responses:
         '201':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            X-Ticvai-Step-Up-Verdict:
+              $ref: '../shared/common.yaml#/components/headers/StepUpVerdict'
           description: Withdrawn, and the expected close figure reduced
           content:
             application/json:
@@ -957,7 +974,8 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403':
           description: The caller lacks CASH_LIFT, or the witness's step-up is missing, failed, or is not
-            `witnessPrincipalId` (`supervisor-step-up-refused`; CHG-RUL-019).
+            `witnessPrincipalId` (`supervisor-step-up-refused`; CHG-RUL-019). An offline step-up re-checked at
+            sync is never refused here; see `X-Ticvai-Step-Up-Verdict` on the 201 (CHG-R14V-001).
           x-ticvai-problem-types: [supervisor-step-up-refused]
           content:
             application/problem+json:
@@ -2316,11 +2334,22 @@ paths:
         that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the
         call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is
         the modal's reject path and sends nothing**: the drawer stays shut and the till shows the reason the supervisor
-        picked; no record is written for a request that was declined. A step-up needs the server, so offline
-        only a caller who holds `CASH_NO_SALE` can do this.
+        picked; no record is written for a request that was declined.
+
+        **Offline, the supervisor signs against the till's offline verifier** (decided 3 November 2026, Chinmay, on
+        system review finding F-01: "Offline verifier" (the till keeps a verifier, re-checked at sync); ADR-0013
+        amendment of 3 November 2026; CHG-R14V-001; this replaces r13's "offline only a caller who holds
+        `CASH_NO_SALE` can do this"). The prompt's picker comes from the till's offline step-up package (identity
+        `getOfflineStepUpPackage`), the PIN is checked on the till, the drawer opens and the no-sale is queued with
+        `supervisorStepUp.offline`. **At sync** Identity re-checks the step-up as at `recordedAt`
+        (`verifySupervisorStepUp`): the no-sale is recorded either way, because the drawer did open, and the `201`
+        carries `X-Ticvai-Step-Up-Verdict` (`confirmed` or `refusedAtSync`); a `refusedAtSync` no-sale keeps the
+        supervisor as `approvedByPrincipalId` as sent, and Identity's `identity.offlineStepUpRefused` raises the
+        alert to the venue's managers. A cashier who holds `CASH_NO_SALE` acts offline alone, as online.
       x-ticvai-step-up: pin
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-step-up-reason: A cashier without CASH_NO_SALE opens the drawer only with a supervisor's PIN on the till (POS-014's approval modal).
+      x-ticvai-offline-step-up: verifier
       x-ticvai-read-via:
       - query: identity#verifySupervisorStepUp
         route: in-process
@@ -2357,13 +2386,15 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            X-Ticvai-Step-Up-Verdict:
+              $ref: '../shared/common.yaml#/components/headers/StepUpVerdict'
           description: Recorded
           content:
             application/json:
               schema: { $ref: '#/components/schemas/NoSaleEvent' }
         '403':
           x-ticvai-problem-types: [supervisor-step-up-refused]
-          description: The caller lacks CASH_NO_SALE and no supervisor step-up was sent, or it was refused (r8 walk fix, CHG-R8WFC-005)
+          description: The caller lacks CASH_NO_SALE and no supervisor step-up was sent, or it was refused (r8 walk fix, CHG-R8WFC-005). An offline step-up re-checked at sync is never refused here; see X-Ticvai-Step-Up-Verdict on the 201 (CHG-R14V-001).
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }

@@ -259,3 +259,66 @@ one architectural pattern rather than two.
 
 That uniformity is worth more than the effort premium suggests, because it is one pattern
 to test, one to debug at 2am, and one to explain to a new engineer.
+---
+
+## Amendment — 3 November 2026: an offline supervisor step-up is checked by the till's offline verifier and re-checked at sync (Chinmay, CHG-R14V-001)
+
+**Decided by Chinmay, 3 November 2026, on system review finding F-01: "Offline verifier" (the till keeps a
+verifier, re-checked at sync).** The review of the r13 tag found three operations that are offline-capable and
+take a same-device PIN step-up (`voidOrder`, `recordNoSale`, `withdrawFromDepositBox`), a step-up only the server
+could check (`SupervisorStepUp`, `identity.verifySupervisorStepUp`), a picker that was online only
+(`listStepUpSupervisors`), and two contradictory answers in the contracts: the void and the no-sale said "offline
+only a caller who holds the permission can do this", the withdrawal queued the witness's PIN unchecked and let the
+cash leave the box. The till's approved screens promise it keeps working offline (POS-014, POS-018).
+
+**The decision.**
+
+1. **The offline package carries a verifier per eligible signer and venue.** Identity keeps one
+   `identity.offline_pin_verifier` row per principal and venue: an Argon2id PHC string over the PIN with its own
+   salt, **never the PIN** and never the server's peppered credential hash, stored encrypted with the tenant's field
+   key (ADR-0063). Identity never holds a PIN, so a verifier is minted only where it has just checked one itself: a
+   correct `pin` sign-in (`login`), a correct online step-up (`verifySupervisorStepUp`) and a new PIN
+   (`changeOwnCredential`), for the venue the PIN was used at and every venue where the principal holds an offline
+   step-up permission. A verifier expires 30 days after it was minted and stops counting at once when the PIN is
+   changed or reset, while it is locked, or when the principal is deactivated or loses the permission.
+2. **The till fetches its package with its own device credential** (`getOfflineStepUpPackage`, `deviceAuth`):
+   the signers of its venue, by display name, with the offline step-up permissions each holds there and whether
+   they may witness (a shift open at the venue), each with its verifier. The package expires 24 hours after it was
+   issued; the till fetches a new one after every sync and at least hourly while online, and **replaces it
+   whole, so a verifier revoked on the server is gone from the till at its next sync.** It is kept only in the
+   device's encrypted local store.
+3. **Offline, the prompt works from the package** (`supervisorPinPrompt`'s `offline` state): the local picker
+   offers the signers who hold the act's permission (or may witness), the signed-in person left out; the typed PIN
+   is checked against the signer's verifier on the till; **the local attempt limit is the tenant's
+   `pinLockoutAfterAttempts`**, after which that signer is locked on that till until it reconnects. With no package,
+   or after it expires, the step-up needs a connection.
+4. **Every offline step-up is recorded and re-verified at sync.** The queued call carries the step-up as online
+   (the PIN sealed in the encrypted outbox and deleted from it once synced) plus its `offline` evidence (package,
+   verifier, when it matched, the wrong PINs before it). At sync Identity re-checks it **as at the act's
+   `recordedAt`**: the PIN against the PIN credential in force then, the verifier (for that venue, not expired or
+   revoked then), the signer active and holding the permission there then, and not the caller. The result is one
+   `identity.offline_step_up` row, `confirmed` or `refusedAtSync` with its reason. A wrong PIN found at sync is not
+   a new attempt and does not count towards the server's lockout.
+5. **The rejection path is named, and it never drops the act.** The void, the no-sale or the withdrawal happened
+   at the till (the drawer opened, the cash left the box), so a `refusedAtSync` act is recorded as sent, as an
+   offline sale replayed after its hold expired is accepted and flagged `unitsGone` (C103 above), never dropped and
+   never silently counted. Its success response carries `X-Ticvai-Step-Up-Verdict: refusedAtSync`; **the operator**
+   sees, once, "Supervisor approval for <the act> was not confirmed when the till synced. The venue manager has been
+   told."; Identity publishes `identity.offlineStepUpRefused`, and **the supervisor's managers at the venue** see the
+   alert reporting raises from it on Shift Exceptions & Alerts (POS-020) and Offline Alerts, Limits & Audit
+   (BO-133) until it is acknowledged.
+6. **Each offline-capable step-up operation declares its offline step-up behaviour**:
+   `x-ticvai-offline-step-up: verifier` (this amendment) or `refused` (the act needs a connection, and its
+   `x-ticvai-offline-note` says so). An MFA or rule-dependent step-up can only be `refused`: its factor is checked by
+   the server. `tools/check-step-up.py` (SU-OFFLINE) fails an operation that declares neither.
+
+**What it does not change.** Online, a failed step-up is still `403 supervisor-step-up-refused` and nothing is
+written. A cashier who holds the act's permission still acts alone, offline as online. An escalated permission
+(`x-ticvai-permission-escalated`, as on `compItem` and `cancelFnbOrder`) is the caller's own permission, resolved at
+sign-in and held by the till; it involves no supervisor and no verifier. Sign-in itself still needs the network
+(identity `login`, CHG-R8SPN-027).
+
+**The cost, stated.** A 4-digit PIN has 10,000 values, so a verifier taken from a stolen, unlocked till can be
+reversed offline (ADR-0071's context). The server-side copy is encrypted and the package is served only to a
+registered device, so the exposure is one venue's signers for at most 24 hours from one device, and every PIN
+checked offline is checked again by the server at sync. ADR-0071, as amended 3 November 2026, records the exception.

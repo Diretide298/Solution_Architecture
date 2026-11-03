@@ -1,0 +1,113 @@
+id: CHG-R14V-001
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'An offline-capable supervisor or witness PIN step-up (voidOrder, recordNoSale, withdrawFromDepositBox) is checked
+  on the till against an offline verifier and re-checked by the server at sync. Identity keeps one verifier per signer and
+  venue (identity.offline_pin_verifier: an Argon2id hash of the PIN with its own salt, field-encrypted, minted only by a
+  correct pin sign-in, a correct online step-up or a new PIN; 30-day expiry; void once the PIN changes or locks); a
+  registered device fetches its venue''s package under deviceAuth (getOfflineStepUpPackage: the local picker list, the
+  attempt limit, a 24-hour expiry, replaced whole at each sync); the step-up carries offline evidence
+  (SupervisorStepUp.offline); verifySupervisorStepUp re-checks it as at recordedAt and writes identity.offline_step_up;
+  a refusal at sync never drops the act: the act is recorded, its success carries X-Ticvai-Step-Up-Verdict refusedAtSync,
+  the till tells the operator and identity.offlineStepUpRefused raises the managers'' alert. ADR-0013, ADR-0022 and
+  ADR-0071 amended; supervisorPinPrompt gets its offline state; SU-OFFLINE in check-step-up.'
+decision:
+  what: 'System review finding F-01 (r13 tag a8e06314: offline POS acts that need a supervisor PIN cannot be verified
+    offline, and the package does not say what happens). The lead, Chinmay, 3 November 2026, after reading the triage:
+    "Offline verifier" (the till keeps a verifier, re-checked at sync), in r14, released with the rest ("All four, one
+    release"). Built as the r14 brief for lane v states it: the offline package carries a verifier per eligible
+    supervisor and venue (a slow salted hash of the PIN, never the PIN; expiry; revoked at the next sync), a local picker
+    list, a local attempt limit and lockout, every offline step-up recorded and re-verified at sync with a named
+    rejection path and what the operator and supervisor then see; the supervisorPinPrompt component gets its offline
+    state.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'System review finding F-01 (3 November 2026, of the r13 tag a8e06314): voidOrder, recordNoSale and
+  withdrawFromDepositBox are x-ticvai-offline-capable and x-ticvai-step-up pin, SupervisorStepUp was checked only by the
+  server, listStepUpSupervisors is online only, and supervisorPinPrompt had no offline state, while POS-014 and POS-018
+  promise the till keeps working offline. The contracts answered twice and differently: voidOrder and recordNoSale said
+  "offline only a caller who holds the permission can do this", withdrawFromDepositBox queued the witness PIN unchecked
+  ("Captured offline, it is verified when the withdrawal syncs") after the cash had left the box. ADR-0013 (local-first;
+  C103''s accepted-and-flagged unitsGone is the precedent for an act replayed after its condition lapsed), ADR-0022
+  (append), ADR-0071 (PIN hashing; CHG-R8SPN-027 named an ADR-0071 exception and a security review for an offline
+  verifier). The two escalated operations the finding also lists (compItem, cancelFnbOrder) take the caller''s own
+  escalated permission, resolved at sign-in and held by the till, and no supervisor: nothing changes for them.'
+keys_touched:
+  operations:
+  - voidOrder
+  - recordNoSale
+  - withdrawFromDepositBox
+  - verifySupervisorStepUp
+  - getOfflineStepUpPackage
+  - login
+  - changeOwnCredential
+  schemas:
+  - SupervisorStepUp
+  - OfflineStepUpEvidence
+  - SupervisorStepUpCheck
+  - SupervisorStepUpVerdict
+  - OfflineStepUpPackage
+  - OfflineStepUpSigner
+  - OfflinePinVerifier
+  - OfflineStepUp
+  tables:
+  - identity.offline_pin_verifier
+  - identity.offline_step_up
+  screens:
+  - POS-014
+  - POS-018
+  other:
+  - 'event identity.offlineStepUpRefused (new)'
+  - 'response header X-Ticvai-Step-Up-Verdict (common.yaml headers StepUpVerdict, new)'
+  - 'contract extension x-ticvai-offline-step-up (verifier | refused, new)'
+  - 'query identity#verifySupervisorStepUp inputs, returns and rule'
+  - 'component supervisorPinPrompt: state offline'
+  - 'job reporting.alertRaising consumes identity.offlineStepUpRefused'
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+  - contracts/satellite/reporting.yaml
+  - events/identity-offlineStepUpRefused.yaml
+  - screens/_components.yaml
+  - screens/P04-point-of-sale.yaml
+  - docs/adr/0013-local-first-point-of-sale.md
+  - docs/adr/0022-conflict-policy.md
+  - docs/adr/0071-credentials-are-stored-as-argon2id-phc-strings.md
+  - docs/adr/0063-encryption-keys-and-biometric-templates.md
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-step-up.py
+root_class: an operation is offline-capable and demands a step-up only the server can check, and declares nothing about
+  what happens offline
+tickets:
+  started:
+  - '30674 ([BE] login: POST /auth/login, Hrushikant, Ready for QA; parent 27732): a correct pin sign-in at a device door
+    now also mints the principal''s offline step-up verifiers (identity.offline_pin_verifier) in the same transaction;
+    the response does not change. A follow-up comment carries this to the developer.'
+  unstarted:
+  - '30981 ([BE] voidOrder), 30861 ([BE] recordNoSale), 32651 ([BE] withdrawFromDepositBox): pass offline evidence,
+    askingOperation, actId, callerPrincipalId, workstationId and recordedAt to verifySupervisorStepUp; record the act on
+    refusedAtSync and send X-Ticvai-Step-Up-Verdict; never 403 an offline step-up.'
+  - '35730 / 35914 ([BE] verifySupervisorStepUp): the offline rule (as at recordedAt, history row, no attempt counted),
+    the identity.offline_step_up row, the identity.offlineStepUpRefused event, and minting verifiers on a correct online
+    PIN.'
+  - '30719 ([BE] changeOwnCredential): a new PIN replaces the principal''s offline verifiers.'
+  - 'POS-014 (28259, 32002-32004), POS-018 (28535, 32665-32667), POS-006 (28256, 31993-31994) and EMP-034 FE tickets:
+    the supervisorPinPrompt offline state; the till fetches and stores the package and shows the refusedAtSync toast.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: system review finding F-01 (r14 review lane v), decided by the lead 3 November 2026'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py::offline_problems
+status: open
+notes: 'New tasks (for the integration plan pass): [BE] Identity getOfflineStepUpPackage (deviceAuth) and the
+  offline_pin_verifier / offline_step_up storage; [BE] Reporting consumer of identity.offlineStepUpRefused raising the
+  managers'' alert; [FE] offline-core: fetch, store and replace the package, verify the PIN locally (Argon2id), attempt
+  count and lockout per signer, the refusedAtSync toast; [DB] the two identity tables in r14''s forward migration.
+  Open, for the lead: a security review of the device store and the package before the first venue trades offline with
+  it (ADR-0071 amendment); the package''s 24-hour and the verifier''s 30-day lifetimes are this lane''s choice, raise or
+  lower them by decision.'

@@ -1224,3 +1224,13 @@ changes:
     the consent pop-up CR-556 opened at Checkout Entry for checkoutCart''s 422 moves with it; the pop-up''s look stays as
     accepted. On Checkout - Payment it opens when Pay now''s checkoutCart refuses 422 consentRequired or consentAnswerBlocks (the pop-up of WEB-006).'
   change: CHG-R14INT-001
+- screen: POS-014
+  field: 'state:offline'
+  to: 0ee3a22cad7564fd
+  approval: 'Design change approved by the lead, 3 November 2026 ("Offline verifier" (the till keeps a verifier, re-checked at sync), on system review finding F-01): offline, a void or a no-sale that needs a supervisor is signed from the till''s own list and PIN check, the supervisorPinPrompt component''s offline state.'
+  change: CHG-R14V-001
+- screen: POS-018
+  field: 'state:offline'
+  to: 1ed6e4283e0a9e04
+  approval: 'Design change approved by the lead, 3 November 2026 ("Offline verifier" (the till keeps a verifier, re-checked at sync), on system review finding F-01): offline, a withdrawal is countersigned from the till''s own list and PIN check, the supervisorPinPrompt component''s offline state.'
+  change: CHG-R14V-001

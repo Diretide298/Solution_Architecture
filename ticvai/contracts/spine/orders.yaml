@@ -6818,13 +6818,25 @@ paths:
         that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the
         call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is
         the modal''s reject path and sends nothing**: the order stays as it was and the till shows the reason the supervisor
-        picked; no record is written for a request that was declined. A step-up needs the server, so offline
-        only a caller who holds `ORDER_VOID` can do this.
+        picked; no record is written for a request that was declined.
+
+
+        **Offline, the supervisor signs against the till''s offline verifier** (decided 3 November 2026, Chinmay, on
+        system review finding F-01: "Offline verifier" (the till keeps a verifier, re-checked at sync); ADR-0013
+        amendment of 3 November 2026; CHG-R14V-001; this replaces r13''s "offline only a caller who holds
+        `ORDER_VOID` can do this"). The prompt''s picker comes from the till''s offline step-up package
+        (identity `getOfflineStepUpPackage`), the PIN is checked on the till, and the void is queued with
+        `supervisorStepUp.offline`. **At sync** Identity re-checks the step-up as at `recordedAt`
+        (`verifySupervisorStepUp`): the void is recorded either way, because it happened at the till, and the `200`
+        carries `X-Ticvai-Step-Up-Verdict` (`confirmed` or `refusedAtSync`); a `refusedAtSync` void keeps the
+        supervisor as `approvedByPrincipalId` as sent, and Identity''s `identity.offlineStepUpRefused` raises the
+        alert to the venue''s managers. A cashier who holds `ORDER_VOID` voids offline alone, as online.
 
         '
       x-ticvai-step-up: pin
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-step-up-reason: A cashier without ORDER_VOID voids only with a supervisor's PIN on the till (POS-014's approval modal).
+      x-ticvai-offline-step-up: verifier
       x-ticvai-read-via:
       - query: identity#verifySupervisorStepUp
         route: in-process
@@ -6878,7 +6890,7 @@ paths:
                   format: date-time
       responses:
         '403':
-          description: 'The caller holds no `ORDER_VOID` and sent no verified supervisor step-up (`supervisor-step-up-refused`), or is not permitted at this scope (`forbidden`). Nothing is written.'
+          description: 'The caller holds no `ORDER_VOID` and sent no verified supervisor step-up (`supervisor-step-up-refused`), or is not permitted at this scope (`forbidden`). Nothing is written. An offline step-up re-checked at sync is never refused here: see `X-Ticvai-Step-Up-Verdict` on the 200 (CHG-R14V-001).'
           x-ticvai-problem-types: [forbidden, supervisor-step-up-refused]
           content:
             application/problem+json:
@@ -6888,6 +6900,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            X-Ticvai-Step-Up-Verdict:
+              $ref: '../shared/common.yaml#/components/headers/StepUpVerdict'
           description: Voided
           content:
             application/json:
