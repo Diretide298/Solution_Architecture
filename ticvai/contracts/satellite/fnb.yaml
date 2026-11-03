@@ -3650,8 +3650,8 @@ paths:
         `recordedAt` outside `valid_from` to `valid_to` answers `400 validation` on `serverPrincipalId`. (2) A visit
         that is `settled`, `merged` or `cancelled` answers `409 table-visit-closed`, as `compItem` does. (3) If the
         visit has no `fnb.table_visit_server` rows yet and `server_principal_id` is set, a row for that server is
-        written first, with `from_at` = `opened_at` and `split_gratuity` true. (4) Then the new row: `from_at` =
-        `recordedAt`, `split_gratuity` = `splitGratuity` (default true), `recorded_by_principal_id` = the caller,
+        written first, with `from_at` = `opened_at` and `is_split_gratuity` true. (4) Then the new row: `from_at` =
+        `recordedAt`, `is_split_gratuity` = `splitGratuity` (default true), `recorded_by_principal_id` = the caller,
         `scope_path` the path of the visit''s outlet''s venue (`tenancy#outletRecords`, `tenancy#scopeRecords`), the
         venue scope the visit is written at. (5) `table_visit.server_principal_id` is set to the server on the row
         with the latest `from_at`, so an offline replay arriving late never overwrites a newer hand-over. A replay
@@ -3693,7 +3693,7 @@ paths:
                 splitGratuity:
                   type: boolean
                   default: true
-                  x-ticvai-stored-as: fnb.table_visit_server.split_gratuity
+                  x-ticvai-stored-as: fnb.table_visit_server.is_split_gratuity
                   description: Whether this server shares the visit's gratuity, recorded on the hand-over's row (ADAM
                     CR-595). Nothing divides it here.
       responses:
@@ -12903,6 +12903,7 @@ components:
         serverPrincipalId:
           type: string
           format: uuid
+          x-ticvai-references: identity.principal
           description: The server who holds the table from `fromAt`.
         fromAt:
           type: string
@@ -12911,10 +12912,12 @@ components:
         splitGratuity:
           type: boolean
           default: true
-          description: Whether this server shares the visit's gratuity.
+          description: Whether this server shares the visit's gratuity. Its column is `is_split_gratuity`, the
+            naming standard's name for a boolean (CR-595's `split_gratuity`).
         recordedByPrincipalId:
           type: string
           format: uuid
+          x-ticvai-references: identity.principal
           description: Who recorded the hand-over, the caller of `reassignServer`.
         scopePath:
           type: string

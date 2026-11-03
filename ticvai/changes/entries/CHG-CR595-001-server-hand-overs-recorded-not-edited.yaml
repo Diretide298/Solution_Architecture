@@ -3,12 +3,12 @@ date: '2026-11-04'
 source: cr
 kind: contract
 summary: 'reassignServer records each hand-over in the new fnb.table_visit_server (id, table_visit_id, server_principal_id,
-  from_at, split_gratuity default true, recorded_by_principal_id, scope_path; index on (table_visit_id, from_at); row security
-  by scope_path, the visit''s venue), writing the opening server''s row first when the visit has none, and keeps table_visit.server_principal_id
-  on the latest from_at. It reads the server in process through identity#principalRecords (XDR-195: SELECT on id, is_active,
-  valid_from and valid_to only, for reassignServer only), answers 400 on an unknown, inactive or out-of-validity server
-  and 409 table-visit-closed, and computes no gratuity split. derive-ddl writes a granted read''s `columns` as a column-limited
-  GRANT.'
+  from_at, is_split_gratuity default true, recorded_by_principal_id, scope_path; index on (table_visit_id, from_at); row
+  security by scope_path, the visit''s venue), writing the opening server''s row first when the visit has none, and keeps
+  table_visit.server_principal_id on the latest from_at. It reads the server in process through identity#principalRecords
+  (XDR-195: SELECT on id, is_active, valid_from and valid_to only, for reassignServer only), answers 400 on an unknown,
+  inactive or out-of-validity server and 409 table-visit-closed, and computes no gratuity split. derive-ddl writes a granted
+  read''s `columns` as a column-limited GRANT.'
 decision:
   what: 'ADAM CR-595, posted on #32798: "Decided (Chinmay, 3 November 2026): a reassignment is recorded, not edited. The
     operations host reads Identity''s principalRecords in process for reassignServer only (id, is_active, valid_from, valid_to
@@ -68,4 +68,6 @@ notes: 'Beyond the posted words: scope_path is the path of the visit''s outlet''
   and splitGratuity are marked x-ticvai-stored-as on the new table; reassignServer declares its reads and writes. XDR-195
   is `narrow`, as XDR-010 is, and carries `columns`, a field the read grants did not have: derive-ddl writes GRANT SELECT
   (id, is_active, valid_from, valid_to) ON identity.principal TO operations, ddl_forward reads it back and its rollback
-  revokes the same columns, and check-cross-deployable-writes X-READ holds the columns to the table''s.'
+  revokes the same columns, and check-cross-deployable-writes X-READ holds the columns to the table''s. The posted split_gratuity
+  column is named is_split_gratuity, the naming standard''s name for a boolean (check-ddl-conventions D-NAMING); server_principal_id
+  and recorded_by_principal_id declare their reference to identity.principal (check-storage-promises SP-KEY-UNDECLARED).'
