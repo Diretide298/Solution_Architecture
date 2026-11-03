@@ -141,8 +141,9 @@ And one rule per decision:
                    plan versions, the module catalogue and listing, the licence position and the downgrade check, as
                    lane_w5_rules_r13 lists them.
   BR-CELL-HEALTH-STORED, BR-CELL-LIST-FILTERS, BR-TENANT-CELLS-HELD, BR-DEVELOPER-ACCOUNT-CALLER,
-  BR-ANOMALY-DEFAULTS-CONFIG, BR-API-CLIENT-CALLER, BR-API-VERSION-DEPRECATION, BR-API-CLIENT-ID (r14 catch-up, lane c:
-                   ADAM CR-562 to CR-566, CR-569 to CR-571; CHG-CR562-001 to CHG-CR571-001): the cell health reading,
+  BR-ANOMALY-DEFAULTS-CONFIG, BR-API-CLIENT-CALLER, BR-API-VERSION-DEPRECATION, BR-API-CLIENT-ID,
+  BR-LISTING-REVIEW-NOTES (r14 catch-up, lane c:
+                   ADAM CR-562 to CR-566, CR-569 to CR-572; CHG-CR562-001 to CHG-CR572-001): the cell health reading,
                    the cell list's filters, a tenant's cells, the public-api caller kinds on three more operations, the
                    platform-default anomaly rules, the deprecation record and the client id, as lane_c_rules_r14 lists
                    them.
@@ -4767,7 +4768,8 @@ def lane_w1_rules_r13(need, op):
 
 
 R14_C_RULES = ["BR-CELL-HEALTH-STORED", "BR-CELL-LIST-FILTERS", "BR-TENANT-CELLS-HELD", "BR-DEVELOPER-ACCOUNT-CALLER",
-               "BR-ANOMALY-DEFAULTS-CONFIG", "BR-API-CLIENT-CALLER", "BR-API-VERSION-DEPRECATION", "BR-API-CLIENT-ID"]
+               "BR-ANOMALY-DEFAULTS-CONFIG", "BR-API-CLIENT-CALLER", "BR-API-VERSION-DEPRECATION", "BR-API-CLIENT-ID",
+               "BR-LISTING-REVIEW-NOTES"]
 
 
 def lane_c_rules_r14(need, op):
@@ -4796,6 +4798,12 @@ def lane_c_rules_r14(need, op):
       BR-API-CLIENT-ID            (CR-571) ApiClient.clientId is the server-made tvc_live_/tvc_test_ value, NOT NULL and
                                   unique; a replayed createApiClient carries no secret; the production client takes the
                                   sandbox client's name; issueApiToken finds the client by it.
+      BR-LISTING-REVIEW-NOTES     (CR-572, and "Go yes" of 3 November 2026) certifyIntegration keeps its notes on the
+                                  listing (reviewNotes, at most 1000; longer is the shared 400 validation), refuses a
+                                  reject without notes 422 reason-required and a certify without a later certifiedUntil
+                                  422 certified-until-required, and the state model certifies and rejects from submitted.
+    The lead's "Go yes" (3 November 2026) adds to BR-API-CLIENT-CALLER: control.developer_member.email is unique among
+    active members (a partial unique index).
     """
     def words(x):
         return " ".join(str(x or "").split()).replace("**", "")
@@ -4893,6 +4901,27 @@ def lane_c_rules_r14(need, op):
          "createApiClient does not say what tenant staff may create, or answers no 404 (CR-569)")
     need("BR-API-CLIENT-CALLER", "Tenant staff: 403, because no tenant screen calls it" in words(rac.get("description")),
          "revokeApiCredential does not refuse tenant staff (CR-569)")
+
+    # One active member per email ("Go yes", 3 November 2026)
+    dm = psch.get("DeveloperMember") or {}
+    need("BR-API-CLIENT-CALLER", {"columns": ["email"], "when": {"status": "active"}} in (dm.get("x-ticvai-unique-when") or []),
+         "control.developer_member.email is not unique among active members (CR-569)")
+
+    # BR-LISTING-REVIEW-NOTES (CR-572)
+    ci = op("certifyIntegration")[3]
+    cbody = (((ci.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+    notes = (cbody.get("properties") or {}).get("notes") or {}
+    rn = ((psch.get("IntegrationListing") or {}).get("properties") or {}).get("reviewNotes") or {}
+    need("BR-LISTING-REVIEW-NOTES", notes.get("maxLength") == 1000 and rn.get("maxLength") == 1000
+         and rn.get("readOnly") is True and "400" in resp(ci) and "422" not in str(notes.get("description")),
+         "certifyIntegration's notes are not kept on the listing, at most 1000 with the shared 400 (CR-572)")
+    need("BR-LISTING-REVIEW-NOTES", {"reason-required", "certified-until-required"} <= ptypes(ci, "422")
+         and "certifyIntegration never writes `inReview`" in words(ci.get("description")),
+         "certifyIntegration does not refuse a reject without notes or a certify without certifiedUntil (CR-572)")
+    il = load("states/integration-listing.yaml")
+    frm = {(t.get("from"), t.get("to")) for t in il.get("transitions") or [] if t.get("operation") == "certifyIntegration"}
+    need("BR-LISTING-REVIEW-NOTES", {("submitted", "certified"), ("submitted", "rejected")} <= frm,
+         "states/integration-listing.yaml does not certify and reject from submitted (CR-572)")
 
     # BR-API-VERSION-DEPRECATION (CR-570)
     dav = op("deprecateApiVersion")[3]

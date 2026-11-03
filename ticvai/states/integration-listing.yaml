@@ -23,6 +23,17 @@ transitions:
   operation: certifyIntegration
   trigger: operation
   guard: Being assessed
+- from: submitted
+  to: certified
+  operation: certifyIntegration
+  trigger: operation
+  guard: '**Approved, with an expiry**, straight from submitted (ADAM CR-572, CHG-CR572-001: certify is accepted from
+    submitted or inReview, and certifyIntegration never writes inReview)'
+- from: submitted
+  to: rejected
+  operation: certifyIntegration
+  trigger: operation
+  guard: Not approved, with reasons the developer can act on, straight from submitted (ADAM CR-572, CHG-CR572-001)
 - from: inReview
   to: certified
   operation: certifyIntegration

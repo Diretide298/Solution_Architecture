@@ -345,7 +345,8 @@ paths:
         does not exist, so ids cannot be probed. On every partner request the caller's `control.developer_member` row is
         read again, and one no longer active is 401 with nothing more read. Any other tenant-session caller is tenant
         staff, 403. `DEVELOPER_VIEW` stays the permission. The developer-portal sign-in is its own task; this operation
-        only reads the session it issues.
+        only reads the session it issues. Until a member's email is unique among active members (Chinmay, 3 November 2026,
+        "Go yes"), an email that matches active members of two accounts answers 403.
       x-ticvai-reads:
       - table: control.developer_account
         for: 'the account asked for (ADAM CR-565)'
@@ -629,7 +630,8 @@ paths:
         **Who may call it** (ADAM CR-569, Chinmay, 3 November 2026; CHG-CR569-001; the caller kinds in this contract's
         description, from the token, never from a permission; `DEVELOPER_ADMIN` marks nothing here). On every partner
         request the caller's `control.developer_member` row is read again: one no longer active is 401, and role
-        `readOnly` is 403. Nothing is written on a refusal.
+        `readOnly` is 403. Nothing is written on a refusal. An email that matches active members of two accounts answers 403
+        until a member's email is unique among active members (Chinmay, 3 November 2026, "Go yes").
         - **TICVAI staff**: any developer account, `sandbox` or `production`; a production client is `issuedBy`
           `ticvai` and keeps the certification and IP allow-list rules above.
         - **A partner caller**: `developerId` must be its own account (any other is 404 `not-found`), and the account
@@ -816,7 +818,9 @@ paths:
         description, from the token, never from a permission). TICVAI staff: any client. A partner caller: only its own
         account's clients; another developer's client is 404, exactly as an unknown one. Tenant staff: 403, because no
         tenant screen calls it. On every partner request the caller's `control.developer_member` row is read again: one
-        no longer active is 401, and role `readOnly` is 403. Nothing is written on a refusal.
+        no longer active is 401, and role `readOnly` is 403. Nothing is written on a refusal. An email that matches
+        active members of two accounts answers 403 until a member's email is unique among active members (Chinmay, 3
+        November 2026, "Go yes").
       x-ticvai-reads:
       - table: control.developer_member
         for: 'the partner caller''s own member row, read again on every request: active, and not readOnly (ADAM CR-569)'
@@ -1801,6 +1805,19 @@ paths:
         **It is also what production access rests on** (17 September minutes, M17-06). Revoking a
         certification, or letting it lapse, suspends the production clients issued against it
         (`setApiClientStatus` `suspended`, reason `certificationLapsed`); sandbox clients are untouched.
+
+        **The decision's words are kept on the listing, and certifying always sets an expiry** (ADAM CR-572, Chinmay,
+        3 November 2026, and "Go yes"; CHG-CR572-001). Every decision (`certify`, `reject`, `revoke`) sets
+        `review_notes` to the `notes` sent, or null when none are sent, in the same transaction as the status change; no
+        other operation writes it, and a resubmission leaves it as it is. `notes` longer than 1000 characters is 400
+        `validation` (the shared type). A `reject` without notes (absent, null or blank) is 422 `reason-required`, the
+        type `decideProductionAccess` uses for a reject without a reason. A `certify` without `certifiedUntil`, or with a
+        date that is not after today, is 422 `certified-until-required`; a certify that passes sets `certified_until` to
+        the date sent, and `revoke` and `reject` leave it as it is. Listings already certified with `certified_until`
+        null stay as they are, and the marketplace read keeps treating null as unexpired. `certify` and `reject` are
+        accepted from `submitted` or `inReview`; certifyIntegration never writes `inReview`. Any other state is 409
+        `integration-listing-not-in-review`, and `revoke` only from `certified` (409
+        `integration-listing-not-certified`). Nothing is written on a refusal. The certify form on DEV-008 is unchanged.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_ADMIN
       x-ticvai-audience: [staff]
@@ -1819,7 +1836,13 @@ paths:
               properties:
                 decision: { type: string, enum: [certify, reject, revoke] }
                 certifiedUntil: { type: string, format: date, nullable: true }
-                notes: { type: string, nullable: true }
+                notes:
+                  type: string
+                  nullable: true
+                  maxLength: 1000
+                  x-ticvai-column: review_notes
+                  description: 'Stored as `control.integration_listing.review_notes` and returned as `reviewNotes`; longer
+                    than 1000 characters is 400 `validation` (ADAM CR-572).'
       responses:
         '200':
           headers:
@@ -1829,9 +1852,19 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/IntegrationListing' }
+        '400':
+          $ref: '../shared/common.yaml#/components/responses/BadRequest'
         '409':
           description: '`certify` or `reject` on a listing that is not `submitted` or `inReview` (`integration-listing-not-in-review`), or `revoke` on one that is not `certified` (`integration-listing-not-certified`). Nothing changes.'
           x-ticvai-problem-types: [integration-listing-not-in-review, integration-listing-not-certified]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '422':
+          description: '`reject` without notes (absent, null or blank: `reason-required`), or `certify` without a
+            `certifiedUntil` after today (`certified-until-required`) (ADAM CR-572). Nothing is written.'
+          x-ticvai-problem-types: [reason-required, certified-until-required]
           content:
             application/problem+json:
               schema:
@@ -2762,11 +2795,20 @@ components:
         A new email is invited (`status` `invited`) and becomes `active` when the person signs in to the portal with it.
         What each role may do in the portal: `owner` everything and the member list, `admin` everything but removing the
         owner, `developer` its own clients and credentials, `readOnly` view.'
+      # One active member per email, compared without case (ADAM CR-569; Chinmay, 3 November 2026, "Go yes";
+      # CHG-CR569-002): a partial unique index on lower(email) where status is active. Invited and removed rows may repeat.
+      x-ticvai-unique-when:
+      - columns: [email]
+        when: {status: active}
       required: [email, role, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
         developerAccountId: { type: string, format: uuid, readOnly: true }
-        email: { type: string, format: email }
+        email:
+          type: string
+          format: email
+          description: 'Unique among active members, compared without case (ADAM CR-569, "Go yes"): one email acts for one
+            developer account. Until the index is applied, an email matching active members of two accounts answers 403.'
         role: { type: string, enum: [owner, admin, developer, readOnly] }
         status: { type: string, enum: [invited, active, removed], readOnly: true }
         invitedAt: { type: string, format: date-time, readOnly: true }
@@ -3378,6 +3420,13 @@ components:
             **Certification expires.** An integration certified against v1 and still listed after v3
             is TICVAI vouching for something it has not looked at in two years.
         certifiedAgainstVersion: { type: string, nullable: true, readOnly: true }
+        reviewNotes:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 1000
+          description: 'The notes of the last certifyIntegration decision (certify, reject or revoke), null when none were
+            sent; set only by that decision, and left as it is by a resubmission (ADAM CR-572).'
         listingFeeModel: { type: string, enum: [none, flat, revenueShare], nullable: true }
         visibility:
           type: string
