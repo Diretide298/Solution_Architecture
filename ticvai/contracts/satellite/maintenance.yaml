@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Maintenance & Safety
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 44
   x-ticvai-tier: satellite
   x-ticvai-module: "17 — Maintenance & Safety Management"
@@ -84,10 +85,10 @@ info:
     - Compliance inspections are retained for seven years alongside the financial trail.
 
 servers:
-  - url: https://{cellHost}/api/v1
-    variables:
-      cellHost:
-        default: cell.ticvai.local
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 
 security:
   - bearerAuth: []

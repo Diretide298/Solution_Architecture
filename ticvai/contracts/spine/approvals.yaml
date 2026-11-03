@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Approvals
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 47
   x-ticvai-module: 11 — Approval Workflows and Governance
   x-ticvai-platforms:
@@ -77,10 +78,10 @@ info:
   contact:
     name: TICVAI Platform
 servers:
-- url: https://api.{region}.ticvai.com/approvals/v1
+- url: https://{cellHost}/api/v1
   variables:
-    region:
-      default: ae
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 tags:

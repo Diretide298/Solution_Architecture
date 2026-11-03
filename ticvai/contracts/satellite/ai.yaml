@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — AI
   version: 1.0.0
+  x-ticvai-hosts: [ai]
   x-ticvai-screen-count: 131
   x-ticvai-module: 8 — Unified Operations Dashboard (AI)
   x-ticvai-platforms:
@@ -81,10 +82,10 @@ info:
   contact:
     name: TICVAI Platform
 servers:
-- url: https://api.{region}.ticvai.com/ai/v1
+- url: https://{cellHost}/ai/v1
   variables:
-    region:
-      default: ae
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 tags:

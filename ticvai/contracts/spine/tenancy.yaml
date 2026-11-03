@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 48
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
@@ -88,11 +89,10 @@ info:
     names below are now settled and a change to them is a breaking contract change.
 
 servers:
-  - url: https://{cellHost}/api/v1
-    variables:
-      cellHost:
-        default: cell.ticvai.local
-        description: Resolved per tenant from the Control Plane. Never hardcoded in a client.
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 
 security:
   - bearerAuth: []

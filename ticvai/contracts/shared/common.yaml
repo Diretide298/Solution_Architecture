@@ -43,6 +43,26 @@ info:
     — treat accordingly.
 
     '
+# **One server definition per host** (ADR-0026, amended 3 November 2026; the r13 system review B-12; CHG-R14J-020). A
+# contract names the hosts it is served from in `info.x-ticvai-hosts` and its `servers` block is these entries, in that
+# order: a tenant's data is served from its cell, the Control Plane's from the Control Plane, the Python AI runtime from
+# the cell under its own base. tools/check-contract-servers.py holds every contract to it.
+x-ticvai-servers:
+  cell:
+    url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+  controlPlane:
+    url: https://{controlPlaneHost}/api/v1
+    variables:
+      controlPlaneHost:
+        default: control.ticvai.local
+  ai:
+    url: https://{cellHost}/ai/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
 components:
   parameters:
     PageSize:

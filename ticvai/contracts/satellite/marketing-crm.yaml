@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 235
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM

@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 81
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
@@ -51,7 +52,6 @@ servers:
   variables:
     cellHost:
       default: cell.ticvai.local
-      description: Resolved per tenant from the Control Plane. Never hardcoded.
 security:
 - bearerAuth: []
 # **The rule questions Identity answers for other modules** (14 October 2026, the cross-module query pattern of the

@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 130
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)

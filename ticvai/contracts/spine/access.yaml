@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 248
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access

@@ -157,6 +157,10 @@ CHECKS = [
     # 2 November (r13 root R13, CHG-R13R13-001): no README under repos/ is a copy of another package file (104 were the
     # Active page); derive-mirrors writes each from its docs/repos/ source or as an index of its folder.
     "check-repo-readmes",
+    # 3 November (the r13 system review B-12, CHG-R14J-020; ADR-0026 amended): every contract is served from its host's
+    # one server definition in common.yaml x-ticvai-servers, from the host its data lives on, and info.version is the
+    # URL version (<N>.0.0).
+    "check-contract-servers",
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",

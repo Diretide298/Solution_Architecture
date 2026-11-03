@@ -4,7 +4,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Cross-Cell
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [controlPlane, cell]
   x-ticvai-screen-count: 2
   x-ticvai-tier: spine
   x-ticvai-module: Cross-cutting — multi-region

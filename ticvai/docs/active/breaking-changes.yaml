@@ -2072,3 +2072,36 @@ changes:
     tag: r13
     producer-tickets: ['30970']
     consumer-tickets: [none-linked]
+  - id: BC-823
+    contract: payments
+    contracts: [payments, wallet, rental, resources, venue-map, accreditation, public-api, workforce, approvals]
+    operation: listPaymentProviderConnections
+    operations: all
+    change: "base path moved from"
+    reason: 'The r13 system review B-12 (CHG-R14J-020): every contract is now served from its host''s one definition
+      (contracts/shared/common.yaml x-ticvai-servers, ADR-0026 amended 3 November 2026). payments, wallet, rental,
+      resources, venue-map and accreditation were served from https://api.ticvai.com/v1, a global host that cannot know
+      the tenant''s cell, and are now https://{cellHost}/api/v1; workforce and approvals carried their module name in the
+      base (https://api.{region}.ticvai.com/workforce/v1, /approvals/v1) and are now https://{cellHost}/api/v1;
+      public-api (the Control Plane''s developer accounts and keys) moved from https://api.ticvai.com/v1 to
+      https://{controlPlaneHost}/api/v1. Every operation''s path key is unchanged; the route a client calls is not, and a
+      base path cannot change additively. ai moved host only (https://{cellHost}/ai/v1), with the same base.'
+    approved-by: 'Chinmay, 3 November 2026 (the r13 system review''s fixes, finding B-12: "All four, one release"; ADR-0026 amended 3 November 2026)'
+    tag: r14
+    producer-tickets: ['27699', '27816', '27950', '28416', '30848', '30854', '30855', '30856', '30857', '30858', '30859', '30860', '30898', '31185', '31239', '31294', '31296', '31358', '31384', '31385', '31390', '31391', '31392', '32338', '32339', '32340', '33473', '33474', '36225', '36316', '37011', '37036', '37102', '37103', '37104']
+    consumer-tickets: ['31749', '31751', '31855', '31857', '31893', '31895', '32100', '32102', '32125', '33038', '33271']
+  - id: BC-824
+    contract: payments
+    operation: listPaymentProviderConnections
+    operations: [listPaymentProviderConnections, createPaymentProviderConnection, testPaymentProviderConnection]
+    change: "/payment-provider-connections"
+    reason: 'The r13 system review B-12 (CHG-R14J-020): on the cell host payments shares /api/v1 with orders, and both
+      declared GET /payment-providers (orders listPaymentProviders, the gateways configured for a scope; payments
+      listPaymentProviderConnections, the provider connections and their capabilities), one route for two operations
+      (check-package rule 47). The payments collection of provider connections is now /payment-provider-connections
+      (list, create, and /{connectionId}/test), named for what it holds; orders keeps /payment-providers. None of the
+      three is started; a path cannot change additively.'
+    approved-by: 'Chinmay, 3 November 2026 (the r13 system review''s fixes, finding B-12: "All four, one release"; ADR-0026 amended 3 November 2026)'
+    tag: r14
+    producer-tickets: [none-started]
+    consumer-tickets: [none-started]

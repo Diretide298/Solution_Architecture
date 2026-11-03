@@ -1,0 +1,96 @@
+id: CHG-R14J-020
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'Every contract is served from its host''s one server definition (contracts/shared/common.yaml x-ticvai-servers:
+  cell https://{cellHost}/api/v1, controlPlane https://{controlPlaneHost}/api/v1, ai https://{cellHost}/ai/v1), named in
+  its info.x-ticvai-hosts. payments, wallet, rental, resources, venue-map and accreditation leave the global
+  https://api.ticvai.com/v1 for the cell host; public-api leaves it for the Control Plane host; workforce and approvals drop
+  their module name from the base (/workforce/v1, /approvals/v1 become /api/v1); ai keeps /ai/v1 on the cell host. Every
+  info.version is the URL version, 1.0.0 (17 were 0.1.0). The payments provider-connection collection moves from
+  /payment-providers to /payment-provider-connections, because on the shared base it collided with orders'' GET
+  /payment-providers. ADR-0026 amended with the host rule, the gateway mapping and what info.version means;
+  check-contract-compat now compares each operation''s full route, the server''s base path included.'
+decision:
+  what: 'The r13 system review, finding B-12 (contracts disagree on host and base path; a cell-resident module served from a
+    global host; info.version with no rule). The lead, 3 November 2026, on the review''s fixes: "All four, one release".
+    The host follows where the data lives (ADR-0038 as amended by ADR-0040; ADR-0039 and ADR-0043 for the Control Plane),
+    one base per runtime (ADR-0055 deployables, ADR-0020 for the Python AI runtime), the existing {cellHost} and
+    {controlPlaneHost} majority kept. Where the Control Plane runs is left to the control-plane placement decision.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: r13 system review B-12 (audit/ticvai/review-2026-11-03, data-contracts reviewer): seven contracts on
+  https://api.ticvai.com/v1, three on https://api.{region}.ticvai.com/<module>/v1, 22 on {cellHost} or {controlPlaneHost}
+  under /api/v1; info.version 0.1.0 on 17 contracts and 1.0.0 on 18; no ADR named the gateway mapping. ADR-0026, ADR-0038.'
+keys_touched:
+  operations: [listPaymentProviderConnections, createPaymentProviderConnection, testPaymentProviderConnection]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/cross-region.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/platform-ops.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/transport.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/devices/ticket-printer.yaml
+  - docs/adr/0026-public-api-versioning.md
+  - docs/active/breaking-changes.yaml
+  - tools/check-contract-servers.py
+  - tools/check-contract-compat.py
+  - tools/run-checks.py
+  - changes/schema.yaml
+  other: ['breaking changes BC-823 (the base path of nine contracts) and BC-824 (the payments provider-connection paths)']
+root_class: 'a value every contract repeats with no single definition and no check: each file''s servers block and
+  info.version written by hand, so they drifted three ways and no rule said which was right'
+tickets:
+  started:
+  - 'payments 27699 (the provider webhook: the URL registered with the PSP moves to the cell host), 32100, 32102, 36225,
+    36316; wallet 27816, 30854 to 30860, 32125, 33271; resources 31749, 31751, 31893, 31895; venue-map 31855, 31857, 33038;
+    accreditation 33473, 33474 (Ready for QA): base path /v1 on api.ticvai.com becomes /api/v1 on the cell host.'
+  - 'public-api 31294, 31296, 31358, 31384, 31385, 31390, 31391, 31392, 37011, 37036: base path /v1 on api.ticvai.com
+    becomes /api/v1 on the Control Plane host.'
+  - 'workforce 28416, 32338, 32339, 32340, 37102, 37103, 37104; approvals 27950, 30848 (In progress), 30898, 31185, 31239:
+    base path /workforce/v1 and /approvals/v1 become /api/v1 on the cell host. Paths and bodies unchanged.'
+  unstarted:
+  - 'Every other ticket of these nine contracts and of ai: regenerated at r14 with the new base; the three payments
+    provider-connection operations (none started) take /payment-provider-connections.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review (B-12), under the lead''s instruction of 3 November 2026 (r14 review lane j)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-servers.py
+status: open
+notes: 'check-contract-compat reads `contracts:` and `operations: all` (with a required `change`) on a breaking-changes
+  entry, so BC-823 approves the base move of nine contracts and nothing else. ADAM''s release diff
+  (viewer/lib/release-diff.mjs) reads an entry''s `contract` and `operation` only, so in a pull BC-823 is reported against
+  payments listPaymentProviderConnections; the follow-up comments carry it to every started ticket. No table, column or
+  migration changes.'

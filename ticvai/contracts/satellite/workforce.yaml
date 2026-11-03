@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Workforce
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 47
   x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
   x-ticvai-platforms:
@@ -58,10 +59,10 @@ info:
   contact:
     name: TICVAI Platform
 servers:
-  - url: https://api.{region}.ticvai.com/workforce/v1
-    variables:
-      region:
-        default: ae
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 security:
   - bearerAuth: []
 tags:
