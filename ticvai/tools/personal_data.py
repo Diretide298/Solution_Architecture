@@ -129,3 +129,24 @@ def copy_steps(table: str, column: str, store: str, subject_column: str, kind: s
     steps.append(f"4. drop: the four-step drop of `{table}.{column}` (its NOT NULL now, stop every read and write, "
                  "then DROP COLUMN in a later forward migration once the copy is verified by count)")
     return "; ".join(steps)
+
+
+def part_only_reads(root) -> set:
+    """(operationId, table) for each `x-ticvai-reads` entry marked `feedsSetup: false`: a read an owner's part of a
+    guest's privacy request makes of a table its module keeps, which needs neither a writer of the table in the first
+    release (derive-delivery-slice) nor the table's migration (build-service-docs): a table the tenant database does not
+    have yet is left out of the part until its migration lands (CHG-R14M-001)."""
+    import yaml
+    from pathlib import Path
+    out = set()
+    loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+    for f in sorted((Path(root) / "contracts").glob("*/*.yaml")):
+        doc = yaml.load(f.read_text(encoding="utf-8"), Loader=loader) or {}
+        for item in (doc.get("paths") or {}).values():
+            for op in (item or {}).values() if isinstance(item, dict) else []:
+                if not isinstance(op, dict):
+                    continue
+                for r in op.get("x-ticvai-reads") or []:
+                    if isinstance(r, dict) and r.get("feedsSetup") is False:
+                        out.add((op.get("operationId"), str(r.get("table"))))
+    return out

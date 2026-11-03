@@ -33,6 +33,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import personal_data  # noqa: E402
+
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
@@ -141,21 +144,6 @@ LATER_BLOCK_OPERATIONS = {
 # done-when needs (CHG-R11FXC-005: consent records, profile, form submissions, documents) stay unmarked and feed it.
 
 
-def reads_feeding_no_setup() -> set:
-    """(operationId, table) for each x-ticvai-reads entry marked feedsSetup: false."""
-    out = set()
-    for f in sorted((ROOT / "contracts").glob("*/*.yaml")):
-        doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
-        for item in (doc.get("paths") or {}).values():
-            for op in (item or {}).values() if isinstance(item, dict) else []:
-                if not isinstance(op, dict):
-                    continue
-                for r in op.get("x-ticvai-reads") or []:
-                    if isinstance(r, dict) and r.get("feedsSetup") is False:
-                        out.add((op.get("operationId"), str(r.get("table"))))
-    return out
-
-
 LATER_BLOCK_SCREENS = {
     "BO-1191": "Organisation, Block B (CHG-R6-040)",
     "BO-1192": "Entitlement Templates, Block B (CHG-R6-040)",
@@ -233,7 +221,7 @@ def main() -> int:
             core.setdefault(o, set()).add(why)
     slice_ = set(core)
     setup_for: dict[str, set[str]] = defaultdict(set)  # setup op -> tables it makes non-empty
-    quiet = reads_feeding_no_setup()
+    quiet = personal_data.part_only_reads(ROOT)
     while True:
         read = {t for o in slice_ for t in (lineage.get(o, {}).get("reads") or [])
                 if not t.startswith("cache:") and (o, t) not in quiet}

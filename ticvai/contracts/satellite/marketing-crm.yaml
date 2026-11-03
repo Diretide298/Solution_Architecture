@@ -5309,7 +5309,9 @@ paths:
 
         **Every Marketing table, and the erasure too** (r13 system review B-01; the lead, 3 November 2026, "Move the
         columns": erasure and export reach every module; CHG-R14M-001). The part covers every Marketing table
-        `handoff/subject-data-register.json` lists under `owners` (the reads below), not only the four above. For
+        `handoff/subject-data-register.json` lists under `owners` (the reads below), not only the four above; a table the
+        tenant database does not have yet (its migration in a later block) is left out of the part until it lands, and
+        those reads are marked `feedsSetup: false`, so they pull no writer and no migration forward. For
         `requestType` `deletion` it erases what Marketing keeps of the guest outside pii.*: the profile''s
         `preferredChannel` and `guestLinkId` are cleared, and each suppression of the guest''s keeps its row and
         `addressHash` with `address` replaced by `erased`; then it records the erasure with identity
