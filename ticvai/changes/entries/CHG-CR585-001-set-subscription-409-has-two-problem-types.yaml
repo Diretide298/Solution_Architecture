@@ -1,0 +1,47 @@
+id: CHG-CR585-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'setSubscription''s 409 names two types in the one URI form: subscription-expired (checked first, no lists, the
+  cell not asked) and downgrade-conflict (title "Downgrade conflicts with current usage", DowngradeConflictProblem with
+  modulesInUse and limitsExceeded, nothing written). previewSubscriptionChange''s conflicts carry the same type, status
+  and title. No enum on DowngradeConflictProblem.type; removeLicenceAddOn''s module-in-use is unchanged.'
+decision:
+  what: 'ADAM CR-585, posted on #30841: "Decided (Chinmay, 3 November 2026): the downgrade refusal on setSubscription gets
+    its own problem type, downgrade-conflict, as you built it. Build now: setSubscription''s 409 has two causes, and each
+    has its own type, in the one URI form https://api.ticvai.com/problems/<slug>. (1) The subscription is expired and cannot
+    be reactivated: type https://api.ticvai.com/problems/subscription-expired, status 409, with no modulesInUse or limitsExceeded.
+    Check this first, before the downgrade check; an expired subscription is refused without asking the tenant''s cell.
+    (2) The downgrade check finds conflicts: type https://api.ticvai.com/problems/downgrade-conflict, status 409, title
+    ''Downgrade conflicts ..." The lead, 3 November 2026: "the new one dont go in r15, log them and we add to r14 only",
+    then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-585 (#30841 setSubscription): the downgrade 409 had no problem type, so it could not be told apart from 409
+  subscription-expired.'
+keys_touched:
+  operations:
+  - setSubscription
+  - previewSubscriptionChange
+  schemas:
+  - DowngradeConflictProblem
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: one status code with two causes and one type
+tickets:
+  started: []
+  unstarted:
+  - '30841 (setSubscription, On hold): the two types, expired checked first.'
+  - '31281 (previewSubscriptionChange, On hold): conflicts typed downgrade-conflict.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-585
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SUBSCRIPTION-409-TYPES
+status: open
+notes: 'Read with CR-568 (lane b): the preview text says that when the check finds no conflicts it "does not make canApply
+  false", so CR-568''s other refusals (subscription-expired, plan-not-offered) still make it false; the posted CR-585 text
+  says "canApply is true" for that case.'

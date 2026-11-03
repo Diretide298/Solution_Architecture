@@ -1,0 +1,64 @@
+id: CHG-CR591-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'listProducts, getProduct and searchCatalogue answer two read-only fields on guest and visitor reads, never stored
+  and null on staff reads: bookingEntry (dateFirst, productFirst, venueMap, timeWindow, bundle, or null with no Book) and
+  bundleId (the published, active, in-window promotions bundle of a bundle product''s variant). The flow rule is written
+  once behind getPublishedBookingFlow and served as white-label#publishedBookingFlowSteps (a venue and product ids; the
+  resolved flow type and enabled step keys), asked once per page by service route. GST-003''s five Book edges follow bookingEntry;
+  Item Detail and the web listings use the same fields; no screen changes visibly.'
+decision:
+  what: 'ADAM CR-591, posted on #33011: "Decided (Chinmay, 3 November 2026): Book stays as the approved screen draws it
+    and goes straight into booking. The server tells each card where Book goes. Build now: 1. Catalogue. Two read-only fields,
+    worked out on read and never stored, are added to every guest or visitor read that answers a product (listProducts,
+    getProduct) and to every searchCatalogue result. Both are null on staff reads. `bookingEntry` is one of `dateFirst`,
+    `productFirst`, `venueMap`, `timeWindow`, `bundle`, or null when the product has no Book (info-only). `bundleId` is
+    set only when `bookingEntry` is `bundle`. 2. Work out `bookingEntry` in this order. (a) Kind `bundle`: the value is
+    `bundle`. `bundleId` is the id ..." The lead, 3 November 2026: "the new one dont go in r15, log them and we add to r14
+    only", then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-591 (#33011 GST-003): Book could not tell which booking screen a product opens, and no read gave the bundle
+  card its bundleId.'
+keys_touched:
+  screens:
+  - GST-003
+  - GST-004
+  - WEB-002
+  - WEB-004
+  operations:
+  - listProducts
+  - getProduct
+  - searchCatalogue
+  - getPublishedBookingFlow
+  schemas:
+  - Product
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/white-label.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - tools/check-business-rules.py
+root_class: a listing card cannot tell which booking screen Book opens
+tickets:
+  started:
+  - '31033 (getPublishedBookingFlow, Ready for QA): its rule is exposed as the service query; built on a new task, not by
+    rewriting it.'
+  unstarted:
+  - '33011 (GST-003, New): Book by bookingEntry and bundleId.'
+  - '31009 (listProducts), 31004 (searchCatalogue), 31727 (getProduct), all New: the two fields.'
+  - 'New task (white-label, under #31033''s parent): the publishedBookingFlowSteps service query.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-591
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-BOOKING-ENTRY
+status: open
+notes: 'Beyond the posted words: the bundle is read through promotions#bundleRecords in process (declared on the three reads);
+  publishedBookingFlowSteps answers resolved false with the type the kind rule picks and its default order for a product
+  with no flow, so Catalogue applies 2(c)''s fallback without copying the rule. GST-004''s Book to GST-049 (a fixture with
+  one on-sale performance) and WEB-004''s to WEB-007 have no bookingEntry value of their own; their notes only say they
+  use the same two fields.'

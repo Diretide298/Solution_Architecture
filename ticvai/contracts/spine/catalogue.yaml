@@ -2390,6 +2390,14 @@ paths:
         - "P02 GST-003 Buy Tickets"
         - "P02 GST-063 Explore – Search Results"
       x-ticvai-read-via:
+      - query: white-label#publishedBookingFlowSteps
+        route: service
+        for: 'each answered product''s resolved booking flow type and its enabled step keys in order, asked once per
+          page, for bookingEntry (ADAM CR-591)'
+      - query: promotions#bundleRecords
+        route: in-process
+        for: 'the promotions bundle whose variant_id is a bundle product''s variant, while getGuestBundle would return it
+          (published, active, in its window), for bundleId (ADAM CR-591)'
       - query: white-label#guidedChoiceAnswerRecords
         route: service
         for: 'its read of whitelabel.guided_choice_answer, WhiteLabel''s data (CHG-MOD-001)'
@@ -2426,6 +2434,13 @@ paths:
       summary: Find something by name
       description: '**The guest app browses by category and cannot search.** On a venue with two hundred
         products that is the difference between finding a thing and giving up.
+
+        **Where Book goes: `bookingEntry` and `bundleId`** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001).
+        On a guest or visitor read every answered product carries the two read-only fields, worked out on read and
+        never stored; both are null on staff reads. `Product.bookingEntry` states the rule. The flow rule is
+        WhiteLabel''s, asked once per page through `white-label#publishedBookingFlowSteps` (service route), the
+        way the published booking settings are read from white-label; Catalogue never copies the rule, and a product
+        that does not resolve gets the kind fallback, never an error for the page.
 
         Distinct from `semanticSearch`, which is AI and retrieves from documents. This is a keyword search
         over the sellable catalogue, and it works with no AI configured — a venue without an assistant
@@ -2571,6 +2586,23 @@ paths:
                       nullable: true
                       description: '`catalogue.product.description_localised` (ADAM CR-533); the screen shows the
                         guest''s language and falls back to `summary`.'
+                    bookingEntry:
+                      type: string
+                      nullable: true
+                      enum:
+                      - dateFirst
+                      - productFirst
+                      - venueMap
+                      - timeWindow
+                      - bundle
+                      description: 'Which booking screen Book opens, by the rule on `Product.bookingEntry` (ADAM
+                        CR-591); null on staff reads and for a product with no Book.'
+                    bundleId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                      description: 'The promotions bundle Book opens, set only when `bookingEntry` is `bundle` (ADAM
+                        CR-591). Not `id`: for a bundle, `id` is the bundle''s catalogue product, not the bundle.'
                     fromPrice:
                       allOf:
                       - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -2974,6 +3006,14 @@ paths:
         - "P13 CMS-103 Booking Flows"
         - "P16 ANL-004 Product Performance"
       x-ticvai-read-via:
+      - query: white-label#publishedBookingFlowSteps
+        route: service
+        for: 'each answered product''s resolved booking flow type and its enabled step keys in order, asked once per
+          page, for bookingEntry (ADAM CR-591)'
+      - query: promotions#bundleRecords
+        route: in-process
+        for: 'the promotions bundle whose variant_id is a bundle product''s variant, while getGuestBundle would return it
+          (published, active, in its window), for bundleId (ADAM CR-591)'
       - query: white-label#guidedChoiceAnswerRecords
         route: service
         for: 'its read of whitelabel.guided_choice_answer, WhiteLabel''s data (CHG-MOD-001)'
@@ -3012,6 +3052,13 @@ paths:
         this on the server** — on a till it is answered from the local catalogue bundle (`getLatestBundle`,
         ADR-0013), which is what `x-ticvai-offline-capable` means here. A till screen that lists this
         operation is reading the bundle.
+
+        **Where Book goes: `bookingEntry` and `bundleId`** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001).
+        On a guest or visitor read every answered product carries the two read-only fields, worked out on read and
+        never stored; both are null on staff reads. `Product.bookingEntry` states the rule. The flow rule is
+        WhiteLabel''s, asked once per page through `white-label#publishedBookingFlowSteps` (service route), the
+        way the published booking settings are read from white-label; Catalogue never copies the rule, and a product
+        that does not resolve gets the kind fallback, never an error for the page.
 
         **What a guest caller gets** (decided 29 September, rev 3 REV3-14). Products with `guestListing:
         bookable` that are on sale at the caller''s channel, plus products with `guestListing: infoOnly`
@@ -3648,6 +3695,14 @@ paths:
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-read-via:
+      - query: white-label#publishedBookingFlowSteps
+        route: service
+        for: 'each answered product''s resolved booking flow type and its enabled step keys in order, asked once per
+          page, for bookingEntry (ADAM CR-591)'
+      - query: promotions#bundleRecords
+        route: in-process
+        for: 'the promotions bundle whose variant_id is a bundle product''s variant, while getGuestBundle would return it
+          (published, active, in its window), for bundleId (ADAM CR-591)'
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)'
@@ -3672,6 +3727,13 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a product that is
         published, and nothing in draft or unpublished; asked for by id, such a record answers as
         not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Where Book goes: `bookingEntry` and `bundleId`** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001).
+        On a guest or visitor read every answered product carries the two read-only fields, worked out on read and
+        never stored; both are null on staff reads. `Product.bookingEntry` states the rule. The flow rule is
+        WhiteLabel's, asked once per page through `white-label#publishedBookingFlowSteps` (service route), the
+        way the published booking settings are read from white-label; Catalogue never copies the rule, and a product
+        that does not resolve gets the kind fallback, never an error for the page.
 
         **One exception: a withdrawn product is returned to a guest or visitor** (decided 20 October 2026,
         Chinmay, R8 blocker cause GPS-C07, option A; CHG-R8SPN-023), so WEB-004's approved withdrawn banner
@@ -26446,6 +26508,39 @@ components:
           maxLength: 200
         description:
           type: string
+        bookingEntry:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          enum:
+          - dateFirst
+          - productFirst
+          - venueMap
+          - timeWindow
+          - bundle
+          description: '**Which booking screen Book opens** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001).
+            Worked out on read and never stored; set on every guest or visitor read that answers a product
+            (`listProducts`, `getProduct`) and on every `searchCatalogue` result, null on staff reads, and null when
+            the product has no Book (info-only). In this order: (a) kind `bundle` gives `bundle` while `bundleId` is
+            set; with no such bundle it is null and the card opens Item Detail as now. (b) `requiresTimeWindow` true
+            gives `timeWindow`. (c) Otherwise the product''s published booking flow by `getPublishedBookingFlow`''s rule
+            (the product''s flow, then its category''s, then the venue''s enabled default for its kind, with the same
+            tie rule), from `white-label#publishedBookingFlowSteps`: its first enabled step, skipping `location` and
+            `helpMeChoose`; `resourceMap` gives `venueMap`; `date`, `time` or `performance` gives `dateFirst`; any
+            other step gives `productFirst`. If no flow resolves, the same test is applied to the default order of the
+            flow type the kind rule picks. Book opens: `dateFirst` GST-007, `productFirst` GST-008, `venueMap` GST-074,
+            `timeWindow` GST-075, each with `productId`; `bundle` GST-056 with `bundleId`.'
+        bundleId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: 'Set only when `bookingEntry` is `bundle` (ADAM CR-591; CHG-CR591-001): the id of the promotions
+            bundle whose `variant_id` is this product''s variant, while `getGuestBundle` would return it (published,
+            active, in its window). Never taken from a search result''s `id`: for a bundle that is the bundle''s
+            catalogue product, not the bundle.'
         fromPrice:
           oneOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money

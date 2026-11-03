@@ -2305,6 +2305,34 @@ paths:
         (decided 28 September, audit STATE-SUBSCRIPTION). After the period ends it is `expired` and this
         call refuses with 409 `subscription-expired`; the tenant needs a new subscription.
 
+        **The two 409s, each with its own type** (ADAM CR-585, Chinmay, 3 November 2026; CHG-CR585-001), in the one
+        URI form `https://api.ticvai.com/problems/<slug>`. (1) The subscription is expired and cannot be reactivated:
+        type `https://api.ticvai.com/problems/subscription-expired`, status 409, with no `modulesInUse` or
+        `limitsExceeded`. This is checked first, before the downgrade check: an expired subscription is refused
+        without asking the tenant''s cell. (2) The downgrade check finds conflicts: type
+        `https://api.ticvai.com/problems/downgrade-conflict`, status 409, title ''Downgrade conflicts with current
+        usage'', body `DowngradeConflictProblem` with `modulesInUse` and `limitsExceeded` filled as above (at least one
+        has entries), and nothing written. A modules conflict and a limits conflict are the same refusal with the same
+        type; they are never split or chosen between. Clients tell the two apart by type alone, never by whether the
+        lists are present.
+
+        **An upgrade changes the tenant''s one subscription record in place and records its prorated charge on it**
+        (ADAM CR-584, Chinmay, 3 November 2026; CHG-CR584-001). (1) In one transaction the tenant''s current
+        `control.contract` row (the in-force row with the latest `starts_at`, greatest `id` on a tie) is updated in
+        place: `plan_id`, `plan_name`, `plan_version` (the target plan''s latest version) and `current_price` = the
+        target package price, worked out as `previewSubscriptionChange` works it out (the version''s `basePrice` plus
+        each `plan_module` row''s `control.module_listing` price unless its `pricingBasis` is `metered`). `id`,
+        `status`, `starts_at`, `renews_at`, `billing_period`, `currency_code` and `issuing_legal_entity` do not change,
+        and no new contract row is written. `control.tenant.subscription_id` stays as it is; `control.tenant.plan_id`
+        becomes the target plan. (2) On an upgrade the same transaction adds to `control.contract.pending_proration`
+        (`SubscriptionPendingProration`; null counts as 0) the `proratedAmount` `previewSubscriptionChange` returns for
+        the same request on the same day, by the same formula, so two upgrades in one term add up. The request''s
+        `prorate` field does not change this. A downgrade, a scheduled change applied at renewal, a first plan and a
+        reactivation never touch the column. The `Subscription` response does not change. `generateInvoice` bills the
+        amount once and `issueInvoice` clears it. Tests: an upgrade keeps the contract id and sets the new price;
+        `pending_proration` equals the preview''s amount on the same day; two upgrades add up; a downgrade leaves it
+        alone; the invoice carries one `oneOff` line; issuing clears it; a cancelled draft does not.
+
         '
       tags:
       - subscription
@@ -2323,6 +2351,18 @@ paths:
         for: 'the downgrade check: the limits the in-force add-ons raise (ADAM CR-541)'
       - table: control.tenant
         for: 'the downgrade check: the tenant''s cell address (cellHost), asked for getModuleEnablement (ADAM CR-541)'
+      - table: control.contract
+        for: 'the tenant''s current contract, updated in place on an upgrade (ADAM CR-584)'
+      - table: control.plan
+        for: 'the target plan''s latest version and its basePrice, for the new current_price (ADAM CR-584)'
+      - table: control.module_listing
+        for: 'each licensed module''s price in the target package price, unless pricingBasis is metered (ADAM CR-584)'
+      x-ticvai-writes:
+      - table: control.contract
+        for: 'an upgrade updates the current row in place (plan_id, plan_name, plan_version, current_price) and adds
+          its prorated charge to pending_proration (ADAM CR-584)'
+      - table: control.tenant
+        for: 'plan_id becomes the target plan; subscription_id stays as it is (ADAM CR-584)'
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -2344,12 +2384,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Subscription'
         '409':
-          description: 'Downgrade conflicts with current usage. The response names every module and limit
-            that would be violated. Or the subscription is `expired` and cannot be reactivated
-            (`subscription-expired`, audit STATE-SUBSCRIPTION); start a new one.
+          description: 'Two causes, each with its own type (ADAM CR-585; CHG-CR585-001). The subscription is
+            `expired` and cannot be reactivated (`subscription-expired`, audit STATE-SUBSCRIPTION; checked first, with
+            no `modulesInUse` or `limitsExceeded`); start a new one. Or the downgrade conflicts with current usage
+            (`downgrade-conflict`, title ''Downgrade conflicts with current usage''): the response names every module
+            and limit that would be violated, and nothing is written. Clients tell them apart by type alone.
 
             '
-          x-ticvai-problem-types: [subscription-expired]
+          x-ticvai-problem-types: [subscription-expired, downgrade-conflict]
           content:
             application/problem+json:
               schema:
@@ -2407,6 +2449,12 @@ paths:
       summary: Preview the effect of a plan change
       description: 'What would change, what would break, and the prorated amount. Run before committing
         — an account manager should never discover a conflict by causing it.
+
+
+        **The same refusal type as `setSubscription`** (ADAM CR-585, Chinmay, 3 November 2026; CHG-CR585-001): when the
+        downgrade check finds conflicts, `conflicts` carries type `https://api.ticvai.com/problems/downgrade-conflict`,
+        status 409 and title ''Downgrade conflicts with current usage'', and `canApply` is false; when it finds none,
+        `conflicts` is left out and the check does not make `canApply` false.
 
 
         **`conflicts` comes from `setSubscription`''s downgrade check** (ADAM CR-541, Chinmay, 3 November 2026): the same
@@ -3771,12 +3819,20 @@ paths:
       - table: control.invoice_number_sequence
         for: 'the issuing legal entity''s next number, taken and incremented in the issuing transaction (ADAM CR-202,
           option B; CHG-R10ID-013)'
+      - table: control.contract
+        for: 'pending_proration set to null when the invoice issued carries the upgrade''s prorated oneOff line, in the
+          same transaction (ADAM CR-584)'
       summary: Issue a draft invoice, giving it its number
       description: '**The step that numbers an invoice** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013).
         `generateInvoice` creates a `draft` with no number; issuing moves it to `issued`, sets `issuedAt`, and assigns
         `invoiceNumber` from the gapless sequence of the TICVAI legal entity that issues it
         (`control.invoice_number_sequence`, `InvoiceNumberSequence`), locked and incremented in the same transaction,
         so the sequence has no gap. An invoice that is not `draft` is 409 `invoice-not-draft` and nothing changes.
+
+        **It clears an upgrade''s pending charge** (ADAM CR-584, Chinmay, 3 November 2026; CHG-CR584-001): when the
+        invoice being issued carries the upgrade''s prorated `oneOff` line, `control.contract.pending_proration`
+        (`SubscriptionPendingProration`) is set to null on the contract in the same transaction. A draft cancelled
+        before issue leaves the amount pending, so the next invoice carries it.
 
         '
       tags:
@@ -4276,9 +4332,16 @@ paths:
         for: 'the tax rate of the billing entity''s country in force at generation (the lead, 25 October 2026, r10 round 3,
           CR-202; CHG-R10ID-023)'
       - table: control.contract
-        for: 'the TICVAI legal entity that issues the tenant''s invoices (`issuingLegalEntity`; r10 round 3, CHG-R10ID-023)'
+        for: 'the TICVAI legal entity that issues the tenant''s invoices (`issuingLegalEntity`; r10 round 3, CHG-R10ID-023),
+          and the current contract''s pending_proration, billed as one oneOff line (ADAM CR-584)'
       description: 'Prices the metered usage against the subscription''s plan version. Idempotent per
         tenant and period — running twice does not double-bill, which matters because it will be scheduled.
+
+        **An upgrade''s pending prorated charge** (ADAM CR-584, Chinmay, 3 November 2026; CHG-CR584-001): when the
+        tenant''s current contract has `pending_proration` (`SubscriptionPendingProration`) above 0, one line of kind
+        `oneOff` is written, description ''Upgrade to <plan name>, prorated to <renewsAt>'', amount =
+        `pending_proration`, priced into the invoice currency as the module lines are, and taxed like them. A dry run
+        shows the line too. `generateInvoice` never clears the column; `issueInvoice` does.
 
         **The lines, per module (decided 29 September, Chinmay).** One `module` line for each module the
         tenant licensed (the package''s modules and each add-on), at the module''s price set on the platform
@@ -18416,8 +18479,32 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         billingPeriod:
           type: string
+    SubscriptionPendingProration:
+      type: object
+      x-ticvai-persistence: control.contract
+      description: '**An upgrade''s prorated charge, waiting to be invoiced** (ADAM CR-584, Chinmay, 3 November 2026;
+        CHG-CR584-001). One nullable column of the contract record, `pending_proration` numeric(18,4), in the row''s
+        `currency_code`; existing rows stay null. **Never returned by any operation**: the `Subscription` response
+        does not change. `setSubscription` adds each upgrade''s `proratedAmount` to it (null counts as 0; a downgrade,
+        a scheduled change applied at renewal, a first plan and a reactivation never touch it); `generateInvoice`
+        bills it as one `oneOff` line and never clears it; `issueInvoice` sets it to null when the invoice it issues
+        carries that line.'
+      properties:
+        pendingProration:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          readOnly: true
+          x-ticvai-column: pending_proration
+          description: The prorated upgrade charges not yet on an issued invoice, in the contract's `currency_code`;
+            null when none is pending.
     DowngradeConflictProblem:
       x-ticvai-persistence: none — error shape
+      description: '**Its type says which refusal it is** (ADAM CR-585, Chinmay, 3 November 2026; CHG-CR585-001):
+        `https://api.ticvai.com/problems/downgrade-conflict` for `setSubscription`''s downgrade refusal and
+        `previewSubscriptionChange`''s `conflicts` (title ''Downgrade conflicts with current usage''),
+        `https://api.ticvai.com/problems/subscription-expired` for an expired subscription (no `modulesInUse` or
+        `limitsExceeded`), and `module-in-use` for `removeLicenceAddOn`, unchanged. `type` takes no enum.'
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object

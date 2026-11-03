@@ -494,6 +494,28 @@ And one rule per decision:
                    rule; no Marketing read.
   BR-BULK-PRICE-SKIPS (CR-544) bulkChangePrices' selection, skip reasons, escalates, 403 and 400.
   BR-CLONE-PRODUCT-RULES (CR-545) cloneProduct's code and name constraints, 400, and its copy list.
+  r14 lane f (ADAM CR-583 to CR-592, approved 3 November 2026; and CR-556's corrected steps 5 and 6;
+  lane_f_rules_r14), each failing on main (9b572f8f) before the lane:
+  BR-CART-CONFLICT-KINDS (CR-583) getCart's overlappingTime and requiresPrerequisite rules, the two kinds never
+                   produced, the consent reads (booking consent records, not consent_record) and checkoutCart on them.
+  BR-UPGRADE-IN-PLACE (CR-584) an upgrade updates the contract in place and adds its prorated charge to
+                   pending_proration, billed once by generateInvoice and cleared by issueInvoice.
+  BR-SUBSCRIPTION-409-TYPES (CR-585) setSubscription's 409 types subscription-expired (checked first) and
+                   downgrade-conflict; the preview's conflicts typed the same; no enum on the problem's type.
+  BR-PREVIEW-DEFAULTS (CR-586) createPreview's defaults, no table read, no outputPreviews at 201, the cache entry
+                   before the outbox in its own transaction.
+  BR-MFA-ISSUER-TARGET (CR-587) the totp issuer from the tenant's root scope node; emailOtp's target defaults to the
+                   account's email, 400 otherwise.
+  BR-STEP-UP-ON-SESSION (CR-588) stepUpToken is always null; revokeAllSessions declares the MFA step-up on the
+                   session and no longer requires the token.
+  BR-VARIANT-SCOPE-VERSION (CR-589) setPromotionVariants' working-venue path, 403/404, version bump and audit row.
+  BR-WEB012-READS-CART (CR-590) WEB-012 reads getCart; the cart and order lines carry productId.
+  BR-BOOKING-ENTRY (CR-591) Product.bookingEntry and bundleId through WhiteLabel's one flow rule; GST-003's Book
+                   edges follow them.
+  BR-APPROVAL-CHAIN-READS (CR-592) the role-holder, currency and FX reads on the three routing operations, 422
+                   fx-rate-unavailable, and the platform rule's stored permission and minimum.
+  BR-VENUE-TIME-ZONE (CR-556 as corrected) TenantAppStatus.venues carries timeZone and GST-007 takes the zone from
+                   it.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2887,6 +2909,7 @@ def main() -> int:
     lane_w5_rules_r13(need, op, ops)
     lane_w3_rules_r13(need, op)
     lane_w1_rules_r13(need, op)
+    lane_f_rules_r14(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2931,7 +2954,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_F_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -4757,6 +4780,185 @@ def lane_w1_rules_r13(need, op):
          and "What a clone copies:" in words(clp.get("description"))
          and "`nameLocalised` null" in words(clp.get("description")),
          "cloneProduct does not take createProduct's code rules, refuse with 400, or state what a clone copies (CR-545)")
+
+
+R14_F_RULES = ["BR-CART-CONFLICT-KINDS", "BR-UPGRADE-IN-PLACE", "BR-SUBSCRIPTION-409-TYPES", "BR-PREVIEW-DEFAULTS",
+               "BR-MFA-ISSUER-TARGET", "BR-STEP-UP-ON-SESSION", "BR-VARIANT-SCOPE-VERSION", "BR-WEB012-READS-CART",
+               "BR-BOOKING-ENTRY", "BR-APPROVAL-CHAIN-READS", "BR-VENUE-TIME-ZONE"]
+
+
+def lane_f_rules_r14(need, op):
+    """r14 lane f (ADAM CR-583 to CR-592, and CR-556's corrected steps 5 and 6, decided by Chinmay on 3 November
+    2026: "the new one dont go in r15, log them and we add to r14 only", "Approve them"). Each rule fails on main
+    before the lane (9b572f8f)."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    def tables(o_, key):
+        return {str(x.get("table") if isinstance(x, dict) else x) for x in o_.get(key) or []}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def body(o_):
+        return ((((o_.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema")
+                or {})
+
+    def screen(rel, sid):
+        return next((x for x in load(rel).get("screens") or [] if x.get("id") == sid), {})
+
+    # BR-CART-CONFLICT-KINDS (CR-583)
+    gc = op("getCart")[3]
+    gcd = words(gc.get("description"))
+    mq = (load("contracts/satellite/marketing-crm.yaml").get("x-ticvai-queries") or {}).get("bookingConsentRecords") or {}
+    need("BR-CART-CONFLICT-KINDS", {("catalogue#performanceRecords", "in-process"), ("catalogue#productRecords",
+                                                                                     "in-process"),
+                                    ("marketing-crm#bookingConsentRecords", "service")} <= vias(gc)
+         and not any(q == "marketing-crm#consentRecords" for q, _ in vias(gc))
+         and mq.get("table") == "marketing.booking_consent_record" and "service" in (mq.get("served") or []),
+         "getCart does not declare the performance, product and booking-consent reads, or Marketing does not serve "
+         "bookingConsentRecords (CR-583)")
+    for frag in ("Two lines on the same performance are not a conflict", "One conflict per such line, `isBlocking` true",
+                 "stay in the kind list but are never produced", "getCart answers `consentQuestions: []`",
+                 "from 0 to that line's quantity minus 1", "A record at an older version does not count",
+                 "read these same computed fields and no other source"):
+        need("BR-CART-CONFLICT-KINDS", frag in gcd, f"getCart does not state {frag!r} (CR-583)")
+    need("BR-CART-CONFLICT-KINDS", "no other source" in words(op("checkoutCart")[3].get("description")),
+         "checkoutCart's consent checks do not read getCart's computed fields alone (CR-583)")
+
+    # BR-UPGRADE-IN-PLACE (CR-584)
+    sub = schemas("contracts/satellite/subscription.yaml")
+    ss = op("setSubscription")[3]
+    spp = (sub.get("SubscriptionPendingProration") or {})
+    need("BR-UPGRADE-IN-PLACE", spp.get("x-ticvai-persistence") == "control.contract"
+         and ((spp.get("properties") or {}).get("pendingProration") or {}).get("x-ticvai-column") == "pending_proration"
+         and "pendingProration" not in ((sub.get("Subscription") or {}).get("properties") or {}),
+         "control.contract has no pending_proration outside the Subscription response (CR-584)")
+    need("BR-UPGRADE-IN-PLACE", {"control.contract", "control.tenant"} <= tables(ss, "x-ticvai-writes")
+         and "no new contract row is written" in words(ss.get("description"))
+         and "two upgrades in one term add up" in words(ss.get("description")),
+         "setSubscription does not update the contract in place and add up the prorated charge (CR-584)")
+    gi, ii = op("generateInvoice")[3], op("issueInvoice")[3]
+    need("BR-UPGRADE-IN-PLACE", "pending_proration" in words([x for x in gi.get("x-ticvai-reads") or []])
+         and "never clears the column" in words(gi.get("description"))
+         and "control.contract" in tables(ii, "x-ticvai-writes")
+         and "A draft cancelled before issue leaves the amount pending" in words(ii.get("description")),
+         "generateInvoice does not bill pending_proration once, or issueInvoice does not clear it (CR-584)")
+
+    # BR-SUBSCRIPTION-409-TYPES (CR-585)
+    need("BR-SUBSCRIPTION-409-TYPES", ptypes(ss, "409") == {"subscription-expired", "downgrade-conflict"}
+         and "before the downgrade check" in words(ss.get("description"))
+         and "`type` takes no enum" in words((sub.get("DowngradeConflictProblem") or {}).get("description"))
+         and "downgrade-conflict" in words(op("previewSubscriptionChange")[3].get("description")),
+         "setSubscription's 409 does not name subscription-expired and downgrade-conflict, checked in that order, "
+         "with the preview's conflicts typed the same (CR-585)")
+
+    # BR-PREVIEW-DEFAULTS (CR-586)
+    cp = op("createPreview")[3]
+    cpd = words(cp.get("description"))
+    ev = load("events/preview-requested.yaml")
+    evf = {x.get("field"): x for x in ev.get("payload") or []}
+    need("BR-PREVIEW-DEFAULTS", "whitelabel.tenant_config" not in tables(cp, "x-ticvai-reads")
+         and "`platform` absent means `web`" in cpd and "`outputs` absent means `[app]`" in cpd
+         and "in its own database transaction" in cpd and "no `outputPreviews`" in cpd
+         and "platform" in ((schemas("contracts/satellite/white-label.yaml").get("Preview") or {}).get("required") or [])
+         and (evf.get("platform") or {}).get("required", True) is not False
+         and "always present" in words((evf.get("outputs") or {}).get("notes")),
+         "createPreview does not fill the defaults, read no table, answer without outputPreviews and write the cache "
+         "entry before the outbox (CR-586)")
+
+    # BR-MFA-ISSUER-TARGET (CR-587)
+    em = op("enrolMfaMethod")[3]
+    emd = words(em.get("description"))
+    need("BR-MFA-ISSUER-TARGET", ("tenancy#scopeRecords", "in-process") in vias(em)
+         and "{level: 'tenant'}" in emd and "a name is never made up" in emd
+         and "400" in (em.get("responses") or {}) and "the account's own email is used" in emd,
+         "enrolMfaMethod does not take the issuer from the tenant's root scope node or default emailOtp's target to "
+         "the account's email (CR-587)")
+
+    # BR-STEP-UP-ON-SESSION (CR-588)
+    vm = op("verifyMfaChallenge")[3]
+    ok200 = ((((vm.get("responses") or {}).get("200") or {}).get("content") or {}).get("application/json") or {})
+    sut = (((ok200.get("schema") or {}).get("properties") or {}).get("stepUpToken") or {})
+    ras = op("revokeAllSessions")[3]
+    need("BR-STEP-UP-ON-SESSION", "Always null" in words(sut.get("description"))
+         and "short-lived, single-purpose `stepUpToken`" not in words(vm.get("description"))
+         and ras.get("x-ticvai-step-up") == "mfa" and ras.get("x-ticvai-step-up-carrier") == "session"
+         and "stepUpToken" not in (body(ras).get("required") or []),
+         "verifyMfaChallenge still issues a step-up token, or revokeAllSessions still requires one in its body "
+         "(CR-588)")
+
+    # BR-VARIANT-SCOPE-VERSION (CR-589)
+    sv = op("setPromotionVariants")[3]
+    need("BR-VARIANT-SCOPE-VERSION", ("tenancy#scopeRecords", "in-process") in vias(sv)
+         and {"promotions.promotion_variant", "promotions.promotion", "promotions.promotion_audit"}
+         <= tables(sv, "x-ticvai-writes")
+         and "working-venue-required" in ptypes(sv, "403") and "404" in (sv.get("responses") or {})
+         and "set version = version + 1 returning version" in words(sv.get("description")),
+         "setPromotionVariants does not write the working venue's path, bump the version and audit the sets (CR-589)")
+
+    # BR-WEB012-READS-CART (CR-590)
+    w12 = screen("screens/P01-guest-web-storefront.yaml", "WEB-012")
+    orders = schemas("contracts/spine/orders.yaml")
+    olp = {}
+    for part in (orders.get("OrderLine") or {}).get("allOf") or []:
+        olp.update(part.get("properties") or {})
+    need("BR-WEB012-READS-CART", any(a.get("operationId") == "getCart" for a in w12.get("apis") or [])
+         and "productId" in ((orders.get("CartLine") or {}).get("properties") or {}) and "productId" in olp
+         and (olp.get("productId") or {}).get("readOnly") is True,
+         "WEB-012 does not read its cart, or the cart and order lines carry no productId (CR-590)")
+
+    # BR-BOOKING-ENTRY (CR-591)
+    prod = (schemas("contracts/spine/catalogue.yaml").get("Product") or {}).get("properties") or {}
+    be = prod.get("bookingEntry") or {}
+    wq = (load("contracts/satellite/white-label.yaml").get("x-ticvai-queries") or {}).get("publishedBookingFlowSteps") \
+        or {}
+    need("BR-BOOKING-ENTRY", be.get("enum") == ["dateFirst", "productFirst", "venueMap", "timeWindow", "bundle"]
+         and be.get("x-ticvai-persisted") is False and "bundleId" in prod and "service" in (wq.get("served") or [])
+         and all(("white-label#publishedBookingFlowSteps", "service") in vias(op(o)[3])
+                 for o in ("listProducts", "getProduct", "searchCatalogue")),
+         "Product carries no bookingEntry and bundleId worked out through WhiteLabel's one flow rule (CR-591)")
+    g3 = screen("screens/P02-guest-mobile-app.yaml", "GST-003")
+    pre = {t.get("to"): str(t.get("precondition") or "") for t in (g3.get("navigation") or {}).get("transitions") or []}
+    need("BR-BOOKING-ENTRY", all(f"`{v}`" in pre.get(k, "") for k, v in (("GST-007", "dateFirst"),
+                                                                         ("GST-008", "productFirst"),
+                                                                         ("GST-074", "venueMap"),
+                                                                         ("GST-075", "timeWindow"),
+                                                                         ("GST-056", "bundle"))),
+         "GST-003's Book edges do not follow bookingEntry (CR-591)")
+
+    # BR-APPROVAL-CHAIN-READS (CR-592)
+    reads = {("identity#delegatedAccessRecords", "in-process"), ("tenancy#venueSettingsRecords", "in-process"),
+             ("tenancy#regionSettingsRecords", "in-process"), ("finance#fxRateRecords", "in-process")}
+    apr = schemas("contracts/spine/approvals.yaml")
+    prr = apr.get("ApprovalRequestPlatformRule") or {}
+    need("BR-APPROVAL-CHAIN-READS", all(reads <= vias(op(o)[3]) for o in ("createApprovalRequest",
+                                                                         "submitApprovalRequest",
+                                                                         "evaluateApprovalRequirement"))
+         and ("platform-ops#platformApprovalRuleFor", "service") in vias(op("submitApprovalRequest")[3])
+         and "fx-rate-unavailable" in ptypes(op("createApprovalRequest")[3], "422")
+         and prr.get("x-ticvai-persistence") == "approvals.request"
+         and {"platformApproverPermission", "platformMinimumApprovals"} <= set(prr.get("properties") or {})
+         and "platform_minimum_approvals" in words(op("decideApprovalRequest")[3].get("description")),
+         "the approval routing operations do not declare the role-holder, currency and FX reads, or the platform "
+         "rule's permission and minimum are not stored and decided by (CR-592)")
+
+    # BR-VENUE-TIME-ZONE (CR-556 steps 5 and 6, as corrected)
+    tas = (schemas("contracts/satellite/white-label.yaml").get("TenantAppStatus") or {}).get("properties") or {}
+    vitem = ((tas.get("venues") or {}).get("items") or {}).get("properties") or {}
+    g7 = screen("screens/P02-guest-mobile-app.yaml", "GST-007")
+    need("BR-VENUE-TIME-ZONE", (vitem.get("timeZone") or {}).get("nullable") is True
+         and any(a.get("operationId") == "getTenantAppStatus" for a in g7.get("apis") or [])
+         and "not `PublishedTenantConfig`" in words(g7.get("notes")),
+         "TenantAppStatus.venues carries no timeZone, or GST-007 does not take the zone from it (CR-556 as "
+         "corrected)")
 
 
 if __name__ == "__main__":

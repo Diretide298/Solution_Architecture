@@ -1,0 +1,54 @@
+id: CHG-CR584-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: An upgrade updates the tenant's current control.contract row in place (plan_id, plan_name, plan_version, current_price
+  as previewSubscriptionChange prices it) and control.tenant.plan_id, and adds the preview's proratedAmount to a new nullable
+  column control.contract.pending_proration (SubscriptionPendingProration, never returned). generateInvoice bills it as
+  one oneOff line, a dry run included, and never clears it; issueInvoice sets it to null in the issuing transaction; a cancelled
+  draft leaves it pending.
+decision:
+  what: 'ADAM CR-584, posted on #30841: "Decided (Chinmay, 3 November 2026): an upgrade changes the tenant''s one subscription
+    record in place and records its prorated charge on it; the next invoice issued bills it once. Build now: (1) setSubscription,
+    upgrade: in one transaction update the tenant''s current control.contract row (the in-force row with the latest starts_at,
+    greatest id on a tie) in place: plan_id, plan_name, plan_version (the target plan''s latest version) and current_price
+    = the target package price, worked out as previewSubscriptionChange works it out (the version''s basePrice plus each
+    plan_module row''s control.module_listing price unless its pricingBasis is metered). id, status, starts_at, renews_at,
+    ..." The lead, 3 November 2026: "the new one dont go in r15, log them and we add to r14 only", then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-584 (#30841 setSubscription): the upgrade''s prorated charge was recorded nowhere and never invoiced, and
+  what an upgrade writes to control.contract was not said.'
+keys_touched:
+  operations:
+  - setSubscription
+  - generateInvoice
+  - issueInvoice
+  schemas:
+  - SubscriptionPendingProration
+  tables:
+  - control.contract
+  - control.tenant
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: a charge the contract promises with nowhere to record or bill it
+tickets:
+  started: []
+  unstarted:
+  - '30841 (setSubscription, On hold): the in-place update and pending_proration.'
+  - '28000 / 31361 (generateInvoice, New): the oneOff line.'
+  - 'issueInvoice''s ticket: clear the column when the invoice carries the line.'
+  - 'New task (MIG, migration owner): control.contract.pending_proration numeric(18,4) null, in the control database''s
+    r14 forward migration.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-584
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-UPGRADE-IN-PLACE
+status: open
+notes: 'Beyond the posted words: setSubscription now declares its reads of control.contract, control.plan and control.module_listing
+  (for the in-place price) and its writes of control.contract and control.tenant; issueInvoice declares its write of control.contract.
+  derive-ddl wrote the column into a new control forward migration, deleted before commit (the integration writes it).'

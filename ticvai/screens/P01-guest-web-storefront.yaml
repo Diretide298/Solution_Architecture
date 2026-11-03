@@ -540,7 +540,12 @@ screens:
 
 
     **A product''s event is Product.eventId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011),
-    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)'
+    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)
+
+
+    **Book uses the same two fields as the app''s Buy Tickets** (ADAM CR-591, Chinmay, 3 November 2026;
+    CHG-CR591-001): each listed product''s `bookingEntry` and `bundleId` (`listProducts`, `searchCatalogue`) say where
+    Book goes; nothing visible changes.'
   density: compact
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -947,7 +952,12 @@ screens:
 
 
     **A product''s event is Product.eventId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011),
-    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)'
+    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)
+
+
+    **Book uses the same two fields as the app''s Item Detail** (ADAM CR-591, Chinmay, 3 November 2026;
+    CHG-CR591-001): the product''s `bookingEntry` and `bundleId` (`getProduct`) say where Book goes; nothing visible
+    changes.'
   density: compact
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getProduct` reads one of them — list, select,
@@ -3430,8 +3440,23 @@ screens:
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
       - kind: cartPanel
-        notes: Order summary stays visible throughout. Never collapsed behind a link
-        provenance: carried from the previous definition
+        bindsTo: Cart
+        columns:
+        - Cart.lines
+        - Cart.subtotal
+        - Cart.discountTotal
+        - Cart.taxTotal
+        - Cart.total
+        operation: getCart
+        notes: 'Order summary stays visible throughout. Never collapsed behind a link. **Filled from the cart it is
+          about to pay for** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), as GST-009 already does: on load
+          `getCart` with the session''s `cartId` (the same guest session or anonymous cart session as WEB-010).
+          Until Pay now the panel shows the cart''s lines (product name, quantity, line total, add-ons under their
+          parent line) and its subtotal, discount, tax and total. It stays open on every state. Opened with an
+          `orderId` from a link, the screen calls `getOrder` instead of `getCart` and fills the same panel from the
+          order''s lines and totals; after Pay now has made the order, it keeps showing the order. Nothing visible
+          changes.'
+        provenance: carried from the previous definition; data from ADAM CR-590 (3 November 2026)
       - kind: progressIndicator
         label: Booking steps
         bindsTo: BookingFlow
@@ -3441,7 +3466,12 @@ screens:
         notes: The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
           venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
-          the same published settings (CMS-016) (CHG-SGU-022).
+          the same published settings (CMS-016) (CHG-SGU-022). **Which product** (ADAM CR-590). `productId` is taken
+          from the cart's lines by the rule WEB-010 and WEB-011 use, the first line with no parent line in cart
+          order (on an order-link arrival, from the order's lines by the same rule). The indicator is drawn from
+          the answer and `signInAt` is read from it, so with `atPayment` a guest who is not signed in gets the
+          sign-in or guest-code step (to WEB-016, keeping the cart) before Pay now. On a 404 the flow type's
+          default order is used, as the other booking screens do. The flow read is never called with no id.
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: consentBlock
         label: Terms and conditions
@@ -3480,7 +3510,8 @@ screens:
         notes: checkoutCart (once; its idempotency key is the cart's), then createPayment against the
           order it returns; an unknown payment outcome has the order to attach to.
   states:
-    loading: The checkout payment, read by `getOrder`.
+    loading: 'The checkout payment: `getCart`, or `getOrder` when an `orderId` came with the link (ADAM CR-590). If
+      the cart has no lines and there is no order, the guest is sent back to the cart (WEB-010).'
     error: Could not load. Names which read failed and leaves the checkout payment untouched.
     emptyFirstRun: No checkout payment yet. Offers Create order (`createOrder`).
     emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen,
@@ -3500,13 +3531,21 @@ screens:
       cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix
       before Block A starts (GFIX-6)).'
     trigger: onLoad
+  - operationId: getCart
+    contract: orders
+    purpose: 'The cart this screen is about to pay for, on load with the session''s `cartId`: the summary panel''s
+      lines and totals, and the first line with no parent line for `getPublishedBookingFlow`''s `productId`; not
+      called when an `orderId` came with the link, which reads `getOrder` instead (ADAM CR-590)'
+    trigger: onLoad
+    provenance: ADAM CR-590, decided by Chinmay on 3 November 2026
   - operationId: inquirePaymentStatus
     contract: orders
     purpose: Ask what happened to a payment that did not answer
     trigger: onAction
   - operationId: getPublishedBookingFlow
     contract: white-label
-    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12); `productId`
+      from the cart''s (or the order''s) first line with no parent line, never called with no id (ADAM CR-590)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
   - operationId: listPublishedPolicies

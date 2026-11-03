@@ -1,0 +1,44 @@
+id: CHG-CR589-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'setPromotionVariants reads the session''s working venue through tenancy#scopeRecords in process: no working venue
+  is 403 working-venue-required, an unknown promotion or one of another venue 404, both writing nothing. Every variant row''s
+  scope_path is the working venue''s path. In one transaction the old rows are deleted, the new inserted, promotion.version
+  goes up by one and one promotionEdited audit row records the sets before and after; channel publications are not touched.'
+decision:
+  what: 'ADAM CR-589, posted on #31433: "Decided (Chinmay, 3 November 2026): option A for the version and the audit values,
+    with option C''s read route; scope_path follows the rule already decided for venue-level writes (the session''s working
+    venue). Build now: (1) Declare and use one in-process read of Tenancy: tenancy#scopeRecords, by the session''s working
+    venue id, for that venue''s path. A session with no working venue is 403 working-venue-required, and nothing is written.
+    An unknown promotionId, or a promotion whose venue_id is not the working venue, is 404 (as updatePromotion answers),
+    and nothing is written. Every stored promotions.promotion_variant row gets scope_path = the working venue''s path, which
+    is then the promotion''s ..." The lead, 3 November 2026: "the new one dont go in r15, log them and we add to r14 only",
+    then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-589 (#31433 setPromotionVariants): the variant''s scope_path, the version bump and the audit row''s values
+  were unsaid.'
+keys_touched:
+  operations:
+  - setPromotionVariants
+  schemas:
+  - PromotionVariant
+  files:
+  - contracts/satellite/promotions.yaml
+  - tools/check-business-rules.py
+root_class: a write leaves the values the server sets unstated
+tickets:
+  started: []
+  unstarted:
+  - '31433 (setPromotionVariants, New): build to the posted comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-589
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-VARIANT-SCOPE-VERSION
+status: open
+notes: PromotionVariant.scopePath now says the working venue's path, never a region or tenant path (it said "its venue,
+  or the region or tenant that configured it").

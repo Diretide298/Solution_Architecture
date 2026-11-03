@@ -339,6 +339,34 @@ x-ticvai-queries:
       draft's languages for a venue-scoped caller before the tenant's first publish. Only the languages are used; the
       draft configuration stays readable by staff at the tenant root only (getTenantConfig, TENANT_CONFIGURE).
     served: [service]
+  publishedBookingFlowSteps:
+    module: white-label
+    table: whitelabel.config_version
+    inputs:
+      venueId: {type: string, format: uuid, description: 'The venue whose published booking flows resolve.'}
+      productIds: {type: array, items: {type: string, format: uuid}, description: 'The products of one page of a guest or visitor read.'}
+    returns:
+      type: array
+      description: 'One item per asked product: productId, the resolved flow type (flowTypeKey) and its enabled step
+        keys in order (stepKeys).'
+      items:
+        type: object
+        required: [productId, resolved]
+        properties:
+          productId: {type: string, format: uuid}
+          resolved: {type: boolean, description: 'True when an enabled published flow resolves for the product.'}
+          flowTypeKey: {type: string, nullable: true, description: 'The resolved flow''s type; when resolved is false, the type the kind rule picks, or null when no type lists the kind.'}
+          stepKeys: {type: array, items: {type: string}, description: 'The resolved flow''s enabled step keys in order; when resolved is false, that type''s default order.'}
+    rule: >-
+      A rule question (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). The flow rule is written once, in the
+      code behind getPublishedBookingFlow, and exposed here: for each product, against the published snapshot's
+      enabled flows of the venue, the product's own bookingFlowId, then its category's, then the venue's enabled
+      default flow for its kind with the same tie rule, exactly as getPublishedBookingFlow resolves it. It answers
+      the resolved flow type and its enabled step keys in order. A product that does not resolve is answered, never
+      refused, so a page is never an error. Asked from another deployable through WhiteLabel's service route
+      (serviceAuth), once per page, by catalogue listProducts, getProduct and searchCatalogue for
+      Product.bookingEntry, the same way Catalogue reads the published booking settings from white-label.
+    served: [service]
   storeAccountRecords:
     module: white-label
     table: whitelabel.store_account
@@ -2092,8 +2120,8 @@ paths:
           platform.venue_settings, Tenancy''s data (XDR-004)'
       - query: tenancy#regionSettingsRecords
         route: in-process
-        for: 'the venue''s region time zone, which day is today for openingHoursToday (ADAM CR-338):
-          platform.region_settings, Tenancy''s data (XDR-004)'
+        for: 'the venue''s region time zone, which day is today for openingHoursToday (ADAM CR-338) and each venue''s
+          timeZone (ADAM CR-556 as corrected): platform.region_settings, Tenancy''s data (XDR-004)'
       x-ticvai-audience:
       - device
       - guest
@@ -4578,9 +4606,6 @@ paths:
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-014 Publishing Workflow"
       x-ticvai-names-for-context: [orders.ticket_template]
-      x-ticvai-reads:
-      - table: whitelabel.tenant_config
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: platform-ops#tenantDomainRecords
         route: in-process
@@ -4618,9 +4643,10 @@ paths:
 
         **It reads nothing from Catalogue or Orders** (ADAM CR-476, Chinmay, 2 November 2026). It asks no query
         of either and calls no service route, and the operations role gets no grant on `orders.ticket_template`.
-        It validates the body and writes `cache:preview:{tenantId}:{previewId}` with `expiresAt`; in the same
-        transaction it writes `preview.requested` to the outbox (`previewId`, `platform`, `language`, `outputs`,
-        `productId` as sent, `expiresAt`), then answers `201` with the Preview (CR-106). Rendering the app, the PDF
+        It validates the body and writes `cache:preview:{tenantId}:{previewId}` with `expiresAt`; then it writes
+        `preview.requested` to the outbox (`previewId`, `platform`, `language`, `outputs`, `productId`, `expiresAt`,
+        with the defaults filled in and in the order ADAM CR-586 sets below), then answers `201` with the Preview
+        (CR-106). Rendering the app, the PDF
         ticket and the Wallet passes is the white-label jobs component''s work in the workers host, triggered by
         `preview.requested`: like every consumer in the workers host it asks `catalogue#productRecords` (ids
         `[productId]`) and `orders#ticketTemplateRecords` in process, and Orders implements ticketTemplateRecords
@@ -4640,6 +4666,32 @@ paths:
         event''s `tenantId`. Its time to live is until `expiresAt`. Otherwise createPreview is unchanged: it
         validates, writes the entry and `preview.requested` to the outbox, and answers 201 Preview with
         `previewId`, `url` and `expiresAt`.
+
+
+        **Defaults, the 201, no table read and the write order** (ADAM CR-586, option A, Chinmay, 3 November 2026;
+        CHG-CR586-001). (1) The body stays optional as published. The defaults are filled in before anything is
+        written: `platform` absent means `web`; `outputs` absent means `[app]`; `expiresInHours` absent means 24. The
+        cache entry, the `preview.requested` event and the 201 all carry the values used: `platform` always one of
+        `ios`, `android` or `web`, and `outputs` always a list that is not empty. The event''s `platform` and
+        `outputs` are always present. (2) The 201 answers `previewId`, `url`, `expiresAt`, `platform` and `language`
+        (`language` only when it was sent) and no `outputPreviews`. The new cache entry also holds no
+        `outputPreviews`. The renderer in the workers host adds one entry (`output`, `url`) to the cache entry''s
+        `outputPreviews` as it finishes each output, so the list grows from absent to one entry per output asked
+        for. `getPreview` answers whatever the entry holds at that moment: an output not rendered yet is simply
+        missing from the list, not an error. Each output''s `url` expires with the preview at `expiresAt`. (3)
+        createPreview reads no table. It does not read `whitelabel.tenant_config` and does not refuse when the draft
+        is missing; it has no new error response. Its only reads are the tenant''s platform subdomain hostname,
+        through the one WhiteLabel reader it shares with getPlatformSubdomain. Reading the draft is the renderer''s
+        work, on its own ticket. (4) **Write order**: first the cache entry through the kernel''s keyed store
+        (logical key `preview:{previewId}`, time to live until `expiresAt`). Then `preview.requested` is committed to
+        the outbox in its own database transaction. Then the answer is 201. If the cache write fails, nothing is
+        written and the answer is a server error. If the outbox commit fails after the cache write, the answer is a
+        server error and the entry is left: no event names it, nothing renders it, and it expires at `expiresAt`. A
+        retry with the same `Idempotency-Key` replays as usual. **Contract tests**: a body of `{}` gives 201 with
+        `platform` `web` and no `outputPreviews`, and the event carries `platform` `web` and `outputs` `[app]`; a body
+        with `outputs` `[pdfTicket]` gives an event with `outputs` `[pdfTicket]`; no query runs against
+        `whitelabel.tenant_config`. **For the renderer ticket**: render the draft, read in the white-label module,
+        and add each output to `outputPreviews` as it finishes.
 
         '
       tags:
@@ -4663,6 +4715,8 @@ paths:
                   - ios
                   - android
                   - web
+                  description: Absent means `web` (ADAM CR-586); the value used is what the cache entry, the event
+                    and the 201 carry.
                 theme:
                   type: string
                   deprecated: true
@@ -4675,7 +4729,8 @@ paths:
                   pattern: ^[a-z]{2}$
                 outputs:
                   type: array
-                  description: What to render besides the app (CHG-CSA-041). Absent means `app` only.
+                  description: What to render besides the app (CHG-CSA-041). Absent means `[app]` (ADAM CR-586);
+                    the list used, never empty, is what the cache entry and the event carry.
                   items:
                     type: string
                     enum:
@@ -4723,7 +4778,9 @@ paths:
         not in a table; this answers it as created (its link and rendered outputs), so a reviewer who reloads the
         page sees the same preview. After `expiresAt` it is gone: 404, and the screen offers to create a new one.
         It reads the entry through the kernel''s `IKeyedState` with the logical key `preview:{previewId}`, as
-        createPreview writes it (ADAM CR-507, 3 November 2026).'
+        createPreview writes it (ADAM CR-507, 3 November 2026). It answers whatever the entry holds at that moment
+        (ADAM CR-586, Chinmay, 3 November 2026; CHG-CR586-001): `outputPreviews` grows as the renderer finishes each
+        output, and an output not rendered yet is simply missing from the list, not an error.'
       tags:
       - publishing
       x-ticvai-permission: TENANT_CONFIGURE
@@ -7250,6 +7307,14 @@ paths:
         enabled flow wins. If none resolves, `flowTypeKey` is tried when sent, then the answer is 404 `not-found`. An
         `eventId` that is not an event of the venue (`catalogue#eventRecords` ids [`eventId`] where {`venueId`},
         asked in process) is 404 `not-found`. GST-007 opened from an event sends `eventId`.
+
+
+        **The rule is written once and served to Catalogue** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001).
+        The resolution above lives in one place, the code behind this operation, and is exposed as the service query
+        `white-label#publishedBookingFlowSteps`: given a venue and a list of product ids, it answers for each product
+        the resolved flow type and its enabled step keys in order. Catalogue asks it once per page, by service route,
+        for `Product.bookingEntry`; it never copies the rule. A product that does not resolve is answered with the
+        kind fallback, never an error for the page.
 
         '
       tags:
@@ -11129,6 +11194,13 @@ components:
                   closes:
                     type: string
                     pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              timeZone:
+                type: string
+                nullable: true
+                description: '**The venue''s time zone, an IANA name** (ADAM CR-556 as corrected, Chinmay, 3 November 2026;
+                  CHG-CR556-002): the venue''s `RegionSettings.timeZone`, read through `regionSettingsRecords`, the zone
+                  `openingHoursToday` already uses. Null when not set. Additive; nothing else changes. Select Date &
+                  Time (GST-007) works out the venue day in it.'
         whatsNew:
           type: array
           maxItems: 10
@@ -13391,6 +13463,7 @@ components:
       - previewId
       - url
       - expiresAt
+      - platform
       properties:
         previewId:
           type: string
@@ -13417,7 +13490,11 @@ components:
           type: array
           readOnly: true
           description: '**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay,
-            2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`.'
+            2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`, once
+            rendered. **Grows as the renderer finishes** (ADAM CR-586, Chinmay, 3 November 2026; CHG-CR586-001):
+            absent in the 201 and in the new cache entry; the renderer in the workers host adds one entry (`output`,
+            `url`) as it finishes each output. `getPreview` answers whatever the entry holds: an output not rendered
+            yet is missing from the list, not an error.'
           items:
             type: object
             required:

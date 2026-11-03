@@ -1,0 +1,45 @@
+id: CHG-CR588-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: verifyMfaChallenge answers stepUpToken null for every challenge; the step-up proof is the verified identity.mfa_challenge
+  row on the caller's session, expiresAt verified_at plus 5 minutes, consumed only by consumeMfaStepUp. The operation's
+  wording and its 200 are as posted. revokeAllSessions declares an MFA step-up carried on the session (action revokeAllSessions)
+  and no longer requires stepUpToken (deprecated, ignored).
+decision:
+  what: 'ADAM CR-588, posted on #30666: "Decided (Chinmay, 3 November 2026): option A. Build now: (1) verifyMfaChallenge
+    returns stepUpToken: null for every challenge, signIn and step-up alike. Do not generate, sign, store or log a token,
+    and add no column to identity.mfa_challenge. The response shape stays as it is (stepUpToken nullable, expiresAt, session).
+    (2) For a step-up, the proof is the identity.mfa_challenge row itself: status verified and verified_at set, bound to
+    the challenge''s action and the caller''s session. The expiresAt you return is verified_at plus 5 minutes. consumeMfaStepUp
+    remains the only check: it finds that row on the caller''s session and sets consumed_at, and answers 403 step-up-token-missing
+    or ..." The lead, 3 November 2026: "the new one dont go in r15, log them and we add to r14 only", then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-588 (#30666 verifyMfaChallenge): since CR-375 moved the step-up onto the session, stepUpToken had no format,
+  lifetime, store or reader.'
+keys_touched:
+  operations:
+  - verifyMfaChallenge
+  - revokeAllSessions
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: a response field left over from a replaced mechanism
+tickets:
+  started: []
+  unstarted:
+  - '30666 (verifyMfaChallenge, On hold): stepUpToken null, no token anywhere.'
+  - '33749 (revokeAllSessions): the MFA step-up on the session; stepUpToken ignored (status not known to this lane; if started,
+    a follow-up comment).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-588
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-STEP-UP-ON-SESSION
+status: open
+notes: 'Not changed, beyond this decision: decideApprovalRequest''s body (approvals.yaml) and another approvals body still
+  carry a stepUpToken field, which rule (4) says a tenant operation never reads; the Control Plane operations'' stepUpToken
+  fields are the platform path and unchanged.'
