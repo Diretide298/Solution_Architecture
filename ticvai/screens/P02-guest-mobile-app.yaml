@@ -9102,10 +9102,10 @@ screens:
       provenance: flow F49 step 5→6
     - to: GST-009
       trigger: Checkout
-      provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+      provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction); no payment id since Checkout
+        makes no order here (ADAM CR-576)
       carries:
       - orderId
-      - paymentId
       - token
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Promo code added 28

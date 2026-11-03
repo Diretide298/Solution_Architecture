@@ -1561,6 +1561,10 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'the venue''s time zone (RegionSettings.timeZone), for visitStartsAt''s offset (ADAM CR-578)'
+      - query: access#entitlementRecords
+        route: in-process
+        for: 'the entitlements each line issued (OrderLine.entitlementIds), for the lines the 200 and the linkExpired and
+          linkPaid 410s answer (ADAM CR-578)'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -1664,6 +1668,10 @@ paths:
         route: in-process
         for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data, for the
           lines its 410 shares with getPaymentLink (PaymentLinkProblem, ADAM CR-578; CHG-R10GEN-001)'
+      - query: access#entitlementRecords
+        route: in-process
+        for: 'the entitlements each line issued (OrderLine.entitlementIds), for the lines its 410 shares with
+          getPaymentLink (PaymentLinkProblem, ADAM CR-578)'
       security:
       - guestAuth: []
       - {}
@@ -27831,19 +27839,19 @@ components:
               chargeCurrency:
                 type: string
                 pattern: ^[A-Z]{3}$
-                description: '`Order.chargeCurrency`.'
+                description: The currency the guest is charged in, as the order holds it.
               chargeTotal:
                 allOf:
                 - $ref: ../shared/common.yaml#/components/schemas/Money
-                description: The new `Order.chargeTotal`, in the charge currency.
+                description: The new charge total the order now holds, in the charge currency.
               chargeFxRate:
                 allOf:
                 - $ref: '#/components/schemas/ExchangeRateDecimal'
-                description: The new `Order.chargeFxRate`, the region's tender rate in force.
+                description: The new rate the order now holds, the region's tender rate in force.
               chargeRateLockedUntil:
                 type: string
                 format: date-time
-                description: The new `Order.chargeRateLockedUntil`, now plus `cartLeaseSeconds`.
+                description: Until when the new quote holds, now plus the venue's cart lease.
     InvitationRefusedProblem:
       x-ticvai-persistence: none — error shape
       allOf:

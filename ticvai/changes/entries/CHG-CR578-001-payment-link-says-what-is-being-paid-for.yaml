@@ -22,6 +22,7 @@ why: 'ADAM CR-578 (Chitrangi Mestry, #31901 WEB-014): getPaymentLink''s lines ca
 keys_touched:
   operations:
   - getPaymentLink
+  - payByLink
   schemas:
   - PaymentLinkLine
   - PaymentLinkProblem
@@ -48,5 +49,8 @@ status: open
 notes: 'Beyond the posted words: the package keeps the default language per tenant (white-label LanguageConfig
   .defaultLanguage), so "the venue''s default language" is read through white-label#tenantLanguageRecords (service), and
   the venue''s offset comes from its region''s time zone (tenancy#regionSettingsRecords); the 410 names its four problem
-  types. GST-009 also shows a payment link through
+  types; getPaymentLink also declares access#entitlementRecords for the lines'' entitlementIds. payByLink shares
+  PaymentLinkProblem, so it declares the catalogue product and performance reads and access#entitlementRecords for the
+  lines that shape can carry (check-cross-module-reads XR-FACT, check-error-sources E-SCHEMA-READ-VIA), though only
+  getPaymentLink fills them; a problem schema of getPaymentLink''s own would avoid that, if the lead prefers it. GST-009 also shows a payment link through
   getPaymentLink; it gains the fields without a change to its record. No screen changes: WEB-014''s notes only.'
