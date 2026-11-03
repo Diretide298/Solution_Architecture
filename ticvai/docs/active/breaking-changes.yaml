@@ -2132,3 +2132,42 @@ changes:
       '33873', '33886', '33887', '33888', '33895', '33896', '33897', '33898', '33899', '33900', '33904', '33905', '33906',
       '33907', '33908', '33909', '33910', '33911', '33912', '33913', '33914', '33915', '34030', '34031', '34032', '35089',
       '35090', '35091', '36340', '36341', '36342', '37014', '37040', '37041', '37042']
+  - id: BC-740
+    contract: subscription
+    operation: addCapacityPack
+    change: "`unit`"
+    reason: 'ADAM CR-560 (CHG-CR560-001): CapacityPack.unit, a free string, becomes the UsageMetric enum (venues,
+      workstations, activeUsers, devices, brandedApps, aiTokens, apiCalls, storageGb, transactions, guestProfiles), and
+      addCapacityPack refuses any other unit 400 validation naming unit. A narrowed request field, and a response field
+      typed anew, are breaking.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-560 posted on #30841: "Capacity packs: CapacityPack.unit takes the
+      UsageMetric values ... addCapacityPack refuses any other unit with 400 validation naming the unit field"), the
+      lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['29312']
+    consumer-tickets: [none-linked]
+  - id: BC-741
+    contract: subscription
+    operation: previewSubscriptionChange
+    change: "`modulesGained`"
+    reason: 'ADAM CR-568 (CHG-CR568-001): SubscriptionPreview.modulesGained, a list of free strings, becomes a list of
+      ModuleKey values, always present (an empty list rather than the field left out). A response field typed anew is
+      breaking by the compat rule.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-568 posted on #31281: "modulesGained / modulesLost: ModuleKeys in the
+      licence position after but not before, and before but not after ... Sort ascending; return [] rather than leaving
+      the field out"), the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['31281']
+    consumer-tickets: [none-linked]
+  - id: BC-742
+    contract: subscription
+    operation: previewSubscriptionChange
+    change: "`modulesLost`"
+    reason: 'ADAM CR-568 (CHG-CR568-001): SubscriptionPreview.modulesLost, a list of free strings, becomes a list of
+      ModuleKey values, always present. A response field typed anew is breaking by the compat rule.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-568 posted on #31281: "modulesGained / modulesLost: ModuleKeys in the
+      licence position after but not before, and before but not after ... Sort ascending; return [] rather than leaving
+      the field out"), the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['31281']
+    consumer-tickets: [none-linked]

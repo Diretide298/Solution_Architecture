@@ -4277,6 +4277,10 @@ paths:
         for: 'its read of control.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
+      - service
+      security:
+      - bearerAuth: []
+      - serviceAuth: []
       x-ticvai-read-routing: replica
       summary: Read module enablement
       description: 'Shows which modules the tenant has licensed and which are enabled. A module that is
@@ -4287,6 +4291,31 @@ paths:
         in-force contract rule `LicencePosition` states (ADAM CR-449; CHG-CR449-001).
         **A platform operator sends `X-Tenant-Id`** (`TenantId`; APPROVALS-TENANCY-C44) to read a tenant''s
         enablement from the cell that holds many tenants; the cell address is `Tenant.cellHost`.
+
+
+        **Who may call it** (ADAM CR-555, Chinmay, 3 November 2026, option A with the service caller narrowed to
+        Platform; CHG-CR555-001). What it returns does not change; only who may call it. (1) **Staff, as today**: a
+        bearer token with `TENANT_CONFIGURE` at tenant scope, checked through the kernel''s ordinary permission
+        check, not by reading the session''s permission list, so a platform operator''s call works with no change
+        here once platform sign-in lands. (2) **A service call** (`serviceAuth` beside `bearerAuth`): it acts for no
+        person, so no permission is checked; the calling deployable is checked instead, and **only Platform (the
+        Control Plane)** is admitted, the one caller the contracts declare (`setSubscription`,
+        `previewSubscriptionChange` and `removeLicenceAddOn` each list `white-label.getModuleEnablement` among their
+        calls). Any other calling deployable is `403`. A missing, expired or wrong-audience token is `401`, as the
+        kernel''s service sign-in answers; the token is validated only through the kernel''s shared service sign-in,
+        with no token check of this operation''s own. The tenant is the one the kernel sets from the verified call:
+        `X-Tenant-Id` as the Control Plane sends it. A service call without it is `400 tenant-required`, and a tenant
+        this cell does not hold is `404`, as `X-Tenant-Id` in common.yaml says. The read runs at the tenant root and
+        answers exactly the rows, fields and order a staff call gets, so the Control Plane''s downgrade and add-on
+        checks read `isEnabled`, `moduleKey` and `displayName` as this cell returns them. It writes nothing. (3) **A
+        platform operator''s call** (the Platform Console sending `X-Tenant-Id`) belongs to the platform sign-in
+        ticket, which in every cell host builds the check of the Control Plane token and the platform caller, whose
+        tenant permissions are the grant''s, at the tenant root, while a platform-staff grant is open. This
+        operation builds no operator-token check, grant lookup or stand-in platform caller: until that ticket lands
+        an operator''s call is refused as any bearer token not issued for the tenant is (`401`); once it lands, an
+        operator with no open grant is `403`. (4) A Control Plane caller signing in to a cell from outside it is a
+        separate piece of work under the service sign-in ticket (#37051); this operation relies on the kernel''s
+        validation and does not wait for it (tested with a stand-in for the verified service caller).
 
          **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
@@ -4306,6 +4335,26 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ModuleEnablement'
+        '400':
+          description: 'A service call without `X-Tenant-Id` (`tenant-required`; ADAM CR-555, CHG-CR555-001). Nothing
+            is read.'
+          x-ticvai-problem-types: [tenant-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '403':
+          description: 'A staff caller without `TENANT_CONFIGURE` at tenant scope, or a service call from any
+            deployable but Platform (the Control Plane) (ADAM CR-555, CHG-CR555-001).'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
@@ -14586,4 +14635,5 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Cell-to-cell. The `ai` service proposing Help me choose set-ups (`proposeGuidedChoice`).
+      description: Cell-to-cell. The `ai` service proposing Help me choose set-ups (`proposeGuidedChoice`), and
+        Platform (the Control Plane) reading `getModuleEnablement` for its downgrade and add-on checks (ADAM CR-555).

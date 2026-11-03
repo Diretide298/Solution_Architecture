@@ -1,0 +1,43 @@
+id: CHG-CR560-002
+date: '2026-11-04'
+source: cr
+kind: contract
+summary: 'CR-560 point (2), as corrected: setSubscription''s downgrade check, and previewSubscriptionChange which runs
+  the same check, find the tenant''s home cell from control.tenant.region_id (the tenant''s home region), then the
+  control.cell_tenant row for the tenant with status live whose control.cell is in that region, and that cell''s active
+  control.cell_endpoint, the address asked for getModuleEnablement. control.tenant is declared for region_id only;
+  Tenant.cellHost is not read. No live row in the home region, or no active endpoint, is the cell that does not answer
+  (503, nothing written).'
+decision:
+  what: 'The correction posted on #30841 and #31281 (4 November 2026, mail off), under the lead''s instruction of 4
+    November 2026 ("take the recommended decision unless its very very important"): "find the home cell from
+    control.tenant.region_id (the tenant''s home region), then the live control.cell_tenant row in that region, its
+    control.cell and the active control.cell_endpoint; declare control.tenant for region_id only, not cellHost."'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'CHG-CR560-001 stopped on point (2): the posted rule named a home mark control.cell_tenant does not have, and
+  CR-568 listed control.tenant (cellHost) among the preview''s reads. The correction names the tenant''s region as the
+  home mark.'
+keys_touched:
+  operations: [setSubscription, previewSubscriptionChange]
+  tables: [control.tenant, control.cell_tenant, control.cell, control.cell_endpoint]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: a cross-cell call with no stated caller, and a unit with no vocabulary
+tickets:
+  started: []
+  unstarted:
+  - '30841 (setSubscription, Sanket Keluskar, On hold): as the correction posted on it says.'
+  - '31281 (previewSubscriptionChange, On hold): the same, through the one shared check function.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-560
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CELL-CALL-CLIENT
+status: open
+notes: 'removeLicenceAddOn still reads control.tenant (cellHost) for its own getModuleEnablement call: the correction
+  names only the two operations above, so it is left as it is and listed for the lead (recommendation: the same home
+  cell rule, through the same function, in the next round of answers).'

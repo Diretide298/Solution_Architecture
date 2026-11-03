@@ -1,0 +1,61 @@
+id: CHG-CR560-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'setSubscription states how the downgrade check calls the tenant''s cell: through the seam
+  ITenantModuleEnablement, default cell unreachable (503); upgrades, first plans and reactivation never call it;
+  serviceAuth issued to the control plane''s own cell identity (sub its cell, aud cell, tid the path''s tenant) over
+  mutual TLS, X-Tenant-Id the same tenant, a mismatch refused; a 5-second timeout, a 5xx or a connection failure is 503
+  with nothing written; the real client is kernel work on its own ticket. CapacityPack.unit is a UsageMetric;
+  addCapacityPack refuses another unit 400 validation naming unit; a pack counts only toward its unit''s metric in
+  targetLimit, unexpired by validFrom/validTo as posted, and a stored row with another unit counts toward no metric.
+  Point (2) of the posted decision (how the home cell and its address are found) is not built: see notes.'
+decision:
+  what: 'Posted on #30841 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the
+    devs" (3 November 2026): "CR-541 stands. The downgrade check asks the tenant''s cell, and if the cell does not
+    answer the call is 503 and nothing is written ... (1) Keep your seam (ITenantModuleEnablement) and its test
+    double ... (3) The call uses serviceAuth as common.yaml defines it ... A timeout (5 seconds), any 5xx or a
+    connection failure is 503 with nothing written. (4) The real client is kernel work on its own ticket ... (5)
+    Capacity packs: CapacityPack.unit takes the UsageMetric values ... addCapacityPack refuses any other unit with 400
+    validation naming the unit field ..."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-560 (Sanket Keluskar, #30841 setSubscription): nothing said how the control plane calls a tenant''s cell
+  for CR-541''s getModuleEnablement call (CHG-CR541-001), and CapacityPack.unit was free text.'
+keys_touched:
+  operations: [setSubscription, addCapacityPack]
+  schemas: [CapacityPack]
+  tables: [control.capacity_pack]
+  files:
+  - contracts/satellite/subscription.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: a cross-cell call with no stated caller, and a unit with no vocabulary
+tickets:
+  started: []
+  unstarted:
+  - '30841 (setSubscription, Sanket Keluskar, On hold): build to the posted comment.'
+  - '29312 (addCapacityPack, not started): refuse a unit that is not a UsageMetric with 400 validation naming unit.'
+  - 'A new kernel task (see notes), for the plan pass.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-560
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CELL-CALL-CLIENT
+status: open
+notes: 'STOPPED on point (2), left as CR-541 wrote it (the cell at Tenant.cellHost, the read of control.tenant): the
+  posted rule finds the home cell as "the control.cell_tenant row for the tenant with status live whose control.cell
+  is in the tenant''s home region" and says "Read control.cell_tenant, control.cell and control.cell_endpoint, not
+  control.tenant", but the tenant''s home region is stored only in control.tenant.region_id (Tenant.regionId);
+  control.cell_tenant has no home mark. And CR-568, posted the same day on #31281, lists control.tenant (cellHost)
+  among the reads of the preview that runs this same check as one function. The lead''s follow-up decides point (2).
+  Beyond the posted words: CapacityPack.unit as a UsageMetric makes derive-ddl give control.capacity_pack.unit the
+  CHECK every contract enum gets (capacity_pack_unit_chk), in the release''s forward migration; BC-740 records the
+  narrowed request field; addCapacityPack declares the shared 400. Second prevention: BR-CAPACITY-PACK-UNIT. New task
+  for the plan pass: "[BE] Kernel: a cross-cell service client beside IServiceClient for the control plane to call a
+  tenant''s cell (target cell and tenant, the address, the token and certificate from the control plane''s service
+  identity; 503 when the cell does not answer); it replaces ITenantModuleEnablement''s default", parent #27687, owner
+  the kernel owner. It and CR-555''s new task under #37051 are the two ends of one call: the plan pass may make them one
+  ticket.'

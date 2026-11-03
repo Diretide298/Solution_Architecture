@@ -1996,6 +1996,13 @@ paths:
         what that tenant may be sold: the standard packages and the custom packages offered to it, never
         another tenant''s private package. Without it, every plan, for platform staff configuring them.
 
+        **One item per plan, its current version** (ADAM CR-567, Chinmay, 3 November 2026; CHG-CR567-001), by the one reader `PlanReader.Current`
+        (`Plan.isActive` states it), with the `offeredToTenantId` and `packageKind` filters as above (a private
+        package is still shown only to its tenant). Earlier versions are not listed: the approved plan table on
+        ADM-008 shows code, name, description, cell tier, base price and billing period with no version, and every
+        version has the plan''s code, so listing them would show one plan several times. A subscriber''s version is
+        still read from its contract (`planId`, `planVersion`).
+
         '
       tags:
       - plan
@@ -2118,6 +2125,9 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: Read a plan
+      description: '**The current version of `planId`, with its modules and limits** (ADAM CR-567, Chinmay, 3 November 2026; CHG-CR567-001), by
+        the one reader `PlanReader.Current` (`Plan.isActive` states it), which replaces the `published_at` ordering.
+        404 when no row has that id.'
       tags:
       - plan
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -2229,6 +2239,13 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: Read the current subscription
+      description: '**Which contract is current, as built** (ADAM CR-567, Chinmay, 3 November 2026; CHG-CR567-001), in `SubscriptionReader.Current`:
+        of the tenant''s `control.contract` rows with `starts_at` on or before today, the latest `starts_at`, then
+        the greatest `id` (ids are time-ordered, so this is the latest made). Any status counts, so an expired
+        contract is answered and the console can show why `setSubscription` refuses. 404 when none has started. It
+        does not read `control.tenant.subscription_id`: that column is in storage, but no operation writes it and
+        the `Tenant` record has no field for it. `previewSubscriptionChange` and `setSubscription` use this same
+        reader for the tenant''s current contract.'
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -2277,7 +2294,12 @@ paths:
         target plan version licenses fewer modules or a lower limit for any metric. **Modules**: what would be
         licensed after the change is the target plan version''s modules, every in-force add-on (add-ons survive a
         plan change) and `core`, combined by the one method that builds `LicencePosition` (ADAM CR-531). The Control
-        Plane asks the tenant''s cell, at `Tenant.cellHost` with `serviceAuth` and `X-Tenant-Id`, for white-label
+        Plane asks the tenant''s home cell with `serviceAuth` and `X-Tenant-Id` (**the home cell**, ADAM CR-560 point (2)
+        as corrected by Chinmay, 4 November 2026, CHG-CR560-002: the tenant''s home region is `control.tenant.region_id`;
+        the home cell is the one whose `control.cell_tenant` row for the tenant has `status` `live` and whose
+        `control.cell` has that `region_id`, and its address the `control.cell_endpoint` of that cell with `status`
+        `active`; `Tenant.cellHost` is not read. No live row in the home region, or no active endpoint, is the cell
+        that does not answer), for white-label
         `getModuleEnablement`; each row with `isEnabled` true whose licence module (the feature-to-module table on
         `ModuleKey` in common.yaml) is not in that set goes into `modulesInUse`, with `moduleKey` (the white-label
         feature key, as the cell returns it, so the tenant knows what to switch off), `displayName` and `isEnabled` as
@@ -2289,6 +2311,24 @@ paths:
         entries the answer is 409 `DowngradeConflictProblem` naming every conflict, and nothing is written; otherwise
         the downgrade is scheduled as above. `previewSubscriptionChange` returns the same conflicts from the same
         check.
+
+        **How the cell is called** (ADAM CR-560, Chinmay, 3 November 2026; CHG-CR560-001): CR-541 stands; the package already says how a cell
+        is called, so nothing new is invented. (1) The call goes through a seam, `ITenantModuleEnablement`, with a
+        test double; its default stays ''cell unreachable'', so a downgrade answers 503 until the real client lands.
+        Upgrades, first plans and reactivation never call it. (3) The call uses `serviceAuth` as common.yaml defines
+        it: a short-lived token issued to the control plane''s own cell identity, `sub` the control plane''s cell,
+        `aud` `cell`, `tid` the tenant in the path (never the request''s tenant, never the operator''s token), over
+        mutual TLS with the control plane''s client certificate. `X-Tenant-Id` carries the same tenant, and the cell
+        refuses a mismatch. A timeout (5 seconds), any 5xx or a connection failure is 503 with nothing written. (4)
+        The real client is kernel work on its own ticket: a cross-cell service client beside `IServiceClient` that
+        takes a target cell and tenant, finds the address, gets the token and certificate from the control plane''s
+        service identity, and calls; when it lands it replaces the seam''s default, and this operation''s code does
+        not change. The tenant''s current contract is read by `getSubscription`''s reader,
+        `SubscriptionReader.Current`, and the default `planVersion` by `PlanReader.Current` (ADAM CR-567;
+        CHG-CR567-001). (5) **Capacity packs in `targetLimit`**: a pack counts only toward the metric its `unit` names
+        (`CapacityPack.unit`, a `UsageMetric`), for both this operation and `previewSubscriptionChange`. A pack is
+        unexpired when `validFrom` is today or earlier (or not set) and `validTo` is today or later (or null). A
+        stored row whose `unit` is not a `UsageMetric` value counts toward no metric.
 
         **When a change takes effect, and what is prorated** (decided 28 September, audit R214 (1)). **An
         upgrade takes effect immediately and is always prorated**: the tenant pays the difference for the
@@ -2350,7 +2390,17 @@ paths:
       - table: control.licence_add_on_limit
         for: 'the downgrade check: the limits the in-force add-ons raise (ADAM CR-541)'
       - table: control.tenant
-        for: 'the downgrade check: the tenant''s cell address (cellHost), asked for getModuleEnablement (ADAM CR-541)'
+        for: 'the downgrade check: the tenant''s home region (region_id only), to find its home cell (ADAM CR-560 point
+          (2), CHG-CR560-002)'
+      - table: control.cell_tenant
+        for: 'the downgrade check: the tenant''s live cell database in its home region (ADAM CR-560 point (2),
+          CHG-CR560-002)'
+      - table: control.cell
+        for: 'the downgrade check: the cell of that row, in the tenant''s home region (ADAM CR-560 point (2),
+          CHG-CR560-002)'
+      - table: control.cell_endpoint
+        for: 'the downgrade check: the home cell''s active endpoint, the address asked for getModuleEnablement (ADAM
+          CR-560 point (2), CHG-CR560-002)'
       - table: control.contract
         for: 'the tenant''s current contract, updated in place on an upgrade (ADAM CR-584)'
       - table: control.plan
@@ -2434,6 +2484,29 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: control.plan
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: control.plan_module
+        for: 'the licence position before and after, and each version''s package price (ADAM CR-568)'
+      - table: control.plan_limit
+        for: 'the limits before and after, for the downgrade test and the downgrade check (ADAM CR-568)'
+      - table: control.licence_add_on
+        for: 'the in-force add-ons, which survive the change (ADAM CR-568)'
+      - table: control.licence_add_on_limit
+        for: 'the limits the in-force add-ons raise (ADAM CR-568)'
+      - table: control.capacity_pack
+        for: 'the unexpired capacity packs counted in targetLimit (ADAM CR-568)'
+      - table: control.usage_record
+        for: 'the downgrade check''s usage figure, as getEntitlementUsage works out current (ADAM CR-568)'
+      - table: control.module_listing
+        for: 'each licensed module''s price in the package price, unless pricingBasis is metered (ADAM CR-568)'
+      - table: control.tenant
+        for: 'the tenant''s home region (region_id only), to find its home cell as setSubscription does (ADAM CR-568,
+          CR-560 point (2), CHG-CR560-002)'
+      - table: control.cell_tenant
+        for: 'the tenant''s live cell database in its home region, as setSubscription finds it (CHG-CR560-002)'
+      - table: control.cell
+        for: 'the cell of that row, in the tenant''s home region (CHG-CR560-002)'
+      - table: control.cell_endpoint
+        for: 'the home cell''s active endpoint, the address asked for getModuleEnablement (CHG-CR560-002)'
       x-ticvai-calls:
       - white-label.getModuleEnablement
       x-ticvai-read-via:
@@ -2461,6 +2534,37 @@ paths:
         check, with the same call to the tenant''s cell for white-label `getModuleEnablement`, returns the same
         `modulesInUse` and `limitsExceeded`.
 
+
+        **The preview answers what `setSubscription` would do with the same body, by the same rules** (ADAM CR-568, Chinmay, 3 November 2026; CHG-CR568-001).
+        (1) **Current contract**: read by `getSubscription`''s reader (`SubscriptionReader.Current`). With none, it is
+        a first plan: nothing before, everything gained, no proration, no conflicts. (2) **Target**: `planId` with
+        `planVersion`, or the plan''s current version (highest active, `PlanReader.Current`). An unknown plan or
+        version is 404. (3) **Downgrade**: when the target, with in-force add-ons and `core`, licenses fewer modules
+        or a lower limit for any metric than now; a change that does both is a downgrade. Any other change of plan or
+        version is an upgrade. (4) **`priceChange`** = target package price minus current package price. A package
+        price is the version''s `basePrice` plus, for each of its `plan_module` rows, that module''s
+        `control.module_listing` price unless `pricingBasis` is `metered`; a module with no listing adds nothing.
+        Add-ons are left out: they survive the change. Currency is the contract''s `currencyCode` (first plan: the
+        target''s). Any price in another currency is 422 `preview-currency-mismatch` naming it; nothing is converted.
+        Same plan and version: 0. (5) **`proratedAmount`**, for an upgrade only. `prorate` true (the default):
+        `priceChange` x days from today to `renewsAt` / days from (`renewsAt` minus one `billingPeriod`) to
+        `renewsAt`, rounded half away from zero to the currency''s minor unit. `prorate` false: `priceChange`
+        unscaled. Absent for a downgrade, a first plan or a contract with no `renewsAt`. (6) **`modulesGained` /
+        `modulesLost`**: `ModuleKey`s in the licence position after but not before, and before but not after. Both
+        positions are built with the one method that builds `LicencePosition` (version modules, in-force add-ons,
+        `core`). Sorted ascending; an empty list rather than the field left out. (7) **`cellTierChange`**: the
+        current version''s `cellTier` to the target''s; null when equal; `requiresMigration` true whenever they
+        differ. (8) **`conflicts`**: for a downgrade only, from `setSubscription`''s downgrade check itself, written
+        once as one function both call; whichever of #30841 and #31281 is built first writes it, and the other calls
+        it. Its usage figure is `getEntitlementUsage`''s `current` figure (#32283), likewise one function. Absent
+        when there are none. A cell that does not answer is 503, as in `setSubscription`. (9) **`canApply`**: false
+        when `conflicts` has entries or `setSubscription` would refuse the body (`subscription-expired`,
+        `plan-not-offered`); otherwise true. (10) Beside `control.contract` and `control.plan` it reads
+        `control.plan_module`, `plan_limit`, `licence_add_on`, `licence_add_on_limit`, `capacity_pack`,
+        `usage_record`, `module_listing`, and, to find the home cell as `setSubscription` does (CHG-CR560-002),
+        `control.tenant` (`region_id` only), `control.cell_tenant`, `control.cell` and `control.cell_endpoint`; it
+        answers 404, 422 and 503.
+
         '
       tags:
       - subscription
@@ -2483,6 +2587,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SubscriptionPreview'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: 'A price the preview adds up (a version''s `basePrice`, or a `control.module_listing` price)
+            is in another currency than the contract''s `currencyCode` (first plan: the target''s)
+            (`preview-currency-mismatch`, naming it; ADAM CR-568, CHG-CR568-001). Nothing is converted.'
+          x-ticvai-problem-types: [preview-currency-mismatch]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '503':
+          $ref: '../shared/common.yaml#/components/responses/ServiceUnavailable'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/licences:
@@ -10212,6 +10329,9 @@ paths:
         billable unit — and it is temporary, so the tier conversation happens at renewal rather than in
         August.
 
+        **`unit` is a `UsageMetric` value** (ADAM CR-560, Chinmay, 3 November 2026; CHG-CR560-001): any other unit is refused `400 validation`
+        with `errors[]` naming the `unit` field, and nothing is written.
+
         '
       tags:
       - subscription
@@ -10241,6 +10361,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CapacityPack'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /billing-reconciliation:
@@ -13615,7 +13737,13 @@ components:
           type: string
           format: uuid
         unit:
-          type: string
+          $ref: '#/components/schemas/UsageMetric'
+          description: '**The metric the pack raises** (ADAM CR-560, Chinmay, 3 November 2026; CHG-CR560-001): one of the `UsageMetric` values
+            (venues, workstations, activeUsers, devices, brandedApps, aiTokens, apiCalls, storageGb, transactions,
+            guestProfiles). `addCapacityPack` refuses any other unit with `400 validation` naming the `unit` field. A
+            pack counts only toward the metric its unit names, in `targetLimit` for both `setSubscription` and
+            `previewSubscriptionChange`; it is unexpired when `validFrom` is today or earlier (or not set) and `validTo`
+            is today or later (or null). A stored row whose unit is not a `UsageMetric` value counts toward no metric.'
         quantity:
           type: integer
         price:
@@ -18366,7 +18494,13 @@ components:
           isActive:
             type: boolean
             description: '**Only the newest version is active** (ADAM CR-510): `createPlanVersion` sets it false on
-              every earlier version. The current version is the highest active one.'
+              every earlier version. The current version is the highest active one.
+
+              **One reader, `PlanReader.Current`** (ADAM CR-567, Chinmay, 3 November 2026; CHG-CR567-001): of the plan''s `control.plan` rows with
+              `is_active` true, the highest `version` compared as an integer (the text cast; never compared as text,
+              where 9 sorts above 10). If no row is active (only rows written before that rule), the highest version
+              the same way. It replaces the `published_at` ordering. `getPlan`, `listPlans` and
+              `SetSubscriptionRequest.planVersion`''s default read the current version through it.'
           subscriberCount:
             type: integer
           publishedAt:
@@ -18383,7 +18517,8 @@ components:
           format: uuid
         planVersion:
           type: string
-          description: Defaults to the current version, the plan's highest active version (ADAM CR-510).
+          description: Defaults to the current version, the plan's highest active version (ADAM CR-510), through
+            the same reader `getPlan` uses, `PlanReader.Current` (ADAM CR-567; CHG-CR567-001).
         effectiveFrom:
           type: string
           format: date
@@ -18542,29 +18677,53 @@ components:
     SubscriptionPreview:
       x-ticvai-persistence: none — computed
       type: object
+      description: 'What `setSubscription` would do with the same body, by the same rules (ADAM CR-568, Chinmay, 3
+        November 2026; CHG-CR568-001); `previewSubscriptionChange` states each rule.'
       required:
       - canApply
       - priceChange
+      - modulesGained
+      - modulesLost
       properties:
         canApply:
           type: boolean
+          description: False when `conflicts` has entries or `setSubscription` would refuse the body
+            (`subscription-expired`, `plan-not-offered`); otherwise true (ADAM CR-568).
         priceChange:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: 'The target package price minus the current package price, in the contract''s `currencyCode`
+            (first plan: the target''s). A package price is the version''s `basePrice` plus, for each of its
+            `plan_module` rows, that module''s `control.module_listing` price unless `pricingBasis` is `metered`; a
+            module with no listing adds nothing; add-ons are left out. Same plan and version: 0 (ADAM CR-568).'
         proratedAmount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: 'For an upgrade only. `prorate` true (the default): `priceChange` x days from today to
+            `renewsAt` / days from (`renewsAt` minus one `billingPeriod`) to `renewsAt`, rounded half away from zero
+            to the currency''s minor unit; `prorate` false: `priceChange` unscaled. Absent for a downgrade, a first
+            plan or a contract with no `renewsAt` (ADAM CR-568).'
         modulesGained:
           type: array
+          description: The `ModuleKey`s in the licence position after the change but not before, sorted ascending;
+            an empty list when there are none (ADAM CR-568).
           items:
-            type: string
+            $ref: '#/components/schemas/ModuleKey'
         modulesLost:
           type: array
+          description: The `ModuleKey`s in the licence position before the change but not after, sorted ascending;
+            an empty list when there are none (ADAM CR-568).
           items:
-            type: string
+            $ref: '#/components/schemas/ModuleKey'
         conflicts:
-          $ref: '#/components/schemas/DowngradeConflictProblem'
+          allOf:
+          - $ref: '#/components/schemas/DowngradeConflictProblem'
+          description: For a downgrade only, from `setSubscription`'s downgrade check itself; absent when there are
+            none (ADAM CR-568).
         cellTierChange:
           type: object
           nullable: true
+          description: The current version's `cellTier` to the target's; null when they are equal (ADAM CR-568).
           properties:
             from:
               $ref: '#/components/schemas/CellTier'
@@ -18572,6 +18731,7 @@ components:
               $ref: '#/components/schemas/CellTier'
             requiresMigration:
               type: boolean
+              description: True whenever `from` and `to` differ (ADAM CR-568).
     LicenceAddOn:
       x-ticvai-persistence: control.licence_add_on + control.licence_add_on_limit
       x-ticvai-retired-columns:

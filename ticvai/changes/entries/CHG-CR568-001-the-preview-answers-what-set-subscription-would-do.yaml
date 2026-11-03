@@ -1,0 +1,53 @@
+id: CHG-CR568-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'previewSubscriptionChange answers what setSubscription would do with the same body, by the same rules: the
+  current contract by getSubscription''s reader (none is a first plan), the target by planVersion or PlanReader.Current
+  (404 unknown), downgrade versus upgrade, priceChange from each version''s package price (basePrice plus each
+  plan_module''s module_listing price unless metered; add-ons left out; 422 preview-currency-mismatch, nothing
+  converted), proratedAmount for an upgrade only, modulesGained and modulesLost from the one LicencePosition method
+  (sorted, always present), cellTierChange, conflicts from setSubscription''s check as one function (503 when the cell
+  does not answer) and canApply. It declares its reads of plan_module, plan_limit, licence_add_on,
+  licence_add_on_limit, capacity_pack, usage_record, module_listing and control.tenant, and answers 404, 422 and 503.'
+decision:
+  what: 'Posted on #31281 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the
+    devs" (3 November 2026): "the preview answers what setSubscription would do with the same body, by the same rules.
+    Build now: 1. Current contract: read by getSubscription''s reader (#31280) ... 4. priceChange = target package
+    price minus current package price ... 5. proratedAmount, for an upgrade only ... 6. modulesGained / modulesLost ...
+    Sort ascending; return [] rather than leaving the field out. 7. cellTierChange ... 8. conflicts: for a downgrade
+    only, from setSubscription''s downgrade check itself, written once as one function both call ... 9. canApply ...
+    10. The operation also reads control.plan_module, plan_limit, licence_add_on, licence_add_on_limit, capacity_pack,
+    usage_record, module_listing and control.tenant (cellHost) ...; it answers 404, 422 and 503. The ticket comes off
+    hold."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-568 (Narayan Gaonkar, #31281 previewSubscriptionChange): priceChange, proratedAmount, modulesGained and
+  modulesLost and cellTierChange had no rule, and CR-541''s limits check (CHG-CR541-001) read tables the operation did
+  not list.'
+keys_touched:
+  operations: [previewSubscriptionChange]
+  schemas: [SubscriptionPreview]
+  files:
+  - contracts/satellite/subscription.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: undecided rules
+tickets:
+  started: []
+  unstarted:
+  - '31281 (previewSubscriptionChange, Narayan Gaonkar, On hold): comes off hold; build to the posted comment.'
+  - '30841 (setSubscription): the downgrade check is one function both call; whichever is built first writes it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-568
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PREVIEW-RULES
+status: open
+notes: 'Beyond the posted words: modulesGained and modulesLost are required and typed ModuleKey (they were free
+  strings), recorded as breaking changes BC-741 and BC-742; each SubscriptionPreview field carries
+  its rule; 404 and 503 are the shared responses. "preview-currency-mismatch naming it" is kept as posted (the plain
+  Problem). The ADM-008, ADM-011, ADM-414, ADM-463 and SGN-022 screens do not change. CR-560''s point (2) is not built
+  (CHG-CR560-001), so control.tenant (cellHost) here agrees with setSubscription''s read as CR-541 left it.'

@@ -144,6 +144,11 @@ And one rule per decision:
                    CHG-CR488-001 to CHG-CR541-001): the cell tier change, the tenant request limits and their route,
                    plan versions, the module catalogue and listing, the licence position and the downgrade check, as
                    lane_w5_rules_r13 lists them.
+  BR-CREDENTIAL-POLICY-PROBLEM, BR-MFA-PRIMARY, BR-ENABLEMENT-SERVICE-CALLER, BR-CELL-CALL-CLIENT,
+  BR-CAPACITY-PACK-UNIT, BR-CURRENT-PLAN-READER, BR-PREVIEW-RULES (r14 catch-up, lane b: ADAM CR-548, CR-549, CR-555,
+                   CR-560, CR-567 and CR-568; CHG-CR548-001 to CHG-CR568-001): the credential policy refusal, the
+                   primary MFA method, the service caller of getModuleEnablement, the cell call and capacity pack unit,
+                   the current plan and contract readers and the subscription preview, as lane_b_rules_r14 lists them.
   BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
                    version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
                    ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
@@ -2973,6 +2978,7 @@ def main() -> int:
     lane_a_rules_r14(need, op)
     lane_f_rules_r14(need, op)
     review_h_rules_r14(need)
+    lane_b_rules_r14(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -3017,7 +3023,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_E_RULES + R14_D_RULES + R14_A_RULES + R14_F_RULES + R14_H_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES + R14_E_RULES + R14_D_RULES + R14_A_RULES + R14_F_RULES + R14_H_RULES + R14_B_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -5510,6 +5516,175 @@ def review_h_rules_r14(need):
     need("BR-ROOT-LABEL", 'ROOT_PATH="t_$(printf \'%s\' "$TENANT_ID"' in prov,
          "provision-tenant.sh does not make the root scope label from the tenant id: a slug's label is lossy and two "
          "tenants of one cell can share a root path (C-05)")
+
+
+R14_B_RULES = ["BR-CREDENTIAL-POLICY-PROBLEM", "BR-MFA-PRIMARY", "BR-ENABLEMENT-SERVICE-CALLER", "BR-CELL-CALL-CLIENT",
+               "BR-CAPACITY-PACK-UNIT", "BR-CURRENT-PLAN-READER", "BR-PREVIEW-RULES"]
+
+
+def lane_b_rules_r14(need, op):
+    """r14 catch-up, lane b: identity and subscriptions (ADAM CR-548, CR-549, CR-555, CR-560, CR-567, CR-568, decided
+    and posted 3 November 2026 under the lead's "Dont hold r13. approve them and rever tto the devs"; CHG-CR548-001 to
+    CHG-CR568-001). Each rule fails on r13 as released (dffd024e) and passes once the posted decision is in.
+
+      BR-CREDENTIAL-POLICY-PROBLEM (CR-548) the 422 policy-not-met of changeOwnCredential, createPrincipal and
+                                   resetPrincipalCredential is CredentialPolicyNotMetProblem (Problem plus rule:
+                                   minLength, pinLength, requireBreachCheck), never errors[].
+      BR-MFA-PRIMARY               (CR-549) createMfaChallenge with no methodId takes the primary usable method, else
+                                   the newest; enrol, verify and remove keep at most one primary; isPrimary never null.
+      BR-ENABLEMENT-SERVICE-CALLER (CR-555) getModuleEnablement takes serviceAuth beside bearerAuth, admits Platform
+                                   alone as the service caller, and answers 400 tenant-required, 401, 403 and 404.
+      BR-CELL-CALL-CLIENT          (CR-560) setSubscription states the seam, the serviceAuth token, the 5-second
+                                   timeout and the kernel client's own ticket.
+      BR-CAPACITY-PACK-UNIT        (CR-560) CapacityPack.unit is a UsageMetric; addCapacityPack answers 400.
+      BR-CURRENT-PLAN-READER       (CR-567) PlanReader.Current (highest active version, compared as an integer) for
+                                   getPlan, listPlans (one item per plan) and the default planVersion;
+                                   SubscriptionReader.Current for getSubscription.
+      BR-PREVIEW-RULES             (CR-568) previewSubscriptionChange states each figure's rule, declares its reads, and
+                                   answers 404, 422 preview-currency-mismatch and 503; modulesGained and modulesLost
+                                   are always present.
+    """
+    def words(x):
+        return " ".join(str(x or "").split()).replace("**", "")
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def tables(o_, key):
+        return {str((t or {}).get("table") if isinstance(t, dict) else t) for t in o_.get(key) or []}
+
+    def schema_ref(o_, code):
+        sch = (((((o_.get("responses") or {}).get(code) or {}).get("content") or {})
+                .get("application/problem+json") or {}).get("schema") or {})
+        refs = [str(sch.get("$ref") or "")] + [str((x or {}).get("$ref") or "") for x in sch.get("oneOf") or []]
+        return {r.rsplit("/", 1)[-1] for r in refs if r}
+
+    ident = load("contracts/spine/identity.yaml")
+    isch = (ident.get("components") or {}).get("schemas") or {}
+    sub = load("contracts/satellite/subscription.yaml")
+    ssch = (sub.get("components") or {}).get("schemas") or {}
+
+    # BR-CREDENTIAL-POLICY-PROBLEM (CR-548)
+    cp = isch.get("CredentialPolicyNotMetProblem") or {}
+    ext = [x for x in cp.get("allOf") or [] if isinstance(x, dict) and "properties" in x]
+    rule = ((ext[0].get("properties") or {}).get("rule") or {}) if ext else {}
+    need("BR-CREDENTIAL-POLICY-PROBLEM", bool(ext) and "rule" in (ext[0].get("required") or [])
+         and rule.get("enum") == ["minLength", "pinLength", "requireBreachCheck"]
+         and "errors" not in (ext[0].get("properties") or {}),
+         "identity has no CredentialPolicyNotMetProblem (Problem plus a required rule of minLength, pinLength, "
+         "requireBreachCheck, no errors[]) (CR-548)")
+    for oid in ("changeOwnCredential", "createPrincipal", "resetPrincipalCredential"):
+        o_ = op(oid)[3]
+        need("BR-CREDENTIAL-POLICY-PROBLEM", "CredentialPolicyNotMetProblem" in schema_ref(o_, "422")
+             and "policy-not-met" in ptypes(o_, "422"),
+             f"{oid}'s 422 policy-not-met is not CredentialPolicyNotMetProblem (CR-548)")
+        txt = words(o_.get("description")) + " " + words(((o_.get("responses") or {}).get("422") or {}).get("description"))
+        need("BR-CREDENTIAL-POLICY-PROBLEM", "with `errors[]` naming" not in txt and "`errors[]` names `requireBreachCheck`" not in txt,
+             f"{oid} still answers policy-not-met with errors[] (CR-548)")
+    rbc = words((((isch.get("PasswordPolicy") or {}).get("properties") or {}).get("requireBreachCheck") or {}).get("description"))
+    need("BR-CREDENTIAL-POLICY-PROBLEM", "with `errors[]` naming `requireBreachCheck`" not in rbc,
+         "PasswordPolicy.requireBreachCheck still refuses with errors[] (CR-548)")
+
+    # BR-MFA-PRIMARY (CR-549)
+    cmc = words(op("createMfaChallenge")[3].get("description"))
+    for frag in ("if none is marked primary, the newest (highest `id`; ids are UUIDv7)",
+                 "every one is left out, the call answers the existing `409 email-otp-not-second-factor`",
+                 "no active methods at all, it answers the existing `422 mfa-method-not-usable`",
+                 "written to `identity.mfa_challenge.method_id`, never left null"):
+        need("BR-MFA-PRIMARY", frag in cmc, f"createMfaChallenge does not state {frag!r} (CR-549)")
+    need("BR-MFA-PRIMARY", "no other active method marked primary" in words(op("verifyMfaEnrolment")[3].get("description")),
+         "verifyMfaEnrolment does not make the first active method primary (CR-549)")
+    need("BR-MFA-PRIMARY", "writes `is_primary` false" in words(op("enrolMfaMethod")[3].get("description")),
+         "enrolMfaMethod does not write is_primary false on the pending method (CR-549)")
+    need("BR-MFA-PRIMARY", "the newest remaining active method" in words(op("removeMfaMethod")[3].get("description")),
+         "removeMfaMethod does not move the primary mark when the primary is removed (CR-549)")
+    ip = words((((isch.get("MfaMethod") or {}).get("properties") or {}).get("isPrimary") or {}).get("description"))
+    need("BR-MFA-PRIMARY", "At most one primary" in ip and "never null" in ip,
+         "MfaMethod.isPrimary does not say at most one primary and never null (CR-549)")
+    need("BR-MFA-PRIMARY", "null means the principal's primary method" not in str(isch.get("MfaChallenge")),
+         "MfaChallenge.methodId still leaves the method null for the primary one (CR-549)")
+
+    # BR-ENABLEMENT-SERVICE-CALLER (CR-555)
+    gme = op("getModuleEnablement")[3]
+    need("BR-ENABLEMENT-SERVICE-CALLER", {"bearerAuth": []} in (gme.get("security") or [])
+         and {"serviceAuth": []} in (gme.get("security") or []) and "service" in (gme.get("x-ticvai-audience") or []),
+         "getModuleEnablement does not take serviceAuth beside bearerAuth (CR-555)")
+    rs = gme.get("responses") or {}
+    need("BR-ENABLEMENT-SERVICE-CALLER", "tenant-required" in ptypes(gme, "400") and {"401", "403", "404"} <= set(rs),
+         "getModuleEnablement does not answer 400 tenant-required, 401, 403 and 404 (CR-555)")
+    gd = words(gme.get("description"))
+    for frag in ("only Platform (the Control Plane) is admitted", "kernel's ordinary permission check",
+                 "no operator-token check, grant lookup or stand-in platform caller"):
+        need("BR-ENABLEMENT-SERVICE-CALLER", frag in gd, f"getModuleEnablement does not state {frag!r} (CR-555)")
+
+    # BR-CELL-CALL-CLIENT (CR-560)
+    sd = words(op("setSubscription")[3].get("description"))
+    for frag in ("`ITenantModuleEnablement`", "'cell unreachable'", "A timeout (5 seconds)",
+                 "the control plane's own cell identity", "beside `IServiceClient`", "the cell refuses a mismatch"):
+        need("BR-CELL-CALL-CLIENT", frag in sd, f"setSubscription does not state {frag!r} (CR-560)")
+    # CR-560 point (2) as corrected on 4 November 2026 (CHG-CR560-002): the home cell from control.tenant.region_id
+    cells = {"control.tenant", "control.cell_tenant", "control.cell", "control.cell_endpoint"}
+    for oid in ("setSubscription", "previewSubscriptionChange"):
+        o_ = op(oid)[3]
+        rd = {str((r or {}).get("table")): str((r or {}).get("for")) for r in o_.get("x-ticvai-reads") or []}
+        need("BR-CELL-CALL-CLIENT", cells <= set(rd) and "region_id only" in rd.get("control.tenant", "")
+             and "cellHost" not in rd.get("control.tenant", ""),
+             f"{oid} does not find the home cell from control.tenant.region_id, cell_tenant, cell and cell_endpoint "
+             "(CR-560 point (2), CHG-CR560-002)")
+    need("BR-CELL-CALL-CLIENT", "`Tenant.cellHost` is not read" in sd and "`status` `live`" in sd,
+         "setSubscription does not state how the home cell is found (CR-560 point (2), CHG-CR560-002)")
+
+    # BR-CAPACITY-PACK-UNIT (CR-560)
+    unit = (((ssch.get("CapacityPack") or {}).get("properties") or {}).get("unit") or {})
+    need("BR-CAPACITY-PACK-UNIT", "UsageMetric" in str(unit.get("$ref") or unit.get("allOf")),
+         "CapacityPack.unit is not a UsageMetric (CR-560)")
+    need("BR-CAPACITY-PACK-UNIT", "counts toward no metric" in words(unit.get("description"))
+         and "counts toward no metric" in sd,
+         "a stored pack whose unit is not a UsageMetric is not said to count toward no metric (CR-560)")
+    acp = op("addCapacityPack")[3]
+    need("BR-CAPACITY-PACK-UNIT", "400" in (acp.get("responses") or {})
+         and "naming the `unit` field" in words(acp.get("description")),
+         "addCapacityPack does not refuse another unit with 400 validation naming unit (CR-560)")
+
+    # BR-CURRENT-PLAN-READER (CR-567)
+    act = words((((((ssch.get("Plan") or {}).get("allOf") or [{}, {}])[1].get("properties") or {}).get("isActive") or {})
+                 .get("description")))
+    for frag in ("`PlanReader.Current`", "the highest `version` compared as an integer", "where 9 sorts above 10",
+                 "If no row is active", "replaces the `published_at` ordering"):
+        need("BR-CURRENT-PLAN-READER", frag in act, f"Plan.isActive does not state {frag!r} (CR-567)")
+    need("BR-CURRENT-PLAN-READER", "The current version of `planId`" in words(op("getPlan")[3].get("description")),
+         "getPlan does not answer the current version (CR-567)")
+    need("BR-CURRENT-PLAN-READER", "One item per plan, its current version" in words(op("listPlans")[3].get("description")),
+         "listPlans does not answer one item per plan (CR-567)")
+    gs = words(op("getSubscription")[3].get("description"))
+    for frag in ("`SubscriptionReader.Current`", "the latest `starts_at`, then the greatest `id`", "Any status counts",
+                 "It does not read `control.tenant.subscription_id`"):
+        need("BR-CURRENT-PLAN-READER", frag in gs, f"getSubscription does not state {frag!r} (CR-567)")
+    pv = words((((ssch.get("SetSubscriptionRequest") or {}).get("properties") or {}).get("planVersion") or {})
+               .get("description"))
+    need("BR-CURRENT-PLAN-READER", "PlanReader.Current" in pv,
+         "SetSubscriptionRequest.planVersion does not default through PlanReader.Current (CR-567)")
+
+    # BR-PREVIEW-RULES (CR-568)
+    psc = op("previewSubscriptionChange")[3]
+    pd = words(psc.get("description"))
+    for frag in ("read by `getSubscription`'s reader", "a module with no listing adds nothing",
+                 "rounded half away from zero to the currency's minor unit", "`requiresMigration` true whenever they differ",
+                 "written once as one function both call", "`canApply`: false when `conflicts` has entries"):
+        need("BR-PREVIEW-RULES", frag in pd, f"previewSubscriptionChange does not state {frag!r} (CR-568)")
+    want = {"control.contract", "control.plan", "control.plan_module", "control.plan_limit", "control.licence_add_on",
+            "control.licence_add_on_limit", "control.capacity_pack", "control.usage_record", "control.module_listing",
+            "control.tenant"}
+    need("BR-PREVIEW-RULES", want <= tables(psc, "x-ticvai-reads"),
+         f"previewSubscriptionChange does not declare its reads {sorted(want - tables(psc, 'x-ticvai-reads'))} (CR-568)")
+    need("BR-PREVIEW-RULES", {"404", "503"} <= set(psc.get("responses") or {})
+         and "preview-currency-mismatch" in ptypes(psc, "422"),
+         "previewSubscriptionChange does not answer 404, 422 preview-currency-mismatch and 503 (CR-568)")
+    sp = ssch.get("SubscriptionPreview") or {}
+    spp = sp.get("properties") or {}
+    need("BR-PREVIEW-RULES", {"modulesGained", "modulesLost"} <= set(sp.get("required") or [])
+         and all("ModuleKey" in str((spp.get(k) or {}).get("items")) for k in ("modulesGained", "modulesLost")),
+         "SubscriptionPreview's modulesGained and modulesLost are not always-present ModuleKey lists (CR-568)")
 
 
 if __name__ == "__main__":
