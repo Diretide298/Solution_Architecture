@@ -791,3 +791,24 @@ reads:
     transaction under the caller''s row-level security, never over the service route (tools/check-cross-module-reads.py
     XR-INPROCESS-HOST). SELECT on approvals.rule is the one the operations role lacked; the write still goes to
     approvals'' setApprovalMatrix as an operation.'
+- id: XDR-195
+  reader: operations
+  tables: [identity.principal]
+  columns: [id, is_active, valid_from, valid_to]
+  privileges: [SELECT]
+  queries: [identity#principalRecords]
+  operations: [reassignServer]
+  # `narrow`, as XDR-010: this entry grants its query to reassignServer only, and only these four columns.
+  narrow: true
+  added: '2026-11-04'
+  decision_ref: 'ADAM CR-595, Chinmay, 3 November 2026 (posted on #32798: "The operations host reads Identity''s
+    principalRecords in process for reassignServer only (id, is_active, valid_from, valid_to and nothing else), as was
+    done for Access''s one Identity read"), approved under the lead''s "take the recommended decision unless its very
+    very important", 4 November 2026'
+  why: 'fnb reassignServer (operations host, #32798) refuses a server who is unknown, inactive, or outside the
+    principal''s validity at recordedAt (400 validation on serverPrincipalId). identity.principal is Identity''s, in
+    commerce, and no host composes Identity''s query classes (ADR-0055 as amended 2 November). The lead chose the narrow
+    in-process read already chosen for Access (XDR-010, CR-302): the operations host asks identity#principalRecords by
+    id through Identity''s own query class, in the caller''s transaction under the caller''s row-level security, and the
+    grant is SELECT on id, is_active, valid_from and valid_to only (`columns`). No other operations host operation reads
+    identity.principal in process under this entry.'

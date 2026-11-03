@@ -1,0 +1,71 @@
+id: CHG-CR595-001
+date: '2026-11-04'
+source: cr
+kind: contract
+summary: 'reassignServer records each hand-over in the new fnb.table_visit_server (id, table_visit_id, server_principal_id,
+  from_at, split_gratuity default true, recorded_by_principal_id, scope_path; index on (table_visit_id, from_at); row security
+  by scope_path, the visit''s venue), writing the opening server''s row first when the visit has none, and keeps table_visit.server_principal_id
+  on the latest from_at. It reads the server in process through identity#principalRecords (XDR-195: SELECT on id, is_active,
+  valid_from and valid_to only, for reassignServer only), answers 400 on an unknown, inactive or out-of-validity server
+  and 409 table-visit-closed, and computes no gratuity split. derive-ddl writes a granted read''s `columns` as a column-limited
+  GRANT.'
+decision:
+  what: 'ADAM CR-595, posted on #32798: "Decided (Chinmay, 3 November 2026): a reassignment is recorded, not edited. The
+    operations host reads Identity''s principalRecords in process for reassignServer only (id, is_active, valid_from, valid_to
+    and nothing else), as was done for Access''s one Identity read. Build now: (1) Migration (MIG owner): new table fnb.table_visit_server
+    (id uuid primary key, table_visit_id uuid not null referencing fnb.table_visit, server_principal_id uuid not null, from_at
+    timestamptz not null, split_gratuity boolean not null default true, recorded_by_principal_id uuid not null, scope_path
+    ltree not null), with an index on (table_visit_id, from_at) and row security by scope_path, written at venue scope as
+    the visit is. Add an in-process SELECT grant for the operations host''s role on identity.principal, limited to those
+    four columns. (2) reassignServer, inside one transaction: read the principal in process. Unknown, is_active false, or
+    recordedAt outside valid_from to valid_to answers 400 validation on serverPrincipalId. A visit that is settled, merged
+    or cancelled answers 409 table-visit-closed, as compItem does. If the visit has no history rows yet and server_principal_id
+    is set, first write a row for that server with from_at = opened_at and split_gratuity true. Then write the new row:
+    from_at = recordedAt, split_gratuity = splitGratuity (default true), recorded_by = the caller. Set table_visit.server_principal_id
+    to the server on the row with the latest from_at, so an offline replay arriving  ..." The lead, 4 November 2026: "take
+    the recommended decision unless its very very important".'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'ADAM CR-595 (#32798 reassignServer): the gratuity split was to follow the assignment, but nothing stored a visit''s
+  server history or splitGratuity, and the principal read went over a service route that is not built.'
+keys_touched:
+  operations:
+  - reassignServer
+  schemas:
+  - TableVisitServer
+  - TableVisit
+  tables:
+  - fnb.table_visit_server
+  - fnb.table_visit
+  - identity.principal
+  files:
+  - contracts/satellite/fnb.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/cross-deployable-writes.md
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/check-cross-deployable-writes.py
+  - tools/check-business-rules.py
+root_class: an operation's rule reads a fact nothing stores
+tickets:
+  started: []
+  unstarted:
+  - '32798 (reassignServer): the history, the principal check, 400 and 409 as posted.'
+  - 'A new [DB] task under MIG-FNB (migration owner): fnb.table_visit_server with its index and row security, and the column-limited
+    SELECT grant on identity.principal for the operations role (to be filed by the integration pass).'
+  - 'A new task under 32677 (closeTableVisit): divide the gratuity among the servers in fnb.table_visit_server once the
+    client gives the rule (the rule awaits the client).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-595
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-REASSIGN-SERVER-HISTORY
+status: open
+notes: 'Beyond the posted words: scope_path is the path of the visit''s outlet''s venue, read with tenancy#outletRecords
+  and tenancy#scopeRecords in process (the visit has no path of its own; CR-561''s rule for outlet rows); serverPrincipalId
+  and splitGratuity are marked x-ticvai-stored-as on the new table; reassignServer declares its reads and writes. XDR-195
+  is `narrow`, as XDR-010 is, and carries `columns`, a field the read grants did not have: derive-ddl writes GRANT SELECT
+  (id, is_active, valid_from, valid_to) ON identity.principal TO operations, ddl_forward reads it back and its rollback
+  revokes the same columns, and check-cross-deployable-writes X-READ holds the columns to the table''s.'

@@ -818,6 +818,11 @@ paths:
         `claimCart`''s comparison (constant-time) and the recovery link `cart.abandoned` carries. `createCart` and
         `getCart` answer it in clear to the cart''s caller. `claimCart`''s rotation is `claimCart`''s.
 
+        **The venue check for a caller with no credential** (ADAM CR-486, Chinmay, 3 November 2026, the correction
+        posted on #30682; CHG-CR486-002): `tenancy#activeVenues` is asked as above, and for a caller with no
+        credential it runs under the routed tenant''s root grant; an inactive venue, or one that is not this
+        tenant''s, is absent and answers `404`, and nothing is written.
+
         '
       tags:
       - cart

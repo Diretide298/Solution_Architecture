@@ -1800,6 +1800,14 @@ def deployable_read_grants(db: str = "tenant") -> str:
                   "no grant written")
             continue
         used = {(role, s) for s in kernel_schemas}
+        # **A read limited to named columns** (ADAM CR-595, Chinmay, 3 November 2026; CHG-CR595-001): an entry's
+        # `columns` (one table only) grants SELECT on those columns and nothing else of the table, so the operations
+        # host reads id, is_active, valid_from and valid_to of identity.principal and no other column.
+        cols = [str(c) for c in r.get("columns") or []]
+        if cols and (len(r.get("tables") or []) != 1 or not all(re.match(r"^[a-z_][a-z0-9_]*$", c) for c in cols)):
+            print(f"  ! cross-deployable read {r.get('id')}: columns name one table's columns; no grant written")
+            continue
+        on = f"({', '.join(cols)}) ON" if cols else "ON"
         for t in r.get("tables") or []:
             schema = str(t).split(".", 1)[0]
             if area(schema) != db:
@@ -1813,7 +1821,7 @@ def deployable_read_grants(db: str = "tenant") -> str:
             out.append(f"-- {r.get('id')}: {role} reads {t} in process (ADR-0055 rule 4 as amended; "
                        f"{r.get('decision_ref') or ''})")
             out.append(f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = {sql_literal(role)}) AND "
-                       f"to_regclass({sql_literal(t)}) IS NOT NULL THEN GRANT {privs} ON {t} TO {role}; "
+                       f"to_regclass({sql_literal(t)}) IS NOT NULL THEN GRANT {privs} {on} {t} TO {role}; "
                        "END IF; END $$;")
     if not out:
         return ""

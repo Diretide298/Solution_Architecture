@@ -14484,10 +14484,10 @@ paths:
         whose newest execution is `deployed` or `partiallyDeployed`; `pricesAtMaximumGuardrail` counts those whose
         `newPrice` is at or above the governing `dynamic_pricing_control`''s `absoluteMaximumPrice`, or the ladder''s
         `maximumPrice` where no control sets one, and `pricesAtMinimumGuardrail` does the same at or below
-        `absoluteMinimumPrice` or `minimumPrice`; `ruleConflicts` is the sum of the seven open-conflict counts
-        listRulePriorityConflict''s summary gives for the venue; `operationalAlerts` lists a code for each condition
-        that holds, `pricesAtUpperBand`, `unresolvedRuleConflicts` and `activatingWithin48Hours`, and the screen
-        words them. `status` answers `draft`, `ready` (a draft with a ladder and at least one rule, whose scope is not
+        `absoluteMinimumPrice` or `minimumPrice`; `ruleConflicts` is `0` until conflict detection is decided (ADAM
+        CR-423, Chinmay, 3 November 2026, the correction posted on #35286; CHG-CR423-002); `operationalAlerts` lists a
+        code for each condition that holds, `pricesAtUpperBand` and `activatingWithin48Hours`, and never
+        `unresolvedRuleConflicts` until conflict detection is decided, and the screen words them. `status` answers `draft`, `ready` (a draft with a ladder and at least one rule, whose scope is not
         frozen), `scheduled` (active, with `effectiveFrom` after now), then `active`, `paused`, `frozen`, `expired`
         and `retired` as stored; `testing` leaves the filter (a saved test case names no strategy; LO-CR423-001).
         `automationMode` is retired (ADAM CR-417): the row answers `automationLevel` from the most specific
@@ -38702,8 +38702,8 @@ components:
             control's absoluteMinimumPrice, or the ladder's minimumPrice where no control sets one (ADAM CR-423)
         ruleConflicts:
           type: integer
-          description: Rule Conflicts, the sum of the seven open-conflict counts listRulePriorityConflict's summary
-            gives for the venue (ADAM CR-423)
+          description: 'Rule Conflicts: always present, and 0 until conflict detection is decided (ADAM CR-423, the
+            correction of 3 November 2026 on #35286)'
         frozenStrategies:
           type: integer
           description: Frozen Strategies
@@ -38716,7 +38716,9 @@ components:
           items:
             type: string
           description: 'Operational Alerts (pack p.76): a code for each condition that holds, pricesAtUpperBand,
-            unresolvedRuleConflicts or activatingWithin48Hours; the screen words them (ADAM CR-423)'
+            unresolvedRuleConflicts or activatingWithin48Hours; the screen words them (ADAM CR-423).
+            unresolvedRuleConflicts is never listed until conflict detection is decided (the correction of 3 November
+            2026 on #35286)'
     DynamicPricingStrategyBuilderView:
       type: object
       x-ticvai-drafted-shape: true

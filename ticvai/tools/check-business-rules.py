@@ -509,6 +509,11 @@ And one rule per decision:
   BR-RICH-TEXT-LINKS (CR-401) relative internal links are kept, http: removed, and a one-off job re-saves the
                    published pages.
   BR-DEVICE-KEY-DISPLAY-ONLY (CR-451) issueDeviceCredential issues display keys only; other devices answer 400.
+  BR-REASSIGN-SERVER-HISTORY (CR-595) reassignServer records each hand-over in fnb.table_visit_server, reads the
+                   server in process (four columns, XDR-195), declares 400 and 409, and computes no split.
+  BR-CART-VENUE-CHECK-ROOT (CR-486's correction) createCart's venue check for a caller with no credential runs under
+                   the tenant root, and an inactive venue answers 404.
+  (CR-423's correction is held by BR-STRATEGY-FIGURES: ruleConflicts is 0 until conflict detection is decided.)
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2401,7 +2406,9 @@ def main() -> int:
          and "LO-CR423-001" in lo_ids,
          "listDynamicPricingStrategy still offers testing, or it is not on the left-out list (CR-423)")
     lds = descr("listDynamicPricingStrategy")
-    for frag in ("`currentPriceAdjustments` counts", "`pricesAtMaximumGuardrail` counts", "seven open-conflict counts",
+    for frag in ("`currentPriceAdjustments` counts", "`pricesAtMaximumGuardrail` counts",
+                 "`ruleConflicts` is `0` until conflict detection is decided",
+                 "never `unresolvedRuleConflicts` until conflict detection is decided",
                  "`pricesAtUpperBand`", "a draft with a ladder and at least one rule"):
         need("BR-STRATEGY-FIGURES", frag in lds, f"listDynamicPricingStrategy does not state {frag!r} (CR-423)")
     # BR-PRICE-BAND-ORDER (ADAM CR-424; CHG-CR424-001)
@@ -4777,7 +4784,8 @@ def lane_w1_rules_r13(need, op):
 
 
 R14_L_RULES = ["BR-TRANSFER-SENT-ROWS", "BR-FNB-LINE-TRANSFERABLE", "BR-QUEUE-REDEEM-DENIALS", "BR-GUEST-BUNDLE-CART",
-               "BR-ADMISSION-START", "BR-RICH-TEXT-LINKS", "BR-DEVICE-KEY-DISPLAY-ONLY"]
+               "BR-ADMISSION-START", "BR-RICH-TEXT-LINKS", "BR-DEVICE-KEY-DISPLAY-ONLY", "BR-REASSIGN-SERVER-HISTORY",
+               "BR-CART-VENUE-CHECK-ROOT"]
 
 
 def lane_l_rules_r14(need, op):
@@ -4919,6 +4927,38 @@ def lane_l_rules_r14(need, op):
     need("BR-DEVICE-KEY-DISPLAY-ONLY", "400" in (idc.get("responses") or {})
          and "**Only display keys are issued here**" in words(idc.get("description")),
          "issueDeviceCredential does not refuse a device that is not a signage display with 400 (CR-451)")
+
+
+    # BR-REASSIGN-SERVER-HISTORY (CR-595, approved 4 November 2026)
+    rs = op("reassignServer")[3]
+    tvs = fnb.get("TableVisitServer") or {}
+    need("BR-REASSIGN-SERVER-HISTORY", tvs.get("x-ticvai-persistence") == "fnb.table_visit_server"
+         and {"id", "tableVisitId", "serverPrincipalId", "fromAt", "splitGratuity", "recordedByPrincipalId",
+              "scopePath"} <= set(tvs.get("required") or [])
+         and (tvs.get("x-ticvai-index") or []) == [["tableVisitId", "fromAt"]],
+         "fnb.table_visit_server is not the history table CR-595 names, with its (table_visit_id, from_at) index")
+    pv = next((v for v in rs.get("x-ticvai-read-via") or [] if (v or {}).get("query") == "identity#principalRecords"), {})
+    need("BR-REASSIGN-SERVER-HISTORY", pv.get("route") == "in-process" and "XDR-195" in words(pv.get("for")),
+         "reassignServer does not read the principal in process under XDR-195 (CR-595)")
+    xdr = next((r for r in (load("docs/active/cross-deployable-writes.yaml").get("reads") or [])
+                if (r or {}).get("id") == "XDR-195"), {})
+    need("BR-REASSIGN-SERVER-HISTORY", xdr.get("reader") == "operations" and xdr.get("narrow") is True
+         and xdr.get("operations") == ["reassignServer"]
+         and xdr.get("columns") == ["id", "is_active", "valid_from", "valid_to"],
+         "XDR-195 does not grant the operations role those four columns of identity.principal for reassignServer only")
+    need("BR-REASSIGN-SERVER-HISTORY", {"400", "409"} <= set(rs.get("responses") or {})
+         and "table-visit-closed" in str(((rs.get("responses") or {}).get("409") or {}).get("x-ticvai-problem-types")),
+         "reassignServer does not declare its 400 and 409 table-visit-closed (CR-595)")
+    need("BR-REASSIGN-SERVER-HISTORY", "fnb.table_visit_server" in tables(rs, "x-ticvai-writes")
+         and "**No split is computed here**" in words(rs.get("description"))
+         and "never overwrites a newer hand-over" in words(rs.get("description")),
+         "reassignServer does not record the hand-over, keep the latest server, and leave the split (CR-595)")
+
+    # BR-CART-VENUE-CHECK-ROOT (CR-486, the correction of 3 November 2026 on #30682)
+    need("BR-CART-VENUE-CHECK-ROOT", "for a caller with no credential it runs under the routed tenant's root grant; an "
+         "inactive venue, or one that is not this tenant's, is absent and answers `404`" in words(
+             op("createCart")[3].get("description")),
+         "createCart does not run the anonymous venue check under the tenant root with 404 for an inactive venue (CR-486)")
 
 
 if __name__ == "__main__":
