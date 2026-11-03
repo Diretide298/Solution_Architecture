@@ -1,0 +1,134 @@
+id: CHG-R14H-003
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'Every operation a guest can call by a per-object path id says whose object it is: x-ticvai-object-owner
+  [subject | share | delegation | session | token], or x-ticvai-self-scoped, and any other guest gets the shared 404 as
+  for an id that does not exist. The 52 operations the review found declare it (getEntitlementCredential: the guest''s
+  own, one shared with them, one delegated with ORDER_VIEW; the admission seed of anyone else''s is 404), 26 of them
+  gain the 404 they lacked, and issueMyAccreditationWalletPass and renewAccreditation answer another holder with 404, not
+  403. x-ticvai-guest-callable no longer stands for ownership. decideRecommendations ignores a subjectId from an
+  anonymous caller, and the GuestVenue and guestAuth texts no longer say row-level security is the line of defence
+  inside a venue.'
+decision:
+  what: 'The lead (Chinmay), 3 November 2026, on the triage of the r13 system review: "All four, one release". Review
+    finding C-03: 52 guest operations that act on a guest''s own record declare no ownership rule and
+    getEntitlementCredential returns the admission seed with no 404; split guest-callable''s two meanings, require
+    self-scoped or an explicit object owner on every guest-reachable operation with a non-public path id, and stop
+    AM-GUEST-PERMISSION accepting guest-callable for them. Finding C-06 where it falls out of that ownership rule: an
+    anonymous caller''s subjectId, and the "line of defence" sentence.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review findings C-03 (HIGH) and C-06 (MEDIUM). The only machine rule was contracts/README.md (a guest
+  naming another guest''s record gets 404, CHG-GCF-002), carried by x-ticvai-self-scoped alone, and C-SELF-404
+  (CHG-R13RVB-001) applied only to self-scoped operations; check-audience-match accepted x-ticvai-guest-callable instead
+  (ADR-0025 says it was removed; 174 remain). The ownership values follow what each operation''s text already said
+  (holds and plans: "the same guest session or subject placed"; getEntitlement: "their own and one shared with them")
+  and grantDelegation''s guest-delegable permissions (ORDER_VIEW, ORDER_CREATE, WALLET_VIEW, WALLET_OPERATE).'
+keys_touched:
+  operations:
+  - updateAccreditationApplication
+  - submitAccreditationApplication
+  - resubmitAccreditationApplication
+  - withdrawAccreditationApplication
+  - issueMyAccreditationWalletPass
+  - renewAccreditation
+  - recordAnswerFeedback
+  - leaveRestaurantWaitlist
+  - replyToMyCase
+  - updateGuestPreferences
+  - getWaiverStatus
+  - sendConversationMessage
+  - handoverToAgent
+  - getGuestProfile
+  - signRentalAgreement
+  - getResourceHold
+  - relinquishResourceHold
+  - extendResourceHold
+  - getSeatHold
+  - relinquishSeatHold
+  - extendSeatHold
+  - getVisitPlan
+  - updateVisitPlan
+  - listVisitPlanAlternatives
+  - bookVisitPlan
+  - setSharedWalletMembers
+  - transferWalletBalance
+  - withdrawWalletDispute
+  - getWalletAutoReloadSetting
+  - setWalletAutoReloadSetting
+  - getWalletExitBalance
+  - settleWalletAtExit
+  - getEntitlement
+  - getEntitlementCredential
+  - getEntitlementHistory
+  - freezeEntitlement
+  - leaveWaitlist
+  - getWaitingRoomPosition
+  - exportSubjectData
+  - getSubjectDataExport
+  - listDelegations
+  - grantDelegation
+  - listCustomerMemberships
+  - getGroupBooking
+  - convertToTermProduct
+  - shareEntitlement
+  - revokeEntitlementShare
+  - quoteUpgrade
+  - getOrderCalendarEvent
+  - getVisitReminder
+  - setVisitReminder
+  - inquirePaymentStatus
+  - decideRecommendations
+  files:
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/shared/common.yaml
+  - contracts/README.md
+  - docs/architecture/specs/permission-resolution.md
+  - tools/audit_guard.py
+  - tools/check-contract-shapes.py
+  - tools/check-audience-match.py
+  - tools/op-descriptions.py
+root_class: a guest operation addressed by somebody's object id that leaves unsaid whose object a guest may name
+tickets:
+  started:
+  - '#31166 updateGuestPreferences and #27923 MarketingService (Ready for QA, Pranay): text not rewritten; a guest
+    reaches only their own subjectId; another is the shared 404 (newly declared).'
+  - '#30673 listDelegations, #30672 grantDelegation and #27732 IdentityService (Ready for QA, Hrushikant): another
+    guest''s subjectId is the shared 404 (newly declared).'
+  - '#32078 revokeEntitlementShare (Ready for QA, Surendra): owner only; unchanged, now declared.'
+  - '#30688 getOrderCalendarEvent (Ready for QA, Pranay): a guest reaches their own order and one a guest delegated to
+    them with ORDER_VIEW; anything else is 404.'
+  - 'Frontend, Ready for QA or In progress: #31068 GST-040 (replyToMyCase gains 404), #31893 / #31895 WEB-010, #31848
+    WEB-007, #31855 / #31857 WEB-050, #32125 WEB-021, #31784 GST-007 (leaveWaitlist gains 404), #31715 / #31717 WEB-015,
+    #31898 WEB-012: a 404 from these calls is the screen''s not-found answer.'
+  unstarted:
+  - 'The backend tickets of the other operations, among them getEntitlementCredential (#28328 and its feature): build
+    the owner check and the shared 404 at r14.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review findings C-03 and C-06, lane h of r14 (the lead''s "All four, one release")'
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py::C-GUEST-OWNER, C-SELF-404, C-ANON-SUBJECT; tools/check-audience-match.py::AM-GUEST-PERMISSION
+status: open
+notes: 'Additive (new 404 responses and a marker). Generator rule: tools/op-descriptions.py wrote "another caller''s id
+  gets 403 on self-scoped operations" in the Done-when of every self-scoped ticket, against the README rule; it now
+  writes 404 for self-scoped and owned operations (the r13 review lane CHG-R13RVB-001 left this for the lead: it changes
+  unstarted tickets'' Done-when text at the next release; started tickets are untouched). C-06''s own fix is not made
+  here and needs the lead: a separate row-security context for anonymous reads (ticvai.audience public, policies only on
+  published tables) or moving public reads to published read models, and per-audience response schemas
+  (x-ticvai-response-by-audience) for the 54 operations staff and anonymous callers share.'

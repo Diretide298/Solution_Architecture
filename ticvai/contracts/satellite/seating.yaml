@@ -1928,6 +1928,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -1969,6 +1970,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -2032,6 +2034,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -2071,6 +2074,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatHold'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: Already expired, or `VenueSettings.seating.seatHoldMaxExtensions` is reached (proposed
             default 2, audit R094). `refusedReason` says which.

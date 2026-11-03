@@ -2706,6 +2706,7 @@ paths:
         for: 'the deviceAuth credential the heartbeat is signed with (APPROVALS-TENANCY-C27) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
       - table: platform.device
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      x-ticvai-device-kinds: [all]
       security:
       - deviceAuth: []
       - apiKeyAuth: []
@@ -3736,6 +3737,7 @@ paths:
         `tenancy.device_tamper_event.detected_at` and `device.tamperDetected`''s `detectedAt` carry the same value,
         null when the body left it out. It is never filled from `recordedAt`, from the row''s creation time or from
         the server clock; `recordedAt` is when the device reported.'
+      x-ticvai-device-kinds: [all]
       security:
       - bearerAuth: []
       - deviceAuth: []
@@ -7477,9 +7479,16 @@ components:
         - handheldScanner
         - accessPodium
         - bleBeacon
+        - workstationTerminal
       description: >
         `mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app,
         registered for push and bound to no workstation.
+
+        `workstationTerminal` (r14 review C-04, CHG-R14H-001; the lead, 3 November 2026: "All four, one
+        release"): the computer a device door runs on (a till, a kiosk), enrolled like any device and bound to
+        its workstation. Its `deviceAuth` credential is how the door proves which workstation it is, which a
+        `workstationId` in a body never proves. A shared handheld or scanner proves it with its own
+        `handheldScanner` credential.
 
         **One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`,
         `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type

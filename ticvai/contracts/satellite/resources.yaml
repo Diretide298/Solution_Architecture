@@ -3054,6 +3054,7 @@ paths:
       - resources
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -3086,6 +3087,7 @@ paths:
       - resources
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -3135,6 +3137,7 @@ paths:
       - resources
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -3153,6 +3156,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResourceHold'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: Already expired or converted, or the extension limit is reached. `refusedReason`
             says which.

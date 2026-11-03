@@ -998,12 +998,19 @@ paths:
         PTR-001): a desk browser is not a registered device, and requiring one locked every web door
         out (CHG-DOOR-001, Chinmay, 2 October 2026: fix the Block A blockers now). **A device door
         sends it** (the till POS-000, the staff handheld EMP-001, the scanner SCN-001), and a
-        device-bound `method` (`pin`, `card`, `rfid`) without it is refused 400 (problem type
-        `workstation-required`), because the device is what bounds a PIN. Nothing else about the
+        device-bound `method` (`pin`, `card`, `rfid`) without it, or without `deviceAuth`, is refused 400 (problem
+        type `workstation-required`), because the device is what bounds a PIN. Nothing else about the
         sign-in changes: the second factor is asked by permission (audit R135), five wrong codes lock
         step-up (R126), a second sign-in is refused 409 (R184), and several roles mean a role prompt
         (ADR-0003). Where the tenant has SSO, the same doors offer `startSsoAuthorization` /
         `completeSsoAuthorization`, which return the same `LoginResponse`.
+
+        **The device is authenticated, and the workstation is the device''s** (r14 review C-04, CHG-R14H-001;
+        the lead, 3 November 2026: "All four, one release"). A device door calls with `deviceAuth`, the credential
+        `enrolDevice` issued to the device the door runs on (`common.yaml` `deviceAuth`), and the workstation is the one
+        that device is bound to, never one the body names: a `workstationId` that is not that workstation is 403
+        `workstation-mismatch`, and a `workstationId` sent without `deviceAuth` is 401 `device-unauthenticated`. Both
+        are answered before any credential is checked, so neither spends an attempt or moves a lockout.
 
         **The credential is checked against `identity.principal_credential`** (`PrincipalCredential`, 14 October 2026,
         CHG-CRD-001, ADAM CR-078): the row for the principal and `method`, its PHC hash (ADR-0071), and its lockout.
@@ -1031,7 +1038,13 @@ paths:
       x-ticvai-writes:
       - table: identity.session
         for: 'grant_id, the one grant a direct sign-in opens the session through (ADAM CR-513)'
-      security: []
+      # A browser door has no credential before signing in (`{}`); a device door authenticates the device it runs on
+      # (`deviceAuth`), which is what bounds a PIN (r14 review C-04, CHG-R14H-001).
+      security:
+      - {}
+      - deviceAuth: []
+      x-ticvai-workstation-from: device
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       requestBody:
         required: true
         content:
@@ -1070,14 +1083,27 @@ paths:
             submitted username whether or not a principal has it, and per sign-in method** (password, PIN, card,
             RFID), so an unknown username has its own counter and its own lock for each method, as a known one
             does, and nothing in the answer reveals which usernames exist. `sso-sign-in-required` checks no
-            credential, spends no attempt and does not carry `attemptsRemaining`.'
+            credential, spends no attempt and does not carry `attemptsRemaining`. **`device-unauthenticated`** (r14
+            review C-04, CHG-R14H-001): the body names a `workstationId` and the call carries no valid `deviceAuth`;
+            no credential is checked, no attempt is spent, and it does not carry `attemptsRemaining`.'
           x-ticvai-problem-types:
           - unauthenticated
           - sso-sign-in-required
+          - device-unauthenticated
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/LoginDeniedProblem'
+        '403':
+          description: 'The body names a `workstationId` that is not the workstation the authenticated device is bound
+            to (`workstation-mismatch`; r14 review C-04, CHG-R14H-001). Answered before the credential is checked: no
+            attempt is spent and nothing is written.'
+          x-ticvai-problem-types:
+          - workstation-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           x-ticvai-problem-types: [session-active-elsewhere, workstation-in-use]
           description: 'An active session already exists for this principal on another device. Per §3.1.3
@@ -1921,6 +1947,7 @@ paths:
       - identity.privacyRequestRaised
       x-ticvai-permission: GUEST_VIEW_PII
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2142,6 +2169,7 @@ paths:
       - identity
       x-ticvai-permission: GUEST_VIEW_PII
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2225,6 +2253,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: GUEST_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2255,6 +2284,8 @@ paths:
                               $ref: '#/components/schemas/DelegatedAccess'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -2350,6 +2381,7 @@ paths:
       - identity
       x-ticvai-permission: GUEST_MANAGE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2409,6 +2441,8 @@ paths:
                 $ref: '#/components/schemas/DelegatedAccess'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [delegation-cycle, minor-grants-adult-authority]
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
@@ -2863,10 +2897,13 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
-      # No session on the POS-000 door (CHG-RUL-015): `{}` admits the call without a token, under the step-up.
+      # No session on the POS-000 door (CHG-RUL-015): the till calls as its device (`deviceAuth`), under the step-up;
+      # an unauthenticated caller is never admitted (r14 review C-04, CHG-R14H-001).
       security:
       - bearerAuth: []
-      - {}
+      - deviceAuth: []
+      x-ticvai-workstation-from: device
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       summary: Supervisor termination of an abandoned session
       description: 'Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displaces
         a second login — an operator who went home still logged in would otherwise be locked out until
@@ -2875,8 +2912,11 @@ paths:
         **Callable on the POS-000 door with no session, under a supervisor''s PIN step-up** (Chinmay, 3 October
         2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which
         reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a
-        session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`),
-        and carries the supervisor''s own principal and PIN (`supervisorStepUp` in the body). The PIN is verified against the
+        session: the till calls this as its device (`deviceAuth`, r14 review C-04, CHG-R14H-001; it was `{}`, no
+        token at all), and carries the supervisor''s own principal and PIN (`supervisorStepUp` in the body).
+        The till is the workstation its device is bound to: a body `workstationId` that is not it is 403
+        `workstation-mismatch`, and a call with neither a session nor `deviceAuth` is 401 `device-unauthenticated`,
+        answered before the PIN is checked, so it spends no attempt and moves no lockout. The PIN is verified against the
         principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT`
         at the till''s venue, and the call reaches only a session at a workstation of that venue. Anything else is `403
         supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up:
@@ -2917,7 +2957,9 @@ paths:
                   type: string
                   format: uuid
                   nullable: true
-                  description: The till making the call. Required with no session (the POS-000 door; CHG-RUL-015).
+                  description: 'The till making the call (the POS-000 door; CHG-RUL-015). With no session the till
+                    is the workstation the calling device is bound to (`deviceAuth`; r14 review C-04, CHG-R14H-001):
+                    it may be left out, and when sent must be that workstation (403 `workstation-mismatch`).'
                 supervisorStepUp:
                   allOf:
                   - $ref: ../shared/common.yaml#/components/schemas/SupervisorStepUp
@@ -2929,12 +2971,24 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Session terminated and audited
+        '401':
+          description: 'Neither a staff session nor an authenticated device (`device-unauthenticated`; r14 review C-04,
+            CHG-R14H-001): a call with no session must come from a registered device by `deviceAuth`. Nothing is read
+            or written and no PIN attempt is spent.'
+          x-ticvai-problem-types:
+          - device-unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           description: The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is
             missing or failed or the session is not at the till's venue (`supervisor-step-up-refused`;
-            CHG-RUL-015).
+            CHG-RUL-015), or the body's `workstationId` is not the calling device's workstation (`workstation-mismatch`;
+            r14 review C-04, CHG-R14H-001).
           x-ticvai-problem-types:
           - supervisor-step-up-refused
+          - workstation-mismatch
           content:
             application/problem+json:
               schema:
@@ -5313,7 +5367,13 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      security: []
+      # A browser door has no credential before signing in (`{}`); a device door authenticates its device
+      # (`deviceAuth`), and the workstation is that device's (r14 review C-04, CHG-R14H-001).
+      security:
+      - {}
+      - deviceAuth: []
+      x-ticvai-workstation-from: device
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       requestBody:
         required: true
         content:
@@ -5331,6 +5391,9 @@ paths:
                 workstationId:
                   type: string
                   format: uuid
+                  description: 'Sent by a device door, as on `login`: the workstation the calling device is bound to
+                    (`deviceAuth`), never believed from the body alone (r14 review C-04, CHG-R14H-001). Sent without
+                    `deviceAuth` it is 401 `device-unauthenticated`; another workstation is 403 `workstation-mismatch`.'
       responses:
         '200':
           headers:
@@ -5342,10 +5405,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
-          x-ticvai-problem-types: [sso-state-invalid]
+          x-ticvai-problem-types: [sso-state-invalid, device-unauthenticated]
           description: 'The `state` is unknown, already used or expired (`sso-state-invalid`; R8 blocker IDENTITY-C58,
             CHG-R8MIG-015; r8 integration, CHG-R8INT-024): the sign-in page says the link has expired and starts
-            again. Not `unauthenticated`: this door takes no session.
+            again. Not `unauthenticated`: this door takes no session. Or the body names a `workstationId` and the
+            call carries no valid `deviceAuth` (`device-unauthenticated`; r14 review C-04, CHG-R14H-001).
 
             '
           content:
@@ -5353,8 +5417,10 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          x-ticvai-problem-types: [sso-group-not-mapped, sso-principal-not-provisioned, forbidden]
-          description: 'Authenticated, but no group maps to a role in this tenant (`sso-group-not-mapped`). The
+          x-ticvai-problem-types: [sso-group-not-mapped, sso-principal-not-provisioned, forbidden, workstation-mismatch]
+          description: 'The body''s `workstationId` is not the calling device''s workstation (`workstation-mismatch`;
+            r14 review C-04, CHG-R14H-001), answered before anything else. Or authenticated, but no group maps to a
+            role in this tenant (`sso-group-not-mapped`). The
             provider proved who they are; it did not grant them anything. Or no principal is linked to the
             provider''s subject and the provider is not set to provision one (`sso-principal-not-provisioned`; R8
             blocker IDENTITY-C57, CHG-R8MIG-015, CHG-R8INT-024). A linked principal that is inactive is
@@ -6195,8 +6261,12 @@ paths:
         **Callable on the POS-000 door with no session, under a supervisor''s PIN step-up** (Chinmay, 3 October
         2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which
         reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a
-        session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`),
-        and carries the supervisor''s own principal and PIN (the `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The PIN is verified against the
+        session: the till calls this as its device (`deviceAuth`, r14 review C-04, CHG-R14H-001; it was `{}`, no
+        token at all), names itself (`workstationId`), and carries the supervisor''s own principal and PIN (the
+        `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The `workstationId` must
+        be the workstation the calling device is bound to (403 `workstation-mismatch`), and a call with neither a
+        session nor `deviceAuth` is 401 `device-unauthenticated`, answered before the PIN is checked, so it spends no
+        attempt and moves no lockout. The PIN is verified against the
         principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT`
         at the till''s venue, and the call reaches only the sessions at that one till (`workstationId` is required then). Anything else is `403
         supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up:
@@ -6226,10 +6296,13 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      # No session on the POS-000 door (CHG-RUL-015): `{}` admits the call without a token, under the step-up.
+      # No session on the POS-000 door (CHG-RUL-015): the till calls as its device (`deviceAuth`), under the step-up;
+      # an unauthenticated caller is never admitted (r14 review C-04, CHG-R14H-001).
       security:
       - bearerAuth: []
-      - {}
+      - deviceAuth: []
+      x-ticvai-workstation-from: device
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       parameters:
       - name: X-Supervisor-Principal-Id
         in: header
@@ -6249,6 +6322,7 @@ paths:
           maxLength: 200
       - name: X-Supervisor-Pin
         in: header
+        x-ticvai-secret: bearer
         required: false
         description: With no session (POS-000), the supervisor's staff PIN, as `SupervisorStepUp.credential`
           (CHG-RUL-015). Never logged, stored or echoed. Ignored with a session.
@@ -6301,11 +6375,23 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ActiveSession'
+        '401':
+          description: 'Neither a staff session nor an authenticated device (`device-unauthenticated`; r14 review C-04,
+            CHG-R14H-001): a call with no session must come from a registered device by `deviceAuth`. Nothing is read
+            and no PIN attempt is spent.'
+          x-ticvai-problem-types:
+          - device-unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           description: The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is
-            missing or failed, or `workstationId` is missing (`supervisor-step-up-refused`; CHG-RUL-015).
+            missing or failed, or `workstationId` is missing (`supervisor-step-up-refused`; CHG-RUL-015), or it is
+            not the calling device's workstation (`workstation-mismatch`; r14 review C-04, CHG-R14H-001).
           x-ticvai-problem-types:
           - supervisor-step-up-refused
+          - workstation-mismatch
           content:
             application/problem+json:
               schema:
@@ -7573,6 +7659,7 @@ paths:
       tags:
       - identity
       x-ticvai-permission: GUEST_VIEW
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -7599,6 +7686,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IdentityCustomerMembership'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /memberships/{membershipId}:
@@ -13428,6 +13517,12 @@ components:
             effect for the device-bound methods `pin`, `card` and `rfid` (400 `workstation-required`
             without it); absent on the TICVAI Console, Venue Management and partner portal sign-ins,
             which have no workstation.
+
+
+            **Believed only from the device** (r14 review C-04, CHG-R14H-001): the call authenticates the device
+            with `deviceAuth`, and this must be the workstation that device is bound to (403
+            `workstation-mismatch`). Sent without `deviceAuth` it is 401 `device-unauthenticated`, and a
+            device-bound method without `deviceAuth` is 400 `workstation-required`.
 
             '
         deviceFingerprint:

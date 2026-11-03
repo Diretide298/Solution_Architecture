@@ -2038,6 +2038,7 @@ paths:
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience: [guest]
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: primary
@@ -2125,6 +2126,7 @@ paths:
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience: [guest]
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -2222,6 +2224,7 @@ paths:
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience: [guest]
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
@@ -2328,6 +2331,7 @@ paths:
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience: [guest]
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false

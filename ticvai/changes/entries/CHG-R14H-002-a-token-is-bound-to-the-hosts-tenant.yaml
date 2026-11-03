@@ -1,0 +1,58 @@
+id: CHG-R14H-002
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'A token is bound to the tenant its request''s host resolves to. bearerAuth and guestAuth, and section 7 of the
+  permission spec, refuse 401 unauthenticated, before any permission, scope or row is read, a token whose tenant claim
+  is not the host''s tenant or whose sid names a session registry entry of another tenant: a cell signs every tenant''s
+  tokens with one key, so the signature proves the cell and never the tenant. The tenant''s root scope label is made
+  from the tenant id (t_ and its 32 hex digits) in the generated provision-tenant.sh, so two tenants never share a root
+  path; a root written before keeps its label.'
+decision:
+  what: 'The lead (Chinmay), 3 November 2026, on the triage of the r13 system review: "All four, one release". Review
+    finding C-05: nothing binds a token''s tenant to the request''s tenant; tokens are signed per cell, tenant root paths
+    can collide. Add the rule to bearerAuth and guestAuth and the kernel spec, and make the root label injective.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review finding C-05 (HIGH): common.yaml signs tokens with one key per cell, ADR-0038 puts many tenants
+  in a cell, tenancy.yaml resolves the tenant from the host and reads no tenant header, and no rule compared the two;
+  provision-tenant.sh made the root label from the slug, a lossy mapping (acme-1 and acme_1 both t_acme_1), and
+  control.cell_tenant.root_scope_path has no unique constraint (it repeats legitimately across one tenant''s rows, so the
+  label is made unique by construction instead).'
+keys_touched:
+  schemas:
+  - CellTenant
+  tables:
+  - control.cell_tenant
+  files:
+  - contracts/shared/common.yaml
+  - contracts/satellite/subscription.yaml
+  - docs/architecture/specs/permission-resolution.md
+  - contracts/README.md
+  - tools/derive-ddl.py
+  - tools/check-business-rules.py
+  other:
+  - backend/provision-tenant.sh (derived by derive-ddl)
+root_class: authentication that proves the cell and never the tenant
+tickets:
+  started:
+  - '#27692 request kernel: hostname to tenant routing (Ready for QA, Pranay): text not rewritten; the token check
+    compares the tenant claim, and the sid registry entry''s tenant, with the tenant the host resolved, 401 before any
+    tenant database is chosen; the X-Ticvai-Tenant header is never read.'
+  - '#30674 login (Ready for QA, Hrushikant): the session registry entry records the tenant it was opened for.'
+  - '#37051 service sign-in between deployables (Ready for QA, Pranay): a tid the cell does not hold is refused.'
+  unstarted:
+  - '#27666 sign-in end to end, #31312 resolveTenantHost, #28001 / #31363 provisionCell: build to section 7.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review finding C-05, lane h of r14 (the lead''s "All four, one release")'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TOKEN-TENANT, BR-ROOT-LABEL
+status: open
+notes: 'The starter''s TenantResolutionMiddleware (the header wins over the host, one tenant per cell) is lane g''s
+  (G-03 with this finding''s starter side): it should follow permission-resolution.md section 7 as written here.
+  A per-tenant signing key (kid per tenant) was the review''s alternative; not taken: the binding check is enough and
+  keeps one key per cell as decided (CHG-R8SPN-014). Lane j rewrites the cell_tenant INSERT of the same generated
+  script (A-03, D-09); this lane changed only the ROOT_PATH lines above it.'

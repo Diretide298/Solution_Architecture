@@ -86,7 +86,9 @@ components:
       description: '**The venue a guest app or site is browsing, named on every public read of venue data** (decided 25
         October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on `guestAuth`). The server checks it
         is one of the tenant''s venues (`404` when it is not) and runs the read under a read-only scope of that venue''s
-        path, so row-level security stays the line of defence and browsing needs no session. Not declared where the
+        path, so row-level security keeps the read inside that venue and browsing needs no session. **Within the venue
+        row-level security admits every row of it** (r13 system review C-06, CHG-R14H-003): what keeps a staff-only
+        row or field out of a public answer is the operation''s query and its guest projection, never the database. Not declared where the
         path (`/venues/{venueId}/...`) or a required `venueId` query parameter already names the venue, which then serves
         the same purpose. Optional in the schema
         so an r1 client still validates.'
@@ -182,6 +184,7 @@ components:
     AdmissionToken:
       name: X-Admission-Token
       in: header
+      x-ticvai-secret: bearer
       required: false
       description: '**The on-sale waiting room''s admission token** (ADR-0066, accepted 1 October). A short-lived
         signed token (tenant, performance, expiry, a unique id; the signing key is a Key Vault secret) that catalogue
@@ -1089,6 +1092,15 @@ components:
         key''s `kid`. The key rotates yearly, and the previous key still verifies for 24 hours after a rotation.
 
 
+        **The token''s tenant is the request''s tenant** (decided 3 November 2026, Chinmay, "All four, one release",
+        r13 system review finding C-05; CHG-R14H-002). One key signs every tenant''s tokens in a cell, so the
+        signature proves the cell and never the tenant. The request''s tenant is the one its host resolves to
+        (`resolveTenantHost`; no tenant header or body field is read), and authentication refuses `401
+        unauthenticated`, before any permission, scope or row is looked at, a token whose `tenant` claim is not that
+        tenant, or whose `sid` names a session registry entry opened for another tenant. Only then is the tenant''s
+        database chosen. The rule in full: `docs/architecture/specs/permission-resolution.md` section 7.
+
+
         **A Control Plane platform-staff token** is accepted by a cell only for `openPlatformStaffGrant`,
         and for any other operation only while an open platform-staff grant exists for that tenant.
         The cell then resolves the caller''s permissions from the grant, not from a role in the tenant,
@@ -1106,6 +1118,11 @@ components:
         guest''s own resources — a guest token can never widen to another subject.
 
 
+        **Bound to its tenant as a staff token is** (r13 system review finding C-05; CHG-R14H-002): a guest token whose
+        `tenant` claim is not the tenant the request''s host resolves to, or whose session belongs to another tenant, is
+        `401 unauthenticated` before anything is read (`bearerAuth`).
+
+
         **An anonymous guest session** (20 October 2026, R8 blocker cause GPS-C23; CHG-R8SPN-031) is a guest token with
         no subject, opened by `orders.createCart` for a visitor with no credential and bound to that cart; it reaches the
         cart operations and nothing that needs a known guest, and it ends when `claimCart` moves the cart to an account.
@@ -1116,7 +1133,9 @@ components:
         `{venueId}`, or a required `venueId` query parameter, where the operation has one, else the `X-Venue-Id` header
         (the `GuestVenue` parameter, declared on each such read). The server checks the venue is one of the tenant''s venues (a venue not of the tenant is
         `404`) and builds, for that request only, a read-only scope of the venue''s path (`ticvai.scope_paths` the
-        venue''s path, nothing written), so row-level security stays the line of defence and browsing needs no session.
+        venue''s path, nothing written), so row-level security keeps the read inside that venue and browsing needs no
+        session. **Inside the venue it admits every row** (r13 system review C-06, CHG-R14H-003): the operation''s query
+        and its guest projection, not the database, are what keep staff-only rows and fields out of a public answer.
         **A read that names no venue is 400 `venue-required`** and reads nothing (the lead, 25 October 2026, r10 round
         3; CHG-R10ID-022); each such read declares it. **A guest read that reaches venue data through an in-process
         scoped query** (`getOrderCalendarEvent`, `createCart`, and any like them) runs that query under the same request
@@ -1167,7 +1186,24 @@ components:
         device id). The server checks it against an active, unrevoked `device_credential` row, resolves the device
         (`platform.device`) and through it the workstation and scope the device is bound to, and acts as that device:
         no person, no role, no permission. A device can only report about itself; a call naming another device is
-        `404`. A retired or unapproved device, or a revoked credential, is `401`.'
+        `404`. A retired or unapproved device, or a revoked credential, is `401`.
+
+
+        **The device doors use it** (r14 review C-04, CHG-R14H-001; the lead, 3 November 2026: "All four, one
+        release"). A call that names a workstation and has no staff session (the till, handheld and scanner
+        sign-in through `login` or `completeSsoAuthorization`, and the till''s session-less supervisor step-up on
+        `listActiveSessions` and `forceLogout`) authenticates the device it runs on with this scheme, and the
+        workstation is the one that device is bound to (`x-ticvai-workstation-from: device`): a `workstationId` in
+        the request that is not that workstation is `403 workstation-mismatch`, and one sent without this scheme is
+        `401 device-unauthenticated`, answered before any PIN or password is checked, so it spends no attempt and
+        moves no lockout. A device-bound PIN is therefore tried only from a registered, unrevoked device.
+
+
+        **Which devices may call an operation** (the same change): every operation a device credential reaches,
+        by this scheme or a device key (`apiKeyAuth`), lists the device kinds it accepts in
+        `x-ticvai-device-kinds` (`DeviceKind` values, or `all` for an operation about the device itself, such as
+        its heartbeat). A device of another kind is `403 device-kind-not-allowed` and nothing is read or written:
+        a signage display''s key never captures stored value.'
     apiKeyAuth:
       type: apiKey
       in: header
@@ -1181,6 +1217,8 @@ components:
         one device and its venue; it is shown once when issued (`issueDeviceCredential`) and revoked per device
         (`revokeDeviceCredential`). A request with it opens a device session scoped to that venue: a `venueId` or
         `queueId` outside it is `403`, and a missing, wrong or revoked key is `401`. One device-key sign-in serves
-        every `apiKeyAuth` operation (issue, hash and store, verify, revoke).
+        every `apiKeyAuth` operation (issue, hash and store, verify, revoke). **It also checks the operation''s
+        `x-ticvai-device-kinds`** (r14 review C-04, CHG-R14H-001): a device whose kind the operation does not list is
+        `403 device-kind-not-allowed`, as for `deviceAuth`.
 
         '

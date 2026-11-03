@@ -766,6 +766,7 @@ paths:
       - access
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, share, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -816,6 +817,12 @@ paths:
         because it is the sensitive half** — a list of a guest''s tickets is a convenience, and the credential
         admits somebody.
 
+        **Whose credential a guest may read** (r13 system review C-03, CHG-R14H-003; the lead, 3 November 2026: "All
+        four, one release"): as `getEntitlement`, the guest''s own entitlement, one shared with them
+        (`shareEntitlement`, not revoked) and one a guest has delegated to them with `ORDER_VIEW`
+        (`x-ticvai-object-owner`), and nothing else. Any other entitlement id is the shared `404`, exactly as one that
+        does not exist, so another guest''s rotation seed is never returned and an id reveals nothing.
+
         **Rotates without reissuing.** A guest whose phone was stolen gets a new payload against the same
         entitlement, and the old one stops scanning.
 
@@ -840,6 +847,7 @@ paths:
       - access
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, share, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -921,6 +929,8 @@ paths:
                         format: date-time
                         description: The seed stops verifying after this. The app fetches a fresh one
                           whenever it is online before then.
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/history:
@@ -954,6 +964,7 @@ paths:
       - access
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -997,6 +1008,8 @@ paths:
                     byPrincipalName:
                       type: string
                       nullable: true
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-tag/enrolments:

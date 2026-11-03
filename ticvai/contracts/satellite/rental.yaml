@@ -1637,6 +1637,7 @@ paths:
       - rental
       x-ticvai-permission: RENTAL_BOOK
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -1659,6 +1660,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalAgreementSignature'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: 'The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is signed.'
           x-ticvai-problem-types: [rental-booking-cancelled, rental-booking-already-settled]

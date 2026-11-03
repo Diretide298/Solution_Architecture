@@ -212,6 +212,7 @@ paths:
     parameters:
     - name: cardCode
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -266,6 +267,7 @@ paths:
     parameters:
     - name: cardCode
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -527,8 +529,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
+      # A device moving stored value authenticates as itself (`deviceAuth`), no longer any device key: the
+      # kinds below are the readers on a machine (r14 review C-04, CHG-R14H-001).
+      x-ticvai-device-kinds: [cardReader, rfidReader, nfcReader]
       security:
-      - apiKeyAuth: []
+      - deviceAuth: []
       - serviceAuth: []
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -581,8 +586,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      # A device moving stored value authenticates as itself (`deviceAuth`), no longer any device key: the
+      # kinds below are the readers on a machine (r14 review C-04, CHG-R14H-001).
+      x-ticvai-device-kinds: [cardReader, rfidReader, nfcReader]
       security:
-      - apiKeyAuth: []
+      - deviceAuth: []
       - serviceAuth: []
       requestBody:
         required: true
@@ -2189,6 +2197,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-device-kinds: [cardReader, rfidReader, nfcReader]
       security:
       - apiKeyAuth: []
       - serviceAuth: []

@@ -1383,6 +1383,7 @@ paths:
       - orders
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -1402,6 +1403,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupBooking'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
@@ -1506,6 +1509,7 @@ paths:
     parameters:
     - name: token
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -1601,6 +1605,7 @@ paths:
     parameters:
     - name: token
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -1914,6 +1919,7 @@ paths:
       - orders
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -1951,6 +1957,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConvertToTermResult'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: 'The order is not paid (`pending`, `held`, `partiallyPaid`, `voided` or `failed`; `order-not-paid`) or has been `refunded` (`order-refunded`), so there is no payment to credit. Nothing changes.'
           x-ticvai-problem-types: [order-not-paid, order-refunded]
@@ -2279,6 +2287,7 @@ paths:
       - orders
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2313,6 +2322,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntitlementShare'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [sharing-not-allowed, recipient-cannot-share-on, entitlement-not-active]
           description: 'Not shareable, and the reason says which: the entitlement''s template does not
@@ -2385,6 +2396,7 @@ paths:
       - orders
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2836,6 +2848,7 @@ paths:
       - orders
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2888,6 +2901,8 @@ paths:
                       answer.
 
                       '
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ticket-templates:
@@ -3966,8 +3981,11 @@ paths:
       x-ticvai-calls:
       - wallet.holdWalletFunds
       - wallet.captureWalletHold
+      # A device moving stored value authenticates as itself (`deviceAuth`), no longer any device key: the
+      # kinds below are the readers on a machine (r14 review C-04, CHG-R14H-001).
+      x-ticvai-device-kinds: [cardReader, rfidReader, nfcReader]
       security:
-      - apiKeyAuth: []
+      - deviceAuth: []
       - serviceAuth: []
       - bearerAuth: []
       summary: Take some or all of a held balance
@@ -4057,8 +4075,11 @@ paths:
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StoredValueAuthorisation.amount, StoredValueAuthorisation.capturedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-calls:
       - wallet.releaseWalletHold
+      # A device moving stored value authenticates as itself (`deviceAuth`), no longer any device key: the
+      # kinds below are the readers on a machine (r14 review C-04, CHG-R14H-001).
+      x-ticvai-device-kinds: [cardReader, rfidReader, nfcReader]
       security:
-      - apiKeyAuth: []
+      - deviceAuth: []
       - serviceAuth: []
       - bearerAuth: []
       summary: Give a hold back
@@ -5925,6 +5946,7 @@ paths:
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: X-Order-Access-Token
         in: header
+        x-ticvai-secret: bearer
         required: false
         description: '`Order.orderAccessToken` from `checkoutCart`''s answer, in place of a session (IDENTITY-C52,
           CHG-R8SPN-025). Valid 24 hours for this order only; a token for another order, expired or forged, is
@@ -6070,6 +6092,7 @@ paths:
       - order
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience:
       - guest
       - staff
@@ -6115,6 +6138,7 @@ paths:
       - order
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - guest
       x-ticvai-scope-level: venue
@@ -6152,6 +6176,7 @@ paths:
       - order
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - guest
       x-ticvai-scope-level: venue
@@ -7582,6 +7607,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -8866,6 +8892,7 @@ paths:
         route: service
         for: 'the store account''s pass certificate, for delivery wallet, as issueWalletPass reads it (r13 root R27)'
       x-ticvai-api-scope: ticketing.write
+      x-ticvai-device-kinds: [workstationTerminal]
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -8946,6 +8973,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - name: X-Order-Access-Token
         in: header
+        x-ticvai-secret: bearer
         required: false
         description: '`Order.orderAccessToken` from `checkoutCart`''s answer, in place of a session, for a guest who
           checked out without an account (r13 root R27), checked as getOrder checks it; with `X-Device-Id`. A token for
@@ -21607,7 +21635,9 @@ components:
           format: password
           writeOnly: true
           description: '**Write-only, single purpose, and it is the only thing the guest presents.** Long
-            enough not to be guessed and scoped to one order — **a token that can read a second order
+            enough not to be guessed (at least 128 bits from a cryptographic random source, 22 or more base64url
+            characters; never logged: `x-ticvai-secret: bearer` on the path; r13 system review C-13, CHG-R14H-005) and
+            scoped to one order — **a token that can read a second order
             is a token that read somebody else''s booking.**
 
 
