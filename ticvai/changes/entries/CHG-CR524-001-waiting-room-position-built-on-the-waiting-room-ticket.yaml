@@ -1,0 +1,50 @@
+id: CHG-CR524-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'getWaitingRoomPosition is built on the waiting-room ticket #29033 with enterWaitingRoom, the release controller
+  and the token check, not on #31122; #29033 settles the shared Redis keys, entry record, token and timing rules in its
+  own design first. The API itself sends the admission cookie on the admitted answer (Set-Cookie, HttpOnly, Secure, scoped
+  to the performance, expiring with the token); Front Door passes it through and never caches the admitted answer (ADR-0066
+  amended).'
+decision:
+  what: 'ADAM CR-524, posted on #31122: "Decided (Chinmay, 3 November 2026): getWaitingRoomPosition is built on the waiting-room
+    ticket #29033, with enterWaitingRoom, the release controller and the token check, as that ticket already lists; it is
+    not built on #31122. Build now: nothing on #31122; close it as covered by #29033. SVC-CATALOGUE-EVENT-2 is done when
+    listEvents, listPerformances and updateEvent pass their tests; the contract tests for getWaitingRoomPosition count toward
+    #29033. #29033 settles, in its own design before building, everything both operations and the cart check share: the
+    per-performance Redis keys (arrival counter and the admitted-up-to mark the controller advances), the per-entry record
+    and its lifetime, the token (format, signing algorithm, Key Vault secret name, lifetime), the rules for position, aheadOfYou,
+    estimatedWaitSeconds and pollAfterSeconds, and when an entry is expired or the room closed ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-524 (Chinmay Patkar, #31122): The Redis counters, the release controller, the token format and the timing
+  rules were defined nowhere, and the operation was planned twice (#29033 and #31122).'
+keys_touched:
+  operations:
+  - getWaitingRoomPosition
+  - enterWaitingRoom
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md
+  - tools/check-business-rules.py
+root_class: an operation planned before the piece that writes its state
+tickets:
+  started: []
+  unstarted:
+  - '31122 (SVC-CATALOGUE-EVENT-2, Chinmay Patkar): build nothing for getWaitingRoomPosition; done when listEvents, listPerformances
+    and updateEvent pass their tests. Closing it as covered by #29033 is the lead''s OpenProject step.'
+  - '29033 (EDGE-WAITING-ROOM): settle the design as posted, then build both operations; getWaitingRoomPosition''s contract
+    tests count here.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-524
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-WAITING-ROOM-COOKIE
+status: open
+notes: 'The plan files are not touched: the integration pass moves getWaitingRoomPosition off SVC-CATALOGUE-EVENT-2 (#31122).
+  Beyond the posted words: the 200 declares a Set-Cookie header, and ADR-0066 gains an amendment of 3 November 2026 saying
+  the API, not the edge, sets the cookie.'

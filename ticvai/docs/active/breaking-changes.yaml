@@ -2032,3 +2032,43 @@ changes:
     tag: r13
     producer-tickets: ['31183']
     consumer-tickets: ['27938', '28289']
+  - id: BC-680
+    contract: catalogue
+    operation: bulkChangePrices
+    change: "`selection.productKind`"
+    reason: 'ADAM CR-544 (CHG-CR544-001): selection.productKind, a free string, becomes the ProductKind enum, so a value
+      that names no product kind is refused rather than matching nothing. A narrowed request field is breaking.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-544 posted on #30970: "productKind (now the ProductKind enum) ...
+      channel becomes the catalogue Channel enum (pos, kiosk, web, mobile, b2b, ota, callCentre) ... skipped has one
+      {productId, reason} per product and reason, and reason becomes an enum of those three"), the lead''s "Close the
+      CRs and respond to devs" of 3 November 2026'
+    tag: r13
+    producer-tickets: ['30970']
+    consumer-tickets: [none-linked]
+  - id: BC-681
+    contract: catalogue
+    operation: bulkChangePrices
+    change: "`selection.channel`"
+    reason: 'ADAM CR-544 (CHG-CR544-001): selection.channel moves from common SalesChannel to the catalogue Channel enum,
+      the vocabulary of catalogue.price_list.channels it is matched against; guestWeb, guestApp, partner, api and
+      backOffice are no longer accepted. A request enum that loses values is breaking.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-544 posted on #30970: "productKind (now the ProductKind enum) ...
+      channel becomes the catalogue Channel enum (pos, kiosk, web, mobile, b2b, ota, callCentre) ... skipped has one
+      {productId, reason} per product and reason, and reason becomes an enum of those three"), the lead''s "Close the
+      CRs and respond to devs" of 3 November 2026'
+    tag: r13
+    producer-tickets: ['30970']
+    consumer-tickets: [none-linked]
+  - id: BC-682
+    contract: catalogue
+    operation: bulkChangePrices
+    change: "`skipped[].reason`"
+    reason: 'ADAM CR-544 (CHG-CR544-001): BulkPriceResult.skipped[].reason, a free string, becomes the enum
+      partnerNetRate, fixedPriceBundle, openChangeRequest. A response field typed anew is breaking by the compat rule.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-544 posted on #30970: "productKind (now the ProductKind enum) ...
+      channel becomes the catalogue Channel enum (pos, kiosk, web, mobile, b2b, ota, callCentre) ... skipped has one
+      {productId, reason} per product and reason, and reason becomes an enum of those three"), the lead''s "Close the
+      CRs and respond to devs" of 3 November 2026'
+    tag: r13
+    producer-tickets: ['30970']
+    consumer-tickets: [none-linked]

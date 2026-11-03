@@ -26780,6 +26780,21 @@ components:
           description: The `note` the latest `freezeEntitlement` took, required there when `reason` is
             `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes
             has something to read.
+        frozenFrom:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: '**The freeze window''s first day** (ADAM CR-543; Chinmay, 3 November 2026): written by
+            `freezeEntitlement` from its `from`. A freeze covers today when `frozenFrom` is on or before today and
+            `frozenUntil` is null or on or after today. Null when never frozen.'
+        frozenUntil:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: '**The freeze window''s last day** (ADAM CR-543): written by `freezeEntitlement` from its `to`;
+            null means open-ended.'
         isNameBound:
           type: boolean
           default: false

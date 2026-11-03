@@ -464,6 +464,36 @@ And one rule per decision:
   BR-PUBLISH-REVIEW-DEFAULT (CR-520, CHG-CR520-001) switching the publish review on creates the default rule, reads
                    approvals#ruleRecords in process (XDR-111) and Identity's role permissions over its service route,
                    and answers 409 review-route-unavailable until #31185.
+  r13 second CR round, lane w1 (ADAM CR-499 to CR-545, decided 3 November 2026; lane_w1_rules_r13), each failing on
+  the r13 candidate before the lane:
+  BR-GROUP-PACKAGE-SOURCE (CR-499) setGroupPackageDefinition answers name and unitPrice null and asks no venue
+                   settings; listGroupPackages names and prices a package as listProducts does, with channel.
+  BR-PRODUCT-BADGE-RATING (CR-504) Product.highlightBadge (per language, 20 characters) on create and update, and
+                   Product.rating (readOnly, not stored); WEB-005's cards bind both.
+  BR-SHOP-DROP-RULES (CR-508) createShopAndDrop's 409 types per reason, 400 line-ids-required, the dropReference
+                   rule, the drop's venue, the order path's merchandise match and the collection point's hours.
+  BR-CATEGORY-TREE-PASSES (CR-523) listProductCategories prunes inactive subtrees for guests and lifts a node's
+                   kept descendants past a node dropped for its kind.
+  BR-WAITING-ROOM-COOKIE (CR-524) getWaitingRoomPosition is built on #29033 and its admitted answer carries the
+                   API's Set-Cookie.
+  BR-GUIDED-ANSWER-FILTER (CR-532) one guided-answer filter: the overlap, subcategory, swim (consent kind swim or
+                   the old swimAbility) and certification rules, and the consent-question read on its three callers.
+  BR-SEARCH-CATALOGUE-SOURCES (CR-533) searchCatalogue's summary is the description, with the localised maps,
+                   channel, showInfoOnly from the published configuration and fromPrice's reads.
+  BR-SIMULATION-CHANNEL-MAP (CR-537) the simulation maps SalesChannel to catalogue Channel; api and backOffice price
+                   nothing.
+  BR-CHANNEL-RETRY-READINGS (CR-538) a retrying incident is refused; the job's trace, audit entry and shared
+                   scrubbing of the excerpt.
+  BR-CHANGE-IMPACT-REPRICE (CR-539) projectedRevenue reprices order lines by each line's ratio, the most specific
+                   line winning; the revenue figures are nullable.
+  BR-CHANNEL-TEST-NOT-SUPPORTED (CR-540) a named test that does not apply is recorded notSupported, and the 422
+                   fires only for an order test that applies.
+  BR-IMPORT-STAGED-ROWS (CR-542) catalogue.import_job_row stages the parse; the job stores mode, appliedCount and
+                   failedCount; the commit's refusals.
+  BR-GUEST-MEMBERSHIP-FIELDS (CR-543) the freeze window is stored; GuestMembership's status, benefits and terms by
+                   rule; no Marketing read.
+  BR-BULK-PRICE-SKIPS (CR-544) bulkChangePrices' selection, skip reasons, escalates, 403 and 400.
+  BR-CLONE-PRODUCT-RULES (CR-545) cloneProduct's code and name constraints, 400, and its copy list.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2856,6 +2886,7 @@ def main() -> int:
     lane_p_rules_r13(need, op, ops)
     lane_w5_rules_r13(need, op, ops)
     lane_w3_rules_r13(need, op)
+    lane_w1_rules_r13(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2900,7 +2931,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES + R13_W4_RULES + R13_W1_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -4484,6 +4515,248 @@ def lane_w4_rules_r13(need, op):
          "listDeveloperMembers is still for staff only (CR-536)")
     need("BR-PUBLIC-API-CALLER", "email" in (sprops(ident, "PrincipalVerifiedEmail")),
          "identity.principal has no verified email (CR-536)")
+
+
+R13_W1_RULES = ["BR-GROUP-PACKAGE-SOURCE", "BR-PRODUCT-BADGE-RATING", "BR-SHOP-DROP-RULES", "BR-CATEGORY-TREE-PASSES",
+                "BR-WAITING-ROOM-COOKIE", "BR-GUIDED-ANSWER-FILTER", "BR-SEARCH-CATALOGUE-SOURCES",
+                "BR-SIMULATION-CHANNEL-MAP", "BR-CHANNEL-RETRY-READINGS", "BR-CHANGE-IMPACT-REPRICE",
+                "BR-CHANNEL-TEST-NOT-SUPPORTED", "BR-IMPORT-STAGED-ROWS", "BR-GUEST-MEMBERSHIP-FIELDS",
+                "BR-BULK-PRICE-SKIPS", "BR-CLONE-PRODUCT-RULES"]
+
+
+def lane_w1_rules_r13(need, op):
+    """r13 second CR round, lane w1 (ADAM CR-499 to CR-545, decided by Chinmay on 3 November 2026: "Close the CRs and
+    respond to devs", "get the NEw CRs in the r13"). Each rule fails on the r13 candidate before the lane (f599f2c6)."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    def tables(o_, key):
+        return {str(x.get("table") if isinstance(x, dict) else x) for x in o_.get(key) or []}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def param(o_, name):
+        return next((x for x in o_.get("parameters") or [] if isinstance(x, dict) and x.get("name") == name), {})
+
+    def body(o_):
+        return ((((o_.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema")
+                or {})
+
+    cat = schemas("contracts/spine/catalogue.yaml")
+    chan = "#/components/schemas/Channel"
+
+    # BR-GROUP-PACKAGE-SOURCE (CR-499)
+    sgp, lgp = op("setGroupPackageDefinition")[3], op("listGroupPackages")[3]
+    sgv = next((v for v in sgp.get("x-ticvai-read-via") or [] if (v or {}).get("query") == "tenancy#venueSettingsRecords"),
+               {})
+    need("BR-GROUP-PACKAGE-SOURCE", "the read is not asked until it does" in words(sgv.get("for"))
+         and "answers `name` and `unitPrice` as null" in words(sgp.get("description")),
+         "setGroupPackageDefinition asks the venue settings, or does not answer name and unitPrice null (CR-499)")
+    gpp = (cat.get("GroupPackageDefinition") or {}).get("properties") or {}
+    need("BR-GROUP-PACKAGE-SOURCE", (gpp.get("nameLocalised") or {}).get("readOnly") is True
+         and (gpp.get("nameLocalised") or {}).get("x-ticvai-persisted") is False
+         and "fromPrice" in words((gpp.get("unitPrice") or {}).get("description")),
+         "GroupPackageDefinition has no read-only nameLocalised, or unitPrice is not the product's fromPrice (CR-499)")
+    need("BR-GROUP-PACKAGE-SOURCE", ((param(lgp, "channel").get("schema") or {}).get("$ref")) == chan
+         and "the same price-list function `listProductVariants` uses" in words(lgp.get("description")),
+         "listGroupPackages takes no channel, or does not price a package as listProducts does (CR-499)")
+
+    # BR-PRODUCT-BADGE-RATING (CR-504)
+    pp = (cat.get("Product") or {}).get("properties") or {}
+    hb, rt = pp.get("highlightBadge") or {}, pp.get("rating") or {}
+    need("BR-PRODUCT-BADGE-RATING", hb.get("nullable") is True
+         and (hb.get("additionalProperties") or {}).get("maxLength") == 20
+         and rt.get("readOnly") is True and rt.get("x-ticvai-persisted") is False and rt.get("nullable") is True
+         and {"average", "count"} <= set((rt.get("properties") or {})),
+         "Product has no highlightBadge (per language, at most 20) or no readOnly, unstored rating {average, count} "
+         "(CR-504)")
+    for req in ("CreateProductRequest", "UpdateProductRequest"):
+        need("BR-PRODUCT-BADGE-RATING", "highlightBadge" in ((cat.get(req) or {}).get("properties") or {}),
+             f"{req} does not take highlightBadge (CR-504)")
+    p01 = load("screens/P01-guest-web-storefront.yaml").get("screens") or []
+    w5 = next((x for x in p01 if (x or {}).get("id") == "WEB-005"), {})
+    cards = [c for r in ((w5.get("layout") or {}).get("regions") or []) for c in (r or {}).get("components") or []
+             if (c or {}).get("operation") == "listProducts"
+             and {"Product.highlightBadge", "Product.rating"} <= set((c or {}).get("columns") or [])]
+    need("BR-PRODUCT-BADGE-RATING", bool(cards), "WEB-005's cards do not bind Product.highlightBadge and Product.rating "
+         "on listProducts (CR-504)")
+
+    # BR-SHOP-DROP-RULES (CR-508)
+    csd = op("createShopAndDrop")[3]
+    need("BR-SHOP-DROP-RULES", ptypes(csd, "409") == {"shop-and-drop-already-dropped", "shop-and-drop-item-not-droppable",
+                                                      "shop-and-drop-collection-point-closed"}
+         and "line-ids-required" in ptypes(csd, "400"),
+         "createShopAndDrop's 409 does not declare one problem type per reason, or its 400 has no line-ids-required "
+         "(CR-508)")
+    need("BR-SHOP-DROP-RULES", any(q == "orders#salesOrderRecords" for q, _ in vias(csd)),
+         "createShopAndDrop does not declare its read of the order (orders#salesOrderRecords) (CR-508)")
+    cdd = words(csd.get("description"))
+    for frag in ("first 22 characters", "`-SD-`", "transaction-scoped lock on that prefix", "Numbering is per prefix",
+                 "never the line's own venue", "of kind `collectionPoint`", "the next local midnight",
+                 "A null `opensAt` or `closesAt` sets no limit", "collection point's serving outlets"):
+        need("BR-SHOP-DROP-RULES", frag in cdd, f"createShopAndDrop does not say {frag!r} (CR-508)")
+
+    # BR-CATEGORY-TREE-PASSES (CR-523)
+    lpc = words(op("listProductCategories")[3].get("description"))
+    for frag in ("Pass 1, for a guest or visitor only:", "Pass 2, for every caller:", "nearest kept ancestor",
+                 "A node never appears under a node it is not filed beneath"):
+        need("BR-CATEGORY-TREE-PASSES", frag in lpc, f"listProductCategories does not say {frag!r} (CR-523)")
+
+    # BR-WAITING-ROOM-COOKIE (CR-524)
+    gwr = op("getWaitingRoomPosition")[3]
+    hdr = ((((gwr.get("responses") or {}).get("200") or {}).get("headers") or {}).get("Set-Cookie") or {})
+    gwd = words(gwr.get("description"))
+    need("BR-WAITING-ROOM-COOKIE", bool(hdr) and "The API itself sends the cookie" in gwd and "#29033" in gwd
+         and "never caches the admitted answer" in gwd,
+         "getWaitingRoomPosition does not send the admission cookie itself, or is not built on #29033 (CR-524)")
+
+    # BR-GUIDED-ANSWER-FILTER (CR-532)
+    wl = schemas("contracts/satellite/white-label.yaml")
+    flt = {}
+    for nm, sc in wl.items():
+        t = str(sc)
+        if "requiresSwimmer" in t and "holdsCertification" in t:
+            flt = sc
+            break
+    ft = words(flt)
+    for frag in ("kind `swim`", "`swimAbility` `confident`", "overlap; an empty bound on either side is open",
+                 "any category below it", "true or no flag keeps products needing this code or no certification"):
+        need("BR-GUIDED-ANSWER-FILTER", frag in ft, f"GuidedChoice answer.filter does not say {frag!r} (CR-532)")
+    need("BR-GUIDED-ANSWER-FILTER", ("marketing-crm#consentQuestionRecords", "in-process") in vias(op("previewGuidedChoice")[3])
+         and "One guided-answer filter, written once as shared code" in words(op("previewGuidedChoice")[3]
+                                                                              .get("description")),
+         "previewGuidedChoice does not call the one shared filter with the consent-question read (CR-532)")
+    for oid in ("listProducts", "searchCatalogue"):
+        o_ = op(oid)[3]
+        need("BR-GUIDED-ANSWER-FILTER", ("marketing-crm#consentQuestionRecords", "service") in vias(o_)
+             and "One shared guided-answer filter" in words(param(o_, "guidedAnswerIds").get("description")),
+             f"{oid} does not declare the consent-question read or state the shared filter's rules (CR-532)")
+
+    # BR-SEARCH-CATALOGUE-SOURCES (CR-533)
+    sc_ = op("searchCatalogue")[3]
+    item = ((((((sc_.get("responses") or {}).get("200") or {}).get("content") or {}).get("application/json") or {})
+             .get("schema") or {}).get("items") or {}).get("properties") or {}
+    need("BR-SEARCH-CATALOGUE-SOURCES", {"nameLocalised", "summaryLocalised"} <= set(item)
+         and ((param(sc_, "channel").get("schema") or {}).get("$ref")) == chan
+         and ("white-label#tenantLanguageRecords", "service") in vias(sc_)
+         and {"catalogue.price_list", "catalogue.price"} <= tables(sc_, "x-ticvai-reads")
+         and "requested language" not in words(param(sc_, "q").get("description")),
+         "searchCatalogue does not answer the localised maps, take channel, read showInfoOnly from the published "
+         "configuration or declare fromPrice's reads (CR-533)")
+    need("BR-SEARCH-CATALOGUE-SOURCES", ("white-label#tenantLanguageRecords", "service") in vias(op("listProducts")[3]),
+         "listProducts does not declare the showInfoOnly read (CR-533)")
+
+    # BR-SIMULATION-CHANNEL-MAP (CR-537)
+    sim = op("simulatePriceBreakdownCalculation")[3]
+    sd = words(sim.get("description"))
+    vw = ((cat.get("PriceBreakdownCalculationSimulationExplainabilityView") or {}).get("properties") or {})
+    fp = ((((vw.get("channelComparison") or {}).get("items") or {}).get("properties") or {}).get("finalPayable") or {})
+    need("BR-SIMULATION-CHANNEL-MAP", "`guestWeb` becomes `web`" in sd and "`partner` becomes `b2b`" in sd
+         and "`api` and `backOffice` have no catalogue channel" in sd and fp.get("nullable") is True,
+         "the simulation does not map SalesChannel to catalogue Channel, or a comparison entry cannot omit "
+         "finalPayable (CR-537)")
+
+    # BR-CHANNEL-RETRY-READINGS (CR-538)
+    rci = op("retryChannelIncident")[3]
+    need("BR-CHANNEL-RETRY-READINGS", "`retrying`" in words(((rci.get("responses") or {}).get("409") or {})
+                                                             .get("description")),
+         "retryChannelIncident does not refuse an incident already retrying (CR-538)")
+    ev = load("events/catalogue-channelIncidentRetryRequested.yaml")
+    pur = words(" ".join(str((c or {}).get("purpose") or "") for c in ev.get("consumers") or []))
+    for frag in ("[removed]", "2,000 characters", "13 to 19 digits", "action retry", "entity_type channelIncident",
+                 "no channel_connection_id ends the attempt as connectorNotAvailable", "rebuilds the call from the incident",
+                 "A connector may scrub more, never less"):
+        need("BR-CHANNEL-RETRY-READINGS", frag in pur,
+             f"catalogue.channelIncidentRetryRequested's job does not say {frag!r} (CR-538)")
+
+    # BR-CHANGE-IMPACT-REPRICE (CR-539)
+    lci = op("listPricingChangeImpact")[3]
+    ld = words(lci.get("description"))
+    for frag in ("`proposed_amount` / `current_amount`", "the most specific wins: product, then rate, then priceList",
+                 "the mean of their ratios", "half away from zero", "trade in more than one currency"):
+        need("BR-CHANGE-IMPACT-REPRICE", frag in ld, f"listPricingChangeImpact does not say {frag!r} (CR-539)")
+    iv = None
+    for nm, sc in cat.items():
+        if {"projectedRevenue", "revenueImpact", "currentRevenue"} <= set((sc or {}).get("properties") or {}):
+            iv = sc
+            break
+    ivp = (iv or {}).get("properties") or {}
+    need("BR-CHANGE-IMPACT-REPRICE", all((ivp.get(k) or {}).get("nullable") is True
+                                         for k in ("currentRevenue", "projectedRevenue", "revenueImpact")),
+         "currentRevenue, projectedRevenue and revenueImpact are not nullable (CR-539)")
+
+    # BR-CHANNEL-TEST-NOT-SUPPORTED (CR-540)
+    tcd = words(op("testChannelConnection")[3].get("description"))
+    need("BR-CHANNEL-TEST-NOT-SUPPORTED", "A named test that does not apply is recorded as `notSupported`" in tcd
+         and "a call where nothing ran leaves `connectionStatus` unchanged" in tcd
+         and "a named order test that does not apply is `notSupported`, not `422`" in tcd,
+         "testChannelConnection does not record a named test that does not apply as notSupported (CR-540)")
+
+    # BR-IMPORT-STAGED-ROWS (CR-542)
+    row = cat.get("CatalogueImportJobRow") or {}
+    rp = row.get("properties") or {}
+    need("BR-IMPORT-STAGED-ROWS", row.get("x-ticvai-persistence") == "catalogue.import_job_row"
+         and ["importJobId", "rowNumber"] in [list(x) for x in row.get("x-ticvai-unique-together") or []]
+         and {"importJobId", "scopePath", "rowNumber", "action", "targetProductId", "payload", "isExcluded", "outcome",
+              "failure", "productId"} <= set(rp)
+         and (rp.get("outcome") or {}).get("enum") == ["pending", "applied", "failed", "excluded"],
+         "catalogue.import_job_row does not stage the parse as CR-542 states")
+    jp = (cat.get("CatalogueImportJob") or {}).get("properties") or {}
+    need("BR-IMPORT-STAGED-ROWS", all((jp.get(k) or {}).get("readOnly") is True for k in ("mode", "appliedCount",
+                                                                                          "failedCount")),
+         "CatalogueImportJob does not store mode, appliedCount and failedCount, read-only (CR-542)")
+    cci = op("commitCatalogueImport")[3]
+    need("BR-IMPORT-STAGED-ROWS", {"catalogue-import-wrong-kind", "catalogue-import-not-ready",
+                                   "catalogue-import-already-committed", "catalogue-import-found-nothing",
+                                   "category-has-live-orders"} <= ptypes(cci, "409")
+         and "catalogue.import_job_row" in tables(op("importProductCatalogue")[3], "x-ticvai-writes")
+         and "The source file is never read again" in words(cci.get("description")),
+         "commitCatalogueImport does not refuse as CR-542 states, or the parse does not write the staged rows")
+
+    # BR-GUEST-MEMBERSHIP-FIELDS (CR-543)
+    ent = (schemas("contracts/spine/access.yaml").get("Entitlement") or {}).get("properties") or {}
+    need("BR-GUEST-MEMBERSHIP-FIELDS", {"frozenFrom", "frozenUntil"} <= set(ent),
+         "access.entitlement does not store frozen_from and frozen_until (CR-543)")
+    gmm = op("getMyMemberships")[3]
+    need("BR-GUEST-MEMBERSHIP-FIELDS", not any(q.startswith("marketing") for q, _ in vias(gmm))
+         and {"catalogue.plan_benefit", "catalogue.membership_benefit"} <= tables(gmm, "x-ticvai-reads")
+         and {"catalogue.plan_benefit", "catalogue.membership_benefit"} <= tables(op("listGuestMemberships")[3],
+                                                                                  "x-ticvai-reads"),
+         "getMyMemberships still reads Marketing, or the two membership reads do not declare the benefit tables (CR-543)")
+    gm = words(cat.get("GuestMembership"))
+    for frag in ("`suspended_reason` set becomes `suspended`", "`frozen_until` is null or on or after today",
+                 "ordered by `plan_benefit.priority` then `code`", "the day after this term's `validTo`"):
+        need("BR-GUEST-MEMBERSHIP-FIELDS", frag in gm, f"GuestMembership does not say {frag!r} (CR-543)")
+
+    # BR-BULK-PRICE-SKIPS (CR-544)
+    bcp = op("bulkChangePrices")[3]
+    sel = ((body(bcp).get("properties") or {}).get("selection") or {}).get("properties") or {}
+    bpr = cat.get("BulkPriceResult") or {}
+    sk = ((((bpr.get("properties") or {}).get("skipped") or {}).get("items") or {}).get("properties") or {})
+    need("BR-BULK-PRICE-SKIPS", chan in str(sel.get("channel")) and "ProductKind" in str(sel.get("productKind"))
+         and "escalates" in (bpr.get("required") or [])
+         and (sk.get("reason") or {}).get("enum") == ["partnerNetRate", "fixedPriceBundle", "openChangeRequest"]
+         and "price-escalation-required" in ptypes(bcp, "403") and "validation" in ptypes(bcp, "400")
+         and "catalogue.package_pricing" in tables(bcp, "x-ticvai-reads"),
+         "bulkChangePrices does not select, skip, escalate and refuse as CR-544 states")
+
+    # BR-CLONE-PRODUCT-RULES (CR-545)
+    clp = op("cloneProduct")[3]
+    cb = body(clp).get("properties") or {}
+    need("BR-CLONE-PRODUCT-RULES", (cb.get("code") or {}).get("maxLength") == 64
+         and (cb.get("code") or {}).get("pattern") == "^[A-Za-z0-9_-]+$"
+         and (cb.get("name") or {}).get("maxLength") == 200 and "validation" in ptypes(clp, "400")
+         and "What a clone copies:" in words(clp.get("description"))
+         and "`nameLocalised` null" in words(clp.get("description")),
+         "cloneProduct does not take createProduct's code rules, refuse with 400, or state what a clone copies (CR-545)")
 
 
 if __name__ == "__main__":

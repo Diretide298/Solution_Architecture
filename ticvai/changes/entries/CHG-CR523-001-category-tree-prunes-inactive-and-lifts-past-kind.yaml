@@ -1,0 +1,42 @@
+id: CHG-CR523-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'listProductCategories builds its tree in two passes: for a guest or visitor, every inactive node is dropped with
+  its whole subtree; then, for every caller, nodes whose kind is not the one in force are removed and their kept children
+  attached to the nearest kept ancestor (or made roots), new siblings ordered by displayOrder then id. Staff skip pass 1
+  and keep every kind with no kind parameter.'
+decision:
+  what: 'ADAM CR-523, posted on #31003: "Decided (Chinmay, 3 November 2026): inactive nodes are pruned with their whole
+    subtree; a node dropped only for its kind passes its kept descendants up. Build now: listProductCategories builds the
+    answer in two passes over the venue''s catalogue.product_category rows. Pass 1, for a guest or visitor only: drop every
+    inactive node together with everything below it, whatever the kinds below, so a section a venue switches off hides all
+    that is filed under it. Staff skip pass 1 and see inactive nodes. Pass 2, for every caller: the kind in force is the
+    kind parameter; with no kind parameter it is category for a guest or visitor, and every kind for staff (so nothing is
+    dropped). Remove each remaining node whose kind is not the one in force, and attach each kept child to the nearest kept
+    ancestor, or make it a root when no ancestor is kept. Among the new siblings, order by displayOrder ..." The lead''s
+    instruction, 3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-523 (Narayan Gaonkar, #31003 listProductCategories): The contract did not say whether a dropped node''s matching
+  descendants are dropped with it or lifted.'
+keys_touched:
+  operations:
+  - listProductCategories
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: a guest filter over a category tree with no rule for a dropped node's descendants
+tickets:
+  started: []
+  unstarted:
+  - '31003 (listProductCategories, Narayan Gaonkar): the two passes and the three contract tests as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-523
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CATEGORY-TREE-PASSES
+status: open
+notes: 'Beyond the posted words: none.'

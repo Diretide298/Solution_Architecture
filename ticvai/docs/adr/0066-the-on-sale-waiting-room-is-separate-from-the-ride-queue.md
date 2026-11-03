@@ -1,6 +1,6 @@
 # ADR-0066: The on-sale waiting room sits at the edge, apart from the ride queue
 
-**Status:** Accepted · 1 October 2026 · Chinmay Parab — a vendor stays the fallback, and only a vendor would need the client · **amended 6 October 2026**: sized and load-tested at 50,000+ arrivals, the sale behind it accepted at 3,000 concurrent ([below](#amendment-6-october-2026-sized-for-50000-arrivals-the-sale-behind-it-accepted-at-3000-concurrent-chinmay-chg-r4-017)) · **amended 25 October 2026**: on the guest web the admission token is an HttpOnly cookie the edge sets, and a gone entry is a 404 ([below](#amendment-25-october-2026-the-web-keeps-the-admission-in-an-edge-cookie-and-a-gone-entry-is-a-404-chinmay-adam-cr-216))
+**Status:** Accepted · 1 October 2026 · Chinmay Parab — a vendor stays the fallback, and only a vendor would need the client · **amended 6 October 2026**: sized and load-tested at 50,000+ arrivals, the sale behind it accepted at 3,000 concurrent ([below](#amendment-6-october-2026-sized-for-50000-arrivals-the-sale-behind-it-accepted-at-3000-concurrent-chinmay-chg-r4-017)) · **amended 25 October 2026**: on the guest web the admission token is an HttpOnly cookie the edge sets, and a gone entry is a 404 ([below](#amendment-25-october-2026-the-web-keeps-the-admission-in-an-edge-cookie-and-a-gone-entry-is-a-404-chinmay-adam-cr-216)) · **amended 3 November 2026**: the API itself sends that cookie and Front Door passes it through ([below](#amendment-3-november-2026-the-api-sends-the-admission-cookie-chinmay-adam-cr-524))
 **Date:** 2026-10-01 (drafted 30 September from the system-design review) · **Deciders:** Chinmay Parab (the client only if a vendor is bought)
 **Finding:** SD-039 (high)
 **Amends:** ADR-0012 (queue integration, amended by this ADR) — Q2 gets its own endpoints and screens, not Q1's
@@ -162,3 +162,18 @@ place at the back: the outcome the room exists to prevent.
 - **A `404` from `getWaitingRoomPosition` for a performance the page knows means the entry is gone** (evicted, or the
   room restarted): the guest re-enters. An unknown performance is the page's cold entry, which offers the event.
 
+
+## Amendment, 3 November 2026: the API sends the admission cookie (Chinmay, ADAM CR-524)
+
+**Raised on #31122, settled by the lead on 3 November 2026** ("Close the CRs and respond to devs"). The 25 October
+amendment said the edge sets the cookie; the decision names the API as the sender.
+
+- **On the guest web the API itself sends the cookie on the admitted answer** of `getWaitingRoomPosition`:
+  `Set-Cookie`, HttpOnly, Secure, scoped to the performance, expiring with the token. Front Door passes it through and
+  never caches the admitted answer. Everything else in the 25 October amendment stands.
+- **`getWaitingRoomPosition` is built on the waiting-room ticket #29033**, with `enterWaitingRoom`, the release
+  controller and the token check, not on the catalogue event ticket. #29033 settles in its own design, before
+  building, what both operations and the cart check share: the per-performance Redis keys (the arrival counter and
+  the admitted-up-to mark the controller advances), the per-entry record and its lifetime, the token (format, signing
+  algorithm, Key Vault secret name, lifetime), the rules for `position`, `aheadOfYou`, `estimatedWaitSeconds` and
+  `pollAfterSeconds`, and when an entry is expired or the room closed rather than `notRequired`.

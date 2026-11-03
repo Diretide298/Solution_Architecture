@@ -1,0 +1,47 @@
+id: CHG-CR537-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: simulatePriceBreakdownCalculation translates each SalesChannel (channel and every compareChannels entry) into catalogue
+  Channel with the channel-availability map (guestWeb web, guestApp mobile, partner b2b, the rest by name; api and backOffice
+  none), matches price_list.channels and the live price's deployments through CR-422's map. A main channel of api or backOffice
+  is 422 no-selected-rate; such a comparison entry has no finalPayable and says no price list prices it. Member, fee and
+  tax rules keep SalesChannel; the answer echoes the SalesChannel sent.
+decision:
+  what: 'ADAM CR-537, posted on #35288: "Decided (Chinmay, 3 November 2026): the simulation translates each SalesChannel
+    into catalogue Channel with the map the package already uses for channel availability, then matches price lists and
+    live-price deployments in Channel. Build now: one function, used for channel and for every entry of compareChannels:
+    guestWeb becomes web, guestApp becomes mobile, partner becomes b2b, and pos, kiosk, callCentre, b2b and ota keep their
+    names. api and backOffice have no catalogue channel. The selected rate is then matched as a Channel value in catalogue.price_list.channels,
+    and the live dynamic price''s deployments go through the existing map from Channel to deployments (web is b2c, mobile
+    is mobileApp, callCentre is callCenter, the rest by the same name). If the main channel is api or backOffice, the answer
+    is 422 no-selected-rate. For such a channel in compareChannels, its comparison entry has ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-537 (Hrushikant Patkar, #35288 simulatePriceBreakdownCalculation (On hold)): The simulation''s channel is
+  common SalesChannel while price lists and live prices key their channels in catalogue Channel, so guestWeb, guestApp,
+  partner, api and backOffice never resolved a price.'
+keys_touched:
+  operations:
+  - simulatePriceBreakdownCalculation
+  schemas:
+  - PriceBreakdownCalculationSimulationExplainabilityView
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: two channel vocabularies meeting at the price list
+tickets:
+  started: []
+  unstarted:
+  - '35288 (On hold, Hrushikant Patkar): one translation function as posted; the ticket can come off hold.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-537
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SIMULATION-CHANNEL-MAP
+status: open
+notes: 'Beyond the posted words: channelComparison.finalPayable is marked nullable, so an api or backOffice entry can carry
+  none.'

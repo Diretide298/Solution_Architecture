@@ -1,0 +1,61 @@
+id: CHG-CR504-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'Product gains highlightBadge (per-language text keyed by ISO 639-1, at most 20 characters each, nullable, stored
+  in the new nullable jsonb column catalogue.product.highlight_badge, set by createProduct and updateProduct, answered by
+  every read of Product) and rating ({average 1.0-5.0 one decimal, count >= 1}, nullable, readOnly, not stored; listProducts
+  answers it, null until the rating source is decided). WEB-005''s ticket cards bind both: the pill on the card image and
+  the star line under the display tags.'
+decision:
+  what: 'ADAM CR-504, posted on #31739: "Decided (Chinmay, 3 November 2026): the WEB-005 cards stay as the client approved
+    them; Product gains a highlight badge and a rating summary. Build now: (1) Product.highlightBadge: LocalisedText (keyed
+    by ISO 639-1 code), nullable, at most 20 characters per language (longer is 400 validation), stored in a new nullable
+    jsonb column catalogue.product.highlight_badge. It is set with createProduct and updateProduct by a caller holding PRODUCT_CONFIGURE,
+    and answered by every operation that answers Product, to every audience. The card shows the value for the guest''s language,
+    falling back to the English value; null shows no badge. (2) Product.rating: an object {average: number from 1.0 to 5.0,
+    one decimal; count: integer, at least 1}, nullable, readOnly, not stored on the product. listProducts answers it; every
+    other operation answers null. It is null until the rating source is decided, and ..." The lead''s instruction, 3 November
+    2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-504 (Chinmay Patkar, #31739 WEB-005): The client-verified frame web-005 draws POPULAR / BEST VALUE badges
+  and a star line per card, and Product had no field for either.'
+keys_touched:
+  screens:
+  - WEB-005
+  operations:
+  - createProduct
+  - updateProduct
+  - listProducts
+  schemas:
+  - Product
+  - CreateProductRequest
+  - UpdateProductRequest
+  tables:
+  - catalogue.product
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-business-rules.py
+root_class: an approved screen shows data the contract does not carry
+tickets:
+  started: []
+  unstarted:
+  - '31739 (WEB-005, Chinmay Patkar): bind highlightBadge and rating as posted; show no badge and no star line while they
+    are null.'
+  - '31652 (createProduct), 30950 (updateProduct), 27870 (listProducts): highlightBadge on create and update and every read;
+    rating null until its source is decided.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-504
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRODUCT-BADGE-RATING
+status: open
+notes: '**Design change: none to the frame.** WEB-005 keeps the client-verified frame; its screen record gains a "Ticket
+  cards" component on listProducts binding Product.highlightBadge and Product.rating, which the frame already draws, recorded
+  in docs/active/approved-ui-changes.yaml against CR-504. Beyond the posted words: rating.average carries multipleOf 0.1
+  for "one decimal". The rating''s source is still the lead''s question (the draft''s options a, b, c).'

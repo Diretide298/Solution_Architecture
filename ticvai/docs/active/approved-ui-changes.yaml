@@ -828,3 +828,13 @@ changes:
     Patkar on #31739, settled 3 November 2026 by Chinmay) gives it getPerformance''s Performance.startsAt. The record is
     brought in line with the approved frame; what the client sees does not change.'
   change: CHG-CR503-001
+- screen: WEB-005
+  field: 'region:collection'
+  to: fa1fe1ad0593ecc8
+  approval: 'ADAM CR-504 (raised by Chinmay Patkar on #31739, settled 3 November 2026 by Chinmay, the lead''s instruction
+    "Close the CRs and respond to devs"): "the WEB-005 cards stay as the client approved them; Product gains a highlight
+    badge and a rating summary ... WEB-005 (#31739) binds both: highlightBadge is the pill on the card image, shown in
+    capitals as drawn; rating is the star line under the display tags ... Nothing else on the card changes." The
+    client-verified frame (wireframes/P01 Guest Web.dc.html#web-005) draws the POPULAR / BEST VALUE pill and the star
+    line on each ticket card; the record binds the two fields to them, and what the client sees does not change.'
+  change: CHG-CR504-001

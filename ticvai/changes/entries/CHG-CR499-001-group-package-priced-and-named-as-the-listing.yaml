@@ -1,0 +1,55 @@
+id: CHG-CR499-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: setGroupPackageDefinition answers what it stores (name and unitPrice null, no product or price read, no venue-settings
+  read; readOnly name and unitPrice ignored on input). listGroupPackages names a package as Product does (name, plus a new
+  read-only nameLocalised from catalogue.product.name_localised) and prices it as listProducts prices fromPrice, by the
+  shared price-list function on the caller's channel, with the same optional channel parameter. pricingBasis never changes
+  the amount.
+decision:
+  what: 'ADAM CR-499, posted on #30948: "Decided (Chinmay, 3 November 2026): option C for this ticket; the group package
+    list prices and names the package the way the product listing does. Build now: setGroupPackageDefinition (#30948) writes
+    catalogue.group_package exactly as specified (one row per product) and answers 200 with the stored fields: id, productId,
+    kind, maxParticipants, durationMinutes, minimumSize, hostCount, pricingBasis, freeLeaderRatio, paymentMode, includes,
+    scopePath. It answers name and unitPrice as null and reads no price and no product name. It no longer needs the venue-settings
+    read (that read was only for unitPrice). name and unitPrice sent in the body are ignored, as readOnly fields are. BO-011
+    binds neither. For listGroupPackages (built on #27870 with listProducts): name is catalogue.product.name, and each package
+    also carries nameLocalised (catalogue.product.name_localised, read-only, not stored on ..." The lead''s instruction,
+    3 November 2026: "Close the CRs and respond to devs" and "get the NEw CRs in the r13".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-499 (Deep Khanvilkar, #30948 setGroupPackageDefinition): GroupPackageDefinition.unitPrice said only "read
+  from the product''s current price" and name "in the caller''s language", and no operation or parameter named a language
+  or a price rule.'
+keys_touched:
+  operations:
+  - setGroupPackageDefinition
+  - listGroupPackages
+  schemas:
+  - GroupPackageDefinition
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: a derived answer field with no stated source
+tickets:
+  started: []
+  unstarted:
+  - '30948 (setGroupPackageDefinition, Deep Khanvilkar): answer the stored fields, name and unitPrice null; drop the venue-settings
+    read.'
+  - '27870 (listProducts, listProductVariants and listGroupPackages): name, nameLocalised and unitPrice as posted, with
+    the channel parameter, calling the one price-list function.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-499
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GROUP-PACKAGE-SOURCE
+status: open
+notes: '**r13''s price rule kept** (the coordinator, 3 November 2026: a posted decision that contradicts an earlier r13
+  lane keeps r13''s rule): the one price rule is catalogue#variantPriceRecords (CR-439, CHG-CR439-001, built once in Catalogue
+  on #35288), so the package names it where the posted text says the price-list function built on #27870. Beyond the posted
+  words: GroupPackageDefinition.name and unitPrice are marked nullable, since setGroupPackageDefinition answers them null.
+  getGroupPackageDefinition (the single GET) is not named by the decision and is left as it was: its answer of name and
+  unitPrice is not stated.'
