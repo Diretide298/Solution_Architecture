@@ -456,7 +456,8 @@ def cmd_judge(pkg, baseline_path, log_path, tail_path="", jobs="1", out_dir="", 
         log.write(line)
         sys.stdout.write(line)
         sys.stdout.flush()
-        m = re.match(r"^\s+(\S+)\s+(ok  |FAIL|rpt |allw|MISSING)", line)
+        # a table row: two spaces, the checker's name, its mark (the closing `  GATE: FAIL` is not a row)
+        m = re.match(r"^\s+([\w.-]+)\s+(ok  |FAIL|rpt |allw|MISSING)", line)
         if m:
             verdicts[m.group(1)] = m.group(2).strip()
         m = re.match(r"^\s+FAIL ALLOWLIST (.*\S)", line)
