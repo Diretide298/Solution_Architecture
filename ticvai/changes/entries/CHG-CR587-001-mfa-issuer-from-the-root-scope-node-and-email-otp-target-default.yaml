@@ -1,0 +1,42 @@
+id: CHG-CR587-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'enrolMfaMethod (totp) reads the issuer from Tenancy''s scopeRecords where {level: tenant}, in process under the
+  caller''s RLS, and puts it URL-encoded in both places of qrCodeUri; no visible tenant row is 500 with nothing written.
+  emailOtp: a target sent must be an email (400 validation, field target); missing or blank, the account''s own email is
+  used, else 400; the chosen address is the destination, masked_target and the event''s destination. A target with totp
+  is ignored. No migration.'
+decision:
+  what: 'ADAM CR-587, posted on #30663: "Decided (Chinmay, 3 November 2026): option A. Build now: (1) The authenticator
+    issuer. When enrolMfaMethod enrols kind totp, read the tenant''s name from the tenant database, never the control database:
+    ask Tenancy''s scopeRecords in process, with where {level: ''tenant''}, on the caller''s connection and transaction
+    and under its row-level security. Take the name of the one row it returns (the tenant''s root scope node, platform.scope.name),
+    whether the node is active or not. That name is the issuer. URL-encode it and put it in both places of qrCodeUri: otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30.
+    The account stays the principal''s username ..." The lead, 3 November 2026: "the new one dont go in r15, log them and
+    we add to r14 only", then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-587 (#30663 enrolMfaMethod): the issuer ("the tenant''s display name") had no source in the tenant database,
+  and emailOtp without target was undefined.'
+keys_touched:
+  operations:
+  - enrolMfaMethod
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: a value the operation must produce with no declared source
+tickets:
+  started: []
+  unstarted:
+  - '30663 (enrolMfaMethod, On hold): the issuer read and the target rule.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-587
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MFA-ISSUER-TARGET
+status: open
+notes: 'Beyond the posted words: enrolMfaMethod declares the shared 400 (BadRequest, validation) for the target refusals;
+  the 201, 403 and 422 are unchanged.'

@@ -1,0 +1,54 @@
+id: CHG-CR583-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'getCart ships with pricing, availability, leases and totals as built plus two conflict kinds: overlappingTime
+  (lines whose performance or booked window overlap, not on the same performance; not blocking) and requiresPrerequisite
+  (a parent line missing or unavailable; blocking), reading catalogue#performanceRecords in process. exceedsPartySize and
+  sameSessionDifferentVenue stay listed and are never produced. Until the consent ticket lands consentQuestions is [] and
+  no consentBlocksBooking is produced; then getCart reads catalogue#productRecords and a new Marketing service read, marketing-crm#bookingConsentRecords
+  (marketing.booking_consent_record by cartId, superseded rows excluded), and works out answered and consentBlocksBooking
+  by the posted rules; checkoutCart''s consent checks read only those computed fields.'
+decision:
+  what: 'ADAM CR-583, posted on #30684: "Decided (Chinmay, 3 November 2026): getCart ships to QA with pricing, availability,
+    leases and totals as built, plus two conflict kinds. The consent part follows on its own ticket, and checkoutCart is
+    not released before it. Build now: 1. getCart declares catalogue#performanceRecords (in process) for line times. 2.
+    overlappingTime: for every pair of lines in the cart whose time ranges overlap (a line''s time range is its performance''s
+    startsAt to endsAt, or its bookedWindow; a line with neither is skipped), one conflict with both lineIds, isBlocking
+    false, and a message naming the two products and their times. Two lines on the same performance are not a conflict.
+    3. requiresPrerequisite: a ..." The lead, 3 November 2026: "the new one dont go in r15, log them and we add to r14 only",
+    then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-583 (#30684 getCart): CartConflict listed five kinds and consentQuestions.answered with no rule and no declared
+  read, so the conflicts and the consent answers were read from nowhere.'
+keys_touched:
+  operations:
+  - getCart
+  - checkoutCart
+  schemas:
+  - Cart
+  - CartConflict
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+root_class: a computed field with no rule and no declared read
+tickets:
+  started: []
+  unstarted:
+  - '30684 (getCart, On hold): build the two conflict kinds now; consentQuestions [] until the consent ticket.'
+  - 'New task (consent part, under #30684): the consent reads and rules 6 to 10; checkoutCart is not released before it.'
+  - 'New task (Marketing, under the Marketing service ticket #27866): serve bookingConsentRecords on the service route.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-583
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CART-CONFLICT-KINDS
+status: open
+notes: 'Beyond the posted words: the Marketing read is named marketing-crm#bookingConsentRecords (input cartId, returns
+  the current BookingConsentRecord rows), declared in marketing-crm.yaml x-ticvai-queries, served on the service route.
+  CR-556 (lane d) says a line with an eligibilityDeclaration counts its rows; a cart line has no eligibility declaration
+  (it is on CreateOrderLine only), so the two agree.'

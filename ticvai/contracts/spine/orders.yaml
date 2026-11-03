@@ -4187,6 +4187,18 @@ paths:
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'each line''s time range, its performance''s startsAt to endsAt, for the overlappingTime conflict (ADAM
+          CR-583)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'each line''s Product.consentQuestionIds, for consentQuestions (ADAM CR-583; asked once the consent ticket
+          lands)'
+      - query: marketing-crm#bookingConsentRecords
+        route: service
+        for: 'the booking consent records of this cart, superseded rows excluded, for consentQuestions[].answered and
+          consentBlocksBooking (ADAM CR-583; asked once the consent ticket lands)'
       - query: catalogue#channelCapacityRecords
         route: in-process
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
@@ -4237,6 +4249,34 @@ paths:
 
         **Staff since 1 October 2026**: the till reads its own cart (`cartId` from the workstation
         session) on POS-010; the declaration said guest and partner while P04 called it.
+
+        **The conflicts and the consent questions** (ADAM CR-583, Chinmay, 3 November 2026; CHG-CR583-001). getCart
+        ships to QA with pricing, availability, leases and totals as built, plus two conflict kinds; the consent part
+        follows on its own ticket, and `checkoutCart` is not released before it. (1) getCart asks
+        `catalogue#performanceRecords` in process for line times. (2) `overlappingTime`: for every pair of lines in
+        the cart whose time ranges overlap (a line''s time range is its performance''s `startsAt` to `endsAt`, or its
+        `bookedWindow`; a line with neither is skipped), one conflict with both `lineIds`, `isBlocking` false, and a
+        `message` naming the two products and their times. Two lines on the same performance are not a conflict.
+        (3) `requiresPrerequisite`: a line whose `parentLineId` names no line in the cart, or names a line whose
+        `isAvailable` is false. One conflict per such line, `isBlocking` true. (4) `exceedsPartySize` and
+        `sameSessionDifferentVenue` stay in the kind list but are never produced: nothing defines a party size or a
+        session yet. (5) Until the consent ticket lands, getCart answers `consentQuestions: []` and produces no
+        `consentBlocksBooking` conflict. **The consent part (its own ticket)**: (6) getCart also asks
+        `catalogue#productRecords` in process for `Product.consentQuestionIds`, and Marketing''s
+        `marketing-crm#bookingConsentRecords`, `marketing.booking_consent_record` by `cartId` (service route,
+        superseded rows excluded). The answers are booking consent records, not a guest''s standing consents, so
+        `marketing-crm#consentRecords` is not asked. Marketing serves this read alongside `consentQuestionRecords`,
+        `consentQuestionVersionRecords` and WhiteLabel''s `bookingFlowRecords`. (7) `consentQuestions` is computed
+        exactly as `Cart.consentQuestions` describes: flow questions first, then each product''s in line order, each
+        question once. A question''s `lineIds` are the lines whose product asks it. (8) `answered`: a `perBooking`
+        question is answered when one current record exists for this cart and question at the shown version. A
+        `perPerson` question is answered when every line in its `lineIds` has a current record for each
+        `personIndex` from 0 to that line''s quantity minus 1 (the cart has no eligibility declaration, so quantity is
+        the person count). For a `perPerson` question the flow asks (empty `lineIds`), every line in the cart is
+        counted. A record at an older version does not count. (9) `consentBlocksBooking`: for each current record
+        with `blocksBooking` true, one blocking conflict on its `cartLineId`; for a `perBooking` answer, on every line
+        that asks the question (every line in the cart if the flow asks it). (10) `checkoutCart`''s
+        `consentRequired` and `consentAnswerBlocks` checks read these same computed fields and no other source.
 
         2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about
         the future and the future moves. Availability, promotions and lease expiry are all live.
@@ -4438,6 +4478,10 @@ paths:
         **A line added from a recommendation carries its `recommendationId`** (29 September, build;
         AI system design 2.2 A step 8): the `trackingId` of the ai `decideRecommendations` item, kept on
         the cart line and the order line so the purchase is attributed rather than guessed.
+
+        **The line''s product is set by the server** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001):
+        `CartLine.productId` is the catalogue product of the line''s variant, set when the line is added and returned
+        by `getCart`; the request body is unchanged, and a client never sends it.
 
         **An hourly product carries its booked window** (decided 29 September, rev 3 REV3-13).
         A meeting room is a product with a `length` variant, and the line sends `bookedWindow`
@@ -5191,7 +5235,9 @@ paths:
         While a required question in `Cart.consentQuestions` has no answer the call is refused 422
         `consentRequired`; where an answer is the one the venue set to block the booking it is refused 422
         `consentAnswerBlocks`, naming the lines. On success the answers are bound to the new order, so each
-        consent record names the order and line it was given for.
+        consent record names the order and line it was given for. **Both checks read `getCart`''s computed
+        `consentQuestions[].answered` and `consentBlocksBooking` conflicts and no other source** (ADAM CR-583,
+        CHG-CR583-001); `checkoutCart` is not released before the consent ticket lands.
 
         **A table deposit line becomes an `orders.deposit` row, not revenue** (rev 3 REV3-8b): authorised
         or taken as `DepositPolicy.dining.collection` says, with the booking''s id, and the booking moves
@@ -5217,7 +5263,9 @@ paths:
         declines.
 
         **A line''s `recommendationId` is carried to the order line** (design 2.2 A step 8), so
-        `order.completed` attributes the purchase to the recommendation it came from.
+        `order.completed` attributes the purchase to the recommendation it came from. **So is its `productId`**
+        (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): copied from the cart line to
+        `orders.order_line.product_id` in the same way, and returned on every read of the order''s lines.
 
         **The guest may pay in the currency they selected** (decided 2 October 2026, Chinmay;
         CHG-FIN-001; reverses the display-only rule of 10 August, MoM 10 Aug 2026 4.7 option (a) and
@@ -6216,6 +6264,11 @@ paths:
         `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they
         placed; another guest's order is refused exactly as one that does not exist, never returned.
         `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
+        **Each line names its product** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): `OrderLine.productId`,
+        stored on `orders.order_line` and copied from the cart line by `checkoutCart`, as on every read of an order's
+        lines. Orders made before this change get it filled in from their variant's product. WEB-012 reads it from an
+        order link for its summary panel and its booking-flow read.
 
         **Or with the order's access token and no session** (decided 20 October 2026, Chinmay, R8 blocker
         cause IDENTITY-C52, option A; CHG-R8SPN-025): the device that checked out, or a payer with no
@@ -25496,6 +25549,15 @@ components:
             readOnly: true
             description: The order's venue, copied onto the line (ADR-0044's own example; system-design
               review SD-008, 29 September) so a line is scoped and partitionable without its order.
+          productId:
+            x-ticvai-references: catalogue.product
+            type: string
+            format: uuid
+            readOnly: true
+            description: 'The catalogue product of the line''s variant (ADAM CR-590, Chinmay, 3 November 2026;
+              CHG-CR590-001), stored on `orders.order_line`: copied from the cart line by `checkoutCart`, as
+              `recommendationId` is, and returned on every read of an order''s lines (`getOrder` included). Orders
+              made before this change get it filled in from their variant''s product. A client never sends it.'
           discounts:
             type: array
             readOnly: true
@@ -25562,6 +25624,14 @@ components:
         productName:
           type: string
           readOnly: true
+        productId:
+          x-ticvai-references: catalogue.product
+          type: string
+          format: uuid
+          readOnly: true
+          description: 'The catalogue product of the line''s variant (ADAM CR-590, Chinmay, 3 November 2026;
+            CHG-CR590-001): set by the server from the variant when the line is added and returned by `getCart`; a
+            client never sends it. `checkoutCart` copies it to the order line.'
         quantity:
           type: integer
           minimum: 1
@@ -25720,6 +25790,12 @@ components:
       description: '2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal**
         — a party of four may legitimately split, and refusing would be wrong more often than right.
 
+        **Which kinds are produced** (ADAM CR-583, Chinmay, 3 November 2026; CHG-CR583-001; the rules are on
+        `getCart`): `overlappingTime` (two lines whose time ranges overlap, not on the same performance; not
+        blocking), `requiresPrerequisite` (a line whose parent line is missing or unavailable; blocking) and, with
+        the consent ticket, `consentBlocksBooking` (blocking). `exceedsPartySize` and `sameSessionDifferentVenue`
+        stay in the list but are never produced: nothing defines a party size or a session yet.
+
         '
       properties:
         kind:
@@ -25832,6 +25908,10 @@ components:
             listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and
             sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or
             several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.
+            **Answered from booking consent records** (ADAM CR-583; CHG-CR583-001): `answered` and the
+            `consentBlocksBooking` conflicts are worked out from Marketing's current booking consent records
+            (`marketing-crm#bookingConsentRecords`) of this cart at the shown version, as `getCart` states; until the consent ticket lands this list is
+            empty.
           items:
             allOf:
             - $ref: ../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion

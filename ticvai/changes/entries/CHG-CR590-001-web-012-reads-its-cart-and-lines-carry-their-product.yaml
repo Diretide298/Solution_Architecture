@@ -1,0 +1,54 @@
+id: CHG-CR590-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'WEB-012 reads getCart on load (getOrder for an order link) to fill its existing summary panel and to take getPublishedBookingFlow''s
+  productId from the first line with no parent line; with atPayment a guest not signed in gets the sign-in step before Pay
+  now; an empty cart and no order goes back to WEB-010. CartLine and OrderLine gain productId (read-only, catalogue.product):
+  set from the variant when the line is added, copied by checkoutCart onto orders.order_line, returned on every read of
+  an order''s lines; old orders filled in.'
+decision:
+  what: 'ADAM CR-590, posted on #31898: "Decided (Chinmay, 3 November 2026): WEB-012 reads the cart it is about to pay for,
+    as the app''s payment screen GST-009 already does. The order is still made at Pay now. Nothing visible changes: the
+    summary panel, the steps indicator and the sign-in gate are already on the approved screen; this gives them their data.
+    Build now: 1. Screen WEB-012 (front end): call orders getCart on load with the session''s cartId, as WEB-010 does (same
+    guest session or anonymous cart session). Until Pay now, the ''Your booking'' summary panel shows the cart''s lines
+    (product name, quantity, line total, add-ons under their parent line) and its subtotal, discount, tax and total. It
+    stays open on every state. When ..." The lead, 3 November 2026: "the new one dont go in r15, log them and we add to
+    r14 only", then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-590 (#31898 WEB-012): since CR-576 WEB-012 starts from the cart but read no cart, so "Your booking" was empty
+  and the flow read had no productId until Pay now.'
+keys_touched:
+  screens:
+  - WEB-012
+  operations:
+  - getCart
+  - addCartLine
+  - checkoutCart
+  - getOrder
+  schemas:
+  - CartLine
+  - OrderLine
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - contracts/spine/orders.yaml
+  - tools/check-business-rules.py
+root_class: a screen reads a record it has no operation for
+tickets:
+  started:
+  - '31898 (WEB-012 build, In progress): through CR-590''s own posted comment; nothing beyond it.'
+  unstarted:
+  - 'Orders tickets for addCartLine and checkoutCart: set and copy productId.'
+  - 'New task (MIG, migration owner): orders.cart_line.product_id and orders.order_line.product_id, and fill the old order
+    lines from their variant''s product.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-590
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-WEB012-READS-CART
+status: open
+notes: 'No visible change: the summary panel, the steps indicator and the sign-in gate are on the approved screen.'

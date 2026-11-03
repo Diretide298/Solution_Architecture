@@ -988,26 +988,32 @@ screens:
       trigger: 'Book (a dated product: date, then time, then tickets)'
       carries:
       - productId
+      precondition: the card's or search result's `bookingEntry` is `dateFirst` (ADAM CR-591)
       provenance: decided 29 September 2026, MOB-2
     - to: GST-008
       trigger: Book (an undated product, or a product-first flow such as a workshop)
       carries:
       - productId
+      precondition: the card's or search result's `bookingEntry` is `productFirst` (ADAM CR-591)
       provenance: decided 29 September 2026, MOB-2, W8
     - to: GST-074
       trigger: Book (a spot on the venue map, where the flow picks on the map)
       carries:
       - productId
+      precondition: the card's or search result's `bookingEntry` is `venueMap` (ADAM CR-591)
       provenance: decided 29 September 2026, MOB-2, W6
     - to: GST-075
       trigger: Book (a space by the hour)
       carries:
       - productId
+      precondition: the card's or search result's `bookingEntry` is `timeWindow` (ADAM CR-591)
       provenance: decided 29 September 2026, MOB-2, W9
     - to: GST-056
       trigger: Book a bundle (e.g. meal combo with admission)
+      precondition: the card's or search result's `bookingEntry` is `bundle` (ADAM CR-591)
       provenance: 'decided 29 September 2026, MOB-2, MOB-4. Carries the card''s bundleId (r8, ORDERS-MONEY-C05):
-        GST-056 needs it to open'
+        GST-056 needs it to open. The bundleId is the card''s or result''s `bundleId` (ADAM CR-591), never a search
+        result''s `id`, which for a bundle is the bundle''s catalogue product'
       carries:
       - bundleId
     - to: BO-005
@@ -1047,7 +1053,19 @@ screens:
 
     Build note (r8 second round, ORDERS-MONEY-C05): the edge to GST-056 now carries the `bundleId` of
     the bundle the card shows, as GST-004''s edge does (this screen holds it: its edge to GST-004 carries
-    it too).'
+    it too).
+
+
+    **Where Book goes is the server''s answer** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). Book stays
+    as the approved screen draws it and goes straight into booking. Each card and each search result carries
+    `bookingEntry` and `bundleId` (`listProducts`, `searchCatalogue`). Book opens: `dateFirst` Select Date & Time
+    (GST-007), with `productId`; `productFirst` Tickets & Add-ons (GST-008), with `productId`; `venueMap` map
+    booking (GST-074), with `productId`; `timeWindow` Book a Space by the Hour (GST-075), with `productId`;
+    `bundle` the bundle screen (GST-056), with the card''s `bundleId`. Null: no Book; info-only products keep Call
+    sales / Email sales, and a bundle whose bundle is withdrawn opens Item Detail as now. No call is added to this
+    screen: the booking screen reads its flow as it already does. Offline, Book opens the booking screen from the
+    cached list, and that screen waits for the connection before holding capacity, as the offline state says. A
+    bundle id is never taken from a search result''s `id`. No screen changes visibly.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -1300,7 +1318,12 @@ screens:
     **Video plays directly (client meeting 30 September, MoM 4.8, Qossai; agreed by Chinmay).** On a ride
     or attraction the info button reveals the details and plays the video straight away; the loader that
     stood in front of it is removed. While the video buffers its poster frame shows; a video that cannot
-    play leaves the poster and the details, never an error screen.'
+    play leaves the poster and the details, never an error screen.
+
+
+    **Book uses the same two fields as Buy Tickets** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001):
+    the product''s `bookingEntry` (`getProduct`) says which booking screen Book opens and `bundleId` which bundle;
+    nothing visible changes.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getProduct` reads one of them — list, select,
@@ -1929,6 +1952,15 @@ screens:
     `bookingFlow`.
 
 
+    **Days in the venue''s time zone** (ADAM CR-556 steps 5 and 6 as corrected, Chinmay, 3 November 2026;
+    CHG-CR556-002). The zone is the picked venue''s `timeZone` in `TenantAppStatus.venues` (`getTenantAppStatus`,
+    which GST-001 already reads for its venue picker), not `PublishedTenantConfig`. Today, the strip days, the day
+    keys, the month calendar''s greyed past days and the part-of-day split are computed in that zone, and times are
+    shown in it; `listPerformances` and `getAvailability` are sent the venue day''s start and end converted to UTC.
+    When `timeZone` is null, the device''s zone is used, as built now. Quick tour, More dates, the month calendar
+    and the pop-up''s look stay exactly as built.
+
+
     **29 September (MOB-29SEP).** **M17-08:** seven-day date strip plus a calendar icon. **W8:** a product-first
     flow (workshop, experience) comes here after the product is chosen on GST-008; the date-first default
     no longer overrides it, because the order is the flow''s. **W5:** surf and session levels appear only
@@ -2226,6 +2258,8 @@ screens:
     preloaded:
     - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
       getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
+    - TenantAppStatus.venues (the picked venue's timeZone), read by GST-001 with getTenantAppStatus (ADAM CR-556 as
+      corrected)
   wireframe:
     status: notStarted
     provenance: client-verified

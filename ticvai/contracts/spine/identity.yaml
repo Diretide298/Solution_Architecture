@@ -5531,6 +5531,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the tenant''s root scope node, whose name is the authenticator issuer in qrCodeUri (ADAM CR-587; totp only)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5566,6 +5569,28 @@ paths:
         `guest-two-step-disabled`.
 
 
+        **The authenticator issuer and an `emailOtp` destination** (ADAM CR-587, option A, Chinmay, 3 November 2026;
+        CHG-CR587-001). (1) **The issuer.** When this call enrols kind `totp`, it reads the tenant''s name from the
+        tenant database, never the control database: it asks Tenancy''s `scopeRecords` in process, with where
+        `{level: ''tenant''}`, on the caller''s connection and transaction and under its row-level security, and takes
+        the name of the one row it returns (the tenant''s root scope node, `platform.scope.name`), whether the node is
+        active or not. That name is the issuer, URL-encoded in both places of `qrCodeUri`:
+        `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`. The
+        account stays the principal''s username or the guest''s email, URL-encoded. If no tenant-level row is visible
+        (a broken tenant set-up), the answer is 500, nothing is written and it is logged; a name is never made up.
+        Other kinds do not make this read. (2) **`emailOtp` and `target`.** If `target` is sent and not blank, it
+        must be an email address; otherwise `400 validation` with field `target`. It becomes the method''s
+        destination. If `target` is missing or blank, the account''s own email is used: `identity.principal.email`
+        for staff and partners, or the guest account''s email (the one already used as the authenticator account).
+        If the account has no email, `400 validation` with field `target`, and nothing is written. The address chosen
+        is stored in `mfa_method.destination`, field-encrypted as now, `masked_target` is built from it exactly as
+        when `target` is sent, and the `identity.mfaCodeIssued` event carries it as `destination`. A `target` sent
+        with `totp` is ignored. (3) Nothing else changes: no migration, no new column, no copy of
+        the control plane''s tenant name in the tenant database. The 201, 403 and 422 answers stay as they are. Screens do not
+        change: the issuer shows only in the person''s authenticator app, and a screen that sends `target` keeps
+        working.
+
+
         **The MFA values** (ADAM CR-522, Chinmay, 3 November 2026: the MFA values follow the authenticator standard,
         and a code the server sends goes by an outbox event like the guest''s; CHG-CR522-001). (1) Authenticator codes (`totp`), RFC 6238:
         HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose
@@ -5574,7 +5599,7 @@ paths:
         secret is 20 random bytes, base32 without padding, returned once in `MfaEnrolment.secret` and stored
         field-encrypted in `mfa_method.secret`; `qrCodeUri` is
         `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`, where
-        `issuer` is the tenant''s display name and `account` the principal''s username or the guest''s email, each
+        `issuer` is the tenant''s name, its root scope node''s (ADAM CR-587, below), and `account` the principal''s username or the guest''s email, each
         URL-encoded. (2) Recovery codes: ten, each 10 characters of Crockford base32, shown as five characters, a
         hyphen, five characters. Every `enrolMfaMethod` of any kind issues a new set and replaces the earlier one, as
         `MfaRecoveryCode` says; they are stored as PHC hashes. (3) A pending enrolment lapses 10 minutes after this
@@ -5611,7 +5636,9 @@ paths:
                   $ref: '#/components/schemas/MfaKind'
                 target:
                   type: string
-                  description: Phone or email for OTP methods.
+                  description: Phone or email for OTP methods. For `emailOtp`, an email address when sent and not
+                    blank (else `400 validation`, field `target`); missing or blank, the account's own email is used
+                    (ADAM CR-587). Ignored with `totp`.
       responses:
         '201':
           headers:
@@ -5622,6 +5649,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MfaEnrolment'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           description: A guest caller while no venue of the tenant has guest two-step verification on
             (rev 3 GAP-B1, per venue).
@@ -6042,19 +6071,37 @@ paths:
       description: 'For a `signIn` challenge (decided 28 September, audit R135) a correct code completes the
         sign-in: the pending session becomes usable and is returned in `session`, or, where `login`
         also answered `requiresRoleSelection`, the client goes on to `selectRole`. For any other action
-        it returns a short-lived, single-purpose `stepUpToken`.
+        the step-up is recorded on the caller''s session until `expiresAt`; `stepUpToken` is always null and stays in
+        the response only so clients built at r1 still read it (ADAM CR-588).
+
+
+        **No step-up token: the proof is the challenge row** (ADAM CR-588, option A, Chinmay, 3 November 2026;
+        CHG-CR588-001). (1) This operation returns `stepUpToken: null` for every challenge, `signIn` and step-up
+        alike. No token is generated, signed, stored or logged, and `identity.mfa_challenge` gets no column for one.
+        The response shape stays as it is (`stepUpToken` nullable, `expiresAt`, `session`). (2) For a step-up, the
+        proof is the `identity.mfa_challenge` row itself: status `verified` and `verified_at` set, bound to the
+        challenge''s `action` and the caller''s session. The `expiresAt` returned is `verified_at` plus 5 minutes.
+        `consumeMfaStepUp` remains the only check: it finds that row on the caller''s session and sets `consumed_at`,
+        and answers `403 step-up-token-missing` or `step-up-token-expired` as now; those problem types keep their
+        names. (3) For whoever builds an operation that demands a step-up: a tenant operation never reads a
+        `stepUpToken` from the body or a header; it decides only through `consumeMfaStepUp`. `revokeAllSessions` is
+        built that way on its own ticket, #33749: it declares an MFA step-up carried on the session, with action
+        `revokeAllSessions`, and `stepUpToken` is no longer required in its body (an old client may still send it;
+        it is ignored). Screens do not change: the authentication-code dialog looks and works as now, and a screen
+        that passed the token on now passes null or nothing. The platform caller''s step-up on the Control Plane
+        token is a different path and does not change.
 
 
         **How an MFA step-up reaches the operation that demands it: the session** (Chinmay, 3 October 2026,
         defaults taken; CHG-RUL-020). A successful step-up is also recorded against the caller''s own session,
-        bound to the challenge''s `action` and to that session, for the token''s short life. Every operation
+        bound to the challenge''s `action` and to that session, for the step-up''s short life (until `expiresAt`). Every operation
         that declares `x-ticvai-step-up: mfa` declares `x-ticvai-step-up-carrier: session` and reads the
         step-up from the session that calls it: the client sends no token field and no header, and a step-up
         made on another session or for another action does not count. It is single-use: the operation that
         consumes it clears it. Without a fresh step-up the operation is refused 403, and the client runs
         `createMfaChallenge` and this operation, then retries. A call with no session (`{}`) cannot carry an
         MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`,
-        CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1.
+        CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1, always null (ADAM CR-588).
 
 
         **The action, the lifetime and the refusals, for every operation that declares `x-ticvai-step-up: mfa`**
@@ -6106,8 +6153,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Verified. The step-up token is short-lived and single-purpose; a `signIn`
-            challenge returns the now usable `session` instead (audit R135)
+          description: Verified. For a step-up, the step-up counts on the caller's session until `expiresAt`; a
+            `signIn` challenge returns the now usable `session` instead (audit R135; ADAM CR-588)
           content:
             application/json:
               schema:
@@ -6116,7 +6163,8 @@ paths:
                   stepUpToken:
                     type: string
                     nullable: true
-                    description: Null for a `signIn` challenge.
+                    description: Always null, for every challenge, `signIn` and step-up alike (ADAM CR-588); kept
+                      only so clients built at r1 still read it. The step-up is recorded on the caller's session.
                   expiresAt:
                     type: string
                     format: date-time
@@ -6432,6 +6480,11 @@ paths:
       description: 'Incident response. Requires step-up authentication and a reason, and is recorded against
         the acting principal.
 
+        **The step-up is an MFA step-up carried on the session** (ADAM CR-588, Chinmay, 3 November 2026;
+        CHG-CR588-001; built on its own ticket, #33749): the action is `revokeAllSessions`, and the operation decides
+        only through Identity''s `consumeMfaStepUp`, never from a token in the body or a header. `stepUpToken` is no
+        longer required in the body; an old client may still send it, and it is ignored.
+
         **Open shifts are not left unseen, and Identity does not report them** (decided 14 October 2026,
         Chinmay, CHG-R6G-006; ADR-0028 tiers, ADR-0055 rule 2). Revoking a cashier mid-shift leaves cash
         unreconciled, and whoever pulls this needs to know that before they do, but Identity is the
@@ -6444,6 +6497,9 @@ paths:
       tags:
       - session
       x-ticvai-permission: SESSION_FORCE_LOGOUT
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020; ADAM CR-588)
+      x-ticvai-step-up-reason: Signs everyone in scope out at once; the second factor proves it is the account holder acting.
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6457,7 +6513,6 @@ paths:
               type: object
               required:
               - reason
-              - stepUpToken
               properties:
                 reason:
                   type: string
@@ -6465,6 +6520,9 @@ paths:
                   maxLength: 500
                 stepUpToken:
                   type: string
+                  deprecated: true
+                  description: Ignored (ADAM CR-588); the MFA step-up is read from the caller's session. An old
+                    client may still send it.
                 venueId:
                   type: string
                   format: uuid

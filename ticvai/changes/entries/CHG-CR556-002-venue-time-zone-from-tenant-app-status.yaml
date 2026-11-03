@@ -1,0 +1,46 @@
+id: CHG-CR556-002
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'CR-556 steps 5 and 6 as corrected: TenantAppStatus.venues[].timeZone (IANA name, nullable), the venue''s RegionSettings.timeZone
+  read through regionSettingsRecords, the zone openingHoursToday uses; GST-007 takes the zone from the picked venue''s timeZone
+  in TenantAppStatus (getTenantAppStatus), not PublishedTenantConfig, and works out today, the strip, day keys, greyed past
+  days and the part-of-day split in it, shows times in it and sends listPerformances and getAvailability the venue day in
+  UTC; null means the device''s zone.'
+decision:
+  what: 'ADAM CR-556, correction posted on #31784 and #31785 (approved by the lead, 3 November 2026): "PublishedTenantConfig
+    has no venues list. The venues with openingHoursToday are TenantAppStatus.venues, answered by getTenantAppStatus, which
+    GST-001 already reads. Step 5: add timeZone (string, IANA name, nullable) to each entry of TenantAppStatus.venues ...
+    Step 6: Select Date & Time takes the zone from the picked venue''s timeZone in TenantAppStatus (getTenantAppStatus),
+    not from PublishedTenantConfig. Everything else in step 6 stands as posted ..."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-556 (#31784, #31785 GST-007): steps 5 and 6 named PublishedTenantConfig.venues, which does not exist; lane
+  d stopped on them (CHG-CR556-001) and the lead posted the correction.'
+keys_touched:
+  screens:
+  - GST-007
+  operations:
+  - getTenantAppStatus
+  schemas:
+  - TenantAppStatus
+  files:
+  - contracts/satellite/white-label.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - tools/check-business-rules.py
+root_class: a decision names a schema field that does not exist
+tickets:
+  started:
+  - '31784 (GST-007 build, In progress): through CR-556''s posted correction; nothing beyond it.'
+  unstarted:
+  - '31785 ([FE] GST-007 connect to API): the zone from getTenantAppStatus.'
+  - 'New task (white-label, getTenantAppStatus''s owner): TenantAppStatus.venues[].timeZone.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-556
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-VENUE-TIME-ZONE
+status: open
+notes: Steps 1 to 4 are lane d's (CHG-CR556-001), untouched here.

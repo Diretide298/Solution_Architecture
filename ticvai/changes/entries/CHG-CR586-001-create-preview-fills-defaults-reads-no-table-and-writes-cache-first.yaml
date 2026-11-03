@@ -1,0 +1,47 @@
+id: CHG-CR586-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'createPreview fills platform web, outputs [app] and expiresInHours 24 before writing; the cache entry, the event
+  and the 201 carry the values used. The 201 and the new entry hold no outputPreviews; the renderer adds one entry per output
+  as it finishes, and getPreview answers what the entry holds. createPreview reads no table (the whitelabel.tenant_config
+  read is removed). Write order: the cache entry, then preview.requested in its own outbox transaction, then 201.'
+decision:
+  what: 'ADAM CR-586, posted on #30767: "Decided (Chinmay, 3 November 2026): option A. Build now: createPreview (POST /tenant-config/preview).
+    (1) The body stays optional as published. Fill in defaults before writing anything: platform absent means web; outputs
+    absent means [app]; expiresInHours absent means 24. The cache entry, the preview.requested event and the 201 all carry
+    the values used: platform always one of ios, android or web, and outputs always a list that is not empty. The event''s
+    platform and outputs are always present. (2) The 201 answers previewId, url, expiresAt, platform and language (language
+    only when it was sent) and no outputPreviews. The new cache entry also holds no outputPreviews. The renderer in the
+    ..." The lead, 3 November 2026: "the new one dont go in r15, log them and we add to r14 only", then "Approve them".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-586 (#30767 createPreview): platform was optional in the body but required in the event, outputPreviews at
+  201 and the tenant_config read were undefined.'
+keys_touched:
+  operations:
+  - createPreview
+  - getPreview
+  schemas:
+  - Preview
+  files:
+  - contracts/satellite/white-label.yaml
+  - events/preview-requested.yaml
+  - tools/check-business-rules.py
+root_class: an optional request field a required downstream field depends on, with no default
+tickets:
+  started: []
+  unstarted:
+  - '30767 (createPreview, New): the defaults, the 201, no table read, the write order and the contract tests.'
+  - '37209 (the preview renderer): render the draft read in the white-label module and add each output to outputPreviews
+    as it finishes.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-586
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PREVIEW-DEFAULTS
+status: open
+notes: 'Beyond the posted words: Preview.platform is now required (the decision says the 201 always carries it, and getPreview
+  answers the same entry). The CR-476 sentence "in the same transaction" is replaced by the CR-586 order.'

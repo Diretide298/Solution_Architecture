@@ -177,6 +177,26 @@ x-ticvai-queries:
       createBookingFlowDefinition and updateBookingFlowDefinition (ids = settings.consentQuestionIds; an id with no
       row or a status other than active is their 400 consent-question-not-active; ADAM CR-429, 31 October 2026).
     served: [in-process, service]
+  bookingConsentRecords:
+    module: marketing-crm
+    table: marketing.booking_consent_record
+    inputs:
+      cartId: {type: string, format: uuid, description: 'The cart whose booking consent records are asked for.'}
+    returns:
+      type: array
+      description: 'The cart''s current records (supersededAt null), each as Marketing stores it; none is an empty list.'
+      items: {$ref: '#/components/schemas/BookingConsentRecord'}
+    rule: >-
+      A data read with one rule of its own (ADAM CR-583, Chinmay, 3 November 2026; CHG-CR583-001): Marketing answers
+      with the marketing.booking_consent_record rows whose cart_id is the asked cart and whose superseded_at is null,
+      as it stores them and as the caller's scope lets it see them (the table's row-level security, under the
+      caller's connection and transaction). They are the answers given for a booking, not marketing.consent_record,
+      which is a guest's standing decision about a data-processing purpose. It decides nothing else: orders getCart
+      works out consentQuestions[].answered and the consentBlocksBooking conflicts from these rows, and checkoutCart
+      reads those computed fields. It is asked from another deployable through Marketing's service route
+      (serviceAuth), served alongside consentQuestionRecords, consentQuestionVersionRecords and WhiteLabel's
+      bookingFlowRecords.
+    served: [service]
   consentQuestionVersionRecords:
     module: marketing-crm
     table: marketing.consent_question_version
