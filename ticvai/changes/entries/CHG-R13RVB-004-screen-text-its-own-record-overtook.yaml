@@ -11,9 +11,8 @@ summary: 'Screen notes and gaps that contradicted their own record are corrected
   POS-028 built in CHG-CSA-045, and by hand BO-008 previewProductTickets, BO-007 bulkUpdateCatalogueProducts, BO-065
   listDeliveryLocations, BO-454 getGameCard); 127 "the screen declares N operations" counts are corrected, the unserved
   pack actions kept. By hand: WEB-008''s notes no longer say listCatalogueBundles is still bound (neither it nor GST-056
-  declares it), GST-030''s prototype difference says the feed is in the first release (CHG-SGU-017, as WEB-046 says), and
-  POS-023''s offline state gives CHG-SPO-020''s recorded default (refuse offline) instead of "an open question". Twins
-  (source.sameAs) are left to their copying tool.'
+  declares it), and GST-030''s prototype difference says the feed is in the first release (CHG-SGU-017, as WEB-046
+  says). Twins (source.sameAs) are left to their copying tool.'
 decision:
   what: 'The lead, 3 November 2026, on the r13 review of all 1,582 Block A tickets: "why are these coming back again and
     again?", "get going on those as well so we close it", "you get the rest sorted". Review finding classes
@@ -37,7 +36,6 @@ keys_touched:
   - BO-186
   - BO-454
   - KIT-009
-  - POS-023
   - POS-028
   - WEB-008
   - GST-030
@@ -97,4 +95,6 @@ notes: 'S-NOTES-STALE now also fails on a generated gap tools/screen_gaps.py jud
   is not settled); GST-056''s pattern (listDetail, its patternReason naming listCatalogueBundles and getBundle, which it
   no longer declares: re-deriving the pattern may change how the screen is drawn); POS-027''s and EMP-055''s 2 October
   gaps, half served (a staff-audience recordConsent and createTableReservationForGuest exist; the profile create and the
-  amend and cancel are not judged here); closing CHG-SPO-020, whose defaults are recorded but which is still open.'
+  amend and cancel are not judged here); POS-023''s offline state still calls offline overselling "an open question, CHG-SPO-020" though CHG-SPO-020 recorded
+  the default (refuse offline): the state is a visible field of a client-approved screen (check-approved-ui AU-FIELD),
+  so the text waits for a "Design change:" record or the lead; and closing CHG-SPO-020, still open.'

@@ -8596,8 +8596,7 @@ screens:
       `evaluatePromotions`.'
     offline: '**A retail sale needs the link** (`createRetailSale` is not offline-capable). The tiles
       stay browsable from the cached catalogue; Charge says to reconnect. (Design-notes correction fnb-retail
-      POS-023; offline retail is refused, as the contract does: the default CHG-SPO-020 recorded on 2 October
-      2026.)'
+      POS-023; the offline-overselling rule is an open question, CHG-SPO-020.)'
     denied: Merchandise scans and prices normally; charging needs `payment.take`. Stock reserved on add
       is released rather than held against a sale that cannot complete.
     stockConflict: The merchandise line went out of stock between scan and charge. The line is flagged
