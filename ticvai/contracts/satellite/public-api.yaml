@@ -90,7 +90,8 @@ info:
     to an active member and carries the member id and the developer account id, with no tenant and no permission. A
     sign-in task of its own builds it; the operations here only read it.
 
-    3. **Partner portal.** `identity.principal.email` (`PrincipalVerifiedEmail`) is nullable, set only once verified,
+    3. **Partner portal.** The principal's verified email (`PrincipalVerifiedEmail.email`, kept in pii.* for the
+    principal's subject since 3 November 2026, CHG-R14M-001) is nullable, set only once verified,
     and never taken from `username`. A partner signed in through the tenant's login acts for the developer account
     whose active member has that email; with no match the caller has no developer account.
 
@@ -522,7 +523,10 @@ paths:
                   items:
                     type: object
                     properties:
-                      email: { type: string, format: email }
+                      email:
+                        x-ticvai-data-class: personal
+                        type: string
+                        format: email
                       role: { type: string, enum: [owner, admin, developer, readOnly] }
       responses:
         '409':
@@ -2817,6 +2821,7 @@ components:
         id: { type: string, format: uuid, readOnly: true }
         developerAccountId: { type: string, format: uuid, readOnly: true }
         email:
+          x-ticvai-data-class: personal
           type: string
           format: email
           description: 'Unique among active members, compared without case (ADAM CR-569, "Go yes"): one email acts for one
@@ -2861,6 +2866,7 @@ components:
         id: { type: string, format: uuid, readOnly: true }
         organisationName: { type: string }
         contactEmail:
+          x-ticvai-data-class: personal
           type: string
           format: email
           description: 'The organisation''s contact, who becomes its owner member on registration; unique without case
@@ -2885,7 +2891,10 @@ components:
       required: [organisationName, contactEmail]
       properties:
         organisationName: { type: string, maxLength: 300 }
-        contactEmail: { type: string, format: email }
+        contactEmail:
+          x-ticvai-data-class: personal
+          type: string
+          format: email
         websiteUrl: { type: string, nullable: true }
         countryCode: { type: string, minLength: 2, maxLength: 2 }
         partnerId:

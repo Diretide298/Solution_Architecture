@@ -1228,8 +1228,10 @@ paths:
                 tradingName:
                   type: string
                 contactName:
+                  x-ticvai-data-class: personal
                   type: string
                 contactEmail:
+                  x-ticvai-data-class: personal
                   type: string
                 country:
                   type: string
@@ -12732,10 +12734,12 @@ components:
           type: string
           nullable: true
         email:
+          x-ticvai-data-class: personal
           type: string
           format: email
           nullable: true
         mobile:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         telephone:
@@ -13233,6 +13237,7 @@ components:
           type: string
           nullable: true
         contactEmail:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         venueType:
@@ -13998,9 +14003,11 @@ components:
         companyName:
           type: string
         contactEmail:
+          x-ticvai-data-class: personal
           type: string
           format: email
         contactPhone:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         countryCode:
@@ -14096,6 +14103,7 @@ components:
             record rides on an onboarding application. `generateInvoice` copies it onto each new invoice as
             `currencyCode`, so a later change never moves an invoice already generated.'
         address:
+          x-ticvai-data-class: business
           type: string
           maxLength: 1000
           nullable: true
@@ -14158,6 +14166,7 @@ components:
           readOnly: true
           description: The token's `sub`, which a cell records as `operatorPrincipalId` (no foreign key there).
         email:
+          x-ticvai-data-class: personal
           type: string
           format: email
           maxLength: 320
@@ -15683,10 +15692,12 @@ components:
           nullable: true
           description: Estimated annual business value.
         contactName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: Applicant contact name.
         contactEmail:
+          x-ticvai-data-class: personal
           type: string
           format: email
           description: Applicant contact email.
@@ -15843,11 +15854,13 @@ components:
           nullable: true
           description: Department.
         email:
+          x-ticvai-data-class: personal
           type: string
           format: email
           nullable: true
           description: Email.
         mobile:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: Mobile.
@@ -16144,6 +16157,7 @@ components:
             commercialRegistration, bankDetails, insurance, signedAgreement, nda and, for agreement documents,
             signedContract, addendum, rateSheet, sla, commercialAnnex.
         documentNumber:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: Document number.
@@ -24967,6 +24981,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Estimated annual business value
         contactName:
+          x-ticvai-data-class: personal
           type: string
           description: Applicant contact name
         billingRequirements:
@@ -25006,6 +25021,7 @@ components:
           description: Partner record created on submission (lifecycle applicant)
           nullable: true
         contactEmail:
+          x-ticvai-data-class: personal
           type: string
           description: Applicant contact email
           format: email
@@ -25077,10 +25093,12 @@ components:
           type: string
           description: Department
         email:
+          x-ticvai-data-class: personal
           type: string
           description: Email
           format: email
         mobile:
+          x-ticvai-data-class: personal
           type: string
           description: Mobile
         telephone:
@@ -25417,6 +25435,7 @@ components:
             commercialRegistration, bankDetails, insurance, signedAgreement, nda, apiAgreement, complianceDocument,
             authorizedSignatoryId, other
         documentNumber:
+          x-ticvai-data-class: personal
           type: string
           description: Document Number
         expiryDate:
@@ -27793,6 +27812,7 @@ components:
           type: string
           description: Agent/User
         customerName:
+          x-ticvai-data-class: personal
           type: string
           description: Customer/Guest where applicable
           nullable: true

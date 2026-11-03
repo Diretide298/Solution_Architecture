@@ -466,9 +466,20 @@ x-ticvai-jobs:
       identity#subjectContactRecords; with none, the row is written pending with no destination and the dispatch job
       fails it with ''no recipient on file''.'
     source: ['events/order-ticketsResent.yaml']
+  subjectDataPart:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [access.biometric_audit_event, access.configuration_change, access.device_binding, access.entitlement,
+      access.face_reenrolment_attempt, access.identity_lock, access.parking_entitlement, access.security_alert]
+    writes: []
+    for: 'access''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /access/validate:
     post:
+      x-ticvai-personal-data: gated
       operationId: validateAccess
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
@@ -630,6 +641,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/entitlements:
     get:
+      x-ticvai-personal-data: gated
       operationId: listMyEntitlements
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
@@ -740,6 +752,7 @@ paths:
         type: string
         format: uuid
     get:
+      x-ticvai-personal-data: gated
       operationId: getEntitlement
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
@@ -2287,6 +2300,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/override:
     post:
+      x-ticvai-personal-data: gated
       operationId: overrideAccess
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
@@ -2371,6 +2385,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/lookup:
     get:
+      x-ticvai-personal-data: gated
       operationId: lookupTicket
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
@@ -3586,6 +3601,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/group-validate:
     post:
+      x-ticvai-personal-data: gated
       operationId: validateGroupAccess
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
@@ -11680,6 +11696,7 @@ paths:
       x-ticvai-bounded: a venue's podiums, defined by hand
   /ticket-credential-investigation:
     get:
+      x-ticvai-personal-data: gated
       operationId: listTicketCredentialInvestigation
       x-ticvai-consumed-by:
         - "P08 BO-226 Ticket & Credential Investigation Console"
@@ -26533,6 +26550,13 @@ components:
       - validTo
       - changeVersion
       properties:
+        holderSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The named holder, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string
           format: uuid
@@ -26819,6 +26843,8 @@ components:
           type: boolean
           default: false
         holderName:
+          x-ticvai-pii: {store: subject.displayName, subject: holderSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         sharedWithSubjectIds:
@@ -27937,6 +27963,7 @@ components:
         productName:
           type: string
         holderName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: 'Present only where the entitlement is name-bound. Identity and entitlement are
@@ -37837,6 +37864,7 @@ components:
           type: string
           description: Payment method
         guestName:
+          x-ticvai-data-class: personal
           type: string
           description: Guest
         visitDate:

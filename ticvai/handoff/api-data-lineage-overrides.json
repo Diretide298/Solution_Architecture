@@ -16747,6 +16747,14 @@
    ],
    "reason": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
+  },
+  "recordSubjectDetails": {
+   "writes": [
+    "pii.subject",
+    "pii.subject_contact",
+    "pii.subject_document"
+   ],
+   "reason": "3 November 2026 (r13 review B-01, CHG-R14M-001): the owner's write of the personal fields the modules keep in pii.*; pii.subject, pii.subject_contact and pii.subject_document are storage-only tables no contract schema persists, so no x-ticvai-writes can name them"
   }
  }
 }

@@ -59,6 +59,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ticket_done  # noqa: E402  (what finishes a ticket: shared with op-release.py, CHG-GTR-002)
 import sprint_plan as sp  # noqa: E402  (the calendar, app-modules and scheduler the plan generators share)
 import frontend_repos as fr  # noqa: E402  (the repository a screen is built in, CHG-R6-060)
+import personal_data  # noqa: E402  (the reads a privacy part makes of its own tables, CHG-R14M-001)
 import ticvai_jobs as tj  # noqa: E402  (the declared jobs, timers and consumers: one task each, CHG-R13JOB-001)
 
 try:
@@ -1749,9 +1750,15 @@ def main() -> int:
     # migrations with a tested ROLLBACK section (backend/MIGRATIONS.md), not writing tables anew.
     ddl = read_ddl()
     used = defaultdict(lambda: {"reads": set(), "writes": set()})
+    # **A privacy part's read of a table its module keeps brings no migration** (r13 review B-01, CHG-R14M-001): the
+    # part leaves out a table the tenant database does not have yet (personal_data.part_only_reads), so the first
+    # release migrates only what its other operations need, as before the part read every table of its module.
+    part_only = personal_data.part_only_reads(ROOT)
     for o in slice_ops:
         for k in ("reads", "writes"):
             for t in lineage[o].get(k) or []:
+                if k == "reads" and (o, t) in part_only:
+                    continue
                 used[t][k].add(o)
     not_tables = sorted(t for t in used if t not in ddl and ":" not in t)
     rel = {t for t in used if t in ddl}

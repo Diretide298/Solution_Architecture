@@ -690,6 +690,18 @@ x-ticvai-jobs:
     - events/ai-riskCaseClosed.yaml
     - events/cart-abandoned.yaml
     - events/device-statusChanged.yaml
+  subjectDataPart:
+    module: orders
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [orders.cart, orders.group_booking, orders.group_customer_organisation_contact, orders.group_participant,
+      orders.guest_credit_account, orders.invitation, orders.membership_activation_action, orders.order_line,
+      orders.resale_listing, orders.resale_settlement, orders.reservation, orders.reservation_line, orders.sales_order,
+      orders.ticket_transfer, orders.visit_reminder, payments.token]
+    writes: []
+    for: 'orders''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /carts:
     post:
@@ -1514,6 +1526,7 @@ paths:
       schema:
         type: string
     get:
+      x-ticvai-personal-data: self
       operationId: getPaymentLink
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
@@ -1731,6 +1744,7 @@ paths:
                   type: string
                   format: password
                 email:
+                  x-ticvai-data-class: personal
                   type: string
                   format: email
                   nullable: true
@@ -3741,6 +3755,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /invitations:
     post:
+      x-ticvai-personal-data: gated
       operationId: issueInvitation
       x-ticvai-read-via:
       - query: catalogue#productRecords
@@ -3821,9 +3836,11 @@ paths:
 
                     '
                 recipientName:
+                  x-ticvai-data-class: personal
                   type: string
                   nullable: true
                 recipientEmail:
+                  x-ticvai-data-class: personal
                   type: string
                   format: email
                   nullable: true
@@ -5410,9 +5427,10 @@ paths:
                 attendees:
                   type: array
                   description: The named holder for each cart line that needs one. Becomes
-                    `CreateOrderLine.holderName` on the order's matching line, kept as that line's
-                    `orders.order_line.holder_name`; `lineId` only picks the line (r11 gate, CHG-R11FXD-004).
-                  x-ticvai-stored-as: orders.order_line.holder_name
+                    `CreateOrderLine.holderName` on the order's matching line, kept in pii.* for that line's
+                    holder subject (`orders.order_line.holder_subject_id`; ADR-0023 as amended 3 November 2026,
+                    CHG-R14M-001); `lineId` only picks the line (r11 gate, CHG-R11FXD-004).
+                  x-ticvai-stored-as: orders.order_line.holder_subject_id
                   items:
                     type: object
                     required:
@@ -5424,6 +5442,7 @@ paths:
                         format: uuid
                         description: A `CartLine.id` in this cart.
                       holderName:
+                        x-ticvai-data-class: personal
                         type: string
                 termsAccepted:
                   type: object
@@ -6059,6 +6078,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createOrder
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
@@ -6548,6 +6568,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: holdOrder
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
@@ -6656,6 +6677,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: resumeOrder
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
@@ -6729,6 +6751,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: applyManualDiscount
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
@@ -6803,6 +6826,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: voidOrder
       x-ticvai-consumed-by:
         - "P04 POS-006 Held Orders"
@@ -8327,6 +8351,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: convertReservation
       x-ticvai-consumed-by:
         - "P04 POS-031 Reservations & Group Arrivals"
@@ -8649,6 +8674,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: modifyOrder
       x-ticvai-consumed-by:
         - "P04 POS-006 Held Orders"
@@ -9625,6 +9651,7 @@ paths:
                       - sms
                       - whatsapp
                     address:
+                      x-ticvai-data-class: personal
                       type: string
                 message:
                   type: string
@@ -9950,6 +9977,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createReservation
       x-ticvai-consumed-by:
         - "P04 POS-031 Reservations & Group Arrivals"
@@ -10116,6 +10144,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: extendReservation
       x-ticvai-consumed-by:
         - "P04 POS-031 Reservations & Group Arrivals"
@@ -11163,6 +11192,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createGroupEnquiry
       x-ticvai-consumed-by:
         - "P08 BO-265 Group Enquiry & Opportunity Capture"
@@ -11258,6 +11288,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /group-customer-organization/{organisationId}:
     put:
+      x-ticvai-personal-data: gated
       operationId: setGroupCustomerOrganization
       x-ticvai-consumed-by:
         - "P08 BO-266 Group Customer & Organization Profile"
@@ -11809,6 +11840,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /participant-guest-list:
     get:
+      x-ticvai-personal-data: gated
       operationId: listParticipantGuestList
       x-ticvai-consumed-by:
         - "P08 BO-276 Participants, Guest Lists & Group Structure"
@@ -12657,6 +12689,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-guest-account:
     put:
+      x-ticvai-personal-data: gated
       operationId: setCustomerGuestAccount
       x-ticvai-consumed-by:
         - "P08 BO-309 Customer, Guest & Account Assignment"
@@ -14961,6 +14994,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /buyer-purchase-resale:
     get:
+      x-ticvai-personal-data: gated
       operationId: listBuyerPurchaseResale
       x-ticvai-consumed-by:
         - "P08 ADM-289 Buyer Purchase & Resale Order Management"
@@ -15822,6 +15856,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /official-resale-marketplace:
     get:
+      x-ticvai-personal-data: gated
       operationId: listOfficialResaleMarketplace
       x-ticvai-consumed-by:
         - "P08 ADM-278 Resale Marketplace Command Center"
@@ -15933,6 +15968,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /buyer-checkout-inventory:
     get:
+      x-ticvai-personal-data: gated
       operationId: listBuyerCheckoutInventory
       x-ticvai-consumed-by:
         - "P08 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
@@ -16720,6 +16756,7 @@ paths:
         type: string
         format: uuid
     put:
+      x-ticvai-personal-data: gated
       operationId: setParticipantGuestList
       x-ticvai-consumed-by:
         - "P08 BO-276 Participants, Guest Lists & Group Structure"
@@ -17069,6 +17106,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: voidEntitlement
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
@@ -17669,6 +17707,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: mergeOrders
       x-ticvai-consumed-by:
         - "P08 BO-328 Order Split, Merge & Transaction Relationship Management"
@@ -18686,10 +18725,12 @@ components:
               type: string
               maxLength: 120
             email:
+              x-ticvai-data-class: personal
               type: string
               format: email
               nullable: true
             phone:
+              x-ticvai-data-class: personal
               type: string
               maxLength: 30
               nullable: true
@@ -18787,10 +18828,12 @@ components:
               type: string
               maxLength: 120
             email:
+              x-ticvai-data-class: personal
               type: string
               format: email
               nullable: true
             phone:
+              x-ticvai-data-class: personal
               type: string
               maxLength: 30
               nullable: true
@@ -18897,10 +18940,12 @@ components:
                 type: string
                 maxLength: 120
               email:
+                x-ticvai-data-class: personal
                 type: string
                 format: email
                 nullable: true
               phone:
+                x-ticvai-data-class: personal
                 type: string
                 maxLength: 30
                 nullable: true
@@ -18916,6 +18961,7 @@ components:
               format: email
               nullable: true
             address:
+              x-ticvai-data-class: business
               type: string
               maxLength: 500
               nullable: true
@@ -18969,6 +19015,13 @@ components:
             - role
             - name
             properties:
+              contactSubjectId:
+                type: string
+                format: uuid
+                nullable: true
+                x-ticvai-subject-kind: contact
+                x-ticvai-references: pii.subject
+                description: '**The organisation''s contact, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `name`, `email`, `phone` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind contact; null while none is given.'
               role:
                 type: string
                 enum:
@@ -18978,13 +19031,19 @@ components:
                 - eventDay
                 - decisionMaker
               name:
+                x-ticvai-pii: {store: subject.displayName, subject: contactSubjectId}
+                x-ticvai-data-class: personal
                 type: string
                 maxLength: 120
               email:
+                x-ticvai-pii: {store: contact.email, subject: contactSubjectId}
+                x-ticvai-data-class: personal
                 type: string
                 format: email
                 nullable: true
               phone:
+                x-ticvai-pii: {store: contact.phone, subject: contactSubjectId}
+                x-ticvai-data-class: personal
                 type: string
                 maxLength: 30
                 nullable: true
@@ -19000,6 +19059,7 @@ components:
               format: email
               nullable: true
             address:
+              x-ticvai-data-class: business
               type: string
               maxLength: 500
               nullable: true
@@ -19044,6 +19104,7 @@ components:
             - fullName
             properties:
               fullName:
+                x-ticvai-data-class: personal
                 type: string
                 maxLength: 200
               role:
@@ -19054,14 +19115,17 @@ components:
                 - supervisor
                 default: participant
               email:
+                x-ticvai-data-class: personal
                 type: string
                 format: email
                 nullable: true
               phone:
+                x-ticvai-data-class: personal
                 type: string
                 maxLength: 30
                 nullable: true
               dateOfBirth:
+                x-ticvai-data-class: personal
                 type: string
                 format: date
                 nullable: true
@@ -19107,11 +19171,20 @@ components:
             - id
             - fullName
             properties:
+              subjectId:
+                type: string
+                format: uuid
+                nullable: true
+                x-ticvai-subject-kind: guest
+                x-ticvai-references: pii.subject
+                description: '**The participant, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `fullName`, `email`, `phone`, `dateOfBirth` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
               id:
                 type: string
                 format: uuid
                 readOnly: true
               fullName:
+                x-ticvai-pii: {store: subject.displayName, subject: subjectId}
+                x-ticvai-data-class: personal
                 type: string
                 maxLength: 200
               role:
@@ -19121,14 +19194,20 @@ components:
                 - leader
                 - supervisor
               email:
+                x-ticvai-pii: {store: contact.email, subject: subjectId}
+                x-ticvai-data-class: personal
                 type: string
                 format: email
                 nullable: true
               phone:
+                x-ticvai-pii: {store: contact.phone, subject: subjectId}
+                x-ticvai-data-class: personal
                 type: string
                 maxLength: 30
                 nullable: true
               dateOfBirth:
+                x-ticvai-pii: {store: subject.dateOfBirth, subject: subjectId}
+                x-ticvai-data-class: personal
                 type: string
                 format: date
                 nullable: true
@@ -24327,6 +24406,13 @@ components:
       - offeredByPrincipalId
       - issuedAt
       properties:
+        recipientSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The invited guest, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `recipientName`, `recipientEmail` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string
           format: uuid
@@ -24361,9 +24447,13 @@ components:
 
             '
         recipientName:
+          x-ticvai-pii: {store: subject.displayName, subject: recipientSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         recipientEmail:
+          x-ticvai-pii: {store: contact.email, subject: recipientSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         costCenterId:
@@ -25420,6 +25510,13 @@ components:
       - quantity
       - quotedUnitPrice
       properties:
+        holderSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The named holder of the line, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string
           format: uuid
@@ -25519,6 +25616,8 @@ components:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           description: What the client charged, from its local bundle.
         holderName:
+          x-ticvai-pii: {store: subject.displayName, subject: holderSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         dataMaskValues:
@@ -29352,6 +29451,7 @@ components:
           type: string
           description: City
         address:
+          x-ticvai-data-class: business
           type: string
           description: Address
         taxVatInformation:
@@ -30538,9 +30638,11 @@ components:
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         firstName:
+          x-ticvai-data-class: personal
           type: string
           description: First Name
         lastName:
+          x-ticvai-data-class: personal
           type: string
           format: date-time
           description: Last Name
@@ -30551,9 +30653,11 @@ components:
           type: string
           description: Ticket Category
         email:
+          x-ticvai-data-class: personal
           type: string
           description: Email
         mobile:
+          x-ticvai-data-class: personal
           type: string
           description: Mobile
         membership:
@@ -30575,6 +30679,7 @@ components:
           type: string
           description: Credential Status
         dateOfBirth:
+          x-ticvai-data-class: personal
           type: string
           format: date-time
           description: Age/Date of Birth where applicable
@@ -31789,9 +31894,11 @@ components:
           type: string
           description: Name
         email:
+          x-ticvai-data-class: personal
           type: string
           description: Email
         mobile:
+          x-ticvai-data-class: personal
           type: string
           description: Mobile
         country:
@@ -31801,6 +31908,7 @@ components:
           type: string
           description: Language
         dateOfBirth:
+          x-ticvai-data-class: personal
           type: string
           format: date-time
           description: Date of Birth
@@ -31854,9 +31962,11 @@ components:
           type: string
           description: Name
         email:
+          x-ticvai-data-class: personal
           type: string
           description: Email
         mobile:
+          x-ticvai-data-class: personal
           type: string
           description: Mobile
         country:
@@ -31866,6 +31976,7 @@ components:
           type: string
           description: Language
         dateOfBirth:
+          x-ticvai-data-class: personal
           type: string
           format: date-time
           description: Date of Birth
@@ -34786,9 +34897,11 @@ components:
           type: string
           description: Name
         email:
+          x-ticvai-data-class: personal
           type: string
           description: Email
         mobile:
+          x-ticvai-data-class: personal
           type: string
           description: Mobile
         membership:
@@ -35716,12 +35829,15 @@ components:
           type: string
           description: Name
         email:
+          x-ticvai-data-class: personal
           type: string
           description: Email
         mobile:
+          x-ticvai-data-class: personal
           type: string
           description: Mobile
         address:
+          x-ticvai-data-class: personal
           type: string
           description: Address
         paymentInformation:
@@ -35806,9 +35922,11 @@ components:
           type: string
           description: Name
         email:
+          x-ticvai-data-class: personal
           type: string
           description: Email
         mobile:
+          x-ticvai-data-class: personal
           type: string
           description: Mobile
         billingDetails:

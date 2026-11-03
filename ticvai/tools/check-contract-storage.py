@@ -17,7 +17,8 @@ A property is stored when one of its schema's persistence tables has a column
   - whose `source` in `handoff/schema-reference.json` is this schema's field,
 or a child table carries it (`<table>_<field>`, `<schema>.<field>`, or a table listed after `+`).
 It is exempt when it says it is not stored: `readOnly` with `x-ticvai-derived`,
-`x-ticvai-persisted: false`, or a `$ref` to a schema the reference lists as embedded/jsonb.
+`x-ticvai-persisted: false`, or a `$ref` to a schema the reference lists as embedded/jsonb, or marked `x-ticvai-pii` (kept
+in pii.* for the row's subject, ADR-0023 as amended 3 November 2026; CHG-R14M-001).
 
 Also: S-OFFLINE-RECORDED-AT (R113) -- a schema written by an offline-capable operation persists to
 a table with no `recorded_at`. ST-PROPERTY-PERSISTENCE and ST-STALE-COLUMN (CHG-MKT-002, ADAM CR-087) -- a
@@ -282,8 +283,10 @@ def main() -> int:
             continue
         have = set().union(*(colnames[t] for t in present))
         for p, ps in sorted(props_of(s, stem, by).items()):
+            # a natural person's field kept in pii.* for the row's subject has no column here by design (x-ticvai-pii;
+            # ADR-0023 as amended 3 November 2026, CHG-R14M-001): check-personal-data PD-STORE holds its store
             if ps.get("x-ticvai-persisted") is False or ps.get("x-ticvai-derived") \
-                    or ps.get("x-ticvai-persistence") or p.startswith("_"):
+                    or ps.get("x-ticvai-persistence") or p.startswith("_") or ps.get("x-ticvai-pii"):
                 continue
             items = ps.get("items") if isinstance(ps.get("items"), dict) else {}
             target = g.ref_name(ps.get("$ref") or items.get("$ref") or "")

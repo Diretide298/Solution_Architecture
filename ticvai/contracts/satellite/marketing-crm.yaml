@@ -662,6 +662,7 @@ x-ticvai-jobs:
 paths:
   /my/cases:
     get:
+      x-ticvai-personal-data: self
       operationId: listMyCases
       x-ticvai-consumed-by:
         - "P01 WEB-025 Help Centre / FAQ"
@@ -722,6 +723,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: self
       operationId: raiseMyCase
       x-ticvai-consumed-by:
         - "P01 WEB-025 Help Centre / FAQ"
@@ -889,6 +891,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: self
       operationId: replyToMyCase
       x-ticvai-consumed-by:
         - "P01 WEB-025 Help Centre / FAQ"
@@ -1370,9 +1373,11 @@ paths:
                   type: string
                   nullable: true
                 phone:
+                  x-ticvai-data-class: personal
                   type: string
                   nullable: true
                 email:
+                  x-ticvai-data-class: personal
                   type: string
                   nullable: true
       responses:
@@ -1682,6 +1687,7 @@ paths:
       schema:
         type: string
     post:
+      x-ticvai-personal-data: self
       operationId: respondToInvitation
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
@@ -1981,6 +1987,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /form-submissions:
     post:
+      x-ticvai-personal-data: gated
       operationId: submitForm
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
@@ -3661,6 +3668,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/profile:
     get:
+      x-ticvai-personal-data: self
       operationId: getMyProfile
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
@@ -3713,6 +3721,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
+      x-ticvai-personal-data: self
       operationId: updateMyProfile
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
@@ -3791,9 +3800,11 @@ paths:
                 displayName:
                   type: string
                 email:
+                  x-ticvai-data-class: personal
                   type: string
                   format: email
                 phone:
+                  x-ticvai-data-class: personal
                   type: string
                 preferredLanguage:
                   type: string
@@ -4889,6 +4900,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests:
     get:
+      x-ticvai-personal-data: gated
       operationId: searchGuests
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
@@ -4984,6 +4996,7 @@ paths:
         type: string
         format: uuid
     get:
+      x-ticvai-personal-data: gated
       operationId: getGuestProfile
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
@@ -5035,6 +5048,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
+      x-ticvai-personal-data: gated
       operationId: updateGuestProfile
       x-ticvai-consumed-by:
         - "P08 BO-735 Guest Directory"
@@ -5331,6 +5345,19 @@ paths:
         with `rowCount` 0, so the export job never waits for a part that will not come.
 
 
+        **Every Marketing table, and the erasure too** (r13 system review B-01; the lead, 3 November 2026, "Move the
+        columns": erasure and export reach every module; CHG-R14M-001). The part covers every Marketing table
+        `handoff/subject-data-register.json` lists under `owners` (the reads below), not only the four above; a table the
+        tenant database does not have yet (its migration in a later block) is left out of the part until it lands, and
+        those reads are marked `feedsSetup: false`, so they pull no writer and no migration forward. For
+        `requestType` `deletion` it erases what Marketing keeps of the guest outside pii.*: the profile''s
+        `preferredChannel` and `guestLinkId` are cleared, and each suppression of the guest''s keeps its row and
+        `addressHash` with `address` replaced by `erased`; then it records the erasure with identity
+        `submitSubjectDataPart` (`deletion`, `rowCount` the rows changed), so Identity''s erasure job holds the erasure
+        done only with Marketing''s answer. The names, contacts and IP addresses Marketing''s rows used to hold are in
+        pii.* now (x-ticvai-pii) and go with the subject.
+
+
         **When.** On the event, which `exportSubjectData` raises with the request: the part is the guest''s Marketing
         data as of the request. It is not delivered until the export is approved; the export job deletes it with the
         export (7 days after `readyAt`, or when the request is rejected, withdrawn or expired).
@@ -5357,6 +5384,103 @@ paths:
         for: 'the guest''s form submissions, for its part of the export (CHG-R11FXC-005)'
       - table: marketing.guest_document
         for: 'the guest''s documents, for its part of the export (CHG-R11FXC-005)'
+      - table: marketing.attribution_touch
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.booking_consent_record
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.case
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.case_service_action
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.challenge_progress
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.communication_policy_decision
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.conversation
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.device_consent
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.guest_device
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.guest_document_upload
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.guest_note
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.guest_preference
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.guest_relationship
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.invitation
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.journey_enrollment
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.lost_item
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.loyalty_position
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.message_dispatch
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.privacy_action
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.privacy_audit_event
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.privacy_exception
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.privacy_request
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.referral
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.review
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.subscription
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.suppression
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.touch_point
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.waiver_requirement
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.waiver_signature
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      - table: marketing.wishlist_item
+        for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
+      x-ticvai-writes:
+      - table: marketing.guest_profile
+        for: 'for deletion, the profile''s personal fields kept on the row (preferredChannel, guestLinkId) cleared (r13
+          review B-01, CHG-R14M-001)'
+      - table: marketing.suppression
+        for: 'for deletion, `address` replaced by `erased`; the row and its addressHash kept, so the guest stays
+          uncontacted (CHG-R14M-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -6073,6 +6197,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent/suppression-list:
     get:
+      x-ticvai-personal-data: gated
       operationId: getSuppressionList
       x-ticvai-audience:
       - staff
@@ -6110,6 +6235,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: addSuppression
       x-ticvai-consumed-by:
         - "P08 BO-788 Subscriptions & Preferences"
@@ -6138,6 +6264,7 @@ paths:
                 channel:
                   $ref: '#/components/schemas/MessageChannel'
                 address:
+                  x-ticvai-data-class: personal
                   type: string
                 reason:
                   type: string
@@ -6876,6 +7003,7 @@ paths:
         type: string
         format: uuid
     get:
+      x-ticvai-personal-data: gated
       operationId: listSegmentMembers
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
@@ -7739,6 +7867,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cases:
     get:
+      x-ticvai-personal-data: gated
       operationId: listCases
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
@@ -7815,6 +7944,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createCase
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
@@ -7882,6 +8012,7 @@ paths:
         type: string
         format: uuid
     get:
+      x-ticvai-personal-data: gated
       operationId: getCase
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
@@ -7919,6 +8050,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
+      x-ticvai-personal-data: gated
       operationId: updateCase
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
@@ -8073,6 +8205,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: reopenCase
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
@@ -8143,6 +8276,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: escalateCase
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
@@ -12154,6 +12288,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-service-profile:
     get:
+      x-ticvai-personal-data: gated
       operationId: listCustomerServiceProfile
       x-ticvai-consumed-by:
         - "P08 BO-737 Customer 360 Profile"
@@ -13541,6 +13676,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /escalation-critical-case:
     get:
+      x-ticvai-personal-data: gated
       operationId: listEscalationCriticalCase
       x-ticvai-consumed-by:
         - "P08 BO-810 Escalation Rules"
@@ -19031,6 +19167,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-answers:
     get:
+      x-ticvai-personal-data: gated
       operationId: listConsentAnswers
       x-ticvai-consumed-by:
         - "P13 CMS-018 Consent & Legal"
@@ -19088,6 +19225,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: recordConsentAnswers
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
@@ -20944,7 +21082,17 @@ components:
           type: string
           format: uuid
           description: The `DeviceConsent` row it was captured with.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The guest the decision is theirs, so erasure finds it** (r13 system review B-01; ADR-0023 as
+            amended 3 November 2026; CHG-R14M-001): the session''s subject where the decision was made signed in, else
+            the subject that later claims the decision (`claimDeviceConsent`). Identity''s erasure job deletes the
+            subject''s rows by it; a decision nobody claimed names no one and ages out with the consent log.'
         ipAddress:
+          x-ticvai-data-class: personal
           type: string
           maxLength: 45
           nullable: true
@@ -21768,6 +21916,7 @@ components:
                   from 0 to quantity minus 1; on a line with an `eligibilityDeclaration`, that row (ADAM CR-556).
                   At or above the line''s quantity is `422 personRequired`.'
               personName:
+                x-ticvai-data-class: personal
                 type: string
                 maxLength: 120
                 nullable: true
@@ -21851,10 +22000,13 @@ components:
           minimum: 0
           nullable: true
         personName:
+          x-ticvai-pii: {store: subject.displayName, subject: personSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 120
           nullable: true
         personSubjectId:
+          x-ticvai-subject-kind: guest
           type: string
           format: uuid
           nullable: true
@@ -22803,6 +22955,27 @@ components:
       - status
       - signedAt
       properties:
+        guardianSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The guardian, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `guardianName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
+        signerSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The person who signed, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `signedName`, `ipAddress` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
+        participantSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The person the waiver covers, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `subjectName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string
           format: uuid
@@ -22825,15 +22998,21 @@ components:
           format: uuid
           nullable: true
         subjectName:
+          x-ticvai-pii: {store: subject.displayName, subject: participantSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 200
         signedName:
+          x-ticvai-pii: {store: subject.displayName, subject: signerSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 200
         signerType:
           type: string
           maxLength: 20
         guardianName:
+          x-ticvai-pii: {store: subject.displayName, subject: guardianSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 200
           nullable: true
@@ -22853,6 +23032,8 @@ components:
           type: string
           maxLength: 128
         ipAddress:
+          x-ticvai-pii: {store: identifier.ipAddress, subject: signerSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 64
           nullable: true
@@ -23793,10 +23974,13 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-subject-kind: guest
           type: string
           format: uuid
           nullable: true
         recipientEmail:
+          x-ticvai-pii: {store: contact.email, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           format: email
           nullable: true
@@ -24198,6 +24382,7 @@ components:
 
             '
         subjectId:
+          x-ticvai-subject-kind: guest
           type: string
           format: uuid
         onBehalfOfSubjectId:
@@ -24250,6 +24435,8 @@ components:
         capturedAtChannel:
           $ref: ../shared/common.yaml#/components/schemas/SalesChannel
         ipAddress:
+          x-ticvai-pii: {store: identifier.ipAddress, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         saleContext:
@@ -26033,10 +26220,12 @@ components:
         cartId:
           type: string
         email:
+          x-ticvai-data-class: personal
           type: string
           format: email
           nullable: true
         mobile:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
     GuestCheckoutMatch:
@@ -26140,6 +26329,7 @@ components:
 
             '
         subjectId:
+          x-ticvai-subject-kind: guest
           x-ticvai-data-class: behavioural
           x-ticvai-unique: tenant
           type: string
@@ -26153,18 +26343,22 @@ components:
 
             '
         displayName:
+          x-ticvai-pii: {store: subject.displayName, subject: subjectId}
           x-ticvai-data-class: personal
           type: string
           nullable: true
         email:
+          x-ticvai-pii: {store: contact.email, subject: subjectId}
           x-ticvai-data-class: personal
           type: string
           nullable: true
         phone:
+          x-ticvai-pii: {store: contact.phone, subject: subjectId}
           x-ticvai-data-class: personal
           type: string
           nullable: true
         preferredLanguage:
+          x-ticvai-pii: {store: subject.preferredLanguage, subject: subjectId}
           x-ticvai-data-class: personal
           type: string
           nullable: true
@@ -26734,7 +26928,17 @@ components:
         channel:
           $ref: '#/components/schemas/MessageChannel'
         address:
+          x-ticvai-data-class: personal
           type: string
+        addressHash:
+          type: string
+          readOnly: true
+          nullable: true
+          description: '**The address as the deterministic hash a subject contact''s value hash uses** (ADR-0023:
+            a suppression list is checked without holding the address it suppresses; as amended 3 November 2026,
+            CHG-R14M-001). Written by the server with the row; a send is matched on it. **An erasure keeps the
+            suppression**: Marketing''s erasure replaces `address` with `erased` and keeps this hash, so a guest who
+            asked not to be contacted stays uncontacted after they are erased.'
         reason:
           type: string
         suppressedAt:
@@ -28027,6 +28231,7 @@ components:
           format: uuid
           nullable: true
         guestName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           readOnly: true
@@ -28900,6 +29105,7 @@ components:
           type: string
           description: WhatsApp business account identifier at the provider.
         phoneNumber:
+          x-ticvai-data-class: business
           type: string
           pattern: '^\+[1-9][0-9]{6,14}$'
           description: E.164.
@@ -33312,6 +33518,7 @@ components:
           format: uuid
           description: The guest's `subjectId`.
         customerName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: Null unless the caller holds GUEST_VIEW_PII.
@@ -33347,9 +33554,11 @@ components:
             GUEST_VIEW_PII.
           properties:
             email:
+              x-ticvai-data-class: personal
               type: string
               nullable: true
             phone:
+              x-ticvai-data-class: personal
               type: string
               nullable: true
         customerSince:
@@ -35417,6 +35626,7 @@ components:
           format: uuid
           nullable: true
         customerName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: Resolved from `pii.subject`; null unless the caller holds `GUEST_VIEW_PII`.
@@ -39310,6 +39520,7 @@ components:
             name:
               type: string
             dateOfBirth:
+              x-ticvai-data-class: personal
               type: string
               format: date
               nullable: true
@@ -39322,6 +39533,7 @@ components:
             name:
               type: string
             signedName:
+              x-ticvai-data-class: personal
               type: string
               description: The name as typed or drawn at signing.
         signatoryType:
@@ -39412,6 +39624,7 @@ components:
           description: Personal data (ADR-0023); null once the subject is erased.
           properties:
             ipAddress:
+              x-ticvai-data-class: personal
               type: string
               nullable: true
             deviceInfo:

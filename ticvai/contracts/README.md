@@ -102,6 +102,17 @@ S-WORKSTATION-OP accepts a workstation operation on such a platform only through
   marker. The checker takes the marker only when all of that holds (audience, permission, the paragraph) and only on
   P10; an unmarked workstation operation on the partner portal is still a finding. On createPayment and
   inquirePaymentStatus.
+## Personal data (3 November 2026, ADR-0023 as amended; CHG-R14M-001)
+
+| Mark | Where | Means |
+|---|---|---|
+| `x-ticvai-data-class: personal` | a property | A natural person's data. Every property named as a person's identifier carries a class (`business` for an organisation's) |
+| `x-ticvai-pii: {store, subject}` | a property of a persisted schema | Kept in `pii.*` (the store, `tools/personal_data.py`) for the subject the named property holds; no column on the module's row. Written through identity `recordSubjectDetails`, read through `identity#subjectDetails` |
+| `x-ticvai-subject-kind` | the subject property | The kind of the `pii.subject` a row with none gets: guest, employee, contact, applicant |
+| `x-ticvai-personal-data: gated` | an operation | Each personal field in the answer is answered only to a caller holding `GUEST_VIEW_PII` at the row's scope, null to anyone else (a guest's own record included) |
+| `x-ticvai-personal-data: self` | an operation | Answers only the caller's own record |
+
+`tools/check-personal-data.py` holds them.
 
 ## Amended 13 Aug — decisions landed
 

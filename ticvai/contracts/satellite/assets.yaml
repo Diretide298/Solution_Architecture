@@ -213,6 +213,15 @@ x-ticvai-jobs:
     - contracts/satellite/assets.yaml
     - contracts/satellite/assets.yaml
     - states/media.yaml:17
+  subjectDataPart:
+    module: assets
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [assets.guest_upload, assets.share]
+    writes: []
+    for: 'assets''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /media:
     get:
@@ -1455,6 +1464,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-shares:
     post:
+      x-ticvai-personal-data: gated
       operationId: createMediaShare
       x-ticvai-consumed-by:
         - "P13 CMS-087 Secure Internal & External Sharing"
@@ -2093,6 +2103,13 @@ components:
       - assetIds
       - expiresAt
       properties:
+        recipientSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: contact
+          x-ticvai-references: pii.subject
+          description: '**The recipient, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `recipientEmail` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind contact; null while none is given.'
         id:
           type: string
           format: uuid
@@ -2102,6 +2119,8 @@ components:
             type: string
             format: uuid
         recipientEmail:
+          x-ticvai-pii: {store: contact.email, subject: recipientSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         recipientOrganisation:
