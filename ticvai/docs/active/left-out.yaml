@@ -416,3 +416,32 @@ items:
   owner: Chinmay
   added: '2026-11-02'
   change: CHG-CR456-001
+- id: LO-CR534-001
+  kind: deferred
+  platform: P01
+  screens: [WEB-022]
+  what: 'WEB-022''s wireframe, screen layout and page info redrawn to the build in 3422264, which ADAM CR-534 accepted as
+    the screen''s design: photo cards on shared rows, the Your plan status pill, the sticky Your membership basket, the
+    page up to 1408px and the three status tokens. Until then the record keeps the client-verified frame''s layout and
+    names the build and the pill mapping in its notes.'
+  source: 'ADAM CR-534 (#31742 WEB-022, Chitrangi Mestry), decided by Chinmay on 3 November 2026: "The package''s
+    wireframe, screen layout and page info follow it later"; CHG-CR534-001'
+  reason: the decision defers the package's drawing of the accepted build; the build itself is accepted now
+  target: 'the next design batch rebuild after r13'
+  owner: Chinmay
+  added: '2026-11-03'
+  change: CHG-CR534-001
+- id: LO-CR534-002
+  kind: deferred
+  platform: P01
+  screens: [WEB-022]
+  what: 'The client-approved frame''s Passholders section on WEB-022 (Adult and Child pass steppers), left out of the
+    #31742 build; it comes back on its own follow-up ticket under #31742, bound to the plan''s variants the way Ticket
+    Type Selection''s guest counters are (listProductVariants).'
+  source: 'ADAM CR-534 (#31742 WEB-022), decided by Chinmay on 3 November 2026: "Leave the Passholders section ... out of
+    this build. It is client-approved and comes back on its own follow-up ticket under this one"; CHG-CR534-001'
+  reason: CR-482 did not bind the section, and the decision moves it to a ticket of its own
+  target: 'the follow-up ticket under #31742 (a plan task the integration pass files)'
+  owner: Chinmay
+  added: '2026-11-03'
+  change: CHG-CR534-001

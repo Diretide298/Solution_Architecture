@@ -1944,7 +1944,29 @@ screens:
     price, Junior surfer 10–15, Spectator) and a line reaches the cart (`addCartLine`) only when a quantity
     is set; until a session is chosen the ticket area says *Choose a session above to see its tickets
     and prices.* **A question the flow already asks on the page is not asked again** in the consent pop-up:
-    on the water park''s swim-ability flow the *Are you able to swim?* answer given on the page stands.'
+    on the water park''s swim-ability flow the *Are you able to swim?* answer given on the page stands.
+
+
+    **Design change: GST-007 as built in 22143c6** (ADAM CR-493, Chinmay, 3 November 2026, accepted with one
+    condition; CHG-CR493-001). **Quick tour:** four coach marks, each a 260-wide card beside the section it
+    explains with an arrow pointing at it, in this order: the date card, the entry windows, Continue, the
+    selection summary. Next is a round arrow button, Back a round back-arrow from step 2, the last step a tick,
+    End tour a text link in the card''s top-right corner. It opens on the first booking visit on this device or
+    from Quick tour, only when the flow''s `quickTour` is on; the first-visit flag stays on the device. **More
+    dates** is the last tile of the day strip, in the day tiles'' shape, after the venue''s `dateStripDays` days;
+    it opens the in-app month calendar (overlay `monthCalendar`). **Consent pop-up:** one question at a time, Yes
+    and No answer it (overlay `consentQuestions`), and a close (x) in the pop-up''s top corner on every platform
+    discards the answers given so far (the condition). Tokens `calendarColors` and `calendarHeaderGradient` and
+    `colors.consentIcon` (#00BFFF) as the build added them. Same operations, request and response fields, errors
+    and permissions as before.
+
+
+    **Opened from an event, the flow is resolved from the event** (ADAM CR-495, Chinmay, 3 November 2026;
+    CHG-CR495-001). `getPublishedBookingFlow` (src/screens/general/useSelectDateAndTime.ts) is sent `{ productId }`
+    when the screen has one (the product-first flow from GST-008), else `{ eventId }` from the entry; never an
+    empty query. On 404 the screen renders date, then time, then tickets with the flow settings'' defaults (no
+    quick tour, no flow-level consent questions); the cart''s product consent questions still apply. A 400 is the
+    error state. The connect-to-API ticket uses the same call.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getAvailability` reads one of them — list,
@@ -1994,7 +2016,8 @@ screens:
         provenance: decided 29 September, rev 3 REV3-19
       - kind: iconButton
         label: Quick tour
-        notes: Replays the four coach marks when `BookingFlowConfig.quickTour` is on.
+        notes: 'Replays the four coach marks when `BookingFlowConfig.quickTour` is on: the date card, the entry
+          windows, Continue, the selection summary (ADAM CR-493).'
         provenance: decided 29 September, rev 3 REV3-20
       - kind: dataTable
         label: Availability
@@ -2019,8 +2042,9 @@ screens:
       - kind: datePicker
         label: Next 7 days
         operation: listPerformances
-        notes: '**A date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31)
-          with a calendar icon that opens the full month for later dates (M17-08).'
+        notes: '**A date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31),
+          then **More dates**, the last tile, in the day tiles'' shape, which opens the in-app month calendar
+          (overlay `monthCalendar`) for later dates (M17-08; as built, ADAM CR-493).'
         provenance: decided 29 September 2026, M17-08
       - kind: secondaryButton
         label: Join the waitlist
@@ -2100,9 +2124,11 @@ screens:
     trigger: onAction
   - operationId: getPublishedBookingFlow
     contract: white-label
-    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12); sent
+      `{ productId }` when the screen has one, else `{ eventId }` from the entry, never an empty query; a 404
+      renders date, time, tickets with the defaults, a 400 is the error state (ADAM CR-495)'
     trigger: onLoad
-    provenance: decided 29 September 2026, W12
+    provenance: decided 29 September 2026, W12; ADAM CR-495, 3 November 2026
   entryState:
     params:
     - name: eventId
@@ -2120,6 +2146,11 @@ screens:
       optional: true
       notes: 'The on-sale waiting-room entry the guest was admitted from (ADAM CR-216, 25 October 2026):
         held only to carry back to GST-046 if `addCartLine` is refused `403 admission-required`.'
+    - name: productId
+      from: GST-008
+      optional: true
+      notes: 'The product chosen first in a product-first flow (W8): sent to `getPublishedBookingFlow` instead of
+        `eventId` (ADAM CR-495, 3 November 2026).'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -2140,7 +2171,9 @@ screens:
       verified: '2026-10-01'
       match: partial
       view: 'Buy tickets → Timed entry → Book now (step 1: date, then entry window)'
-      differences: Booking in the app runs the website booking engine; per-flow step order.
+      differences: 'Booking in the app runs the website booking engine; per-flow step order. As built in 22143c6
+        (ADAM CR-493, design change): coach-mark cards with arrows, the More dates tile and the in-app month
+        calendar, and the one-question Yes / No consent pop-up with a close (x).'
     stateViews:
       loading: P02/venue-loader
       error: P02/state-error
@@ -2170,29 +2203,55 @@ screens:
   - id: consentQuestions
     component: modal
     trigger: Once, after the session or date is picked, when the cart has consent questions
-    body: '**The venue''s consent questions for this booking** (e.g. *Are you able to swim?*), one or
-      several, in the order `Cart.consentQuestions` gives (the flow''s `consentQuestionIds` and every
-      cart product''s, each once); per person or once per booking as each question says. Next records
-      them with `recordConsentAnswers` (question version, answer, who, when). A blocking answer marks
-      the lines it blocks. No tenant on/off toggle (decided 29 September, rev 3 REV3-26).'
+    body: '**The venue''s consent questions for this booking** (e.g. *Are you able to swim?*), **one question
+      at a time**, in the order `Cart.consentQuestions` gives (the flow''s `consentQuestionIds` and every
+      cart product''s, each once). The question text is a centred large title under the icon for its kind
+      (a swimmer for swim, `colors.consentIcon` #00BFFF), with the question''s `helpText` under it when it has
+      one; no *Question n of m* kicker. A per-person question is asked once for each person, naming them.
+      **Yes** (black) and **No** (red) answer and go on. When the tapped answer is the question''s
+      `blockingAnswer`, the pop-up warns first (*...Tap No again to carry on.*, or Yes when Yes blocks) and
+      records it on the second tap. `recordConsentAnswers` sends every answer once, after the last question
+      (question version, answer, who, when), then the cart is read again. A blocking answer marks the lines it
+      blocks. **A close (x) in the pop-up''s top corner, on every platform**, discards the answers given so far
+      and records nothing, the same as the system back on Android. No tenant on/off toggle (decided 29
+      September, rev 3 REV3-26; as built, ADAM CR-493, 3 November 2026).'
     bindsTo: ConsentQuestion
     confirm:
-      label: Next
+      label: Yes / No
       operation: recordConsentAnswers
     dismiss:
-      label: Back
+      label: Close (x)
       discards:
       - answers
-    provenance: client-verified
+    provenance: client-verified; ADAM CR-493 (design change, 3 November 2026)
+  - id: monthCalendar
+    component: modal
+    trigger: More dates, the last tile of the day strip
+    body: '**The in-app month calendar** (as built, ADAM CR-493, 3 November 2026): a deep-green header with the
+      year and the chosen date large over the skyline and sand (`calendarHeaderGradient`), month arrows, a
+      Sunday-first grid with past days (in the venue''s time zone) greyed, and Cancel / OK pills
+      (`calendarColors`). OK picks the date exactly as a strip tile does (`listPerformances` and
+      `getAvailability` for that day); Cancel keeps the date the guest had. The arrows mirror in Arabic.'
+    confirm:
+      label: OK
+      operation: listPerformances
+    dismiss:
+      label: Cancel
+      discards:
+      - the date picked in the calendar
+    provenance: ADAM CR-493 (design change, 3 November 2026)
   - id: quickTour
     component: modal
-    trigger: First booking visit on this device, or Quick tour
-    body: '**Four coach marks** over date, time, tickets and basket, with Back, Next and End tour; the
-      first-visit flag is kept on the device only (decided 29 September, rev 3 REV3-20).'
+    trigger: First booking visit on this device, or Quick tour, when the flow's quickTour is on
+    body: '**Four coach marks**, each a 260-wide card beside the section it explains with an arrow pointing at
+      it, in this order: the date card, the entry windows, Continue, the selection summary. Next is a round
+      arrow button, Back a round back-arrow from step 2, the last step a tick, End tour a text link in the
+      card''s top-right corner; the first-visit flag is kept on the device only (decided 29 September, rev 3
+      REV3-20; as built, ADAM CR-493, 3 November 2026).'
     dismiss:
       label: End tour
       discards: []
-    provenance: client-verified
+    provenance: client-verified; ADAM CR-493 (design change, 3 November 2026)
   purposeNote: Rewritten 29 September for the date → time → ticket order (decided 29 September, rev 3
     REV3-2).
 - id: GST-008
@@ -2303,7 +2362,19 @@ screens:
     booking-flow settings.** Every `cardLayout` (stackedRows, splitRows, cardsAcross, posterCards) and
     `cardSize` is drawn with the white card; tags show only when `ticketTags` is on, and each ticket type''s
     description only when `cardInfo` is on; the step line takes `stepIndicator`''s style, and `none` hides
-    it. The operations, fields, errors and permissions are the ones above.'
+    it. The operations, fields, errors and permissions are the ones above.
+
+
+    **Design change: GST-008 as built in 22143c6** (ADAM CR-494, Chinmay, 3 November 2026, accepted on top of the
+    white ticket cards of CR-349; CHG-CR494-001). (1) **Open ticket:** the photo across the top, 190 high and
+    clipped to its frame, with a gradient (token `photoIntoCardGradient`) that is clear down to 40% of its height
+    and solid white at its foot, so it runs into the white card; the title, price and ticket-type rows sit on an
+    explicit white background; the counters and live prices are unchanged. (2) **Shut ticket:** the *N selected*
+    badge sits in the top row beside the ticket''s kind icon; the foot row holds only the from-price and the
+    chevron. The badge shows whenever at least one of that ticket is chosen, whether `ticketTags` is on or off (it
+    is not a tag), and is hidden at zero; tags still show only when `ticketTags` is on and descriptions only when
+    `cardInfo` is on. (3) Both changes are drawn in every `cardLayout` (stackedRows, splitRows, cardsAcross,
+    posterCards) and `cardSize`, and mirror in Arabic. Same operations, fields, errors and permissions as before.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProductVariants` reads the ticket types of the product and a stepper sets each
@@ -2341,7 +2412,10 @@ screens:
           CR-349, 30 October 2026): shut, the photo down the leading side beside the category, name, tags,
           from-price and a chevron; open, the photo across the top, the name, the price and the counters.
           Every `cardLayout` and `cardSize` is drawn with the white card, and the tags and description
-          still follow `ticketTags` and `cardInfo`.'
+          still follow `ticketTags` and `cardInfo`. Since ADAM CR-494 (3 November 2026): open, the photo is 190
+          high and runs into the white card (`photoIntoCardGradient`, clear to 40%, white at the foot); shut,
+          the *N selected* badge sits in the top row beside the kind icon, shown whenever one is chosen with
+          `ticketTags` on or off and hidden at zero, and the foot row holds only the from-price and the chevron.'
         operation: listProductVariants
         provenance: decided 29 September, rev 3 GAP-D3, REV3-2, 23SEP-6
       - kind: cardList
@@ -2470,7 +2544,8 @@ screens:
         cards, the Choose your tickets title over Step n of m and the step line, no expand hint and a
         mascot-only loader, where this view draws a light canvas, ticket-shaped cards, the venue and step
         over the title, the hint and the venue loader. The booking-flow settings still drive the cards
-        and the step line.'
+        and the step line. Since 3 November 2026 (ADAM CR-494, as built in 22143c6) the open card''s photo
+        runs into the white card and the N selected badge sits in the top row beside the kind icon.'
     stateViews:
       loading: P02/mascot-loader
       error: P02/state-error

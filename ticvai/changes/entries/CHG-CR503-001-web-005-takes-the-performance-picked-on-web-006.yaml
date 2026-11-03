@@ -1,0 +1,52 @@
+id: CHG-CR503-001
+date: '2026-11-03'
+source: cr
+kind: spec
+summary: 'WEB-005 Ticket Type Selection takes the performance picked on WEB-006 as an optional entry value
+  (performanceId, the route''s ?performanceId= or page state on the staged page) and reads it with getPerformance on load,
+  so the cart lines and the basket''s Date of visit row (the client-verified frame''s, the date of Performance.startsAt in
+  the venue''s time zone, shown once the basket has a line) both come from it; every addCartLine line carries
+  performanceId and the edge to WEB-010 passes it on; in the dated flow the rows stay hidden and Continue off until it is
+  present; a 404 or a performance no longer on sale sends the guest back to WEB-006 with eventId; absent, no row and no
+  performanceId on the lines.'
+decision:
+  what: 'ADAM CR-503, posted on #31739: "Decided (Chinmay, 3 November 2026): WEB-005 takes the performance the guest
+    picked on Date & Performance Selection (WEB-006) as an optional entry value and reads it with the existing public
+    performance read, so the cart lines and the Date of visit row both come from it. Build now: 1. Keep the optional
+    ?performanceId= on the WEB-005 route ... 2. When performanceId is present, call getPerformance ... on load. 3. In
+    the basket, show the frame''s ''Date of visit'' row ... 4. Send performanceId on every addCartLine line ... and pass
+    it on to Shopping Cart (WEB-010) on that edge. 5. In the dated flow ... the ticket rows stay hidden and Continue stays
+    off until performanceId is present. 6. If getPerformance answers 404, or the performance is no longer on sale, drop
+    the value and send the guest back to WEB-006 with eventId ... 7. When performanceId is absent ... show no Date of
+    visit row and send lines without performanceId ... Remove the build''s ''stopgap'' note: this is the design." The
+    lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3 November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-503 (Chinmay Patkar, #31739 WEB-005): since REV3-2 WEB-005 comes after the date and time, and WEB-006''s
+  Picks a time edge carries performanceId, but WEB-005''s entry state had none and nothing read the performance for the
+  frame''s Date of visit row (web-005.jpg, client-verified).'
+keys_touched:
+  screens: [WEB-005]
+  operations: [getPerformance, addCartLine]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-business-rules.py
+root_class: a value the previous screen carries that the next screen never declared
+tickets:
+  started: []
+  unstarted:
+  - '31739 (WEB-005, Chinmay Patkar): build as posted; drop the stopgap note.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-503
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PERFORMANCE-INTO-TICKETS
+status: open
+notes: 'The record is brought in line with the client-verified frame, which draws the Date of visit row; what the client
+  sees does not change. docs/active/approved-ui-changes.yaml records the two visible fields the record gains against the
+  frame and CR-503: the Date of visit component (getPerformance, Performance.startsAt) and the edge back to WEB-006 when
+  the time is no longer available. getPerformance''s x-ticvai-consumed-by gains WEB-005 (tools/link-screens-contracts.py).
+  Beyond the posted words: none.'

@@ -1,0 +1,52 @@
+id: CHG-CR528-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'getKioskConfigValidation and publishKioskConfigs read payments#paymentMethodRecords and assets#mediaAssetRecords
+  in process under the routed tenant''s root grant for the check only, returning findings only. paymentMethodUnavailable:
+  an accepted method is available when an active payments.method row with that code has venueIds containing the
+  kiosk''s venue or empty; no scope path is read (CR-443''s ancestor reading of payment methods is replaced).
+  mediaDoesNotFit: a slide''s asset counts as held only when its venueId is null or the kiosk''s venue. VenueOps''
+  MediaAssetRecord carries VenueId (assets.media_asset.venue_id); no column, table or new query.'
+decision:
+  what: 'ADAM CR-528, posted on #30932: "Decided (Chinmay, 3 November 2026): the kiosk checks read the venue''s and the
+    tenant''s rows for the check only, with today''s fields. Build now, on getKioskConfigValidation and
+    publishKioskConfigs (sub-tasks #35623 and #35619): (1) Read payments#paymentMethodRecords and assets#mediaAssetRecords
+    in process under the tenant root grant for the check only ... Only findings are returned ... (2)
+    paymentMethodUnavailable: an accepted method is available when an active payments.method row with that code has
+    venueIds containing the kiosk''s venue or empty ... No scope path is read. (3) mediaDoesNotFit: ... only when the row
+    exists and its venueId is null ... or the kiosk''s venue ... (4) Add VenueId to MediaAssetRecord in VenueOps'' query
+    class ... No column, table or new query. (5) The catalogue product read for tileWithoutProducts is unchanged." The
+    lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3 November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-528 (Hrushikant Patkar, raised from #30932): CR-443''s kiosk half read payment methods by a scope_path
+  payments.method does not have; availability is decided by venueIds (the payments contract''s rule) and media by
+  venue_id. The kiosk work has its sub-tasks #35623 and #35619.'
+keys_touched:
+  operations: [getKioskConfigValidation, publishKioskConfigs]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/assets.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'queries payments#paymentMethodRecords and assets#mediaAssetRecords (their rules)'
+root_class: a read rule written against a field the table does not have
+tickets:
+  started: []
+  unstarted:
+  - '35623 (getKioskConfigValidation) and 35619 (publishKioskConfigs), Hrushikant Patkar: the two reads under the root
+    grant, findings only; venueIds for methods, venue_id for media; VenueId on MediaAssetRecord.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-528
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-KIOSK-CHECK-ROWS
+status: open
+notes: 'tools/check-business-rules.py BR-CATALOGUE-ANCESTORS (CR-443, lane q) no longer asks getKioskConfigValidation to
+  say "at its ancestors": since CR-528 the kiosk checks read no ancestors; it still holds the check-only read and the two
+  query rules'' root-grant statement. #30932 (Ready for QA) is the pattern the decision follows, not reached. Beyond the
+  posted words: none.'

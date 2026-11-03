@@ -1,0 +1,46 @@
+id: CHG-CR500-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'diffConfigVersion''s changes follow one rule for the whole config: two snapshots compared (a version''s stored
+  snapshot; the draft in getTenantConfig''s shape without live state and venues); area is each top-level part by its
+  property name (16, in a fixed order; never tenantId, version, isDraft, updatedAt; read-only properties skipped); path
+  joins property names with ''.'', keyed array items by key in brackets, others by index, plain-value arrays compared
+  whole; one entry per changed value, before and after as compact JSON text, a one-sided value added or removed, null
+  as absent, ordered by area then path; changeScope buildTime exactly where pendingBuildTimeChanges says so; an unknown
+  version or against is 404 not-found.'
+decision:
+  what: 'ADAM CR-500, posted on #30768: "Decided (Chinmay, 3 November 2026): diffConfigVersion''s changes follow one rule
+    for the whole config. Build now: (1) Compare the two snapshots ... (2) area: each top-level part of the snapshot by
+    its property name: brand, appIcons, bookingFlow, bookingFlows, theme, fonts, footer, notificationBranding,
+    enabledPaymentMethods, accessibility, header, navigation, homepage, modules, features, languages ... (3) path ...
+    (4) One entry per changed value ... (5) changeScope is buildTime exactly where the publish''s
+    pendingBuildTimeChanges says so ... (6) A version or against that names no config_version of the tenant answers 404
+    not-found. affectedProducts is unchanged. The CMS-014, CMS-015, CMS-103 and ADM-016 screens do not change." The
+    lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3 November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-500 (Deep Khanvilkar, #30768 diffConfigVersion): the "field-level diff" had no defined shape outside
+  bookingFlows: which areas, the path syntax, how before and after encode a value, and which changeScope an entry gets.'
+keys_touched:
+  operations: [diffConfigVersion]
+  schemas: [ConfigDiff]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: a computed response whose shape was left undefined
+tickets:
+  started: []
+  unstarted:
+  - '30768 (diffConfigVersion, Deep Khanvilkar): the one rule as posted, the area enum and the 404.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-500
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONFIG-DIFF-SHAPE
+status: open
+notes: '**Named beyond the posted words:** ConfigDiff.changes[].area, path, before and after carry the rule in their
+  descriptions (area names the 16 parts in the posted order; it stays a string, since an enum would be a breaking change
+  under check-contract-compat); diffConfigVersion declares 404 (the common NotFound).'

@@ -1,0 +1,48 @@
+id: CHG-CR511-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'recordStorefrontSessionEvents records each batch through the kernel''s IIdempotencyStore in
+  platform.idempotency_record in the outbox row''s transaction (key batchId, operation recordStorefrontSessionEvents,
+  request_hash SHA-256 hex of the body, completed, 202, principal null, the tenant root, the usual expiry); a repeated or
+  concurrent batchId answers 202 with nothing written. The outbox row''s aggregate_id is batchId, sequence 1. venueId
+  naming an active venue (tenancy#activeVenues, in process) gives scopePath that venue''s path and is carried; otherwise
+  the tenant root and venueId left out; never refused.'
+decision:
+  what: 'ADAM CR-511, posted on #30764: "Decided (Chinmay, 3 November 2026): batch de-duplication uses the kernel''s
+    idempotency record. Build now: (1) In the same transaction as the outbox row, record the batch through the kernel''s
+    IIdempotencyStore in platform.idempotency_record ... If batchId was already recorded, answer 202 and write nothing,
+    whatever the body ... (2) The outbox row''s aggregate_id is batchId and its sequence is 1 ... (3) If venueId names an
+    active venue of the tenant (tenancy#activeVenues, in process, as publishTenantConfig reads it), scopePath is that
+    venue''s path and venueId is carried. Otherwise, or if it is absent, scopePath is the tenant root and venueId is left
+    out of the event. Never refused. (4) Everything else stays as CR-107 and CR-283 settled it, including waiting on
+    #37050''s durable key store." The lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3
+    November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-511 (Deep Khanvilkar, #30764 recordStorefrontSessionEvents): batchId de-duplication had nowhere to be
+  stored, the outbox aggregate_id had no source and an unknown venueId''s scope was undefined; host roles already hold
+  SELECT, INSERT and UPDATE on platform.idempotency_record (V0120), a kernel table.'
+keys_touched:
+  operations: [recordStorefrontSessionEvents]
+  tables: [platform.idempotency_record, platform.outbox]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: contract against storage (a promised de-duplication with no store named)
+tickets:
+  started: []
+  unstarted:
+  - '30764 (recordStorefrontSessionEvents, Deep Khanvilkar): the batch record, the outbox key and the venue rule as
+    posted; still waits on #37050.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-511
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SESSION-BATCH-RECORD
+status: open
+notes: 'The operation now declares x-ticvai-writes platform.idempotency_record (a kernel table every host writes, CR-002)
+  and x-ticvai-read-via tenancy#activeVenues (in process; platform.scope is a kernel table, as XDR-022 records for
+  publishTenantConfig). Beyond the posted words: none.'

@@ -1,0 +1,61 @@
+id: CHG-CR493-001
+date: '2026-11-03'
+source: cr
+kind: spec
+summary: 'GST-007 Select Date & Time is specified as the guest-app build in 22143c6: the quick tour is four coach-mark
+  cards (260 wide, an arrow at the date card, the entry windows, Continue and the selection summary; round Next and Back,
+  a tick on the last, End tour a text link), More dates is the last tile of the day strip and opens the in-app month
+  calendar (overlay monthCalendar: deep-green header, Sunday-first grid, past days greyed, Cancel / OK, mirrored in
+  Arabic), and the consent pop-up asks one question at a time with Yes and No, warns before a blocking answer, sends
+  every answer once after the last question, and has a close (x) on every platform that discards the answers. Same
+  operations, fields, errors and permissions.'
+decision:
+  what: 'ADAM CR-493, posted on #31784: "Decided (Chinmay, 3 November 2026): your GST-007 design change is accepted as
+    built in 22143c6, with one condition about closing the consent pop-up. Build now: (1) Quick tour: four coach marks,
+    each a 260-wide card beside the section it explains with an arrow pointing at it ... (2) More dates is the last tile
+    of the day strip ... It opens the in-app month calendar ... (3) Consent pop-up: one question at a time ...
+    recordConsentAnswers sends every answer once, after the last question, then the cart is read again. The condition:
+    draw a close (x) in the pop-up''s top corner on every platform. It discards the answers given so far and records
+    nothing, the same as the system back on Android. Same operations, request and response fields, errors and
+    permissions as before." The lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3 November
+    2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-493 (Chitrangi Mestry, #31784 GST-007): the build differs from the client-verified prototype view in look
+  and in the consent pop-up''s controls. The lead''s rule of 28 October 2026 (frontend starter, 28eb978d) lets the
+  developer change a screen''s design and log it, after which the lead updates the screen''s UI (precedents
+  CHG-CR349-001, CHG-CR473-001). On iOS the build''s pop-up had no way to close once the on-screen Back went, hence the
+  condition.'
+keys_touched:
+  screens: [GST-007]
+  operations: [recordConsentAnswers, listPerformances, getAvailability]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-business-rules.py
+root_class: a frontend design change logged after the build, brought back into the package's screen record
+tickets:
+  started: []
+  unstarted:
+  - '31784 (GST-007 build, Chitrangi Mestry): build as posted; the close (x) on every platform discards the answers and
+    records nothing.'
+  - '31785 ([FE] GST-007 connect to API): the same operations at its next pull.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-493
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GST007-AS-BUILT
+status: open
+notes: '**Design change: GST-007 restyled as built in 22143c6 (coach-mark cards, More dates and the month calendar, the
+  one-question Yes / No consent pop-up), with the lead''s condition: a close (x) on every platform.** The screen
+  record''s consentQuestions overlay now reads confirm Yes / No (recordConsentAnswers, after the last question) and
+  dismiss Close (x) (discards the answers); a monthCalendar overlay (OK / Cancel) is added behind More dates; the quick
+  tour overlay opens only when the flow''s quickTour is on. docs/active/approved-ui-changes.yaml records the three
+  changed overlays against ADAM CR-493. The frame stays the prototype capture (wireframes/incoming/P02-mobile-v4/gst-007.html);
+  the record and its prototype.differences name the build. The tokens calendarColors, calendarHeaderGradient and
+  colors.consentIcon (#00BFFF) are the guest app''s, as the build added them; screens/_design-tokens.yaml is not
+  changed. tools/check-approved-ui.py holds the changed overlays to the approval. **Named beyond the posted words:**
+  the monthCalendar overlay''s OK calls listPerformances (its confirm operation) and its Cancel discards "the date
+  picked in the calendar".'

@@ -1230,6 +1230,12 @@ screens:
       carries:
       - productId
       provenance: decided 29 September 2026, W8
+    - to: WEB-006
+      trigger: The time picked is no longer available (getPerformance 404, or no longer on sale); pick another
+      carries:
+      - eventId
+      provenance: 'ADAM CR-503 (Chinmay, 3 November 2026): the performanceId is dropped and the guest is sent
+        back to WEB-006 with eventId, told that time is no longer available'
   density: compact
   pattern: listDetail
   patternReason: '`listProductVariants` reads a population and nothing reads one of them; the detail is
@@ -1315,6 +1321,18 @@ screens:
         operation: listProducts
         notes: Clears the Help me choose filter (W4).
         provenance: decided 29 September 2026, W4
+      - kind: detailPanel
+        label: Date of visit
+        bindsTo: Performance
+        columns:
+        - Performance.startsAt
+        operation: getPerformance
+        notes: 'The basket''s *Date of visit* row, as the client-verified frame draws it (web-005.jpg): the date of
+          `Performance.startsAt` in the venue''s time zone, formatted as in the frame (*FRI 2 Oct*), shown only once
+          the basket has a line. While `getPerformance` loads, the row shows its own placeholder; if it fails, the
+          error names *the date of visit* and the rest of the screen stays usable. No row when `performanceId` is
+          absent (an undated ticket, or a product-first flow where the date comes after this step). ADAM CR-503.'
+        provenance: client-verified frame (rev 3, web-005.jpg); ADAM CR-503, 3 November 2026
     - name: actionBar
       slot: rowActions
       components:
@@ -1368,13 +1386,28 @@ screens:
     provenance: decided 29 September 2026, W12
   - operationId: addCartLine
     contract: orders
-    purpose: Continue adds the chosen tickets to the cart
+    purpose: Continue adds the chosen tickets to the cart, each line with performanceId when the screen holds one
     trigger: onAction
-    provenance: design cross-check, 3 October 2026 (CHG-R1S-023)
+    provenance: design cross-check, 3 October 2026 (CHG-R1S-023); ADAM CR-503
+  - operationId: getPerformance
+    contract: catalogue
+    purpose: 'The performance picked on WEB-006, read on load when performanceId is present (guest token
+      optional): the basket''s Date of visit row; a 404, or a performance no longer on sale, drops the value and
+      sends the guest back to WEB-006 (ADAM CR-503)'
+    trigger: onLoad
+    provenance: ADAM CR-503 (Chinmay, 3 November 2026)
   entryState:
     params:
     - name: productId
       from: WEB-004
+    - name: performanceId
+      from: WEB-006
+      optional: true
+      notes: 'The performance the guest picked on Date & Performance Selection (WEB-006''s Picks a time edge), the
+        route''s optional `?performanceId=`, or page state when the two steps render as one staged page (ADAM
+        CR-503, 3 November 2026). Absent for an undated ticket, or in a product-first flow where the date comes
+        after this step. In the dated flow (`performanceReveal` `dateTimeTicket`) the ticket rows stay hidden and
+        Continue stays off until it is present.'
     - name: venueId
       from: session
     - name: cartId
@@ -1489,7 +1522,19 @@ screens:
     size dropdown. The estimate reads *<ticket> · Guests × <n>*, and the request is `requestGroupBooking`
     with the group ticket as `packageProductId` and the headcount as `expectedSize`. Supervisors listed
     separately and free, and a water-park group choosing a session, are not in the contract yet (questions
-    of 1 October).'
+    of 1 October).
+
+
+    **The performance picked on WEB-006 comes in with the guest** (ADAM CR-503, Chinmay, 3 November 2026;
+    CHG-CR503-001). The optional `?performanceId=` on this route is the value WEB-006''s *Picks a time* edge
+    carries (page state when the two steps render as one staged page). When it is present the screen calls
+    `getPerformance` on load, so the cart lines and the basket''s *Date of visit* row both come from it: every
+    `addCartLine` line carries `performanceId`, and the edge to Shopping Cart (WEB-010) passes it on. In the
+    dated flow the ticket rows stay hidden and Continue stays off until it is present. A 404, or a performance
+    no longer on sale, drops the value and sends the guest back to WEB-006 with `eventId`, saying that time is no
+    longer available. When it is absent there is no Date of visit row and lines go without `performanceId`; the
+    product-first Continue goes to WEB-006 carrying `productId` as now. This is the design, not a stopgap. Change
+    date or time still carries `eventId`.'
 - id: WEB-006
   name: Date & Performance Selection
   module: Booking & Selection
@@ -6065,7 +6110,19 @@ screens:
     variant in the guest''s real cart (`createCart`, `addCartLine`, `updateCartLine`, `removeCartLine`),
     the right panel is that cart (`getCart`), and Continue goes on into the flow (`getPublishedBookingFlow`).
     The Most popular badge and the saving come from `Product.isFeatured` and `Product.compareAtPrice`,
-    a new ticket; until it is built the cards show neither, never a made-up value.'
+    a new ticket; until it is built the cards show neither, never a made-up value.
+
+
+    **Design change: WEB-022 as built in 3422264** (ADAM CR-534, Chinmay, 3 November 2026; it replaces CR-516''s
+    log; CHG-CR534-001). The build''s photo cards on shared rows, the *Your plan* status pill, the sticky *Your
+    membership* basket, the page up to 1408px and the three status tokens are accepted as the screen''s design;
+    the package''s wireframe, screen layout and page info follow it later (LO-CR534-001). The status pill maps every
+    `GuestMembership.status` from `getMyMemberships`: `active` is *Active* (`--status-active`), `frozen` *Paused*
+    (`--status-paused`), `suspended` *Suspended* (`--status-paused`), `expired` *Expired* (`--status-expired`),
+    `cancelled` *Cancelled* (`--status-expired`); never a raw value or an empty pill. *Most popular* and the
+    saving line stay out until #37213 delivers them. The frame''s Passholders section (Adult and Child pass
+    steppers) is left out of this build; it is client-approved and comes back on its own follow-up ticket, bound to
+    the plan''s variants the way Ticket Type Selection''s guest counters are (LO-CR534-002).'
   density: compact
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getProduct` reads one of them — list, select,
@@ -6145,8 +6202,11 @@ screens:
         - GuestMembership.name
         - GuestMembership.status
         operation: getMyMemberships
-        provenance: ADAM CR-482, decided by Chinmay on 2 November 2026
-        notes: For a signed-in guest, `getMyMemberships` marks on its card a plan they already hold.
+        provenance: ADAM CR-482, decided by Chinmay on 2 November 2026; the pill ADAM CR-534, 3 November 2026
+        notes: 'For a signed-in guest, `getMyMemberships` marks on its card a plan they already hold, as a status
+          pill (ADAM CR-534) mapped from every `GuestMembership.status`: `active` Active (`--status-active`),
+          `frozen` Paused (`--status-paused`), `suspended` Suspended (`--status-paused`), `expired` Expired
+          (`--status-expired`), `cancelled` Cancelled (`--status-expired`). Never a raw value or an empty pill.'
     - name: contextPanel
       slot: selection
       components:
@@ -6291,8 +6351,11 @@ screens:
       match: partial
       view: Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership
         → 'Other plans — Compare'
-      differences: The page is the plan step of the membership booking flow, drawn as the frame draws
-        it with its basket (ADAM CR-482); the account 'Compare' action is a toast.
+      differences: 'The page is the plan step of the membership booking flow, drawn as the frame draws
+        it with its basket (ADAM CR-482); the account ''Compare'' action is a toast. Since 3 November 2026 the
+        build in 3422264 is the screen''s design (ADAM CR-534): photo cards on shared rows, the Your plan
+        status pill, the sticky Your membership basket, the page up to 1408px; this frame is redrawn to it
+        later (LO-CR534-001), and its Passholders section waits for its own ticket (LO-CR534-002).'
     stateViews:
       loading: P01/turnstile-loader
       error: P01/status-card

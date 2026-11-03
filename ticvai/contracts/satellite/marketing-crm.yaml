@@ -432,6 +432,16 @@ x-ticvai-jobs:
     reliesOn: [setDataRetentionSetting, setDataRetentionPolicy]
     for: "Marketing's retention job: guest profiles, notes, documents, preferences, form submissions, consent records and conversation messages. Every day it reads the tenant's period for guestProfile from Tenancy's data retention settings (tenancy#dataRetentionSettingRecords; a class with no row takes the platform default, ADR-0047) and applies its onExpiry (archive, anonymise or delete) to its own rows past the period, counted from the class's anchor; another module's rows are that module's job (the lead, 2 November 2026, on lane s's question (\"(Recommended)\"): one retention job in each module that holds personal data, run by that module's retention setting (tenancy.data_retention_setting); CHG-R13INT-011)."
     source: ['contracts/spine/tenancy.yaml']
+  guestDocumentUploadCleanup:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: timer}
+    reads: [marketing.guest_document_upload]
+    writes: []
+    reliesOn: [createGuestDocumentUpload]
+    for: 'Deletes from the guest-document store a pending object not attached within 24 hours of its issue (ADAM
+      CR-521, Chinmay, 3 November 2026; CHG-CR521-001).'
+    source: ['contracts/satellite/marketing-crm.yaml']
   campaignScheduler:
     module: marketing-crm
     host: workers
@@ -1937,7 +1947,12 @@ paths:
       x-ticvai-reads:
       - table: marketing.waiver_version_control
         for: 'the submitted form version''s resign rule, whether an earlier version''s live acceptance counts (Marketing''s
-          own data; ADAM CR-472)'
+          own data; ADAM CR-472), read under the routed tenant''s root grant filtered to the caller''s scope paths (ADAM
+          CR-496)'
+      - table: marketing.form_definition
+        for: 'the submitted formId and formVersion, published, read under the routed tenant''s root grant
+          (ITenantRootGrant) filtered to the caller''s scope paths, so a form published above the caller''s venue is
+          found (ADAM CR-496)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1977,6 +1992,27 @@ paths:
         or the submitted version''s resign rule is `resignAtNextBooking` or `resignBeforeNextVisit`, or the version
         has no resign rule. It is written with its own `form_version`, `expires_at` set from that version''s
         `validForMonths`, and answered `201`. No grant or migration is needed.
+
+
+        **A form published above the caller''s venue is found** (ADAM CR-496, option A, Chinmay, 3 November 2026;
+        CHG-CR496-001), as for the published privacy policies and the other tenant-root reads. Before anything is
+        written: (1) the caller''s scope paths for this request are taken: a staff member''s grants, or a guest''s
+        venue path from `guestAuth`. (2) Under the routed tenant''s root grant (`ITenantRootGrant`), in one
+        statement, the `marketing.form_definition` row for the submitted `formId` and `formVersion` with status
+        `published` is read, and kept only when its `scope_path` is at or below one of the caller''s paths or at or
+        above one of them (`scope_path <@ ANY(paths) OR scope_path @> ANY(paths)`). If no row is left, the answer is
+        `404 form-version-not-found` and nothing is written; a form published at another venue or another brand
+        stays 404. (3) Under the same grant and the same scope filter, `marketing.waiver_version_control` is read
+        for that `form_id` and `form_version`, and its `resign_rule` decides the earlier-version rule (`noResign`);
+        no row means no resign rule applies. (4) The connection returns to the caller''s own grant (`SET LOCAL`
+        back) before `marketing.form_submission` is touched: the live-acceptance check (200) and the insert (201)
+        stay under the grant-holder-write policy of CR-318, so a guest still reads and writes only its own
+        submissions. (5) Nothing else is read under the root grant, and nothing from those two rows is returned
+        beyond what the response already carries. No migration, no change to the request or the responses; the
+        row security of `form_definition` and `waiver_version_control` stays as it is for every other operation.
+        Tests: a form published at the tenant path is submitted by venue staff and by a guest at that venue (201,
+        then 200 on a repeat); a form at another venue is 404; a draft or retired version is 404; a tenant-level
+        `noResign` rule on an earlier version is applied; a guest cannot read another guest''s submission.
 
         '
       tags:
@@ -2102,7 +2138,15 @@ paths:
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001): a staff caller''s subjectId must be a known
+          subject (ADAM CR-521)'
+      x-ticvai-reads:
+      - table: marketing.guest_document_upload
+        for: 'the upload row createGuestDocumentUpload issued for the storageRef: same subject_id and kind, status
+          pending (ADAM CR-521)'
+      x-ticvai-writes:
+      - table: marketing.guest_document_upload
+        for: 'marks the upload row attached, in the same transaction as the guest_document insert (ADAM CR-521)'
       x-ticvai-consumed-by:
       security:
       - guestAuth: []
@@ -2115,6 +2159,20 @@ paths:
         `retainUntil` is required. **A guest document with no deletion date is a guest document kept forever.**
         It is the end of the document''s purpose plus the retention period client counsel sets, which is
         still open (audit R149).
+
+
+        **The server issues and checks every key; a key the client makes up is never stored** (ADAM CR-521,
+        option A, Chinmay, 3 November 2026; CHG-CR521-001). `storageRef` is accepted only when a
+        `marketing.guest_document_upload` row exists for it with the same `subject_id` and `kind`, status
+        `pending`, and the object exists in the guest-document store at no more than the issued size; otherwise
+        the answer is `422 guest-document-upload-invalid` and nothing is written. In the same transaction it
+        inserts `marketing.guest_document`, marks the upload row `attached`, and sets `id`, `uploaded_at` (now) and
+        `uploaded_by_principal_id` (the staff principal, or null for a guest''s own upload); any of these three sent
+        by the client is ignored. The subject rules are those of `createGuestDocumentUpload`: a guest may send only
+        its own session''s `subjectId` (otherwise 403); staff may name any subject, checked through
+        `identity#subjectRecords` (404 if unknown). `marketing.guest_document` takes the grant-holder subject
+        policy (`x-ticvai-rls: grant-holder-write`, `platform.apply_grant_holder_subject_rls`), as
+        `form_submission` has, so staff with a grant write for a guest and a guest only for itself.
 
         '
       tags:
@@ -2145,6 +2203,105 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestDocument'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          x-ticvai-problem-types: [guest-document-upload-invalid]
+          description: 'The storageRef was not issued by createGuestDocumentUpload for this subject and kind, is no
+            longer pending, or its object is missing from the store or larger than the issued size (ADAM CR-521);
+            nothing is written.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-documents/uploads:
+    post:
+      operationId: createGuestDocumentUpload
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'a staff caller''s subjectId must be a known subject, pii.subject, Identity''s data (404 if unknown;
+          ADAM CR-521)'
+      x-ticvai-writes:
+      - table: marketing.guest_document_upload
+        for: 'the issued upload row, pending, with its storage_ref, subject, kind, content type, size, issuer and
+          expiry (ADAM CR-521)'
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      summary: Issue the key and a signed upload URL for a guest document
+      description: '**The upload step for the guest-document store** (ADAM CR-521, option A, Chinmay, 3 November
+        2026; CHG-CR521-001). The server issues and checks every guest-document key; a key the client makes up is
+        never stored. A guest may send only its own session''s `subjectId` (otherwise 403); staff may name any
+        subject, checked through `identity#subjectRecords` (404 if unknown). Allowed types are image/jpeg,
+        image/png and application/pdf, up to 10 MB, as for guest identity uploads; otherwise `400
+        media-type-not-permitted` or `media-too-large`. It writes a `marketing.guest_document_upload` row (status
+        `pending`) and answers 201 with `storageRef`, a signed upload URL into the tenant''s private guest-document
+        store (not the media library) and `expiresAt` (15 minutes). The server builds the key from the subject and
+        a random id. `uploadGuestDocument` then takes the `storageRef`. A pending object not attached within 24
+        hours is deleted (`x-ticvai-jobs.guestDocumentUploadCleanup`).
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: GUEST_VIEW_PII
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [kind, contentType, sizeBytes, subjectId]
+              properties:
+                kind:
+                  type: string
+                  enum: [avatar, idDocument, visa, signedWaiver, medicalNote, accessibilityEvidence, photo, other]
+                contentType:
+                  type: string
+                  enum: [image/jpeg, image/png, application/pdf]
+                sizeBytes:
+                  type: integer
+                  minimum: 1
+                  maximum: 10485760
+                subjectId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The key and the signed upload URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestDocumentUploadTicket'
+        '400':
+          x-ticvai-problem-types: [media-type-not-permitted, media-too-large]
+          description: A content type other than image/jpeg, image/png or application/pdf, or a file larger than
+            10 MB (ADAM CR-521).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /challenges:
@@ -24029,7 +24186,7 @@ components:
             is written only by the Orders service through `recordSaleOwnerAnswers` (service-to-service), never by a
             caller of `submitForm`. Null for a submission made outside a sale.
     GuestDocument:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listComplianceEvidenceWaiver, uploadGuestDocument
+      x-ticvai-rls: grant-holder-write   # ADAM CR-521 (3 November 2026): staff with a grant write for a guest, a guest only for itself, as form_submission (CR-318); was grant-holder-read (CHG-MOD-007)
       type: object
       x-ticvai-persistence: marketing.guest_document
       description: 'BL-133. **No store for guest photos, avatars, IDs or signed documents anywhere.**
@@ -24068,9 +24225,10 @@ components:
         storageRef:
           type: string
           description: '**The stored object''s key in the guest-document store**, which is deliberately not
-            `assets` (BL-133). No operation in this contract issues one yet: `assets` `createUpload` is
-            staff-only and writes the media library, so the upload step for this store is still to be
-            designed.
+            `assets` (BL-133). **`createGuestDocumentUpload` issues it** (ADAM CR-521, 3 November 2026): the
+            server builds the key from the subject and a random id, and `uploadGuestDocument` accepts it only
+            when its upload row is pending for the same subject and kind and the object is in the store at no
+            more than the issued size.
 
             '
         contentType:
@@ -24099,6 +24257,91 @@ components:
           type: string
           format: uuid
           nullable: true
+    GuestDocumentUpload:
+      x-ticvai-rls: grant-holder-write   # the same row security as guest_document (ADAM CR-521)
+      type: object
+      x-ticvai-persistence: marketing.guest_document_upload
+      description: '**A guest-document key the server issued** (ADAM CR-521, option A, Chinmay, 3 November 2026;
+        CHG-CR521-001). `createGuestDocumentUpload` writes it `pending`; `uploadGuestDocument` accepts its
+        `storageRef` only while it is pending for the same subject and kind, and marks it `attached` in the
+        transaction that inserts the guest_document. A pending object not attached within 24 hours is deleted from
+        the store.'
+      required:
+      - id
+      - storageRef
+      - subjectId
+      - kind
+      - contentType
+      - sizeBytes
+      - issuedAt
+      - expiresAt
+      - status
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        storageRef:
+          readOnly: true
+          type: string
+          maxLength: 500
+          x-ticvai-unique: tenant
+          description: The key the server built from the subject and a random id.
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+        kind:
+          type: string
+          maxLength: 40
+          description: The kind the key was issued for, one of GuestDocument.kind's values, as the request body's enum
+            checks; uploadGuestDocument accepts the key only for the same kind.
+        contentType:
+          type: string
+          enum: [image/jpeg, image/png, application/pdf]
+        sizeBytes:
+          type: integer
+          minimum: 1
+          maximum: 10485760
+          description: The issued size; the stored object may be no larger.
+        issuedByPrincipalId:
+          readOnly: true
+          type: string
+          format: uuid
+          nullable: true
+          description: The staff principal that asked for the key, or null for a guest's own upload.
+        issuedAt:
+          readOnly: true
+          type: string
+          format: date-time
+        expiresAt:
+          readOnly: true
+          type: string
+          format: date-time
+          description: When the signed upload URL stops working (15 minutes after issue).
+        status:
+          readOnly: true
+          type: string
+          enum: [pending, attached]
+          default: pending
+    GuestDocumentUploadTicket:
+      x-ticvai-persistence: 'none — response shape: what createGuestDocumentUpload answers; the row is
+        GuestDocumentUpload (marketing.guest_document_upload)'
+      type: object
+      required: [storageRef, uploadUrl, expiresAt]
+      properties:
+        storageRef:
+          type: string
+          maxLength: 500
+          description: The issued key, which uploadGuestDocument takes (ADAM CR-521).
+        uploadUrl:
+          type: string
+          description: Signed. PUT the file here, into the tenant's private guest-document store (not the media
+            library).
+        expiresAt:
+          type: string
+          format: date-time
+          description: 15 minutes after issue.
     Challenge:
       type: object
       x-ticvai-persistence: marketing.challenge
