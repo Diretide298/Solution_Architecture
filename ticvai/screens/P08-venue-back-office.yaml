@@ -38867,6 +38867,12 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listAdmissionRules
+    inputSources:
+      id: listAdmissionRules.id
+      code: listAdmissionRules.code
+      name: listAdmissionRules.name
+      openMinutesBefore: listAdmissionRules.openMinutesBefore
+      closeMinutesAfter: listAdmissionRules.closeMinutesAfter
   entryState:
     preloaded:
     - EntryExitReEntryRulesView.entryMode
@@ -39384,6 +39390,12 @@ screens:
     invalidates:
     - listMultiParkCrossover2
     - listAdmissionRules
+    inputSources:
+      id: listAdmissionRules.id
+      code: listAdmissionRules.code
+      name: listAdmissionRules.name
+      openMinutesBefore: listAdmissionRules.openMinutesBefore
+      closeMinutesAfter: listAdmissionRules.closeMinutesAfter
   wireframe:
     status: notStarted
     provenance: generated
@@ -46864,15 +46876,23 @@ screens:
       components:
       - kind: selectField
         label: Credential only
+        operation: updateAdmissionRules
+        bindsTo: AdmissionRules.reEntryVerification
         provenance: pack Access Control Module_Reference.pdf, page 106 §Configure
       - kind: textField
         label: Credential + UV stamp
+        operation: updateAdmissionRules
+        bindsTo: AdmissionRules.reEntryVerification
         provenance: pack Access Control Module_Reference.pdf, page 106 §Configure
       - kind: selectField
         label: Credential + Face
+        operation: updateAdmissionRules
+        bindsTo: AdmissionRules.reEntryVerification
         provenance: pack Access Control Module_Reference.pdf, page 106 §Configure
       - kind: selectField
         label: Credential + operator
+        operation: updateAdmissionRules
+        bindsTo: AdmissionRules.reEntryVerification
         provenance: pack Access Control Module_Reference.pdf, page 106 §Configure
   states:
     loading: The re-entry temporary exit configuration as saved.
@@ -47014,6 +47034,12 @@ screens:
     - listMultiParkCrossover2
     - listMultiParkCrossover
     - listAdmissionRules
+    inputSources:
+      id: listAdmissionRules.id
+      code: listAdmissionRules.code
+      name: listAdmissionRules.name
+      openMinutesBefore: listAdmissionRules.openMinutesBefore
+      closeMinutesAfter: listAdmissionRules.closeMinutesAfter
   entryState:
     preloaded:
     - MultiParkCrossoverJourneyOrchestratorView.eventType
@@ -91792,12 +91818,18 @@ screens:
       components:
       - kind: metricTile
         label: Expected Rentals
+        operation: listDemandBookingCurve
+        bindsTo: AiDemandForecastingBookingCurveStudioView.demand
         provenance: pack Rental_Management.pdf, page 131 §Forecast KPIs
       - kind: metricTile
         label: Expected Revenue
+        operation: listDemandBookingCurve
+        bindsTo: AiDemandForecastingBookingCurveStudioView.revenue
         provenance: pack Rental_Management.pdf, page 131 §Forecast KPIs
       - kind: metricTile
         label: Forecast Utilization
+        operation: listDemandBookingCurve
+        bindsTo: AiDemandForecastingBookingCurveStudioView.forecastFinalOccupancy
         provenance: pack Rental_Management.pdf, page 131 §Forecast KPIs
       - kind: metricTile
         label: Sell-Out Probability
@@ -94758,11 +94790,6 @@ screens:
     purpose: Build the application form
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: updateAccreditationProgramme
-    contract: accreditation
-    purpose: Link the built form to the programme (formId)
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listForms
     contract: marketing-crm
     purpose: The builder's list of forms
@@ -133526,6 +133553,8 @@ screens:
       components:
       - kind: metricTile
         label: Forecast Demand
+        operation: listDemandBookingCurve
+        bindsTo: AiDemandForecastingBookingCurveStudioView.demand
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 157 §Display
       - kind: metricTile
         label: Planned Resources
@@ -134527,13 +134556,6 @@ screens:
     purpose: Start a new map
     trigger: onAction
     invalidates:
-    - listSeatMaps
-  - operationId: updateSeatMap
-    contract: seating
-    purpose: Save the canvas
-    trigger: onAction
-    invalidates:
-    - getSeatMap
     - listSeatMaps
   - operationId: editSeatMapStructure
     contract: seating
@@ -149461,16 +149483,6 @@ screens:
     purpose: Where the money stands
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: listTaxInvoices
-    contract: finance
-    purpose: List tax invoices
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listCreditMemos
-    contract: finance
-    purpose: List credit memos
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listEInvoiceTransmissions
     contract: finance
     purpose: E-invoicing transmission log and failures
@@ -175926,30 +175938,35 @@ screens:
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 122 §Authorized users can
       - kind: primaryButton
         label: Accept
+        collectedBy: Every recommendation review decision
         operation: decidePricingRecommendation
         notes: 'Sends `decision: accept`.'
         provenance: contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision
           (decided 29 September, readiness close-out)
       - kind: secondaryButton
         label: Modify
+        collectedBy: Every recommendation review decision
         operation: decidePricingRecommendation
         notes: 'Sends `decision: modify`.'
         provenance: contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision
           (decided 29 September, readiness close-out)
       - kind: secondaryButton
         label: Reject
+        collectedBy: Every recommendation review decision
         operation: decidePricingRecommendation
         notes: 'Sends `decision: reject`.'
         provenance: contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision
           (decided 29 September, readiness close-out)
       - kind: secondaryButton
         label: Schedule
+        collectedBy: Every recommendation review decision
         operation: decidePricingRecommendation
         notes: 'Sends `decision: schedule`.'
         provenance: contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision
           (decided 29 September, readiness close-out)
       - kind: secondaryButton
         label: Send for approval
+        collectedBy: Every recommendation review decision
         operation: decidePricingRecommendation
         notes: 'Sends `decision: sendForApproval`.'
         provenance: contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision
@@ -194861,10 +194878,6 @@ screens:
   - operationId: listSaleChannel
     contract: catalogue
     purpose: Sales Channel Command Center
-    trigger: onLoad
-  - operationId: listChannelSaleSchedule
-    contract: catalogue
-    purpose: Channel Sales Schedule & Availability Windows
     trigger: onLoad
   - operationId: listChannelSaleRule
     contract: catalogue

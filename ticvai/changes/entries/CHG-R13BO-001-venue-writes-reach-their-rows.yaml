@@ -1,0 +1,61 @@
+id: CHG-R13BO-001
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'The 21 RF-TENANT-ROOT findings built on by started tickets, fixed at their source in three classes: the check now
+  reads a split policy (apply_split_rls) as the policy it is, so identity.principal_credential and its history are judged by
+  V0108''s own-or-home-scope policy (6, no table changed); a guest''s row with no scope that venue staff write takes the
+  grant-holder-write rule CHG-R11FXC-003 settled (marketing.guest_note, orders.guest_credit_account, ledger.deposit,
+  orders.membership_activation_action: 8); a table written below the tenant gets a scope, by its parent or its own path, as the
+  lead''s default ruling of 14 October says (catalogue.plan_benefit follows its plan, marketing.guest_extra_field gains a
+  server-set scopePath, read by any staff grant as its options and values are: 7).'
+decision:
+  what: 'The lead, 3 November 2026, on the r13 gate''s started-ticket findings: "why are these coming back again and again?",
+    and "you get the rest sorted": fix each at its source, never by acknowledging, baselining or exempting; what needs a
+    product decision is brought back. The rules applied are settled ones: CHG-R11FXC-003 (the lead, 29 October 2026: the
+    staff-grant write rule for a guest''s row with no scope) and the default ruling of 14 October 2026 (CHG-MOD-007: "A table
+    written below tenant gets a scope (follows its parent); else the operation runs at tenant", and for reads "open its
+    SELECT (x-ticvai-rls)").'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: r13 release gate (refresh-safe run 20261103-023619-14406), check-rls-scope-fit RF-TENANT-ROOT, 21 known findings
+  now built on by started tickets (#27732, #27949, #30674, #31235, #31238, #33310, #27671, #31798, #33328, #32056, #32015,
+  #32050); CR-076 and CHG-GEN-010. The identity six were the check''s own misreading: it skipped every apply_split_rls call and
+  kept the baseline''s apply_tenant_rls, though V0108 replaced it (CHG-R8MIG-007, CHG-R10GFC-004).'
+keys_touched:
+  operations: [addGuestNote, getGuestTimeline, openGuestCreditAccount, recordDeposit, settleDeposit, resolveMembershipActivation,
+    getPlanBenefits, setPlanBenefits, listProductRetirementSuspension, listGuestExtraFields, setGuestExtraFields, createPrincipal,
+    forceLogout, resetPrincipalCredential]
+  schemas: [GuestNote, GuestCreditAccount, Deposit, MembershipActivationView, MarketingGuestExtraField]
+  tables: [marketing.guest_note, orders.guest_credit_account, ledger.deposit, orders.membership_activation_action,
+    catalogue.plan_benefit, marketing.guest_extra_field, identity.principal_credential, identity.principal_credential_history]
+  files:
+  - tools/check-rls-scope-fit.py
+  - tools/derive-ddl.py
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/finance.yaml
+root_class: 'a table''s row security written by one rule and judged by another: a guest''s row with no scope written by venue
+  staff, a table with two protected owners left at the tenant root, a venue singleton stored with no venue path, and a
+  checker reading a replaced policy'
+tickets:
+  started:
+  - '33310, 32056, 32015, 32050 ([DB] guest_note, guest_credit_account, deposit, membership_activation_action; Hrushikant
+    Patkar, Ready for QA): the table''s policy becomes grant-holder-write in the r13 forward migration; no code change.'
+  - '31798 ([DB] catalogue.plan_benefit), 27671: the table follows its plan (entitlement_template_id) for read and write.'
+  - '33328 ([DB] marketing.guest_extra_field): a new scope_path column (NOT NULL after backfill to the tenant root''s path),
+    grant-holder-read; setGuestExtraFields sets it from the caller''s venue.'
+  - '27732, 27949, 30674, 31235, 31238 (identity): no change; the policy they build against was always V0108''s.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 gate fix lane y (fix/r13-y), started-ticket findings, under the lead''s instruction of 3 November 2026'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::ROW_OWNER
+status: open
+notes: 'check-rls-scope-fit now classes a split policy by its two checks (any grant, above, scope, subject, tenant; a branch
+  EXISTS over a parent takes the parent''s read class). That read is lenient: own_row(...) alone reads as a scope check, so a
+  staff write to a guest-only split table (pii.subject''s write) is not reported. Judged on this tree: 6 findings gone, 0 new.
+  Database change: four policies re-applied, one ROW_OWNER pick, one column; in the integration''s forward migration.'

@@ -5331,6 +5331,9 @@ paths:
               properties:
                 code:
                   type: string
+                  x-ticvai-persisted: false
+                  description: The first code from the method being enrolled, compared with the pending method's
+                    secret (or the code sent to its destination) and never stored (r13 gate, CHG-R13BO-002).
       responses:
         '200':
           headers:

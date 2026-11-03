@@ -442,6 +442,11 @@ ROW_OWNER = {
     "orders.refund_line": "refund_id",            # CHG-R10ORD-014 (CR-208)
     "orders.refund_payment": "refund_id",         # CHG-R10ORD-014 (CR-208)
     "catalogue.product_media": "product_id",   # CHG-R6-005 (CR-009)
+    # r13 gate (CHG-R13BO-001): a plan's benefits are the plan's rows ("keyed by the entitlement template because that
+    # is the plan", getPlanBenefits; setPlanBenefits replaces them whole). Declaring the scope_path of
+    # catalogue.membership_benefit (CHG-MOD-007) gave the table a second protected owner, so it fell to the tenant root
+    # ("several protected owners") and a venue's PRODUCT_CONFIGURE could neither read nor set a plan it owns.
+    "catalogue.plan_benefit": "entitlement_template_id",   # CHG-R13BO-001
     "inventory.quotation_line": "quotation_id",   # CHG-R6-013
     "reporting.dashboard_tile": "dashboard_id",   # CHG-R6-013
     # CHG-R6-015 (ADAM CR-013): declaring `location_id -> inventory.location` gave these a second protected

@@ -2202,6 +2202,9 @@ paths:
                   - validateOnly
                   - publish
                   default: validateOnly
+                  x-ticvai-persisted: false
+                  description: 'What the call does, not a fact about the version: `publish` writes the version and its
+                    snapshots, `validateOnly` writes nothing. Not stored (r13 gate, CHG-R13BO-002).'
                 note:
                   type: string
                   nullable: true
@@ -3863,6 +3866,9 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
+      x-ticvai-writes:
+      - table: platform.audit_record
+        for: 'the body''s reason, in the audit row''s reason (ADAM CR-376; r13 gate, CHG-R13BO-002)'
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -3879,6 +3885,10 @@ paths:
                   type: string
                   minLength: 1
                   maxLength: 500
+                  x-ticvai-stored-as: platform.audit_record.reason
+                  description: 'Reason, recorded in the audit: the operation puts it on the request''s audit context and the
+                    audit interceptor writes it to the audit row''s `reason`, which `listAuditRecords` returns (ADAM CR-376;
+                    CHG-CR376-001). No other row keeps it: the restore writes no version row (r13 gate, CHG-R13BO-002).'
       responses:
         '200':
           headers:

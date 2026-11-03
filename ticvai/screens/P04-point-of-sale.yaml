@@ -9344,6 +9344,9 @@ screens:
         provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: dataTable
         label: Tax invoices
+        reads:
+        - getTaxInvoice
+        - getTaxDocumentRendition
         bindsTo: FinTaxInvoice
         operation: listTaxInvoices
         notes: Query orderId; opening one shows it (getTaxInvoice) and offers the PDF.

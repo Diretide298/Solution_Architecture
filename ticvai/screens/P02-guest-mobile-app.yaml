@@ -4133,6 +4133,8 @@ screens:
     trigger: onAction
     invalidates:
     - listDelegations
+    inputSources:
+      overSubjectId: session.subjectId
   - operationId: listProducts
     contract: catalogue
     purpose: List products
@@ -15078,6 +15080,8 @@ screens:
     confirm:
       label: Turn on
       operation: verifyMfaEnrolment
+      alsoCalls:
+      - enrolMfaMethod
     dismiss:
       label: Cancel
       discards:

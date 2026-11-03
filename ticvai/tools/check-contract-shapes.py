@@ -224,6 +224,7 @@ def deref(node, doc, depth=0):
 
 
 SCOPE_IDS = ("venueId", "tenantId")
+CALLER_SET_NOTES: list = []   # C-REQUEST-SERVER-FIELDS: writes whose server-named field the field says the caller sets
 
 
 def _body_fields(node, doc, depth=0):
@@ -435,6 +436,16 @@ def main() -> int:
                 natural = {k for grp in node.get("x-ticvai-unique-together") or [] for k in (grp or [])}
                 natural |= {k for k, v in props.items() if isinstance(v, dict) and v.get("x-ticvai-unique")}
                 bad = [p for p in bad if p not in natural]
+                # **A field the caller sets, said so on the field** (r13 gate, CHG-R13BO-003). CHG-SHP-005 (14 October
+                # 2026, the lead: "go with your recommendation") kept `status` writable on 20 writes because the caller
+                # moves it (a draft fee, a channel listing going live), but said so only in its change entry, so the
+                # rule kept reporting them and each came back as "built on" once its ticket started. The field now
+                # says it: `x-ticvai-caller-sets: <why>` on the property; an empty value says nothing and is not taken.
+                caller = {p for p in bad if isinstance(props.get(p), dict)
+                          and str(props[p].get("x-ticvai-caller-sets") or "").strip()}
+                for p in sorted(caller):
+                    CALLER_SET_NOTES.append(f"{oid}.{p}")
+                bad = [p for p in bad if p not in caller]
                 if bad and persisted:
                     guard.add("C-REQUEST-SERVER-FIELDS", oid,
                               f"{oid}: request body requires server-owned {', '.join(bad)}")
@@ -596,6 +607,9 @@ def main() -> int:
     extra_rules(guard, ops, docs)
     segregation_rules(guard, ops, docs)
     html_rules(guard, ops, docs)
+    if CALLER_SET_NOTES:
+        guard.note(f"C-REQUEST-SERVER-FIELDS: {len(CALLER_SET_NOTES)} field(s) the field says the caller sets "
+                   f"(x-ticvai-caller-sets, CHG-SHP-005): {', '.join(CALLER_SET_NOTES)}")
     return guard.finish()
 
 

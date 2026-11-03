@@ -1,0 +1,51 @@
+id: CHG-R13BO-004
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'Of check-screen-wiring''s 39 started-ticket findings, 22 are fixed in invisible screen metadata (no approved UI
+  changes): reads bound to the component that shows them (ANL-017, ANL-068, BO-219, BO-591, BO-946, CMS-103, POS-026), reads
+  another screen of the same app reaches dropped where nothing shows them (ADM-258 listChannelSaleSchedule, BO-1081 tax invoices
+  and credit memos, BO-618 updateAccreditationProgramme, BO-954 updateSeatMap), the bodies of ADM-113''s decision buttons and
+  BO-156/160/220''s Save named from the row read, GST-073''s form sending enrolMfaMethod and GST-015''s grant over the session''s
+  own subject; the check learns two sources (a form''s confirm.alsoCalls collects its body; inputSources may name session.<id>).
+  17 that would change an approved screen are brought to the lead.'
+decision:
+  what: 'The lead, 3 November 2026: "why are these coming back again and again?", "you get the rest sorted"; fix at the
+    source, never acknowledge, baseline or exempt; approved UI is fixed, so what needs a visible element is brought back
+    (the lead''s rule of 14 October, "the UI is fixed").'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding: r13 release gate (run 20261103-023619-14406), check-screen-wiring S-OP-UNREACHED (R273) 33, S-BUTTON-FORM (R264)
+  5, S-INPUT-SOURCE (CR-142) 1, built on by started tickets (#29763, #35240, #28742, #33108, #33109, #32306, #27858, #30969,
+  #35285, #33474, #35641, #35675, #31775, #29719, #35183, #37050, #30712, #27732, #30672).'
+keys_touched:
+  screens: [ADM-258, ANL-017, ANL-068, BO-219, BO-591, BO-946, BO-618, BO-954, BO-1081, CMS-103, POS-026, ADM-113, BO-156,
+    BO-160, BO-220, GST-073, GST-015]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P16-venue-analytics.yaml
+  - screens/P13-white-label-cms.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - tools/check-screen-wiring.py
+root_class: a declared operation, or a body, that nothing on an approved screen reaches or names
+tickets:
+  started:
+  - 'every backend ticket listed in why: no change; the screens that call their operations are as before or fewer.'
+  - '30712 (GST-073, Chitrangi Mestry): no change; the two-step form sends enrolMfaMethod then verifyMfaEnrolment, as its text says.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 gate fix lane y (fix/r13-y), started-ticket findings, under the lead''s instruction of 3 November 2026'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Left for the lead (approved UI): ADM-258 listChannelSaleRule; ANL-053 createDashboard; BO-022 getTaxInvoice,
+  listTaxInvoices, issueTaxInvoice, getTaxDocumentRendition; BO-023 listCreditMemos, getTaxDocumentRendition; BO-140
+  setTemperatureCheckpoint; BO-620 listAccreditationProgrammes, updateAccreditationProgramme; BO-624
+  updateAccreditationProgramme; BO-837 createContentPage; BO-839 createContentBlock; BO-874 getPrincipal; BO-954 createSeatMap;
+  CMS-007 deleteContentPage. Kept, not dropped: BO-154 and BO-222 createAdmissionRules and POS-026 issueTaxInvoice, whose
+  approved empty states promise the create (S-STATE-BOILERPLATE). Found: GST-015''s path subjectId (the family member) is
+  passed by the check as the session''s subject, which it is not.'

@@ -101,7 +101,13 @@ def policies(backend: Path) -> dict:
     out = {}
     for st in statements(backend):
         m = CALL.match(st)
-        if m and m.group(1) not in ("apply_split_rls", "apply_split_insert_rls"):   # CR-506's variant (CHG-CR506-001)
+        # **A split policy is a policy** (r13 gate, CHG-R13BO-001). apply_split_rls drops the table's policies and
+        # writes its own read and write checks (V0104's definition), so it replaces whatever came before it. It was
+        # skipped here, and the table kept the baseline's class: identity.principal_credential, which V0108 gave its
+        # own-or-home-scope split policy (CHG-R8MIG-007, IDENTITY-C37), was still read as tenant-root only, so
+        # createPrincipal, forceLogout and resetPrincipalCredential at a venue were reported as writes the policy
+        # refuses while V0108 lets them through. CR-506's variant (CHG-CR506-001) is read the same way.
+        if m:
             out[fwd.unq(m.group(2))] = (m.group(1), m.group(3))
     return out
 
@@ -157,6 +163,24 @@ def classes(pol: dict) -> dict:
             return "tenant"
         return "scope"
 
+    def check_class(expr: str, depth: int) -> str:
+        """One check of a split policy: 'any' when any grant holder or signed-in session passes it, 'above' when it
+        reads above the owner, else as write_of reads it (scope, subject or the tenant root alone). A branch that is
+        `EXISTS (SELECT 1 FROM <parent> ...)` passes where the parent's row is visible, so it takes the parent's read
+        class (marketing.guest_profile through its segment, CHG-R11GST-002)."""
+        if re.search(r"grant_holder\(\)|signed_in\(\)|cardinality\(platform\.current_scope_paths\(\)\)\s*>\s*0", expr):
+            return "any"
+        if "above_scope(" in expr:
+            return "above"
+        base = write_of(expr)
+        if base in ("subject", "tenant"):
+            wide = ("tenant", "subject", "scope", "above", "any")
+            for par in re.findall(r"EXISTS \(SELECT 1 FROM ([a-z_]+\.[a-z_0-9]+)", expr):
+                pc = cls(par, depth + 1) if par in pol else None
+                if pc and pc[0] in wide and wide.index(pc[0]) > wide.index(base):
+                    base = pc[0]
+        return base
+
     def cls(t: str, depth: int = 0):
         if t in memo:
             return memo[t]
@@ -187,6 +211,11 @@ def classes(pol: dict) -> dict:
             # a guest's row that belongs to no scope, read and written by any staff grant and by its own guest
             # (x-ticvai-rls grant-holder-write, CHG-R11FXC-003)
             r = ("any", "any")
+        elif helper in ("apply_split_rls", "apply_split_insert_rls"):
+            # the two checks it was given, read and write: any grant, at or above the owner, the owner's scope, the
+            # subject, or the tenant root alone (CHG-R13BO-001)
+            q = [x.replace("''", "'") for x in re.findall(r"'((?:[^']|'')*)'", args or "")]
+            r = (check_class(q[0], depth), check_class(q[1], depth)) if len(q) >= 2 else None
         elif helper in PARENT_HELPERS:
             p = parent_of(args)
             pc = cls(p, depth + 1) if p else None

@@ -645,7 +645,6 @@ paths:
     patch:
       operationId: updateSeatMap
       x-ticvai-consumed-by:
-        - "P08 BO-954 Venue Canvas"
         - "P08 BO-955 Sections & Zones"
       x-ticvai-audience:
       - staff
