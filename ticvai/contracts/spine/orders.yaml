@@ -18512,6 +18512,7 @@ components:
                 format: uuid
                 nullable: true
                 x-ticvai-subject-kind: contact
+                x-ticvai-references: pii.subject
                 description: '**The organisation''s contact, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `name`, `email`, `phone` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind contact; null while none is given.'
               role:
                 type: string
@@ -18667,6 +18668,7 @@ components:
                 format: uuid
                 nullable: true
                 x-ticvai-subject-kind: guest
+                x-ticvai-references: pii.subject
                 description: '**The participant, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `fullName`, `email`, `phone`, `dateOfBirth` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
               id:
                 type: string
@@ -23897,6 +23899,7 @@ components:
           format: uuid
           nullable: true
           x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
           description: '**The invited guest, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `recipientName`, `recipientEmail` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string
@@ -25000,6 +25003,7 @@ components:
           format: uuid
           nullable: true
           x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
           description: '**The named holder of the line, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string

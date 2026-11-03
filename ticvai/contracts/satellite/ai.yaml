@@ -3918,7 +3918,7 @@ paths:
         the memory rule keeps for aged conversations (ai-system-design.md 3.9: the summary, entities and embedding carry
         the subject and go with it); in `ai.activity` it clears `prompt`, `response` and `sources` of the subject''s
         rows and keeps the metering (tokens, cost, outcome), which the tenant''s bill needs and which names no one once
-        the subject is erased. `ai.decision_record` holds personal content only by reference (`subject_ref`,
+        the subject is erased. The decision record holds personal content only by reference (`subject_ref`,
         `inputs_ref` to the activity row), never as a value, so the hash chain stays whole and nothing personal is left
         in it. `rowsLeft` counts every one of these tables.
 

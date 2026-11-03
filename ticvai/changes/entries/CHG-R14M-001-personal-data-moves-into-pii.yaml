@@ -74,6 +74,9 @@ keys_touched:
   - tools/check-contract-storage.py
   - tools/check-stored-request-fields.py
   - tools/run-checks.py
+  - tools/derive-delivery-slice.py
+  - tools/check-schema-drift.py
+  - handoff/api-data-lineage-overrides.json
   other: [the jobs of 26 contracts (x-ticvai-jobs.subjectDataPart), identity x-ticvai-jobs guestErasure and
       subjectExport, identity x-ticvai-queries.subjectDetails]
 root_class: 'personal data with no machine-readable mark, so where it was kept, who could read it and what erasure and
@@ -206,7 +209,8 @@ prevention:
 status: open
 notes: 'Generator rules beside the check: derive-schema (x-ticvai-pii fields get no column; `personal` and `dataClass`
   in the schema reference), derive-ddl (the moved columns retired with their copy in migration-review.md, "personal data
-  moved"), derive-subject-data-register (keyed on any subject column, x-ticvai-pii and kept personal columns; `owners`
+  moved", judged by check-schema-drift as a retired column), derive-delivery-slice (a privacy part''s reads marked
+  feedsSetup: false pull no writer into the slice, so the export''s reach moves no screen into Block A), derive-subject-data-register (keyed on any subject column, x-ticvai-pii and kept personal columns; `owners`
   by contract). Not settled here, for the lead: the control database''s people (B-02, ADR-0043: no pii schema and no
   PII permission there yet; fields marked, not moved, responses not gated) and the ledger''s tax-document buyer names
   (tax-law retention). Beyond the brief''s words: staff principals and sessions get a pii.subject (kind employee) to hold

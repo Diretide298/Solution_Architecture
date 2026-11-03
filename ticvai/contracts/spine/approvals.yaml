@@ -5767,6 +5767,7 @@ components:
           format: uuid
           nullable: true
           x-ticvai-subject-kind: applicant
+          x-ticvai-references: pii.subject
           description: '**The badge holder, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind applicant; null while none is given.'
         scopePath:
           type: string

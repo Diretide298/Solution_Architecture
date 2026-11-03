@@ -124,8 +124,8 @@ def copy_steps(table: str, column: str, store: str, subject_column: str, kind: s
                      f"for each row's `{column}`: run by the application's one-off job, never in SQL, since the "
                      "key is the application's")
     else:
-        steps.append(f"3. copy: insert a `pii.subject_network_identifier` (subject_id, source_table `{table}`, "
-                     f"source_id the row's id, ip_address, captured_at the row's time) for each row's `{column}`")
+        steps.append(f"3. copy: insert a `pii.subject_network_identifier` (subject_id, record_table `{table}`, "
+                     f"record_id the row's id, ip_address, captured_at the row's time) for each row's `{column}`")
     steps.append(f"4. drop: the four-step drop of `{table}.{column}` (its NOT NULL now, stop every read and write, "
                  "then DROP COLUMN in a later forward migration once the copy is verified by count)")
     return "; ".join(steps)

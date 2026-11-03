@@ -5346,64 +5346,94 @@ paths:
         for: 'the guest''s documents, for its part of the export (CHG-R11FXC-005)'
       - table: marketing.attribution_touch
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.booking_consent_record
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.case
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.case_service_action
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.challenge_progress
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.communication_policy_decision
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.conversation
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.device_consent
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.guest_device
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.guest_document_upload
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.guest_note
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.guest_preference
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.guest_relationship
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.invitation
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.journey_enrollment
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.lost_item
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.loyalty_position
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.message_dispatch
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.privacy_action
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.privacy_audit_event
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.privacy_exception
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.privacy_request
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.referral
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.review
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.subscription
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.suppression
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.touch_point
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.waiver_requirement
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.waiver_signature
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       - table: marketing.wishlist_item
         for: 'the guest''s rows, for its part of the export (r13 review B-01, CHG-R14M-001)'
+        feedsSetup: false
       x-ticvai-writes:
       - table: marketing.guest_profile
         for: 'for deletion, the profile''s personal fields kept on the row (preferredChannel, guestLinkId) cleared (r13
@@ -22879,18 +22909,21 @@ components:
           format: uuid
           nullable: true
           x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
           description: '**The guardian, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `guardianName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         signerSubjectId:
           type: string
           format: uuid
           nullable: true
           x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
           description: '**The person who signed, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `signedName`, `ipAddress` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         participantSubjectId:
           type: string
           format: uuid
           nullable: true
           x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
           description: '**The person the waiver covers, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `subjectName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string

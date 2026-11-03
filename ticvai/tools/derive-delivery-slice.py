@@ -133,6 +133,29 @@ LATER_BLOCK_OPERATIONS = {
     "publishPricingEffectiveDate": "dates a pricing change request; bulkChangePrices needs none (ADAM CR-544; CHG-R13INT-020)",
     "setPackagePricingDefinition": "defines a package price; bulkChangePrices only skips a fixed package price (ADAM CR-544; CHG-R13INT-020)",
 }
+# **A guest's privacy part reads what exists; those reads feed no setup** (r13 system review B-01; the lead, 3 November
+# 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). An owner's part of a guest's export
+# reads every table of its module that holds the guest, and an empty table is a correct answer (the part says
+# rowCount 0). A read the contract marks `feedsSetup: false` (on its x-ticvai-reads entry) makes no writer of that table
+# setup, so a module's export reach does not pull the module's screens into Block A; the reads exportSubjectData's
+# done-when needs (CHG-R11FXC-005: consent records, profile, form submissions, documents) stay unmarked and feed it.
+
+
+def reads_feeding_no_setup() -> set:
+    """(operationId, table) for each x-ticvai-reads entry marked feedsSetup: false."""
+    out = set()
+    for f in sorted((ROOT / "contracts").glob("*/*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        for item in (doc.get("paths") or {}).values():
+            for op in (item or {}).values() if isinstance(item, dict) else []:
+                if not isinstance(op, dict):
+                    continue
+                for r in op.get("x-ticvai-reads") or []:
+                    if isinstance(r, dict) and r.get("feedsSetup") is False:
+                        out.add((op.get("operationId"), str(r.get("table"))))
+    return out
+
+
 LATER_BLOCK_SCREENS = {
     "BO-1191": "Organisation, Block B (CHG-R6-040)",
     "BO-1192": "Entitlement Templates, Block B (CHG-R6-040)",
@@ -210,9 +233,10 @@ def main() -> int:
             core.setdefault(o, set()).add(why)
     slice_ = set(core)
     setup_for: dict[str, set[str]] = defaultdict(set)  # setup op -> tables it makes non-empty
+    quiet = reads_feeding_no_setup()
     while True:
         read = {t for o in slice_ for t in (lineage.get(o, {}).get("reads") or [])
-                if not t.startswith("cache:")}
+                if not t.startswith("cache:") and (o, t) not in quiet}
         add = set()
         for t in read:
             if writers[t] & slice_:

@@ -384,7 +384,7 @@ x-ticvai-queries:
     inputs:
       ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject ids asked for: the subject columns of the asker''s rows (`subjectId`, `holderSubjectId`, ...).'}
       fields: {type: array, items: {type: string}, description: 'The x-ticvai-pii stores the asker answers with (`subject.displayName`, `contact.email`, `document.number`, `identifier.ipAddress`, ...); only those come back.'}
-      source: {type: object, additionalProperties: true, description: 'For `identifier.ipAddress`: the asker''s table and row ids (`sourceTable`, `sourceIds`) whose network identifiers are asked for.'}
+      record: {type: object, additionalProperties: true, description: 'For `identifier.ipAddress`: the asker''s table and row ids (`recordTable`, `recordIds`) whose network identifiers are asked for.'}
     returns:
       type: array
       description: 'One entry per subject found, with the asked fields; an erased subject (is_erased) answers its id, `erased: true` and no field.'
@@ -960,7 +960,7 @@ paths:
         subject''s primary `pii.subject_contact` of that kind, normalised and hashed as registerGuest does, unverified;
         `document.number` as a `pii.subject_document` (kind from `documentKind`, `other` when not sent), encrypted
         into `number_ciphertext` through KERNEL-FIELD-ENC (ADR-0063 section 5) with `number_last4`;
-        `identifier.ipAddress` as a `pii.subject_network_identifier` naming the module''s `sourceTable` and `sourceId`.
+        `identifier.ipAddress` as a `pii.subject_network_identifier` naming the module''s `recordTable` and `recordId`.
         Writes no event: an event would copy the fields into the outbox (CHG-XDW-005''s rule).'
       tags:
       - identity
@@ -12676,13 +12676,13 @@ components:
     SubjectNetworkIdentifier:
       type: object
       x-ticvai-persistence: pii.subject_network_identifier
-      x-ticvai-index: [[sourceTable, sourceId]]
+      x-ticvai-index: [[recordTable, recordId]]
       description: '**The IP address a person''s row was made from, kept apart from the row** (r13 system review B-01;
         the lead, 3 November 2026, "Move the columns"; ADR-0023 as amended 3 November 2026; CHG-R14M-001). A form
         submission, a waiver signature, a rental agreement signature or a staff session no longer holds its IP address:
         `recordSubjectDetails` writes it here against the subject and the module''s row, `subjectDetails` reads it back,
         and erasure deletes it with the subject''s other pii.* rows. Storage only, never returned by itself.'
-      required: [id, subjectId, sourceTable, sourceId, ipAddress, capturedAt]
+      required: [id, subjectId, recordTable, recordId, ipAddress, capturedAt]
       properties:
         id:
           type: string
@@ -12693,11 +12693,11 @@ components:
           format: uuid
           x-ticvai-references: pii.subject
           description: The person whose address it is.
-        sourceTable:
+        recordTable:
           type: string
           maxLength: 63
           description: The module's table the row is in (`marketing.form_submission`, `rental.agreement_signature`, ...).
-        sourceId:
+        recordId:
           type: string
           format: uuid
           description: The id of that row.
@@ -12784,11 +12784,11 @@ components:
         networkIdentifier:
           type: object
           nullable: true
-          required: [ipAddress, sourceTable, sourceId]
+          required: [ipAddress, recordTable, recordId]
           properties:
             ipAddress: {type: string, maxLength: 45, x-ticvai-data-class: personal}
-            sourceTable: {type: string, maxLength: 63}
-            sourceId: {type: string, format: uuid}
+            recordTable: {type: string, maxLength: 63}
+            recordId: {type: string, format: uuid}
     SubjectDetails:
       type: object
       x-ticvai-persistence: none — projection over pii.subject, pii.subject_contact, pii.subject_document and pii.subject_network_identifier
@@ -12812,8 +12812,8 @@ components:
           items:
             type: object
             properties:
-              sourceTable: {type: string}
-              sourceId: {type: string, format: uuid}
+              recordTable: {type: string}
+              recordId: {type: string, format: uuid}
               ipAddress: {type: string, x-ticvai-data-class: personal}
     PrincipalExternalIdentity:
       type: object
@@ -13139,6 +13139,7 @@ components:
           format: uuid
           nullable: true
           x-ticvai-subject-kind: employee
+          x-ticvai-references: pii.subject
           description: '**The signed-in person (their principal''s subject), as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `ipAddress` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind employee; null while none is given.'
         status:
           allOf:
@@ -14189,6 +14190,7 @@ components:
           format: uuid
           nullable: true
           x-ticvai-subject-kind: employee
+          x-ticvai-references: pii.subject
           description: '**The principal, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `email` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind employee; null while none is given.'
         email:
           x-ticvai-pii: {store: contact.email, subject: subjectId}
