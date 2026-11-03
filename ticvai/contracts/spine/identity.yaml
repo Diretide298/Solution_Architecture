@@ -13569,7 +13569,7 @@ components:
             - minLength
             - pinLength
             - requireBreachCheck
-            description: 'The first rule that failed, checked in this order. For a password: `minLength` (shorter
+            description: 'The first rule that failed, the rules checked one after another. For a password: `minLength` (shorter
               than `PasswordPolicy.minLength`), then `requireBreachCheck` (found in the breached-password corpus;
               this check runs only when the tenant''s `requireBreachCheck` is true, after the length check). For a
               PIN: `pinLength` (not exactly `PasswordPolicy.pinLength` digits).'
