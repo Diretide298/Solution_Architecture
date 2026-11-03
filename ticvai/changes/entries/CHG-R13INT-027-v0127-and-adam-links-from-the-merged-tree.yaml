@@ -1,0 +1,42 @@
+id: CHG-R13INT-027
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'The forward migrations after V0126, written once by the refresh on the merged tree (backend/tenant/V0127__after_r1_20261103.sql;
+  backend/control/V0127__after_r1_20261103.sql and V0128__names_after_r1_20261103.sql), and ADAM''s ticket links rebuilt
+  from the same refreshed tree (tools/adam-links.py, no token: statuses carried), so setRolePermissions links identity#setRolePermissions,
+  are committed as CHG-R13INT-008 did.'
+decision:
+  what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
+    new finding at its source, never by baselining, acknowledging or exempting. The lane brief: "the integration refresh
+    writes the release''s migration once for all lanes"; docs/active/release-runbook.md section 4 (adam-links.py after the
+    full refresh, before the release gate).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-525): check-ticket-links TL-DEAD-LINK on tenancy#setRolePermissions and on the V0127 files the refresh
+  wrote.'
+keys_touched:
+  files:
+  - backend/tenant/V0127__after_r1_20261103.sql
+  - backend/control/V0127__after_r1_20261103.sql
+  - backend/control/V0128__names_after_r1_20261103.sql
+  - handoff/service-docs/adam-links.json
+root_class: release-time outputs the refresh does not write, judged by the gate before they are made
+tickets:
+  started: []
+  unstarted:
+  - the [DB] tasks of CHG-R13PL-053 to -070 and R13-DB-SHARED gain the V0127 files.
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-525
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ticket-links.py
+status: open
+notes: 'Every change in V0127 has its [DB] task: identity.session.grant_id and principal.email (R13-DB-SESSION-GRANT-AND-PRINCIPAL-EMAIL),
+  marketing.guest_document_upload (CR521-GUEST-DOCUMENT-UPLOAD-DB), guest_extra_field and the grant-holder policies (R13-DB-GRANT-HOLDER-AND-SCOPE-POLICIES),
+  the venue_settings, ticket_transfer and order_event policies (R13-DB-ORDERS-AND-VENUE-SETTINGS-POLICIES), catalogue.product
+  and import_job (CR504-542-DB-CATALOGUE-PRODUCT-AND-IMPORT), import_job_row (CR542-IMPORT-JOB-ROW-DB), access.entitlement
+  (CR543-DB-ENTITLEMENT-FREEZE-WINDOW), the approvals.rule grant (R13-DB-IN-PROCESS-READ-GRANTS) and the control plan keys
+  (R13-DB-CONTROL-PLAN-VERSION-KEYS).'

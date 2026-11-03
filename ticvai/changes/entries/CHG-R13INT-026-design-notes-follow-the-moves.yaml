@@ -1,0 +1,39 @@
+id: CHG-R13INT-026
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: The design notes and BO-071's source cite setRolePermissions in identity.yaml (CR-525 moved it there), and WEB-006's
+  correction quotes searchCatalogue's swimmer rule as CR-532 wrote it; ADM-258's gap note counts the 2 operations it declares
+  (tools/applied/r13-review-stale-screen-text.py, run again).
+decision:
+  what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
+    new finding at its source, never by baselining, acknowledging or exempting. ADAM CR-525 and CR-532 (lanes w3, w4) and
+    the review lane x2''s stale-text rule (CHG-R13RVB-004).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-525, CR-532): check-design-notes, "no operation or schema setRolePermissions in contracts/spine/tenancy.yaml"
+  (3) and the searchCatalogue quote; check-screen-wiring S-NOTES-STALE ADM-258.'
+keys_touched:
+  screens:
+  - BO-054
+  - BO-071
+  - BO-116
+  - WEB-006
+  - ADM-258
+  files:
+  - handoff/design-notes/platform-foundation.yaml
+  - handoff/design-notes/venue-operations.yaml
+  - handoff/design-notes/ticketing-guest.yaml
+  - screens/P08-venue-back-office.yaml
+root_class: a citation left at a contract an operation moved out of
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-525
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-design-notes.py
+status: open

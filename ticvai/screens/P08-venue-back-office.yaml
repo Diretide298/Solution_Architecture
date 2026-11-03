@@ -21059,7 +21059,7 @@ screens:
       administration and have nothing to do with maintenance plans. Only createMaintenancePlan was bound;
       updateMaintenancePlan (PATCH, suspend) exists and a plan library that cannot change a plan is incomplete
       (design-notes correction venue-operations BO-071).'
-    source: screens/P08-venue-back-office.yaml#BO-071 | contracts/spine/tenancy.yaml#setRolePermissions
+    source: screens/P08-venue-back-office.yaml#BO-071 | contracts/spine/identity.yaml#setRolePermissions
       | contracts/satellite/maintenance.yaml#updateMaintenancePlan
 - id: BO-072
   name: Incident Log
@@ -194022,7 +194022,7 @@ screens:
     operational/configuration status.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 3 operations.** Unserved: POS,
+    why: '**The pack names 8 actions on this screen and the screen declares 2 operations.** Unserved: POS,
       Mobile POS, Flying POS, Call Center, API, Partner Portal, Third-Party Channel, Custom Channel. Each
       needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
       the screen side rather than the contract side.'

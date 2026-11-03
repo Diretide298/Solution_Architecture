@@ -1,0 +1,31 @@
+id: CHG-R13INT-024
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'WEB-005''s collection as merged (CR-503''s Date of visit row and CR-504''s card badge and rating) is listed in
+  docs/active/approved-ui-changes.yaml against the two approvals: each lane listed its own change against the earlier content,
+  and the merge is the content with both.'
+decision:
+  what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
+    new finding at its source, never by baselining, acknowledging or exempting. ADAM CR-503 and CR-504, settled 3 November
+    2026 by Chinmay on #31739; the client-verified frame is unchanged.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-503, CR-504): check-approved-ui AU-FIELD WEB-005 region:collection, to 09b4696c39017154.'
+keys_touched:
+  screens:
+  - WEB-005
+  files:
+  - docs/active/approved-ui-changes.yaml
+root_class: two approved changes to one field, each listed against content the merge replaced
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-504
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py::AU-FIELD
+status: open

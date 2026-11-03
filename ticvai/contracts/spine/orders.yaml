@@ -9242,6 +9242,7 @@ paths:
   /ticket-transfers:
     get:
       operationId: listTicketTransfers
+      x-ticvai-names-for-context: [orders.cart, orders.sales_order]
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"

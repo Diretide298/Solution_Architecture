@@ -1,0 +1,35 @@
+id: CHG-R13INT-022
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'restoreWalletConfigurationVersion no longer declares platform.audit_record as its write: the audit interceptor
+  writes the reason (ADAM CR-376), so the declared write made check-write-lineage read the operation as writing its own
+  audit row (W-AUDIT); check-request-fields-stored accepts x-ticvai-stored-as platform.audit_record.<column> for an operation
+  that does not write its own audit row.'
+decision:
+  what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
+    new finding at its source, never by baselining, acknowledging or exempting. ADAM CR-376 (the audit interceptor writes
+    the reason on the request''s audit context to platform.audit_record.reason), as lane y recorded it (CHG-R13BO-002).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-376): check-write-lineage W-AUDIT restoreWalletConfigurationVersion, "writes platform.audit_record
+  and does not declare x-ticvai-audits-itself, so the interceptor writes a second row".'
+keys_touched:
+  operations:
+  - restoreWalletConfigurationVersion
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-request-fields-stored.py
+root_class: one fact (the kernel writes the audit row) declared in a way a second check reads the other way
+tickets:
+  started: []
+  unstarted:
+  - '30857 (restoreWalletConfigurationVersion): no change; the interceptor writes the reason.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-376
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py::W-AUDIT
+status: open

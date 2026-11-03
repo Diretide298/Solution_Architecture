@@ -2026,7 +2026,9 @@ paths:
                     (ADAM CR-544).
       responses:
         '403':
-          description: 'The caller lacks the permission (`forbidden`), or a real run escalates and the caller holds no `PRICE_CONFIGURE` (`price-escalation-required`).'
+          description: 'The caller lacks the permission (`forbidden`), or a real run escalates
+            (`BulkPriceResult.escalates`) and the caller holds no `PRICE_CONFIGURE` (`price-escalation-required`);
+            nothing changes (ADAM CR-544).'
           x-ticvai-problem-types: [forbidden, price-escalation-required]
           content:
             application/problem+json:
@@ -2046,14 +2048,6 @@ paths:
           description: 'An adjustment that takes any price below zero (naming the price), or a future `effectiveFrom`
             (a future-dated change goes through a pricing change request); the whole run is refused and nothing
             changes (ADAM CR-544).'
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
-        '403':
-          x-ticvai-problem-types: [price-escalation-required]
-          description: 'A real run that escalates (`BulkPriceResult.escalates`), from a caller without `PRICE_CONFIGURE`;
-            nothing changes (ADAM CR-544).'
           content:
             application/problem+json:
               schema:

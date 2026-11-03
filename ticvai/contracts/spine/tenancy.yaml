@@ -2804,6 +2804,9 @@ paths:
         format: uuid
     post:
       operationId: enrolDevice
+      x-ticvai-writes:
+      - table: tenancy.device_audit
+        for: 'the audit row of the move, in the same transaction (ADAM CR-485; r13 integration, CHG-R13INT-023)'
       x-ticvai-consumed-by:
         - "P08 ADM-581 Terminal Provisioning & Device Configuration"
         - "P08 BO-196 Physical Device Registration & Provisioning"

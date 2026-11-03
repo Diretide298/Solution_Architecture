@@ -1,0 +1,31 @@
+id: CHG-R13INT-025
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'bulkChangePrices has one 403: lane x2''s (forbidden or price-escalation-required) and lane w1''s (price-escalation-required)
+  were both kept by the merge, and YAML keeps only the last.'
+decision:
+  what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
+    new finding at its source, never by baselining, acknowledging or exempting. ADAM CR-544 (lane w1) and the review lane
+    x2''s declared refusals (CHG-R13RVB-002).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-544): check-yaml-keys, "contracts/spine/catalogue.yaml:2053: key 403 repeats the one at line 2028";
+  check-package the same.'
+keys_touched:
+  operations:
+  - bulkChangePrices
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: a merge that kept two copies of one response
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-544
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-yaml-keys.py
+status: open

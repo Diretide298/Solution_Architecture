@@ -1,0 +1,36 @@
+id: CHG-R13INT-023
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'The second CR round''s texts that name a table: enrolDevice writes its tenancy.device_audit row (x-ticvai-writes,
+  as its CR-485 text says), and addLicenceAddOn (control.module_listing, CR-535: "which this operation does not read") and
+  listTicketTransfers (orders.cart and orders.sales_order, CR-502''s comparison) name them for context.'
+decision:
+  what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
+    new finding at its source, never by baselining, acknowledging or exempting. ADAM CR-485, CR-502 and CR-535 (lanes w2,
+    w5), as their texts say.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (ADAM CR-485, CR-502, CR-535): check-parameter-columns 4 new P-NAMED-TABLE.'
+keys_touched:
+  operations:
+  - enrolDevice
+  - addLicenceAddOn
+  - listTicketTransfers
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/orders.yaml
+root_class: a table a description names that the lineage does not list
+tickets:
+  started: []
+  unstarted:
+  - 'enrolDevice''s ticket: the audit row as its text says.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-485
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py::P-NAMED-TABLE
+status: open

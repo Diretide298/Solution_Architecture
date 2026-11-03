@@ -3871,9 +3871,6 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
-      x-ticvai-writes:
-      - table: platform.audit_record
-        for: 'the body''s reason, in the audit row''s reason (ADAM CR-376; r13 gate, CHG-R13BO-002)'
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

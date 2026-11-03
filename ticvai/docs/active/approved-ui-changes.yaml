@@ -838,3 +838,11 @@ changes:
     client-verified frame (wireframes/P01 Guest Web.dc.html#web-005) draws the POPULAR / BEST VALUE pill and the star
     line on each ticket card; the record binds the two fields to them, and what the client sees does not change.'
   change: CHG-CR504-001
+- screen: WEB-005
+  field: 'region:collection'
+  to: 09b4696c39017154
+  approval: 'The two approvals above together, as merged into r13 (3 November 2026): ADAM CR-503''s Date of visit row
+    from getPerformance and ADAM CR-504''s highlight badge and rating on the ticket cards, both settled 3 November 2026
+    by Chinmay on #31739; each entry approved its own change against the earlier content, and this is the content
+    with both. What the client sees is the client-verified frame (wireframes/frames/web-005.html).'
+  change: CHG-R13INT-024

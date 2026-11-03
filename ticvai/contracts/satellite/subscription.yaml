@@ -2511,6 +2511,7 @@ paths:
         format: uuid
     post:
       operationId: addLicenceAddOn
+      x-ticvai-names-for-context: [control.module_listing]
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-007 Module & Feature Entitlement"

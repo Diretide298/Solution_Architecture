@@ -1,0 +1,35 @@
+id: CHG-R13INT-021
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'Flow F303 (the finance dashboard board) no longer has its first step call listTaxInvoices and listCreditMemos
+  from BO-1081: lane y dropped the two reads from BO-1081, where nothing shows them (CHG-R13BO-004); ANL-072, the next step,
+  keeps them.'
+decision:
+  what: 'The r13 integration gate after every lane merged (refresh-safe on fix/r13-integration, 3 November 2026): fix every
+    new finding at its source, never by baselining, acknowledging or exempting. The r13 review lane y (CHG-R13BO-004): "a
+    declared read another screen of the same app reaches is dropped where nothing shows it".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (r13 review, CHG-R13BO-004): check-flows, "step 1 calls listTaxInvoices from BO-1081, but BO-1081 does not
+  declare it" (and listCreditMemos).'
+keys_touched:
+  screens:
+  - BO-1081
+  operations:
+  - listTaxInvoices
+  - listCreditMemos
+  files:
+  - flows/F303-ticvai-finance-backend-structure-reference-v1-0-board-1-fina.yaml
+root_class: a flow step left naming a read its screen no longer declares
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 integration gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flows.py
+status: open
