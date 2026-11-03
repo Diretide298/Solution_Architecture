@@ -1,0 +1,77 @@
+id: CHG-R14G-003
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'The backend starter had no authentication, no ITenantContext implementation, one Database:ConnectionString for the
+  process (one database, against ADR-0038) and nothing setting ticvai.* per transaction; ITenantContext said "set on the connection".
+  Now TenantResolutionMiddleware resolves the request''s host to its tenant (ITenantDirectory) before authentication, and
+  no tenant header is read; JWT bearer authentication (RS256, the cell''s keys) applies TenantBinding to every validated token:
+  a tenant claim (tid for serviceAuth) other than the host''s tenant, a missing or dead sid, or a session of another tenant
+  is 401. TicvaiDbContext connects to that tenant''s database (Tenants:Entries, a database each); every transaction opens
+  with set_config(ticvai.scope_paths / subject_id / principal_id, ..., true), which is SET LOCAL, from ScopeContextInterceptor,
+  run through ITransactionRunner; ITenantContext.TenantId is a Guid, with the subject and principal; /health is 503 when a
+  tenant database does not answer; every log line and span carries tenant_id, region_id and venue_id. Integration tests: a
+  token of tenant B at tenant A''s host is 401, with or without a tenant header; a session of another tenant is 401; an unknown
+  host 404; health 503. A PostgreSQL test (the pipeline''s service) proves a query without the context sees no rows and nothing
+  leaks to the next user of a pooled connection.'
+decision:
+  what: 'Review findings G-03 (HIGH), the starter side of C-05 (HIGH) and G-11 (the TenantId string/Guid split, no log enricher,
+    /health blind to the database): a tenant-routing data path keyed by the token''s tenant, a transaction interceptor issuing
+    the three SET LOCALs, authentication in the pipeline, and a test that a query without the context sees no rows. Lane h
+    states the contract rule (common.yaml bearerAuth/guestAuth, CHG-R14H-002); the starter implements it. The lead, 3 November
+    2026, after reading the r13 system review triage: "All four, one release" (the starters, device/guest/token access, gate
+    integrity, tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review G-03, G-11 (findings/G-starters.md) and C-05 (findings/C-security-ai.md); ADR-0038; backend/MIGRATIONS.md
+  "The connection context" (CHG-R8MIG-007); ADR-0056.
+keys_touched:
+  files:
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Middleware/TenantResolutionMiddleware.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Middleware/RequestLogContextMiddleware.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Security/AuthenticationSetup.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Security/TokenOptions.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Health/TenantDatabasesHealthCheck.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Extensions/ApplicationBuilderExtensions.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Extensions/ServiceCollectionExtensions.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/Program.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/TICVAI.Api.csproj
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Api/appsettings.json
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/ITenantContext.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/ITenantDirectory.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/ISessionRegistry.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Persistence/ITransactionRunner.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/Tenancy/
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/Persistence/ScopeContextInterceptor.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/Persistence/EfTransactionRunner.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/TICVAI.Infrastructure.csproj
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/Configuration/DatabaseOptions.cs (removed)
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.UnitTests/Security/TenantBindingTests.cs
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.IntegrationTests/
+  - viewer/mcp/setup/starters/backend/README.md
+  - viewer/mcp/setup/starters/backend/CLAUDE.md
+  - viewer/mcp/setup/starters/docs/backend-patterns.md
+  - tools/check-starter-fit.py
+root_class: a starter that names the tenant and row-security concepts but leaves every mechanism, and steers the wrong way
+  on one database and a session-level SET
+tickets:
+  started:
+  - '#27692 [BE] Request kernel: hostname to tenant routing, per-transaction scope (Ready for QA): authentication refuses
+    401 a token whose tenant claim is not the host''s tenant or whose sid names another tenant''s session (CHG-R14H-002);
+    the context is set with SET LOCAL / set_config(..., true) at the start of every transaction; TenantId is a Guid.'
+  - '#37051 [BE] Service sign-in between deployables (Ready for QA): a serviceAuth token''s tid must equal the host-resolved
+    tenant; the call runs at the tenant root.'
+  unstarted:
+  - '#27691 [BE] Observability: the starter now pushes tenant_id, region_id and venue_id on every log line and span; build
+    on it.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py::SF-TENANT
+status: open
+notes: SF-RLS-CONTEXT holds the SET LOCAL half (the three settings read from MIGRATIONS.md). The unknown-host answer is the
+  starter's 404 not-found; lane h owns the contract wording.

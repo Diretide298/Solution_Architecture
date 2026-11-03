@@ -214,7 +214,7 @@ const setup = (args) => ps(SETUP, [...base, ...args], ENV);
 const registeredFor = () => (existsSync(path.join(BIN, 'registered.txt')) ? readFileSync(path.join(BIN, 'registered.txt'), 'utf8') : '');
 const ADAM_ITEMS = ['.claude', 'CLAUDE.md', 'project-bible'];
 const STARTER_CODE = ['apps', 'packages', 'nx.json', 'package.json', 'pnpm-lock.yaml', 'tsconfig.base.json', '.eslintrc.cjs',
-  '.github', '.gitignore', 'README.md', 'src', 'tests', 'TICVAI-Backend.slnx', 'Directory.Build.props', 'BannedSymbols.txt', 'docs'];
+  '.github', '.gitlab-ci.yml', '.gitignore', 'README.md', 'src', 'tests', 'TICVAI-Backend.slnx', 'Directory.Build.props', 'BannedSymbols.txt', 'docs'];
 
 /** A bare "team repository" with one commit, standing in for GitLab. */
 function teamRepo(name, files) {
@@ -456,6 +456,14 @@ ok(fromStarter.code === 0 && existsSync(path.join(STARTED, 'DemoShop-Backend.sln
 ok(existsSync(path.join(STARTED, '.git')) && git(['log', '--oneline'], STARTED).trim().split('\n').length === 1,
   'as a new git repository with the starter as its first commit');
 ok(!readFileSync(path.join(STARTED, 'CLAUDE.md'), 'utf8').includes('TICVAI'), 'its CLAUDE.md is renamed too');
+// r13 review G-10: a team repository that cannot be cloned stops setup. It never falls back to the starter,
+// which would be a repository with its own history that lives nowhere else (for ai, a folder with no code).
+const NOCLONE = path.join(PLACES, 'no-access-backend');
+const noClone = await setup(['-Role', 'backend', '-Folder', NOCLONE, '-RepoUrl', path.join(WORK, 'team-src', 'no-such-repo.git')]);
+ok(noClone.code !== 0 && /Could not clone/.test(noClone.text) && !existsSync(NOCLONE),
+  '**a team repository that cannot be cloned stops setup: no starter copy, no folder left behind**',
+  `code ${noClone.code}, folder ${existsSync(NOCLONE)}
+${noClone.text.slice(-800)}`);
 
 // ── 4. -UseStarter ───────────────────────────────────────────────────
 

@@ -1,0 +1,42 @@
+id: CHG-R14G-007
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: The starter's Money had no scale (Round took it from the caller), serialised as {"Amount":1.235,"Currency":"OMR"}
+  (a JSON number), accepted a 5-dp AED, and had no minor-units list and no allocation. Now Money is {Amount, Currency, Scale}
+  (0 to 4); it refuses an amount with more places than its scale, combines only one currency at one scale, rounds back to
+  its scale, and Allocate splits it by weight without losing a minor unit (largest remainder). MoneyJsonConverter writes and
+  reads the contract's {"amount":"1.235","currency":"OMR","scale":3} and refuses a number, a missing field or too many places.
+  CurrencyMinorUnits is the ISO 4217 list beside Money (CR-192), used by Money.InMinorUnits for a currency other than the
+  trading one. Tests run on AED and OMR.
+decision:
+  what: 'Review finding G-07 (HIGH): add the scale and the kernel minor-units table, validate the amount against the scale,
+    write a string JSON converter, add Allocate, and test AED and OMR. The lead, 3 November 2026, after reading the r13 system
+    review triage: "All four, one release" (the starters, device/guest/token access, gate integrity, tenant setup and stale
+    docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review G-07 (findings/G-starters.md); ADR-0008; common.yaml Money (ADAM CR-192, CHG-R10ORD-018).
+keys_touched:
+  files:
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Domain/ValueObjects/Money.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Domain/ValueObjects/MoneyJsonConverter.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Domain/ValueObjects/CurrencyMinorUnits.cs
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.UnitTests/Domain/KernelTests.cs
+  - viewer/mcp/setup/starters/docs/backend-patterns.md
+  - viewer/mcp/setup/starters/backend/CLAUDE.md
+  - tools/check-starter-fit.py
+root_class: a kernel value type that disagrees with the ADR and the wire contract it implements
+tickets:
+  started: []
+  unstarted:
+  - '#37252 [BE] Kernel: the ISO 4217 minor-units list beside Money: the starter now has it (CurrencyMinorUnits), and Money
+    carries its scale and the string wire form; build the team repository''s kernel to the same.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py::SF-MONEY
+status: open

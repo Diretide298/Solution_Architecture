@@ -1,0 +1,50 @@
+id: CHG-R14G-001
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'The backend starter decided an operation with a flat ICurrentPrincipal.Has(permission), which ignores scope and
+  fails 8 of the 22 normative vectors (V04-V08, V12, V15, V26). The kernel now has ResolvedAuthority: section 2 of the permission-resolution
+  spec over the selected role''s grants (deny wins, wildcard deny, downward only, R9 inactive nodes, R10 expired grants),
+  Permits(permission, scopePath), the CR-367 published per-scope set and its deepest-entry lookup. ICurrentPrincipal decides
+  with Permits and has no Has(); EffectivePermissions is coarse only. A unit test runs every vector of a byte-identical copy
+  of permission-vectors.json through both forms (44 cases), and backend-patterns 3.3 teaches Permits at the operation''s scope.'
+decision:
+  what: 'Review finding G-01 (CRITICAL): give the kernel a scope-aware seam, make the 3.3 example call it with the operation''s
+    scope, and run permission-vectors.json through it, as spec 7.2 requires. The lead, 3 November 2026, after reading the
+    r13 system review triage: "All four, one release" (the starters, device/guest/token access, gate integrity, tenant setup
+    and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review G-01 (findings/G-starters.md); permission-resolution spec sections 2, 5 and 7.2 (ADAM CR-189, CR-367,
+  CHG-CR367-001); ADR-0002.
+keys_touched:
+  files:
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/ResolvedAuthority.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/Grant.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/ScopePath.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/PermissionsByScopeLookup.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Security/ICurrentPrincipal.cs
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.UnitTests/PermissionVectors.json
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.UnitTests/Security/PermissionVectorTests.cs
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.UnitTests/TICVAI.UnitTests.csproj
+  - viewer/mcp/setup/starters/docs/backend-patterns.md
+  - viewer/mcp/setup/starters/backend/CLAUDE.md
+  - tools/check-starter-fit.py
+root_class: a starter kernel seam that does not implement the authorisation spec it names
+tickets:
+  started:
+  - '#27692 [BE] Request kernel (Ready for QA): if the kernel built from the starter kept ICurrentPrincipal.Has(permission)
+    or decides an operation from EffectivePermissions, replace it with a Permits(permission, scopePath) seam over the session''s
+    resolved grants (section 2), and run all 22 vectors of permission-vectors.json through it.'
+  - '#30674 login and #30715 selectRole (Ready for QA): the session they write must carry the selected role''s grants for
+    the seam (the grants, the resolution time for R10, the inactive nodes for R9); no wire change.'
+  unstarted:
+  - '#32080 resolvePermissions: build on the ResolvedAuthority seam rather than a second resolver.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py::SF-VECTORS
+status: open

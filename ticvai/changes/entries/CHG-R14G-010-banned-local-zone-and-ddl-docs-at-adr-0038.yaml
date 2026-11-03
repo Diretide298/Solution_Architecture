@@ -1,0 +1,37 @@
+id: CHG-R14G-010
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'D-15: the starter already banned DateTimeOffset.Now (the finding held only for the ticvai/repos/ copy, which lane
+  j retires); it now bans TimeZoneInfo.Local too. backend/README.md still said "exactly one generation of DDL", listed a flat
+  000/010/900/910 folder and "Still open: CF-161"; MIGRATIONS.md "Applying" and the 002 header derive-ddl writes said migrations
+  fan out per region (ADR-0014). The README now describes tenant/ and control/ with their forward migrations, and CF-161 settled
+  by ADR-0038/0039; MIGRATIONS.md and derive-ddl''s 002 header say per tenant database (ADR-0038).'
+decision:
+  what: 'Review finding D-15 (LOW): add TimeZoneInfo.Local to BannedSymbols, and the README and the 002 header with the ADR-0038
+    wording. The lead, 3 November 2026, after reading the r13 system review triage: "All four, one release" (the starters,
+    device/guest/token access, gate integrity, tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review D-15 (findings/D-code-scaffolds.md); ADR-0038, ADR-0039.
+keys_touched:
+  files:
+  - viewer/mcp/setup/starters/backend/BannedSymbols.txt
+  - viewer/mcp/setup/starters/docs/backend-patterns.md
+  - backend/README.md
+  - backend/MIGRATIONS.md
+  - tools/derive-ddl.py
+root_class: documentation of the database layout left behind by the ADR that changed it
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py
+status: open
+notes: 'backend/tenant/002-migration-register.sql and backend/control/002-migration-register.sql are derived: the integration
+  refresh writes the new header.'

@@ -1,0 +1,37 @@
+id: CHG-R14G-008
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'check-starter-fit passed with no starters, with Money.cs and Id.cs deleted and with a doc rewritten against ADR-0008/0038,
+  and compared the docs only with an equally stale mirror. It now fails closed on a missing input (SF-INPUTS, never baselined;
+  --no-starters is the explicit opt-out), drops the mirror comparison, and holds the starter to the authored package: SF-VECTORS
+  (the spec''s vectors file byte for byte through Permits and the lookup), SF-SPEC-CR, SF-MONEY (scale, string wire form,
+  the contract''s AED 2 and OMR 3), SF-RLS-CONTEXT (the three settings MIGRATIONS.md names, SET LOCAL), SF-TENANT, SF-IDEMPOTENCY,
+  SF-MODULES (ADR-0055 and composes), SF-CI, SF-OUTBOX-ORDER, SF-ID-RULE (Id.cs mints UUIDv7, offline id.ts uses v7 only)
+  and SF-DOC-TYPES over every backticked name, member and host. --self-test runs 15 sabotage cases, the review''s among them,
+  on a copy and expects each to fail; --run builds and tests the starters and fails a test project that runs nothing.'
+decision:
+  what: 'Review finding G-08 (HIGH): fail when an input is missing, compare the docs with the authored spec, and add behavioural
+    rules (build and test the starter, the vectors through its seam, the Money wire shape, the SET LOCAL wiring, every backticked
+    type). The lead, 3 November 2026, after reading the r13 system review triage: "All four, one release" (the starters, device/guest/token
+    access, gate integrity, tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review finding G-08 (findings/G-starters.md, G-work/fit runs A and C).
+keys_touched:
+  files:
+  - tools/check-starter-fit.py
+root_class: a guard that checks names and markers and passes when its inputs are absent
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
+notes: The gate runs the static rules; --run is the behavioural proof for a release or a starter change, and the starters'
+  own pipelines run the tests in the team repositories.

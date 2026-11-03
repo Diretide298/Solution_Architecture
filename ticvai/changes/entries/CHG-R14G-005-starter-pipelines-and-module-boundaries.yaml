@@ -1,0 +1,57 @@
+id: CHG-R14G-005
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'No pipeline ran the backend tests; the integration test project had none ("No test is available", exit 0); the frontend''s
+  only CI was a GitHub Actions file in repositories on GitLab, on node 20, whose nx affected --base=origin/main is empty on
+  main; the frontend failed its own lint (no scope:ui constraint); the architecture tests checked layers only. Now: a .gitlab-ci.yml
+  per starter (backend: the build with warnings as errors, every test project against a PostgreSQL 16 service with TICVAI_REQUIRE_DATABASE=1,
+  failing a project that ran no tests or a skipped test; frontend: node 22, corepack pnpm, nx affected against the merge request''s
+  base, run-many on the default branch and tags); the GitHub workflow is gone; eslint has scope:ui, scope:offline-core and
+  type:package constraints; ModuleBoundaryTests checks ADR-0055''s 16 .NET modules (modules.json) on the compiled IL, method
+  bodies included: a module uses another only through its Features/<Module>/Public/ types, and across deployables only where
+  cross-deployable-writes.yaml records the reader composing it; planted violations prove the rule fires. IntegrationTests
+  has 8 real tests.'
+decision:
+  what: 'Review findings G-05 (HIGH) and the starter part of D-07 (module-boundary tests over all modules; IntegrationTests
+    gets a real test). The lead, 3 November 2026, after reading the r13 system review triage: "All four, one release" (the
+    starters, device/guest/token access, gate integrity, tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review G-05 (findings/G-starters.md) and D-07 (findings/D-code-scaffolds.md); ADR-0055; quality-gates.md.
+keys_touched:
+  files:
+  - viewer/mcp/setup/starters/backend/.gitlab-ci.yml
+  - viewer/mcp/setup/starters/frontend/.gitlab-ci.yml
+  - viewer/mcp/setup/starters/frontend/.github/workflows/ci.yml (removed)
+  - viewer/mcp/setup/starters/frontend/.eslintrc.cjs
+  - viewer/mcp/setup/starters/frontend/.gitignore
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.ArchitectureTests/ModuleBoundaryTests.cs
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.ArchitectureTests/modules.json
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.ArchitectureTests/Planted/PlantedModules.cs
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.ArchitectureTests/TICVAI.ArchitectureTests.csproj
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.IntegrationTests/
+  - viewer/mcp/setup/starters/backend/README.md
+  - viewer/mcp/setup/starters/frontend/README.md
+  - viewer/mcp/setup/starters/docs/backend-patterns.md
+  - viewer/mcp/setup/setup.ps1
+  - viewer/mcp/setup-check.mjs
+  - tools/check-starter-fit.py
+root_class: a gate the standards call blocking that runs nowhere, or passes by finding nothing
+tickets:
+  started:
+  - '#27688 [BE] Architecture tests for 17 modules (Ready for QA): the list is ADR-0055''s 16 .NET modules with their deployables
+    (the AI is Python); a module reaches another only through its Public API, across deployables only where the host composes
+    it; the test reads method bodies and references, not only signatures; an empty test project fails.'
+  unstarted:
+  - '#27626 [DevOps] CI pipelines for the backend and frontend repositories: start from the starters'' .gitlab-ci.yml.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py::SF-CI
+status: open
+notes: 'SF-MODULES compares modules.json with ADR-0055''s table and with cross-deployable-writes.yaml composes: a lane that
+  adds a composes entry adds it to modules.json. The six per-app frontend repositories need their own pipelines (a new task).'

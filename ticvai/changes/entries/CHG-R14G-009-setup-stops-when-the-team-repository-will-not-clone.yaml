@@ -1,0 +1,33 @@
+id: CHG-R14G-009
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'When a team repository was configured for a project and role and the clone failed (or git was missing), setup made
+  the folder from the starter: a repository with its own history that lives nowhere else (for ai, a folder with no code and
+  commands that cannot run). Setup now stops with the reason ("ask your lead for access, clone it yourself, then run setup
+  on that folder"), as the frontend branch already did, and leaves no folder behind; README.txt and the -RepoUrl help say
+  so; setup-check.mjs runs the case.'
+decision:
+  what: 'Review finding G-10 (MEDIUM): stop, as the frontend branch already does, when a team repository is configured and
+    the clone fails. The lead, 3 November 2026, after reading the r13 system review triage: "All four, one release" (the starters,
+    device/guest/token access, gate integrity, tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review finding G-10 (findings/G-starters.md).
+keys_touched:
+  files:
+  - viewer/mcp/setup/setup.ps1
+  - viewer/mcp/setup/README.txt
+  - viewer/mcp/setup-check.mjs
+root_class: a silent fallback that makes a second history of a team repository
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: viewer/mcp/setup-check.mjs
+status: open
