@@ -343,6 +343,7 @@ x-ticvai-jobs:
     trigger: {kind: timer}
     reads: [control.cell]
     writes: [control.cell]
+    reliesOn: [getCellHealth]
     for: 'The writer of control.cell.health (ADAM CR-562, CHG-CR562-001): stores each cell''s health reading in the
       CellHealth shape, which getCell and getCellHealth answer; separate work on its own task.'
     source: ['contracts/satellite/subscription.yaml']
