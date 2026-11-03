@@ -215,8 +215,9 @@ WHAT = {
         "**A tender against an order**, with the rate it converted at fixed on the row (CF-37). A "
         "payment reconciled next month is reconciled at the rate of the day it was taken."),
     "control.cell": (
-        "**A deployment and a legal boundary at once** (ADR-0001). One per jurisdiction, carrying "
-        "its cloud provider, region and endpoint. **Only `CrossRegionService` reaches another "
+        "**A region, and a legal boundary at once** (ADR-0038, which supersedes ADR-0001 and ADR-0014). "
+        "It holds many tenants, each in its own database on one of its instances (ADR-0040), and "
+        "carries its cloud provider, region and endpoint. **Only `CrossRegionService` reaches another "
         "one**, and it moves a pseudonymous link rather than a guest."),
     "catalogue.performance": (
         "**When a product happens** — a session, a showing, a timed entry slot. Capacity lives "

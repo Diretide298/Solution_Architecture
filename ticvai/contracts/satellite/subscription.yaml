@@ -45,7 +45,8 @@ info:
     \ deciding what a tenant may use\n  is one place too many.\n- **A subscription grants; it never enables.**\
     \ Licensing says *may*; the tenant's own\n  configuration says *does*. Downgrading a plan does not\
     \ silently switch off a module\n  a venue is trading on — it flags the conflict and waits.\n- **Cell\
-    \ placement is per region** (ADR-0014), and every region in a different country\n  must be placed\
+    \ placement is per region** (ADR-0038, which supersedes ADR-0014: a cell is a region holding a database per\
+    \ tenant), and every region in a different country\n  must be placed\
     \ in its own jurisdiction. Provisioning enforces that rather than trusting\n  the operator.\n- **Metering\
     \ is separate from billing.** Usage is recorded continuously and priced\n  periodically. Conflating\
     \ them means a pricing change rewrites history.\n- Suspension is graceful and reversible; termination\
@@ -2756,7 +2757,7 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List a tenant's cells
-      description: One per region (ADR-0014), with placement, tier and health. **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
+      description: One per region the tenant has venues in (ADR-0039; ADR-0038, which supersedes ADR-0014), with placement, tier and health. **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - cell
       x-ticvai-permission: PLATFORM_CELL_VIEW

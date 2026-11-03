@@ -1552,8 +1552,9 @@ MIGRATION_REGISTER = """-- The migration register.
 -- reads or writes it. It came from `V0001__baseline.sql` and would have been lost when that file
 -- was deleted on 21 September.
 --
--- Migrations fan out per region, not per tenant (ADR-0014). A tenant in three regions is three
--- cells and three applications, and they may legitimately sit at different versions mid-rollout.
+-- Migrations fan out per tenant database, and the canary is a tenant (ADR-0039; ADR-0014's per-region
+-- fan-out is superseded by ADR-0038). Each tenant database keeps its own register, so databases may
+-- legitimately sit at different versions mid-rollout.
 -- **Emitted into both databases** because ADR-0039 made `control` a database of its own, and a
 -- database that is migrated independently needs its own record of where it got to.
 CREATE TABLE IF NOT EXISTS platform.schema_version (

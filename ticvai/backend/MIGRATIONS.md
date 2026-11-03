@@ -196,9 +196,12 @@ the first time somebody writes a report query directly against the database.
 
 ## Applying
 
-Migrations fan out **per region**, not per tenant (ADR-0014). A tenant in three regions is
-three cells and three applications, and they may legitimately sit at different versions during
-a rollout — `platform.schema_version` records where each one is.
+Migrations fan out **per tenant database**, and the canary is a tenant inside the canary cell, not
+the cell (ADR-0039; ADR-0014's per-region fan-out is superseded by ADR-0038, under which a cell is a
+region holding a database per tenant). Each run keeps one `control.migration_run_tenant` row per
+tenant, rolled up per cell in `control.migration_run_cell`; a wave is a set of tenants and may be
+part of one cell. Tenant databases may legitimately sit at different versions during a rollout —
+each database's `platform.schema_version` records where it is.
 
 The orchestrator that performs this fan-out is the Block A task PLATFORM-MIGRATE (migration fan-out
 across tenant databases, with progress and resume). Until it exists, migrations past V0001 can be

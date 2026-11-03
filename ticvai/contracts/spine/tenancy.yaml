@@ -74,7 +74,8 @@ info:
 
     Three positions shape this contract:
 
-    - A cell serves exactly one tenant in one REGION (ADR-0014). Every path here operates
+    - A cell is one REGION and serves many tenants, each in its own database (ADR-0038, which
+      supersedes ADR-0014). Every path here operates
       within the current cell; there is no cross-region read. Jurisdiction is a placement
       constraint on regions, not the split rule.
     - Region owns currency, decimal scale, time zone, date format and fiscal year.
@@ -7399,7 +7400,8 @@ components:
           type: string
           readOnly: true
           description: >
-            The cell serving this region. One cell per tenant per region (ADR-0014).
+            The cell serving this region. A region is one cell, and the cell holds many tenants (ADR-0038,
+            which supersedes ADR-0014).
 
     Placement:
       x-ticvai-persistence: "none — embedded in region_settings"

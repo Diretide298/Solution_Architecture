@@ -47,8 +47,8 @@ info:
     \ is versioned and reusable; an\n  execution is a dated artefact with its own parameters and result.\
     \ A report someone can\n  no longer reproduce is not evidence.\n- **Large exports are asynchronous.**\
     \ A synchronous export of a year of scan events is a\n  timeout, and a retry of a timeout is two.\n\
-    - Cross-cell and cross-tenant reporting comes from the central warehouse\n  (ADR-0001 (retired — see\
-    \ ADR-0014 and ADR-0017), ADR-0014). **Cells are never queried directly**, and aggregates only.\n"
+    - Cross-cell and cross-tenant reporting comes from the central warehouse\n  (ADR-0017, and\
+    \ ADR-0038, which supersedes ADR-0001's and ADR-0014's cell model: a cell is a region holding many tenants). **Cells are never queried directly**, and aggregates only.\n"
 servers:
 - url: https://{cellHost}/api/v1
   variables:
