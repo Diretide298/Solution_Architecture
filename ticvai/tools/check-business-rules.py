@@ -524,8 +524,9 @@ And one rule per decision:
                    investigating with a reason; each change logged. Checked in the contract and `states/incident.yaml`.
   BR-FARE          (CHG-RUL-012) Fare tables are versioned by `effectiveFrom`: a future table sits beside the
                    current one (`FareTable.upcoming`) and a quote prices at travel time (`travelAt`).
-  BR-SESSIONS-DOOR (CHG-RUL-015) `listActiveSessions` and `forceLogout` admit a call with no session (`{}`) and
-                   carry the supervisor's PIN step-up themselves.
+  BR-SESSIONS-DOOR (CHG-RUL-015) `listActiveSessions` and `forceLogout` admit a call with no session and
+                   carry the supervisor's PIN step-up themselves; since r14 that call is the till's device
+                   (`deviceAuth`), never `{}` (r13 system review C-04, CHG-R14H-001).
   BR-ATTENDANCE    (CHG-RUL-016) `recordAttendance` acts on the caller (`x-ticvai-self-scoped: principal`, no
                    person in the body); `amendAttendance` is the supervisor's correction.
   BR-AI-CURRENCY   (CHG-RUL-017) The AI spend ceiling defaults to the tenant's billing currency, never USD.
@@ -830,7 +831,11 @@ def main() -> int:
     # -------------------------------------------------------------- BR-SESSIONS-DOOR
     for oid in ("listActiveSessions", "forceLogout"):
         o = op(oid)[3]
-        need("BR-SESSIONS-DOOR", {} in (o.get("security") or []), f"{oid} does not admit a call with no session")
+        # The session-less call is the till's device since r14 (r13 system review C-04, CHG-R14H-001): deviceAuth,
+        # never {} (an unauthenticated caller), so the door stays usable and is no longer open to the internet.
+        sec = o.get("security") or []
+        need("BR-SESSIONS-DOOR", {"deviceAuth": []} in sec and {} not in sec,
+             f"{oid} does not admit the till's session-less call as its device (deviceAuth, never {{}})")
         need("BR-SESSIONS-DOOR", bool(o.get("x-ticvai-step-up-carrier")), f"{oid} carries no supervisor step-up")
 
     # -------------------------------------------------------------- BR-ATTENDANCE
