@@ -432,6 +432,18 @@ x-ticvai-jobs:
     reliesOn: [setDataRetentionSetting, setDataRetentionPolicy]
     for: "Marketing's retention job: guest profiles, notes, documents, preferences, form submissions, consent records and conversation messages. Every day it reads the tenant's period for guestProfile from Tenancy's data retention settings (tenancy#dataRetentionSettingRecords; a class with no row takes the platform default, ADR-0047) and applies its onExpiry (archive, anonymise or delete) to its own rows past the period, counted from the class's anchor; another module's rows are that module's job (the lead, 2 November 2026, on lane s's question (\"(Recommended)\"): one retention job in each module that holds personal data, run by that module's retention setting (tenancy.data_retention_setting); CHG-R13INT-011)."
     source: ['contracts/spine/tenancy.yaml']
+  mfaCodeSender:
+    module: marketing-crm
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.mfaCodeIssued]
+    reads: []
+    writes: [marketing.message_dispatch]
+    for: 'Marketing''s MFA code sender (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001): on identity.mfaCodeIssued
+      it decrypts destination and code at send time and sends the 6-digit code by email through the tenant''s
+      configured email provider, in the person''s language, recording a transactional marketing.message_dispatch row
+      without the code; idempotent on challengeId, retried until expiresAt and never dead-lettered.'
+    source: ['events/identity-mfaCodeIssued.yaml']
   campaignScheduler:
     module: marketing-crm
     host: workers

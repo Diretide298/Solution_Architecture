@@ -2027,6 +2027,7 @@ def main() -> int:
     pricing_rules_r13(need, op)
     lane_q_rules_r13(need, op)
     roots_r13_v(need, op)
+    lane_w4_rules_r13(need, op)
 
     # ---------------------------------------------------------------- r12 CR lane F (31 October 2026; the lead: "for
     # each one actually check if they hold and if not then find out the best way keeping in mind what client needs").
@@ -2852,7 +2853,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + R13_O_RULES + R13_LANE_P_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W4_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -3724,6 +3725,176 @@ def roots_r13_v(need, op):
          "createShopAndDrop's read-via still gives CR-104's outlet hours as the rule the lead replaced (R41)")
     need("BR-R13-ONE-RULE", "stored with `requiresApproval` true" in words(op("setSubstitutionRules")[3].get("description")),
          "setSubstitutionRules does not state when requiresApproval is true (R41)")
+
+
+R13_W4_RULES = ["BR-DELEGATION-INPUT", "BR-RULE-CODE-KEY", "BR-STEP-UP-CHECK", "BR-MATRIX-LIST-REACH",
+                "BR-PRIVACY-VENUE", "BR-SESSION-GRANT", "BR-BREACH-CORPUS", "BR-MFA-VALUES",
+                "BR-ROLE-PERMISSIONS-HOME", "BR-PUBLIC-API-CALLER"]
+
+
+def lane_w4_rules_r13(need, op):
+    """r13 second CR round, lane w4: identity, approvals, public API (ADAM CR-497, CR-498, CR-509, CR-512, CR-513,
+    CR-514, CR-522, CR-525, CR-526, CR-536, decided 3 November 2026; CHG-CR497-001 ...). Each rule fails on the r13
+    candidate (f599f2c6) and passes once the posted decision is in."""
+    def words(x):
+        return " ".join(str(x or "").split()).replace("**", "")
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route")))
+                for v in o_.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def tables(o_, key):
+        return {str((t or {}).get("table") if isinstance(t, dict) else t) for t in o_.get(key) or []}
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    def sprops(rel, name):
+        return (schemas(rel).get(name) or {}).get("properties") or {}
+
+    def params(o_):
+        return {str((p or {}).get("$ref", "")).rsplit("/", 1)[-1] for p in o_.get("parameters") or []}
+
+    appr, ident = "contracts/spine/approvals.yaml", "contracts/spine/identity.yaml"
+    iq = load(ident).get("x-ticvai-queries") or {}
+
+    # BR-DELEGATION-INPUT (ADAM CR-497)
+    ard = op("approveRoleAuthorityDelegation")[3]
+    for sch in ("RolesAuthorityDelegationApprovalLimitsInput", "RolesAuthorityDelegationApprovalLimitsView"):
+        pr = sprops(appr, sch)
+        for f in ("delegator", "delegate", "requiredRole", "venue"):
+            need("BR-DELEGATION-INPUT", (pr.get(f) or {}).get("format") == "uuid",
+                 f"{sch}.{f} is not a uuid (CR-497)")
+        need("BR-DELEGATION-INPUT", "ApprovalKind" in str(pr.get("requestKind")),
+             f"{sch}.requestKind is not an ApprovalKind (CR-497)")
+    need("BR-DELEGATION-INPUT", "validation" in ptypes(ard, "400"),
+         "approveRoleAuthorityDelegation's 400 does not answer the shared validation problem (CR-497)")
+    need("BR-DELEGATION-INPUT", "always the path of the venue the caller acts at" in words(ard.get("description"))
+         and "platform.venue_settings" in tables(ard, "x-ticvai-reads"),
+         "approveRoleAuthorityDelegation does not store the caller's venue path or read the venue's money (CR-497)")
+
+    # BR-RULE-CODE-KEY (ADAM CR-498)
+    code = words((sprops(appr, "ApprovalRule").get("code") or {}).get("description"))
+    need("BR-RULE-CODE-KEY", "rule_matrix_id_matrix_version_code_uniq" in code
+         and "unique index on (`matrix_id`, `code`)" not in code,
+         "ApprovalRule.code still names the old key (matrix_id, code) rather than the versioned one (CR-498)")
+    v119 = (ROOT / "backend" / "tenant" / "V0119__names_after_r1_20261029.sql")
+    need("BR-RULE-CODE-KEY", v119.exists() and "DROP INDEX approvals.rule_matrix_id_code_uniq"
+         in v119.read_text(encoding="utf-8"),
+         "the names migration no longer drops approvals.rule_matrix_id_code_uniq (CR-498)")
+
+    # BR-STEP-UP-CHECK (ADAM CR-509)
+    cq = iq.get("consumeMfaStepUp") or {}
+    need("BR-STEP-UP-CHECK", cq.get("table") == "identity.mfa_challenge" and "in-process" in (cq.get("served") or [])
+         and "consumed" in str(cq.get("returns")) and "expired" in str(cq.get("returns")),
+         "identity declares no in-process consumeMfaStepUp over identity.mfa_challenge answering consumed, missing or "
+         "expired (CR-509)")
+    for oid in ("approveMatrixMultiLevel", "approveRoleAuthorityDelegation"):
+        need("BR-STEP-UP-CHECK", ("identity#consumeMfaStepUp", "in-process") in vias(op(oid)[3]),
+             f"{oid} does not ask identity#consumeMfaStepUp in process (CR-509, CR-497)")
+    amm = op("approveMatrixMultiLevel")[3]
+    mi = sprops(appr, "ApprovalMatrixMultiLevelApprovalConfigurationInput")
+    need("BR-STEP-UP-CHECK", (mi.get("requiredApproverRole") or {}).get("format") == "uuid"
+         and (mi.get("venue") or {}).get("format") == "uuid",
+         "approveMatrixMultiLevel's requiredApproverRole or venue is not a uuid (CR-509)")
+    need("BR-STEP-UP-CHECK", "copied into it unchanged" in words(amm.get("description"))
+         and "keep their stored values" in words(amm.get("description")),
+         "approveMatrixMultiLevel does not say how the other rules and the unmapped fields carry into the new version "
+         "(CR-509)")
+
+    # BR-MATRIX-LIST-REACH (ADAM CR-526)
+    lam = words(op("listApprovalMatrices")[3].get("description"))
+    need("BR-MATRIX-LIST-REACH", "deepest listed entry" in lam and "one copy of each matrix id" in lam,
+         "listApprovalMatrices does not say which nodes are 'here' for a caller with several, or how they merge (CR-526)")
+
+    # BR-PRIVACY-VENUE (ADAM CR-512)
+    for oid in ("exportSubjectData", "deleteGuestAccount"):
+        o_ = op(oid)[3]
+        need("BR-PRIVACY-VENUE", "GuestVenue" in params(o_) and "venue-required" in ptypes(o_, "400")
+             and {("tenancy#scopeRecords", "in-process"), ("tenancy#regionSettingsRecords", "in-process")} <= vias(o_),
+             f"{oid} raises its request at no venue: no X-Venue-Id, 400 venue-required or the venue reads (CR-512)")
+    esd = op("exportSubjectData")[3]
+    need("BR-PRIVACY-VENUE", "identity.subject_data_export" in tables(esd, "x-ticvai-reads")
+         and "One open export per guest" in words(esd.get("description")),
+         "exportSubjectData does not answer a second export with the open one (CR-512)")
+    job = words(((load(ident).get("x-ticvai-jobs") or {}).get("subjectExport") or {}).get("for"))
+    need("BR-PRIVACY-VENUE", "72 hours" in job and "storage seam" in job,
+         "the export job's declaration does not carry its rules (CR-512)")
+
+    # BR-SESSION-GRANT (ADAM CR-513)
+    sg = schemas(ident).get("SessionGrant") or {}
+    gid = (sg.get("properties") or {}).get("grantId") or {}
+    need("BR-SESSION-GRANT", sg.get("x-ticvai-persistence") == "identity.session"
+         and gid.get("x-ticvai-references") == "identity.delegated_access",
+         "identity.session has no grant_id referencing identity.delegated_access (CR-513)")
+    need("BR-SESSION-GRANT", "does not resolve grants again" in words(op("getCurrentSession")[3].get("description")),
+         "getCurrentSession does not answer from the session registry filled at sign-in (CR-513)")
+    for oid in ("login", "selectRole"):
+        need("BR-SESSION-GRANT", "identity.session" in tables(op(oid)[3], "x-ticvai-writes"),
+             f"{oid} does not write the session's grant_id (CR-513)")
+
+    # BR-BREACH-CORPUS (ADAM CR-514)
+    rbc = words((sprops(ident, "PasswordPolicy").get("requireBreachCheck") or {}).get("description"))
+    for w in ("Pwned Passwords", "Identity:BreachCorpusPath", "readiness check", "SUFFIX:COUNT"):
+        need("BR-BREACH-CORPUS", w in rbc, f"PasswordPolicy.requireBreachCheck does not state {w!r} (CR-514)")
+    for oid in ("createPrincipal", "resetPrincipalCredential"):
+        need("BR-BREACH-CORPUS", "policy-not-met" in ptypes(op(oid)[3], "422"),
+             f"{oid} does not answer 422 policy-not-met for a breached password (CR-514)")
+
+    # BR-MFA-VALUES (ADAM CR-522)
+    ev = ROOT / "events" / "identity-mfaCodeIssued.yaml"
+    need("BR-MFA-VALUES", ev.exists(), "events/identity-mfaCodeIssued.yaml does not exist (CR-522)")
+    for oid in ("enrolMfaMethod", "createMfaChallenge"):
+        need("BR-MFA-VALUES", "identity.mfaCodeIssued" in (op(oid)[3].get("x-ticvai-emits") or []),
+             f"{oid} does not emit identity.mfaCodeIssued (CR-522)")
+    me = sprops(ident, "MfaEnrolment")
+    need("BR-MFA-VALUES", "period=30" in words((me.get("qrCodeUri") or {}).get("description"))
+         and "pattern" in ((me.get("recoveryCodes") or {}).get("items") or {}),
+         "MfaEnrolment does not state the otpauth URI or the recovery code format (CR-522)")
+    need("BR-MFA-VALUES", "RFC 6238" in words(op("verifyMfaChallenge")[3].get("description"))
+         and "RFC 6238" in words(op("verifyMfaEnrolment")[3].get("description")),
+         "the MFA verifications do not state the RFC 6238 values (CR-522)")
+    need("BR-MFA-VALUES", ptypes(op("removeMfaMethod")[3], "409") == {"last-required-mfa-method"},
+         "removeMfaMethod's 409 is not last-required-mfa-method (CR-522)")
+    mj = (load("contracts/satellite/marketing-crm.yaml").get("x-ticvai-jobs") or {}).get("mfaCodeSender") or {}
+    need("BR-MFA-VALUES", "identity.mfaCodeIssued" in (mj.get("consumes") or []),
+         "Marketing declares no consumer of identity.mfaCodeIssued (CR-522)")
+
+    # BR-ROLE-PERMISSIONS-HOME (ADAM CR-525)
+    f_, _, _, srp, _ = op("setRolePermissions")
+    need("BR-ROLE-PERMISSIONS-HOME", f_ is not None and f_.name == "identity.yaml",
+         "setRolePermissions is not built in the Identity module (CR-525)")
+    need("BR-ROLE-PERMISSIONS-HOME", {"identity.role", "identity.role_permission", "identity.session",
+                                      "identity.refresh_token"} <= tables(srp, "x-ticvai-writes")
+         and "identity.delegated_access" in tables(srp, "x-ticvai-reads")
+         and not any(q.startswith("identity#") for q, _ in vias(srp)),
+         "setRolePermissions does not declare its own tables, or still asks Identity's queries (CR-525)")
+    need("BR-ROLE-PERMISSIONS-HOME", "validation" in ptypes(srp, "400"),
+         "setRolePermissions does not answer 400 validation for an inheritsFromRoleId it refuses (CR-525)")
+
+    # BR-PUBLIC-API-CALLER (ADAM CR-536)
+    pa = load("contracts/satellite/public-api.yaml")
+    need("BR-PUBLIC-API-CALLER", "never by its permissions" in words((pa.get("info") or {}).get("description")),
+         "public-api does not say how it tells callers apart (CR-536)")
+    for oid, want in (("listDeveloperMembers", {"control.developer_account", "control.developer_member"}),
+                      ("listIntegrationListings", {"control.integration_listing", "control.developer_member"}),
+                      ("listProductionAccessRequests", {"control.production_access_request",
+                                                        "control.developer_member"}),
+                      ("requestProductionAccess", {"control.api_client", "control.integration_listing",
+                                                   "control.developer_account", "control.developer_member",
+                                                   "control.production_access_request"})):
+        need("BR-PUBLIC-API-CALLER", tables(op(oid)[3], "x-ticvai-reads") == want,
+             f"{oid} does not declare exactly the reads CR-536 names")
+    need("BR-PUBLIC-API-CALLER", tables(op("requestProductionAccess")[3], "x-ticvai-writes")
+         == {"control.production_access_request"},
+         "requestProductionAccess does not declare its one write (CR-536)")
+    need("BR-PUBLIC-API-CALLER", "partner" in (op("listDeveloperMembers")[3].get("x-ticvai-audience") or []),
+         "listDeveloperMembers is still for staff only (CR-536)")
+    need("BR-PUBLIC-API-CALLER", "email" in (sprops(ident, "PrincipalVerifiedEmail")),
+         "identity.principal has no verified email (CR-536)")
 
 
 if __name__ == "__main__":

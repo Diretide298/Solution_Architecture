@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 49
+  x-ticvai-screen-count: 48
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -884,111 +884,6 @@ paths:
                         items: { $ref: '#/components/schemas/AuditRecord' }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-
-  /roles/{roleId}/permissions:
-    parameters:
-      - name: roleId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-    put:
-      operationId: setRolePermissions
-      x-ticvai-consumed-by:
-        - "P08 BO-054 Role Assignment"
-      x-ticvai-read-via:
-      - query: identity#rolePermissionRecords
-        route: in-process
-        for: 'its read of identity.role_permission, Identity''s data (CHG-MOD-001)'
-      - query: identity#roleRecords
-        route: in-process
-        for: 'its read of identity.role, Identity''s data (CHG-MOD-001)'
-      - query: identity#segregationRuleRecords
-        route: in-process
-        for: 'its read of identity.segregation_rule, Identity''s data (CHG-MOD-001)'
-      summary: What this role may do
-      description: >
-        POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found
-        `identity.role_permission` with one column** — and nothing wrote it.
-
-        A role that grants no permissions is not a role, and until now a venue could create one and
-        never give it anything.
-
-        **The whole set in one call.** A permission added one at a time leaves a role briefly
-        holding a combination nobody intended, and **a segregation-of-duties rule evaluated against
-        that intermediate state either fires wrongly or misses.**
-
-        **Refused where it breaches a `SegregationRule`.** The refusal names the rule and the two
-        permissions in conflict — a venue told only *not allowed* will grant it another way.
-
-        **The role-time check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). Every rule is evaluated
-        against the role's own permissions (this body) united with those of `inheritsFromRoleId`, **whatever
-        the rule's `scopeSensitive`**: a role's permissions are granted together at one scope, so a pair
-        inside a role always overlaps. Only `severity: block` refuses, with `409 segregation-breach`
-        (`common.yaml`), the one type and status every segregation check answers with; `requireApproval`
-        and `warn` are accepted and surface when a grant attaches the role and in `listSegregationViolations`.
-        **A parent role's edit re-checks every role that inherits from it** (its own set united with the new
-        one); a breach there refuses this call too, naming the child role. Each change writes one
-        `platform.audit_record` row in the same transaction.
-
-        **No escalated permission** (decided 28 September, audit R197): a role's permission set has
-        no value to set a threshold on, and an escalation that repeated `ROLE_MANAGE` gated nothing.
-        The control is `ROLE_MANAGE` itself, which requires MFA (audit R135). **Removing a
-        permission ends the live sessions of every principal holding the role at once** (audit
-        R126); an addition takes effect at their next sign-in.
-
-        **The checklist a preset filled stays editable here** (decided 2 October 2026, Chinmay, pre-apply
-        round: roles are preset permission configurations; DEC-007; CHG-CSP-003). A role started from the
-        Viewer preset is given more ticks with this call like any other role; the preset is not consulted
-        and not changed.
-      tags: [identity]
-      x-ticvai-permission: ROLE_MANAGE
-      x-ticvai-audience: [staff]
-      x-ticvai-scope-level: tenant
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [permissions]
-              properties:
-                permissions:
-                  type: array
-                  items: { $ref: '../shared/permissions.yaml#/components/schemas/Permission' }
-                inheritsFromRoleId: { type: string, format: uuid, nullable: true }
-      responses:
-        '200':
-          description: >
-            Set. The role's whole permission set as it now stands — the body echoed back after the
-            replace, so a screen can redraw the checklist without a second read.
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [roleId, permissions]
-                properties:
-                  roleId: { type: string, format: uuid }
-                  permissions:
-                    type: array
-                    items: { $ref: '../shared/permissions.yaml#/components/schemas/Permission' }
-                  inheritsFromRoleId: { type: string, format: uuid, nullable: true }
-          headers:
-            X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
-        '409':
-          description: >
-            **Breaches a segregation rule** whose severity is `block`, in this role or in a role inheriting
-            it (`segregation-breach`). Names the rule, both permissions and the role where they meet.
-          x-ticvai-problem-types: [segregation-breach]
-          content:
-            application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

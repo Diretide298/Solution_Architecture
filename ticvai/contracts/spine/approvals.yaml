@@ -1242,7 +1242,22 @@ paths:
         raise its own refund limit is not a control.** What counts as loosening is defined on
         `setApprovalMatrix` (decided 28 September, audit R129).
 
-         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
+
+
+        **Which nodes are "here", for a caller whose grants cover several** (ADAM CR-526, Chinmay, 3 November 2026:
+        option A, with the reach the standing list rule gives; CHG-CR526-001). (1) The nodes are the scope paths whose
+        deepest listed entry in the session''s per-scope permissions (`Session.permissionsByScope`) holds
+        `APPROVAL_CONFIGURE`, the rule every list follows; not the session''s other scope paths: a caller who
+        configures approvals at venue A and only sells at venue B gets A''s answer only. A caller with one such path
+        gets exactly what the text above says. (2) `effective` false: the matrices whose `scope_path` equals one of
+        those paths, as each stands in force (highest version, with its rules). (3) `effective` true: for each of those
+        paths, and for each kind (`kind` narrows to one), the matrix that applies there: the nearest node''s, the
+        venue''s, else the region''s, else the tenant''s; a node whose version in force is inactive sets nothing, and
+        the next ancestor''s applies. (4) The answers of all the paths are merged, one copy of each matrix id kept, and
+        sorted by `id` descending (newest first), as above. Each matrix keeps its own `scopePath` and `scopeLevel`, so
+        the screens can tell where each row comes from; nothing on the screens changes. (5) No new query parameter and
+        no new refusal.'
       tags:
       - matrix
       x-ticvai-permission: APPROVAL_CONFIGURE
@@ -2011,6 +2026,17 @@ paths:
   /matrix-multi-level:
     put:
       operationId: approveMatrixMultiLevel
+      x-ticvai-names-for-context: [platform.scope]
+      x-ticvai-read-via:
+      - query: identity#consumeMfaStepUp
+        route: in-process
+        for: 'the MFA step-up, checked and consumed before any other write in this operation''s own transaction: missing
+          is 403 step-up-token-missing, expired is 403 step-up-token-expired, nothing written; a later refusal rolls
+          the consume back (ADAM CR-509)'
+      x-ticvai-reads:
+      - table: platform.venue_settings
+        for: 'the venue''s currencyCode and currencyScale, which amount must be in (ADAM CR-509, as on #30847); Approvals
+          is part of the Tenancy service, so this is its own module''s table'
       x-ticvai-writes:
       - table: approvals.matrix_version
         for: 'the new version of the matrix the rule goes into, as setApprovalMatrix stores one (ADAM CR-300, option B)'
@@ -2037,19 +2063,33 @@ paths:
         | Input | Stored as |
         |---|---|
         | `module` | **required by the server** (`400 validation` without it; optional in the schema only so an r1 client still validates). The matrix: `approvals.matrix.kind`, an `ApprovalKind` value (400 when it is not one); it selects which matrix the rule goes into |
-        | `venue` | the matrix's scope (`scope_level` venue, its `scope_path`). **Only the caller's own scope node (audit R183):** absent, it is the venue the caller acts at, never the tenant's matrix; a venue that is not that node is `400 validation` (`errors[]` names `venue`). Nobody writes another level's matrix through this call |
+        | `venue` | the matrix's scope (`scope_level` venue, its `scope_path`). **Only the caller's own scope node (audit R183):** absent, it is the venue the caller acts at, never the tenant's matrix; a venue that is not that node is `400 validation` (`errors[]` names `venue`). It is the venue's id, its `platform.scope` id (ADAM CR-509). Nobody writes another level's matrix through this call |
         | `code` | `approvals.rule.code`, the upsert key within the matrix |
         | `approvalMode` | `compositeMode`, and what the engine runs: `single` sequential with `levels` 1; `sequential` and `multiLevel` sequential with `levels` = `minimumApprovals`; `parallel` parallel; `anyOne` parallel with `minimumApprovals` 1; `allMustApprove` consensus; `conditional` sequential, applying only where `skipConditions` does not hold |
-        | `amount`, `percentage` | `minAmount`, `minPercentage` |
+        | `amount`, `percentage` | `minAmount`, `minPercentage`. `amount` is in the venue's currency and scale (its settings row, `platform.venue_settings`, read as on #30847); anything else is `400 validation` naming `amount` (ADAM CR-509) |
         | `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
-        | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
+        | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields. `minimumApprovals` is required for `sequential` and `multiLevel` (`400 validation` naming it; ADAM CR-509); `levels` is 1 where the `approvalMode` row sets none |
         | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
         | `skipConditions` | `condition`, negated: the rule is skipped where it holds (ADAM CR-102, CHG-R10ID-015). It is one or more clauses of the condition language (`ApprovalRule.condition`) joined by ` OR ` (skip when any holds); the stored `condition` is each clause negated (`=` and `!=`, `<` and `>=`, `>` and `<=`, `in` and `notIn` swap) joined by ` AND `. A clause that does not parse, or an ` AND ` inside `skipConditions` (its negation would need an OR), is `422 condition-invalid` and nothing is stored. As for any condition, a request missing the attribute does not match the rule |
-        | `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
+        | `requiredApproverRole` | `requiredApproverRoleId`, a role id (uuid; not a uuid is `400 validation` naming `requiredApproverRole`, and existence is not checked, as with the approver roles in `setApprovalMatrix`; ADAM CR-509), and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has, with `requiredApproverRole` added when it is not already in it (CR-509) |
         | (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
         The view reads the same row back in the input's shape. `setApprovalMatrix` stays the operation of record for whole
         matrices; both write the same rows, so neither overwrites the other's rules.
+
+        **The step-up, the new version and the fields the input does not map** (ADAM CR-509, Chinmay, 3 November 2026:
+        option A; CHG-CR509-001). (1) The MFA step-up is checked and consumed through Identity's in-process step-up
+        check (`identity#consumeMfaStepUp`), called before any other write, in this operation's own transaction:
+        missing is `403 step-up-token-missing`, expired is `403 step-up-token-expired`, nothing written; a later
+        refusal rolls the consume back. Until that check lands, tests use a fake of it. (2) Every save stores a new
+        version: every rule of the version in force is copied into it unchanged (codes, order and all fields), then the
+        body is applied to the rule with its `code`, or appended last if the code is new. On the replaced rule, fields
+        the input does not map keep their stored values (`approverScopeLevel`, `requiresMfa`, `requiresSignature`,
+        `slaMinutes`, escalation and expiry, `subjectTypes`, `signatureMethods`, `externalProviderId`, `maxAmount`,
+        `riskScoreAbove`, sort order). A mapped field left out becomes null, or its schema default where it has one.
+        The approver role list is kept, with `requiredApproverRole` added when it is not already in it. The loosening
+        and unreachable checks run on the whole new version. (3) The new version keeps the active flag of the version
+        in force; version 1 is active.
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_CONFIGURE
@@ -2086,7 +2126,9 @@ paths:
                 $ref: '#/components/schemas/ApprovalMatrixMultiLevelApprovalConfigurationView'
         '400':
           description: 'Validation failed: `module` missing or not an `ApprovalKind`; `venue` not the venue the caller acts at
-            (audit R183); or a new rule with no `requiredApproverRole` (`approver-role-required`).
+            (audit R183); `requiredApproverRole` not a uuid, `amount` not in the venue''s currency and scale, or
+            `minimumApprovals` missing for `sequential` or `multiLevel` (ADAM CR-509; `errors[]` names the field); or a
+            new rule with no `requiredApproverRole` (`approver-role-required`).
 
             '
           x-ticvai-problem-types: [validation, approver-role-required]
@@ -2118,7 +2160,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalConditionInvalidProblem'
         '403':
-          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001), as Identity''s in-process step-up check `identity#consumeMfaStepUp` answers it (ADAM CR-509). Nothing is written.'
           x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
@@ -2133,6 +2175,7 @@ paths:
   /role-authority-delegation:
     put:
       operationId: approveRoleAuthorityDelegation
+      x-ticvai-names-for-context: [platform.scope]
       x-ticvai-read-via:
       - query: identity#delegatedAccessRecords
         route: in-process
@@ -2149,6 +2192,10 @@ paths:
         route: in-process
         for: 'the delegation-authority check (ADAM CR-479): whether the delegate holds APPROVAL_DECIDE at the delegation''s
           scope or above (403 delegateLacksPermission), as a yes or no under the routed tenant''s root grant'
+      - query: identity#consumeMfaStepUp
+        route: in-process
+        for: 'the MFA step-up, checked and consumed in this operation''s own transaction before any other write: missing
+          is 403 step-up-token-missing, expired is 403 step-up-token-expired (ADAM CR-509, CR-497)'
       x-ticvai-body-key: [delegator, delegate]
       x-ticvai-body-key-note: 'Keyed by the body''s `delegator` and `delegate`, not a singleton (ADAM CR-352, Chinmay, 30
         October 2026; CHG-CR352-001): one delegation per pair of people at the caller''s venue. The PUT finds the active
@@ -2175,14 +2222,16 @@ paths:
 
         | Input | Stored as |
         |---|---|
-        | `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
+        | `delegator`, `delegate` (principal ids, uuids, else `400 validation` naming the field; ADAM CR-497) | `delegatorPrincipalId`, `delegatePrincipalId` |
         | `start`, `end`, `reason` | `from`, `to`, `reason` |
-        | `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
-        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap. `maxAmount` never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it); `maxPercentage` is not compared with the matrix, which stores no percentage ceiling (ADAM CR-479) |
-        | `scope`, `venue`, `region`, `department` | `scopePath`: the most specific scope node given |
+        | `requestKind` | `kinds` = [it]: an `ApprovalKind` value, anything else `400 validation` naming `requestKind` (ADAM CR-497); absent, `kinds` null (every kind) |
+        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage` (`max_amount`, `max_percentage`): the delegation's own cap. `authorityAmount` is in the venue's money, `currencyCode` and `currencyScale` read from the venue's settings row (`platform.venue_settings`); a different currency, or more decimal places than the scale, is `400 validation` naming `authorityAmount` (ADAM CR-497). `maxAmount` never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it); `maxPercentage` is not compared with the matrix, which stores no percentage ceiling (ADAM CR-479) |
+        | `venue` | `scopePath` is **always the path of the venue the caller acts at** (ADAM CR-497): delegations are written at venue scope and are same role, same venue (agreed 29 September). `venue` is optional; when sent it must be that venue's id (its `platform.scope` id, a uuid), else `400 validation` with `errors[]` naming `venue` |
+        | `scope`, `region`, `department` | **display only: not stored, never refused** (ADAM CR-497), like `businessUnit` and `legalEntity`; they never set `scopePath` |
         | `businessUnit`, `legalEntity` | **not a scope, and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): neither is a level of the scope tree, so neither sets `scopePath`. Kept in the schema so an r1 client still validates; a value sent is ignored |
         | `delegationType` | `delegationType` |
-        | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
+        | `requiredRole` (and `role`, `position`) | `requiredRoleId`: a role id (uuid, else `400 validation` naming `requiredRole`; ADAM CR-497); the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
+        | `user` | display only, echoed as sent; never the delegator, since `delegator` is required |
 
         Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of one delegation.
 
@@ -2195,6 +2244,33 @@ paths:
         **The same delegation-authority check as `createApprovalDelegation`** (ADAM CR-479, Chinmay, 2 November 2026;
         CHG-CR479-001): one check in the Approvals module, called by both operations before anything is written, as
         `createApprovalDelegation` states it (the `400`s first, then the `403`s, then the `409`).
+
+        **Ids, kinds, money, scope and the answer** (ADAM CR-497, Chinmay, 3 November 2026: option A for ids, kinds,
+        money and the response; the delegation's scope is always the caller's venue; CHG-CR497-001). Finding the existing
+        delegation stays as built (`is_active`, `valid_to` after now, `scope_path` at or under the caller's venue), and
+        the delegate's authority is checked at that venue path or above. A `delegator`, `delegate`, `requiredRole` or
+        `venue` that is not a uuid, a `requestKind` that is not an `ApprovalKind`, a `venue` that is not the caller's,
+        and an `authorityAmount` not in the venue's currency and scale are the shared `400 validation` problem, with
+        `errors[]` naming the field and no `refusedReason`, beside the existing `invalidWindow` and
+        `delegateIsDelegator`. There is no new existence refusal: an id that names nobody fails the existing checks
+        (`403 delegate-lacks-permission` or `exceeds-delegator-authority`, `409 delegate-lacks-required-role`). The
+        currency is read from `platform.venue_settings`: Approvals is part of the Tenancy service, so it is its own
+        module's read and needs no declared route to another module. The screen's picker sends the kind value; its
+        labels do not change.
+
+        **The `200`** (`RolesAuthorityDelegationApprovalLimitsView`, CR-497). From the row written: `delegator`,
+        `delegate`, `start`, `end`, `reason`, `delegationType`, `requiredRole`, `requestKind` (the one kind; left out
+        when every kind), `authorityAmount` (with the venue's currency and scale), `authorityPercentage`, `venue` (the
+        caller's venue id). Echoed as sent: `user`, `role`, `position`, `department`, `region`, `scope`. Left out:
+        `businessUnit`, `legalEntity`.
+
+        **The MFA step-up is checked and consumed through Identity's in-process step-up check**
+        (`identity#consumeMfaStepUp`, decided on #30846, ADAM CR-509; the same rule), called before any other write in
+        this operation's own transaction; until that check lands, tests use a fake of it.
+      x-ticvai-reads:
+      - table: platform.venue_settings
+        for: 'the venue''s currencyCode and currencyScale, which authorityAmount must be in (ADAM CR-497); Approvals is
+          part of the Tenancy service, so this is its own module''s table'
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_CONFIGURE
@@ -2221,21 +2297,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/RolesAuthorityDelegationApprovalLimitsView'
         '400':
-          description: 'The delegation is malformed: `invalidWindow` (`end` not after `start`) or `delegateIsDelegator`.
+          description: 'The delegation is malformed: `invalidWindow` (`end` not after `start`) or `delegateIsDelegator`,
+            with `refusedReason` (`DelegationRefusedProblem`). **Or the shared validation problem** (ADAM CR-497):
+            `errors[]` names `delegator`, `delegate` or `requiredRole` (not a uuid), `requestKind` (not an
+            `ApprovalKind`), `venue` (not a uuid, or not the venue the caller acts at) or `authorityAmount` (another
+            currency, or more decimal places than the venue''s scale), and there is no `refusedReason`. Nothing is
+            written.
 
             '
-          x-ticvai-problem-types: [invalid-window, delegate-is-delegator]
+          x-ticvai-problem-types: [validation, invalid-window, delegate-is-delegator]
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/DelegationRefusedProblem'
+                oneOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Problem
+                - $ref: '#/components/schemas/DelegationRefusedProblem'
         '403':
           description: 'The delegation would hand over authority that is not there: `delegateLacksPermission` or
             `exceedsDelegatorAuthority`, with the same status as `createApprovalDelegation`. **Or the step-up is not
             there** (ADAM CR-375; CHG-CR375-001): the caller''s session has no verified, unconsumed MFA step-up for
             this operation (`step-up-token-missing`, `refusedReason` `stepUpTokenMissing`), or the newest one is
             older than 5 minutes (`step-up-token-expired`, `refusedReason` `stepUpTokenExpired`), by the rule in
-            identity `verifyMfaChallenge`. Nothing is written.
+            identity `verifyMfaChallenge`, as Identity''s in-process step-up check answers it (`identity#consumeMfaStepUp`,
+            ADAM CR-509, CR-497). Nothing is written.
 
             '
           x-ticvai-problem-types: [delegate-lacks-permission, exceeds-delegator-authority, step-up-token-missing,
@@ -5971,8 +6055,13 @@ components:
           type: string
           maxLength: 64
           nullable: true
-          description: '**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005; enforced by a
-            unique index on (`matrix_id`, `code`) since ADAM CR-102, CHG-R10ID-015, compared without case). The composite
+          description: '**A stable code for the rule, unique within one version of its matrix** (4 October 2026,
+            CHG-FXC-005; ADAM CR-102, CHG-R10ID-015). Enforced by `rule_matrix_id_matrix_version_code_uniq` on
+            (`matrix_id`, `matrix_version`, `lower(code)`), the only code key since ADAM CR-300 (CHG-CR300-001): codes
+            compare without case, within one version, and null codes do not collide, so a new version repeats the codes
+            of the one before. The old key on (`matrix_id`, `lower(code)`), `rule_matrix_id_code_uniq`, is dropped,
+            guarded, by the names migration `backend/tenant/V0119__names_after_r1_20261029.sql` (ADAM CR-498,
+            CHG-CR498-001). The composite
             `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do
             not collide. A body with two rules of one code is `400 validation`.'
         minimumApprovals:
@@ -7447,8 +7536,9 @@ components:
           description: Product
         venue:
           type: string
+          format: uuid
           description: 'Venue. Optional: the venue the caller acts at, which is the only one accepted (audit R183); absent
-            means that venue, never the tenant matrix.'
+            means that venue, never the tenant matrix. Its `platform.scope` id (ADAM CR-509).'
         department:
           type: string
           description: Department
@@ -7488,7 +7578,8 @@ components:
           description: Skip Conditions
         requiredApproverRole:
           type: string
-          description: Role that must always approve, e.g. CFO, in an N-of-M group. Required when the rule is new
+          format: uuid
+          description: A role id (ADAM CR-509). Role that must always approve, e.g. CFO, in an N-of-M group. Required when the rule is new
             (`400 approver-role-required`), because it becomes the rule's only approver role.
       required:
       - code
@@ -7513,10 +7604,13 @@ components:
           description: Position
         department:
           type: string
-          description: Department
+          description: 'Department. Display only: not stored and never refused; the delegation''s scope is the caller''s venue
+            (ADAM CR-497).'
         venue:
           type: string
-          description: Venue
+          format: uuid
+          description: 'Venue: the id of the venue the caller acts at (its `platform.scope` id). Optional in the input;
+            any other venue is `400 validation` (ADAM CR-497).'
         businessUnit:
           type: string
           description: Business Unit
@@ -7525,16 +7619,20 @@ components:
           description: Legal Entity
         region:
           type: string
-          description: Region
+          description: 'Region. Display only: not stored and never refused; the delegation''s scope is the caller''s venue
+            (ADAM CR-497).'
         delegator:
           type: string
-          description: Delegator
+          format: uuid
+          description: Delegator, a principal id (ADAM CR-497)
         delegate:
           type: string
-          description: Delegate
+          format: uuid
+          description: Delegate, a principal id (ADAM CR-497)
         scope:
           type: string
-          description: Scope
+          description: 'Scope. Display only: not stored and never refused; the delegation''s scope is the caller''s venue
+            (ADAM CR-497).'
         start:
           type: string
           format: date-time
@@ -7556,13 +7654,15 @@ components:
           description: Why temporary authority is granted
         requiredRole:
           type: string
-          description: Required role
+          format: uuid
+          description: Required role, a role id (ADAM CR-497)
         authorityAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Authority amount
         requestKind:
-          type: string
-          description: What the authority limit covers, e.g. discount, refund, goodwill
+          $ref: '#/components/schemas/ApprovalKind'
+          description: 'What the authority limit covers: an `ApprovalKind` value (refund, discountOverride,
+            complimentaryTicket, ...), anything else `400 validation` (ADAM CR-497). Absent, every kind.'
         authorityPercentage:
           type: number
           description: Percentage limit where the authority is a percentage, e.g. discount up to 15
@@ -7590,10 +7690,13 @@ components:
           description: Position
         department:
           type: string
-          description: Department
+          description: 'Department. Display only: not stored and never refused; the delegation''s scope is the caller''s venue
+            (ADAM CR-497).'
         venue:
           type: string
-          description: Venue
+          format: uuid
+          description: 'Venue: the id of the venue the caller acts at (its `platform.scope` id). Optional in the input;
+            any other venue is `400 validation` (ADAM CR-497).'
         businessUnit:
           type: string
           deprecated: true
@@ -7606,16 +7709,20 @@ components:
             of `platform.scope`, so it never sets the delegation''s `scopePath`; a value sent is ignored.'
         region:
           type: string
-          description: Region
+          description: 'Region. Display only: not stored and never refused; the delegation''s scope is the caller''s venue
+            (ADAM CR-497).'
         delegator:
           type: string
-          description: Delegator
+          format: uuid
+          description: Delegator, a principal id (ADAM CR-497)
         delegate:
           type: string
-          description: Delegate
+          format: uuid
+          description: Delegate, a principal id (ADAM CR-497)
         scope:
           type: string
-          description: Scope
+          description: 'Scope. Display only: not stored and never refused; the delegation''s scope is the caller''s venue
+            (ADAM CR-497).'
         start:
           type: string
           format: date-time
@@ -7637,13 +7744,15 @@ components:
           description: Why temporary authority is granted
         requiredRole:
           type: string
-          description: Required role
+          format: uuid
+          description: Required role, a role id (ADAM CR-497)
         authorityAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Authority amount
         requestKind:
-          type: string
-          description: What the authority limit covers, e.g. discount, refund, goodwill
+          $ref: '#/components/schemas/ApprovalKind'
+          description: 'What the authority limit covers: an `ApprovalKind` value (refund, discountOverride,
+            complimentaryTicket, ...), anything else `400 validation` (ADAM CR-497). Absent, every kind.'
         authorityPercentage:
           type: number
           description: Percentage limit where the authority is a percentage, e.g. discount up to 15
