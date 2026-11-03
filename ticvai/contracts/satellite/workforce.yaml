@@ -194,6 +194,15 @@ x-ticvai-jobs:
     writes: [workforce.rota_assignment]
     for: Workforce rota no-show timer.
     source: ['states/rota-assignment.yaml:61']
+  subjectDataPart:
+    module: workforce
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [workforce.employee]
+    writes: []
+    for: 'workforce''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /rota-assignments:
     get:
@@ -1622,6 +1631,7 @@ paths:
 
   /employees:
     get:
+      x-ticvai-personal-data: gated
       operationId: listEmployees
       summary: People, as the HR system of record has them
       description: 'Resource board 3 page 45, decision 6 of the schema merge. **The employee record
@@ -1678,6 +1688,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /employees/{employeeId}:
     get:
+      x-ticvai-personal-data: gated
       operationId: getEmployee
       x-ticvai-consumed-by:
         - "P08 BO-874 Staff Resource Profile"
@@ -3254,6 +3265,13 @@ components:
       - employmentStatus
       - createdAt
       properties:
+        employeeSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: employee
+          x-ticvai-references: pii.subject
+          description: '**The employee, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `firstName`, `lastName`, `email`, `mobile`, `dateOfBirth` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind employee; null while none is given.'
         id:
           type: string
           format: uuid
@@ -3269,16 +3287,24 @@ components:
           type: string
           maxLength: 50
         firstName:
+          x-ticvai-pii: {store: subject.givenName, subject: employeeSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 100
         lastName:
+          x-ticvai-pii: {store: subject.familyName, subject: employeeSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 100
         email:
+          x-ticvai-pii: {store: contact.email, subject: employeeSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 254
           nullable: true
         mobile:
+          x-ticvai-pii: {store: contact.mobile, subject: employeeSubjectId}
+          x-ticvai-data-class: personal
           type: string
           maxLength: 30
           nullable: true
@@ -3286,6 +3312,8 @@ components:
           type: string
           format: date
         dateOfBirth:
+          x-ticvai-pii: {store: subject.dateOfBirth, subject: employeeSubjectId}
+          x-ticvai-data-class: personal
           type: string
           format: date
           nullable: true

@@ -1,0 +1,52 @@
+id: CHG-CR566-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'Platform-default anomaly rules are per-cell configuration (ApiAnomalyRules:PlatformDefaults, ApiAnomalyRule
+  shape, clientId null, fixed UUIDv7 ids), never rows: control.api_anomaly_rule holds tenant rules only, tenant_id NOT
+  NULL in storage (x-ticvai-column-nullable: false, a new derive-schema rule; the wire field stays nullable) referencing
+  control.tenant, scope_path and the row policy unchanged. listApiAnomalyRules merges the tenant''s rows and the
+  defaults by id with one cursor; setApiAnomalyRule matches ruleKey among the tenant''s rows and refuses a default''s id
+  409 anomaly-rule-id-mismatch; the anomaly monitor applies client rule, then tenant rule, then default.'
+decision:
+  what: 'Posted on #31390 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026: "platform-default anomaly rules are per-cell
+    configuration, never rows. control.api_anomaly_rule holds only tenant rules. scope_path stays NOT NULL and the row
+    policy is unchanged ... 1. Configuration key ApiAnomalyRules:PlatformDefaults ... 2. Storage: a forward migration
+    makes control.api_anomaly_rule.tenant_id NOT NULL ... 3. listApiAnomalyRules ... plus every configured default with
+    tenantId null and scopePath null ... 4. setApiAnomalyRule ... A path anomalyRuleId equal to a default''s id is
+    refused with 409 anomaly-rule-id-mismatch ... 5. Anomaly monitor job ... 6. Contract wording, additive and with no
+    shape change."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-566 (#31390 listApiAnomalyRules): a platform default could not be stored (scope_path NOT NULL) nor read
+  (the path policy hides a null path), and nothing said where defaults come from; ADR-0064 (CR-490) already keeps a
+  platform-default limit in per-cell configuration.'
+keys_touched:
+  operations: [listApiAnomalyRules, setApiAnomalyRule]
+  schemas: [ApiAnomalyRule]
+  tables: [control.api_anomaly_rule]
+  files:
+  - contracts/satellite/public-api.yaml
+  - tools/derive-schema.py
+  - tools/check-business-rules.py
+root_class: 'contract against storage: a wire value the table could not hold'
+tickets:
+  started:
+  - '31390 (listApiAnomalyRules, Ready for QA): merge the configured defaults as posted.'
+  unstarted:
+  - '31384 (setApiAnomalyRule): match ruleKey among the tenant''s rows; a default''s id is 409, as posted.'
+  - '37349 (JOB-PUBLIC-API-ANOMALY-MONITOR, Deep Khanvilkar): the precedence as posted; the job''s text now states it.'
+  - 'New [DB] child of MIG-CONTROL-13 (#28006) for the migration owner: ALTER TABLE control.api_anomaly_rule ALTER COLUMN
+    tenant_id SET NOT NULL (handoff/migration-review.md lists it), and its reference to control.tenant.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-566
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-schema.py::column_required
+status: open
+notes: 'Beyond the posted words: ApiAnomalyRule.tenantId declares x-ticvai-references control.tenant (check-storage-promises
+  SP-KEY-UNDECLARED holds a NOT NULL *_id to a declared key); the column rule is x-ticvai-column-nullable: false, read by
+  derive-schema''s column_required; BR-ANOMALY-DEFAULTS-CONFIG in tools/check-business-rules.py holds the decision.
+  Not decided by the posted text: what the migration does with an existing row whose tenant_id is null.'

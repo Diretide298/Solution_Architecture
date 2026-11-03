@@ -600,6 +600,16 @@ x-ticvai-jobs:
     - events/ai-riskCaseClosed.yaml
     - events/cart-abandoned.yaml
     - events/device-statusChanged.yaml
+  subjectDataPart:
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [ai.activity, ai.answer_feedback, ai.chunk_embedding, ai.conversation, ai.index_entry, ai.message, ai.rec_decision,
+      ai.rec_decline, ai.rec_event]
+    writes: []
+    for: 'ai''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` nothing: Identity''s erasure job calls `eraseSubject`, which erases the AI tables, and it answers no part. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /ai/translate:
     post:
@@ -3868,6 +3878,20 @@ paths:
         for: 'the subject''s index entries, deleted with its chunk rows in one transaction'
       - table: ai.chunk_embedding
         for: 'the subject''s chunk rows (subject_id), deleted with its index entries; their Qdrant points follow'
+      - table: ai.conversation
+        for: 'the guest''s conversations (subject_id), deleted with their messages (r13 review C-11, CHG-R14M-001)'
+      - table: ai.message
+        for: 'the messages of those conversations (subject_id), deleted (C-11, CHG-R14M-001)'
+      - table: ai.activity
+        for: 'the subject''s AI calls: prompt, response and sources cleared, the metering kept (C-11, CHG-R14M-001)'
+      - table: ai.answer_feedback
+        for: 'the subject''s feedback rows, deleted (C-11, CHG-R14M-001)'
+      - table: ai.rec_decision
+        for: 'the subject''s recommendation decisions, deleted (C-11, CHG-R14M-001)'
+      - table: ai.rec_event
+        for: 'the subject''s recommendation events, deleted (C-11, CHG-R14M-001)'
+      - table: ai.rec_decline
+        for: 'the subject''s declined recommendations, deleted (C-11, CHG-R14M-001)'
       x-ticvai-no-wrong-state: 'the AI side keeps no state for a subject: a subject with nothing indexed, or already
         erased, answers 200 with zeros, so a retry or a second call is never refused (CHG-R8RES-007)'
       summary: Remove everything the AI index holds about a guest
@@ -3884,6 +3908,19 @@ paths:
         `ai.index_entry` and `ai.chunk_embedding` with the subject, and a Qdrant count of 0 for the payload key; the
         response carries the three counts removed and the two counts left (both 0 on success). A call for a subject
         with nothing indexed answers the same with zeros, so a retry is safe.
+
+
+        **It reaches every AI table that holds the guest, not only the index** (r13 system review C-11; the lead, 3
+        November 2026: "erasure and export reach every module, ai.conversation and the AI messages get a subject id
+        erasure can find"; ADR-0023 as amended 3 November 2026; CHG-R14M-001). In the same transaction as the index
+        rows it deletes the subject''s `ai.conversation` rows and their `ai.message` rows (both by `subject_id`), its
+        `ai.answer_feedback`, `ai.rec_decision`, `ai.rec_event` and `ai.rec_decline` rows, and the compact metadata
+        the memory rule keeps for aged conversations (ai-system-design.md 3.9: the summary, entities and embedding carry
+        the subject and go with it); in `ai.activity` it clears `prompt`, `response` and `sources` of the subject''s
+        rows and keeps the metering (tokens, cost, outcome), which the tenant''s bill needs and which names no one once
+        the subject is erased. The decision record holds personal content only by reference (`subject_ref`,
+        `inputs_ref` to the activity row), never as a value, so the hash chain stays whole and nothing personal is left
+        in it. `rowsLeft` counts every one of these tables.
 
         '
       tags:
@@ -3921,7 +3958,9 @@ paths:
                   rowsLeft:
                     type: integer
                     minimum: 0
-                    description: ai.index_entry and ai.chunk_embedding rows still naming the subject; 0 on success.
+                    description: 'Rows still naming the subject in ai.index_entry, ai.chunk_embedding, ai.conversation,
+                      ai.message, ai.answer_feedback and the ai.rec_* tables, and ai.activity rows with a prompt or
+                      response left (CHG-R14M-001); 0 on success.'
                   pointsLeft:
                     type: integer
                     minimum: 0
@@ -19133,6 +19172,7 @@ components:
         relevance:
           type: number
     AiMessage:
+      x-ticvai-index: [[subjectId]]
       type: object
       x-ticvai-persistence: ai.message
       required:
@@ -19142,6 +19182,15 @@ components:
       - content
       - createdAt
       properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The guest whose conversation the message is in, so erasure finds it** (r13 system review
+            C-11; the lead, 3 November 2026: "ai.conversation and the AI messages get a subject id erasure can find";
+            CHG-R14M-001). Copied from the conversation''s `subjectId` when the message is written; null in a staff
+            conversation. `eraseSubject` deletes the subject''s messages by it.'
         id:
           type: string
           format: uuid

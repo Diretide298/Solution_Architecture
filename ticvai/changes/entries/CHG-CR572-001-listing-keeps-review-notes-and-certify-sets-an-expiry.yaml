@@ -1,0 +1,47 @@
+id: CHG-CR572-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'certifyIntegration keeps its words on the listing: control.integration_listing.review_notes (IntegrationListing.
+  reviewNotes, nullable, readOnly, at most 1000) set by every decision to the notes sent or null; notes over 1000 are 400
+  validation (the shared type). reject without notes is 422 reason-required; certify without a certifiedUntil after today
+  is 422 certified-until-required; certify sets certified_until, reject and revoke leave it. certify and reject from
+  submitted or inReview, never writing inReview; the state model gains submitted to certified and submitted to rejected.'
+decision:
+  what: 'Posted on #31294 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the
+    devs": "certifyIntegration keeps its words on the listing, certifying always sets an expiry, and the state model
+    follows the contract ... 1. Storage: a forward migration adds control.integration_listing.review_notes text, at most
+    1000 characters ... 3. reject without notes ... is 422 with problem type reason-required ... 4. certify without
+    certifiedUntil ... is 422 with problem type certified-until-required ... The state model gains submitted to certified
+    and submitted to rejected"; corrected by the lead''s "Go yes" of 3 November 2026, answering the developers'' questions: "notes over 1000 characters answer 400 validation (the shared type),
+    not 422."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-572 (#31294 certifyIntegration): the notes had nowhere to be kept, and the state model allowed certify and
+  reject only from inReview, which no decision value reaches, while the contract''s 409 accepts submitted.'
+keys_touched:
+  operations: [certifyIntegration, listIntegrationListings]
+  schemas: [IntegrationListing]
+  tables: [control.integration_listing]
+  files:
+  - contracts/satellite/public-api.yaml
+  - states/integration-listing.yaml
+  - tools/check-business-rules.py
+root_class: 'contract against storage: an input with no column, and a state model behind its contract'
+tickets:
+  started:
+  - '31294 (certifyIntegration, Ready for QA): as posted, with the 400 for over-long notes from the "Go yes" comment.'
+  unstarted:
+  - 'The release''s forward migration (integration pass): ADD COLUMN review_notes text with its 1000-character CHECK on
+    control.integration_listing.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-572
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-LISTING-REVIEW-NOTES
+status: open
+notes: 'Left as it was: states/integration-listing.yaml still has submitted to inReview on certifyIntegration ("Being
+  assessed"), which the decision''s "certifyIntegration never writes inReview" contradicts; nothing posted removes it.
+  The DEV-008 certify form is unchanged.'

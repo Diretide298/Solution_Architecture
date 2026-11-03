@@ -1,0 +1,35 @@
+id: CHG-CR572-003
+date: '2026-11-04'
+source: cr
+kind: spec
+summary: 'states/integration-listing.yaml drops submitted -> inReview on certifyIntegration: CR-572 says certify is
+  accepted from submitted or inReview and certifyIntegration never writes inReview, so the transition that had it write
+  inReview ("Being assessed") is not a transition the operation makes.'
+decision:
+  what: 'Decided overnight by the coordinator for lane c, under the lead''s instruction of 4 November 2026 ("take the
+    recommended decision unless its very very important"): "states/integration-listing.yaml: drop submitted -> inReview
+    on certifyIntegration (CR-572: it never writes inReview)".'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'CHG-CR572-001 made certifyIntegration certify and reject straight from submitted and never write inReview, but the
+  state model still had certifyIntegration move submitted to inReview.'
+keys_touched:
+  operations: [certifyIntegration]
+  other: [states/integration-listing.yaml]
+  files:
+  - states/integration-listing.yaml
+  - tools/check-business-rules.py
+root_class: a state model that says an operation makes a transition its contract says it never makes
+tickets:
+  started: []
+  unstarted:
+  - 'certifyIntegration''s ticket: no inReview write.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-572
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-LISTING-REVIEW-NOTES
+status: open
+notes: 'inReview stays in the enum (a listing already there may hold it); nothing in r14 moves a listing into it.'

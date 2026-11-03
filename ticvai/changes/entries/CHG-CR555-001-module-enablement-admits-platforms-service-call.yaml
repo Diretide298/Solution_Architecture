@@ -1,0 +1,48 @@
+id: CHG-CR555-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'white-label getModuleEnablement takes serviceAuth beside bearerAuth (audience staff and service): staff as
+  today (TENANT_CONFIGURE through the kernel''s ordinary permission check); a service call checks no permission, admits
+  Platform (the Control Plane) alone and refuses any other deployable 403, a bad token 401 through the kernel''s shared
+  service sign-in, no X-Tenant-Id 400 tenant-required, a tenant the cell does not hold 404, and answers the same rows,
+  fields and order as staff, writing nothing. The platform operator''s path stays with the platform sign-in ticket,
+  and the Control Plane signing in to a cell from outside it is new work under #37051.'
+decision:
+  what: 'Posted on #30761 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the
+    devs" (3 November 2026): "option A, with the service caller narrowed to Platform. Build now on #30761. What
+    getModuleEnablement returns does not change; only who may call it does. 1. Staff, as today ... 2. A service call:
+    accept serviceAuth beside bearerAuth ... admit only Platform (the Control Plane) ... Any other calling deployable
+    gets 403 ... A service call without it is 400 tenant-required, and a tenant this cell does not hold is 404 ... 3. A
+    platform operator''s call ... belongs to the platform sign-in ticket ... 4. A Control Plane caller signing in to a
+    cell from outside it is a separate piece of work under the service sign-in ticket (#37051)."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-555 (#30761 getModuleEnablement): CR-541 (CHG-CR541-001) has setSubscription call it with serviceAuth, as
+  previewSubscriptionChange and removeLicenceAddOn already did, but its security listed bearerAuth alone.'
+keys_touched:
+  operations: [getModuleEnablement]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: an operation another deployable calls does not accept a service sign-in
+tickets:
+  started:
+  - '30761 (getModuleEnablement, Ready for QA): text not rewritten; the posted decision is what it builds (serviceAuth
+    beside bearerAuth, Platform alone, the 400, 401, 403 and 404).'
+  unstarted:
+  - 'A new task under #37051 (see notes), for the plan pass.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-555
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ENABLEMENT-SERVICE-CALLER
+status: open
+notes: 'Beyond the posted words: the 400 (tenant-required) and the 403 (forbidden) are declared with their own
+  descriptions, and 401 and 404 as the shared responses; white-label''s serviceAuth scheme names this caller. New task
+  for the plan pass: "[BE] Service sign-in from the Control Plane into a tenant''s cell: the Control Plane''s identity,
+  a token a cell host accepts, and the tenant it sends (setSubscription, previewSubscriptionChange, removeLicenceAddOn,
+  terminateTenant)", parent #37051, owner the service sign-in ticket''s owner (kernel). CR-560 (CHG-CR560-001) posts
+  the caller''s end of the same call as kernel work on its own ticket.'

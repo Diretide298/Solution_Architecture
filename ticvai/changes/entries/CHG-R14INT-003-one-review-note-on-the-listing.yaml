@@ -1,0 +1,40 @@
+id: CHG-R14INT-003
+date: '2026-11-04'
+source: cr
+kind: contract
+summary: 'certifyIntegration''s notes are kept once on the listing: lane c''s reviewNotes (control.integration_listing.review_notes,
+  at most 1000 characters, ADAM CR-572) and lane s''s certificationNotes (certification_notes, CHG-R14BO-006, the lead''s
+  "Keep them") are the same field, the note of the last certify, reject or revoke decision. review_notes is kept;
+  certificationNotes and control.integration_listing.certification_notes are not added.'
+decision:
+  what: 'The coordinator''s rule for the r14 integration, under the lead''s instruction of 4 November 2026 ("take the
+    recommended decision unless its very very important"): "if they are the same field, keep one, review_notes, and
+    record it as CHG-R14INT-003". Both lanes store certifyIntegration''s body notes on the listing, set only by that
+    decision: they are the same field.'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'The merge of lanes s and c conflicted on certifyIntegration''s notes and IntegrationListing: each lane added its own
+  column for the same note.'
+keys_touched:
+  operations: [certifyIntegration]
+  schemas: [IntegrationListing]
+  tables: [control.integration_listing]
+  files:
+  - contracts/satellite/public-api.yaml
+  - tools/check-business-rules.py
+root_class: two decisions settled the same day on the same screen, each built in its own lane
+tickets:
+  started: []
+  unstarted:
+  - 'certifyIntegration''s ticket and the control.integration_listing [DB] task: one column, review_notes.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-572
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-LISTING-REVIEW-NOTES
+status: open
+notes: 'CHG-R14BO-006 is left as lane s wrote it; this entry is the later word. The plan pass task
+  R14S-DB-INTEGRATION-LISTING-NOTES (certification_notes) is dropped with the column: review_notes is lane c''s
+  migration task.'

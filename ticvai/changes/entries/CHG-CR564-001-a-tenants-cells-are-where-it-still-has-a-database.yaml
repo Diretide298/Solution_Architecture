@@ -1,0 +1,39 @@
+id: CHG-CR564-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'listTenantCells answers each control.cell with at least one control.cell_tenant row for the tenant whose
+  status is provisioning, live, suspended or draining, once each, by name then id; a cell with only dropped rows is left
+  out, and a tenant with no such row (an unknown one too) gets 200 []. It declares its reads (control.cell_tenant,
+  control.cell), no 404, and does not read control.tenant.'
+decision:
+  what: 'Posted on #31367 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026: "a cell counts as the tenant''s cell while the
+    tenant still has a database there ... listTenantCells answers each control.cell that has at least one
+    control.cell_tenant row for the tenant whose status is provisioning, live, suspended or draining ... Each cell
+    appears once ... A tenant with no such row, including an unknown tenant, gets 200 with an empty array: the operation
+    declares no 404 and does not read control.tenant ... Keep the rule in one place (the status filter of the query)."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-564 (#31367 listTenantCells): control.cell_tenant keeps dropped rows so migration records stay readable,
+  and the operation did not say whether a dropped placement still counts.'
+keys_touched:
+  operations: [listTenantCells]
+  tables: [control.cell, control.cell_tenant]
+  files:
+  - contracts/satellite/subscription.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'which of a table''s kept history rows count as the current one'
+tickets:
+  started:
+  - '31367 (listTenantCells, Ready for QA): the status filter and the tests the decision names, as posted.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-564
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TENANT-CELLS-HELD
+status: open
+notes: 'The carried lineage override for listTenantCells is removed: the contract now declares both reads.'

@@ -1,0 +1,47 @@
+id: CHG-CR569-002
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'control.developer_member.email is unique among active members (x-ticvai-unique-when on DeveloperMember: a
+  partial unique index on lower(email) where status is active), for the integration''s forward migration; until it is
+  applied, an email matching active members of two accounts answers 403 on getDeveloperAccount, createApiClient and
+  revokeApiCredential, as built.'
+decision:
+  what: 'Posted on #31295 and #31383 (Chinmay, 3 November 2026), the lead''s "Go yes" of 3 November 2026, answering the
+    developers'' questions: "developer_member.email becomes unique among active members: a partial unique index on
+    lower(email) where the member is active (describe it for the integration''s forward migration; delete any V file
+    derive-ddl writes). Until then the two-accounts case answers 403, as built."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-569 (#31295 createApiClient, #31383 revokeApiCredential): the developer asked what happens when one
+  verified email is an active member of two developer accounts.'
+keys_touched:
+  operations: [getDeveloperAccount, createApiClient, revokeApiCredential]
+  schemas: [DeveloperMember]
+  tables: [control.developer_member]
+  files:
+  - contracts/satellite/public-api.yaml
+  - tools/check-business-rules.py
+root_class: 'a match the caller rule relies on that may name two rows'
+tickets:
+  started:
+  - '31295 (createApiClient, On hold), 31383 (revokeApiCredential) and 31389 (getDeveloperAccount, On hold): the
+    two-accounts case stays 403, as built.'
+  unstarted:
+  - 'The release''s forward migration (integration pass): CREATE UNIQUE INDEX developer_member_email_uniq ON
+    control.developer_member (lower(email)) WHERE status = ''active''. The decision does not say which row gives way
+    where an email is already active in two accounts; the index build fails there.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-569
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-API-CLIENT-CALLER
+status: open
+notes: 'Not built from the same "Go yes": the verified email read through identity#principalRecords in process with no
+  tenant grant migration. The operations host is not in commerce, so an in-process read of an Identity query needs a
+  granted read in docs/active/cross-deployable-writes.yaml, and check-cross-deployable-writes (X-READ) refuses a granted
+  read without tables, while a granted table derives GRANT SELECT ON identity.principal TO operations into the tenant
+  forward migration (the operations role has no SELECT on identity today). Stopped for a correction. Corrects
+  CHG-CR569-001''s ticket list: revokeApiCredential''s ticket is #31383 (under #28009).'

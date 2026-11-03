@@ -29,7 +29,8 @@ ticketed block must still be built in one, or carry its reason in `docs/active/b
                  `decidedReads`) whose creating migration is built only in a later block: listProductApprovalWorkflows
                  (#31816, A1) reads catalogue.approval_policy, created by MIG-CATALOGUE-3 (#31608), which the plan put in
                  Block B (ADAM CR-460, CHG-R13PL-001). build-service-docs.py pulls such a migration into the block of the
-                 first task that waits on it; this holds the plan to it
+                 first task that waits on it; this holds the plan to it. A privacy part's read marked
+                 `feedsSetup: false` is not judged: the part leaves out a table not yet created (CHG-R14M-001)
   C-REACH        a Block A screen is reached from its app's entry (`navigation.isEntryPoint`) only through a screen
                  outside its drop or an earlier one (EMP-003, the staff home, was in no block; CHG-RONEP-006). The plan
                  pulls in app homes only (`navHomes`, lever A, CHG-RONEP-007); a screen behind a command centre gets a
@@ -63,6 +64,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+import personal_data as pd  # noqa: E402  (a privacy part's own-table reads, CHG-R14M-001)
 import ticket_done as td  # noqa: E402  (load_holds, CHG-FXP-002)
 import sprint_plan as sp  # noqa: E402
 import ticket_done as td  # noqa: E402
@@ -254,6 +256,9 @@ def main() -> int:
     # none.
     lineage = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
     decided = {o: set((x or {}).get("tables") or []) for o, x in (extra.get("decidedReads") or {}).items()}
+    # a privacy part's read of a table its module keeps waits for no migration: the part leaves out a table the tenant
+    # database does not have yet (personal_data.part_only_reads; r13 review B-01, CHG-R14M-001)
+    part_only = pd.part_only_reads(g.ROOT)
     creators = defaultdict(set)
     for r in rows:
         if r.get("type") != "Task" or "#" in r.get("key", "") or r.get("track") != "Database":
@@ -275,7 +280,7 @@ def main() -> int:
             o = b.split(" ", 1)[1].split("#")[-1]
             x = lineage.get(o) or {}
             for t in sorted(set(x.get("reads") or []) | set(x.get("writes") or []) | decided.get(o, set())):
-                if t not in creators:
+                if t not in creators or (o, t) in part_only:
                     continue
                 first = first_block(creators[t])
                 if RANK.get(first, 9) > RANK[b_task]:

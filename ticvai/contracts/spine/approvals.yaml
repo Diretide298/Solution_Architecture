@@ -227,6 +227,15 @@ x-ticvai-jobs:
     writes: [approvals.workflow_instance, approvals.workflow_intervention, approvals.workflow_version]
     for: 'Approvals workflow engine: run workflow instances and activate versions.'
     source: ['states/workflow-instance.yaml:25', 'states/workflow-version.yaml:74']
+  subjectDataPart:
+    module: approvals
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [approvals.accreditation_badge, approvals.request]
+    writes: []
+    for: 'approvals''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /approval-requests:
     get:
@@ -1862,6 +1871,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-badges:
     get:
+      x-ticvai-personal-data: gated
       operationId: listAccreditationBadges
       x-ticvai-audience:
       - staff
@@ -1894,6 +1904,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: issueAccreditationBadge
       x-ticvai-audience:
       - staff
@@ -5903,6 +5914,13 @@ components:
       - id
       - scopePath
       properties:
+        holderSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: applicant
+          x-ticvai-references: pii.subject
+          description: '**The badge holder, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind applicant; null while none is given.'
         scopePath:
           type: string
           readOnly: true
@@ -5915,6 +5933,8 @@ components:
           type: string
           format: uuid
         holderName:
+          x-ticvai-pii: {store: subject.displayName, subject: holderSubjectId}
+          x-ticvai-data-class: personal
           type: string
         zones:
           type: array
