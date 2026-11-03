@@ -1920,10 +1920,10 @@ paths:
         updates, one `catalogue.audit_entry` per changed price through the shared `AuditEntries.InsertAsync`, filled as
         the other pricing handlers fill it: `domain` pricing, `entity_type` price, `entity_id` the price id,
         `product_id` the price''s product, `field` list_price, `previous_value` and `new_value` the old and new amount
-        as decimal strings, the caller as actor, `occurred_at` the run''s time. It writes no `catalogue.product_version`
-        row: a product version is defined once by `updateProduct`, whose content hash and snapshot cover the product
+        as decimal strings, the caller as actor, `occurred_at` the run''s time. It writes no product version row: a
+        product version is defined once by `updateProduct`, whose content hash and snapshot cover the product
         and its media, channel texts, sale permissions and owner forms, not prices, so a price-only change leaves that
-        hash unchanged and there is no version. It writes no `catalogue.price_list_version` row: price-list versions
+        hash unchanged and there is no version. It writes no price-list version row: price-list versions
         are created only when an approved pricing change request publishes, and pricing rollback restores them from
         their snapshot; a price change that must be reversible by rollback goes through a pricing change request. A
         dry run, a skipped product, a price whose new amount equals the old one, and a refused run (400 or 403) write
@@ -4383,8 +4383,8 @@ paths:
 
 
         **What it writes besides prices** (ADAM CR-580, Chinmay, 3 November 2026; CHG-CR580-001): the rule
-        `bulkChangePrices` states. One `catalogue.audit_entry` per changed price, and no version rows: no
-        `catalogue.product_version` and no `catalogue.price_list_version`.
+        `bulkChangePrices` states. One `catalogue.audit_entry` per changed price, and no version rows: no product
+        version and no price-list version.
 
         '
       tags:

@@ -35,9 +35,12 @@ keys_touched:
   - catalogue.price_list_version
   files:
   - contracts/spine/catalogue.yaml
+  - handoff/api-data-lineage-overrides.json
   - tools/check-business-rules.py
   other:
   - CR-558 closed as superseded by CR-580 (no change of its own)
+  - the carried lineage override for bulkChangePrices drops catalogue.product_version, which kept the write in the
+    lineage after the contract stopped declaring it
 root_class: a write declared from a word ("versions") another operation does not define
 tickets:
   started: []

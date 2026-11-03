@@ -35,6 +35,7 @@ keys_touched:
   files:
   - contracts/satellite/retail.yaml
   - docs/active/cross-deployable-writes.yaml
+  - handoff/cross-deployable-writes.md
   - tools/check-business-rules.py
   other:
   - XDR-150 (the operations host asks catalogue#variantPriceRecords in process for these two operations; the SELECT is
@@ -57,4 +58,7 @@ status: open
 notes: 'Beyond the posted words: the in-process read of catalogue#variantPriceRecords from the operations host is
   recorded as read grant XDR-150 (narrow, these two operations), because tools/check-cross-module-reads.py XR-ROUTE
   refuses an in-process read across deployables without one; it grants nothing new (XDR-007 and XDR-055 already give
-  the operations role SELECT on the six tables the query reads), as the posted "so no new grant" says.'
+  the operations role SELECT on the six tables the query reads), as the posted "so no new grant" says. The 409s
+  declare problem types, which tools/check-error-sources.py E-PROBLEM-TYPE requires and the posted text does not name:
+  createMerchandise [barcode-in-use, sku-in-use, variant-not-priced], updateMerchandise [barcode-in-use], one per
+  refusedReason.'

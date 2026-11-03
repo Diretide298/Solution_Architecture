@@ -490,6 +490,7 @@ paths:
             `barcodeInUse`; the SKU already used by another item at the same `outletId`, compared lowercased,
             `skuInUse`; or the catalogue variant has no price at the outlet's venue on channel pos now,
             `variantNotPriced`, with nothing written (ADAM CR-559).
+          x-ticvai-problem-types: [barcode-in-use, sku-in-use, variant-not-priced]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
@@ -582,6 +583,7 @@ paths:
               schema: { $ref: '#/components/schemas/MerchandiseItem' }
         '409':
           description: The new barcode is already in use by another item with the same `outletId` (ADAM CR-104). `refusedReason` is `barcodeInUse` (`skuInUse` is create only; ADAM CR-559).
+          x-ticvai-problem-types: [barcode-in-use]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MerchandiseConflictProblem' }
