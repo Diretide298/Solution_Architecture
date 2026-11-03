@@ -1,0 +1,68 @@
+id: CHG-CR521-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'The server issues and checks every guest-document key. New operation createGuestDocumentUpload (POST
+  /guest-documents/uploads, marketing-crm; GUEST_VIEW_PII, venue scope, staff and guest, as uploadGuestDocument): body
+  kind, contentType, sizeBytes, subjectId (a guest only its own, else 403; staff any, checked through
+  identity#subjectRecords, 404 if unknown); image/jpeg, image/png, application/pdf up to 10 MB, else 400
+  media-type-not-permitted or media-too-large; writes a pending row to the new marketing.guest_document_upload and
+  answers 201 with storageRef, a signed upload URL into the tenant''s private guest-document store and expiresAt (15
+  minutes); a pending object not attached within 24 hours is deleted (job guestDocumentUploadCleanup).
+  uploadGuestDocument accepts storageRef only for a pending row of the same subject and kind whose object is in the
+  store at no more than the issued size, else 422 guest-document-upload-invalid; it inserts the guest_document, marks the
+  row attached and sets id, uploaded_at and uploaded_by_principal_id, ignoring them from the client.
+  marketing.guest_document takes the grant-holder subject policy (grant-holder-write), as form_submission has.'
+decision:
+  what: 'ADAM CR-521, posted on #31168: "Decided (Chinmay, 3 November 2026): option A. The server issues and checks every
+    guest-document key; a key the client makes up is never stored. Build now: 1. New operation createGuestDocumentUpload,
+    POST /guest-documents/uploads in marketing-crm ... The operation writes a row to a new table,
+    marketing.guest_document_upload (id, storage_ref, subject_id, kind, content_type, size_bytes,
+    issued_by_principal_id, issued_at, expires_at, status pending|attached) ... It answers 201 with storageRef, a signed
+    upload URL ... and expiresAt (15 minutes) ... A pending object not attached within 24 hours is deleted. 2.
+    uploadGuestDocument (#31168) accepts storageRef only when ... Otherwise it answers 422 guest-document-upload-invalid
+    ... 3. Migration: give marketing.guest_document the grant-holder subject policy
+    (platform.apply_grant_holder_subject_rls), as form_submission has ... The storageRef description changes to name
+    createGuestDocumentUpload as the step that issues the key. No screen changes." The lead''s "Close the CRs and
+    respond to devs" and "get the NEw CRs in the r13", 3 November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-521 (Sanket Keluskar, #31168 uploadGuestDocument): storageRef was free text no operation issued
+  (GuestDocument.storageRef said "still to be designed"), and guest_document''s write policy (subject_in_scope, V0104)
+  refused venue staff, the problem CR-318 fixed for form_submission with apply_grant_holder_subject_rls (V0118).
+  Assets'' createGuestUpload is guest-only and deletes after 24 hours, and BL-133 keeps these documents out of assets.'
+keys_touched:
+  operations: [createGuestDocumentUpload, uploadGuestDocument]
+  schemas: [GuestDocument, GuestDocumentUpload, GuestDocumentUploadTicket]
+  tables: [marketing.guest_document, marketing.guest_document_upload]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'job marketing-crm#guestDocumentUploadCleanup (workers, timer)'
+root_class: a stored-object key the server never issued, and a write policy that refused the staff who write for a guest
+tickets:
+  started: []
+  unstarted:
+  - '31168 (uploadGuestDocument, Sanket Keluskar): accept only an issued, pending storageRef of the same subject and kind
+    (422 otherwise), attach it in the insert''s transaction, set id, uploaded_at and uploaded_by_principal_id.'
+  - 'New [BE] task under #27924 (listed for the integration pass): createGuestDocumentUpload, the upload table and the
+    cleanup job.'
+  - 'New [DB] task under the affected MIG-* ticket, the migration owner Hrushikant Patkar (listed for the integration
+    pass): marketing.guest_document_upload with its grant-holder policy, and guest_document''s policy changed to
+    grant-holder-write.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-521
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-DOCUMENT-UPLOAD
+status: open
+notes: '**Named beyond the posted words:** the response is GuestDocumentUploadTicket (storageRef, uploadUrl, expiresAt;
+  not stored); storage_ref is unique per tenant; uploadGuestDocument declares 403 and 404 for the subject rules (as step
+  1 states them); the request body has additionalProperties false; the 24-hour deletion is a declared job,
+  marketing-crm#guestDocumentUploadCleanup (workers, a timer with no interval stated), which deletes the object from the
+  store and writes no row. guest_document_upload.kind is a plain string (at most 40) whose values the request body''s
+  enum checks: an enum carrying other needs a note column (check-contract-shapes C-ENUM-OTHER, R222), which the posted
+  columns do not have.'

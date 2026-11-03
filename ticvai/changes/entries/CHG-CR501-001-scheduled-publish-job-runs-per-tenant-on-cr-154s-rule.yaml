@@ -1,0 +1,60 @@
+id: CHG-CR501-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'The scheduled-publish job (white-label#scheduledPublish, workers, every minute) runs one transaction per tenant
+  with the tenant''s due rows selected FOR UPDATE SKIP LOCKED; due is scheduled_for passed, is_current false,
+  activation_failed_at and activated_at null, review_status notRequired or approved. Per tenant the due version with the
+  latest scheduledFor (tie: highest version) is validated again and made current (activated_at now, contentPublished in
+  the outbox, its changed list against the version current until now) or its failure recorded, never retried; every
+  other version due in the same run is passed over with ''Superseded by version N, which was due at the same time.''.
+  A version approved while its scheduledFor is in the future is left waiting by the approval.granted consumer and made
+  current by the job. r13''s CR-154 rule is kept: activated_at is set whenever a version becomes current, and a version
+  published before the current one became current is superseded.'
+decision:
+  what: 'ADAM CR-501, posted on #30774: "Decided (Chinmay, 3 November 2026): the scheduled-publish job is built as its own
+    ticket. Build now: (1) A WhiteLabel scheduled job in the workers host, run every minute, one transaction per tenant.
+    Select the tenant''s due rows FOR UPDATE SKIP LOCKED ... (2) Due means: ... review_status notRequired or approved
+    ... (3) Add whitelabel.config_version.activated_at ... Only this job writes it. (4) Per tenant, take the due version
+    with the latest scheduledFor ... (5) Every other version due in the same run is passed over ... ''Superseded by
+    version N, which was due at the same time.'' ... (6) ... White-label''s approval.granted consumer must leave such a
+    version waiting ... (7) Tests ..." The lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3
+    November 2026; where it contradicts r13 the coordinator''s instruction of 3 November 2026: "keep r13''s rule and give
+    me the exact correction text for the developer".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-501 (Narayan Gaonkar, #30774 publishTenantConfig, On hold): the scheduled-publish job had no ticket. It
+  was drafted against r12; r13 already carries CR-154''s decision of 2 November 2026 (CHG-R13JOB-004: activated_at set
+  on every activation and backfilled, and the newer-publish supersede rule), which CR-501''s step (3) "Only this job
+  writes it" contradicts, so r13''s rule is kept and a correction goes to the developer.'
+keys_touched:
+  operations: [publishTenantConfig]
+  schemas: [ConfigVersion]
+  tables: [whitelabel.config_version]
+  files:
+  - contracts/satellite/white-label.yaml
+  - events/approval-granted.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'job white-label#scheduledPublish (its for text)'
+root_class: a later decision drafted against an older release, merged onto the rule the release already carries
+tickets:
+  started:
+  - '30774 (publishTenantConfig, Narayan Gaonkar; On hold) and 27779: build the job as posted except step (3), which
+    keeps CR-154''s rule (correction comment in the lane report); the approval.granted consumer leaves a version
+    scheduled for later waiting.'
+  unstarted:
+  - 'New [BE] task under #27779 (listed for the integration pass): the scheduled-publish job, as the decision says
+    ("built as its own ticket").'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-501
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SCHEDULED-PUBLISH-RUN
+status: open
+notes: '**Not as posted, by the coordinator''s instruction:** activated_at stays as CR-154 decided (set by an immediate
+  publish, the approval consumer and the job; backfilled from published_at), not "only this job writes it", and CR-154''s
+  newer-publish supersede stays alongside the same-run supersede. No column change: activated_at is already in r13
+  (CHG-R13JOB-004, CHG-R13PL-048).'

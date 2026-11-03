@@ -1,0 +1,50 @@
+id: CHG-CR507-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'createPreview takes the tenant''s address exactly as getPlatformSubdomain does: it declares
+  platform-ops#tenantDomainRecords and subscription#cellRecords (in process), through one WhiteLabel reader of the
+  platform subdomain hostname that both operations use; url is https://<that hostname>/previews/{previewId}, never a
+  custom domain (a missing address is a server error). The cache entry goes through the kernel''s IKeyedState with the
+  logical key preview:{previewId} (the entry the contract calls cache:preview:{tenantId}:{previewId}); createPreview
+  writes it, getPreview reads it, and the preview.requested renderer reads and writes it the same way after setting the
+  tenant from the event''s tenantId, until expiresAt.'
+decision:
+  what: 'ADAM CR-507, posted on #30767: "Decided (Chinmay, 3 November 2026): createPreview takes the tenant''s address
+    exactly as getPlatformSubdomain does. Build now: (1) createPreview declares platform-ops#tenantDomainRecords (in
+    process) and subscription#cellRecords (in process) ... (2) One reader in WhiteLabel answers the tenant''s platform
+    subdomain hostname ... Whichever of this ticket and getPlatformSubdomain''s sub-task (#31078) lands first builds it
+    ... (3) url = https://<that hostname>/previews/{previewId}. Never a custom domain ... (4) The cache entry goes through
+    the kernel''s IKeyedState with the logical key preview:{previewId} ... (5) Otherwise createPreview is unchanged." The
+    lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3 November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-507 (Deep Khanvilkar, #30767 createPreview): the preview url needs the tenant''s platform subdomain, and
+  no read createPreview declared supplied it (CR-476 had removed its Catalogue and Orders reads); getPlatformSubdomain
+  already declares the two reads in this module.'
+keys_touched:
+  operations: [createPreview, getPreview, getPlatformSubdomain]
+  files:
+  - contracts/satellite/white-label.yaml
+  - events/preview-requested.yaml
+  - tools/check-business-rules.py
+root_class: a read the operation needs is not declared
+tickets:
+  started: []
+  unstarted:
+  - '30767 (createPreview, Deep Khanvilkar): the two in-process reads through the shared reader, the url rule and the
+    IKeyedState entry.'
+  - '31078 (getPlatformSubdomain''s sub-task): the same reader; whichever lands first builds it with Platform''s query
+    class for tenantDomainRecords.'
+  - '37209 (the preview renderer, made by hand on 2 November): set the tenant from the event''s tenantId, then read and
+    write the entry through IKeyedState (preview:{previewId}).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-507
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PREVIEW-ADDRESS
+status: open
+notes: 'tools/check-business-rules.py BR-PREVIEW-READS-NOTHING (CR-476, lane q) now lets createPreview ask exactly the
+  two address reads and still nothing of Catalogue or Orders. Beyond the posted words: none.'

@@ -322,7 +322,8 @@ x-ticvai-queries:
       publishGuidedChoice, whose event targets must be the choice's venue's and, at publish, on sale (ADAM CR-394,
       Chinmay, 31 October 2026; docs/active/cross-deployable-writes.yaml XDR-033), and for updateGuidedChoice, which
       applies the same check (ADAM CR-444, 1 November 2026), through Catalogue's own query class under the caller's
-      row security.
+      row security. It is asked in process by the operations host for getPublishedBookingFlow, whose eventId must be
+      an event of the path's venue (ids [eventId] where {venueId}; ADAM CR-495, 3 November 2026; XDR-110).
     served: [in-process, service]
   groupPackageRecords:
     module: catalogue
@@ -472,7 +473,8 @@ x-ticvai-queries:
       It is asked in process by the operations host for white-label
       deleteBookingFlow's 409 flow-in-use (where {bookingFlowId}, and the venue's products on sale that would fall
       back to the flow; ADAM CR-426) and for getPublishedBookingFlow's resolution (ids [productId] where {venueId};
-      ADAM CR-427), 31 October 2026; XDR-051.
+      ADAM CR-427), 31 October 2026; XDR-051; and, for a booking opened from an event, where {venueId, eventId}
+      (ADAM CR-495, 3 November 2026).
     served: [in-process, service]
   # **Which products list an asset** (ADAM CR-309, option (b), Chinmay, 29 October 2026; CHG-CR309-001). Assets'
   # deleteMediaAsset (operations host) refuses 409 in-use while a product lists the asset, and productRecords answers

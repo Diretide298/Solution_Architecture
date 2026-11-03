@@ -1,0 +1,51 @@
+id: CHG-CR534-001
+date: '2026-11-03'
+source: cr
+kind: spec
+summary: 'The WEB-022 build in 3422264 (photo cards on shared rows, the Your plan status pill, the sticky Your membership
+  basket, the page up to 1408px, the three status tokens) is the screen''s design and replaces CR-516''s log; the
+  package''s wireframe, screen layout and page info follow it later (LO-CR534-001). The Your plan pill maps every
+  GuestMembership.status: active Active (--status-active), frozen Paused and suspended Suspended (--status-paused),
+  expired Expired and cancelled Cancelled (--status-expired); never a raw value or an empty pill. Most popular and the
+  saving stay out until #37213. The Passholders section is left out of this build and comes back on its own follow-up
+  ticket under #31742 (LO-CR534-002).'
+decision:
+  what: 'ADAM CR-534, posted on #31742: "Decided (Chinmay, 3 November 2026): the WEB-022 build in commit 3422264 ... is
+    accepted as the screen''s design and replaces CR-516''s log. The package''s wireframe, screen layout and page info
+    follow it later. Build now: 1. Keep the build as it is, except for the status pill. 2. Map the pill to every
+    GuestMembership.status value from getMyMemberships ... Never show a raw value or an empty pill. 3. ''Most popular''
+    and the saving line stay out until #37213 delivers them, as logged. 4. Leave the Passholders section (Adult and Child
+    pass steppers) out of this build. It is client-approved and comes back on its own follow-up ticket under this one,
+    bound to the plan''s variants the way Ticket Type Selection''s guest counters are." The lead''s "Close the CRs and
+    respond to devs" and "get the NEw CRs in the r13", 3 November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-534 (Chitrangi Mestry, #31742 WEB-022): a design change log for the build made to CR-482; its pill covered
+  three of GuestMembership''s five statuses, and the frame''s Passholders section, client-approved, was not bound by
+  CR-482. CR-516 (the earlier log) was rejected as replaced by this one.'
+keys_touched:
+  screens: [WEB-022]
+  operations: [getMyMemberships]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: a frontend design change logged after the build; the package's drawing deferred on the left-out list
+tickets:
+  started: []
+  unstarted:
+  - '31742 (WEB-022 build, Chitrangi Mestry): keep the build; map the pill to all five statuses; leave Passholders out.'
+  - 'New [FE] task under #31742 (listed for the integration pass): the Passholders section bound to the plan''s variants.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-534
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-WEB022-STATUS-PILL
+status: open
+notes: '**Design change: WEB-022 as built in 3422264 (photo cards on shared rows, Your plan pill, sticky basket, 1408px
+  page).** The screen record keeps the client-verified frame''s layout until the redraw (LO-CR534-001); its notes, the
+  Your plan banner''s notes and prototype.differences name the build and the pill mapping, so no visible field changed
+  and docs/active/approved-ui-changes.yaml needs no entry. The Passholders section is on the left-out list
+  (LO-CR534-002) until its ticket. Beyond the posted words: none.'

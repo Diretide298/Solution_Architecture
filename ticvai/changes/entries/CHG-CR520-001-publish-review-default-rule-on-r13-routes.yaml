@@ -1,0 +1,60 @@
+id: CHG-CR520-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'setPublishReviewPolicy, on switching enabled from false to true, reads the tenant''s approval rules
+  (approvals#ruleRecords, in process: the operations host composes Tenancy''s query classes, XDR-111); with an active
+  configurationChange rule at the tenant root whose subjectTypes are empty or contain whiteLabelPublication it creates
+  nothing; otherwise it reads the roles that grant TENANT_PUBLISH (identity#rolePermissionRecords, over Identity''s
+  service route, which Identity now serves) and calls setApprovalMatrix as an operation with one rule (configurationChange,
+  [whiteLabelPublication], those roles, tenant, 1 level, no expiry, SLA or condition), saving the policy only after the
+  call succeeds. requiresReviewerOtherThanAuthor needs no wiring. Until #31185 stores matrices, switching on is 409
+  review-route-unavailable; switching off keeps the matrix.'
+decision:
+  what: 'ADAM CR-520, posted on #30776: "Decided (Chinmay, 3 November 2026): switching the publish review on creates this
+    default when the tenant has no route for white-label publications. Build now: (1) On switching enabled from false to
+    true, read the tenant''s approval rules (approvals#ruleRecords over Tenancy''s service route) ... (2) Otherwise read
+    the roles that grant TENANT_PUBLISH (identity#rolePermissionRecords) and call approvals'' setApprovalMatrix as an
+    operation over Tenancy''s service route, under service sign-in between deployables, with one rule ... (3)
+    requiresReviewerOtherThanAuthor is stored as given and needs no wiring ... (4) While setApprovalMatrix does not store
+    matrices (#31185), switching on is refused with 409 review-route-unavailable ... (5) Switching off keeps the matrix."
+    The lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3 November 2026; where it
+    contradicts r13 the coordinator''s instruction of 3 November 2026: "keep r13''s rule and give me the exact correction
+    text for the developer".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-520 (Narayan Gaonkar, #30776 setPublishReviewPolicy): the "tenant default matrix" had no defined rule and
+  setApprovalMatrix no storage yet. Drafted against r12: r13''s class ruling (CHG-R13INP-001, XDR-073; ADR-0055 as amended
+  2 November 2026) has the operations host ask Tenancy''s queries in process, never over the service route, so the
+  ruleRecords read keeps r13''s route; identity#rolePermissionRecords was served in process only, inside commerce.'
+keys_touched:
+  operations: [setPublishReviewPolicy, setApprovalMatrix]
+  tables: [approvals.rule, identity.role_permission, whitelabel.publish_review_policy]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/identity.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'query identity#rolePermissionRecords served on the service route too (POST /queries/role-permission-records)'
+root_class: a later decision drafted against an older release, merged onto the routes the release already rules
+tickets:
+  started: []
+  unstarted:
+  - '30776 (setPublishReviewPolicy, Narayan Gaonkar): as posted, except approvals#ruleRecords in process (correction
+    comment in the lane report); the 409 until #31185.'
+  - 'New [BE] task under Identity''s served-queries ticket (listed for the integration pass): serve
+    identity#rolePermissionRecords on the service route, POST /queries/role-permission-records (CR-438''s rule).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-520
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PUBLISH-REVIEW-DEFAULT
+status: open
+notes: '**Not as posted, by the coordinator''s instruction:** approvals#ruleRecords is read in process (XDR-111 grants
+  the operations role SELECT on approvals.rule), not over Tenancy''s service route; tools/check-cross-module-reads.py
+  XR-INPROCESS-HOST refuses the posted route. **Named beyond the posted words:** identity#rolePermissionRecords is read
+  over Identity''s service route, which Identity now serves (the posted text names no route, and the operations host
+  does not compose Identity); setPublishReviewPolicy declares 409 review-route-unavailable.'

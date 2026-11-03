@@ -435,6 +435,35 @@ And one rule per decision:
   BR-MEMBERSHIP-PLAN-PAGE (CR-482, CHG-CR482-001) Product.isFeatured and compareAtPrice (compare_at_amount), set on
                    create and update; WEB-022 sells through the cart and goes on to WEB-011.
   BR-WEB035-PRICE-CARDS (CR-473, CHG-CR473-001) WEB-035 keeps CR-358's Prices in your currency cards on listProducts.
+  r13 second CR round, lane w3 (ADAM CR-493 to CR-534, decided 3 November 2026; lane_w3_rules_r13), each failing on
+  the r13 candidate before the lane (f599f2c6):
+  BR-GST007-AS-BUILT (CR-493, CHG-CR493-001) GST-007's coach-mark cards, the More dates month calendar and the
+                   one-question Yes / No consent pop-up with a close (x) that discards the answers.
+  BR-GST008-PHOTO-BADGE (CR-494, CHG-CR494-001) GST-008's open photo runs into the white card and the N selected badge
+                   sits beside the kind icon, in the record and in the frame.
+  BR-BOOKING-FLOW-EVENT (CR-495, CHG-CR495-001) getPublishedBookingFlow resolves from eventId (products where
+                   {venueId, eventId}, first that resolves); GST-007 sends productId, else eventId.
+  BR-FORM-ROOT-READ (CR-496, CHG-CR496-001) submitForm reads the published form and its resign rule under the root
+                   grant, filtered to the caller's paths, then returns to the caller's grant.
+  BR-CONFIG-DIFF-SHAPE (CR-500, CHG-CR500-001) diffConfigVersion's areas, paths, values, order, changeScope and 404.
+  BR-PERFORMANCE-INTO-TICKETS (CR-503, CHG-CR503-001) WEB-005 takes performanceId from WEB-006 and shows the Date of
+                   visit from getPerformance.
+  BR-PREVIEW-ADDRESS (CR-507, CHG-CR507-001) createPreview takes the address through getPlatformSubdomain's reads and
+                   keeps its entry through IKeyedState (preview:{previewId}).
+  BR-SESSION-BATCH-RECORD (CR-511, CHG-CR511-001) the batch is recorded in platform.idempotency_record, the outbox row
+                   keyed by batchId, the scope an active venue's path or the tenant root.
+  BR-GUEST-DOCUMENT-UPLOAD (CR-521, CHG-CR521-001) createGuestDocumentUpload issues the key; uploadGuestDocument checks
+                   it (422) and guest_document takes the grant-holder subject policy.
+  BR-KIOSK-CHECK-ROWS (CR-528, CHG-CR528-001) the kiosk checks read payment methods by venueIds and media by venue_id
+                   under the root grant, findings only.
+  BR-WEB022-STATUS-PILL (CR-534, CHG-CR534-001) WEB-022's Your plan pill maps every GuestMembership.status; the
+                   redraw and the Passholders section are on the left-out list.
+  BR-SCHEDULED-PUBLISH-RUN (CR-501, CHG-CR501-001) the scheduled-publish job's run (per tenant, SKIP LOCKED, the review
+                   filter, latest scheduledFor, the same-run supersede) on top of CR-154's activated_at rule, and the
+                   approval consumer leaves a later-scheduled version waiting.
+  BR-PUBLISH-REVIEW-DEFAULT (CR-520, CHG-CR520-001) switching the publish review on creates the default rule, reads
+                   approvals#ruleRecords in process (XDR-111) and Identity's role permissions over its service route,
+                   and answers 409 review-route-unavailable until #31185.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2776,8 +2805,11 @@ def main() -> int:
 
     # BR-PREVIEW-READS-NOTHING (CR-476)
     cpv = op("createPreview")[3]
-    need("BR-PREVIEW-READS-NOTHING", not cpv.get("x-ticvai-read-via"),
-         "createPreview asks a query; the renderer in the workers host reads Catalogue and Orders, not it (CR-476)")
+    # ADAM CR-507 (3 November 2026): createPreview asks the two address reads getPlatformSubdomain asks, and nothing else
+    cpv_q = {str((v or {}).get("query")) for v in cpv.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+    need("BR-PREVIEW-READS-NOTHING", cpv_q <= {"platform-ops#tenantDomainRecords", "subscription#cellRecords"},
+         "createPreview asks a query beyond its address reads; the renderer in the workers host reads Catalogue and "
+         "Orders, not it (CR-476, CR-507)")
     need("BR-PREVIEW-READS-NOTHING", not any(r.get("reader") == "operations" and "orders.ticket_template"
                                              in (r.get("tables") or []) for r in xdr13.values()),
          "a reads entry grants the operations role orders.ticket_template (CR-476: no grant)")
@@ -2822,6 +2854,7 @@ def main() -> int:
     channel_rules_r13(need, op)
     lane_p_rules_r13(need, op, ops)
     lane_w5_rules_r13(need, op, ops)
+    lane_w3_rules_r13(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2866,7 +2899,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES + R13_W3_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -3286,8 +3319,11 @@ def lane_q_rules_r13(need, op):
            if isinstance(r, dict)}
 
     # BR-CATALOGUE-ANCESTORS (ADAM CR-443): the guided choice and kiosk checks read rows at the venue and its ancestors
-    for oid in ("createGuidedChoice", "proposeGuidedChoice", "updateGuidedChoice", "publishGuidedChoice",
-                "getKioskConfigValidation"):
+    # getKioskConfigValidation left this loop with ADAM CR-528 (3 November 2026): its checks read the venue's and the
+    # tenant's rows by venueIds and venue_id, no scope path (lane w3's BR-KIOSK-CHECK-ROWS)
+    need("BR-CATALOGUE-ANCESTORS", "for this check only" in words(op("getKioskConfigValidation")[3].get("description")),
+         "getKioskConfigValidation does not read its rows for this check only (CR-443, CR-528)")
+    for oid in ("createGuidedChoice", "proposeGuidedChoice", "updateGuidedChoice", "publishGuidedChoice"):
         need("BR-CATALOGUE-ANCESTORS", "at its ancestors" in words(op(oid)[3].get("description"))
              and "for this check only" in words(op(oid)[3].get("description")),
              f"{oid} does not say its check reads the rows at the venue and at its ancestors, for this check only (CR-443)")
@@ -4068,6 +4104,215 @@ def lane_w5_rules_r13(need, op, ops):
         need("BR-DOWNGRADE-CHECK", frag in sd, f"setSubscription's downgrade check does not state {frag!r} (CR-541)")
     need("BR-DOWNGRADE-CHECK", "the same check" in words(psc.get("description")),
          "previewSubscriptionChange does not return the conflicts from setSubscription's check (CR-541)")
+
+
+R13_W3_RULES = ["BR-GST007-AS-BUILT", "BR-GST008-PHOTO-BADGE", "BR-BOOKING-FLOW-EVENT", "BR-FORM-ROOT-READ",
+                "BR-CONFIG-DIFF-SHAPE", "BR-PERFORMANCE-INTO-TICKETS", "BR-PREVIEW-ADDRESS", "BR-SESSION-BATCH-RECORD",
+                "BR-GUEST-DOCUMENT-UPLOAD", "BR-KIOSK-CHECK-ROWS", "BR-WEB022-STATUS-PILL", "BR-SCHEDULED-PUBLISH-RUN",
+                "BR-PUBLISH-REVIEW-DEFAULT"]
+
+
+def lane_w3_rules_r13(need, op):
+    """r13 second CR round, lane w3 (ADAM CR-493 to CR-534, decided by Chinmay on 3 November 2026: "Close the CRs and
+    respond to devs", "get the NEw CRs in the r13"; CHG-CR493-001 to CHG-CR534-001). Each rule fails on the r13
+    candidate before the lane (f599f2c6) and passes once the posted decision is in."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route")))
+                for v in o_.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def tables(o_, key):
+        return {str((t or {}).get("table")) for t in o_.get(key) or [] if isinstance(t, dict)}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def schemas(rel):
+        return (load(rel).get("components") or {}).get("schemas") or {}
+
+    def screen(rel, sid):
+        return next((x for x in load(rel).get("screens") or [] if (x or {}).get("id") == sid), {})
+
+    def components(scr):
+        return [c for r in ((scr.get("layout") or {}).get("regions") or []) for c in (r or {}).get("components") or []]
+
+    def overlay(scr, oid):
+        return next((o_ for o_ in scr.get("overlays") or [] if (o_ or {}).get("id") == oid), {})
+
+    def params(scr):
+        return {str((p or {}).get("name")): p for p in ((scr.get("entryState") or {}).get("params") or [])}
+
+    def query(rel, name):
+        return ((load(rel).get("x-ticvai-queries") or {}).get(name)) or {}
+
+    p01, p02 = "screens/P01-guest-web-storefront.yaml", "screens/P02-guest-mobile-app.yaml"
+    xdr = {str((r or {}).get("id")): r for r in load("docs/active/cross-deployable-writes.yaml").get("reads") or []
+           if isinstance(r, dict)}
+    lo = {str((i or {}).get("id")) for i in load("docs/active/left-out.yaml").get("items") or [] if isinstance(i, dict)}
+
+    # BR-GST007-AS-BUILT (CR-493): coach-mark cards, the More dates calendar, the one-question Yes / No pop-up with a close
+    g7 = screen(p02, "GST-007")
+    cq, mc, qt = overlay(g7, "consentQuestions"), overlay(g7, "monthCalendar"), overlay(g7, "quickTour")
+    cqb = words(cq.get("body"))
+    need("BR-GST007-AS-BUILT", "one question at a time" in cqb and "on every platform" in cqb
+         and "records it on the second tap" in cqb and "after the last question" in cqb
+         and "Close" in str((cq.get("dismiss") or {}).get("label")) and (cq.get("dismiss") or {}).get("discards") == ["answers"]
+         and (cq.get("confirm") or {}).get("operation") == "recordConsentAnswers",
+         "GST-007's consent pop-up is not the one-question Yes / No pop-up with a close (x) that discards the answers (CR-493)")
+    need("BR-GST007-AS-BUILT", (mc.get("confirm") or {}).get("label") == "OK" and (mc.get("dismiss") or {}).get("label") == "Cancel"
+         and "Sunday-first" in words(mc.get("body")) and "mirror in Arabic" in words(mc.get("body")),
+         "GST-007 has no in-app month calendar behind More dates (OK / Cancel, Sunday-first, mirrored in Arabic) (CR-493)")
+    need("BR-GST007-AS-BUILT", "260-wide card" in words(qt.get("body"))
+         and "the date card, the entry windows, Continue, the selection summary" in words(qt.get("body")),
+         "GST-007's quick tour is not the four coach-mark cards in the built order (CR-493)")
+
+    # BR-GST008-PHOTO-BADGE (CR-494)
+    g8 = screen(p02, "GST-008")
+    tt = next((c for c in components(g8) if (c or {}).get("label") == "Ticket types"), {})
+    need("BR-GST008-PHOTO-BADGE", "photoIntoCardGradient" in words(g8.get("notes"))
+         and "whether `ticketTags` is on or off" in words(g8.get("notes")) and "photoIntoCardGradient" in words(tt.get("notes")),
+         "GST-008 does not state the photo fading into the white card and the N selected badge beside the kind icon (CR-494)")
+    fr = (ROOT / "wireframes/frames/gst-008.html").read_text(encoding="utf-8")
+    need("BR-GST008-PHOTO-BADGE", '<span class="tag">3 selected</span>' not in fr and 'class="sel">3 selected' in fr
+         and ".v4f-gst-008 .tk.open .ph{height:190px" in fr,
+         "wireframes/frames/gst-008.html still draws the selected badge as a tag, or the open photo is not 190 high (CR-494)")
+
+    # BR-BOOKING-FLOW-EVENT (CR-495)
+    gpb = op("getPublishedBookingFlow")[3]
+    gpd = words(gpb.get("description"))
+    need("BR-BOOKING-FLOW-EVENT", "eventId" in {(p or {}).get("name") for p in gpb.get("parameters") or []}
+         and "where {`venueId`, `eventId`}" in gpd and "`flowTypeKey` and `eventId` the answer is 400" in gpd
+         and "The first product that resolves to an enabled flow wins" in gpd
+         and ("catalogue#eventRecords", "in-process") in vias(gpb),
+         "getPublishedBookingFlow does not resolve the flow from an eventId as CR-495 decided")
+    need("BR-BOOKING-FLOW-EVENT", "getPublishedBookingFlow" in ((xdr.get("XDR-110") or {}).get("operations") or []),
+         "XDR-110 does not name getPublishedBookingFlow's in-process event read (CR-495)")
+    g7api = next((a for a in g7.get("apis") or [] if a.get("operationId") == "getPublishedBookingFlow"), {})
+    need("BR-BOOKING-FLOW-EVENT", "`{ eventId }`" in words(g7api.get("purpose")) and "productId" in params(g7),
+         "GST-007 does not send { productId } when it has one, else { eventId } (CR-495)")
+
+    # BR-FORM-ROOT-READ (CR-496)
+    sf = op("submitForm")[3]
+    sfd = words(sf.get("description"))
+    need("BR-FORM-ROOT-READ", "`ITenantRootGrant`" in sfd and "`scope_path <@ ANY(paths) OR scope_path @> ANY(paths)`" in sfd
+         and "(`SET LOCAL` back)" in sfd and "marketing.form_definition" in tables(sf, "x-ticvai-reads"),
+         "submitForm does not read the published form and its resign rule under the root grant, filtered to the "
+         "caller's paths, then return to the caller's grant (CR-496)")
+
+    # BR-CONFIG-DIFF-SHAPE (CR-500)
+    cd = schemas("contracts/satellite/white-label.yaml").get("ConfigDiff") or {}
+    area = ((((cd.get("properties") or {}).get("changes") or {}).get("items") or {}).get("properties") or {}).get("area") or {}
+    need("BR-CONFIG-DIFF-SHAPE", "one of brand, appIcons, bookingFlow, bookingFlows, theme, fonts, footer, "
+         "notificationBranding, enabledPaymentMethods, accessibility, header, navigation, homepage, modules, features, "
+         "languages; entries are ordered by area in this order" in words(area.get("description")),
+         "ConfigDiff's area does not name the snapshot's top-level parts, in their order (CR-500)")
+    dcv = op("diffConfigVersion")[3]
+    dvd = words(dcv.get("description"))
+    need("BR-CONFIG-DIFF-SHAPE", "404" in (dcv.get("responses") or {}) and "compact JSON text" in dvd
+         and "`features[guestCheckout].isEnabled`" in dvd and "A property that is null counts as absent" in dvd
+         and "exactly where the publish''s `pendingBuildTimeChanges` says so".replace("''", "'") in dvd,
+         "diffConfigVersion does not state CR-500's one rule for areas, paths, values, order, changeScope and the 404")
+
+    # BR-PERFORMANCE-INTO-TICKETS (CR-503)
+    w5 = screen(p01, "WEB-005")
+    dov = next((c for c in components(w5) if (c or {}).get("label") == "Date of visit"), {})
+    w5api = {a.get("operationId"): a for a in w5.get("apis") or []}
+    need("BR-PERFORMANCE-INTO-TICKETS", (params(w5).get("performanceId") or {}).get("optional") is True
+         and (w5api.get("getPerformance") or {}).get("trigger") == "onLoad" and dov.get("operation") == "getPerformance"
+         and any(t.get("to") == "WEB-006" and t.get("carries") == ["eventId"] and "no longer available" in str(t.get("trigger"))
+                 for t in (w5.get("navigation") or {}).get("transitions") or []),
+         "WEB-005 does not take performanceId from WEB-006, read getPerformance and show the Date of visit (CR-503)")
+
+    # BR-PREVIEW-ADDRESS (CR-507)
+    cpv, gps = op("createPreview")[3], op("getPlatformSubdomain")[3]
+    need("BR-PREVIEW-ADDRESS", vias(cpv) == {("platform-ops#tenantDomainRecords", "in-process"),
+                                             ("subscription#cellRecords", "in-process")}
+         and vias(cpv) <= vias(gps),
+         "createPreview does not take the address through getPlatformSubdomain's two in-process reads (CR-507)")
+    cpd = words(cpv.get("description"))
+    need("BR-PREVIEW-ADDRESS", "`IKeyedState`" in cpd and "`preview:{previewId}`" in cpd and "never a custom domain" in cpd
+         and "One reader" in words(gps.get("description")) and "IKeyedState" in words(op("getPreview")[3].get("description")),
+         "createPreview, getPreview and getPlatformSubdomain do not state the one reader and the IKeyedState entry (CR-507)")
+    prq = load("events/preview-requested.yaml")
+    need("BR-PREVIEW-ADDRESS", "IKeyedState" in " ".join(str((c or {}).get("purpose")) for c in prq.get("consumers") or []),
+         "preview.requested's renderer does not read and write the entry through IKeyedState (CR-507)")
+
+    # BR-SESSION-BATCH-RECORD (CR-511)
+    rse = op("recordStorefrontSessionEvents")[3]
+    rsd = words(rse.get("description"))
+    need("BR-SESSION-BATCH-RECORD", ("tenancy#activeVenues", "in-process") in vias(rse)
+         and "platform.idempotency_record" in tables(rse, "x-ticvai-writes")
+         and "`IIdempotencyStore`" in rsd and "`aggregate_id` is `batchId` and its sequence is 1" in rsd
+         and "never refused" in rsd,
+         "recordStorefrontSessionEvents does not record the batch in the kernel's idempotency record, key the outbox row by "
+         "batchId and scope by an active venue (CR-511)")
+
+    # BR-GUEST-DOCUMENT-UPLOAD (CR-521)
+    mk = schemas("contracts/satellite/marketing-crm.yaml")
+    cgu, ugd = op("createGuestDocumentUpload")[3], op("uploadGuestDocument")[3]
+    need("BR-GUEST-DOCUMENT-UPLOAD", cgu.get("x-ticvai-permission") == "GUEST_VIEW_PII"
+         and cgu.get("x-ticvai-scope-level") == "venue" and set(cgu.get("x-ticvai-audience") or []) == {"staff", "guest"}
+         and "marketing.guest_document_upload" in tables(cgu, "x-ticvai-writes")
+         and ptypes(cgu, "400") == {"media-type-not-permitted", "media-too-large"},
+         "createGuestDocumentUpload does not issue the key as uploadGuestDocument's twin (CR-521)")
+    need("BR-GUEST-DOCUMENT-UPLOAD", "guest-document-upload-invalid" in ptypes(ugd, "422")
+         and "marketing.guest_document_upload" in tables(ugd, "x-ticvai-writes"),
+         "uploadGuestDocument does not check the issued key (422 guest-document-upload-invalid) and attach it (CR-521)")
+    need("BR-GUEST-DOCUMENT-UPLOAD", (mk.get("GuestDocument") or {}).get("x-ticvai-rls") == "grant-holder-write"
+         and (mk.get("GuestDocumentUpload") or {}).get("x-ticvai-persistence") == "marketing.guest_document_upload"
+         and (mk.get("GuestDocumentUpload") or {}).get("x-ticvai-rls") == "grant-holder-write"
+         and "createGuestDocumentUpload" in words((((mk.get("GuestDocument") or {}).get("properties") or {})
+                                                   .get("storageRef") or {}).get("description")),
+         "marketing.guest_document has not the grant-holder subject policy, or the upload table is missing (CR-521)")
+
+    # BR-KIOSK-CHECK-ROWS (CR-528)
+    gkd = words(op("getKioskConfigValidation")[3].get("description"))
+    need("BR-KIOSK-CHECK-ROWS", "containing the kiosk''s venue or empty".replace("''", "'") in gkd
+         and "no scope path is read" in gkd and "Only findings are returned" in gkd
+         and "a row of another venue counts as not held" in gkd,
+         "getKioskConfigValidation does not read the venue's and the tenant's rows with today's fields (CR-528)")
+    pmr = words(query("contracts/satellite/payments.yaml", "paymentMethodRecords").get("rule"))
+    mar = words(query("contracts/satellite/assets.yaml", "mediaAssetRecords").get("rule"))
+    need("BR-KIOSK-CHECK-ROWS", "scope_path that is the venue's or an ancestor" not in pmr and "no scope path is read" in pmr
+         and "VenueId on its MediaAssetRecord" in mar,
+         "paymentMethodRecords still reads scope paths, or mediaAssetRecords' record carries no VenueId (CR-528)")
+
+    # BR-SCHEDULED-PUBLISH-RUN (CR-501, with r13's CR-154 rule kept: activated_at on every activation, newer publish wins)
+    wl = load("contracts/satellite/white-label.yaml")
+    spj = words(((wl.get("x-ticvai-jobs") or {}).get("scheduledPublish") or {}).get("for"))
+    need("BR-SCHEDULED-PUBLISH-RUN", all(f in spj for f in ("FOR UPDATE SKIP LOCKED", "review_status notRequired or approved",
+                                                             "the latest scheduledFor (on a tie, the highest version number)",
+                                                             "Superseded by version N, which was due at the same time.",
+                                                             "superseded: version N was published after this one was scheduled")),
+         "white-label#scheduledPublish does not run as CR-501 decided on top of CR-154's rule")
+    agr = load("events/approval-granted.yaml")
+    agp = words(" ".join(str((c or {}).get("purpose")) for c in agr.get("consumers") or [] if (c or {}).get("context") == "white-label"))
+    need("BR-SCHEDULED-PUBLISH-RUN", "is left waiting" in agp and "makes it current when it falls due" in agp,
+         "white-label's approval.granted consumer does not leave a version scheduled for later waiting (CR-501)")
+
+    # BR-PUBLISH-REVIEW-DEFAULT (CR-520, the reads on r13's routes: Tenancy's queries in process from operations)
+    spr = op("setPublishReviewPolicy")[3]
+    spd = words(spr.get("description"))
+    need("BR-PUBLISH-REVIEW-DEFAULT", ("approvals#ruleRecords", "in-process") in vias(spr)
+         and ("identity#rolePermissionRecords", "service") in vias(spr)
+         and "review-route-unavailable" in ptypes(spr, "409")
+         and "`approverScopeLevel` `tenant`, `levels` 1" in spd and "approvals never lets a requester approve" in spd
+         and "setPublishReviewPolicy" in ((xdr.get("XDR-111") or {}).get("operations") or [])
+         and "service" in (query("contracts/spine/identity.yaml", "rolePermissionRecords").get("served") or []),
+         "setPublishReviewPolicy does not create CR-520's default rule, or reads it on the wrong route (CR-520)")
+
+    # BR-WEB022-STATUS-PILL (CR-534)
+    w22 = screen(p01, "WEB-022")
+    yp = next((c for c in components(w22) if (c or {}).get("label") == "Your plan"), {})
+    ypn = words(yp.get("notes"))
+    need("BR-WEB022-STATUS-PILL", all(f in ypn for f in ("`active` Active (`--status-active`)", "`frozen` Paused",
+                                                         "`suspended` Suspended", "`expired` Expired",
+                                                         "`cancelled` Cancelled", "Never a raw value or an empty pill"))
+         and {"LO-CR534-001", "LO-CR534-002"} <= lo,
+         "WEB-022's Your plan pill does not map every GuestMembership.status, or the redraw and Passholders are not on "
+         "the left-out list (CR-534)")
 
 
 if __name__ == "__main__":

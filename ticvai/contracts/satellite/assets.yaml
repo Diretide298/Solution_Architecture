@@ -131,7 +131,10 @@ x-ticvai-queries:
       routed tenant's root grant (ITenantRootGrant), filtered in the statement to those, in process, for that check
       only, as CR-336 and CR-362 did; the caller's grant is in force again for every other statement (the lead, 2
       November 2026: "yes for both"), so a library asset is found; every other asker reads as the caller's scope lets
-      it see them.
+      it see them. **A row of another venue counts as not held, and only the findings reach the caller** (ADAM CR-528,
+      Chinmay, 3 November 2026; CHG-CR528-001): VenueOps' query class carries VenueId on its MediaAssetRecord
+      (assets.media_asset.venue_id, which the query already returns as MediaAsset.venueId); no column, table or new
+      query.
     served: [in-process, service]
   # **A guest's identity uploads, as Identity's projection** (r11 gate, 29 October 2026; CHG-R11FXV-001; the lead's
   # r10 ruling on the ADR-0028 tiers, CHG-R10ID-018): Identity is Foundation, so submitGuestIdentityDocument checks the

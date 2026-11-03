@@ -1,0 +1,50 @@
+id: CHG-CR496-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'submitForm, before anything is written, reads the published marketing.form_definition row for formId and
+  formVersion and its marketing.waiver_version_control resign rule under the routed tenant''s root grant
+  (ITenantRootGrant), each in one statement filtered to the caller''s scope paths (scope_path <@ ANY(paths) OR
+  scope_path @> ANY(paths)), then returns to the caller''s grant (SET LOCAL back) for the live-acceptance check and the
+  insert under CR-318''s grant-holder-write policy. No row is 404 form-version-not-found; no migration, no request or
+  response change; the two tables'' row security is unchanged for every other operation.'
+decision:
+  what: 'ADAM CR-496, posted on #31165: "Decided (Chinmay, 3 November 2026): option A, as for the published privacy
+    policies and the other tenant-root reads already in the package. Build now, in submitForm (#31165), before anything
+    is written: 1. Take the caller''s scope paths ... 2. Under the tenant root grant (ITenantRootGrant), in one
+    statement, read the marketing.form_definition row ... Keep it only when its scope_path is at or below one of the
+    caller''s paths or at or above one of them ... 3. Under the same grant and the same scope filter, read
+    marketing.waiver_version_control ... 4. Return to the caller''s own grant (SET LOCAL back) before touching
+    marketing.form_submission ... 5. Read nothing else under the root grant ... No migration." The lead''s "Close the
+    CRs and respond to devs" and "get the NEw CRs in the r13", 3 November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-496 (Pranay Shinde, #31165 submitForm, On hold): form_definition and waiver_version_control have scope row
+  security (a caller sees rows at or below its paths), so a form published at the tenant path was 404 for venue staff and
+  for guests (a guest''s scope is its venue''s path). The tenant-root read precedent: identity.yaml (CR-362), workforce
+  (CR-336), access (CR-396), the published privacy policies (CR-440).'
+keys_touched:
+  operations: [submitForm]
+  tables: [marketing.form_definition, marketing.waiver_version_control, marketing.form_submission]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+root_class: 'a venue caller reads rows published above its scope (RF-TENANT-ROOT / RF-OWNED-ABOVE): read under the root
+  grant, filtered to the caller''s scope'
+tickets:
+  started:
+  - '31165 (submitForm, Pranay Shinde; On hold): build to the posted decision, the two reads under ITenantRootGrant
+    filtered to the caller''s paths, then SET LOCAL back before form_submission; the five tests posted.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-496
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FORM-ROOT-READ
+status: open
+notes: 'submitForm''s x-ticvai-reads now names marketing.form_definition (the lineage already read it, path-inferred).
+  check-rls-scope-fit''s RF-OWNED-ABOVE findings for submitForm stay as they were baselined: the class has no
+  machine-readable marker for a statement run under the root grant, so the check cannot tell; the business rule holds the
+  text. Beyond the posted words: none.'

@@ -307,8 +307,10 @@ x-ticvai-queries:
       scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within commerce, through the C# query interface Identity implements.
-    served: [in-process]
+      process within commerce, through the C# query interface Identity implements. It is asked from another
+      deployable through Identity's service route (serviceAuth; POST /queries/role-permission-records, ADAM CR-438)
+      by white-label setPublishReviewPolicy, for the roles that grant TENANT_PUBLISH (ADAM CR-520, 3 November 2026).
+    served: [in-process, service]
   segregationRuleRecords:
     module: identity
     table: identity.segregation_rule

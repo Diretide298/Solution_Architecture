@@ -1,0 +1,54 @@
+id: CHG-CR494-001
+date: '2026-11-03'
+source: cr
+kind: spec
+summary: 'GST-008 Tickets & Add-ons is specified and drawn as the guest-app build in 22143c6, on top of CR-349''s white
+  ticket cards: the open ticket''s photo is 190 high and runs into the white card (token photoIntoCardGradient, clear to
+  40% of its height, white at its foot) with the title, price and ticket-type rows on white; the shut ticket''s N
+  selected badge sits in the top row beside its kind icon, shown whenever one is chosen whether ticketTags is on or off
+  and hidden at zero, and the foot row holds only the from-price and the chevron; both in every cardLayout and cardSize,
+  mirrored in Arabic.'
+decision:
+  what: 'ADAM CR-494, posted on #31775: "Decided (Chinmay, 3 November 2026): your GST-008 design change is accepted as
+    built in 22143c6, on top of the white ticket cards decided earlier. Build now: (1) Open ticket: the photo across the
+    top, 190 high and clipped to its frame, with a gradient (token photoIntoCardGradient) that is clear down to 40% of
+    its height and solid white at its foot ... (2) Shut ticket: the ''N selected'' badge sits in the top row beside the
+    ticket''s kind icon. The foot row holds only the from-price and the chevron. The badge shows whenever at least one
+    of that ticket is chosen, whether ticketTags is on or off (it is not a tag), and it is hidden at zero ... (3) Draw
+    both changes in every cardLayout ... and cardSize, and mirror them in Arabic. Same operations, fields, errors and
+    permissions as before." The lead''s "Close the CRs and respond to devs" and "get the NEw CRs in the r13", 3
+    November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-494 (Chitrangi Mestry, #31775 GST-008): a design change on the build, logged under the lead''s rule of 28
+  October 2026 (frontend starter, 28eb978d); CR-349''s condition (every cardLayout and cardSize, ticketTags and cardInfo
+  still take effect, CHG-CR349-001) carries over, and the badge is not a tag so it shows with ticketTags off.'
+keys_touched:
+  screens: [GST-008]
+  operations: [listProductVariants]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - wireframes/frames/gst-008.html
+  - wireframes/incoming/P02-mobile-v4/gst-008.html
+  - tools/check-business-rules.py
+root_class: a frontend design change logged after the build, brought back into the package's frame and screen record
+tickets:
+  started:
+  - '31775 (GST-008, Chitrangi Mestry; Ready for QA): build to the posted decision as already built in 22143c6; check
+    the badge shows with ticketTags off and is hidden at zero, in every cardLayout and cardSize and in Arabic.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-494
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GST008-PHOTO-BADGE
+status: open
+notes: '**Design change: GST-008''s open photo runs into the white card and the N selected badge moves beside the kind
+  icon (as built in 22143c6).** No visible field of the screen record changed (regions, columns and states as approved),
+  so docs/active/approved-ui-changes.yaml needs no entry; the record''s notes, the Ticket types notes and
+  prototype.differences say it. wireframes/frames/gst-008.html (and its copy under wireframes/incoming/P02-mobile-v4/)
+  is redrawn: the open card''s photo 190 high with the fade to white, the badge in the top row beside a ticket icon on
+  the shut cards (All shut, Offline) and on the ticketTags-off card, which had no badge before. **Named beyond the
+  posted words:** the frame draws the kind icon as a ticket glyph; the build''s icon is the guest app''s.'

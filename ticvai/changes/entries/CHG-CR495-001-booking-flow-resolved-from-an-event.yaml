@@ -1,0 +1,60 @@
+id: CHG-CR495-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'getPublishedBookingFlow (GET /venues/{venueId}/booking-flow) takes an optional eventId (uuid). With productId
+  sent, eventId is ignored. With eventId and no productId, the venue''s published, on-sale products for that event
+  (Product.eventId; catalogue#productRecords where {venueId, eventId}, in process) are taken in displayOrder then id,
+  each through the existing rule (own flow, category''s, venue default by kind and tie rule); the first that resolves to
+  an enabled flow wins; then flowTypeKey when sent; then 404. An eventId that is not an event of the venue is 404. The
+  400 is for none of productId, productCategoryId, flowTypeKey and eventId. GST-007 sends { productId } when it has one,
+  else { eventId }; on 404 it renders date, time, tickets with the defaults; a 400 is the error state.'
+decision:
+  what: 'ADAM CR-495, posted on #31784: "Decided (Chinmay, 3 November 2026): when GST-007 is opened from an event, the
+    booking flow is resolved from the event''s id. Build now: (1) Backend, getPublishedBookingFlow ... add an optional
+    query parameter eventId (uuid) ... These are read in process through catalogue#productRecords where {venueId,
+    eventId} ... The first product that resolves to an enabled flow wins. If none resolves, try flowTypeKey when sent,
+    then answer 404 not-found. An eventId that is not an event of the venue is 404 not-found. The 400 validation is now
+    for none of productId, productCategoryId, flowTypeKey and eventId ... (2) GST-007 ... send { productId } when the
+    screen has one ... else { eventId } from the entry. Never send an empty query. On 404, render the date, then time,
+    then ticket order with the flow settings'' defaults ... A 400 is the error state. (3) Connecting to the real client on
+    the connect-to-API ticket uses the same call." The lead''s "Close the CRs and respond to devs" and "get the NEw CRs in
+    the r13", 3 November 2026.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-495 (Chitrangi Mestry, #31784 GST-007): GST-007 opened from an event holds only eventId, and
+  getPublishedBookingFlow answered 400 with none of productId, productCategoryId and flowTypeKey; an Event has no
+  bookingFlowId, and the link runs from Product.eventId, which only the server can follow.'
+keys_touched:
+  screens: [GST-007]
+  operations: [getPublishedBookingFlow]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'queries catalogue#productRecords (where {venueId, eventId}) and catalogue#eventRecords (in process, XDR-110)'
+root_class: a screen value the operation it calls could not take
+tickets:
+  started: []
+  unstarted:
+  - '27878 (getPublishedBookingFlow, Hrushikant Patkar): the eventId parameter and the event rule, through a new child
+    task (listed for the integration pass).'
+  - '31784 (GST-007 build, Chitrangi Mestry): send { productId } when the screen has one, else { eventId }; 404 renders
+    the default order; 400 is the error state.'
+  - '31785 ([FE] GST-007 connect to API): the same call.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-495
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-BOOKING-FLOW-EVENT
+status: open
+notes: '**Named beyond the posted words:** to answer "an eventId that is not an event of the venue is 404" the operation
+  asks catalogue#eventRecords (ids [eventId] where {venueId}) in process, recorded as XDR-110 (no new grant: XDR-033
+  already gives the operations role SELECT on catalogue.event), and the eventRecords and productRecords rules name
+  getPublishedBookingFlow. GST-007''s entry state gains an optional productId from GST-008, the value GST-008''s
+  product-first edge already carries.'
