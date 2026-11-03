@@ -1,0 +1,50 @@
+id: CHG-R14G-004
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: offline-core's outbox gave concurrent enqueues one sequence (an UPDATE then a SELECT outside a transaction, no UNIQUE),
+  and after a transient failure stranded the rest of the batch inFlight while later entries (a void) overtook them, with the
+  state still "online, no error". Now the sequence is allocated and the entry inserted in one exclusive transaction with UNIQUE(sequence);
+  only the entry being sent is inFlight; a transient failure halts the drain with the rest pending behind it (mode halted,
+  stoppedAtSequence); each drain first recovers what a crash left inFlight; the orchestrator reads conflictPolicy and calls
+  an onServerWins hook so the client re-reads (ADR-0022); synced_at is the server's time from the answer (null when the answer
+  has none), the device's time kept apart as device_acked_at. 15 new vitest tests (concurrent enqueue, the TEST2 order, no
+  stranding, crash recovery, 408/429, permanent rejection, serverWins) fail against the old code; --passWithNoTests is gone
+  from offline-core and api-client.
+decision:
+  what: 'Review findings G-04 (HIGH) = D-05 (HIGH): allocate and insert in one transaction with UNIQUE(sequence), mark only
+    the entry being sent inFlight, and test both cases; D-05''s synced_at point. The lead, 3 November 2026, after reading
+    the r13 system review triage: "All four, one release" (the starters, device/guest/token access, gate integrity, tenant
+    setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review G-04 (findings/G-starters.md, G-work/offline/harness.ts) and D-05 (findings/D-code-scaffolds.md); ADR-0013;
+  ADR-0022.
+keys_touched:
+  files:
+  - viewer/mcp/setup/starters/frontend/packages/offline-core/src/outbox.ts
+  - viewer/mcp/setup/starters/frontend/packages/offline-core/src/sync-orchestrator.ts
+  - viewer/mcp/setup/starters/frontend/packages/offline-core/src/sqlite.ts
+  - viewer/mcp/setup/starters/frontend/packages/offline-core/src/outbox.test.ts
+  - viewer/mcp/setup/starters/frontend/packages/offline-core/src/sync-orchestrator.test.ts
+  - viewer/mcp/setup/starters/frontend/packages/offline-core/src/memory-sqlite.test-support.ts
+  - viewer/mcp/setup/starters/frontend/packages/offline-core/project.json
+  - viewer/mcp/setup/starters/frontend/packages/api-client/project.json
+  - viewer/mcp/setup/starters/docs/frontend-patterns.md
+  - viewer/mcp/setup/starters/frontend/README.md
+  - tools/check-starter-fit.py
+root_class: a hand-written sync engine with no test of the failure it exists for
+tickets:
+  started: []
+  unstarted:
+  - 'The POS and scanner app teams porting offline-core: take the r14 outbox.ts and sync-orchestrator.ts whole (devnote).'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py::SF-OUTBOX-ORDER
+status: open
+notes: The UNIQUE index fails initialise() on a device database that already holds duplicate sequences; no device runs the
+  starter's engine yet. The contracts carry no general server time on a sync answer; a transport that has one passes syncedAt.

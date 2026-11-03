@@ -14,12 +14,12 @@ This describes the backend repository as the setup zip creates it: `TICVAI-Backe
 
 | Banned (build error) | Use instead | Why |
 |---|---|---|
-| `DateTime.Now` / `.Today` / `.UtcNow`, `DateTimeOffset.Now` | `DateTimeOffset.UtcNow` or `TimeProvider` | Venues span time zones within one tenant; server-local time is meaningless |
+| `DateTime.Now` / `.Today` / `.UtcNow`, `DateTimeOffset.Now`, `TimeZoneInfo.Local` | `DateTimeOffset.UtcNow` or `TimeProvider`, and the venue's time zone | Venues span time zones within one tenant; server-local time is meaningless |
 | `Guid.NewGuid()` | `TICVAI.Domain.Identity.Id.New()` | It mints UUID v4; every new id is UUIDv7 ([naming-and-style](naming-and-style.md) 4) |
 
 | Rule (review) | Use | Why |
 |---|---|---|
-| No bare `decimal` for money | `TICVAI.Domain.ValueObjects.Money` (amount + ISO 4217 code) | A raw decimal loses the currency and its scale (AED 2, OMR 3) |
+| No bare `decimal` for money | `TICVAI.Domain.ValueObjects.Money`: `{ amount, currency, scale }` (ADR-0008). The trading currency's scale comes from the venue's or region's settings; any other currency's from `CurrencyMinorUnits` (`Money.InMinorUnits`). On the wire `MoneyJsonConverter` writes the amount as a decimal string; `Allocate` splits an amount without losing a minor unit | A raw decimal loses the currency and its scale (AED 2, OMR 3); an amount with more places than its scale is refused |
 | Every id is a `Guid`, stored as `uuid` | `TICVAI.Domain.Identity.Id.New()` (UUIDv7) for a row created on the server; the device's id, unchanged, for one created offline | One id type ([naming-and-style](naming-and-style.md) 4); time-ordered, so indexes stay compact; PostgreSQL 16 has no `uuidv7()`, so the application mints every id |
 | Human codes people read or type (order numbers, ticket codes) | a separate column | A code is not the id; it can be reissued or reformatted without touching a key |
 
@@ -31,16 +31,20 @@ the `Id` class: write `Identity.Id.New()` there.
 
 | Project | Holds | May reference |
 |---|---|---|
-| `TICVAI.Domain` | entities, value objects (`Money`), `Id`, domain exceptions | nothing |
+| `TICVAI.Domain` | entities, value objects (`Money`, `CurrencyMinorUnits`), `Id`, domain exceptions | nothing |
 | `TICVAI.Contracts` | request, response and event types, named as the contract names them | nothing |
-| `TICVAI.Application` | `Features/<Module>/` use cases, `Result`/`Error`, abstractions (`ITenantContext`, `ICurrentPrincipal`, `IIdempotencyStore`, `IOutbox`, `IBrokerPublisher`) | Domain, Contracts |
-| `TICVAI.Infrastructure` | EF Core `DbContext`, repositories, `SqlMigrationRunner`, external services | Application |
+| `TICVAI.Application` | `Features/<Module>/` use cases, `Result`/`Error`, abstractions (`ITenantContext`, `ICurrentPrincipal`, `ResolvedAuthority`, `ISessionRegistry`, `ITenantDirectory`, `IIdempotencyStore`, `IdempotentExecution`, `ITransactionRunner`, `IOutbox`, `IBrokerPublisher`) | Domain, Contracts |
+| `TICVAI.Infrastructure` | EF Core `DbContext` on the request's tenant database, `ScopeContextInterceptor`, `EfTransactionRunner`, `PostgresIdempotencyStore`, repositories, `SqlMigrationRunner`, external services | Application |
 | `TICVAI.Api` | controllers, middleware, `Program.cs` | Application, Contracts, Infrastructure |
 
 - **The reference rules are enforced by `TICVAI.ArchitectureTests`, not by convention.** A
   layer referencing one it may not fails the test run.
-- A module is a folder under `Application/Features/`, named for the service (`Orders`,
-  `Catalogue`). Two modules share only what is in `TICVAI.Domain` or `TICVAI.Contracts`.
+- A module is a folder `Features/<Module>/` (in Application, and in Infrastructure or Api where it has
+  code there), named as ADR-0055's module map names it: the 16 in
+  `tests/TICVAI.ArchitectureTests/modules.json` (`Order`, `Catalogue`, `FnB`, ...). Another module uses
+  it only through its `Features/<Module>/Public/` types (its query and write API, ADR-0055 rules 2 and
+  3); across deployables not even that, except where the reader's host composes the module's queries
+  in process. `ModuleBoundaryTests` checks every module on the compiled IL, method bodies included.
 - Domain layer is persistence-ignorant — no EF, Npgsql, Redis or ASP.NET references.
 - API layer returns contract DTOs, never domain entities.
 
@@ -62,8 +66,9 @@ public sealed class RefundAuthoriser(
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        // Guard clauses first, happy path unindented.
-        if (!principal.Has("ORDER_REFUND"))
+        // Guard clauses first, happy path unindented. The permission is checked at the scope the
+        // operation acts on (spec 7.2), never against the flat EffectivePermissions.
+        if (!principal.Permits("ORDER_REFUND", request.VenueScopePath))
         {
             return Result<RefundAuthorisation>.Failure(Error.Forbidden("ORDER_REFUND"));
         }
@@ -82,7 +87,7 @@ public sealed class RefundAuthoriser(
 | Rule | Detail |
 |---|---|
 | `sealed` by default | Unseal deliberately |
-| `readonly record struct` for value objects | `Money`, `ScopeNode` |
+| `readonly record struct` for value objects | `Money` |
 | `Result<T>` for expected failures | Exceptions for the genuinely unexpected |
 | `CancellationToken` on every async method | Threaded through, never ignored |
 | `.ConfigureAwait(false)` in library code | Not in the API layer |
@@ -91,8 +96,22 @@ public sealed class RefundAuthoriser(
 
 ### 3.4 Data access
 
-- Every query runs with `ticvai.scope_paths` set from `ITenantContext.ScopePaths`. RLS is
-  defence in depth, not the only line.
+- **The tenant is the request's host's** (ADR-0038: one process serves every tenant of the cell, a
+  database each). `TenantResolutionMiddleware` resolves the host through `ITenantDirectory` before
+  authentication; no tenant header or body field is read. A token whose `tenant` claim (`tid` for
+  serviceAuth) is not that tenant, or whose `sid` names a session of another tenant, is `401`
+  (`TenantBinding`, r13 review C-05). `TicvaiDbContext` connects to that tenant's database.
+- **Every permission check is per scope**: `ICurrentPrincipal.Permits(permission, scopePath)` with the
+  scope the operation acts on (the venue, the workstation, the tenant root for a tenant-level
+  operation). It runs section 2 of the permission-resolution spec over the selected role's grants
+  (`ResolvedAuthority`); `EffectivePermissions` is for coarse checks only and never decides an
+  operation (spec 7.2, CR-189, CR-367). Every vector of `PermissionVectors.json` runs through it in
+  `TICVAI.UnitTests`.
+- **Data access runs in a transaction** (`ITransactionRunner`). Its start sets `ticvai.scope_paths`,
+  `ticvai.subject_id` and `ticvai.principal_id` with `SET LOCAL` semantics (`ScopeContextInterceptor`:
+  `set_config(..., true)`), so the context ends with the transaction and never reaches the next user
+  of a pooled connection. Never `SET` them on the connection. A query outside a transaction sees no
+  scoped rows. RLS is defence in depth, not the only line.
 - **The schema is plain SQL migrations we write, not EF Core migrations.** Each [DB] ticket names
   its file (`V0001__baseline.sql`, `V0022__catalogue.sql`, ...); you write it in our `db/tenant`
   or `db/control` folder. The package's numbered files (`backend/tenant` and `backend/control`:
@@ -106,8 +125,12 @@ public sealed class RefundAuthoriser(
   what the package's statements leave and changes nothing else. Before the merge request,
   `--full <database>` applies every file once, in order, to an empty database. Never edit an
   applied file: add a new one.
-- A retried mutating request with the same `Idempotency-Key` gets the first answer, from
-  `IIdempotencyStore` (in memory in development; Redis in production).
+- **Idempotency-Key** (`common.yaml` `IdempotencyKey`, SD-024, CR-182): run the change through
+  `IdempotentExecution`. A replay with the same request gets the first answer and writes nothing; the
+  same key with a different request is `409` `idempotency-conflict` and is never applied; two
+  concurrent first requests apply once. The record is `platform.idempotency_record`, written by
+  `PostgresIdempotencyStore` in the change's own transaction and unique on (operation, key). Redis may
+  cache it; it is never the guarantee.
 - Parameterised always. String-concatenated SQL is a build-blocking review finding.
 - Explicit transaction boundaries. Order + payment + entitlement + ledger is **one**
   transaction.
@@ -121,7 +144,7 @@ as amended 1 October 2026):
 | Interface | Who calls it | What it does |
 |---|---|---|
 | `IOutbox` (`Application/Abstractions/Messaging`) | a module, in a use case | `EnqueueAsync` writes the event to `platform.outbox` **in the transaction of the state change**. It never talks to the broker |
-| `IBrokerPublisher` (same folder) | the outbox relay in the `workers` host, and nothing else | `PublishBatchAsync` sends a batch of `EventEnvelope`s, keyed by aggregate id, and returns once the broker has confirmed all of them. One adapter per broker implements it |
+| `IBrokerPublisher` (same folder) | the outbox relay, and nothing else (ADR-0055 puts it in the workers deployable; this starter has no workers host yet) | `PublishBatchAsync` sends a batch of `EventEnvelope`s, keyed by aggregate id, and returns once the broker has confirmed all of them. One adapter per broker implements it |
 
 - **A module never publishes to the broker.** A crash between commit and a direct publish loses the
   event; the outbox row commits with the change or not at all. Modules do not reference a broker

@@ -47,7 +47,18 @@ export interface OutboxEntry {
   status: OutboxStatus;
   /** When the device recorded it. Not when the server received it. */
   recordedAt: string;
+  /**
+   * The server's time it accepted the write, when its answer carries one (a resource the server
+   * stamps `syncedAt` on arrival returns it in the body). Null when the answer has none: the
+   * outbox never writes the device's clock here, so recordedAt (device) and syncedAt (server)
+   * stay two different clocks.
+   */
   syncedAt: string | null;
+  /**
+   * The device's time when the server's acceptance came back. The device's clock, for pruning and
+   * the sync indicator; never read it as the server's time.
+   */
+  deviceAckedAt: string | null;
   attempts: number;
   lastError: string | null;
   /** Denormalised for scoping and for surfacing failures per venue. */
@@ -77,6 +88,9 @@ export interface EnqueueRequest {
 const MAX_ATTEMPTS = 8;
 
 export class Outbox {
+  /** Enqueues from this Outbox, one after another (see enqueue). */
+  private chain: Promise<unknown> = Promise.resolve();
+
   constructor(private readonly db: SQLiteDatabase) {}
 
   async initialise(): Promise<void> {
@@ -93,6 +107,7 @@ export class Outbox {
         status          TEXT NOT NULL,
         recorded_at     TEXT NOT NULL,
         synced_at       TEXT,
+        device_acked_at TEXT,
         attempts        INTEGER NOT NULL DEFAULT 0,
         last_error      TEXT,
         venue_id        TEXT NOT NULL,
@@ -103,6 +118,12 @@ export class Outbox {
         ON outbox (status, sequence)
         WHERE status IN ('pending', 'failed');
 
+      -- One place in the order per entry. Two entries sharing a sequence would make
+      -- "strict sequence order" undefined, so a race that got past enqueue's
+      -- transaction fails here instead of queueing silently.
+      CREATE UNIQUE INDEX IF NOT EXISTS outbox_sequence_unique
+        ON outbox (sequence);
+
       CREATE TABLE IF NOT EXISTS outbox_sequence (
         id       INTEGER PRIMARY KEY CHECK (id = 1),
         next_val INTEGER NOT NULL
@@ -110,6 +131,13 @@ export class Outbox {
 
       INSERT OR IGNORE INTO outbox_sequence (id, next_val) VALUES (1, 1);
     `);
+
+    // A table created before device_acked_at existed gets the column; CREATE TABLE IF NOT
+    // EXISTS leaves an existing table as it was.
+    const columns = await this.db.all<{ name: string }>(`PRAGMA table_info(outbox)`);
+    if (!columns.some((column) => column.name === 'device_acked_at')) {
+      await this.db.exec(`ALTER TABLE outbox ADD COLUMN device_acked_at TEXT`);
+    }
   }
 
   /**
@@ -119,10 +147,51 @@ export class Outbox {
    */
   async enqueue(request: EnqueueRequest): Promise<OutboxEntry> {
     const id = request.id ?? newId();
-    const sequence = await this.nextSequence();
     const recordedAt = request.recordedAt ?? new Date().toISOString();
+    const payload = JSON.stringify(request.payload);
 
-    const entry: OutboxEntry = {
+    // Allocating the sequence and inserting the entry are one transaction, so an entry
+    // never holds a sequence another entry also holds, and a failed insert gives its
+    // sequence back. Enqueues from this Outbox also run one after another: many async
+    // drivers' transactions do not hold off other statements on the same connection
+    // (expo-sqlite's withTransactionAsync, for one), and two screens can enqueue at once.
+    const sequence = await this.serialise(() =>
+      this.db.transaction(async (tx) => {
+        await tx.run(`UPDATE outbox_sequence SET next_val = next_val + 1 WHERE id = 1`);
+        const row = await tx.get<{ next_val: number }>(
+          `SELECT next_val FROM outbox_sequence WHERE id = 1`,
+        );
+        if (!row) {
+          throw new Error('Outbox sequence row missing. Call initialise() first.');
+        }
+        const allocated = row.next_val - 1;
+
+        await tx.run(
+          `INSERT INTO outbox (
+             id, sequence, entity, operation, endpoint, method, payload,
+             conflict_policy, status, recorded_at, attempts, venue_id, workstation_id
+           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            id,
+            allocated,
+            request.entity,
+            request.operation,
+            request.endpoint,
+            request.method,
+            payload,
+            request.conflictPolicy,
+            'pending',
+            recordedAt,
+            0,
+            request.venueId,
+            request.workstationId,
+          ],
+        );
+        return allocated;
+      }),
+    );
+
+    return {
       id,
       sequence,
       entity: request.entity,
@@ -134,35 +203,12 @@ export class Outbox {
       status: 'pending',
       recordedAt,
       syncedAt: null,
+      deviceAckedAt: null,
       attempts: 0,
       lastError: null,
       venueId: request.venueId,
       workstationId: request.workstationId,
     };
-
-    await this.db.run(
-      `INSERT INTO outbox (
-         id, sequence, entity, operation, endpoint, method, payload,
-         conflict_policy, status, recorded_at, attempts, venue_id, workstation_id
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        id,
-        sequence,
-        entry.entity,
-        entry.operation,
-        entry.endpoint,
-        entry.method,
-        JSON.stringify(entry.payload),
-        entry.conflictPolicy,
-        entry.status,
-        recordedAt,
-        0,
-        entry.venueId,
-        entry.workstationId,
-      ],
-    );
-
-    return entry;
   }
 
   /**
@@ -170,6 +216,9 @@ export class Outbox {
    *
    * Ordering is not an optimisation. A void that reaches the server before the
    * sale it voids will be rejected, and the device will retry forever.
+   *
+   * An entry `inFlight` is not in the batch. The orchestrator marks only the entry it is
+   * about to send, and puts back any it finds stranded before it peeks (sync-orchestrator).
    */
   async peekBatch(limit = 50): Promise<OutboxEntry[]> {
     const rows = await this.db.all<Record<string, unknown>>(
@@ -184,6 +233,7 @@ export class Outbox {
     return rows.map(toEntry);
   }
 
+  /** Marks the entry about to be sent. The drain marks one entry at a time, never a batch. */
   async markInFlight(ids: readonly string[]): Promise<void> {
     if (ids.length === 0) return;
     const placeholders = ids.map(() => '?').join(',');
@@ -193,10 +243,17 @@ export class Outbox {
     );
   }
 
-  async markSynced(id: string, syncedAt: string): Promise<void> {
+  /**
+   * @param syncedAt the server's time from its answer, or null when the answer carries none.
+   *   Never the device's clock.
+   * @param deviceAckedAt the device's time the acceptance came back.
+   */
+  async markSynced(id: string, syncedAt: string | null, deviceAckedAt: string): Promise<void> {
     await this.db.run(
-      `UPDATE outbox SET status = 'synced', synced_at = ?, last_error = NULL WHERE id = ?`,
-      [syncedAt, id],
+      `UPDATE outbox
+          SET status = 'synced', synced_at = ?, device_acked_at = ?, last_error = NULL
+        WHERE id = ?`,
+      [syncedAt, deviceAckedAt, id],
     );
   }
 
@@ -239,18 +296,24 @@ export class Outbox {
     return rows.map(toEntry);
   }
 
-  /** Retains synced entries briefly for audit and support before pruning. */
+  /**
+   * Retains synced entries briefly for audit and support before pruning. Compares the device's
+   * clock with the device's clock (device_acked_at), never with the server's.
+   */
   async pruneSynced(olderThan: Date): Promise<number> {
     const result = await this.db.run(
-      `DELETE FROM outbox WHERE status = 'synced' AND synced_at < ?`,
+      `DELETE FROM outbox
+        WHERE status = 'synced' AND COALESCE(device_acked_at, synced_at) < ?`,
       [olderThan.toISOString()],
     );
     return result.changes;
   }
 
   /**
-   * Recovers entries stranded in `inFlight` by a crash or a kill mid-drain.
-   * Safe to replay because the server deduplicates on the entry's id.
+   * Recovers entries stranded in `inFlight` by a crash, a kill or a database error mid-send.
+   * Safe to replay because the server deduplicates on the entry's id. The orchestrator calls
+   * it at the start of every drain, when none of its own sends is outstanding. It is a safety
+   * net, not the way an entry normally leaves `inFlight` (synced, failed or rejected is).
    */
   async recoverInFlight(): Promise<number> {
     const result = await this.db.run(
@@ -259,17 +322,10 @@ export class Outbox {
     return result.changes;
   }
 
-  private async nextSequence(): Promise<number> {
-    await this.db.run(`UPDATE outbox_sequence SET next_val = next_val + 1 WHERE id = 1`);
-    const row = await this.db.get<{ next_val: number }>(
-      `SELECT next_val FROM outbox_sequence WHERE id = 1`,
-    );
-
-    if (!row) {
-      throw new Error('Outbox sequence row missing. Call initialise() first.');
-    }
-
-    return row.next_val - 1;
+  private serialise<T>(work: () => Promise<T>): Promise<T> {
+    const run = this.chain.then(work, work);
+    this.chain = run.catch(() => undefined);
+    return run;
   }
 }
 
@@ -286,6 +342,7 @@ function toEntry(row: Record<string, unknown>): OutboxEntry {
     status: row.status as OutboxStatus,
     recordedAt: row.recorded_at as string,
     syncedAt: (row.synced_at as string | null) ?? null,
+    deviceAckedAt: (row.device_acked_at as string | null) ?? null,
     attempts: row.attempts as number,
     lastError: (row.last_error as string | null) ?? null,
     venueId: row.venue_id as string,

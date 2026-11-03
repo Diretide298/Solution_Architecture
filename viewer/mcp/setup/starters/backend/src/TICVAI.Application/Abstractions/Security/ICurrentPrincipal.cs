@@ -15,10 +15,21 @@ public interface ICurrentPrincipal
     bool IsAuthenticated { get; }
 
     /// <summary>
-    /// The permissions resolved for this principal at this scope - the contracts'
-    /// x-ticvai-permission values. Resolved on the server from roles, never taken from the client.
+    /// The selected role's grants, resolved at login (R6, R7) and read from the session registry;
+    /// <see cref="ResolvedAuthority.None"/> (everything denied) when there is no session.
     /// </summary>
-    IReadOnlySet<string> EffectivePermissions { get; }
+    ResolvedAuthority Authority { get; }
 
-    bool Has(string permission) => EffectivePermissions.Contains(permission);
+    /// <summary>
+    /// <b>The permission check for an operation</b>: is the contract's <c>x-ticvai-permission</c>
+    /// permitted at the scope the operation acts on (spec 7.2)? Pass the venue, workstation or other
+    /// node the request acts on, or the tenant root for a tenant-level operation.
+    /// </summary>
+    bool Permits(string permission, string scopePath) => Authority.Permits(permission, scopePath);
+
+    /// <summary>
+    /// Permissions held at one scope at least. Coarse checks only; never decides an operation
+    /// (spec 7.2: a permission at venue A and anything at venue B puts it here).
+    /// </summary>
+    IReadOnlySet<string> EffectivePermissions => Authority.EffectivePermissions;
 }

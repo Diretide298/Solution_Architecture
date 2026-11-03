@@ -63,7 +63,8 @@
 
 .PARAMETER RepoUrl
     The git repository a new folder is cloned from, instead of the team repository setup knows
-    for the project and role. Without one, the folder is made from the starter. A frontend
+    for the project and role. Without one, the folder is made from the starter. When there is one
+    and it cannot be cloned (no git, no access), setup stops: it never falls back to the starter. A frontend
     developer can name their app's repository here and get the clone and ADAM's files in one run.
 
 .PARAMETER UseStarter
@@ -620,7 +621,10 @@ function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
     $url = $RepoUrl
     if (-not $url) { $url = $TeamRepos["$($picked.id)/$RoleName"] }
     $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($url -and -not $git) { Note "git is not installed, so $url cannot be cloned; starting from the starter instead." }
+    # A team repository exists for this project and role: the folder is a clone of it or nothing. A starter
+    # copy would be a repository that lives nowhere else, with its own history, colliding with the team's at
+    # the first push (r13 review G-10); for ai it would be a folder with no code at all.
+    if ($url -and -not $git) { Stop-Setup "git is not installed, so $url cannot be cloned. Install Git, then run setup again." }
     if ($url -and $git) {
         # A private GitLab project answers "not found" to a request without credentials instead of
         # asking for them, so Git would never prompt. The username goes into the address and the
@@ -663,13 +667,10 @@ function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
         }
         if (Test-Path -LiteralPath $Target) { Remove-Item -LiteralPath $Target -Recurse -Force -ErrorAction SilentlyContinue }
         $why = "Could not clone $url. A wrong password says Authentication failed; a right one that says not found means your GitLab account has no access to the project yet."
-        if ($RoleName -eq 'frontend' -and -not $UseStarter) {
-            Stop-Setup "$why Ask your lead for access, clone it yourself, then run setup on that folder."
-        }
-        Note "$why Starting from the starter instead; ask your lead for access and clone it later."
+        Stop-Setup "$why Ask your lead for access, clone it yourself, then run setup on that folder."
     }
     New-Item -ItemType Directory -Force -Path $Target | Out-Null
-    # -Force brings the dot-folders too: .claude and .github matter.
+    # -Force brings the dot-files and dot-folders too: .claude and .gitlab-ci.yml matter.
     Copy-Item -Path (Join-Path $source '*') -Destination $Target -Recurse -Force
     $script:StarterCode = $true
 

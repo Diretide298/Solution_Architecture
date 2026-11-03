@@ -1,0 +1,44 @@
+id: CHG-R14G-006
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'The starter''s IIdempotencyStore had no operation, no transaction and no claim: a reused key with a different body
+  found nothing (the caller ran the write again), two concurrent first requests both missed, and backend-patterns said "in
+  memory in development; Redis in production". Now IdempotentExecution runs the contract''s rule inside one ITransactionRunner
+  transaction (a replay gets the first answer and writes nothing; the same key with a different request is a 409 idempotency-conflict
+  and is never applied; two concurrent first requests apply once), and PostgresIdempotencyStore writes platform.idempotency_record
+  in the change''s transaction (status completed, scope_path the tenant root, expires_at 24 hours on), turning a unique violation
+  on (operation_id, idempotency_key) into a replay. The in-memory store is for unit tests only and is never registered.'
+decision:
+  what: 'Review finding G-06 (HIGH): claimed, replay or conflict, backed by platform.idempotency_record in the business transaction;
+    backend-patterns 3.4 to match. The lead, 3 November 2026, after reading the r13 system review triage: "All four, one release"
+    (the starters, device/guest/token access, gate integrity, tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: r13 system review G-06 (findings/G-starters.md); common.yaml IdempotencyKey (SD-024; ADAM CR-182, CHG-R9CR-001).
+keys_touched:
+  files:
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Persistence/IIdempotencyStore.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/Abstractions/Persistence/IdempotentExecution.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Application/DependencyInjection/ServiceCollectionExtensions.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/Idempotency/PostgresIdempotencyStore.cs
+  - viewer/mcp/setup/starters/backend/src/TICVAI.Infrastructure/Idempotency/InMemoryIdempotencyStore.cs
+  - viewer/mcp/setup/starters/backend/tests/TICVAI.UnitTests/Persistence/IdempotencyTests.cs
+  - viewer/mcp/setup/starters/docs/backend-patterns.md
+  - viewer/mcp/setup/starters/backend/CLAUDE.md
+  - tools/check-starter-fit.py
+root_class: a starter seam that predates the contract rule it implements
+tickets:
+  started:
+  - '#27696 [BE] Durable idempotency (Ready for QA): a reused key with a different request answers 409 idempotency-conflict
+    and is never applied; the record is written in the change''s own transaction; a concurrent second request fails on the
+    unique index, rolls back and replays; Redis is never the store.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py::SF-IDEMPOTENCY
+status: open

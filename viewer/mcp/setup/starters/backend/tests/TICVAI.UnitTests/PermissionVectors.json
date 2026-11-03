@@ -1,0 +1,392 @@
+{
+  "$comment": "NORMATIVE. Generated from architecture/specs/permission-resolution.md. A failing vector is a build failure.",
+  "fixture": "reference",
+  "vectors": [
+    {
+      "id": "V01",
+      "proves": "default deny",
+      "grants": [],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V02",
+      "proves": "exact match",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V03",
+      "proves": "inherits 6 levels down",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1.d_ticketing.sd_mainentrance.ws_pos01"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V04",
+      "proves": "does not bubble up",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1.d_ticketing.sd_mainentrance.ws_pos01",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V05",
+      "proves": "sibling venue isolation",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_beta.r_south.v_beta1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V06",
+      "proves": "cross-brand isolation",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_beta.r_south.v_beta1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V07",
+      "proves": "deny wins over broader allow",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "ALLOW"
+        },
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "DENY"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V08",
+      "proves": "deny inherits downward",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "ALLOW"
+        },
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "DENY"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1.d_ticketing.sd_mainentrance.ws_pos01"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V09",
+      "proves": "deny is scoped not global",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "ALLOW"
+        },
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "DENY"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_beta.r_south.v_beta1"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V10",
+      "proves": "specific allow does NOT override broader deny",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "ALLOW"
+        },
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha",
+          "effect": "DENY"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V11",
+      "proves": "deny does not bubble up",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "ALLOW"
+        },
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1.d_ticketing.sd_mainentrance.ws_pos01",
+          "effect": "DENY"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V12",
+      "proves": "wildcard deny",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "ALLOW"
+        },
+        {
+          "permission": "*",
+          "scope": "t_ref.b_alpha.r_north",
+          "effect": "DENY"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V13",
+      "proves": "wildcard deny is scoped",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "ALLOW"
+        },
+        {
+          "permission": "*",
+          "scope": "t_ref.b_alpha.r_north",
+          "effect": "DENY"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_beta.r_south.v_beta1"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V15",
+      "proves": "department isolation within a venue",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1.d_ticketing",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1.d_fnb.sd_outlet1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V16",
+      "proves": "department inherits to workstation",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1.d_ticketing",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1.d_ticketing.sd_mainentrance.ws_pos01"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V17",
+      "proves": "permissions are not hierarchical among themselves",
+      "grants": [
+        {
+          "permission": "ORDER_REFUND",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_REFUND_APPROVE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V21",
+      "proves": "region-scoped configuration",
+      "grants": [
+        {
+          "permission": "PRODUCT_CONFIGURE",
+          "scope": "t_ref.b_alpha.r_north",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "PRODUCT_CONFIGURE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V22",
+      "proves": "self scope",
+      "grants": [
+        {
+          "permission": "PRODUCT_CONFIGURE",
+          "scope": "t_ref.b_alpha.r_north",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "PRODUCT_CONFIGURE",
+        "scope": "t_ref.b_alpha.r_north"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V25",
+      "proves": "reporting scope is explicit",
+      "grants": [
+        {
+          "permission": "REPORT_VIEW_VENUE",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "REPORT_VIEW_TENANT",
+        "scope": "t_ref"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V26",
+      "proves": "cannot force-logout another venue",
+      "grants": [
+        {
+          "permission": "SESSION_FORCE_LOGOUT",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "SESSION_FORCE_LOGOUT",
+        "scope": "t_ref.b_beta.r_south.v_beta1"
+      },
+      "expect": "DENY"
+    },
+    {
+      "id": "V27",
+      "proves": "workstation as a valid target",
+      "grants": [
+        {
+          "permission": "KIOSK_ATTEND",
+          "scope": "t_ref.b_alpha.r_north.v_alpha1.d_fnb.sd_outlet1.ws_pos02",
+          "effect": "ALLOW"
+        }
+      ],
+      "query": {
+        "permission": "KIOSK_ATTEND",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1.d_fnb.sd_outlet1.ws_pos02"
+      },
+      "expect": "PERMIT"
+    },
+    {
+      "id": "V28",
+      "proves": "deny at equal depth",
+      "grants": [
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "ALLOW"
+        },
+        {
+          "permission": "ORDER_CREATE",
+          "scope": "t_ref",
+          "effect": "DENY"
+        }
+      ],
+      "query": {
+        "permission": "ORDER_CREATE",
+        "scope": "t_ref.b_alpha.r_north.v_alpha1.d_ticketing.sd_mainentrance.ws_pos01"
+      },
+      "expect": "DENY"
+    }
+  ]
+}

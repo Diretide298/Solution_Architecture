@@ -68,7 +68,9 @@ SET IT UP
   GitLab username, then Git asks for your GitLab password. Setup only adds
   CLAUDE.md, .claude\ and project-bible\setup\ where the repository lacks
   them, and commits nothing on top of the team's code. If the clone fails,
-  you get the skeleton above and can clone later.
+  setup stops and says why: ask your lead for access, then run it again.
+  It never falls back to the skeleton, which would be a repository that
+  lives nowhere else.
 
   and registers ADAM with Claude Code for that folder only. It can also run
   the full connection test for you at the end.

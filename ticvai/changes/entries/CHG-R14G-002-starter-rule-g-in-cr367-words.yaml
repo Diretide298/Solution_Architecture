@@ -1,0 +1,44 @@
+id: CHG-R14G-002
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'api-conventions rule g, copied into every backend, frontend and AI workspace, still said a permission holds "at
+  the scope the operation acts on or an ancestor" (CR-189), the wording CR-367 replaced on 30 October because it permits what
+  V07, V08 and V12 deny; the frontend CLAUDE.md, frontend-patterns 4.2 and the eslint message said clients "consume effectivePermissions".
+  All now state spec 7.2/7.3 in CR-367''s words (the entry of the deepest listed path that contains the node; entries never
+  combined; clients never apply a deny) and cite CR-367. check-starter-fit compares the starter docs with the authored package,
+  not with the ticvai/repos/ mirror: SF-SPEC-CR fails a starter doc line citing a change request a later decision corrected
+  without citing the later one, read from the change entries (CHG-CR367-001: "This corrects CR-189").'
+decision:
+  what: 'Review finding G-02 (HIGH), and its frontend half: put rule g in CR-367''s words in the starter docs, the frontend
+    CLAUDE.md and the eslint message; compare the starter docs with the authored spec, not with a mirror. The lead, 3 November
+    2026, after reading the r13 system review triage: "All four, one release" (the starters, device/guest/token access, gate
+    integrity, tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review G-02 (findings/G-starters.md; trace_vectors.py: node-or-ancestor fails V07, V08, V12); ADAM CR-367,
+  CHG-CR367-001; permission-resolution spec 7.2 and 7.3.'
+keys_touched:
+  files:
+  - viewer/mcp/setup/starters/docs/api-conventions.md
+  - viewer/mcp/setup/starters/docs/frontend-patterns.md
+  - viewer/mcp/setup/starters/frontend/CLAUDE.md
+  - viewer/mcp/setup/starters/frontend/.eslintrc.cjs
+  - tools/check-starter-fit.py
+root_class: a standards doc restating a spec rule that a later change request corrected, with nothing propagating the correction
+tickets:
+  started:
+  - 'Started [FE] tickets whose screen shows or hides actions by permission: look a node up in Session.permissionsByScope
+    by the deepest listed entry (CR-367), never by unioning ancestors (the doc developers were handed said "or an ancestor");
+    one comment per frontend repository (lane-g-comments.md).'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py::SF-SPEC-CR
+status: open
+notes: 'SF-DOCS-MIRROR (starter docs against ticvai/repos/ticvai-backend/project-bible) is removed: the mirror was as stale
+  as the starter, and lane j retires the code trees, keeping the project documents generated from the starters.'

@@ -6,3 +6,4 @@ coverage/
 .adam/
 .env
 .claude/settings.local.json
+.pnpm-store/

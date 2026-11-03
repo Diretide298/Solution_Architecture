@@ -5,12 +5,19 @@
  * mode switching. This is the piece the 31 Jul 2026 decision describes: the
  * system detects connectivity loss on its own, switches to offline mode without
  * operator intervention, restores automatically and flushes pending work.
+ *
+ * One orchestrator drains one database. Two draining the same outbox (two tabs, two
+ * processes) would each send entries and lose the per-device order.
  */
 
 import type { SQLiteDatabase } from './sqlite';
 import { Outbox, type OutboxEntry } from './outbox';
 
-export type ConnectionMode = 'online' | 'offline' | 'syncing';
+/**
+ * `halted`: the server is reachable but a transient failure stopped the drain at
+ * `SyncState.stoppedAtSequence`. Nothing after that entry is sent until it succeeds.
+ */
+export type ConnectionMode = 'online' | 'offline' | 'syncing' | 'halted';
 
 export interface SyncTransport {
   /**
@@ -32,15 +39,29 @@ export interface SyncTransportResult {
    * be refused seconds later.
    */
   consistencyToken?: string;
+  /**
+   * The server's time it accepted the write, taken from the answer: the `syncedAt` a
+   * resource's body carries where the server stamps it on arrival. The contracts have no
+   * general server-time field (syncOrders' OrderSyncResult has none), so leave it out when
+   * the answer has none; the outbox then records no syncedAt rather than the device's clock.
+   */
+  syncedAt?: string;
   error?: string;
 }
 
 export interface SyncState {
   mode: ConnectionMode;
+  /** Entries not yet accepted: pending, failed (to retry) or in flight. */
   pending: number;
   rejected: number;
-  lastSyncedAt: string | null;
+  /** The device's time of the last acceptance (the device's clock, for the indicator). */
+  lastDeviceAckedAt: string | null;
   lastError: string | null;
+  /**
+   * The sequence of the entry a transient failure stopped the drain at; nothing after it is
+   * sent until it succeeds or is rejected. Null when the drain is not held.
+   */
+  stoppedAtSequence: number | null;
   consistencyToken: string | null;
 }
 
@@ -52,11 +73,21 @@ export interface SyncOrchestratorOptions {
   drainIntervalMs?: number;
   baseBackoffMs?: number;
   maxBackoffMs?: number;
+  /**
+   * ADR-0022 `serverWins`: the server's version stands, "the client's write is rejected and
+   * the client re-reads". Called once for each `serverWins` entry the server rejects
+   * permanently (a 4xx other than 408/429), after the entry is marked `rejected`. The app
+   * re-reads what the entry wrote (refetch the record, refresh the local bundle) and tells
+   * the user. A throw is surfaced as `lastError`; it does not stop the drain.
+   */
+  onServerWins?: (entry: OutboxEntry, result: SyncTransportResult) => void | Promise<void>;
 }
 
 type Listener = (state: SyncState) => void;
 
-const DEFAULTS: Required<SyncOrchestratorOptions> = {
+type Timings = Required<Omit<SyncOrchestratorOptions, 'onServerWins'>>;
+
+const DEFAULTS: Timings = {
   batchSize: 50,
   probeIntervalMs: 5_000,
   drainIntervalMs: 1_000,
@@ -65,15 +96,17 @@ const DEFAULTS: Required<SyncOrchestratorOptions> = {
 };
 
 export class SyncOrchestrator {
-  private readonly options: Required<SyncOrchestratorOptions>;
+  private readonly options: Timings;
+  private readonly onServerWins: SyncOrchestratorOptions['onServerWins'];
   private readonly listeners = new Set<Listener>();
 
   private state: SyncState = {
     mode: 'offline',
     pending: 0,
     rejected: 0,
-    lastSyncedAt: null,
+    lastDeviceAckedAt: null,
     lastError: null,
+    stoppedAtSequence: null,
     consistencyToken: null,
   };
 
@@ -87,7 +120,9 @@ export class SyncOrchestrator {
     private readonly transport: SyncTransport,
     options: SyncOrchestratorOptions = {},
   ) {
-    this.options = { ...DEFAULTS, ...options };
+    const { onServerWins, ...timings } = options;
+    this.options = { ...DEFAULTS, ...timings };
+    this.onServerWins = onServerWins;
   }
 
   static async create(
@@ -113,14 +148,7 @@ export class SyncOrchestrator {
   async start(): Promise<void> {
     if (!this.stopped) return;
     this.stopped = false;
-
-    // Anything left in-flight belongs to a crashed or killed process. Safe to
-    // replay because the server deduplicates on the entry id.
-    const recovered = await this.outbox.recoverInFlight();
-    if (recovered > 0) {
-      await this.refreshCounts();
-    }
-
+    await this.refreshCounts();
     this.schedule(0);
   }
 
@@ -161,13 +189,24 @@ export class SyncOrchestrator {
         return;
       }
 
+      // None of this orchestrator's sends is outstanding here (`draining` guards it), so an
+      // entry still inFlight was stranded by a crash, a kill or a database error between
+      // sending and recording the answer. Put it back first so the batch starts from it.
+      await this.outbox.recoverInFlight();
+
       const batch = await this.outbox.peekBatch(this.options.batchSize);
 
       if (batch.length === 0) {
-        this.emit({ mode: 'online', lastError: null });
-        this.consecutiveFailures = 0;
         await this.refreshCounts();
-        this.schedule(this.options.probeIntervalMs);
+        if (this.state.pending === 0) {
+          this.consecutiveFailures = 0;
+          this.emit({ mode: 'online', lastError: null, stoppedAtSequence: null });
+          this.schedule(this.options.probeIntervalMs);
+        } else {
+          // Never "online, no error" while entries wait.
+          this.emit({ mode: 'halted', lastError: `${this.state.pending} entries could not be drained` });
+          this.schedule(this.backoff());
+        }
         return;
       }
 
@@ -177,32 +216,44 @@ export class SyncOrchestrator {
 
       // Sequential ordering is not an optimisation. A void arriving before the
       // sale it voids is rejected, and the device would retry it forever. So a
-      // failure stops the batch rather than skipping past it.
+      // transient failure stops the batch rather than skipping past it, and the
+      // entries after it stay pending, behind it.
+      if (halted) this.emit({ mode: 'halted' });
       this.schedule(halted ? this.backoff() : this.options.drainIntervalMs);
+    } catch (error) {
+      // A database error mid-drain. Say so and retry; never stop scheduling silently.
+      this.consecutiveFailures += 1;
+      this.emit({ mode: 'halted', lastError: messageOf(error) });
+      this.schedule(this.backoff());
     } finally {
       this.draining = false;
     }
   }
 
+  /** Sends the batch in sequence order, one entry in flight at a time. Returns true on a halt. */
   private async drain(batch: readonly OutboxEntry[]): Promise<boolean> {
-    await this.outbox.markInFlight(batch.map((entry) => entry.id));
-
     for (const entry of batch) {
-      if (this.stopped) return true;
+      if (this.stopped) return false;
+
+      // Only the entry about to be sent is inFlight. The rest of the batch stays pending,
+      // so a halt leaves it where the next drain picks it up, in order, behind this one.
+      await this.outbox.markInFlight([entry.id]);
 
       let result: SyncTransportResult;
       try {
         result = await this.transport.send(entry);
       } catch (error) {
-        result = { ok: false, error: error instanceof Error ? error.message : String(error) };
+        result = { ok: false, error: messageOf(error) };
       }
 
       if (result.ok) {
-        await this.outbox.markSynced(entry.id, new Date().toISOString());
+        const deviceAckedAt = new Date().toISOString();
+        await this.outbox.markSynced(entry.id, result.syncedAt ?? null, deviceAckedAt);
         this.consecutiveFailures = 0;
 
         this.emit({
-          lastSyncedAt: new Date().toISOString(),
+          lastDeviceAckedAt: deviceAckedAt,
+          stoppedAtSequence: null,
           consistencyToken: result.consistencyToken ?? this.state.consistencyToken,
         });
         continue;
@@ -217,19 +268,49 @@ export class SyncOrchestrator {
 
       if (permanent) {
         // The server will never accept this. Surface it to the operator rather
-        // than retrying behind an "all synced" indicator.
+        // than retrying behind an "all synced" indicator, and carry on: the server
+        // quarantines what depends on it (a void of a rejected sale), so a bad entry
+        // never halts the till.
         await this.outbox.markRejected(entry.id, result.error ?? `HTTP ${result.status}`);
-        this.emit({ lastError: result.error ?? `Rejected: HTTP ${result.status}` });
+        this.emit({ lastError: result.error ?? `Rejected: HTTP ${result.status}`, stoppedAtSequence: null });
+        await this.afterRejection(entry, result);
         continue;
       }
 
       await this.outbox.markFailed(entry.id, result.error ?? 'Transport failure');
       this.consecutiveFailures += 1;
-      this.emit({ lastError: result.error ?? 'Transport failure' });
+      this.emit({ lastError: result.error ?? 'Transport failure', stoppedAtSequence: entry.sequence });
       return true;
     }
 
     return false;
+  }
+
+  /** What a permanent rejection means under the entry's declared policy (ADR-0022). */
+  private async afterRejection(entry: OutboxEntry, result: SyncTransportResult): Promise<void> {
+    const policy = entry.conflictPolicy;
+    switch (policy) {
+      case 'serverWins':
+        // The server's version stands; the client re-reads and tells the user.
+        if (!this.onServerWins) return;
+        try {
+          await this.onServerWins(entry, result);
+        } catch (error) {
+          this.emit({ lastError: `Re-read after a serverWins rejection failed: ${messageOf(error)}` });
+        }
+        return;
+      // append: nothing is overwritten, so nothing to reconcile; the rejection is on its merits.
+      // lastWriterWins: the server keeps the later recordedAt; not a conflict the client settles.
+      // manualMerge: a human resolves it, from rejected() in the sync status UI.
+      case 'append':
+      case 'lastWriterWins':
+      case 'manualMerge':
+        return;
+      default: {
+        const unknown: never = policy;
+        this.emit({ lastError: `Unknown conflict policy ${String(unknown)} on entry ${entry.id}` });
+      }
+    }
   }
 
   private async probeSafely(): Promise<boolean> {
@@ -262,4 +343,8 @@ export class SyncOrchestrator {
       listener(this.state);
     }
   }
+}
+
+function messageOf(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

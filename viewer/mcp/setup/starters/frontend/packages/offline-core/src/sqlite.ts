@@ -2,7 +2,7 @@
  * SQLite adapter boundary.
  *
  * Apps must never import a SQLite driver directly — the lint rule in
- * `.eslintrc.json` bans `expo-sqlite`, `react-native-sqlite-storage` and
+ * `.eslintrc.cjs` bans `expo-sqlite`, `react-native-sqlite-storage` and
  * `@op-engineering/op-sqlite` from app code. Everything goes through this
  * interface so the driver can be swapped once, in one place.
  */
@@ -19,10 +19,13 @@ export interface SQLiteDatabase {
   get<T>(sql: string, params?: readonly unknown[]): Promise<T | null>;
   all<T>(sql: string, params?: readonly unknown[]): Promise<T[]>;
   /**
-   * Runs `work` inside a transaction, rolling back on throw.
+   * Runs `work` inside a transaction, rolling back on throw. Statements on `tx` are the
+   * transaction's; implement it exclusively (expo-sqlite's withExclusiveTransactionAsync,
+   * not withTransactionAsync), so another statement on the connection waits for it.
    *
-   * The outbox drain relies on this: marking a batch in-flight and dispatching
-   * it must not interleave with an enqueue from the sale screen.
+   * The outbox relies on this: `enqueue` allocates an entry's sequence and inserts the
+   * entry in one transaction, so two enqueues never share a sequence (the outbox's
+   * UNIQUE(sequence) index turns a race that gets through into an error, not a duplicate).
    */
   transaction<T>(work: (tx: SQLiteDatabase) => Promise<T>): Promise<T>;
   close(): Promise<void>;
