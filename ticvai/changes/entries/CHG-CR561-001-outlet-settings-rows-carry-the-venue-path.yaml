@@ -1,0 +1,64 @@
+id: CHG-CR561-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: '"Operations write it at outlet scope" on CourseRules.scopePath, TableCombination.scopePath and
+  KitchenRoutingRules.scopePath now says what it means: the server writes the scope path of the venue the outlet
+  belongs to, as DiningTable.scopePath does; outlets have no scope node. setCourseRules looks the outlet up
+  (tenancy#outletRecords; 404 when not found or not visible) and its venue''s path (tenancy#scopeRecords), writes it on
+  every write, keeps outlet_id as the key, and refuses the write when the venue has no scope node. setTableCombinations
+  and setKitchenRoutingRules write the same path. Nothing changes in Tenancy.'
+decision:
+  what: 'ADAM CR-561, posted on #31210: "Decided (Chinmay, 3 November 2026): an outlet''s settings rows carry the path of
+    the outlet''s venue. Outlets have no scope node of their own, and none is planned. ... Build now: 1. setCourseRules:
+    look up the outlet in the path (platform.outlet by id; refuse 404 if it does not exist or is not visible to the
+    caller). Write fnb.course_rule.scope_path as the path of that outlet''s venue scope node in platform.scope ... 2.
+    Keep outlet_id as the key ... 3. If the outlet''s venue has no scope node, refuse the write ... 4. The same rule
+    applies to setTableCombinations (fnb.table_combination.scope_path, ticket #31213) and to kitchen routing rules ...
+    5. Change nothing in Tenancy ... What you built with the venue path is correct. Keep it. The contract wording
+    catches up later." The lead''s instruction, 3 November 2026: "Dont hold r13. approve them and rever tto the devs".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-561 (Narayan Gaonkar, #31210 setCourseRules): fnb.course_rule.scope_path and fnb.table_combination.scope_path
+  are ltree NOT NULL, and the schemas said "Operations write it at outlet scope", but platform.outlet has no scope path
+  and nothing creates a platform.scope row of level outlet. DiningTable.scopePath (CHG-MOD-007) already writes the
+  venue''s path.'
+keys_touched:
+  operations:
+  - setCourseRules
+  - setTableCombinations
+  - setKitchenRoutingRules
+  schemas:
+  - CourseRules
+  - TableCombination
+  - KitchenRoutingRules
+  tables:
+  - fnb.course_rule
+  - fnb.table_combination
+  - fnb.kitchen_routing_rule
+  - platform.outlet
+  - platform.scope
+  files:
+  - contracts/satellite/fnb.yaml
+  - tools/check-business-rules.py
+root_class: an outlet-scoped row has no outlet path to write
+tickets:
+  started:
+  - '31210 (setCourseRules, Narayan Gaonkar, Ready for QA): built with the venue path, which the decision keeps. The
+    package now also declares the 404 for an outlet not found or not visible, and the refusal when the outlet''s venue
+    has no scope node, both in the posted text; check the build answers them.'
+  - '31213 (setTableCombinations, Narayan Gaonkar, Ready for QA): the same venue path, named in the posted decision;
+    check the build writes it and refuses a venue with no scope node.'
+  unstarted:
+  - '37105 (setKitchenRoutingRules, Chinmay Patkar, New): write fnb.kitchen_routing_rule.scope_path as the outlet''s
+    venue path.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-561
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-OUTLET-VENUE-PATH
+status: open
+notes: 'For a follow-up comment: the posted text says "refuse the write" when the outlet''s venue has no scope node but
+  names no status or problem type; the package says the same and adds none.'

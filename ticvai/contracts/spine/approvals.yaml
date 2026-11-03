@@ -871,6 +871,12 @@ paths:
         cancelPricingRollback cancels its rollback''s waiting request with it, and setDynamicPricingGuardrailPolicy
         its control''s open automation raise (ADAM CR-425). A request that is no longer waiting is left as it is.
 
+
+        **A draft is refused** (ADAM CR-582, Chinmay, 3 November 2026; CHG-CR582-001): a request at `draft` is `409`
+        `ApprovalStateProblem` with `refusedReason` `notSubmitted` and `currentStatus` draft, problem type
+        `not-submitted`. Nothing is stored and the draft stays a draft; a draft is not answered `404`. The other
+        refusals (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`) stay as they are.
+
         '
       tags:
       - request
@@ -905,10 +911,11 @@ paths:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
           description: 'The request is not waiting. `refusedReason` says which: `alreadyDecided` (approved or rejected),
-            `withdrawn`, `expired` or `cancelled`, and `currentStatus` names the status it is in.
+            `withdrawn`, `expired`, `cancelled`, or `notSubmitted` (still a draft; ADAM CR-582), and `currentStatus`
+            names the status it is in.
 
             '
-          x-ticvai-problem-types: [already-decided, withdrawn, expired, cancelled]
+          x-ticvai-problem-types: [already-decided, withdrawn, expired, cancelled, not-submitted]
           content:
             application/problem+json:
               schema:
@@ -1001,6 +1008,16 @@ paths:
       - query: ai#approvalRequestScoreRecords
         route: service
         for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
+      x-ticvai-reads:
+      - table: platform.scope
+        for: 'assigneeDepartmentId''s eligibility: a row of level department (the decision''s kind department), in the
+          request''s tenant, whose path equals the request''s scopePath or lies under it; TenancyService''s own table
+          (ADAM CR-582)'
+      - table: approvals.request
+        for: 'the request: its status (a draft is 409 not-submitted), scopePath, current level and requester (ADAM
+          CR-582)'
+      - table: approvals.request_approver
+        for: 'assigneePrincipalId''s eligibility: an approver row at the request''s current level (ADAM CR-582)'
       x-ticvai-audience:
       - staff
       summary: Assign, reassign or claim a request in a shared queue
@@ -1012,6 +1029,22 @@ paths:
         among the request''s eligible approvers (`422 assignee-not-eligible`) or is the requester. A request already
         claimed by someone else is `409 already-claimed` unless the caller holds APPROVAL_DELEGATE, which reassigns.
         Assignment narrows who acts; it never widens who may approve, which stays the matrix''s.
+
+
+        **Who is eligible, and a draft** (ADAM CR-582, Chinmay, 3 November 2026; CHG-CR582-001): a department queue is
+        eligible when it is a department of the request''s tenant inside the request''s scope. (1) `assigneeDepartmentId`
+        is eligible when it names a `platform.scope` row of kind department (its `level`), in the request''s tenant,
+        whose path equals the request''s `scopePath` or lies under it; `platform.scope` is the service''s own table,
+        read here. Anything else, an unknown id or a unit of another kind included, is `422 assignee-not-eligible`. No
+        department is refused for being a department. (2) `assigneePrincipalId` is eligible as now: a principal with an
+        `approvals.request_approver` row at the request''s current level, and not the requester. Both fields may be given
+        together; each is checked on its own, and either failing is `422 assignee-not-eligible`. (3) A department
+        assignment only routes the request; it gives nobody the right to decide: `decideApprovalRequest` still refuses
+        anyone without a chain row at the current level (`notInApproverChain`). A department assignment does not stop a
+        chain approver from claiming: claiming sets `assignedToPrincipalId` and keeps `assignedToDepartmentId`. Both
+        fields null returns the request to the shared queue, as now. (4) A request at `draft` is `409`, problem type
+        `not-submitted`, the response schema unchanged. A request that does not exist stays `404`; a request that is no
+        longer waiting keeps `already-decided`.
 
         '
       tags:
@@ -1055,16 +1088,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
-          description: Claimed by somebody else (`already-claimed`), or no longer waiting (`already-decided`).
+          description: Claimed by somebody else (`already-claimed`), no longer waiting (`already-decided`), or still a
+            draft (`not-submitted`; ADAM CR-582).
           x-ticvai-problem-types:
           - already-claimed
           - already-decided
+          - not-submitted
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: The assignee is not an eligible approver of this request, or is its requester (`assignee-not-eligible`).
+          description: The assignee is not an eligible approver of this request, or is its requester, or the department
+            is not a department inside the request's scope, an unknown id or a unit of another kind included
+            (`assignee-not-eligible`; ADAM CR-582).
           x-ticvai-problem-types:
           - assignee-not-eligible
           content:
@@ -6824,7 +6861,8 @@ components:
         value per cause, so "someone already approved it" and "it timed out" are told apart.
         Since 2 October 2026 also `cancelApprovalRequest` (`alreadyDecided`, `withdrawn`, `expired`,
         `cancelled`) and `reopenApprovalRequest` (`openRequestExists`, `alreadyDecided`, `withdrawn`),
-        with the values above (CHG-CSP-043). `levelFellBack` is `recordExternalApprovalDecision` answering after the level
+        with the values above (CHG-CSP-043). `notSubmitted` is `cancelApprovalRequest` refusing a request still at
+        `draft` (ADAM CR-582). `levelFellBack` is `recordExternalApprovalDecision` answering after the level
         it was sent to timed out and fell back to people (R8 blocker fix, APPROVALS-TENANCY-C04). The same shape comes from
         `approveUnifiedDecision` (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`). `approvalNoLongerRequired`
         and `noApproverAvailable` are `submitApprovalRequest` finding that the matrix in force now cannot route the
@@ -6849,6 +6887,7 @@ components:
             - levelFellBack
             - approvalNoLongerRequired
             - noApproverAvailable
+            - notSubmitted
           requestId:
             type: string
             format: uuid

@@ -1,0 +1,60 @@
+id: CHG-CR559-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'createMerchandise and updateMerchandise copy list_price from the catalogue variant, never typed in:
+  catalogue#variantPriceRecords in process at the outlet''s venue on channel pos now (read grant XDR-150, no new
+  grant). Create stores on_hand 0, refuses an unpriced variant 409 variantNotPriced and a SKU already used at the
+  outlet 409 skuInUse (the unique violations are 409, never 500); update re-takes the price and keeps the stored one
+  when there is none. MerchandiseConflictProblem.refusedReason is [barcodeInUse, skuInUse, variantNotPriced]. No body
+  gains a price; BO-048 and BO-007 do not change.'
+decision:
+  what: 'ADAM CR-559, posted on #30874: "Decided (Chinmay, 3 November 2026): a merchandise item''s price is copied from
+    its catalogue variant, never typed in. The approved Retail Products screen has no price field, and a till sale
+    charges the price Orders took from the catalogue. Build now, on createMerchandise (#30874) and updateMerchandise
+    (#30876): 1. Venue: read the item''s outlet with tenancy#outletRecords ... 2. Price at create: ask
+    catalogue#variantPriceRecords in process ... A null amount is 409 with refusedReason variantNotPriced ... 3. Price
+    on update ... 4. Stock at create: write on_hand 0 ... 5. SKU in use ... MerchandiseConflictProblem.refusedReason
+    becomes [barcodeInUse, skuInUse, variantNotPriced] ... 6. Screens BO-048 and BO-007 do not change". The lead''s
+    instruction, 3 November 2026: "Dont hold r13. approve them and rever tto the devs".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-559 (Pranay Shinde, #30874 createMerchandise): retail.merchandise.list_price and on_hand are NOT NULL, but
+  CreateMerchandiseRequest carries neither, MerchandiseItem.variantId says "Price and tax come from there" with no
+  declared read, and the 409 offered only barcodeInUse although the (outlet_id, lower(sku)) unique index exists
+  (V0116).'
+keys_touched:
+  operations:
+  - createMerchandise
+  - updateMerchandise
+  schemas:
+  - MerchandiseConflictProblem
+  - MerchandiseItem
+  tables:
+  - retail.merchandise
+  files:
+  - contracts/satellite/retail.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - XDR-150 (the operations host asks catalogue#variantPriceRecords in process for these two operations; the SELECT is
+    XDR-007's and XDR-055's, no grant added)
+root_class: a NOT NULL column with no declared source on create
+tickets:
+  started: []
+  unstarted:
+  - '30874 (createMerchandise, Pranay Shinde, On hold): venue from the outlet, price from the catalogue, on_hand 0, the
+    SKU and unpriced 409s, as posted.'
+  - '30876 (updateMerchandise, Pranay Shinde, New): the price re-taken on every successful update, as posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-559
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MERCH-PRICE-SOURCE
+status: open
+notes: 'Beyond the posted words: the in-process read of catalogue#variantPriceRecords from the operations host is
+  recorded as read grant XDR-150 (narrow, these two operations), because tools/check-cross-module-reads.py XR-ROUTE
+  refuses an in-process read across deployables without one; it grants nothing new (XDR-007 and XDR-055 already give
+  the operations role SELECT on the six tables the query reads), as the posted "so no new grant" says.'

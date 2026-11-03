@@ -1,0 +1,65 @@
+id: CHG-CR581-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'listProducts keeps its stated order and the key is added: Product.displayOrder (integer, nullable, default
+  100, stored as catalogue.product.display_order like product_category''s, indexed on (venue_id, display_order, id)),
+  taken by createProduct (100 when not sent) and updateProduct (only when carried; null stores null), and returned by
+  every operation that answers Product and the till''s bundle. listProducts sorts display_order ascending NULLS LAST,
+  then id, with a cursor on (display_order, id); filters narrow, never reorder. No approved screen changes.'
+decision:
+  what: 'ADAM CR-581, posted on #31009: "Decided (Chinmay, 3 November 2026): listProducts keeps the order its contract
+    states, and the missing sort key is added to Product and its table. Build now: 1. Storage: add a forward tenant
+    migration: ALTER TABLE catalogue.product ADD COLUMN display_order integer DEFAULT 100 ... Add an index on
+    (venue_id, display_order, id) for the list. 2. Contract: Product gets displayOrder: integer, nullable, default 100
+    ... 3. createProduct stores displayOrder when sent, else 100. updateProduct changes it only when the body carries
+    it; sending null stores null. 4. listProducts sorts by display_order ascending NULLS LAST, then id ascending ... 5.
+    The contract''s Order line becomes: ''Sorted by displayOrder ascending, then by id. A product with no displayOrder
+    sorts after those that have one.'' 6. Screens: no approved screen changes." The lead''s instruction, 3 November
+    2026: "Dont hold r13. approve them and rever tto the devs".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-581 (Narayan Gaonkar, #31009 listProducts): the contract said "Sorted by `displayOrder` ascending, then by
+  `id`", but Product has no displayOrder and catalogue.product no display_order; tools/check-list-order.py LO-FIELD
+  listed it among the lists ordered on a field their items do not have (CHG-R13RVB-006).'
+keys_touched:
+  operations:
+  - listProducts
+  - createProduct
+  - updateProduct
+  - getProduct
+  schemas:
+  - Product
+  - CreateProductRequest
+  - UpdateProductRequest
+  - CatalogueBundle
+  tables:
+  - catalogue.product
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-list-order.py
+  - tools/check-business-rules.py
+  other:
+  - LO_FIELD_CEILING lowered from 60 to 59 (listProducts ruled)
+  - catalogue.product.display_order and its index reach the database through r14's forward migration, written once by
+    the integration pass
+root_class: a list's stated order names a field its items do not have
+tickets:
+  started: []
+  unstarted:
+  - '31009 (listProducts, Narayan Gaonkar, New): the order and the cursor, as posted.'
+  - '31652 (createProduct, Narayan Gaonkar, New): store displayOrder, 100 when not sent.'
+  - '30950 (updateProduct, Sanket Keluskar, New): change displayOrder only when the body carries it.'
+  - '31727 (getProduct, Deep Khanvilkar, New): return displayOrder.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-581
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-list-order.py
+status: open
+notes: 'tools/check-list-order.py LO-FIELD is the class check (its ceiling now 59, it only falls);
+  tools/check-business-rules.py BR-PRODUCT-DISPLAY-ORDER holds the posted details. Beyond the posted words: the till''s
+  CatalogueBundle.payload says its products carry displayOrder in listProducts'' order, which is posted point 4''s "On
+  the till, the bundle answer uses the same order".'

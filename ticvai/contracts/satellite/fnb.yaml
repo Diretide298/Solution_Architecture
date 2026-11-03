@@ -2226,6 +2226,16 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-024 Outlet Setup"
         - "P06 EMP-053 Table & Seating Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet in the path (platform.outlet by id) and its venue (venue_id), whose venue path the row''s
+          scope_path carries; outlets have no scope node of their own (ADAM CR-561; XDR-004)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the outlet''s venue scope node (platform.scope), written as fnb.table_combination.scope_path on every
+          write, the same path the venue''s own rows carry; an outlet whose venue has no scope node refuses the write
+          (ADAM CR-561)'
       summary: Which tables can be pushed together, and to what capacity
       description: 'Board 4. **A party of nine at a restaurant of four-tops is the everyday case**, and
         the package had no way to say that tables 6 and 7 make a nine.
@@ -2234,6 +2244,12 @@ paths:
         a service run. **A host knows which pairs work and a floor plan does not.**
 
         Without it, `getTableMap` reports a full room while the venue turns away a booking it could seat.
+
+
+        **Each row carries the path of the outlet''s venue** (ADAM CR-561, Chinmay, 3 November 2026; CHG-CR561-001):
+        `fnb.table_combination.scope_path` is written as the path of the outlet''s venue scope node in `platform.scope`,
+        as `setCourseRules` states, set by the server on every write and never taken from the request; outlets have no
+        scope node of their own. If the outlet''s venue has no scope node, the write is refused.
 
         '
       tags:
@@ -3424,12 +3440,36 @@ paths:
       operationId: setCourseRules
       x-ticvai-consumed-by:
         - "P08 BO-136 F&B Global Settings & Controls"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet in the path (platform.outlet by id) and its venue (venue_id); not found or not visible to the caller is 404, whose venue path the row''s
+          scope_path carries; outlets have no scope node of their own (ADAM CR-561; XDR-004)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the outlet''s venue scope node (platform.scope), written as fnb.course_rule.scope_path on every
+          write, the same path the venue''s own rows carry; an outlet whose venue has no scope node refuses the write
+          (ADAM CR-561)'
       summary: How this outlet courses by default
       description: 'Board 3. **Coursing was a per-ticket field with no default**, so every table was coursed
         by hand or not at all.
 
         **A fine-dining room and a food court do not course the same way**, and neither should have to
         be told twice a night.
+
+
+        **An outlet''s settings rows carry the path of the outlet''s venue** (ADAM CR-561, Chinmay, 3 November 2026;
+        CHG-CR561-001). Outlets have no scope node of their own, and none is planned. (1) The outlet in the path is
+        looked up (`platform.outlet` by id, `tenancy#outletRecords`); it is `404` if it does not exist or is not visible
+        to the caller. `fnb.course_rule.scope_path` is written as the path of that outlet''s venue scope node in
+        `platform.scope`, the same path the venue''s own rows carry, on every write, insert or replace, and never taken
+        from the request body; `scopePath` stays read-only in the response and returns that venue path. (2)
+        `outlet_id` stays the key the outlet''s course rules are found by, one row per outlet: reads and the replace on
+        PUT select by `outlet_id`, not by path. Row-level security on `scope_path` then lets anyone granted at the
+        venue, its region or the tenant read and write the row, as it does for dining tables. (3) If the outlet''s venue
+        has no scope node, the write is refused; an empty or made-up path is never written (`scope_path` is NOT NULL).
+        (4) Nothing changes in Tenancy: no `platform.scope` row of level outlet, no new column on `platform.outlet`, no
+        backfill and no migration.
 
         '
       tags:
@@ -3453,6 +3493,8 @@ paths:
       responses:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '200':
           headers:
             X-Consistency-Token:
@@ -9049,6 +9091,11 @@ paths:
       - query: tenancy#outletRecords
         route: in-process
         for: 'the outlet the stations serve (422 unknown-station) (CHG-MOD-003)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the outlet''s venue scope node (platform.scope), written as fnb.kitchen_routing_rule.scope_path on every
+          write, the same path the venue''s own rows carry; an outlet whose venue has no scope node refuses the write
+          (ADAM CR-561)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q189 and Q190 (BO-135, DI-323); shape follows setCourseRules'
@@ -9066,6 +9113,13 @@ paths:
         If the station a line routes to is inactive or every display assigned to it is down, its ticket goes to
         `fallbackStationId` instead (DI-323: the fallback display). Every station named must belong to this
         outlet, or to the producing outlet that serves it (`KitchenStation.servesOutletIds`); otherwise `422`.
+
+
+        **The row carries the path of the outlet''s venue** (ADAM CR-561, Chinmay, 3 November 2026; CHG-CR561-001):
+        `fnb.kitchen_routing_rule.scope_path` is written as the path of the outlet''s venue scope node in
+        `platform.scope`, as `setCourseRules` states, set by the server on every write and never taken from the
+        request; outlets have no scope node of their own. If the outlet''s venue has no scope node, the write is
+        refused.
 
         '
       tags:
@@ -13263,7 +13317,10 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope, which means: the
+            server writes the scope path of the venue the outlet belongs to (its venue''s `platform.scope` node), on
+            every write and never from a request, as `DiningTable.scopePath` does; outlets have no scope node of their
+            own (ADAM CR-561, Chinmay, 3 November 2026).'
     WasteApprovalPolicy:
       type: object
       x-ticvai-persistence: fnb.waste_approval_policy
@@ -13660,7 +13717,10 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope, which means: the
+            server writes the scope path of the venue the outlet belongs to (its venue''s `platform.scope` node), on
+            every write and never from a request, as `DiningTable.scopePath` does; outlets have no scope node of their
+            own (ADAM CR-561, Chinmay, 3 November 2026).'
     TableCombination:
       type: object
       x-ticvai-persistence: fnb.table_combination
@@ -13697,7 +13757,10 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope, which means: the
+            server writes the scope path of the venue the outlet belongs to (its venue''s `platform.scope` node), on
+            every write and never from a request, as `DiningTable.scopePath` does; outlets have no scope node of their
+            own (ADAM CR-561, Chinmay, 3 November 2026).'
     SectionLayout:
       type: object
       description: An outlet's floor divided into sections, each with its server (`setSectionLayout`).

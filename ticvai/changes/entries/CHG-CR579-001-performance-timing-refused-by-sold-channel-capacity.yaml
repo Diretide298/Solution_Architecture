@@ -1,0 +1,52 @@
+id: CHG-CR579-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'updatePerformance declares its reads and writes and how it refuses: sold tickets are any
+  catalogue.channel_capacity row of the performance with sold above 0 (read only when the body carries startsAt or
+  endsAt, never written), the test event cancellation uses; a timing change is a startsAt or endsAt that differs from
+  the stored one; a timing change with sold tickets is 409 performance-has-sold-tickets; the other fields are accepted
+  either way; admissionRulesId is stored as sent, and the foreign key refusing it is 400 validation naming it
+  (declared). Access''s tables are not read.'
+decision:
+  what: 'ADAM CR-579, posted on #31408: "Decided (Chinmay, 3 November 2026): option A. Build now on #31408, in
+    updatePerformance''s transaction under the caller''s grant. (1) Read the performance row; unknown or out of scope is
+    404 as today. (2) Sold tickets: the performance has sold tickets when any catalogue.channel_capacity row with its
+    performance_id has sold greater than 0 ... (3) A timing change is a startsAt or endsAt that differs from the stored
+    starts_at or ends_at ... (4) admissionRulesId is stored as sent in admission_rules_id. When the database refuses it
+    on the foreign key to access.admission_rules, answer 400 validation naming admissionRulesId and write nothing. Do
+    not read Access''s tables. (5) catalogue.channel_capacity is read-only here". The lead''s instruction, 3 November
+    2026: "Dont hold r13. approve them and rever tto the devs".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-579 (Chinmay Patkar, #31408 updatePerformance): the contract refused "a timing change on a performance with
+  sold tickets" but declared no reads, and catalogue.performance holds no sold count: it is
+  catalogue.channel_capacity.sold, as transitionEventLifecycle''s "has sales" (CR-109) reads it. admission_rules_id has
+  a foreign key and no 400 was declared.'
+keys_touched:
+  operations:
+  - updatePerformance
+  tables:
+  - catalogue.performance
+  - catalogue.channel_capacity
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: a rule reads data from a table its ticket does not list
+tickets:
+  started: []
+  unstarted:
+  - '31408 (updatePerformance, Chinmay Patkar, New): the sold-ticket test, the timing-change rule and the 400, as
+    posted.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-579
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PERFORMANCE-SOLD
+status: open
+notes: 'The package words the foreign key as "the column''s foreign key to Access''s admission rules" instead of naming
+  access.admission_rules: tools/check-cross-module-reads.py XR-FACT refuses an operation''s text that names another
+  module''s table it asks no query over, and the decision says not to read Access''s tables. The 404 the decision calls
+  "as today" is now declared on the operation.'

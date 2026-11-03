@@ -1,0 +1,52 @@
+id: CHG-CR574-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'listMerchandise, createMerchandise and updateMerchandise read Tenancy''s outlets in process
+  (tenancy#outletRecords, XDR-004), since a merchandise item reaches its venue only through its outlet. listMerchandise
+  asks the browsed venue''s outlets (where {venueId}), lists only their items, answers an empty page for an outletId
+  not among them, and prices the page with one venueSettingsRecords read; create asks ids [outletId] (not found or of
+  another venue is 400 on outletId); update asks the stored outlet for the 200''s currency. No venue column.'
+decision:
+  what: 'ADAM CR-574, posted on #30875: "Decided (Chinmay, 3 November 2026): a merchandise item reaches its venue only
+    through its outlet, so listMerchandise, createMerchandise and updateMerchandise read Tenancy''s outlets in process,
+    the same rule F&B''s menus follow. Build now, on #30875 (keep it as built), #30874 and #30876: use
+    tenancy#outletRecords, route in-process, inside the operation''s own transaction ... listMerchandise: the venue is
+    X-Venue-Id for a guest or visitor, and the session''s venue for staff ... When outletId is given and is not one of
+    them, answer an empty page, never another venue''s items ... createMerchandise: outletRecords with ids [outletId]
+    ... updateMerchandise: outletRecords with ids [the stored outlet_id], for the 200''s currency. retail.merchandise
+    gets no venue column and no storage change." The lead''s instruction, 3 November 2026: "Dont hold r13. approve
+    them and rever tto the devs".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-574 (Pranay Shinde, #30875 listMerchandise): retail.merchandise has outlet_id and no venue column, yet the
+  three operations price in the venue''s currency and the guest browses by X-Venue-Id, with only
+  tenancy#venueSettingsRecords declared. tenancy#outletRecords is served in process on the operations host (CR-296,
+  XDR-004), as the F&B menus ask it (CR-260). The same outlet read gives CR-559''s price its venue.'
+keys_touched:
+  operations:
+  - listMerchandise
+  - createMerchandise
+  - updateMerchandise
+  tables:
+  - platform.outlet
+  - retail.merchandise
+  files:
+  - contracts/satellite/retail.yaml
+  - tools/check-business-rules.py
+root_class: a read the operation needs but does not declare
+tickets:
+  started:
+  - '30875 (listMerchandise, Pranay Shinde, Ready for QA): the posted decision says keep it as built; the package now
+    declares the outlet read and the empty page for another venue''s outletId. Nothing to change beyond the comment.'
+  unstarted:
+  - '30874 (createMerchandise, Pranay Shinde, On hold): the outlet read, 400 on outletId.'
+  - '30876 (updateMerchandise, Pranay Shinde, New): the stored outlet read for the 200''s currency.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-574
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MERCH-OUTLET-VENUE
+status: open
