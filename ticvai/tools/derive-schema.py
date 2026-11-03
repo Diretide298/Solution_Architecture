@@ -108,6 +108,20 @@ def column_nullable(spec) -> bool:
     return is_nullable(spec) or (isinstance(spec, dict) and spec.get("x-ticvai-column-nullable") is True)
 
 
+def column_required(prop, required, spec) -> bool:
+    """Whether the stored column is NOT NULL: the field is required and cannot be null, or the contract says the column
+    is never null whatever the wire allows.
+
+    **A wire field that may be null or absent can still be a column that never is** (ADAM CR-566 and CR-571, Chinmay,
+    3 November 2026; CHG-CR566-001, CHG-CR571-001): `x-ticvai-column-nullable: false` makes the column NOT NULL.
+    `ApiAnomalyRule.tenantId` is null on the wire for a platform default, which is configuration and never a row, so
+    every stored row has a tenant; `ApiClient.clientId` is set by the server on every client and is not a required
+    member of the create body."""
+    if isinstance(spec, dict) and spec.get("x-ticvai-column-nullable") is False:
+        return True
+    return prop in required and not column_nullable(spec)
+
+
 def is_nullable(spec) -> bool:
     """Whether a property may legitimately hold null, in any of the forms OpenAPI allows.
 
@@ -1007,7 +1021,7 @@ def main() -> int:
             cols.append({
                 "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in req and not column_nullable(pspec) else "no",
+                "required": "yes" if column_required(prop, req, pspec) else "no",
                 "source": f"{owner.get(child, '')}.{parent_schema}.{key}[].{prop}",
                 "description": describe(pspec),
                 "table": child,
@@ -1123,7 +1137,7 @@ def main() -> int:
                 # Without one, the mechanical parts of the standard apply (`conventional_name`).
                 "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in required and not column_nullable(spec) else "no",
+                "required": "yes" if column_required(prop, required, spec) else "no",
                 "source": f"{owner.get(table, '')}.{sname}.{prop}",
                 "description": describe(spec),
                 "table": table,

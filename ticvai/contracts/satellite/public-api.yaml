@@ -101,6 +101,10 @@ info:
     writes and touches no other table. Until the sign-in task lands, the partner path is tested with a developer
     session built in the test, and the TICVAI staff and tenant staff paths ship.
 
+    6. **The same caller kinds** decide `getDeveloperAccount` (ADAM CR-565; CHG-CR565-001), `createApiClient` and
+    `revokeApiCredential` (ADAM CR-569; CHG-CR569-001), Chinmay, 3 November 2026: each says what each caller kind gets.
+    `DEVELOPER_ADMIN` marks nothing here.
+
 servers:
   - url: https://api.ticvai.com/v1
 
@@ -151,7 +155,9 @@ x-ticvai-jobs:
     emits: [apiClient.anomalyDetected]
     reliesOn: [setApiAnomalyRule]
     for: 'The anomaly monitor: records an ApiAnomaly (control.api_anomaly) for a rule set with setApiAnomalyRule and publishes
-      apiClient.anomalyDetected.'
+      apiClient.anomalyDetected. For each client and ruleKey it applies the tenant''s rule for that client if there is one,
+      else the tenant''s rule with clientId null, else the platform default (ApiAnomalyRules:PlatformDefaults); a tenant
+      rule''s isActive and values replace the default''s (ADAM CR-566, CHG-CR566-001).'
     source: ['events/apiClient-anomalyDetected.yaml']
   lifecycleTimers:
     module: public-api
@@ -169,6 +175,18 @@ x-ticvai-jobs:
     - states/api-version.yaml:27
     - states/developer-account.yaml:24
     - states/integration-listing.yaml:51
+  deprecationNotice:
+    module: public-api
+    host: workers
+    trigger: {kind: queue}
+    reads: [control.api_version]
+    writes: [control.api_version]
+    reliesOn: [deprecateApiVersion]
+    for: 'The deprecation notice job (ADAM CR-570, CHG-CR570-001): finds the control.api_version rows deprecateApiVersion left
+      deprecated with deprecation_notified_at null, sends each affected developer account the notice, naming the operations
+      it calls, and sets deprecation_notified_at. It and the per-client, per-version, per-operation usage record it needs
+      are separate work on their own task.'
+    source: ['contracts/satellite/public-api.yaml']
   replayDispatcher:
     module: public-api
     host: workers
@@ -315,10 +333,26 @@ paths:
       description: >
         **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
         DEV-002 registers an organisation (`registerDeveloper`) and sets its members; it had no read of the
-        organisation it then shows. A partner reads only its own (`x-ticvai-self-scoped`). Returns what the
-        write stores, in the write's own shape.
+        organisation it then shows. Returns what the write stores, in the write's own shape.
+
+        **Who may call it** (ADAM CR-565, Chinmay, 3 November 2026; CHG-CR565-001; the caller kinds in this
+        contract's description, worked out from the token, never from a permission), the same way
+        `listDeveloperMembers` does. TICVAI staff (the Control Plane operator token) read any developer account. A
+        partner caller (a developer session, for the account id it carries; or a tenant session whose principal's
+        verified email, point 3 of this contract's description, matches an active `control.developer_member`, for that
+        member's account)
+        reads only its own account: a `developerId` naming any other account is 404 `not-found`, exactly as an id that
+        does not exist, so ids cannot be probed. On every partner request the caller's `control.developer_member` row is
+        read again, and one no longer active is 401 with nothing more read. Any other tenant-session caller is tenant
+        staff, 403. `DEVELOPER_VIEW` stays the permission. The developer-portal sign-in is its own task; this operation
+        only reads the session it issues. Until a member's email is unique among active members (Chinmay, 3 November 2026,
+        "Go yes"), an email that matches active members of two accounts answers 403.
+      x-ticvai-reads:
+      - table: control.developer_account
+        for: 'the account asked for (ADAM CR-565)'
+      - table: control.developer_member
+        for: 'the partner caller''s own member row, read again on every request (ADAM CR-565)'
       x-ticvai-permission: DEVELOPER_VIEW
-      x-ticvai-self-scoped: principal
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -334,7 +368,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeveloperAccount'
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '401':
+          description: 'A partner caller whose `control.developer_member` row is no longer active (ADAM CR-565). Nothing is read or written.'
+          x-ticvai-problem-types: [unauthenticated]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: 'Tenant staff: only TICVAI staff and the account''s own partner callers read it (ADAM CR-565).'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -581,6 +626,31 @@ paths:
         hash under the platform's client-secret key (ADR-0063, amendment of 25 October 2026), with `expiresAt` the
         client's. A partner caller creates clients only for its own developer account, and only once that account
         is `verified` (409 `developer-not-verified`).
+
+        **Who may call it** (ADAM CR-569, Chinmay, 3 November 2026; CHG-CR569-001; the caller kinds in this contract's
+        description, from the token, never from a permission; `DEVELOPER_ADMIN` marks nothing here). On every partner
+        request the caller's `control.developer_member` row is read again: one no longer active is 401, and role
+        `readOnly` is 403. Nothing is written on a refusal. An email that matches active members of two accounts answers 403
+        until a member's email is unique among active members (Chinmay, 3 November 2026, "Go yes").
+        - **TICVAI staff**: any developer account, `sandbox` or `production`; a production client is `issuedBy`
+          `ticvai` and keeps the certification and IP allow-list rules above.
+        - **A partner caller**: `developerId` must be its own account (any other is 404 `not-found`), and the account
+          must be `verified` (409 `developer-not-verified`). It creates `sandbox` only, `issuedBy` `partner`; a
+          `production` client is 409 `certification-required` (the route is `requestProductionAccess`).
+        - **Tenant staff** (BO-1177): `sandbox` clients only; `developerId` must name a verified account (404 or 409 as
+          above); `allowedTenantIds` is set to the caller's tenant alone, whatever is sent; `issuedBy` `partner`; a
+          `production` client is 409 `certification-required`.
+
+        **The client id** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001). The server makes `clientId` (see
+        `ApiClient.clientId`) whenever it creates a client; an insert that hits its unique index retries once with a
+        fresh value. **A replay never carries a secret**: the first answer is 201 `{client, clientSecret}`, and what is
+        kept as the Idempotency-Key's stored answer is that answer with `clientSecret` removed, so a request repeating the
+        key gets 201 with the same client and no `clientSecret`, and nothing is written a second time. The secret exists
+        only as its keyed hash in `control.api_client_secret`; a caller who lost the first answer takes a new secret
+        with `rotateApiCredential`.
+      x-ticvai-reads:
+      - table: control.developer_member
+        for: 'the partner caller''s own member row, read again on every request: active, and not readOnly (ADAM CR-569)'
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -601,7 +671,8 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: >
             Created. **The secret is returned once and never again** — a system that can show you a
-            secret later is a system that stores one.
+            secret later is a system that stores one. A replay of the same Idempotency-Key answers 201 with the
+            same `client` and no `clientSecret`: the stored answer never holds it (ADAM CR-571).
           content:
             application/json:
               schema:
@@ -609,11 +680,25 @@ paths:
                 properties:
                   client: { $ref: '#/components/schemas/ApiClient' }
                   clientSecret: { type: string, format: password }
+        '401':
+          description: 'A partner caller whose `control.developer_member` row is no longer active (ADAM CR-569). Nothing is read or written.'
+          x-ticvai-problem-types: [unauthenticated]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: 'A partner caller whose member role is `readOnly`, which never writes (ADAM CR-569). Nothing is written.'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '409':
           description: >
-            A `production` client without a current certification, or asked for by a developer rather
-            than issued by TICVAI (`certification-required`, M17-06). Use `requestProductionAccess`. Or the
-            caller's developer account is not `verified` (`developer-not-verified`, ADAM CR-098).
+            A `production` client without a current certification, or asked for by a partner caller or tenant staff
+            rather than issued by TICVAI (`certification-required`, M17-06; ADAM CR-569). Use `requestProductionAccess`.
+            Or the developer account is not `verified` (`developer-not-verified`, ADAM CR-098, CR-569).
           x-ticvai-problem-types:
             - certification-required
             - developer-not-verified
@@ -728,6 +813,17 @@ paths:
         client gets `revokedAt` now, so no secret verifies again. It never suspends: pausing a client reversibly is
         `setApiClientStatus`. A client already `revoked` is 409 `api-client-revoked`; an unknown client, or one of
         another developer account (the rule in this contract's description), is 404.
+
+        **Who may call it** (ADAM CR-569, Chinmay, 3 November 2026; CHG-CR569-001; the caller kinds in this contract's
+        description, from the token, never from a permission). TICVAI staff: any client. A partner caller: only its own
+        account's clients; another developer's client is 404, exactly as an unknown one. Tenant staff: 403, because no
+        tenant screen calls it. On every partner request the caller's `control.developer_member` row is read again: one
+        no longer active is 401, and role `readOnly` is 403. Nothing is written on a refusal. An email that matches
+        active members of two accounts answers 403 until a member's email is unique among active members (Chinmay, 3
+        November 2026, "Go yes").
+      x-ticvai-reads:
+      - table: control.developer_member
+        for: 'the partner caller''s own member row, read again on every request: active, and not readOnly (ADAM CR-569)'
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -742,6 +838,19 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revoked
+        '401':
+          description: 'A partner caller whose `control.developer_member` row is no longer active (ADAM CR-569). Nothing is read or written.'
+          x-ticvai-problem-types: [unauthenticated]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: 'Tenant staff, since no tenant screen calls it; or a partner caller whose member role is `readOnly`
+            (ADAM CR-569). Nothing is written.'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
         '409':
@@ -777,6 +886,10 @@ paths:
         request from an address outside `ApiClient.ipAllowList` is refused 403 `ip-not-allowed`, and a
         client past `expiresAt` gets no token (403 `client-expired`). Every refusal counts towards
         the anomaly rules (`setApiAnomalyRule`).
+
+        **The client is found by its `clientId`** (ADAM CR-571; CHG-CR571-001): the body's `clientId` is the
+        `control.api_client.client_id` the server made (`ApiClient.clientId`), never the client's uuid `id`; then the
+        secret is checked as below.
 
         **How the secret is checked, and which licence applies** (ADAM CR-098, accepted for r10;
         CHG-R10ID-011). The sent `clientSecret` is hashed with the platform's client-secret key of each live row's
@@ -1430,13 +1543,32 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-026 End-of-Support Notice Management"
         - "P14 DEV-008 Programme Administration"
-      summary: Announce a sunset date and notify subscribers
+      summary: Announce a sunset date; the notice job notifies subscribers
       description: >
         13.1.32 and 13.1.34. **Deprecation is an announcement with a date, not a switch.**
 
-        Notifies every client using the version, and **the notification names which operations they
-        actually call** — a generic *"v1 is retiring"* to somebody using three of two hundred
+        **The notice is sent by the notice job, and it names which operations each developer account
+        actually calls** — a generic *"v1 is retiring"* to somebody using three of two hundred
         endpoints is a message they will ignore.
+
+        **What this operation does** (ADAM CR-570, Chinmay, 3 November 2026; CHG-CR570-001): it records the
+        deprecation and its reason, enforces the minimum notice, and leaves the notice waiting for its job. It
+        finds the `control.api_version` row by `version` (unique): an unknown version is 404 `not-found`; one that
+        is not `current` is 409 `api-version-not-current`. A `sunsetAt` earlier than now plus the row's
+        `minimum_notice_months` months is 422 `notice-too-short`, and nothing changes. Otherwise it sets `status`
+        `deprecated`, `deprecated_at` now, `sunset_at`, `migration_guide_url` and `deprecation_reason` (the body's
+        `reason`), leaves `deprecation_notified_at` null, and returns the `ApiVersion` with `deprecationReason`.
+        **It notifies nobody**: the deprecation notice job (`deprecationNotice`) finds deprecated rows with
+        `deprecation_notified_at` null and sends each affected developer account the notice, naming the operations
+        it calls; that job and the per-client, per-version, per-operation usage record it needs are separate work.
+        It reads and writes `control.api_version` and nothing else.
+      x-ticvai-reads:
+      - table: control.api_version
+        for: 'the version by its unique `version`, its status and minimum notice (ADAM CR-570)'
+      x-ticvai-writes:
+      - table: control.api_version
+        for: 'status deprecated, deprecated_at, sunset_at, migration_guide_url and deprecation_reason; deprecation_notified_at
+          left null for the notice job (ADAM CR-570)'
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_ADMIN
       x-ticvai-audience: [staff]
@@ -1454,7 +1586,10 @@ paths:
               required: [sunsetAt, reason]
               properties:
                 sunsetAt: { type: string, format: date-time }
-                reason: { type: string }
+                reason:
+                  type: string
+                  x-ticvai-column: deprecation_reason
+                  description: 'Stored as `control.api_version.deprecation_reason` and returned as `deprecationReason` (ADAM CR-570).'
                 migrationGuideUrl: { type: string, nullable: true }
       responses:
         '200':
@@ -1465,9 +1600,19 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ApiVersion' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '409':
           description: 'The version is not `current` (still `preview`, or already `deprecated` or `sunset`); only the current version is deprecated. Nothing changes and nobody is notified.'
           x-ticvai-problem-types: [api-version-not-current]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '422':
+          description: '`sunsetAt` is earlier than now plus the version''s `minimumNoticeMonths` months (`notice-too-short`;
+            ADAM CR-570). Nothing changes.'
+          x-ticvai-problem-types: [notice-too-short]
           content:
             application/problem+json:
               schema:
@@ -1660,6 +1805,19 @@ paths:
         **It is also what production access rests on** (17 September minutes, M17-06). Revoking a
         certification, or letting it lapse, suspends the production clients issued against it
         (`setApiClientStatus` `suspended`, reason `certificationLapsed`); sandbox clients are untouched.
+
+        **The decision's words are kept on the listing, and certifying always sets an expiry** (ADAM CR-572, Chinmay,
+        3 November 2026, and "Go yes"; CHG-CR572-001). Every decision (`certify`, `reject`, `revoke`) sets
+        `review_notes` to the `notes` sent, or null when none are sent, in the same transaction as the status change; no
+        other operation writes it, and a resubmission leaves it as it is. `notes` longer than 1000 characters is 400
+        `validation` (the shared type). A `reject` without notes (absent, null or blank) is 422 `reason-required`, the
+        type `decideProductionAccess` uses for a reject without a reason. A `certify` without `certifiedUntil`, or with a
+        date that is not after today, is 422 `certified-until-required`; a certify that passes sets `certified_until` to
+        the date sent, and `revoke` and `reject` leave it as it is. Listings already certified with `certified_until`
+        null stay as they are, and the marketplace read keeps treating null as unexpired. `certify` and `reject` are
+        accepted from `submitted` or `inReview`; certifyIntegration never writes `inReview`. Any other state is 409
+        `integration-listing-not-in-review`, and `revoke` only from `certified` (409
+        `integration-listing-not-certified`). Nothing is written on a refusal. The certify form on DEV-008 is unchanged.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_ADMIN
       x-ticvai-audience: [staff]
@@ -1686,10 +1844,12 @@ paths:
                 notes:
                   type: string
                   nullable: true
-                  x-ticvai-stored-as: control.integration_listing.certification_notes
-                  description: Stored as the listing's `certificationNotes` (control.integration_listing
-                    certification_notes, nullable), replacing the note of an earlier decision; a decision with no
-                    notes stores null (the lead, 3 November 2026, "Keep them"; r14 gate, CHG-R14BO-006).
+                  maxLength: 1000
+                  x-ticvai-column: review_notes
+                  description: 'Stored as `control.integration_listing.review_notes` and returned as `reviewNotes`; longer
+                    than 1000 characters is 400 `validation` (ADAM CR-572). The one note of the decision: lane s''s
+                    certificationNotes (the lead, 3 November 2026, "Keep them", CHG-R14BO-006) is this same field, kept
+                    once as `review_notes` (CHG-R14INT-003).'
       responses:
         '200':
           headers:
@@ -1699,9 +1859,19 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/IntegrationListing' }
+        '400':
+          $ref: '../shared/common.yaml#/components/responses/BadRequest'
         '409':
           description: '`certify` or `reject` on a listing that is not `submitted` or `inReview` (`integration-listing-not-in-review`), or `revoke` on one that is not `certified` (`integration-listing-not-certified`). Nothing changes.'
           x-ticvai-problem-types: [integration-listing-not-in-review, integration-listing-not-certified]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '422':
+          description: '`reject` without notes (absent, null or blank: `reason-required`), or `certify` without a
+            `certifiedUntil` after today (`certified-until-required`) (ADAM CR-572). Nothing is written.'
+          x-ticvai-problem-types: [reason-required, certified-until-required]
           content:
             application/problem+json:
               schema:
@@ -2257,6 +2427,12 @@ paths:
         developer takes the secret once with `rotateApiCredential`. Rejecting needs a reason the
         developer can act on. A request whose certification lapsed since it was made is refused 409
         `certification-required`.
+
+        **The production client's name and client id** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001). On
+        approve the client's `name` is the sandbox client's name as it stands at the decision (the request's
+        `sandbox_client_id`, its `control.api_client.name`); the decide body and the request body take no name. Its
+        `clientId` is made by the server as for every client (`ApiClient.clientId`, `tvc_live_`). It has no secret,
+        so the answer stored for a replay is the whole answer.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_ADMIN
       x-ticvai-audience: [staff]
@@ -2327,6 +2503,17 @@ paths:
         **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
         DEV-008 and ADM-015 set anomaly rules with `setApiAnomalyRule` and nothing read them. Returns what
         the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
+
+        **The configured platform defaults and the caller tenant's rules** (ADAM CR-566, Chinmay, 3 November 2026;
+        CHG-CR566-001). It returns the caller tenant's `control.api_anomaly_rule` rows, read under the path policy,
+        plus every platform default configured under `ApiAnomalyRules:PlatformDefaults` (per-cell configuration,
+        never a row), each with `tenantId` and `scopePath` null. The merged list is ordered by `id`, oldest first;
+        the page cursor is the last `id` returned and runs across both sources. A default is returned even when the
+        tenant has its own rule with the same `ruleKey`; the tenant's row shows beside it. Until the key is present
+        there are no defaults, and nothing fails.
+      x-ticvai-reads:
+      - table: control.api_anomaly_rule
+        for: 'the caller tenant''s rules, under the path policy (ADAM CR-566)'
       x-ticvai-permission: DEVELOPER_ADMIN
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -2367,6 +2554,13 @@ paths:
         `ApiAnomaly` and publishes `apiClient.anomalyDetected`; `action` may also throttle or
         suspend the client (`setApiClientStatus`), and suspension is audited. Matched on `ruleKey`:
         replaces or creates. Quotas stay on `setApiQuota`; this watches what quotas do not catch.
+
+        **Only the caller tenant's rules** (ADAM CR-566, Chinmay, 3 November 2026; CHG-CR566-001). It matches
+        `ruleKey` only among the caller tenant's rows and sets `tenantId` and `scopePath` from the caller. A `ruleKey`
+        that equals a platform default's creates the tenant's own rule, which overrides that default. A path
+        `anomalyRuleId` equal to a platform default's `id` is 409 `anomaly-rule-id-mismatch` and nothing changes:
+        platform defaults (`ApiAnomalyRules:PlatformDefaults`) are configuration and are never written through the
+        API.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_ADMIN
       x-ticvai-audience: [staff]
@@ -2396,7 +2590,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ApiAnomalyRule' }
         '409':
-          description: 'Refused, and nothing is stored. `anomaly-rule-id-mismatch` (ADAM CR-245): a record for `ruleKey` exists and the path''s `anomalyRuleId` is not its id (or names another such record); nothing changes.'
+          description: 'Refused, and nothing is stored. `anomaly-rule-id-mismatch` (ADAM CR-245): a record for `ruleKey` exists and the path''s `anomalyRuleId` is not its id (or names another such record), or the path''s `anomalyRuleId` is a platform default''s id (ADAM CR-566); nothing changes.'
           x-ticvai-problem-types:
           - anomaly-rule-id-mismatch
           content:
@@ -2555,6 +2749,13 @@ components:
       description: >
         **When API traffic is abnormal** (17 September minutes, M17-07). Platform defaults ship for
         every tenant; TICVAI tightens them per tenant or per client.
+
+        **A platform default is per-cell configuration, never a row** (ADAM CR-566, Chinmay, 3 November 2026;
+        CHG-CR566-001). The configuration key `ApiAnomalyRules:PlatformDefaults` is a list of rules in this shape
+        (`id`, `ruleKey`, `measure`, `comparison`, `threshold`, `windowMinutes`, `action`, `isActive`), `clientId`
+        always null, each with a fixed UUIDv7 `id` that never changes; the lead sets the values, and until the key is
+        present there are no defaults. `control.api_anomaly_rule` holds only tenant rules: `tenant_id` is NOT NULL
+        (a forward migration makes it so), `scope_path` stays NOT NULL and the row policy is unchanged.
       required: [ruleKey, measure, comparison, threshold, action]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -2581,13 +2782,20 @@ components:
           format: uuid
           nullable: true
           readOnly: true
+          x-ticvai-column-nullable: false
+          x-ticvai-references: control.tenant
           description: '**The tenant a rule belongs to** (4 October 2026, CHG-FXC-003). Null for a platform default, which
-            every tenant reads; `listApiAnomalyRules` returns the platform defaults and the caller tenant''s own rules.'
+            every tenant reads; `listApiAnomalyRules` returns the platform defaults and the caller tenant''s own rules. A
+            platform default is per-cell configuration (`ApiAnomalyRules:PlatformDefaults`) that the list returns with
+            `tenantId` and `scopePath` both null and that is never stored, so every stored row has a tenant (NOT NULL;
+            ADAM CR-566).'
         scopePath:
           type: string
           nullable: true
           readOnly: true
-          description: The tenant's root scope path for a tenant rule (scope row-level security); null for a platform default.
+          description: 'The tenant''s root scope path for a tenant rule (scope row-level security); null for a platform default,
+            which is per-cell configuration (`ApiAnomalyRules:PlatformDefaults`) returned by the list and never stored (ADAM
+            CR-566).'
 
     DeveloperMember:
       type: object
@@ -2599,11 +2807,20 @@ components:
         A new email is invited (`status` `invited`) and becomes `active` when the person signs in to the portal with it.
         What each role may do in the portal: `owner` everything and the member list, `admin` everything but removing the
         owner, `developer` its own clients and credentials, `readOnly` view.'
+      # One active member per email, compared without case (ADAM CR-569; Chinmay, 3 November 2026, "Go yes";
+      # CHG-CR569-002): a partial unique index on lower(email) where status is active. Invited and removed rows may repeat.
+      x-ticvai-unique-when:
+      - columns: [email]
+        when: {status: active}
       required: [email, role, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
         developerAccountId: { type: string, format: uuid, readOnly: true }
-        email: { type: string, format: email }
+        email:
+          type: string
+          format: email
+          description: 'Unique among active members, compared without case (ADAM CR-569, "Go yes"): one email acts for one
+            developer account. Until the index is applied, an email matching active members of two accounts answers 403.'
         role: { type: string, enum: [owner, admin, developer, readOnly] }
         status: { type: string, enum: [invited, active, removed], readOnly: true }
         invitedAt: { type: string, format: date-time, readOnly: true }
@@ -2684,12 +2901,31 @@ components:
         CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own,
         so a partner API key, a POS integration credential and a webstore credential were three
         unrelated things with three lifecycles.
+      # One client per client id, compared exactly (ADAM CR-571; CHG-CR571-001).
+      x-ticvai-unique-together:
+      - [clientId]
       required: [id, developerId, name, environment, scopes, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
         developerId: { type: string, format: uuid, x-ticvai-references: control.developer_account }
         name: { type: string }
-        clientId: { type: string, readOnly: true }
+        clientId:
+          type: string
+          readOnly: true
+          pattern: '^tvc_(live|test)_[a-z0-9]{32}$'
+          x-ticvai-column-nullable: false
+          x-ticvai-unique-compare: exact
+          description: >-
+            **The public half of the credential pair** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001), made
+            by the server whenever a client is created, in `createApiClient` and in `decideProductionAccess` alike:
+            `tvc_live_` for a production client or `tvc_test_` for a sandbox client, then 32 lowercase letters and
+            digits from a cryptographically secure random source. It never changes, not on rotation or on a status
+            change. The prefix is for people and secret scanners only: what a client may reach is decided by its
+            `environment`, never by reading the prefix. `issueApiToken` finds the client by it. It is not the uuid
+            `id` the `/api-clients/{clientId}/...` paths take. Stored NOT NULL with a unique index; an insert that hits
+            the index retries once with a fresh value. A forward migration gives every existing row whose `client_id`
+            is null a value made the same way, then makes `client_id` NOT NULL with the unique index. Shown and copied
+            on the client detail panel, so never null.
         environment:
           type: string
           enum: [sandbox, production]
@@ -3109,9 +3345,14 @@ components:
         13.1.31 to 13.1.35, ADR-0026. **CF-141 is sharper under D1**: a single supported production
         version was tenable when only Softlabs called the API, and **with third parties a breaking
         change with no window breaks somebody else's business.**
+
+        **One row per version** (ADAM CR-570, Chinmay, 3 November 2026; CHG-CR570-001): `version` is unique. The
+        forward migration that adds the index first checks for duplicate `version` rows and stops if any are found.
+      x-ticvai-unique-together:
+      - [version]
       required: [version, status]
       properties:
-        version: { type: string }
+        version: { type: string, x-ticvai-unique-compare: exact }
         status: { type: string, enum: [preview, current, deprecated, sunset] }
         releasedAt: { type: string, format: date-time }
         deprecatedAt: { type: string, format: date-time, nullable: true }
@@ -3123,6 +3364,12 @@ components:
             **The commitment, not the intention.** A deprecation policy without a stated minimum is
             a policy that shortens under pressure.
         migrationGuideUrl: { type: string, nullable: true }
+        deprecationReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: 'Why the version was deprecated: the `reason` sent to `deprecateApiVersion`, which sets it (ADAM CR-570);
+            null until then.'
         activeClientCount: { type: integer, readOnly: true }
         changes:
           x-ticvai-persistence-column: jsonb
@@ -3142,6 +3389,21 @@ components:
               breaking: { type: boolean, default: false }
               summary: { type: string }
 
+    ApiVersionNotice:
+      type: object
+      x-ticvai-persistence: control.api_version
+      description: >-
+        **Whether a deprecation's notice was sent** (ADAM CR-570, Chinmay, 3 November 2026; CHG-CR570-001). One column of
+        the version record, `deprecation_notified_at`: `deprecateApiVersion` leaves it null, and the deprecation notice
+        job (`deprecationNotice`) sets it once it has sent the notice. **Never returned by any operation**.
+      properties:
+        deprecationNotifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          x-ticvai-column: deprecation_notified_at
+          description: When the deprecation notice was sent; null until the notice job sends it.
     IntegrationListing:
       type: object
       x-ticvai-persistence: "control.integration_listing"
@@ -3170,13 +3432,15 @@ components:
             **Certification expires.** An integration certified against v1 and still listed after v3
             is TICVAI vouching for something it has not looked at in two years.
         certifiedAgainstVersion: { type: string, nullable: true, readOnly: true }
-        certificationNotes:
+        reviewNotes:
           type: string
           nullable: true
           readOnly: true
-          description: The reviewer's note on the latest certification decision, as `certifyIntegration` sent it in
-            `notes`; null when it sent none. Set only by `certifyIntegration` (the lead, 3 November 2026, "Keep them";
-            r14 gate, CHG-R14BO-006).
+          maxLength: 1000
+          description: 'The notes of the last certifyIntegration decision (certify, reject or revoke), null when none were
+            sent; set only by that decision, and left as it is by a resubmission (ADAM CR-572). The
+            certification decision''s note CHG-R14BO-006 kept (the lead, 3 November 2026, "Keep them") is this field
+            (CHG-R14INT-003).'
         listingFeeModel: { type: string, enum: [none, flat, revenueShare], nullable: true }
         visibility:
           type: string

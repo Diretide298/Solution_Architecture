@@ -2905,16 +2905,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "deprecateApiVersion": {
-   "reads": [
-    "control.api_client"
-   ],
-   "writes": [
-    "marketing.message_dispatch"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "diffSeatMapVersions": {
    "reads": [
     "seating.seat_map",
@@ -3518,14 +3508,6 @@
   "getCellCapacity": {
    "reads": [
     "control.cell"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "getCellHealth": {
-   "reads": [
-    "control.cell",
-    "control.cell_instance"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
@@ -9638,13 +9620,6 @@
     "catalogue.tax_profile"
    ],
    "reason": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "listTenantCells": {
-   "reads": [
-    "control.cell_tenant"
-   ],
-   "reason": "4 October 2026 (CHG-FXC-004): Cell.tenant_id is retired (ADR-0039 section 4) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listTerritoryMarketDistribution": {

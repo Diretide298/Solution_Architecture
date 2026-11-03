@@ -1,0 +1,48 @@
+id: CHG-CR569-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'createApiClient and revokeApiCredential follow public-api''s caller kinds (CR-536), never DEVELOPER_ADMIN:
+  the member row is read again on every partner request (401 inactive, 403 readOnly, nothing written). createApiClient:
+  TICVAI staff any account and environment (production issuedBy ticvai); a partner its own verified account, sandbox only,
+  issuedBy partner, production 409 certification-required; tenant staff (BO-1177) sandbox only on a verified account,
+  allowedTenantIds set to the caller''s tenant alone, issuedBy partner. revokeApiCredential: staff any client, a partner
+  its own (another''s 404), tenant staff 403. Both declare the control.developer_member read and the 401 and 403.'
+decision:
+  what: 'Posted on #31295 (Chinmay, 3 November 2026), under the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026: "createApiClient and revokeApiCredential follow the
+    caller kinds already in public-api.yaml ... (1) Caller kind comes from the token, never from a permission ...
+    DEVELOPER_ADMIN marks nothing here. (2) Every partner request reads the caller''s control.developer_member row again:
+    if it is no longer active, answer 401; role readOnly is 403 on both operations ... (3) createApiClient ... Tenant
+    staff (BO-1177): sandbox clients only ... allowedTenantIds is set to the caller''s tenant alone ... (4)
+    revokeApiCredential ... Tenant staff: 403 ... (5) Declare the read of control.developer_member ... and add the 401
+    and 403 responses."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-569 (#31295 createApiClient): the partner rule keyed on a signed-in email no session carried and nothing
+  told TICVAI staff from tenant staff; CR-536 (CHG-CR536-001) settled the caller kinds for four other operations, and
+  BO-1177, a tenant screen, binds createApiClient.'
+keys_touched:
+  operations: [createApiClient, revokeApiCredential]
+  tables: [control.developer_member]
+  files:
+  - contracts/satellite/public-api.yaml
+  - tools/check-business-rules.py
+root_class: 'an access rule needs to know who the caller is, and the operation did not use the rule that says'
+tickets:
+  started:
+  - '31295 (createApiClient, On hold): ship the TICVAI staff and tenant staff paths; test the partner path with a
+    developer session built in the test, as posted.'
+  unstarted:
+  - '28009 (SVC-PLATFORM-PUBLICAPI-11, revokeApiCredential, Narayan Gaonkar): the caller kinds as posted on #31295.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-569
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-API-CLIENT-CALLER
+status: open
+notes: 'Beyond the posted words: createApiClient declares a 404 (the shared NotFound) for another account''s or an
+  unknown developerId, which the decision''s 404 needed; the 401 names problem type unauthenticated and the 403s
+  forbidden, as CR-536 did. Only control.developer_member is declared as a read, as posted; the carried lineage override
+  keeps createApiClient''s reads of control.developer_account, control.integration_listing and control.api_licence.'

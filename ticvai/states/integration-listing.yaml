@@ -19,10 +19,17 @@ transitions:
   trigger: operation
   guard: Sent for review
 - from: submitted
-  to: inReview
+  to: certified
   operation: certifyIntegration
   trigger: operation
-  guard: Being assessed
+  guard: '**Approved, with an expiry**, straight from submitted (ADAM CR-572, CHG-CR572-001: certify is accepted from
+    submitted or inReview, and certifyIntegration never writes inReview, so it has no submitted -> inReview
+    transition, CHG-CR572-003)'
+- from: submitted
+  to: rejected
+  operation: certifyIntegration
+  trigger: operation
+  guard: Not approved, with reasons the developer can act on, straight from submitted (ADAM CR-572, CHG-CR572-001)
 - from: inReview
   to: certified
   operation: certifyIntegration

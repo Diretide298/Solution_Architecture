@@ -2171,3 +2171,31 @@ changes:
     tag: r14
     producer-tickets: ['31281']
     consumer-tickets: [none-linked]
+  - id: BC-750
+    contract: subscription
+    operation: listCells
+    change: "`query:region`"
+    reason: 'ADAM CR-563 (CHG-CR563-001): the region query parameter, which said no cell field it matched, is replaced by
+      regionId (a uuid matched exactly against control.cell.region_id), as listCellClusters filters. A removed parameter
+      is breaking; ADM-003 sends neither.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-563 posted on #31366: "listCells filters by regionId, the same way listCellClusters
+      does ... Replace the query parameter region with regionId (string, uuid, optional) ... status is optional and takes
+      the CellStatus values ... Any other value is 400 validation naming status"), the lead''s "Dont hold r13. approve them
+      and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['31366']
+    consumer-tickets: [none-linked]
+  - id: BC-751
+    contract: subscription
+    operation: listCells
+    change: "`query:status`"
+    reason: 'ADAM CR-563 (CHG-CR563-001): status, a free string, takes the CellStatus values and matches control.cell.status
+      exactly; any other value is 400 validation. A parameter typed anew is breaking by the compat rule; ADM-003 sends
+      neither.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-563 posted on #31366: "listCells filters by regionId, the same way listCellClusters
+      does ... Replace the query parameter region with regionId (string, uuid, optional) ... status is optional and takes
+      the CellStatus values ... Any other value is 400 validation naming status"), the lead''s "Dont hold r13. approve them
+      and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['31366']
+    consumer-tickets: [none-linked]
