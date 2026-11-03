@@ -1,0 +1,52 @@
+id: CHG-R14PUL-001
+date: '2026-11-03'
+source: developer
+kind: process
+summary: 'ADAM''s pull lists the package''s known findings on what a ticket links. tools/build-known-findings.py writes
+  handoff/known-findings.json at every refresh: every finding the gate''s checks keep in their baselines and still find
+  (the audit-class guards of handoff/audit-baseline.json, through audit_guard.Guard.export_known, and the lines
+  tools/refresh-safe-baseline.json accepts), each with its check, rule, message and the artefacts it is about in
+  ADAM''s link vocabulary (screen, operation, table, file, adr). ADAM serves it as the package route known-findings
+  (viewer/lib/known-findings.mjs), and the connector''s README gains "Known gaps in the package (already on our list)"
+  for the findings on the ticket''s links, with the rule to follow; with none, no section. tools/check-known-findings.py
+  holds the index current and complete.'
+decision:
+  what: 'The lead, 3 November 2026: "why are these coming back again and again? we rebuild adam and still same
+    errors?", then "start on 1,2,3", where 3 is "a ticket''s pull lists the package checks it already fails, so
+    developers stop raising change requests for gaps we already know about." The pull shows what the baselines
+    already hold; nothing is baselined, acknowledged or exempted, and no check''s verdict changes.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding of the night of 2 to 3 November 2026 (r14 brief, lane k): the package''s checks already know many gaps
+  (check-screen-wiring "4529 known (baseline)"), but a developer''s pull never showed them, so a developer met a known
+  gap, raised a change request, and a round went on settling something already on the list. At dffd024e (r13) the
+  index holds 5,685 known findings by artefact; 7,232 of the 9,241 tasks in adam-links.json link at least one.'
+keys_touched:
+  files:
+  - tools/build-known-findings.py
+  - tools/check-known-findings.py
+  - tools/audit_guard.py
+  - tools/refresh.sh
+  - tools/run-checks.py
+  - tools/refresh-manifest.py
+  - handoff/known-findings.json
+  - viewer/lib/known-findings.mjs
+  - viewer/server.mjs
+  - viewer/mcp/tools.mjs
+  - viewer/mcp/known-findings-check.mjs
+  - viewer/api/release-check.mjs
+root_class: a gap the package already knows, kept only in a check's baseline, never shown where the developer meets it
+tickets:
+  started: []
+  unstarted:
+  - 'every ticket: its next pull, once ADAM serves a release with handoff/known-findings.json and the connector is
+    updated (/update-adam after the setup zip is rebuilt), lists the known findings on its links. No OpenProject text
+    changes.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 3 November 2026 (r14 brief, item 3)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-known-findings.py
+status: open

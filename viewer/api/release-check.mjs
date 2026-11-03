@@ -115,6 +115,16 @@ await writeFile(path.join(PKG, 'docs', 'active', 'breaking-changes.yaml'), `- id
   reason: The loan period moves from 14 to 21 days, and dueAt with it.
   approved-by: Harness Architect
 `);
+// r2 carries the package's known findings (tools/build-known-findings.py, CHG-R14PUL-001): one on the borrow screen
+// (7001's link), none on the profile (7003's). r1 has no index, as every release before r14.
+await mkdir(path.join(PKG, 'handoff'), { recursive: true });
+await writeFile(path.join(PKG, 'handoff', 'known-findings.json'), `${JSON.stringify({
+  counts: { findings: 1 },
+  findings: [{ check: 'check-screen-wiring', rule: 'S-STATE-BOILERPLATE', key: 'WEB-001:emptyFirstRun',
+    message: "WEB-001: emptyFirstRun 'carries the create action' and no create operation",
+    artefacts: ['screen:WEB-001'] }],
+}, null, 1)}
+`);
 git('add', '-A');
 gitDate = { GIT_COMMITTER_DATE: '2099-01-05T10:00:00Z', GIT_AUTHOR_DATE: '2099-01-05T10:00:00Z' };
 git('commit', '-q', '-m', 'second release');
@@ -269,6 +279,10 @@ try {
   const readme1 = await readFile(path.join(WORK, '.adam', 'work', '7001', 'README.md'), 'utf8');
   check('and README.md names the release as the latest', /\*\*Release:\*\* r1, the latest release/.test(readme1)
     && /You are always on the latest release \(r1\)/.test(readme1), readme1.slice(0, 600));
+  const known1 = await client.packageJson('known-findings');
+  check('known-findings at r1, a release with no index: not found, and the pull writes no known-gaps section',
+    known1.ok && known1.data?.found === false && known1.data?.served === 'r1' && !readme1.includes('Known gaps in the package')
+      && !first.knownGaps, JSON.stringify(known1.data));
   const file1 = JSON.parse(await readFile(path.join(WORK, '.adam', 'work', '7001', 'screen-WEB-001.json'), 'utf8'));
   check('and each linked file says which release it is', file1.release === 'r1', JSON.stringify(file1).slice(0, 200));
   const again = await call('POST', '/api/work-packages/7001/pin', { project_id: 'ticvai', reason: 'pull' });
@@ -367,6 +381,28 @@ try {
   const readme3 = await readFile(path.join(WORK, '.adam', 'work', '7003', 'README.md'), 'utf8');
   check('and README.md says none of its artefacts changed', /None of the artefacts/.test(readme3)
     && !/breaking contract change/i.test(readme3));
+
+  // ── the known findings on what a ticket links (CHG-R14PUL-001) ─────
+  const knownRes = await fetch(`${VIEWER}/pkg/ticvai/known-findings`, { headers: { cookie: jar.cookie } });
+  const etag = knownRes.headers.get('etag');
+  const known2 = await client.packageJson('known-findings');
+  check('known-findings at r2 serves the index whole, for the served tag',
+    known2.ok && known2.data?.found === true && known2.data?.served === 'r2' && known2.data?.findings?.length === 1,
+    JSON.stringify(known2.data).slice(0, 300));
+  check('with an ETag, so the connector holds it: a revalidation is a 304 with no body',
+    Boolean(etag) && (await fetch(`${VIEWER}/pkg/ticvai/known-findings`,
+      { headers: { cookie: jar.cookie, 'if-none-match': etag } })).status === 304, `${knownRes.status} ${etag}`);
+  check('a ticket linking a screen with a known finding: README.md lists it, once, with its check and the rule to follow',
+    readme2.includes('## Known gaps in the package (already on our list) (1)')
+      && readme2.includes("- screen `WEB-001` - check-screen-wiring S-STATE-BOILERPLATE: WEB-001: emptyFirstRun 'carries the create action'")
+      && /They are known and being fixed: build around them as the package says now, and raise a change request only if one blocks you/.test(readme2),
+    readme2.slice(readme2.indexOf('## Known gaps'), readme2.indexOf('## Known gaps') + 500));
+  check('and the pull says so, and ticket.json keeps it',
+    consumer.knownGaps === 1 && /1 known gap in the package/.test(consumer.next ?? '')
+      && JSON.parse(await readFile(path.join(dir1, 'ticket.json'), 'utf8')).knownFindings?.[0]?.via === 'screen WEB-001',
+    `${consumer.knownGaps} ${consumer.next}`);
+  check('a ticket whose links carry no known finding has no such section',
+    !readme3.includes('Known gaps in the package') && !bystander.knownGaps);
 
   const oldConnector = await call('POST', '/api/work-packages/7010/pin', { project_id: 'ticvai', reason: 'pull' });
   check('a pull from a connector older than the rule is moved to the latest release by the service',
@@ -521,7 +557,7 @@ try {
   const crAt = readmeCr.indexOf('## Change requests on this ticket');
   check('adam_pull lists the change requests raised from the ticket, near the top',
     crAt > 0 && crAt < readmeCr.indexOf('## Description') && readmeCr.includes(`### ${full.id} · accepted`)
-      && /\*\*Decision:\*\* Notices say 21 days from r2\./.test(readmeCr) && /follow the decision above/.test(readmeCr),
+      && /\*\*Decision:\*\* Notices say 21 days from r2\./.test(readmeCr) && /build to the decision above now/.test(readmeCr),
     readmeCr.slice(0, 1500));
   check('and says so in its answer and its next step',
     withCrs.changeRequests?.total >= 1 && /Change requests on this ticket/.test(withCrs.next ?? ''), JSON.stringify(withCrs.changeRequests));

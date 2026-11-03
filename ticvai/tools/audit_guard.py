@@ -431,8 +431,23 @@ class Guard:
             ordered[k] = data[k]
         BASELINE.write_text(json.dumps(ordered, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 
+    def export_known(self, base: dict, out: str):
+        """Writes this guard's known findings (baselined and still found, strict ones never) with their messages to
+        `out`, for tools/build-known-findings.py (r14 lane k, CHG-R14PUL-001): what a developer's pull shows as gaps
+        already on the list. Only when TICVAI_KNOWN_FINDINGS_OUT names the file; it changes no verdict and no output."""
+        sets = {r: set(v or ()) for r, v in base.items()}
+        known = [{"rule": r, "key": k, "message": cur[k]} for r, cur in sorted(self.found.items())
+                 for k in sorted(cur) if k in sets.get(r, ()) and (r, k) not in self.strict]
+        gone = {r: sorted(k for k in v if k not in (self.found.get(r) or {})) for r, v in sorted(sets.items())}
+        doc = {"check": self.name, "rules": dict(self.rules), "known": known,
+               "gone": {r: v for r, v in gone.items() if v}}
+        Path(out).write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+
     def finish(self, limit: int = 12) -> int:
         base = self._baseline()
+        out = os.environ.get("TICVAI_KNOWN_FINDINGS_OUT")
+        if out and not self.update and self.ack_why is None:
+            self.export_known(base, out)
         built = self.built_on(base)
         if self.ack_why is not None:
             return self._acknowledge(built)
