@@ -1,0 +1,52 @@
+id: CHG-R14I-001
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'The release gate has one allowlist, dated and read by run-checks.py itself: an entry carries added, expires (14
+  days at most), approved_by, change and why, names single findings (never a count line), and lets no crash through; refresh-safe.sh
+  takes run-checks.py''s verdict instead of running checkers in threads beside it; a pass over an allowlisted failure says
+  "PASS with N allowlisted failure(s)"; the audit baseline may not grow between releases without the lead''s approval by
+  name.'
+decision:
+  what: 'Review findings E-01 (the judge side), E-02, E-04 and E-11: tools/gate_allowlist.py holds the rules; run-checks.py
+    applies tools/refresh-safe-baseline.json (mark `allw`, closing line `GATE:`); refresh-safe.sh''s judge runs every checker
+    once through run-checks.py, so SERIAL holds for all; tools/check-baseline-ratchet.py fails a key handoff/audit-baseline.json
+    gained since the last r* tag unless a change entry''s baseline_growth approves it, and any allowlist entry that is undated,
+    unapproved, expired, longer than 14 days or a count pin. The allowlist is emptied: its three entries (check-authored-inputs
+    since 1 October, check-screen-patterns since 5 October, check-screen-permissions since 20 October) are fixed (CHG-R14I-009,
+    -010, -011) or with the lead. Decided by the lead, 3 November 2026, on the r13 system review''s triage: "All four, one
+    release" (the starters, device/guest/token access, gate integrity, tenant setup and stale docs go into r14, released
+    together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'The r13 system review, finding E-02 with E-01, E-04 and E-11 (3 November 2026): r13''s "gate PASS" was refresh-safe.sh''s
+  judgement against an undated allowlist run-checks.py never read; three gating checkers failed run bare; the screen-patterns
+  entry pinned a count line (NP 191 grew to 312 as "NP 1"); the audit baseline grew from 5,592 (r6) to 5,961 (r13) known
+  findings with nothing comparing it with a tag; a baselined checker that crashed after its known lines passed. CLAUDE.md
+  rule 15.'
+keys_touched:
+  files:
+  - tools/gate_allowlist.py
+  - tools/run-checks.py
+  - tools/refresh-safe.sh
+  - tools/refresh-safe-baseline.json
+  - tools/check-baseline-ratchet.py
+  - tools/refresh-manifest.py
+  - tools/refresh.sh
+  - docs/active/refresh-runbook.md
+  - docs/active/release-runbook.md
+root_class: 'A00 TOOLING: an allowlist outside the expiry rule'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s own decision of 3 November 2026 on the r13 system review'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-baseline-ratchet.py
+status: open
+notes: 'The 5,961 audit-baseline entries known at r13 carry no expiry, by the lead''s answer of 3 November 2026 to lane
+  i: "No expiry, ratchet only" (check-baseline-ratchet holds growth). A bare checker and the gate agree whenever the allowlist
+  is empty; at r14 it holds one dated entry (CHG-R14I-012).'

@@ -147,13 +147,13 @@ def collect_created(files: list[Path]) -> None:
     a referenced table exists.
     """
     for f in files:
-        body = split_rollback(f.read_text())[0]
+        body = split_rollback(f.read_text(encoding="utf-8"))[0]
         CREATED.update(re.findall(TABLE_RE, body))
 
 
 def collect_alters(files: list[Path]) -> None:
     for f in files:
-        text = f.read_text()
+        text = f.read_text(encoding="utf-8")
         for m in re.finditer(r"ALTER TABLE ([\w.]+)[\s\S]{0,400}?REFERENCES platform\.scope_node \(id, level\)",
                              text):
             ALTERED.add(m.group(1))
@@ -210,7 +210,7 @@ def descope_drops(code: str) -> set:
 
 def check_file(path: Path, known_schemas: set[str]) -> set[str]:
     name = path.name
-    raw = path.read_text()
+    raw = path.read_text(encoding="utf-8")
     body, rollback = split_rollback(raw)
     code = strip_comments(body)
 
@@ -357,7 +357,7 @@ def main() -> int:
     print(f"checking {len(files)} migration(s) in {SCRIPTS}\n")
     for f in files:
         known = check_file(f, known)
-        tables = len(re.findall(r"CREATE TABLE ", f.read_text()))
+        tables = len(re.findall(r"CREATE TABLE ", f.read_text(encoding="utf-8")))
         print(f"  {f.name:28} {tables:>3} tables")
 
     print()

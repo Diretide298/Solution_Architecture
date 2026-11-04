@@ -1,0 +1,42 @@
+id: CHG-R14I-009
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'BO-293 and DEV-001 no longer name a permission their operations stopped requiring in r8: BO-293 names MEMBERSHIP_VIEW
+  (getMembershipProductValidation, to show it) and MEMBERSHIP_MANAGE (approveMembershipProductValidation, to approve); DEV-001
+  says there is no permission to name, because listApiVersions and listApiScopes are public.'
+decision:
+  what: 'Review finding F-12: the wording parked for the client since the r8 integration (CHG-R8INT-017; DEV-001 as parked,
+    BO-293 with the read''s permission named as well, which check-screen-patterns P3 requires), applied as a design change
+    logged in docs/active/approved-ui-changes.yaml under the lead''s rule of 22 October 2026 ("let frontend change ui and
+    log it in changes"). Decided by the lead, 3 November 2026, on the r13 system review''s triage: "All four, one release"
+    (the starters, device/guest/token access, gate integrity, tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'The r13 system review, finding F-12: check-screen-permissions exits 1 at the r13 tag on SP-NOACCESS BO-293 and DEV-001,
+  allowlisted since 20 October (CHG-R8INT-017, BC-395, CHG-R8SAT-001).'
+keys_touched:
+  screens:
+  - BO-293
+  - DEV-001
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P14-developer-portal.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-screen-patterns.py
+root_class: no-access text naming a permission the operations no longer require
+tickets:
+  started: []
+  unstarted:
+  - '#29864, #35361, #35362, #35363 (FE BO-293, New)'
+  - '#27982, #31300, #31301, #31302 (FE DEV-001, New)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s own decision of 3 November 2026 on the r13 system review'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-permissions.py
+status: open
+notes: 'Design change (the lead, 3 November 2026, r14 gate integrity): the no-access text of two approved screens. DEV-001''s
+  screen permission is removed by the lead''s later answer, "Make it public" (CHG-R14I-014).'

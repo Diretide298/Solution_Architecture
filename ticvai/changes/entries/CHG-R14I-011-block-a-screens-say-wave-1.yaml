@@ -1,0 +1,52 @@
+id: CHG-R14I-011
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'Twenty screens the plan builds in Block A say wave 1, as check-screen-patterns P8 requires: BO-087, BO-291, BO-344,
+  BO-954, BO-1018, BO-1034, BO-1179, BO-1187, ADM-071, ADM-088, ADM-108, ADM-259, ADM-260, ADM-261, ADM-263, ADM-266, ADM-267,
+  ADM-268, ADM-269, ADM-606.'
+decision:
+  what: 'Review findings E-01 and E-02 (P8 20 behind the count pin): the plan already builds each in Block A (CHG-TKT-008,
+    the r4 and r6 bundles, CHG-R13INT-015); the screen files still said wave 2 or 3. Decided by the lead, 3 November 2026,
+    on the r13 system review''s triage: "All four, one release" (the starters, device/guest/token access, gate integrity,
+    tenant setup and stale docs go into r14, released together).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'The r13 system review, finding E-01: the 20 P8 findings were let through as "P8 20" by the count pin.'
+keys_touched:
+  screens:
+  - BO-087
+  - BO-291
+  - BO-344
+  - BO-954
+  - BO-1018
+  - BO-1034
+  - BO-1179
+  - BO-1187
+  - ADM-071
+  - ADM-088
+  - ADM-108
+  - ADM-259
+  - ADM-260
+  - ADM-261
+  - ADM-263
+  - ADM-266
+  - ADM-267
+  - ADM-268
+  - ADM-269
+  - ADM-606
+  files:
+  - screens/P08-venue-back-office.yaml
+root_class: a screen record behind the plan
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s own decision of 3 November 2026 on the r13 system review'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: No visible field changes (check-approved-ui passes). The screens' FE tickets are New or On hold.

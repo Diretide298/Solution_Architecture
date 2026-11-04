@@ -1258,3 +1258,18 @@ changes:
     the device door''s existing error state says "This device is not registered" for 401 device-unauthenticated and
     403 workstation-mismatch; no new state, control or layout.'
   change: CHG-R14INT-002
+- screen: BO-293
+  field: 'state:emptyNoAccess'
+  to: 268aefda67488b55
+  approval: 'Design change by the lead, 3 November 2026 (r14: "All four, one release", gate integrity; the r13 system review F-12: fixing what check-screen-permissions reports is review lane i''s work), under the lead''s rule of 22 October 2026 ("let frontend change ui and log it in changes"): the no-access text names the permission its operations require since r8 (MEMBERSHIP_VIEW to show it, MEMBERSHIP_MANAGE to approve; GPS-C33, BC-395; the read is named as well as the parked wording, check-screen-patterns P3), the wording parked for the client since the r8 integration (CHG-R8INT-017).'
+  change: CHG-R14I-009
+- screen: DEV-001
+  field: 'state:emptyNoAccess'
+  to: 7c03d2ad0fc24415
+  approval: 'Design change by the lead, 3 November 2026 (r14: "All four, one release", gate integrity; the r13 system review F-12: fixing what check-screen-permissions reports is review lane i''s work), under the lead''s rule of 22 October 2026 ("let frontend change ui and log it in changes"): the no-access text names the permission its operations require since r8 (none: listApiVersions and listApiScopes are public, CHG-R8SAT-001), the wording parked for the client since the r8 integration (CHG-R8INT-017).'
+  change: CHG-R14I-009
+- screen: ADM-606
+  field: 'region:selection'
+  to: 474c9f2c46688adf
+  approval: 'Design change by the lead, 3 November 2026 (r14, on lane i''s READ stop: "Add the six reads" ... "bind getMixedTenderRules on ADM-606 (its no-access text and component change is covered by this decision)"): a panel showing the tender rules the screen edits, read with getMixedTenderRules.'
+  change: CHG-R14I-013

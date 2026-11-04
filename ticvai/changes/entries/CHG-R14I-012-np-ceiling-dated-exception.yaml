@@ -1,0 +1,35 @@
+id: CHG-R14I-012
+date: '2026-11-03'
+source: audit
+kind: process
+summary: The release gate lets through, until 17 November 2026, the one check-screen-patterns finding NP-CEILING 312 > 191
+  (279 later-sprint screens that wait for a person to define them), by a dated entry in tools/refresh-safe-baseline.json
+  that names that finding line, never a count line; the gate prints "PASS with 1 allowlisted failure".
+decision:
+  what: 'The lead, 3 November 2026, on lane i''s stop (the r13 system review, finding E-01): "Dated exception, 14 days".
+    added 2026-11-03, expires 2026-11-17, approved_by Chinmay, why "279 later-sprint screens wait for a person to define
+    them (back-office wireframes not yet signed; held tasks)".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'The r13 system review, finding E-01: NP stood at 312 against its stated ceiling of 191 behind a count pin. With the
+  pin gone (CHG-R14I-001, CHG-R14I-002) the finding fails for real, and defining 279 screens needs a person.'
+keys_touched:
+  files:
+  - tools/refresh-safe-baseline.json
+  - tools/check-screen-patterns.py
+  - tools/gate_allowlist.py
+root_class: 'A00 TOOLING: a dated exception under rule 15'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s own answer of 3 November 2026 to r14 review lane i''s stops'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-baseline-ratchet.py
+status: open
+notes: 'On 18 November 2026 the entry is past its expiry and fails the gate by itself (gate_allowlist rule 1, check-baseline-ratchet
+  BR-ALLOWLIST): the screens are defined by then, or the lead approves a new entry. One more later-sprint screen needing
+  a person (313) is a new line and fails at once.'

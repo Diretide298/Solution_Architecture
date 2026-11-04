@@ -9208,6 +9208,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-profile:
+    get:
+      operationId: getChannelProfile
+      x-ticvai-audience:
+        - staff
+      summary: A sales channel's profile, as saved
+      description: '**The read of what `createChannelProfile` saves** (r14, CHG-R14I-013; the lead, 3 November 2026: "Add the six
+        reads"). The screen that edits it opens on the saved record: ADM-259 opened on an existing channel shows its identity, scope and ownership. One record per `channelId` within the caller''s
+        venue, the same key the write takes in its body; a `channelId` with nothing saved yet is `404 not-found`, and the
+        screen opens empty for a first save.'
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: channelId
+          in: query
+          required: true
+          description: The sales channel whose record is read (`catalogue.sales_channel`).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A sales channel's profile, as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelCreationProfileConfigurationView'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createChannelProfile
       x-ticvai-consumed-by:
@@ -9282,6 +9317,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-catalogue:
+    get:
+      operationId: getProductCatalogue
+      x-ticvai-audience:
+        - staff
+      summary: A sales channel's product assignment, as saved
+      description: '**The read of what `setProductCatalogue` saves** (r14, CHG-R14I-013; the lead, 3 November 2026: "Add the six
+        reads"). The screen that edits it opens on the saved record: ADM-260 shows which products the channel sells before an assignment changes. One record per `channelId` within the caller''s
+        venue, the same key the write takes in its body; a `channelId` with nothing saved yet is `404 not-found`, and the
+        screen opens empty for a first save.'
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: channelId
+          in: query
+          required: true
+          description: The sales channel whose record is read (`catalogue.sales_channel`).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A sales channel's product assignment, as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductCatalogueAssignmentView'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductCatalogue
       x-ticvai-consumed-by:
@@ -9333,6 +9403,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-pricing-commercial:
+    get:
+      operationId: getChannelPricingCommercial
+      x-ticvai-audience:
+        - staff
+      summary: A sales channel's pricing and commercial profile, as saved
+      description: '**The read of what `setChannelPricingCommercial` saves** (r14, CHG-R14I-013; the lead, 3 November 2026: "Add the six
+        reads"). The screen that edits it opens on the saved record: ADM-261 shows the pricing source the channel consumes. One record per `channelId` within the caller''s
+        venue, the same key the write takes in its body; a `channelId` with nothing saved yet is `404 not-found`, and the
+        screen opens empty for a first save.'
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: channelId
+          in: query
+          required: true
+          description: The sales channel whose record is read (`catalogue.sales_channel`).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A sales channel's pricing and commercial profile, as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelPricingCommercialProfileAssignmentView'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setChannelPricingCommercial
       x-ticvai-consumed-by:
@@ -9738,6 +9843,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-fee-payment:
+    get:
+      operationId: getChannelFeePayment
+      x-ticvai-audience:
+        - staff
+      summary: A sales channel's fees, payment and fulfilment configuration, as saved
+      description: '**The read of what `setChannelFeePayment` saves** (r14, CHG-R14I-013; the lead, 3 November 2026: "Add the six
+        reads"). The screen that edits it opens on the saved record: ADM-266 shows the fees, payment methods and fulfilment the channel has. One record per `channelId` within the caller''s
+        venue, the same key the write takes in its body; a `channelId` with nothing saved yet is `404 not-found`, and the
+        screen opens empty for a first save.'
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: channelId
+          in: query
+          required: true
+          description: The sales channel whose record is read (`catalogue.sales_channel`).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A sales channel's fees, payment and fulfilment configuration, as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelFeesPaymentFulfillmentConfigurationView'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setChannelFeePayment
       x-ticvai-consumed-by:
@@ -9814,6 +9954,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-readiness-validation:
+    get:
+      operationId: getChannelReadinessValidation
+      x-ticvai-audience:
+        - staff
+      summary: A sales channel's readiness and publication state, as last validated
+      description: '**The read of what `publishChannelReadinessValidation` saves** (r14, CHG-R14I-013; the lead, 3 November 2026: "Add the six
+        reads"). The screen that edits it opens on the saved record: ADM-267 shows the readiness checklist and status before a publish. One record per `channelId` within the caller''s
+        venue, the same key the write takes in its body; a `channelId` with nothing saved yet is `404 not-found`, and the
+        screen opens empty for a first save.'
+      tags:
+        - drafted
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: channelId
+          in: query
+          required: true
+          description: The sales channel whose record is read (`catalogue.sales_channel`).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A sales channel's readiness and publication state, as last validated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelPublicationReadinessAiValidationView'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: publishChannelReadinessValidation
       x-ticvai-consumed-by:

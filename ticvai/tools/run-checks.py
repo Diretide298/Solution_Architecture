@@ -46,6 +46,16 @@ error and warning counts, and which commit and release tag the run sat on -- so 
 The table and the exit code are unchanged. `refresh-safe.sh` writes `handoff/checks.json` from the
 judged run, which is the one a release is made from; `--from-log` is for the logs taken before this
 existed, which carry only the table, so their first findings are empty rather than guessed.
+
+**This run's verdict is the release gate's** (r14, CHG-R14I-001; review E-02, E-11, E-12). Until r13 the gate was
+refresh-safe.sh's judgement against an undated allowlist this script never read, so a checker run here failed while
+the release said "gate PASS". Now this script applies `tools/refresh-safe-baseline.json` itself, through
+`tools/gate_allowlist.py`: a failing gating checker is let through (`allw` in the table) only when every finding line
+it printed is named by an entry that is dated, approved, under 14 days old and not past its expiry, and it ran to its
+own verdict. The closing line then says `PASS with N allowlisted failure(s)`, never a bare PASS. refresh-safe.sh's
+judge takes this script's table as its verdict and runs no checker of its own, so the SERIAL rule below holds for
+every checker. A name given on the command line that is not a checker fails the run (a misspelt name used to run
+nothing and pass), and every checker runs under a timeout (TIMEOUT, or --timeout SECONDS).
 """
 import datetime
 import io
@@ -58,6 +68,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+import gate_allowlist  # noqa: E402  the one allowlist, its dates and its rules (r14, CHG-R14I-001)
 
 CHECKS = [
     "check-screens", "check-frontend", "check-flows", "check-board-flows",
@@ -274,10 +286,28 @@ CHECKS = [
     # the landing pages carry no figure the package contradicts, with OVERVIEW.md exactly what derive-overview renders.
     "check-adr-index",
     "check-landing-figures",
+    # 3 November 2026 (r14 review lane i, the r13 system review E-01..E-12; the lead: "All four, one release"). The gate
+    # itself: the baselines only shrink between releases unless the lead approves the growth by name, and the release
+    # allowlist is dated, approved and at most 14 days old (CHG-R14I-001); a refresh writes into an authored file only
+    # inside a field it declares (CHG-R14I-003; the comparison runs under refresh-safe.sh, which passes the tree the
+    # refresh started from as REFRESH_SAFE_BASE; bare, its self-test); every tool names its text encoding
+    # (CHG-R14I-006). Never baselined.
+    "check-baseline-ratchet",
+    "check-derived-fields",
+    "check-text-encoding",
 ]
 
 # Arguments a checker is run with here, when its bare form is not the one a gate run needs (CHG-R8GEN-002).
-ARGS = {"check-regenerate-twice": ["--chain"]}
+# check-changelog --since (no REF: the latest r* tag): the commit rule (every commit since the last release that touches
+# an authored input names its change id) is part of the gate, not a manual runbook step (r14, review E-03,
+# CHG-R14I-003). It applies from the r13 tag forward; a tagless clone fails it ("no r* tag to start from").
+ARGS = {"check-regenerate-twice": ["--chain"], "check-changelog": ["--since"]}
+if os.environ.get("REFRESH_SAFE_BASE"):
+    ARGS["check-derived-fields"] = ["--base", os.environ["REFRESH_SAFE_BASE"]]
+
+# **No checker runs unbounded** (review E-12): one hung checker used to hang the gate. The slowest, check-regenerate-
+# twice --chain with the ticket-text generators in its chain, takes about fifteen minutes; an hour is a hang.
+TIMEOUT = 3600
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
 REPORT_ONLY = {
@@ -303,10 +333,8 @@ REPORT_ONLY = {
     # check-audience-match gates since 14 October 2026 (CHG-SWP-002): the guest fixes have landed (AM-GUEST-OP,
     # AM-GUEST-FIELD and AM-GUEST-PERMISSION find nothing on r6), its baseline is recorded, and it gained
     # AM-TICKET-OP (a staff operation on a guest app's feature ticket, #27741).
-    "check-preauth-session":
-        "gates once the public theme and policy reads land and the lead records its baseline",
-    "check-subject":
-        "gates once the POS loyalty swap lands and the lead records its baseline",
+    # check-preauth-session and check-subject gate since r14 (3 November 2026, review E-12, CHG-R14I-008): both pass
+    # with 0 new and 0 known, so a new finding blocks; change entries closed on them were closed on a report.
     # check-candidate-decisions gates since 2 October 2026 (CHG-CLN-011): the five POS v2 candidates are decided
     # (POSV2-9..13, applied by CHG-SPO-001) and it passes with an empty baseline.
 }
@@ -336,10 +364,18 @@ def _run_one(t):
     if not os.path.exists(path):
         return t, 127, None, 0.0
     t0 = time.time()
-    p = subprocess.run([sys.executable, path] + ARGS.get(t, []), capture_output=True, text=True,
-                       encoding="utf-8", errors="replace", cwd=ROOT,
-                       env=dict(os.environ, PYTHONIOENCODING="utf8"))
+    # PYTHONUTF8: a checker reads and writes UTF-8 whatever the platform's locale (review E-10, CHG-R14I-006).
+    try:
+        p = subprocess.run([sys.executable, path] + ARGS.get(t, []), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", cwd=ROOT, timeout=_TIMEOUT[0],
+                           env=dict(os.environ, PYTHONIOENCODING="utf8", PYTHONUTF8="1"))
+    except subprocess.TimeoutExpired as e:
+        out = e.stdout if isinstance(e.stdout, str) else (e.stdout or b"").decode("utf-8", "replace")
+        return t, 124, (out or "") + "\nTIMEOUT after %ds: the checker did not finish\n" % _TIMEOUT[0], time.time() - t0
     return t, p.returncode, (p.stdout or "") + (p.stderr or ""), time.time() - t0
+
+
+_TIMEOUT = [TIMEOUT]
 
 
 # ---------------------------------------------------------------------------------------------
@@ -505,6 +541,12 @@ def _args(argv):
             i += 0 if "=" in a else 1
             if not out_dir:
                 raise SystemExit("run-checks: --out-dir needs a directory")
+        elif a == "--timeout" or a.startswith("--timeout="):
+            v = a.split("=", 1)[1] if "=" in a else (argv[i + 1] if i + 1 < len(argv) else "")
+            i += 0 if "=" in a else 1
+            if not v.isdigit() or int(v) < 1:
+                raise SystemExit("run-checks: --timeout needs a whole number of seconds")
+            _TIMEOUT[0] = int(v)
         elif a.split("=", 1)[0] in ("--json", "--from-log"):
             key = a.split("=", 1)[0][2:].replace("-", "_")
             opts[key] = a.split("=", 1)[1] if "=" in a else (argv[i + 1] if i + 1 < len(argv) else "")
@@ -537,11 +579,19 @@ def main():
         return 0
     started = time.time()
     records = []
+    unknown = [c for c in only if c not in CHECKS]
+    if unknown:
+        # A misspelt name used to run nothing and pass (review E-12).
+        print("run-checks: not a checker in CHECKS: %s" % ", ".join(unknown))
+        return 2
+    allow = gate_allowlist.load()
+    allow_bad = gate_allowlist.all_problems(allow)
     checks = [c for c in CHECKS if not only or c in only]
     if out_dir:
         os.makedirs(out_dir, exist_ok=True)
 
     results = []
+    allowed, judged, notes = {}, {}, []
 
     def report(r):
         t, rc, out, secs = r
@@ -558,12 +608,26 @@ def main():
         lines = [l for l in out.split("\n") if l.strip()]
         last = lines[-1].strip() if lines else ""
         mark = "ok  " if rc == 0 else "FAIL"
+        verdict, why = "pass", []
         if t in REPORT_ONLY and rc != 0:
             mark = "rpt "
+        elif rc != 0:
+            verdict, why = gate_allowlist.judge(t, rc, out, allow)
+            if verdict == "allowlisted":
+                mark = "allw"
+                allowed[t] = why[0]
+            elif why:
+                judged[t] = why
         print("  %-26s %s rc=%-3d %5.1fs  %s" % (t, mark, rc, secs, last[:96]), flush=True)
         results.append((t, rc, last))
+        if verdict == "allowlisted":
+            for pt in gate_allowlist.gone(t, out, allow):
+                notes.append("%s: allowlist pattern %r matched nothing: remove it" % (t, pt))
         if opts["json"]:
-            records.append(record(t, rc, out, secs))
+            r = record(t, rc, out, secs)
+            if verdict == "allowlisted":
+                r["allowlisted"] = why[0]
+            records.append(r)
 
     if out_dir and os.path.exists(os.path.join(out_dir, "results.tsv")):
         os.remove(os.path.join(out_dir, "results.tsv"))
@@ -585,22 +649,34 @@ def main():
             for f in pending:                      # in the list's order, each as soon as it can be
                 report(f.result())
 
-    bad = [(t, rc) for t, rc, _ in results if rc != 0 and t not in REPORT_ONLY]
+    bad = [(t, rc) for t, rc, _ in results if rc != 0 and t not in REPORT_ONLY and t not in allowed]
     rpt = [(t, rc) for t, rc, _ in results if rc != 0 and t in REPORT_ONLY]
+    n_fail = len(bad) + len(allow_bad)
 
-    print("\n  %d checker(s) run · %d gate failure(s) · %d report-only non-zero"
-          % (len(results), len(bad), len(rpt)))
+    print("\n  %d checker(s) run · %d gate failure(s) · %d allowlisted · %d report-only non-zero"
+          % (len(results), n_fail, len(allowed), len(rpt)))
     for t, rc in rpt:
         print("    rpt  %-26s rc=%d — %s" % (t, rc, REPORT_ONLY[t]))
+    for t, why in sorted(allowed.items()):
+        print("    allw %-26s %s" % (t, why))
     for t, rc in bad:
-        print("    FAIL %-26s rc=%d" % (t, rc))
+        print("    FAIL %-26s rc=%d%s" % (t, rc, ("  (%s)" % "; ".join(judged[t])[:200]) if t in judged else ""))
+    # An entry of the allowlist that is not valid (undated, unapproved, expired, a count pin) fails the run whether
+    # or not its checker failed: the file is part of the gate.
+    for c, why in allow_bad:
+        print("    FAIL ALLOWLIST %s: %s" % (c, why))
+    for n in notes:
+        print("    note %s" % n)
+    print("  GATE: %s" % gate_allowlist.verdict_line(n_fail, len(allowed)))
 
     if opts["json"]:
         # After the table, so a run that cannot write its JSON has still printed its verdict.
-        write_json(opts["json"], records, started, time.time(), extra={"jobs": jobs})
+        write_json(opts["json"], records, started, time.time(),
+                   extra={"jobs": jobs, "gate": gate_allowlist.verdict_line(n_fail, len(allowed)),
+                          "allowlisted": len(allowed)})
         print("  the run as JSON: %s" % opts["json"])
 
-    if bad and gate:
+    if n_fail and gate:
         return 1
     return 0
 

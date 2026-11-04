@@ -11,6 +11,9 @@ set -euo pipefail
 # cp1252. Setting this once here beats patching 34 files, and beats each tool needing an
 # environment variable it cannot set for itself.
 export PYTHONIOENCODING=utf-8
+# Every tool reads and writes UTF-8 whatever the platform's locale (review E-10, CHG-R14I-006): on Windows a bare
+# read_text() is cp1252, and docs/registers/clusters.md was committed with 26 mojibake dashes.
+export PYTHONUTF8=1
 
 # **`python3` on Windows may be the Microsoft Store stub, which prints an error and exits 0.**
 # `set -e` cannot catch a success, so every call below would quietly do nothing and the run would
@@ -99,11 +102,13 @@ python3 tools/derive-board-panel-map.py
 # a tool cannot tell a rename from a deletion and both need a person.
 python3 tools/derive-schema-history.py --apply
 python3 tools/build-schema-workbook.py
-python3 tools/build-services-workbook.py 2>/dev/null || true
+# Called bare since r14 (review E-08, CHG-R14I-007): `2>/dev/null || true` hid a crash, and the stale workbook it
+# left passed the step's output check.
+python3 tools/build-services-workbook.py
 # The merge sheet is generated from handoff/merge-verdicts.json, which is hand-authored.
 # It runs here so the sheet cannot drift from the verdicts the way its first cut did —
 # that one was typed from the review and said 26 where the review had settled 31.
-python3 tools/build-merge-workbook.py 2>/dev/null || true
+python3 tools/build-merge-workbook.py
 # **The screens are authored before anything reads them.** Everything below this comment writes
 # into screens/P*.yaml, and everything after it — the boards, the id register, the screen index,
 # the mirrors — is built from what these leave behind. Running them later would publish an index
@@ -270,7 +275,7 @@ python3 tools/build-linkage.py
 python3 tools/screen-ledger.py
 python3 tools/audit-screen-estate.py
 python3 tools/list-undrawn.py
-python3 tools/build-thin-screens-workbook.py 2>/dev/null || true
+python3 tools/build-thin-screens-workbook.py
 
 python3 tools/build-screen-index.py
 
@@ -321,7 +326,7 @@ python3 tools/build-package-report.py --apply
 # numbers are; this is what a backend engineer opens to work from — 2,073 operations on one sheet
 # with an `Agreed?` column, 627 tables with the RLS mode each actually gets, and the 591
 # references that cross a service. Reads `package-report.json`, so it runs after it.
-# Called bare rather than with `2>/dev/null || true` like the two workbook builders above it.
+# Called bare, as every builder is since r14 (the two workbook builders above it once carried `2>/dev/null || true`).
 # Discarding an exit code is the habit the gate was restored to break, and openpyxl is present.
 python3 tools/build-readiness-workbook.py
 # **The known findings by artefact, for ADAM's pull** (r14 lane k, CHG-R14PUL-001; the lead, 3 November 2026: "a
@@ -436,6 +441,7 @@ frontend_repos                                                     # imported by
 screen_gaps                                                        # imported by check-screen-wiring and tools/applied/r13-review-stale-screen-text.py (which generated gaps a screen record has overtaken), no main (3 November 2026, CHG-R13RVB-004)
 personal_data                                                      # imported by derive-schema, derive-ddl, derive-delivery-slice, build-service-docs and check-personal-data (what a person's data is and where pii.* keeps it), no main (3 November 2026, CHG-R14M-001)
 ticvai_jobs                                                        # imported by build-service-docs and check-jobs (the declared jobs, timers and consumers, x-ticvai-jobs), no main (2 November 2026, CHG-R13JOB-001)
+derived_fields gate_allowlist                                      # imported by check-derived-fields, and by run-checks.py, refresh-safe.sh and check-baseline-ratchet (the release allowlist's rules), no main (3 November 2026, CHG-R14I-001, CHG-R14I-003)
 ticket_features                                                    # imported by check-ticket-scope and check-audience-match (a feature's screens and operations), no main (14 October, CHG-SWP-001)
 apply-repo-layout                                                  # writes screens' component paths and ADAM setup's repository table from frontend-repos.yaml profiles: authored inputs, run by hand when a profile changes; check-frontend-repos holds both (14 October, CHG-RPO-002)
 audit-screen-promises                                              # ranks screen promises for an AI sample, by hand (--out); decides nothing (14 October, CHG-SWP-005)

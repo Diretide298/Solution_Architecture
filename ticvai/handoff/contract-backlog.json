@@ -5589,12 +5589,12 @@
    "why": "**Found by the 29 September re-trace.** Domain 12 was parked as having no contract (CF-21) until `accreditation.yaml` landed. Re-tracing it moved 48 rows to contracted; these 13 have the configuration or the record but not the operation that completes them.",
    "fix": "Add a read of an application's documents; a holder-callable read and delivery of their own mobile credential; a `qr` credential kind with its symbology; a resubmit path after rejection; a `renewAccreditation` operation and a renewal-window event; accreditation KPIs in reporting; accreditation events in `events/` for webhooks; an accreditation export; and a programme template that copies categories, requirements, validity and badges. Also fix `accreditation.yaml` citing `access.validateEntry` (the operation is `validateAccess`), and rebind P11 from the approvals stubs to the accreditation operations.",
    "lane": "settled",
-   "status": "open",
+   "status": "done",
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "closed": null,
-   "closedBy": null
+   "closed": "2026-09-29",
+   "closedBy": "Built in the build pass of 29 September (commit c17dc66f), recorded as closed on 3 November 2026 when the r14 authored-inputs check found the entry open with every one of its 13 rows CONTRACTED. Item by item: `listAccreditationDocuments` reads an application's documents; `listMyAccreditationCredentials`, `issueMyAccreditationWalletPass` and `deliverAccreditationCredential` are the holder's own read and delivery; the credential kind `qr` carries `encodedIdentifier` and `symbology`; `resubmitAccreditationApplication` is the resubmit path; `renewAccreditation` and the event `accreditation.renewalDue` are renewal and its window; reporting seeds the five accreditation KPIs (12.1.50) over three accreditation sources; `accreditation.applicationDecided`, `accreditation.credentialIssued` and `accreditation.holderStatusChanged` are delivered to webhooks (12.1.53); `exportAccreditationData` is the export; `cloneAccreditationProgramme` copies a programme. accreditation.yaml no longer cites access.validateEntry, and P11 binds only accreditation operations."
   },
   {
    "id": "BL-181",
@@ -5610,12 +5610,12 @@
    "why": "**Found by the 29 September re-trace.** `access.validateAccess` returns a `ValidationResult` about tickets only: no holder, photo, category or zones, so the staff app has nothing to show when someone presents an accreditation credential.",
    "fix": "Add `verifyAccreditationCredential` to accreditation (credential identifier in, holder photo, category, zones and validity out), or an accreditation block on `ValidationResult`; bind it on the staff app scan screen.",
    "lane": "settled",
-   "status": "open",
+   "status": "done",
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedOnDomains": [],
-   "closed": null,
-   "closedBy": null
+   "closed": "2026-09-29",
+   "closedBy": "`verifyAccreditationCredential` (accreditation): a credential identifier in, the holder's photo, category, zones and validity out; bound on the staff scanner (screens/P07-staff-scanner.yaml). Built 29 September (commit c17dc66f); recorded as closed on 3 November 2026 by the r14 authored-inputs check."
   },
   {
    "id": "BL-182",
