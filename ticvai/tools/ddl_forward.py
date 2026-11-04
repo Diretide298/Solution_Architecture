@@ -646,6 +646,8 @@ class Model:
                 continue
             if BACKFILL_UPDATE.match(s):
                 continue   # a declared backfill's one-time UPDATE (CHG-R10OPN-002): data, not schema
+            if DATA_STEP.match(s):
+                continue   # a hand-written data step, `$data$`, or its session helper (CHG-R14INT-004): not schema
             tf = TYPE_FIX.match(s)
             if tf:
                 # a column a frozen baseline typed with a type nothing creates, converted (CHG-R12DB-001)
@@ -927,6 +929,15 @@ def guard_block(guard: str, stmts) -> str:
 
 # **A backfill a contract declares** (CHG-R10OPN-002): the UPDATE inside `backfill_block`, which a model does not fold.
 BACKFILL_UPDATE = re.compile(rf"^UPDATE (?:ONLY )?{QNAME} SET {NAME} = .+$", re.I | re.S)
+
+
+# **A hand-written data step is data, not schema** (r14 integration, 4 November 2026; CHG-R14INT-004). A forward
+# migration a person writes for a live database counts the rows a new rule would refuse and stops on them, fills a
+# column from the rows' own data, or copies values (personal data into pii.*), before the guarded schema block that
+# makes the change. Such a step is a `DO $data$ ... $data$` block, and its helpers are session functions
+# (`CREATE ... FUNCTION pg_temp.`): neither changes the schema, so the old side skips them, and only the schema
+# blocks beside them (SET NOT NULL, VALIDATE CONSTRAINT) are folded and leave the review list.
+DATA_STEP = re.compile(r"^(?:DO \$data\$|CREATE (?:OR REPLACE )?FUNCTION pg_temp\.)", re.I)
 
 
 def backfill_block(t: str, c: str, add: str, value: str) -> str:

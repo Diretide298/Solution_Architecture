@@ -194,6 +194,32 @@ not silently lossy.
 **Every table with a `scope_path` needs RLS with `FORCE`.** API-layer enforcement alone fails
 the first time somebody writes a report query directly against the database.
 
+## r14's forward migrations (4 November 2026, CHG-R14INT-004)
+
+r14 adds five files, written once at the r14 integration from the merged tree. They apply in name order, each as
+one transaction, and each can be applied twice.
+
+| File | Database | Written by | What it does |
+|---|---|---|---|
+| `control/V0128a__r14_checks_before_after_r1_20261104.sql` | control | hand | Counts the rows V0129's three new unique indexes would refuse: a duplicate `api_client.client_id`, a duplicate `api_version.version`, an email active in two developer accounts. Stops on any, naming the table and the count. Changes nothing. |
+| `control/V0129__after_r1_20261104.sql`, `tenant/V0129__after_r1_20261104.sql` | both | derive-ddl | The additive part: new tables, columns, indexes and grants; CHECKs added NOT VALID (validated where the old values all pass); new foreign keys NOT VALID; the column-limited grant on `identity.principal`; guarded DROP NOT NULL on the personal-data columns that move. |
+| `control/V0130__names_after_r1_20261104.sql` | control | derive-ddl | The names the contracts use (keys). |
+| `control/V0131__r14_data_after_r1_20261104.sql` | control | hand | `api_client.client_id` is filled the server's way, then made NOT NULL. `api_anomaly_rule.tenant_id` is counted, stopping on any null, then made NOT NULL. `webhook_replay.tenant_id` follows CR-434's three steps: backfill from the subscription's client, stop on any row left, then SET NOT NULL. |
+| `tenant/V0131__r14_data_after_r1_20261104.sql` | tenant | hand | `order_line.product_id` is filled from the line's variant. The service_order_line status CHECK is counted, then VALIDATEd. The personal data moves into `pii.*`: each row gets its subject, and the subject fields and network identifiers are copied and verified by count in the same transaction, stopping on any mismatch. Contacts and document numbers are counted here and copied by the application's one-off job, because the value hash and the encryption belong to the application. |
+
+**The live database has rows, so no step deletes or rewrites a row a new rule refuses.** Such a row stops the
+migration, with the table and the count, and the lead decides what happens to it. This was decided overnight under
+the lead's 4 November instruction.
+
+**Personal data: the old columns are NOT dropped and NOT emptied in r14.** They keep every value. V0129 only makes
+them nullable, so new rows can leave them empty. Retiring them is the four-step drop's DROP COLUMN in a later forward
+migration, and it waits for the lead: this is personal data on a live database. The file headers say the same.
+
+**The hand-written data steps are `DO $data$ ... $data$` blocks**, and their helpers are session functions
+(`pg_temp.`). `tools/ddl_forward.py` (DATA_STEP) reads them as data, not schema. Each change they lead to
+(SET NOT NULL, VALIDATE CONSTRAINT) is a guarded block of its own, which the next derive folds. A derive run on
+this tree therefore writes nothing, and the review rows they answer leave `handoff/migration-review.md`.
+
 ## Applying
 
 Migrations fan out **per tenant database**, and the canary is a tenant inside the canary cell, not

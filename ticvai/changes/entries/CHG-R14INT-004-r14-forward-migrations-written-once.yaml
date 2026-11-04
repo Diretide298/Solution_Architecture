@@ -1,0 +1,56 @@
+id: CHG-R14INT-004
+date: '2026-11-04'
+source: audit
+kind: process
+summary: 'r14''s forward migrations, written once at the integration from the merged tree. derive-ddl wrote control
+  and tenant V0129 (additive) and control V0130 (names, including lane j''s 13 NOT VALID keys to
+  control.platform_operator). Three files are hand-written. Control V0128a counts the rows V0129''s three unique
+  indexes would refuse and stops on any. Control V0131 fills api_client.client_id and then sets it NOT NULL; it counts
+  null api_anomaly_rule.tenant_id rows before NOT NULL, and takes webhook_replay.tenant_id through CR-434''s three
+  steps. Tenant V0131 fills order_line.product_id from its variant, counts the service_order_line status CHECK''s
+  refusals before VALIDATE, and moves the personal data. Each row gets its pii.subject. 29 subject fields and 4 network
+  identifiers are copied and verified by count in the same transaction. The 18 contacts and the document number are
+  counted, for the application''s copy job. The old columns are kept, not dropped or emptied. A data step is a
+  `$data$` block that tools/ddl_forward.py (DATA_STEP) reads as data, so a derive on this tree writes nothing.'
+decision:
+  what: 'The r14 integration brief (the lead, 4 November 2026: "take the recommended decision unless its very very
+    important"), with the overnight rule that a row a new rule refuses is counted and stops the migration, never
+    deleted or rewritten. Personal data: copy and verify, and do not retire the old columns; that waits for the lead.
+    The contacts and the document number go to the application''s job because the value hash and the encryption are
+    the application''s (ADR-0063), not SQL''s.'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Every lane deleted the V files its own derive wrote (CHG-R14M-001, CHG-CR434-001, CHG-CR571-001, CHG-CR590-001,
+  CHG-CR594-001 and the rest), so r14 needs its migrations written once from the merged tree. The live database has
+  rows, and derive-ddl writes only the additive part.'
+keys_touched:
+  tables: [control.api_client, control.api_version, control.developer_member, control.api_anomaly_rule,
+    control.webhook_replay, orders.order_line, fnb.service_order_line, pii.subject, pii.subject_network_identifier]
+  files:
+  - backend/control/V0128a__r14_checks_before_after_r1_20261104.sql
+  - backend/control/V0129__after_r1_20261104.sql
+  - backend/control/V0130__names_after_r1_20261104.sql
+  - backend/control/V0131__r14_data_after_r1_20261104.sql
+  - backend/tenant/V0129__after_r1_20261104.sql
+  - backend/tenant/V0131__r14_data_after_r1_20261104.sql
+  - backend/MIGRATIONS.md
+  - tools/ddl_forward.py
+root_class: a forward migration for a database that has rows, written as if it had none
+tickets:
+  started: []
+  unstarted:
+  - 'The r14 [DB] tasks of the plan pass (CHG-R14PL-*): each copies its statements from these files.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r14 integration'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py::DATA_STEP
+status: open
+notes: 'Tested on a local Postgres 16 (pgvector image): control and one tenant database built from backend/ in file
+  order, with seeded rows holding personal data, an order line and an F&B line. Every file applied, then r14''s files
+  were applied a second time with no error. Subjects were made and fields copied; the network identifier was copied;
+  product_id was filled; the CHECK was validated and webhook_replay.tenant_id is NOT NULL. A dangling subject id
+  stopped the migration with its message, as designed. For the lead: retiring the old personal-data columns (the
+  DROP COLUMN), and whether Identity''s contact value hash may ever be computed in SQL.'

@@ -46,6 +46,7 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_order",
     "display_tags",
     "entitlement_template_id",
     "event_id",
@@ -189,6 +190,7 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_order",
     "display_tags",
     "entitlement_template_id",
     "event_id",
@@ -300,6 +302,7 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_order",
     "display_tags",
     "entitlement_template_id",
     "event_id",
@@ -427,6 +430,7 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_order",
     "display_tags",
     "entitlement_template_id",
     "event_id",
@@ -905,6 +909,7 @@
   "readColumns": {
    "catalogue.performance": [
     "admission_rules_id",
+    "admission_starts_at",
     "approval_request_id",
     "ends_at",
     "event_id",
@@ -948,6 +953,7 @@
   "readColumns": {
    "catalogue.performance": [
     "admission_rules_id",
+    "admission_starts_at",
     "approval_request_id",
     "ends_at",
     "event_id",
@@ -1611,6 +1617,7 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_order",
     "display_tags",
     "entitlement_template_id",
     "event_id",
@@ -2083,6 +2090,7 @@
   "readColumns": {
    "catalogue.performance": [
     "admission_rules_id",
+    "admission_starts_at",
     "approval_request_id",
     "ends_at",
     "event_id",
@@ -2127,6 +2135,7 @@
   "readColumns": {
    "catalogue.performance": [
     "admission_rules_id",
+    "admission_starts_at",
     "approval_request_id",
     "ends_at",
     "event_id",
@@ -3597,12 +3606,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -3681,6 +3691,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -3744,12 +3756,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -3828,6 +3841,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -3877,12 +3892,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -3961,6 +3977,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -4032,12 +4050,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -4116,6 +4135,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -4175,12 +4196,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -4259,6 +4281,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -4319,12 +4343,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -4403,6 +4428,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -5205,12 +5232,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -5289,6 +5317,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -5475,12 +5505,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -5559,6 +5590,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -5705,12 +5738,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -5789,6 +5823,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -6060,6 +6096,7 @@
     "offered_at",
     "order_id",
     "recipient_address_masked",
+    "recipient_channel",
     "status",
     "ticket_ids",
     "to_subject_id"
@@ -6129,6 +6166,7 @@
     "offered_at",
     "order_id",
     "recipient_address_masked",
+    "recipient_channel",
     "status",
     "ticket_ids",
     "to_subject_id"
@@ -6227,7 +6265,7 @@
     "attributes",
     "booked_window",
     "data_mask_values",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "performance_id",
@@ -6285,7 +6323,7 @@
     "attributes",
     "booked_window",
     "data_mask_values",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "performance_id",
@@ -6346,7 +6384,7 @@
     "attributes",
     "booked_window",
     "data_mask_values",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "performance_id",
@@ -6433,7 +6471,7 @@
     "attributes",
     "booked_window",
     "data_mask_values",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "performance_id",
@@ -11311,7 +11349,6 @@
     "ended_at",
     "ended_by_principal_id",
     "id",
-    "ip_address",
     "is_mfa_satisfied",
     "last_seen_at",
     "principal_id",
@@ -11319,6 +11356,7 @@
     "session_id",
     "started_at",
     "status",
+    "subject_id",
     "venue_id",
     "workstation_id"
    ]
@@ -16627,6 +16665,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -16745,6 +16786,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -16888,6 +16932,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -17003,6 +17050,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -17107,6 +17157,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -17218,6 +17271,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -17430,6 +17486,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -17554,6 +17613,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -17684,6 +17746,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -17814,6 +17879,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -18047,6 +18115,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -21471,9 +21542,7 @@
    "inventory.supplier": [
     "account_id",
     "code",
-    "contact_email",
-    "contact_name",
-    "contact_phone",
+    "contact_subject_id",
     "contacts",
     "currency",
     "id",
@@ -21519,9 +21588,7 @@
    "inventory.supplier": [
     "account_id",
     "code",
-    "contact_email",
-    "contact_name",
-    "contact_phone",
+    "contact_subject_id",
     "contacts",
     "currency",
     "id",
@@ -22401,6 +22468,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "retail.merchandise"
   ],
   "routing": "",
@@ -22471,6 +22539,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "retail.merchandise"
   ],
   "routing": "",
@@ -25390,7 +25459,8 @@
   "writes": [
    "cache:idempotency",
    "maintenance.inspection_template",
-   "maintenance.inspection_template_item"
+   "maintenance.inspection_template_item",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -30624,6 +30694,7 @@
     "rationale",
     "role",
     "sources",
+    "subject_id",
     "trace_id"
    ],
    "ai.proposed_action": [
@@ -37983,6 +38054,7 @@
     "override_reason",
     "parent_line_id",
     "performance_id",
+    "product_id",
     "product_name",
     "quantity",
     "recommendation_id",
@@ -38124,6 +38196,7 @@
     "override_reason",
     "parent_line_id",
     "performance_id",
+    "product_id",
     "product_name",
     "quantity",
     "recommendation_id",
@@ -38360,6 +38433,7 @@
     "override_reason",
     "parent_line_id",
     "performance_id",
+    "product_id",
     "product_name",
     "quantity",
     "recommendation_id",
@@ -38457,6 +38531,7 @@
     "override_reason",
     "parent_line_id",
     "performance_id",
+    "product_id",
     "product_name",
     "quantity",
     "recommendation_id",
@@ -38597,6 +38672,7 @@
     "override_reason",
     "parent_line_id",
     "performance_id",
+    "product_id",
     "product_name",
     "quantity",
     "recommendation_id",
@@ -38731,6 +38807,7 @@
     "override_reason",
     "parent_line_id",
     "performance_id",
+    "product_id",
     "product_name",
     "quantity",
     "recommendation_id",
@@ -38860,6 +38937,7 @@
     "override_reason",
     "parent_line_id",
     "performance_id",
+    "product_id",
     "product_name",
     "quantity",
     "recommendation_id",
@@ -38986,12 +39064,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -39070,6 +39149,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -39365,7 +39446,6 @@
   ],
   "readColumns": {
    "catalogue.waitlist_entry": [
-    "contact_point",
     "id",
     "joined_at",
     "offer_expires_at",
@@ -39409,7 +39489,6 @@
   ],
   "readColumns": {
    "catalogue.waitlist_entry": [
-    "contact_point",
     "id",
     "joined_at",
     "offer_expires_at",
@@ -39480,7 +39559,6 @@
   ],
   "readColumns": {
    "catalogue.waitlist_entry": [
-    "contact_point",
     "id",
     "joined_at",
     "offer_expires_at",
@@ -39539,12 +39617,10 @@
     "amount",
     "basis",
     "cart_line_id",
-    "contact_point",
     "created_at",
     "deposit_id",
     "duration_minutes",
     "group_id",
-    "guest_name",
     "hold_expires_at",
     "id",
     "notes",
@@ -39613,12 +39689,10 @@
     "amount",
     "basis",
     "cart_line_id",
-    "contact_point",
     "created_at",
     "deposit_id",
     "duration_minutes",
     "group_id",
-    "guest_name",
     "hold_expires_at",
     "id",
     "notes",
@@ -39704,12 +39778,10 @@
     "amount",
     "basis",
     "cart_line_id",
-    "contact_point",
     "created_at",
     "deposit_id",
     "duration_minutes",
     "group_id",
-    "guest_name",
     "hold_expires_at",
     "id",
     "notes",
@@ -39787,12 +39859,10 @@
     "amount",
     "basis",
     "cart_line_id",
-    "contact_point",
     "created_at",
     "deposit_id",
     "duration_minutes",
     "group_id",
-    "guest_name",
     "hold_expires_at",
     "id",
     "notes",
@@ -40840,6 +40910,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -42246,7 +42319,7 @@
     "frozen_days",
     "frozen_from",
     "frozen_until",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "invitation_id",
     "is_name_bound",
@@ -42333,7 +42406,7 @@
     "frozen_days",
     "frozen_from",
     "frozen_until",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "invitation_id",
     "is_name_bound",
@@ -42422,6 +42495,7 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_order",
     "display_tags",
     "entitlement_template_id",
     "event_id",
@@ -42713,6 +42787,7 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_order",
     "display_tags",
     "entitlement_template_id",
     "event_id",
@@ -43162,8 +43237,7 @@
     "product_id",
     "quantity",
     "reason",
-    "recipient_email",
-    "recipient_name",
+    "recipient_subject_id",
     "scope_path"
    ]
   },
@@ -45949,6 +46023,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -48154,6 +48231,7 @@
     "active_client_count",
     "changes",
     "deprecated_at",
+    "deprecation_reason",
     "id",
     "migration_guide_url",
     "minimum_notice_months",
@@ -48195,6 +48273,7 @@
     "active_client_count",
     "changes",
     "deprecated_at",
+    "deprecation_reason",
     "id",
     "migration_guide_url",
     "minimum_notice_months",
@@ -48241,6 +48320,7 @@
     "listing_fee_model",
     "name",
     "required_scopes",
+    "review_notes",
     "status",
     "visibility"
    ]
@@ -48285,6 +48365,7 @@
     "listing_fee_model",
     "name",
     "required_scopes",
+    "review_notes",
     "status",
     "visibility"
    ]
@@ -48329,6 +48410,7 @@
     "listing_fee_model",
     "name",
     "required_scopes",
+    "review_notes",
     "status",
     "visibility"
    ]
@@ -48556,12 +48638,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -48640,6 +48723,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -48945,7 +49030,7 @@
     "frozen_days",
     "frozen_from",
     "frozen_until",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "invitation_id",
     "is_name_bound",
@@ -49036,7 +49121,7 @@
     "frozen_days",
     "frozen_from",
     "frozen_until",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "invitation_id",
     "is_name_bound",
@@ -49216,17 +49301,19 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
     "reprint_count",
     "resource_reservation_id",
+    "sales_order_id",
     "seat_ids",
     "server_unit_price",
     "tax_amount",
@@ -49253,9 +49340,14 @@
    "orders.payment_link": [
     "expires_at",
     "id",
+    "order_id",
     "releases_reservation_on_expiry",
     "status",
     "token"
+   ],
+   "orders.sales_order": [
+    "id",
+    "order_number"
    ]
   },
   "readVia": [
@@ -50270,6 +50362,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -50402,6 +50497,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -50556,6 +50654,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -51114,7 +51215,8 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.menu"
+   "fnb.menu",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -51221,7 +51323,8 @@
    "cache:idempotency",
    "cache:resolution",
    "fnb.menu",
-   "fnb.menu_version"
+   "fnb.menu_version",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
@@ -51491,6 +51594,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -51658,6 +51764,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -51993,6 +52102,9 @@
     "updated_at"
    ],
    "fnb.service_order_line": [
+    "comp_reason",
+    "comped_at",
+    "comped_by_principal_id",
     "course",
     "id",
     "line_total",
@@ -53521,9 +53633,7 @@
    "inventory.supplier": [
     "account_id",
     "code",
-    "contact_email",
-    "contact_name",
-    "contact_phone",
+    "contact_subject_id",
     "contacts",
     "currency",
     "id",
@@ -53799,12 +53909,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -53883,6 +53994,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -53945,7 +54058,7 @@
     "frozen_days",
     "frozen_from",
     "frozen_until",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "invitation_id",
     "is_name_bound",
@@ -54924,7 +55037,7 @@
    "approvals.accreditation_badge": [
     "approval_request_id",
     "expires_at",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "issued_at",
     "revoked_reason",
@@ -54960,7 +55073,7 @@
    "approvals.accreditation_badge": [
     "approval_request_id",
     "expires_at",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "issued_at",
     "revoked_reason",
@@ -75709,14 +75822,12 @@
    ],
    "rental.participant": [
     "custom_fields",
-    "date_of_birth",
-    "emergency_contact",
-    "guardian_name",
+    "emergency_contact_subject_id",
+    "guardian_subject_id",
     "has_signed_waiver",
     "id",
-    "id_number",
     "is_primary_renter",
-    "name",
+    "participant_subject_id",
     "scope_path"
    ]
   },
@@ -76395,7 +76506,7 @@
    "seating.group_request": [
     "accessible_spaces_needed",
     "budget_per_head",
-    "contact_name",
+    "contact_subject_id",
     "deposit_amount",
     "id",
     "minimum_contiguous",
@@ -76507,8 +76618,8 @@
     "id",
     "is_password_protected",
     "opened_count",
-    "recipient_email",
     "recipient_organisation",
+    "recipient_subject_id",
     "revoked_at",
     "scope_path",
     "url"
@@ -76580,7 +76691,7 @@
  "createPaymentProviderConnection": {
   "contract": "payments",
   "verb": "POST",
-  "path": "/payment-providers",
+  "path": "/payment-provider-connections",
   "reads": [
    "cache:idempotency",
    "payments.provider_connection"
@@ -76806,14 +76917,12 @@
    ],
    "rental.participant": [
     "custom_fields",
-    "date_of_birth",
-    "emergency_contact",
-    "guardian_name",
+    "emergency_contact_subject_id",
+    "guardian_subject_id",
     "has_signed_waiver",
     "id",
-    "id_number",
     "is_primary_renter",
-    "name",
+    "participant_subject_id",
     "scope_path"
    ]
   },
@@ -77312,7 +77421,7 @@
    "seating.hold_pool": [
     "created_by",
     "hold_type_id",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "performance_id",
     "reason",
@@ -77909,14 +78018,12 @@
    ],
    "rental.participant": [
     "custom_fields",
-    "date_of_birth",
-    "emergency_contact",
-    "guardian_name",
+    "emergency_contact_subject_id",
+    "guardian_subject_id",
     "has_signed_waiver",
     "id",
-    "id_number",
     "is_primary_renter",
-    "name",
+    "participant_subject_id",
     "scope_path"
    ]
   },
@@ -78108,14 +78215,9 @@
     "affiliation_role",
     "category_code",
     "completeness_percent",
-    "date_of_birth",
-    "email",
-    "full_name",
     "id",
     "is_identity_document_verified",
-    "nationality",
     "organisation_id",
-    "phone",
     "photo_asset_id",
     "programme_id",
     "scope_path",
@@ -79207,14 +79309,12 @@
    ],
    "rental.participant": [
     "custom_fields",
-    "date_of_birth",
-    "emergency_contact",
-    "guardian_name",
+    "emergency_contact_subject_id",
+    "guardian_subject_id",
     "has_signed_waiver",
     "id",
-    "id_number",
     "is_primary_renter",
-    "name",
+    "participant_subject_id",
     "scope_path"
    ]
   },
@@ -80504,14 +80604,9 @@
     "affiliation_role",
     "category_code",
     "completeness_percent",
-    "date_of_birth",
-    "email",
-    "full_name",
     "id",
     "is_identity_document_verified",
-    "nationality",
     "organisation_id",
-    "phone",
     "photo_asset_id",
     "programme_id",
     "scope_path",
@@ -81264,7 +81359,7 @@
    "seating.group_request": [
     "accessible_spaces_needed",
     "budget_per_head",
-    "contact_name",
+    "contact_subject_id",
     "deposit_amount",
     "id",
     "minimum_contiguous",
@@ -81699,14 +81794,12 @@
    ],
    "rental.participant": [
     "custom_fields",
-    "date_of_birth",
-    "emergency_contact",
-    "guardian_name",
+    "emergency_contact_subject_id",
+    "guardian_subject_id",
     "has_signed_waiver",
     "id",
-    "id_number",
     "is_primary_renter",
-    "name",
+    "participant_subject_id",
     "scope_path"
    ]
   },
@@ -81782,7 +81875,7 @@
  "listPaymentProviderConnections": {
   "contract": "payments",
   "verb": "GET",
-  "path": "/payment-providers",
+  "path": "/payment-provider-connections",
   "reads": [
    "payments.provider_connection"
   ],
@@ -82160,14 +82253,12 @@
    ],
    "rental.participant": [
     "custom_fields",
-    "date_of_birth",
-    "emergency_contact",
-    "guardian_name",
+    "emergency_contact_subject_id",
+    "guardian_subject_id",
     "has_signed_waiver",
     "id",
-    "id_number",
     "is_primary_renter",
-    "name",
+    "participant_subject_id",
     "scope_path"
    ]
   },
@@ -82709,7 +82800,7 @@
    "seating.hold_pool": [
     "created_by",
     "hold_type_id",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "performance_id",
     "reason",
@@ -83582,7 +83673,7 @@
    "seating.hold_pool": [
     "created_by",
     "hold_type_id",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "performance_id",
     "reason",
@@ -84388,14 +84479,9 @@
     "affiliation_role",
     "category_code",
     "completeness_percent",
-    "date_of_birth",
-    "email",
-    "full_name",
     "id",
     "is_identity_document_verified",
-    "nationality",
     "organisation_id",
-    "phone",
     "photo_asset_id",
     "programme_id",
     "scope_path",
@@ -88203,11 +88289,10 @@
     "agreement_version",
     "document_asset_id",
     "id",
-    "ip_address",
     "participant_id",
     "scope_path",
-    "signatory_name",
     "signatory_role",
+    "signatory_subject_id",
     "signature_asset_id",
     "signed_at"
    ]
@@ -88803,14 +88888,12 @@
    ],
    "rental.participant": [
     "custom_fields",
-    "date_of_birth",
-    "emergency_contact",
-    "guardian_name",
+    "emergency_contact_subject_id",
+    "guardian_subject_id",
     "has_signed_waiver",
     "id",
-    "id_number",
     "is_primary_renter",
-    "name",
+    "participant_subject_id",
     "scope_path"
    ]
   },
@@ -88828,7 +88911,7 @@
  "testPaymentProviderConnection": {
   "contract": "payments",
   "verb": "POST",
-  "path": "/payment-providers/{connectionId}/test",
+  "path": "/payment-provider-connections/{connectionId}/test",
   "reads": [
    "cache:idempotency",
    "payments.merchant_account",
@@ -88964,14 +89047,9 @@
     "affiliation_role",
     "category_code",
     "completeness_percent",
-    "date_of_birth",
-    "email",
-    "full_name",
     "id",
     "is_identity_document_verified",
-    "nationality",
     "organisation_id",
-    "phone",
     "photo_asset_id",
     "programme_id",
     "scope_path",
@@ -89192,14 +89270,12 @@
    ],
    "rental.participant": [
     "custom_fields",
-    "date_of_birth",
-    "emergency_contact",
-    "guardian_name",
+    "emergency_contact_subject_id",
+    "guardian_subject_id",
     "has_signed_waiver",
     "id",
-    "id_number",
     "is_primary_renter",
-    "name",
+    "participant_subject_id",
     "scope_path"
    ]
   },
@@ -89857,16 +89933,12 @@
    "workforce.employee": [
     "code",
     "created_at",
-    "date_of_birth",
     "date_of_joining",
-    "email",
+    "employee_subject_id",
     "employment_status",
     "employment_type",
-    "first_name",
     "id",
-    "last_name",
     "manager_employee_id",
-    "mobile",
     "principal_id",
     "tenant_id",
     "updated_at"
@@ -89981,16 +90053,12 @@
    "workforce.employee": [
     "code",
     "created_at",
-    "date_of_birth",
     "date_of_joining",
-    "email",
+    "employee_subject_id",
     "employment_status",
     "employment_type",
-    "first_name",
     "id",
-    "last_name",
     "manager_employee_id",
-    "mobile",
     "principal_id",
     "tenant_id",
     "updated_at"
@@ -95860,6 +95928,7 @@
     "offered_at",
     "order_id",
     "recipient_address_masked",
+    "recipient_channel",
     "status",
     "ticket_ids",
     "to_subject_id"
@@ -96068,6 +96137,7 @@
     "override_reason",
     "parent_line_id",
     "performance_id",
+    "product_id",
     "product_name",
     "quantity",
     "recommendation_id",
@@ -100499,11 +100569,9 @@
     "updated_at"
    ],
    "orders.group_customer_organisation_contact": [
-    "email",
+    "contact_subject_id",
     "group_customer_organisation_id",
     "id",
-    "name",
-    "phone",
     "role"
    ]
   }
@@ -100876,13 +100944,10 @@
   ],
   "readColumns": {
    "orders.group_participant": [
-    "date_of_birth",
-    "email",
-    "full_name",
     "group_participant_list_id",
     "id",
-    "phone",
-    "role"
+    "role",
+    "subject_id"
    ],
    "orders.group_participant_list": [
     "file_ref",
@@ -102251,7 +102316,7 @@
     "frozen_days",
     "frozen_from",
     "frozen_until",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "invitation_id",
     "is_name_bound",
@@ -104233,12 +104298,13 @@
     "data_mask_values",
     "entitlement_ids",
     "gross_amount",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "inventory_reservation_id",
     "net_amount",
     "performance_id",
     "price_variance",
+    "product_id",
     "quantity",
     "quoted_unit_price",
     "recommendation_id",
@@ -104317,6 +104383,8 @@
     "subject_id",
     "synced_at",
     "tax_amount",
+    "terms_accepted_at",
+    "terms_version",
     "total_price_variance",
     "venue_id",
     "workstation_id"
@@ -119676,7 +119744,7 @@
     "frozen_days",
     "frozen_from",
     "frozen_until",
-    "holder_name",
+    "holder_subject_id",
     "id",
     "invitation_id",
     "is_name_bound",
@@ -122359,12 +122427,10 @@
     "amount",
     "basis",
     "cart_line_id",
-    "contact_point",
     "created_at",
     "deposit_id",
     "duration_minutes",
     "group_id",
-    "guest_name",
     "hold_expires_at",
     "id",
     "notes",
@@ -122470,7 +122536,6 @@
     "ended_at",
     "ended_by_principal_id",
     "id",
-    "ip_address",
     "is_mfa_satisfied",
     "last_seen_at",
     "principal_id",
@@ -122478,6 +122543,7 @@
     "session_id",
     "started_at",
     "status",
+    "subject_id",
     "venue_id",
     "workstation_id"
    ]
@@ -123491,7 +123557,6 @@
     "ended_at",
     "ended_by_principal_id",
     "id",
-    "ip_address",
     "is_mfa_satisfied",
     "last_seen_at",
     "principal_id",
@@ -123499,6 +123564,7 @@
     "session_id",
     "started_at",
     "status",
+    "subject_id",
     "venue_id",
     "workstation_id"
    ]
@@ -125004,12 +125070,10 @@
     "amount",
     "basis",
     "cart_line_id",
-    "contact_point",
     "created_at",
     "deposit_id",
     "duration_minutes",
     "group_id",
-    "guest_name",
     "hold_expires_at",
     "id",
     "notes",
@@ -128391,6 +128455,18 @@
    "redis"
   ],
   "readColumns": {
+   "catalogue.product": [
+    "description",
+    "id",
+    "name"
+   ],
+   "catalogue.variant": [
+    "description",
+    "id",
+    "is_default",
+    "name",
+    "product_id"
+   ],
    "promotions.bundle": [
     "description",
     "id",
@@ -128399,15 +128475,15 @@
     "savings_amount",
     "savings_percentage",
     "valid_from",
-    "valid_to"
+    "valid_to",
+    "variant_id"
    ],
    "promotions.bundle_choice_group": [
     "allow_duplicates",
     "bundle_id",
     "choose",
     "id",
-    "label",
-    "unavailable_behaviour"
+    "label"
    ],
    "promotions.bundle_choice_option": [
     "bundle_choice_group_id",
@@ -128421,15 +128497,8 @@
     "component_kind",
     "id",
     "is_optional",
-    "menu_item_id",
     "quantity",
-    "redeem_at_outlet_ids",
-    "substitute_variant_ids",
-    "substitution_approval",
-    "substitution_price_effect",
-    "substitution_triggers",
-    "variant_id",
-    "venue_id"
+    "variant_id"
    ]
   },
   "readVia": [
@@ -130156,7 +130225,6 @@
     "entitlement_ids",
     "id",
     "plus_ones",
-    "recipient_email",
     "responded_at",
     "scope_path",
     "status",
@@ -130453,7 +130521,6 @@
     "form_id",
     "form_version",
     "id",
-    "ip_address",
     "on_behalf_of_subject_id",
     "signature_asset_id",
     "subject_id",
@@ -131840,8 +131907,6 @@
     "updated_at"
    ],
    "marketing.guest_profile": [
-    "display_name",
-    "email",
     "engagement_score",
     "engagement_tier",
     "guest_link_id",
@@ -131851,9 +131916,7 @@
     "lifetime_value",
     "merged_at",
     "merged_into_subject_id",
-    "phone",
     "preferred_channel",
-    "preferred_language",
     "subject_id",
     "tags",
     "visit_count"
@@ -131905,8 +131968,6 @@
   ],
   "readColumns": {
    "marketing.guest_profile": [
-    "display_name",
-    "email",
     "engagement_score",
     "engagement_tier",
     "guest_link_id",
@@ -131916,9 +131977,7 @@
     "lifetime_value",
     "merged_at",
     "merged_into_subject_id",
-    "phone",
     "preferred_channel",
-    "preferred_language",
     "subject_id",
     "tags",
     "visit_count"
@@ -132785,8 +132844,6 @@
   ],
   "readColumns": {
    "marketing.guest_profile": [
-    "display_name",
-    "email",
     "engagement_score",
     "engagement_tier",
     "guest_link_id",
@@ -132796,9 +132853,7 @@
     "lifetime_value",
     "merged_at",
     "merged_into_subject_id",
-    "phone",
     "preferred_channel",
-    "preferred_language",
     "segment_id",
     "subject_id",
     "tags",
@@ -132861,8 +132916,6 @@
   ],
   "readColumns": {
    "marketing.guest_profile": [
-    "display_name",
-    "email",
     "engagement_score",
     "engagement_tier",
     "guest_link_id",
@@ -132876,9 +132929,7 @@
     "merged_into_subject_id",
     "notes",
     "open_case_count",
-    "phone",
     "preferred_channel",
-    "preferred_language",
     "recent_order_ids",
     "subject_id",
     "tags",
@@ -132943,8 +132994,6 @@
   ],
   "readColumns": {
    "marketing.guest_profile": [
-    "display_name",
-    "email",
     "engagement_score",
     "engagement_tier",
     "guest_link_id",
@@ -132958,9 +133007,7 @@
     "merged_into_subject_id",
     "notes",
     "open_case_count",
-    "phone",
     "preferred_channel",
-    "preferred_language",
     "recent_order_ids",
     "subject_id",
     "tags",
@@ -133340,6 +133387,7 @@
   "readColumns": {
    "marketing.suppression": [
     "address",
+    "address_hash",
     "channel",
     "id",
     "reason",
@@ -133377,6 +133425,7 @@
   "readColumns": {
    "marketing.suppression": [
     "address",
+    "address_hash",
     "channel",
     "id",
     "reason",
@@ -133855,8 +133904,6 @@
   ],
   "readColumns": {
    "marketing.guest_profile": [
-    "display_name",
-    "email",
     "engagement_score",
     "engagement_tier",
     "guest_link_id",
@@ -133866,9 +133913,7 @@
     "lifetime_value",
     "merged_at",
     "merged_into_subject_id",
-    "phone",
     "preferred_channel",
-    "preferred_language",
     "segment_id",
     "subject_id",
     "tags",
@@ -136909,10 +136954,8 @@
     "subject_id"
    ],
    "marketing.guest_profile": [
-    "display_name",
     "id",
     "merged_into_subject_id",
-    "preferred_language",
     "subject_id"
    ],
    "marketing.privacy_request": [
@@ -137610,12 +137653,6 @@
    }
   ],
   "readColumns": {
-   "marketing.guest_profile": [
-    "id",
-    "merged_into_subject_id",
-    "preferred_language",
-    "subject_id"
-   ],
    "pii.subject": [
     "display_name",
     "id",
@@ -139818,11 +139855,18 @@
     "group_booking_id",
     "id",
     "order_id",
+    "order_line_id",
     "participant_subject_id",
     "performance_id",
     "product_id",
     "signatory_subject_id",
     "ticket_id"
+   ],
+   "orders.order_line": [
+    "holder_subject_id",
+    "id",
+    "performance_id",
+    "product_id"
    ],
    "pii.subject": [
     "display_name",
@@ -140021,7 +140065,10 @@
    ],
    "marketing.waiver_signature": [
     "form_definition_id",
+    "guardian_subject_id",
     "id",
+    "participant_subject_id",
+    "signer_subject_id",
     "status"
    ],
    "marketing.waiver_verification": [
@@ -140392,7 +140439,10 @@
    "marketing.waiver_signature": [
     "document_hash",
     "form_version",
-    "id"
+    "guardian_subject_id",
+    "id",
+    "participant_subject_id",
+    "signer_subject_id"
    ],
    "marketing.waiver_verification": [
     "id",
@@ -142005,16 +142055,15 @@
     "document_hash",
     "form_definition_id",
     "form_version",
-    "guardian_name",
+    "guardian_subject_id",
     "id",
-    "ip_address",
+    "participant_subject_id",
     "signed_at",
-    "signed_name",
+    "signer_subject_id",
     "signer_type",
     "source_reference_id",
     "source_type",
-    "status",
-    "subject_name"
+    "status"
    ]
   }
  },
@@ -142176,7 +142225,6 @@
     "order_id",
     "order_line_id",
     "person_index",
-    "person_name",
     "person_subject_id",
     "question_id",
     "question_kind",
@@ -142234,7 +142282,6 @@
     "order_id",
     "order_line_id",
     "person_index",
-    "person_name",
     "person_subject_id",
     "question_id",
     "question_kind",
@@ -143213,7 +143260,6 @@
     "form_id",
     "form_version",
     "id",
-    "ip_address",
     "on_behalf_of_subject_id",
     "signature_asset_id",
     "subject_id",
@@ -143510,6 +143556,7 @@
     "listing_fee_model",
     "name",
     "required_scopes",
+    "review_notes",
     "status",
     "visibility"
    ]
@@ -144254,6 +144301,156 @@
   ],
   "readsInProcess": [
    "platform.workstation"
+  ],
+  "readColumns": {
+   "identity.offline_pin_verifier": [
+    "expires_at",
+    "id",
+    "issued_at",
+    "principal_id",
+    "venue_id"
+   ]
+  }
+ },
+ "getWalletIntegrationMapping": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-integration-mappings",
+  "reads": [
+   "wallet.integration_mapping"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "How one integration's fields, currencies, statuses and credit types map, as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "wallet.integration_mapping": [
+    "api_client_id",
+    "credit_type_mappings",
+    "currency_mappings",
+    "date_time_format",
+    "field_mappings",
+    "id",
+    "scope_path",
+    "status_mappings",
+    "time_zone"
+   ]
+  }
+ },
+ "getChannelProfile": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/channel-profile",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A sales channel's profile, as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getProductCatalogue": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/product-catalogue",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A sales channel's product assignment, as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getChannelPricingCommercial": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/channel-pricing-commercial",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A sales channel's pricing and commercial profile, as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getChannelFeePayment": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/channel-fee-payment",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A sales channel's fees, payment and fulfilment configuration, as saved",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getChannelReadinessValidation": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/channel-readiness-validation",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "A sales channel's readiness and publication state, as last validated",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
   ]
  }
 }
