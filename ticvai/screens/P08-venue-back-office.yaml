@@ -10312,7 +10312,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /venue-operations/asset-register-bo-031
-    component: src/routes/venue-operations/AssetRegisterBO031Detail.tsx
+    redirect: BO-069
     status: notStarted
   navigation:
     inferred: true
@@ -30997,7 +30997,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /sell/recipe-bom-management
-    component: src/routes/sell/RecipeBomManagementList.tsx
+    redirect: BO-111
     status: notStarted
   navigation:
     entryFrom:
@@ -31647,7 +31647,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /sell/central-kitchen-commissary-management
-    component: src/routes/sell/CentralKitchenCommissaryManagementList.tsx
+    redirect: BO-112
     status: notStarted
   navigation:
     entryFrom:
@@ -35648,7 +35648,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /food-beverage/order-routing-kds-printer-rules
-    component: src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx
+    redirect: BO-134
     status: notStarted
   navigation:
     entryFrom:
@@ -36157,7 +36157,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /stock-supply/production-execution-batch-management
-    component: src/routes/ops/ProductionExecutionBatchManagementList.tsx
+    redirect: BO-112
     status: notStarted
   navigation:
     entryFrom:
@@ -67314,7 +67314,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /venue-operations/my-approval-inbox-bo-365
-    component: src/routes/venue-operations/MyApprovalInbox.tsx
+    redirect: BO-084
     status: notStarted
   navigation:
     exitTo:
@@ -69826,7 +69826,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /venue-operations/reminder-breach-notification-rules-bo-389
-    component: src/routes/venue-operations/ReminderBreachNotificationRules.tsx
+    redirect: BO-388
     status: notStarted
   navigation:
     entryFrom:
@@ -69882,7 +69882,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /venue-operations/escalation-policy-builder-bo-390
-    component: src/routes/venue-operations/EscalationPolicyBuilder.tsx
+    redirect: BO-388
     status: notStarted
   navigation:
     entryFrom:
@@ -85229,7 +85229,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /rentals/dynamic-pricing-ai-recommendation-bo-528
-    component: src/routes/rentals/DynamicPricingAiRecommendation.tsx
+    redirect: ADM-088
     status: notStarted
   navigation:
     entryFrom:
@@ -100251,7 +100251,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /access-venue/temporary-seasonal-accreditation-bo-669
-    component: src/routes/access-venue/TemporarySeasonalAccreditation.tsx
+    redirect: BO-666
     status: notStarted
   navigation:
     entryFrom:
@@ -101087,7 +101087,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /access-venue/communication-template-library-bo-677
-    component: src/routes/access-venue/CommunicationTemplateLibrary.tsx
+    redirect: BO-785
     status: notStarted
   navigation:
     entryFrom:
@@ -106467,7 +106467,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /operations/outlet-management-bo-728
-    component: src/routes/operations/OutletManagement.tsx
+    redirect: BO-044
     status: notStarted
   navigation:
     entryFrom:
@@ -106522,7 +106522,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /operations/create-edit-outlet-bo-729
-    component: src/routes/operations/CreateEditOutlet.tsx
+    redirect: BO-044
     status: notStarted
   navigation:
     entryFrom:
@@ -173645,7 +173645,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /commercial/rule-priority-conflict-resolution-dynamic-pricing-test-c-adm-097
-    component: src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx
+    redirect: BO-441
     status: notStarted
   navigation:
     entryFrom:
@@ -192476,7 +192476,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /platform/approval-matrix-multi-level-approval-configuration-adm-242
-    component: src/routes/platform/ApprovalMatrixMultiLevelApprovalConfiguration.tsx
+    redirect: BO-086
     status: notStarted
   navigation:
     entryFrom:
@@ -193532,7 +193532,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /platform/unified-approval-inbox-decision-workspace-adm-249
-    component: src/routes/platform/UnifiedApprovalInboxDecisionWorkspace.tsx
+    redirect: BO-084
     status: notStarted
   navigation:
     entryFrom:
@@ -194044,7 +194044,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /platform/sla-escalation-bottleneck-monitor-adm-252
-    component: src/routes/platform/SlaEscalationBottleneckMonitor.tsx
+    redirect: BO-391
     status: notStarted
   navigation:
     entryFrom:
@@ -209723,7 +209723,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /commercial/refund-policy-rule-configuration-t118-adm-611
-    component: src/routes/commercial/RefundPolicyRuleConfigurationT118.tsx
+    redirect: BO-1146
     status: notStarted
   navigation:
     entryFrom:
@@ -224989,7 +224989,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /platform/webhook-configuration-subscription-manager-adm-353
-    component: src/routes/platform/WebhookConfigurationSubscriptionManager.tsx
+    redirect: BO-1074
     status: notStarted
   navigation:
     entryFrom:

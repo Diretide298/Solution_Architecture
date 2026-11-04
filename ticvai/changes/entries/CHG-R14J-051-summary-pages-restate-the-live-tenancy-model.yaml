@@ -1,0 +1,52 @@
+id: CHG-R14J-051
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'The architecture summaries developers read first restate the live tenancy model. docs/architecture/
+  cells-and-tenancy.md ("Status: Settled", "Cell = Tenant × Jurisdiction", noisy neighbour "structurally impossible",
+  "partition the hot tables", a venue "promoted to its own cell") is rewritten from ADR-0038 (as amended by ADR-0040),
+  ADR-0039, ADR-0042, ADR-0043, ADR-0017 (as amended), ADR-0005 (as amended by ADR-0056), ADR-0056 and ADR-0064, and
+  says which ADRs it restates. docs/principles.md (tenant isolation "where a cell holds one tenant", venues
+  "partitioned", the corrections table, "twenty-four" ADRs), docs/architecture/ai-platform.md (the Qdrant isolation
+  row, now ADR-0049), backend/README.md (CF-161 "the CREATE TABLE statements are identical either way", "carries no
+  history" beside the V01nn series), and the one-liners in docs/architecture/README.md and docs/STRUCTURE.md are
+  corrected. The copy of ADR-0016 kept in backend/ (0016-read-write-separation), a stale fork of docs/adr/0016 without its 14 August amendment, is
+  deleted (nothing linked it).'
+decision:
+  what: 'r13 system review finding A-07 (the architecture summaries developers read first still teach the superseded
+    tenancy model; the class is CF-97). The lead, 3 November 2026: "All four, one release" (the review fixes go into
+    r14 together). Each page states what the accepted ADRs state, citing them; nothing new is decided. The prevention
+    is CHG-R14J-050''s rule 15c, which now reads docs/architecture, docs/principles.md, docs/STRUCTURE.md and
+    backend/*.md and treats the superseded formula "Cell = Tenant" as a citation of ADR-0014 even with no number.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding A-07 (architecture coherence), class CF-97: ADR-0038 ("A cell holds
+  many tenants. This is the part that supersedes ADR-0014"), ADR-0040 ("A tenant database is never split"),
+  ADR-0056 (venue partitioning deferred), ADR-0064 (per-tenant limits exist because tenants share a cell), ADR-0049
+  (a Qdrant collection per tenant).'
+keys_touched:
+  files:
+  - docs/architecture/cells-and-tenancy.md
+  - docs/architecture/ai-platform.md
+  - docs/architecture/README.md
+  - docs/principles.md
+  - docs/STRUCTURE.md
+  - backend/README.md
+  - the copy of ADR-0016 in backend/ (0016-read-write-separation, deleted)
+  other:
+  - 'derived on the next refresh: the repos/ mirrors of these docs (project-bible/docs/...)'
+root_class: a summary page labelled settled that restates a decision nobody re-reads when the decision is superseded
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-package.py rule 15c (python tools/check-package.py --self-test), CHG-R14J-050
+status: open
+notes: 'The design batches'' HLD board (design-r1/HLD-LLD/BOARD.md, D04) lists cells-and-tenancy.md as a source; it now
+  reads the restated page. The old copies under repos/ (ticvai-docs/architecture/ and every project-bible/architecture/)
+  are lane j''s repos/ work, not this entry.'

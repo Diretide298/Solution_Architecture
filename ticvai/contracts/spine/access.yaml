@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 248
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
@@ -52,7 +53,7 @@ info:
     \ the front gate and\n  scanned twenty metres later must not be refused by a lagging replica.\n- Scans\
     \ recorded offline are appended, never conflicting, deduplicated on the\n  client-generated UUIDv7.\n\
     - Deny is always explained. A gate operator facing a queue needs a reason, not a\n  boolean.\n\nCross-cell\
-    \ (ADR-0014, ADR-0010): entitlements cross cells. A ticket issued in one cell is validated in another\
+    \ (ADR-0038, which supersedes ADR-0014; ADR-0010): entitlements cross cells. A ticket issued in one cell is validated in another\
     \ as a REDEMPTION RIGHT — a narrow projection carrying only what a gate needs, with no personal data.\
     \ Redemption is authoritative in the consuming cell and reconciled back to the issuer, exactly as\
     \ offline scans are authoritative on the device and reconciled to the server. The gate must work when\

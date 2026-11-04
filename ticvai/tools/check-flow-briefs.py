@@ -41,7 +41,7 @@ import sys
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ticket_done import MERGED_NOTE  # noqa: E402
+from ticket_done import merged_into  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REQUIRED = ['title', 'process', 'trigger', 'actors', 'inputs', 'processing', 'outputs', 'steps',
@@ -91,9 +91,9 @@ def package():
         for s in (load_yaml(f) or {}).get('screens') or []:
             if isinstance(s, dict) and s.get('id'):
                 screens.add(s['id'])
-                m = MERGED_NOTE.search(str(s.get('notes') or ''))
-                if m:
-                    MERGED[s['id']] = m.group(1)
+                into = merged_into(s)    # implementation.redirect first, then the notes (CHG-R14J-030)
+                if into:
+                    MERGED[s['id']] = into
     ops = {}
     for f in glob.glob(os.path.join(ROOT, 'contracts', '*', '*.yaml')):
         name = os.path.splitext(os.path.basename(f))[0]

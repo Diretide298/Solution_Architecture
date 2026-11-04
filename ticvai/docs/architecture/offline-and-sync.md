@@ -15,7 +15,7 @@ Offline is not a feature. It is a layer every write path passes through.
 | Mobile / Flying POS | **Full, mandatory** | Roaming, may be off-site |
 | Dedicated venue-scanner app | **Full, mandatory** | Native. Explicitly not web |
 | Employee app | Partial | Validity lookup, not full scanning |
-| Kiosk | Full | Unattended |
+| Kiosk | **None** for selling | Unattended, on the venue LAN (`screens/P05-guest-kiosk.yaml`: `offlineCapable: false`; every KSK purchase step says "Not available" offline). Only the attract loop and the published kiosk configuration and languages play from the kiosk's cache (CHG-R4-001, 5 October 2026; `getPublishedKioskConfig` is cacheable, `serverWins`). Corrected 3 November 2026 (r13 system review F-11, CHG-R14J-031); it said "Full" |
 | Guest app | Partial | Cached tickets |
 | Back office, B2C web | **None** | Config-heavy, always connected |
 

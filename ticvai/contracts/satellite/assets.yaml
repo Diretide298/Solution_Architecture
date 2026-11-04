@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Digital Media Library
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 26
   x-ticvai-tier: satellite
   x-ticvai-module: "23 — Digital Asset Management"
@@ -86,10 +87,10 @@ info:
       through the API.
 
 servers:
-  - url: https://{cellHost}/api/v1
-    variables:
-      cellHost:
-        default: cell.ticvai.local
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 
 security:
   - bearerAuth: []

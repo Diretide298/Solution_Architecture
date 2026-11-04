@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — AI
   version: 1.0.0
+  x-ticvai-hosts: [ai]
   x-ticvai-screen-count: 131
   x-ticvai-module: 8 — Unified Operations Dashboard (AI)
   x-ticvai-platforms:
@@ -81,10 +82,10 @@ info:
   contact:
     name: TICVAI Platform
 servers:
-- url: https://api.{region}.ticvai.com/ai/v1
+- url: https://{cellHost}/ai/v1
   variables:
-    region:
-      default: ae
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 tags:
@@ -610,6 +611,22 @@ x-ticvai-jobs:
     writes: []
     for: 'ai''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` nothing: Identity''s erasure job calls `eraseSubject`, which erases the AI tables, and it answers no part. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
     source: ['events/identity-privacyRequestRaised.yaml']
+  spendMetering:
+    # **The metering job the event names** (r13 system review B-09; CHG-R14J-010). ai.ceilingApproaching's notes say
+    # "the metering job evaluates spend against AiPolicy.monthlyTokenCeiling and fires", and no job was declared, so
+    # the event's critical consumer (the venue manager's notice) waited for an event nothing wrote.
+    module: ai
+    host: ticvai-ai
+    trigger: {kind: timer}
+    reads: [ai.activity, ai.spend_ceiling, ai.policy]
+    emits: [ai.ceilingApproaching]
+    reliesOn: [setAiSpendCeiling]
+    for: 'AI''s spend metering: the period''s metered spend per scope (ai.activity) against its ceiling
+      (ai.spend_ceiling, ai.policy ceilingWarningPercent); ai.ceilingApproaching once at the warning threshold and
+      once at 100% per scope and period (the consumers'' key scopePath+percentOfCeiling+period).'
+    source:
+    - contracts/satellite/ai.yaml
+    - events/ai-ceilingApproaching.yaml
 paths:
   /ai/translate:
     post:

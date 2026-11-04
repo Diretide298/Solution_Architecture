@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 81
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
@@ -51,7 +52,6 @@ servers:
   variables:
     cellHost:
       default: cell.ticvai.local
-      description: Resolved per tenant from the Control Plane. Never hardcoded.
 security:
 - bearerAuth: []
 # **The rule questions Identity answers for other modules** (14 October 2026, the cross-module query pattern of the
@@ -14734,7 +14734,8 @@ components:
         cellName:
           type: string
           description: 'The cell this workstation''s region is served from, which is the cell the commerce host
-            answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it
+            answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes
+            ADR-0014): the host fills it
             from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for
             diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the
             host''s configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513,

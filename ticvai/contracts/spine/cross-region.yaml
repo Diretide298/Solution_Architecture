@@ -4,7 +4,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Cross-Cell
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [controlPlane, cell]
   x-ticvai-screen-count: 2
   x-ticvai-tier: spine
   x-ticvai-module: Cross-cutting — multi-region
@@ -41,7 +42,7 @@ info:
     \ and partial indexes have no expression in OpenAPI.\n**`security` arrays hold OAuth scopes.** Empty\
     \ means \"this scheme, no scopes\" — for bearer tokens there is nothing to list. Empty is not the\
     \ same as absent: absent means unauthenticated.\n\n## This context\nEntitlements, wallets, memberships\
-    \ and guest identity span cells (ADR-0010). Under cell-per-region (ADR-0014) this is the normal path\
+    \ and guest identity span cells (ADR-0010). Under cell-per-region (ADR-0038, which supersedes ADR-0014) this is the normal path\
     \ for any multi-region tenant, not an exception — which is why it is Wave 1.\nThree mechanisms, and\
     \ one rule that governs all of them.\n**The rule: only a pseudonymous `guestLinkId` crosses a cell\
     \ boundary.** No name, email, phone, document number, date of birth or biometric template. Each cell\

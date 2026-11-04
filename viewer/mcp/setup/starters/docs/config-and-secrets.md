@@ -7,6 +7,8 @@
 
 ## Key vault per cell
 
+Azure Key Vault, in the cell's UAE region (decided 28 September, audit R057).
+
 A compromise is contained to one tenant. The isolated tier can hold customer-managed keys. Vault references, never inline values.
 
 ## Build-time vs runtime — guest apps

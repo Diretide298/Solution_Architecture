@@ -77,7 +77,10 @@ COLLAPSE_AT, COLLAPSE_SHARE, COLLAPSE_ALWAYS = 12, 0.6, 200
 GLOB_BUDGET = 80
 # Copies, whatever reads them: derive-mirrors and sync-project-bible compare each copy before
 # overwriting it, which the trace records as a read, but "project-bible/ is a copy, not a source".
-DERIVED_ROOTS = ("repos/*/project-bible/**", "repos/ticvai-docs/**")
+# The three repositories whose code trees are retired keep a CLAUDE.md derive-mirrors copies from ADAM's starter
+# (CHG-R14J-002).
+DERIVED_ROOTS = ("repos/*/project-bible/**", "repos/ticvai-docs/**", "repos/ticvai-backend/CLAUDE.md",
+                 "repos/ticvai-frontend/CLAUDE.md", "repos/ticvai-ai/CLAUDE.md")
 # Written whole by a refresh step added after the manifest was traced, so the traced manifest names no writer for it
 # and classify() would call it authored: file -> the step that writes it. The next trace finds the writer itself.
 UNTRACED_DERIVED = {

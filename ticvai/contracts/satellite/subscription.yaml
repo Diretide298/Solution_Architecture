@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [controlPlane]
   x-ticvai-screen-count: 131
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
@@ -44,7 +45,8 @@ info:
     \ deciding what a tenant may use\n  is one place too many.\n- **A subscription grants; it never enables.**\
     \ Licensing says *may*; the tenant's own\n  configuration says *does*. Downgrading a plan does not\
     \ silently switch off a module\n  a venue is trading on — it flags the conflict and waits.\n- **Cell\
-    \ placement is per region** (ADR-0014), and every region in a different country\n  must be placed\
+    \ placement is per region** (ADR-0038, which supersedes ADR-0014: a cell is a region holding a database per\
+    \ tenant), and every region in a different country\n  must be placed\
     \ in its own jurisdiction. Provisioning enforces that rather than trusting\n  the operator.\n- **Metering\
     \ is separate from billing.** Usage is recorded continuously and priced\n  periodically. Conflating\
     \ them means a pricing change rewrites history.\n- Suspension is graceful and reversible; termination\
@@ -2933,7 +2935,7 @@ paths:
       x-ticvai-read-routing: replica
       summary: List a tenant's cells
       description: |-
-        One per region (ADR-0014), with placement, tier and health. **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
+        One per region (ADR-0039; ADR-0038, which supersedes ADR-0014), with placement, tier and health. **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
 
         **A cell is the tenant's while the tenant still has a database there** (ADAM CR-564, Chinmay, 3 November 2026; CHG-CR564-001). It answers each `control.cell` that has at least one `control.cell_tenant` row for the tenant whose `status` is `provisioning`, `live`, `suspended` or `draining`; a dropped placement is history, kept only so migration records stay readable, and a cell whose only rows for the tenant are `dropped` is left out. Each cell appears once however many rows it has. While a tenant moves, the old cell (`draining`) and the new one (`provisioning`) are both listed; once the old database is dropped, only the new one is. The rule is kept in one place, the status filter of the query. A tenant with no such row, an unknown tenant included, gets 200 with an empty array: there is no 404, and the tenant record is not read. Each item is the `Cell` as it is.
       x-ticvai-reads:
@@ -12652,6 +12654,7 @@ components:
           format: date-time
           readOnly: true
         issuedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           readOnly: true
@@ -18201,6 +18204,7 @@ components:
           maxLength: 1000
           nullable: true
         terminationRequestedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           nullable: true
@@ -18272,6 +18276,7 @@ components:
           description: Accepted by `createTenant` and `updateTenant`; stored here so the response can
             return what was sent.
         accountManagerPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           nullable: true
@@ -18852,6 +18857,7 @@ components:
             force. A removed add-on is kept, not deleted, as the record of the removal; it counts in no
             `LicencePosition` and blocks no new add-on for the module (`add-on-already-active`).'
         removedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           nullable: true

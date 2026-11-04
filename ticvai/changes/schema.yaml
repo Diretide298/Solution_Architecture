@@ -12,6 +12,8 @@ version: 1
 # inside each block (CHG-R6-051).
 id_blocks:
   R6: 10
+  # r14 lane j (3 November 2026): the lane and its five parallel parts number from 001, 010, 020, 030, 040, 050.
+  R14J: 10
 id_pattern: '^CHG-[A-Z][A-Z0-9]{1,5}-\d{3}$'
 slug_pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
 

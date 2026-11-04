@@ -1,10 +1,8 @@
 # TICVAI
 
-Generated 17 August 2026
-
 **2864 operations · 1173 tables · 2453 screens · 210 state models · 113 events · 98 flows · 72 ADRs**
 
-**Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
+**Conflicts:** every one and its state in `conflict-status.md`; the open ones, with who answers each, in [OVERVIEW.md](OVERVIEW.md). **Today's figures are in OVERVIEW.md**, derived on every refresh; the counts on this page are rewritten from `handoff/status.json` by `tools/sync-counts.py`, and it carries no other figure (r13 system review F-13).
 
 ---
 
@@ -15,12 +13,12 @@ provenance and what each one rules out — including the six that were wrong fir
 
 | | |
 |---|---|
-| **`COVERAGE.md`** | What is here and what is not, against the whole build |
+| **`COVERAGE.md`** | What was here and what was not on 17 August 2026 (historical) |
 | **`conflict-status.md`** | Every conflict and its state, one line each |
 | **`wireframes/TICVAI Wireframe Boards.dc.html`** | 219 boards, 2453 screens. Open in a browser |
-| **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
+| **`handoff/platforms-and-apps.md`** | The platforms and the apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
-| **`handoff/TICVAI_Schema_Reference.xlsx`** | 1173 tables, 3,911 columns, nine sheets |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | The data model as a workbook: 1173 tables |
 | **`handoff/ai-index.md`** | Where every AI artefact lives |
 | **`docs/active/workshop-packs.md`** | The three blocked domains, prepared |
 
@@ -28,33 +26,24 @@ provenance and what each one rules out — including the six that were wrong fir
 
 | | |
 |---|---|
-| `contracts/` | **2864 operations** across 25 files — 267 spine, 470 satellite |
-| `screens/` | 364 definitions across 16 platforms, all specified |
-| `frontend/` | 10 app manifests, with build readiness |
+| `contracts/` | **2864 operations** in 33 contracts, spine and satellite |
+| `screens/` | 2453 screens across 16 platforms |
+| `frontend/` | 13 frontends, one derived manifest each, with build readiness |
 | `states/` · `events/` | 210 state models · 113 events, cross-checked |
-| `flows/` | 23 user journeys with 137 unhappy paths |
-| `handoff/` | 144 registers738 indexes and workbooks — the derived layer |
+| `flows/` | 98 flows written as journeys, beside the routes derived from the client boards |
+| `handoff/` | Registers, indexes and workbooks: the derived layer |
 | `docs/` | Architecture, 72 ADRs, the conflict register |
-| `tools/` | **22 checkers and 11 audits**, run as one gated pass by `tools/run-checks.py`, plus the derivers |
+| `tools/` | The checks, run as one gated pass by `tools/run-checks.py`, and the derivers |
 | `wireframes/` | 219 boards from Claude Code, linked to every definition |
 | `sources/` | The matrix, the minutes, the client design references |
 
 ## Validating
 
-    cd ticvai-full
-    python3 tools/check-screens.py        check-frontend      check-flows
-    python3 tools/check-states.py         check-config-scope  check-wireframes
-    python3 tools/check-package.py        # the layers against each other
-
-Six report zero warnings. `check-states` reports a backlog of lifecycles declared inline on a
-property with no state model — **found on 17 August when the checker's own blind spot was
-fixed**, and they are under-specified rather than wrong.
+    bash tools/refresh.sh                 # every derived file, in order
+    python3 tools/run-checks.py           # every check; the gate is tools/refresh-safe.sh
 
 ## What this is
 
-A design package. **2864 operations, 1173 tables and 2453 screens are specified and none of it
-has been executed** — no SQL is written, no code is built, and every number above is an
-assertion until something runs.
-
-The fastest way to test that is `venue-scanner`: eleven screens, fully specified, offline-mandatory,
-and one flow with eight branches.
+The design package of the platform: the contracts, the data model, the screens, the journeys through them, and the
+reasoning behind every decision that was not obvious. Developers build from it through ADAM at each release tag
+(`repos/README.md` says where each repository lives); how far the build has come is in [OVERVIEW.md](OVERVIEW.md).

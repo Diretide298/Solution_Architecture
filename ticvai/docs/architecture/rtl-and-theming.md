@@ -1,7 +1,8 @@
 # RTL and theming
 
-**Arabic is a mirror, not a translation.** Every one of the twelve platforms declares
-`directions: [ltr, rtl]`, and that declaration is currently a claim with nothing behind it.
+**Arabic is a mirror, not a translation.** Every platform but P14 (Developer Portal) and P15 (Kitchen Display)
+declares `directions: [ltr, rtl]` in its `screens/P*.yaml` (those two declare `ltr` only), and that declaration is
+currently a claim with nothing behind it.
 This is what it has to mean.
 
 ---
@@ -13,7 +14,7 @@ that strings can be added to a finished screen while direction cannot.
 
 Retrofitting RTL means revisiting every layout decision made in between — every margin, every
 icon, every animation — and the work is roughly linear in the number of screens by then.
-Doing it first costs about four days on `design-tokens` and `ui`; doing it after 364 screens
+Doing it first costs about four days on `design-tokens` and `ui`; doing it after the screens
 exist costs weeks and produces a worse result, because the retrofit is a search for mistakes
 rather than a decision made once.
 
@@ -83,7 +84,7 @@ letting a tenant flip either produces surfaces nobody designed.
 
 ## What this means per platform
 
-All twelve declare `[ltr, rtl]`. **Three carry a further constraint worth stating.**
+Every platform but P14 and P15 declares `[ltr, rtl]`. **Three carry a further constraint worth stating.**
 
 **P07 Venue Scanner** renders outdoors in sunlight and at night. Contrast has to survive both,
 which is a harder problem than either theme alone and argues for a high-contrast variant rather

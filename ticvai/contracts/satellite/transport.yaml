@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Transport Ticketing
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 32
   x-ticvai-tier: satellite
   x-ticvai-module: "1 — Ticketing Catalogue (Transport)"
@@ -93,10 +94,10 @@ info:
     inventory the prototype does not draw and the client has not asked for.
 
 servers:
-  - url: https://{cellHost}/api/v1
-    variables:
-      cellHost:
-        default: cell.ticvai.local
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 
 security:
   - bearerAuth: []

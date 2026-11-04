@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 240
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue

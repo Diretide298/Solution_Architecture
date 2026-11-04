@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Rental
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 40
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
@@ -55,7 +56,10 @@ info:
 
     '
 servers:
-- url: https://api.ticvai.com/v1
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 x-ticvai-jobs:

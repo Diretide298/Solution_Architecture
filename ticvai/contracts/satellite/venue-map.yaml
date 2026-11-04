@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Venue map
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 23
   x-ticvai-tier: satellite
   x-ticvai-module: "21 — Seat Management & Venue Mapping"
@@ -130,7 +131,10 @@ info:
     matters: a venue that can only send a manifest still gets sellable seats.
 
 servers:
-  - url: https://api.ticvai.com/v1
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 
 security:
 - bearerAuth: []

@@ -1,5 +1,10 @@
 # What is in this package, and what is not
 
+> **Historical: the account of 17 August 2026, kept as the record of that day.** It is not today's state: SQL, the
+> forward migrations and the developers' code exist since, and several figures below were machine-updated until
+> 3 November 2026 and are frozen since (r13 system review F-13, CHG-R14J-041). **Today's figures are in
+> [OVERVIEW.md](OVERVIEW.md)**, derived from the package on every refresh.
+
 **17 August 2026.** An honest account of the delivery against the whole build.
 
 The short version: **the design layer is substantially complete and nothing has been executed.**

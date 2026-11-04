@@ -9,17 +9,22 @@
 import { readFile, readdir } from 'node:fs/promises';
 
 /**
- * The canonical platform roster is the app list in the frontend monorepo, not
- * whatever happens to be named in the docs — so apps with no declared endpoint
- * still appear, and the gap is visible.
+ * The canonical platform roster is the package's app manifests, `frontend/<app>.yaml` (each one's `app:`), not
+ * whatever happens to be named in the docs, so apps with no declared endpoint still appear and the gap is visible.
+ *
+ * **Until r14 this read the frontend monorepo's scaffold, `repos/ticvai-frontend/apps`.** r14 retired the code trees
+ * under `repos/` (CHG-R14J-002: the apps live in their own GitLab repositories), so that folder is gone and the roster
+ * read nothing; the manifests are derived from the screens on every refresh and name every app (CHG-R14INT-005).
  */
 export async function loadPlatforms(root) {
   try {
-    const entries = await readdir(`${root}/repos/ticvai-frontend/apps`, { withFileTypes: true });
-    return entries
-      .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
-      .map((e) => e.name)
-      .sort();
+    const names = (await readdir(`${root}/frontend`)).filter((n) => /\.ya?ml$/i.test(n));
+    const apps = [];
+    for (const n of names) {
+      const m = /^app:\s*([A-Za-z0-9_-]+)\s*$/m.exec(await readFile(`${root}/frontend/${n}`, 'utf8'));
+      if (m) apps.push(m[1]);
+    }
+    return [...new Set(apps)].sort();
   } catch {
     return [];
   }
@@ -27,29 +32,24 @@ export async function loadPlatforms(root) {
 
 // Two vocabularies name the same apps and both are live.
 //
-// The left column is the frontend monorepo's scaffold (`repos/ticvai-frontend/apps`), which
-// is what `loadPlatforms` returns. The right is what the package's own screens declare as
-// `platform.app`, and what `handoff/api-list.md` has carried since it became generated —
-// there are thirteen of those against six of these, so the scaffold is behind the design.
-//
-// Accepting both keeps the consumer column readable whichever vocabulary it was written in,
-// and the mapping folds the package name onto the scaffold name so existing callers are
-// unaffected.
+// The roster `loadPlatforms` returns is the package's app names (`frontend/*.yaml`), which is also what the screens
+// declare as `platform.app` and what `handoff/api-list.md` has carried since it became generated. The older names are
+// the retired frontend scaffold's (`repos/ticvai-frontend/apps`, gone at r14): a consumer column still written in
+// them folds onto the package name, so the column matches the roster whichever vocabulary it was written in. Where an
+// old name covered several apps (`backoffice` was four of them) it folds onto the main one.
 const APP_ALIASES = new Map([
-  ['guest-web', 'web-b2c'], ['webb2c', 'web-b2c'],
-  ['guest-app', 'guest'], ['guest-kiosk', 'kiosk'],
-  ['venue-pos', 'pos'],
-  ['venue-scanner', 'scanner'],
-  ['venue-staff-app', 'employee'],
-  ['venue-management-web', 'backoffice'],
-  ['ticvai-web', 'backoffice'], ['venue-support-web', 'backoffice'],
-  ['developer-portal-web', 'backoffice'], ['signup-web', 'web-b2c'],
-  ['partner-web', 'backoffice'], ['accreditation-web', 'backoffice'],
-  ['kitchen-display', 'employee'],
+  ['web-b2c', 'guest-web'], ['webb2c', 'guest-web'],
+  ['guest', 'guest-app'], ['kiosk', 'guest-app'],
+  ['pos', 'venue-pos'],
+  ['scanner', 'venue-scanner'],
+  ['employee', 'venue-staff-app'],
+  ['backoffice', 'venue-management-web'],
 ]);
 
 const KNOWN_APPS = new Set([
-  'pos', 'backoffice', 'scanner', 'guest', 'employee', 'webb2c', 'web-b2c', 'edge', 'kiosk', 'all',
+  'guest-web', 'guest-app', 'venue-pos', 'venue-scanner', 'venue-staff-app', 'venue-management-web',
+  'venue-support-web', 'ticvai-web', 'developer-portal-web', 'signup-web', 'partner-web', 'accreditation-web',
+  'kitchen-display', 'edge', 'all',
   ...APP_ALIASES.keys(),
 ]);
 

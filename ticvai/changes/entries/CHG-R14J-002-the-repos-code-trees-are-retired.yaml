@@ -1,0 +1,80 @@
+id: CHG-R14J-002
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'repos/ keeps each repository''s project documents and no code. The hand-written code trees of
+  repos/ticvai-backend (src, tests, tools/check-migrations.py, the solution and build settings, docker-compose),
+  repos/ticvai-frontend (the six-app Nx workspace, its packages and settings) and repos/ticvai-ai (src, pyproject, CI),
+  their AGENTS.md and the old update-bible.sh mirror script are removed. tools/derive-mirrors.py now writes what stays from what
+  developers really get: the three repositories'' CLAUDE.md from ADAM''s starter CLAUDE.md
+  (viewer/mcp/setup/starters/<role>/), every bible''s setup/ from the starter docs, every bible''s repos/ rules page
+  (backend, frontend, ai from the starter CLAUDE.md; contracts, infra, docs from new authored sources in
+  docs/repos/rules/, their stale lines corrected: UUIDv7 not ULID, a key vault per cell holding many tenants, the
+  migration fan-out per tenant database), and it removes the bible folders that only shadowed a mirrored docs/ folder
+  with an older partial copy (adr/ with 18 of 73 ADRs, architecture/, active/, registers/) and the August .synced-at
+  stamp. Four starter docs (backend-patterns, config-and-secrets, dependencies, git-and-mrs) took the decided text the
+  package''s ticvai-docs/setup copy had and the starter lacked (audit R038 and R057, GitLab CI, the environments), so
+  developers'' project-bible/setup has it too. The contracts and infra repositories keep their own sources (publishing
+  scripts; Terraform), and their AGENTS.md and CLAUDE.md read orders point at project-bible/docs/. The docs/repos/
+  READMEs say where each repository''s code is.'
+decision:
+  what: 'The lead, 3 November 2026, on the r13 system review''s D-06: "Retire the code trees" (keep the project
+    documents, generated from the starters), with "All four, one release". Closing with it, as findings about the
+    package''s copies: D-01 (the copy did not compile), D-02 (the copy''s permission resolver), D-03 (the copy''s
+    one-tenant-per-cell middleware and the AI copy''s vector store), D-04 (the rules page taught .NET 8, one tenant,
+    ULIDs), D-05 (the copy''s offline outbox), D-07 (the copy''s architecture and integration tests), D-08 (the
+    copy''s migration checker fork). The same defects in ADAM''s starters are lane g''s (G-01, G-03, G-04, D-07''s
+    starter part); D-11''s code is the AI engineers''. ticvai-infra''s Terraform stays: it is the package''s only
+    infrastructure source (the HLD sizes and check-terraform-pools read it) and has no starter to diverge from.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding D-06 (code scaffolds): the repos/ code trees were stale copies no
+  tool kept in step with the starters developers get; every A-STARTER fix landed only in ADAM''s starters, and
+  check-starter-fit never looked at repos/. D-04: project-bible/repos/backend.md had no source.'
+keys_touched:
+  files:
+  - repos/ticvai-backend (code tree and AGENTS.md removed)
+  - repos/ticvai-frontend (code tree and AGENTS.md removed)
+  - repos/ticvai-ai (code tree and AGENTS.md removed)
+  - the old mirror script update-bible.sh at the top of repos/ (removed)
+  - repos/ticvai-contracts/AGENTS.md
+  - repos/ticvai-contracts/CLAUDE.md
+  - repos/ticvai-infra/AGENTS.md
+  - repos/ticvai-infra/CLAUDE.md
+  - docs/repos/index.md
+  - docs/repos/README.md
+  - docs/repos/ticvai-backend.md
+  - docs/repos/ticvai-frontend.md
+  - docs/repos/ticvai-ai.md
+  - docs/repos/ticvai-docs.md
+  - docs/repos/rules/contracts.md (new authored source)
+  - docs/repos/rules/infra.md (new authored source)
+  - docs/repos/rules/docs.md (new authored source)
+  - viewer/mcp/setup/starters/docs/backend-patterns.md (ADAM starter doc)
+  - viewer/mcp/setup/starters/docs/config-and-secrets.md (ADAM starter doc)
+  - viewer/mcp/setup/starters/docs/dependencies.md (ADAM starter doc)
+  - viewer/mcp/setup/starters/docs/git-and-mrs.md (ADAM starter doc)
+  - tools/derive-mirrors.py (project documents from the starters; shadowed folders removed)
+  - tools/check-repo-trees.py (new, self-test)
+  - tools/run-checks.py
+  - tools/derive-overview.py (the repos/ line)
+  - tools/refresh-manifest.py (DERIVED_ROOTS)
+  other:
+  - 'derived on the next refresh: repos/ticvai-backend/CLAUDE.md, repos/ticvai-frontend/CLAUDE.md,
+    repos/ticvai-ai/CLAUDE.md, every project-bible''s setup/ and repos/, the repository READMEs; the shadowed bible
+    folders go'
+  - 'ADAM reads less from repos/ after this: viewer/lib/consumers.mjs lists platforms from repos/ticvai-frontend/apps
+    (now none) and viewer/lib/cicd.mjs reads each repository''s top-level build files (the backend and AI ones are
+    gone). Neither is changed here; both should read the package''s frontend/*.yaml manifests and services/ instead'
+root_class: a copy nothing keeps in step, presented as the thing it copies
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-repo-trees.py::RT-CODE, RT-STARTER, RT-SHADOW (--self-test)
+status: open

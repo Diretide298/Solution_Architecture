@@ -1,0 +1,55 @@
+id: CHG-R14J-031
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'A frontend manifest now says per platform what each platform declares: tools/derive-frontend.py writes
+  platformProfiles (formFactor, runtime, offlineCapable, deployment per platform) and an app-level value only where every
+  platform the app serves declares the same, with mixedAcross naming the rest. frontend/guest-app.yaml no longer tells
+  the kiosk (P05: React web, online only, a kiosk-mode shell pushed by device management) that it is the native,
+  offline, store-deployed guest app (P02); venue-management-web no longer gives P13 and P16 the deployment of P08.
+  docs/architecture/offline-and-sync.md''s kiosk row says what the package decided (no offline selling; the attract
+  loop and the published kiosk configuration play from cache, CHG-R4-001), not "Full". New
+  tools/check-frontend-manifests.py FM-PLATFORM.'
+decision:
+  what: 'r13 system review finding F-11 (the kiosk gets three different answers on runtime and offline). The lead,
+    3 November 2026: "All four, one release". Per-platform attributes, not a kiosk manifest of its own: P05''s app is
+    guest-app in screens/P05-guest-kiosk.yaml and docs/active/frontend-repos.yaml, and P05''s own repository
+    (ticvai-kiosk) is the lead''s assumption of 13 October, already in the manifest''s repositories; splitting the app
+    would rename an app the screens and the repository map both name, which is not this fix. The kiosk''s answer is the
+    platform''s own: runtime reactWeb, offlineCapable false, the kiosk deployment, as screens/P05-guest-kiosk.yaml
+    declares and every KSK purchase screen''s offline state ("Not available") and CHG-R4-001 (the cached attract loop and
+    configuration) agree.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding F-11 (screens and flows). audit-guest-parity had flagged the same
+  manifest ("the kiosk (reactWeb) ships inside the reactNative guest app").'
+keys_touched:
+  files:
+  - tools/derive-frontend.py (platformProfiles, app-level values only where the platforms agree, mixedAcross)
+  - tools/check-frontend-manifests.py (new; self-test)
+  - tools/run-checks.py
+  - docs/architecture/offline-and-sync.md (the kiosk row)
+  other:
+  - 'derived on the next refresh: the 13 frontend/*.yaml manifests (platformProfiles on each; guest-app loses its
+    app-level formFactor, runtime, offlineCapable and deployment, venue-management-web its app-level deployment), the
+    docs mirrors under repos/'
+root_class: a generator that takes a multi-platform app's attributes from its first platform
+tickets:
+  started: []
+  unstarted:
+  - 'the kiosk screens'' frontend tickets (P05, ticvai-kiosk; none started on 3 November): the manifest they read now
+    gives the kiosk its own runtime, offline and deployment'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-frontend-manifests.py::FM-PLATFORM (--self-test)
+status: open
+notes: 'On the r13 manifests FM-PLATFORM reports 23 findings (every manifest lacks platformProfiles; guest-app''s four
+  first-platform values; venue-management-web''s deployment); on the regenerated ones none. The started tickets on KSK
+  screens are back-end tickets (#27885, #31052, #31053, #35599, #35624, Ready for QA), which the frontend manifest does
+  not reach. The offline-and-sync table row has no check of its own (a prose table); the manifests and the screens
+  are where the decision lives, and FM-PLATFORM holds those. docs/architecture/frontend-delivery.md still says
+  guest-app holds "P05 Guest Kiosk 15" (finding F-13, another part of this lane).'

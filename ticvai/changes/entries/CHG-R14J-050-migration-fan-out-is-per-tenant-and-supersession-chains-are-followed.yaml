@@ -1,0 +1,79 @@
+id: CHG-R14J-050
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'The migration fan-out unit is a tenant database, and the canary a tenant, everywhere a developer reads it
+  (ADR-0039): platform-ops.yaml''s file header ("fans out per region, not per tenant (ADR-0014)") and applyMigration
+  ("Fans out per region (ADR-0014)"), backend/MIGRATIONS.md "Applying", and derive-ddl''s 002-migration-register
+  header. Every redirect "ADR-0001 (retired — see ADR-0014 and ADR-0017)" and every prose citation of the superseded
+  ADR-0014 in the contracts (access, cross-region, identity, tenancy, subscription, reporting, the contracts README)
+  and in two generators'' text (derive-diagrams'' regions note, derive-table-notes'' control.cell note) now names the
+  live successor, ADR-0038. check-package rule 15c reads these files and follows supersession chains to their end.
+  Prose only: no contract shape, field, operation or table changes.'
+decision:
+  what: 'r13 system review finding A-06 (migration fan-out is "per region (ADR-0014)" in the migration docs, both
+    register DDLs and the migration contract, but per tenant in ADR-0039; the ADR-0001 redirect points at a superseded
+    ADR; check-package rule 15 reads only docs/adr and deploy). The lead, 3 November 2026: "All four, one release"
+    (the review fixes go into r14 together). The text states what ADR-0039 3 and ADR-0038 already decided; nothing new
+    is decided. The two frozen r1 baseline files backend/{tenant,control}/002-migration-register.sql keep their r1
+    comment (frozen, check-migration-freeze); the generator text is corrected for a regenerated baseline, and
+    MIGRATIONS.md is the developers'' how-to.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding A-06 (architecture coherence): ADR-0039 3 ("the fan-out unit is a
+  tenant database, and the canary is a tenant") against platform-ops.yaml, backend/MIGRATIONS.md and the 002 header,
+  which said ADR-0014, superseded by ADR-0038. The class is CF-97 (a reader built on a superseded ADR).'
+keys_touched:
+  operations: [applyMigration, startRollout, listTenantCells]
+  schemas: [subscription.Cell (listTenantCells description), identity.WorkstationContext.cellName,
+    tenancy.RegionSettings.cellName]
+  files:
+  - contracts/satellite/platform-ops.yaml (info description, startRollout, applyMigration)
+  - contracts/satellite/reporting.yaml (info description)
+  - contracts/satellite/subscription.yaml (info description, listTenantCells)
+  - contracts/spine/access.yaml (info description)
+  - contracts/spine/cross-region.yaml (info description)
+  - contracts/spine/identity.yaml (WorkstationContext.cellName description)
+  - contracts/spine/tenancy.yaml (info description, cellName description)
+  - contracts/README.md
+  - backend/MIGRATIONS.md
+  - tools/derive-ddl.py (MIGRATION_REGISTER header text only)
+  - tools/derive-diagrams.py (regions note)
+  - tools/derive-table-notes.py (control.cell note)
+  - tools/check-package.py (rule 15c and its --self-test)
+  - changes/schema.yaml (id_blocks R14J)
+  other:
+  - 'derived on the next refresh: handoff/schema-reference.json descriptions, the control.cell table note, the HLD
+    regions note, operation descriptions in handoff/service-docs and the repos/ mirrors'
+root_class: a superseded decision kept in prose outside docs/adr, where the supersession check did not read
+tickets:
+  started:
+  - '#31367 listTenantCells (Ready for QA, Narayan Gaonkar): description wording only; nothing to change in code
+    (one cell per region the tenant has venues in, as before)'
+  - '#31314 [DB] control.cell and #27991 [DB] the control forward migration (Ready for QA, Hrushikant Patkar): the
+    control.cell table note now says a cell is a region holding many tenants (ADR-0038); a comment, no column or
+    constraint change'
+  - '#27732 and #30674 login, #37052 (getCurrentSession, Redis session registry), #30790 [FE] PTR-001 (Ready for QA):
+    WorkstationContext.cellName''s description now says a cell is a region serving many tenants (ADR-0038); the
+    fill rule (configuration key Cell:Name) is unchanged; nothing to change in code'
+  unstarted:
+  - 'applyMigration and startRollout (PLATFORM-MIGRATE and the rollout tickets, none started on 3 November): build
+    the fan-out per tenant database with the canary a tenant inside the canary cell, one control.migration_run_tenant
+    row per tenant per run (ADR-0039 3); the contract text no longer says per region'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-package.py rule 15c (python tools/check-package.py --self-test)
+status: open
+notes: 'Rule 15c reads contracts/ (YAML and README), backend/*.md, docs/architecture/, docs/principles.md,
+  docs/STRUCTURE.md, docs/repos/ and the string literals of tools/derive-*.py (comments are history and are not read).
+  A line citing an ADR whose status is Superseded (not merely amended: 0001, 0014, 0036 today) passes only when,
+  within one line either way, it says so and every superseded ADR the window names has one of its live successors
+  named beside it, the chain followed to its end (0001 -> 0014 -> 0038, and 0017). A superseded formula written without
+  its number counts as citing it ("Cell = Tenant", ADR-0014). On the r13 tree it reports 30 findings; on this tree 0.
+  An "Restates:" field on ADRs listing the summary pages each invalidates was considered and not added: it needs a
+  person to judge, for every accepted ADR, which pages restate it, which is not bounded tonight; the formula rule and
+  the wider file set catch the cases the review found.'

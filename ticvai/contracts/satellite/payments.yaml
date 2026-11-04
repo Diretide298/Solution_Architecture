@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Payment Orchestration
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 48
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
@@ -50,7 +51,10 @@ info:
 
     '
 servers:
-- url: https://api.ticvai.com/v1
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 x-ticvai-queries:
@@ -676,7 +680,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /payment-providers:
+  /payment-provider-connections:
     get:
       operationId: listPaymentProviderConnections
       x-ticvai-consumed-by:
@@ -749,7 +753,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /payment-providers/{connectionId}/test:
+  /payment-provider-connections/{connectionId}/test:
     parameters:
     - name: connectionId
       in: path

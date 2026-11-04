@@ -81,6 +81,9 @@ CHECKS = [
     # only on a member not in handoff/audit-baseline.json; --update-baseline after a fix tightens it.
     "check-ticket-text", "check-screen-wiring", "check-navigation", "check-contract-shapes",
     "check-ddl-conventions", "check-contract-storage", "check-starter-fit", "check-glossary-terms",
+    # 3 November (r13 system review A-13, CHG-R14J-011): a Control Plane actor a PLATFORM_* staff operation writes is a
+    # control.platform_operator (ADR-0072), never a tenant identity.principal.
+    "check-control-actors",
     "check-wireframe-coverage",
     # 14 October (ADAM CR-065..CR-074, batch DDL, CHG-DDL-001..008): what an operation promises about storage, the
     # derived DDL keeps -- an array a slice operation takes is stored, a 409 for a duplicate code has its unique
@@ -144,6 +147,10 @@ CHECKS = [
     # 13 October (Chinmay, r5, CHG-R6-059): the frontend is one GitLab repository per app; every screen platform and
     # frontend app has its entry in docs/active/frontend-repos.yaml, and ADAM setup's table names the same ones.
     "check-frontend-repos",
+    # 3 November (the r13 system review F-14 and F-11; the lead, "All four, one release"; CHG-R14J-030, CHG-R14J-031):
+    # a merged screen is an implementation.redirect to a built screen, with no component of its own; a frontend
+    # manifest says per platform what each platform declares (the kiosk is not the native guest app).
+    "check-screen-redirects", "check-frontend-manifests",
     # 14 October (Chinmay, r6, CHG-ADM-001 and CHG-ADM-002): developers and agents are always on the latest release
     # (nothing ADAM says asks them to choose one), and a settled CR reaches its ticket: a comment for the agent while
     # it is open, a child task when it is closed. Both read ../viewer, the way check-frontend-repos does.
@@ -154,6 +161,14 @@ CHECKS = [
     # 2 November (r13 root R13, CHG-R13R13-001): no README under repos/ is a copy of another package file (104 were the
     # Active page); derive-mirrors writes each from its docs/repos/ source or as an index of its folder.
     "check-repo-readmes",
+    # 3 November (the r13 system review D-06 with D-01..D-05, D-07, D-08, D-04 and D-10; the lead: "Retire the code
+    # trees"; CHG-R14J-002, CHG-R14J-003): repos/ holds each repository's project documents and no code tree, its
+    # CLAUDE.md, setup/ and rules pages are copies of ADAM's starters, and the contracts repository can publish.
+    "check-repo-trees",
+    # 3 November (the r13 system review B-12, CHG-R14J-020; ADR-0026 amended): every contract is served from its host's
+    # one server definition in common.yaml x-ticvai-servers, from the host its data lives on, and info.version is the
+    # URL version (<N>.0.0).
+    "check-contract-servers",
     # 4 October (the Sprint 1-2 fix round, contracts, CHG-FXC-003): an id an operation is addressed or filtered by
     # has a column to match (a ratchet over the 226 known). check-write-lineage gained W-CACHEKEY and W-CREATED.
     "check-parameter-columns",
@@ -254,6 +269,11 @@ CHECKS = [
     # what ADAM's pull lists as known gaps, is the builder's output now, holds every baselined finding, and maps each
     # to an artefact a ticket links or says why it names none. Its self-test runs first. Strict: never baselined.
     "check-known-findings",
+    # 3 November (r13 system review A-12 and F-13; the lead: "All four, one release"; CHG-R14J-040, CHG-R14J-041): the
+    # ADR index says what each ADR's own Status line says (ADR-0065 was Accepted in its file, Proposed in the index), and
+    # the landing pages carry no figure the package contradicts, with OVERVIEW.md exactly what derive-overview renders.
+    "check-adr-index",
+    "check-landing-figures",
 ]
 
 # Arguments a checker is run with here, when its bare form is not the one a gate run needs (CHG-R8GEN-002).

@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 63
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
@@ -64,7 +65,10 @@ info:
 
     '
 servers:
-- url: https://api.ticvai.com/v1
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 # **The rule questions Wallet answers for other modules** (ADR-0055 amendment, 14 October 2026; the r6 shared

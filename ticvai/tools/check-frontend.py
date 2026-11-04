@@ -91,6 +91,13 @@ def main() -> int:
                 ERRORS.append(f"{f.name}: {s['id']} route '{route}' is not absolute")
 
             comp = imp.get("component", "")
+            # A redirect has a route and no component: nothing is built for it (CHG-R14J-030, review F-14).
+            # tools/check-screen-redirects.py holds what it may and may not name.
+            if imp.get("redirect"):
+                if comp:
+                    ERRORS.append(f"{f.name}: {s['id']} redirects to {imp['redirect']} and still names a "
+                                  f"component ({comp})")
+                continue
             if prof:
                 if comp != fr.component_path(plat.get("code"), comp) or not fr.component_tail(comp) \
                         or not comp.endswith(".tsx"):

@@ -1,8 +1,9 @@
 # backend/ — the versioned SQL
 
-**The SQL files are generated: `tools/derive-ddl.py` rebuilds them on `refresh.sh`. Do not hand-edit
-them.** Two databases, one folder each (ADR-0038: a cell holds many tenants, each in its own tenant
-database; ADR-0039: the control database is its own):
+**The SQL files here are written by `tools/derive-ddl.py`: never hand-edit them.** This page is written by hand and
+its figures are kept current by `tools/sync-counts.py`. Since r1 the baseline files (`000` to `930`) are frozen
+at the tag and never regenerated; every later change is a forward migration, `V0100` and up, which derive-ddl
+writes once and never rewrites (MIGRATIONS.md).
 
 ```
 tenant/                      every tenant database
@@ -44,8 +45,9 @@ surviving key on `identity.principal` pointed at `platform.scope_node`, a name t
 renamed to `platform.org_unit` on 26 August. **Two tables, one per generation, and the graph quietly
 wired itself to the dead half.**
 
-**If you hold an older series, delete it.** This folder is regenerated in full and carries no
-history; the history is in the contracts.
+**If you hold the August `V0001`-`V0003b` series, delete it.** It is no part of this folder. The history this
+folder does carry is the forward-migration series after r1 (`V0100` and up, in each database's folder), applied
+after the frozen baseline in name order; the August files are not in it.
 
 ---
 
@@ -74,7 +76,9 @@ first row that legitimately points nowhere.**
 
 ## Still open
 
-**CF-161** is settled: ADR-0038 puts each tenant in its own database inside a cell (a region holding many
-tenants), and ADR-0039 keeps the control database apart.
+**CF-161 is closed** (ADR-0038, 3 September 2026): a cell is a region holding a database per tenant. The claim
+that once stood here, that the `CREATE TABLE` statements are identical either way, was wrong, as ADR-0038 says:
+the decision dropped `control.cell.tenant_id`, added tables, and took `control` out of the tenant template into
+a database of its own (ADR-0039), which is why this folder has `tenant/` and `control/`.
 
 **CF-64** — cloud provider. Affects the managed Postgres tier and nothing in these files.

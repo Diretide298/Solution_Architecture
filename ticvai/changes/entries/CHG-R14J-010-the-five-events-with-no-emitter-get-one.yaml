@@ -1,0 +1,65 @@
+id: CHG-R14J-010
+date: '2026-11-03'
+source: audit
+kind: contract
+summary: 'The five events nothing emitted now have their emitters, and check-jobs J-EMITTER fails (it printed) on any
+  event no operation and no declared job writes. fnb.menuPublished, which carries allergen changes to two critical
+  consumers (the AI index and the answer cache): publishMenu and rollbackMenu emit it, and a new timer
+  fnb#menuSchedule makes a scheduled menu version live at its outlet''s local midnight and emits it.
+  retail.merchandisePublished: createMerchandise and updateMerchandise (isActive false is the withdrawal).
+  maintenance.templatePublished: createInspectionTemplate (a template is superseded by a new version).
+  device.firmwareRolloutCompleted: rollbackDeviceFirmware (rolledBack) and setDeviceFirmwareStatus (withdrawing a
+  firmware halts its running rollouts), and a new queued job tenancy#firmwareRollout (the waves, completed or halted on
+  the failure threshold) that the event''s notes named and nothing declared. ai.ceilingApproaching: a new timer
+  ai#spendMetering in ticvai-ai, the "metering job" the event names.'
+decision:
+  what: 'r13 system review finding B-09 (five events have no emitter; one carries allergen changes to a critical
+    consumer). The lead, 3 November 2026: "All four, one release" (the review fixes go into r14 together). The three
+    jobs are the work the event texts already name (the rollout job, the metering job) or the operation''s text
+    promises (a scheduled publish takes effect at the outlet''s local midnight); no operation was invented. The
+    emitters are declared in events/ (emittedBy), which lineage, check-jobs and check-write-lineage read; x-ticvai-emits
+    on the operations is not added, here or for the other 111 pairs: a derive writing contracts is what finding E-03
+    removes, check-contract-compat counts an added x-ticvai-emits as a breaking change, and adding them by hand is 105
+    operations and 36 started tickets (left-out LO-R14J-001).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 system review of 3 November 2026, finding B-09 (data and contracts), known since
+  CHG-R13JOB-003, whose notes left these five for the lead; ADR-0055 (workers host), ADR-0020 (the AI runtime).'
+keys_touched:
+  operations: [publishMenu, rollbackMenu, createMerchandise, updateMerchandise, createInspectionTemplate,
+    rollbackDeviceFirmware, setDeviceFirmwareStatus]
+  files:
+  - events/fnb-menuPublished.yaml
+  - events/retail-merchandisePublished.yaml
+  - events/maintenance-templatePublished.yaml
+  - events/device-firmwareRolloutCompleted.yaml
+  - events/ai-ceilingApproaching.yaml
+  - contracts/satellite/fnb.yaml (x-ticvai-jobs.menuSchedule)
+  - contracts/spine/tenancy.yaml (x-ticvai-jobs.firmwareRollout)
+  - contracts/satellite/ai.yaml (x-ticvai-jobs.spendMetering)
+  - tools/check-jobs.py (J-EMITTER fails on an event nothing emits; self-test)
+  - docs/active/left-out.yaml (LO-R14J-001)
+  other:
+  - 'derived on the next refresh: handoff/api-data-lineage.json (platform.outbox in the writes of publishMenu,
+    rollbackMenu, createMerchandise, updateMerchandise, createInspectionTemplate), handoff/service-docs/plan-tasks.csv
+    (three job tasks)'
+root_class: an event whose emitter is written in prose only, so lineage and the plan cannot see who writes it
+tickets:
+  started: []
+  unstarted:
+  - 'the tickets of publishMenu, rollbackMenu, createMerchandise, updateMerchandise, createInspectionTemplate and
+    rollbackDeviceFirmware (none started on 3 November): each writes its event to the outbox in its transaction'
+  - 'three new plan tasks from x-ticvai-jobs (build-service-docs): JOB-FNB-MENU-SCHEDULE (parent AM-FOOD-BEVERAGE-P04),
+    JOB-TENANCY-FIRMWARE-ROLLOUT (parent AM-SETUP-PLATFORM-FOUNDATION-P08-REST), JOB-AI-SPEND-METERING (parent
+    AM-SETUP-AI-INTELLIGENCE-P08-REST, the AI engineers)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r13 system review of 3 November 2026, the lead''s decisions of that day'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-jobs.py
+status: open
+notes: 'J-EMITTER now fails on every event with no emitter (it failed only when the emittedWhen text named an
+  operation, and printed the rest); on the r13 tree it reports exactly these five, on the fixed tree none.
+  setDeviceFirmwareStatus and rollbackDeviceFirmware already wrote platform.outbox, so their lineage does not change.'

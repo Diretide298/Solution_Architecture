@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Public API and developer access
   version: 1.0.0
+  x-ticvai-hosts: [controlPlane]
   x-ticvai-screen-count: 35
   x-ticvai-tier: satellite
   x-ticvai-module: "13 — Developer & API Management"
@@ -107,7 +108,10 @@ info:
     `DEVELOPER_ADMIN` marks nothing here.
 
 servers:
-  - url: https://api.ticvai.com/v1
+- url: https://{controlPlaneHost}/api/v1
+  variables:
+    controlPlaneHost:
+      default: control.ticvai.local
 
 security:
 - bearerAuth: []
@@ -2754,7 +2758,7 @@ components:
           format: uuid
           nullable: true
           readOnly: true
-          x-ticvai-references: identity.principal
+          x-ticvai-references: control.platform_operator
         decidedAt: { type: string, format: date-time, nullable: true, readOnly: true }
         reason: { type: string, nullable: true, readOnly: true }
         productionClientId:

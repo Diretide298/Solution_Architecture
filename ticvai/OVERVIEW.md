@@ -4,16 +4,16 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**2864 operations · 33 contracts · 1173 tables · 2453 screens · 210 state models · 98 flows · 72 ADRs**
+**2864 operations · 33 contracts · 1173 tables · 2453 screens · 210 state models · 98 authored flows · 72 ADRs**
 
-**Design 95% · Build 32%.**
+**Design 95% · Build 32%** (handoff/status.json).
 
 ---
 
 ## What this is for
 
-**A contract-first package that refuses to contradict itself.** Nine validators run on
-every change: a screen cannot call an operation that does not exist, an operation cannot
+**A contract-first package that refuses to contradict itself.** 107 checks run on
+every refresh, 99 of them gating: a screen cannot call an operation that does not exist, an operation cannot
 name a table stored nowhere, a state model cannot anchor on a schema with no values, a
 flow cannot step through a screen that was deleted.
 
@@ -36,9 +36,10 @@ package has been bitten by that three times.
 | Operations reaching a screen | 2577 of 2864 | 90% |
 | Screens reachable from an entry point | 2451 of 2453 | 100% |
 | Screens drawn on a board | 2453 of 2453 | 100% |
-| Screens in a journey | 2108 of 2453 | 86% |
-| Conflicts | 158 closed | 8 open, none blocking |
-| **Tables written** | **0** of 1173 | **build has not started** |
+| Screens in an authored journey | 265 of 2453 | 11% |
+| Screens on any flow, board-derived routes included | 2108 of 2453 | 86% |
+| Conflicts | 158 closed | 8 open, 0 blocking |
+| Tables in the DDL | 1,123 of 1,173 | 96% |
 
 ---
 
@@ -50,7 +51,7 @@ package has been bitten by that three times.
 | **`conflict-status.md`** | Every conflict and its state, one line each |
 | **`handoff/TICVAI_Schema_Reference.xlsx`** | The data model as a workbook |
 | **`handoff/schema-roots.md`** | Which table each schema is about, and how the rest hang off it |
-| **`COVERAGE.md`** | What is here and what is not |
+| **`COVERAGE.md`** | The account of 17 August 2026 of what was here and what was not (historical) |
 | **`docs/adr/`** | Why the platform is shaped this way |
 
 **Running the viewer** renders all of it as five linked layers:
@@ -96,7 +97,7 @@ cd viewer && npm start        →  http://localhost:4173
 | `docs/adr/` | Decisions, with the alternatives and why they lost |
 | `docs/registers/` | Conflicts, traceability, the backlog |
 | `handoff/` | Derived artefacts — the schema reference, the lineage, the graph |
-| `tools/` | Nine validators and eight derivers. `bash tools/refresh.sh` runs everything |
+| `tools/` | 107 checks (tools/run-checks.py) and 43 derivers. `bash tools/refresh.sh` runs everything |
 | `repos/` | Mirrors of this package for each build repository. Also generated |
 
 ---
@@ -105,15 +106,15 @@ cd viewer && npm start        →  http://localhost:4173
 
 **Put last on purpose.** A landing page that only lists what exists is a landing page that misleads.
 
-**Build is 0%.** 1173 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 100% of in-scope requirements and the gap to build is the entire remaining risk.**
+**Build is 32%** by the package's own measure (handoff/status.json). **The design is 100% of in-scope requirements and the gap to build is the remaining risk.**
 
-**98 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 2864 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
+**98 authored journeys of a target 120**, beside 193 routes derived from the client boards. 3 of 33 contracts have no operation in an authored journey (`payments`, `rental`, `transport`). **Every journey written so far has found a defect**, which is the argument for writing more.
 
-**2453 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
+**2 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
 
-**8 conflicts are open.** None blocks build; four need an email and one needs a workshop.
+**8 conflicts are open**, 0 of them blocking. Each is listed with who answers it:
 
-- **CF-171** — Chinmay + Qossai **Re-measured 20 September: 577 of 2864 operations, 28%** — the figures above are 577 of 1,626 and 35%. **The absolute number has not moved by one, and all 577 still have a `summary` that is verbatim the title of a screen in their own `x-ticvai-consumed-by`.** It reads better only because the denominator grew by 2864 operations that were specified properly. **A measurement that drifts in our own favour is the one nobody re-runs**, which is the whole argument of this row restated against itself. Concentrated in `access` (146), `catalogue` (108), `promotions` (96), `orders` (89), `marketing-crm` (68), `subscription` (50) and `approvals` (20).
+- **CF-171** — Chinmay + Qossai **Re-measured 20 September: 577 of 2,056 operations, 28%** — the figures above are 577 of 1,626 and 35%. **The absolute number has not moved by one, and all 577 still have a `summary` that is verbatim the title of a screen in their own `x-ticvai-consumed-by`.** It reads better only because the denominator grew by 430 operations that were specified properly. **A measurement that drifts in our own favour is the one nobody re-runs**, which is the whole argument of this row restated against itself. Concentrated in `access` (146), `catalogue` (108), `promotions` (96), `orders` (89), `marketing-crm` (68), `subscription` (50) and `approvals` (20).
 - **CF-170** — Chinmay + Dinesh
 - **CF-169** — Chinmay + Dinesh
 - **CF-162** — Dinesh

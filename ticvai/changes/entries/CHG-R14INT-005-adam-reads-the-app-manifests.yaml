@@ -1,0 +1,32 @@
+id: CHG-R14INT-005
+date: '2026-11-04'
+source: audit
+kind: process
+summary: 'ADAM reads the app manifests where it read the retired code trees: viewer/lib/consumers.mjs takes its
+  platform roster from frontend/*.yaml (each app:), and folds a consumer column still written in the retired
+  scaffold''s names onto the package names; viewer/lib/cicd.mjs adds the team repositories the manifests name
+  (node, by their runtime) and judges "no pipeline builds an image" and "no CD" only when the package holds workflows,
+  since the pipelines live in the team repositories.'
+decision:
+  what: 'Lane j''s note on CHG-R14J-002, which the coordinator gave to the integration under the lead''s instruction of
+    4 November 2026 ("take the recommended decision unless its very very important"): consumers.mjs and cicd.mjs
+    read the retired code trees and now find nothing; make them read frontend/*.yaml and services/.'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'CHG-R14J-002 retired the code trees under repos/: repos/ticvai-frontend/apps and every repos/*/.github are gone,
+  so ADAM''s platform roster was empty and its CI/CD page reported errors about pipelines that only moved.'
+keys_touched:
+  other:
+  - 'ADAM: viewer/lib/consumers.mjs (loadPlatforms) and viewer/lib/cicd.mjs (readAppRepos)'
+root_class: a copy nothing keeps in step, presented as the thing it copies
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: lane j''s note on the r13 system review''s repos/ retirement (CHG-R14J-002)'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: viewer/lib/consumers.mjs::loadPlatforms
+status: open

@@ -94,6 +94,29 @@ async function readRepoLanguage(root, repo) {
   };
 }
 
+/**
+ * The team repositories the package's app manifests name (`frontend/<app>.yaml`: `repositories[].repo` and the
+ * runtime), each a node repository. **Since r14 the code lives there, not under `repos/`** (CHG-R14J-002 retired the
+ * code trees; `repos/<repo>` keeps each repository's project documents only), so a repository's language is read off
+ * the manifest that names it (CHG-R14INT-005).
+ */
+async function readAppRepos(root) {
+  const names = (await readdir(path.join(root, 'frontend')).catch(() => [])).filter((n) => /\.ya?ml$/i.test(n));
+  const repos = new Map();
+  for (const n of names) {
+    const doc = yaml.load(await readFile(path.join(root, 'frontend', n), 'utf8').catch(() => '')) ?? {};
+    for (const r of doc.repositories ?? []) {
+      if (!r?.repo) continue;
+      const entry = repos.get(r.repo) ?? { name: r.repo, apps: [], runtimes: new Set() };
+      if (doc.app) entry.apps.push(doc.app);
+      if (doc.runtime) entry.runtimes.add(doc.runtime);
+      repos.set(r.repo, entry);
+    }
+  }
+  return [...repos.values()].map((r) => ({ ...r, runtimes: [...r.runtimes] }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 async function readWorkflows(root, repo) {
   const rel = `repos/${repo}/.github/workflows`;
   const names = (await readdir(path.join(root, rel)).catch(() => []))
@@ -448,7 +471,9 @@ function findFindings({ workflows, images, recipes, configs, repos, storage, sta
   // Nothing builds an image, and nothing deploys one.
   const allText = workflows.flatMap((w) => w.jobs.flatMap((j) => j.steps))
     .map((s) => `${s.uses ?? ''} ${s.run ?? ''}`).join('\n');
-  if (images.length && !/docker\s+build|docker\/build-push|buildx|kaniko/i.test(allText)) {
+  // **No workflow in the package is not no pipeline** (CHG-R14INT-005): since r14 the pipelines live in the team
+  // repositories (GitLab), not under `repos/`, so these two are judged only when the package holds workflows.
+  if (workflows.length && images.length && !/docker\s+build|docker\/build-push|buildx|kaniko/i.test(allText)) {
     out.push({
       severity: 'error',
       kind: 'no-image-build',
@@ -459,7 +484,7 @@ function findFindings({ workflows, images, recipes, configs, repos, storage, sta
       where: workflows.map((w) => w.file).slice(0, 3),
     });
   }
-  if (configs.length && !/docker\s+compose|kubectl|helm|terraform|\bdeploy\b/i.test(allText)) {
+  if (workflows.length && configs.length && !/docker\s+compose|kubectl|helm|terraform|\bdeploy\b/i.test(allText)) {
     out.push({
       severity: 'error',
       kind: 'no-cd',
@@ -573,6 +598,7 @@ export async function buildCicd(root) {
   const storage = await readStorage(root);
   const stale = await readDecisionStatus(root);
 
+  const appRepos = await readAppRepos(root);
   const repos = await Promise.all(repoNames.map(async (name) => {
     const mine = workflows.filter((w) => w.repo === name);
     const { languages, holds } = await readRepoLanguage(root, name);
@@ -585,6 +611,12 @@ export async function buildCicd(root) {
       gates: mine.reduce((sum, w) => sum + w.gates.length, 0),
     };
   }));
+  // The app repositories the manifests name and repos/ does not hold (CHG-R14INT-005): node, by their runtime.
+  for (const r of appRepos) {
+    if (repos.some((x) => x.name === r.name)) continue;
+    repos.push({ name: r.name, workflows: 0, toolchain: [], languages: ['node'], holds: ['apps'], gates: 0,
+      apps: r.apps, runtimes: r.runtimes });
+  }
 
   const findings = findFindings({ workflows, images, recipes, configs, repos, storage, stale });
 
