@@ -346,7 +346,7 @@
   ]
  },
  "MessageDispatch": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "grant-holder-write",
   "x-ticvai-append-only": "queuedAt",
   "x-ticvai-index": [
    [
@@ -1224,7 +1224,14 @@
     "$ref": "#/components/schemas/MessageChannel"
    },
    "address": {
+    "x-ticvai-data-class": "personal",
     "type": "string"
+   },
+   "addressHash": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**The address as the deterministic hash a subject contact's value hash uses** (ADR-0023: a suppression list is checked without holding the address it suppresses; as amended 3 November 2026, CHG-R14M-001). Written by the server with the row; a send is matched on it. **An erasure keeps the suppression**: Marketing's erasure replaces `address` with `erased` and keeps this hash, so a guest who asked not to be contacted stays uncontacted after they are erased."
    },
    "reason": {
     "type": "string"

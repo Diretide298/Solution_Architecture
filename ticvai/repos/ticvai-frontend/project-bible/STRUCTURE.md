@@ -45,7 +45,7 @@ there does not.
       adding-things             recipes for anything structural
 
     architecture/               how it is built
-      cells-and-tenancy         cell = tenant x jurisdiction
+      cells-and-tenancy         a cell is a region, a database per tenant (ADR-0038)
       hierarchy-and-authz       seven levels, deny-overrides-allow
       offline-and-sync          outbox, ordering, conflict policy
       data-model                spine aggregates, partitioning, data mask

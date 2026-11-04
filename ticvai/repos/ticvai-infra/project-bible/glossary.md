@@ -27,6 +27,7 @@ Sources: client-supplied reference definitions · MoM decisions 30 Jul – 12 Au
 | **Category** | A node in a hierarchy that groups Products for navigation, reporting and defaults: `ProductCategory` in `catalogue.yaml`, with parent and child. Scoped variants (`RentalCategory`, `ReportCategory`) group within their own module. **Not a Seat Category**, which prices a seat. *Proposed, client to approve (audit R146)* | Department (for products), Group |
 | **Component** | A constituent part of a Product's definition | Element, Part |
 | **Attribute** | An axis that generates Product variants. Adding an attribute value auto-creates sellable variants | Option, Variant, Modifier |
+| **Variant** | One sellable form of a Product, generated from its Attributes: a row of `catalogue.variant`, referenced as `variantId` (`AddCartLineRequest.variantId`, `GuestBundle.variantId`; ADAM CR-597, Chinmay, 3 November 2026, which names the field). **Never the Attribute axis itself**: the Attribute row's ban is on calling an axis a variant | — |
 | **Metric Sheet** | The grid defining product-to-price relationships across axes | Matrix, Grid, Price table |
 | **Price List** | A named set of prices, scoped by channel, season or calendar | Tariff, Rate card |
 | **Envelope** | A capacity allocation container. Combines with Space Structure and Seat Category to form capacity | Pool, Bucket, Quota |

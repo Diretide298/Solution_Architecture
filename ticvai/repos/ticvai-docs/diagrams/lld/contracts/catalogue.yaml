@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 269 operations
+title: catalogue — 274 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -144,7 +144,6 @@ operations:
   - catalogue.audit_entry
   - catalogue.price
   - catalogue.price_list
-  - catalogue.product_version
 - operation: bulkUpdateCatalogueProducts
   verb: POST
   path: /products/bulk-update
@@ -623,6 +622,46 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: getChannelFeePayment
+  verb: GET
+  path: /channel-fee-payment
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getChannelPricingCommercial
+  verb: GET
+  path: /channel-pricing-commercial
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getChannelProfile
+  verb: GET
+  path: /channel-profile
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: getChannelReadinessValidation
+  verb: GET
+  path: /channel-readiness-validation
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getDynamicPriceRule
   verb: GET
   path: /pricing/dynamic-rules/{ruleId}
@@ -789,6 +828,16 @@ operations:
   offline: false
   reads:
   - catalogue.variant_dimension
+  writes: []
+- operation: getProductCatalogue
+  verb: GET
+  path: /product-catalogue
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getProductChannelTexts
   verb: GET
@@ -3379,6 +3428,7 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+  - catalogue.audit_entry
   - catalogue.price_list
 - operation: setPricing
   verb: PUT
@@ -3967,6 +4017,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.channel_capacity
   - catalogue.performance
   writes:
   - cache:idempotency

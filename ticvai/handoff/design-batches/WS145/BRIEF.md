@@ -139,7 +139,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-839` | Dynamic Product Pages | B | 8 | 0 | 6 | 16 | 3 | 0 | — | notStarted (—) |
 | `BO-840` | Mobile App CMS | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-841` | Personalization & Localization | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-842` | SEO Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-842` | SEO Management | D | 13 | 0 | 6 | 12 | 1 | 0 | — | notStarted (—) |
 | `BO-843` | Publishing, Analytics & Audit | B | 2 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch

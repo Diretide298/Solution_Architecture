@@ -26,7 +26,10 @@
     {
      "to": "WEB-031",
      "trigger": "My Reservations",
-     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId, resourceId only pre-select (optional); WEB-031 finds productId (listGroupPackages) itself, and WEB-031 opens on its own"
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds productId, so an edge into it carries them"
     },
     {
      "to": "GST-014",
@@ -109,12 +112,21 @@
     "provenance": "r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)"
    },
    {
+    "operationId": "listTicketTransfers",
+    "contract": "orders",
+    "purpose": "The guest's sent transfers, drawn as the approved frame's sent rows in Transfer & resale, above the resale rows; no component of its own and the layout does not change (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001). Called with `direction=sent` when the screen opens, every page read until `hasMore` is false, and again after Transfer tickets succeeds. One row per transfer, in the order returned (soonest to lapse first). Title: the line of the `listMyOrders` order whose `id` is the transfer's `orderId` and whose `entitlementIds` hold its `ticketIds`, written as the order cards write that line (more order pages are read when the order is not loaded). Second line: the channel part, ' · ', the state part. Channel part from `recipientChannel`: email is 'Sent to ' plus `recipientAddressMasked` (always masked, as the server sends it), sms is 'Sent by SMS', whatsapp is 'Sent by WhatsApp'. State part: offered is 'waiting to be claimed' (no date); claimed is 'claimed' plus the day and month of `claimedAt`; expired is 'expired, tickets returned' plus the day and month of `expiresAt`; cancelled is 'cancelled'. 'N sent this year' at the top right counts the sent transfers whose `offeredAt` falls in the current calendar year in the venue's time zone; the read has no total. The loading and empty states that speak of the ticket transfer list mean this list: a guest with no sent transfers sees the first-run empty state. The rows' Details and Cancel transfer buttons are not part of this read (no operation exists for them).",
+    "trigger": "onLoad",
+    "shownBy": "Sent by SMS · waiting to be claimed",
+    "provenance": "ADAM CR-593, Chinmay, 3 November 2026 (CHG-CR593-001)"
+   },
+   {
     "operationId": "transferOrderTickets",
     "contract": "orders",
     "purpose": "Transfer tickets to another guest",
     "trigger": "onAction",
     "invalidates": [
-     "listMyOrders"
+     "listMyOrders",
+     "listTicketTransfers"
     ]
    },
    {
@@ -716,7 +728,7 @@
     {
      "to": "WEB-030",
      "trigger": "Ticket Transfer",
-     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: transferId only pre-selects (optional); WEB-030 finds orderId (listMyOrders) itself, and WEB-030 opens on its own"
+     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: transferId only pre-selects (optional); WEB-030 finds orderId (listTicketTransfers) itself, and WEB-030 opens on its own"
     },
     {
      "to": "WEB-031",

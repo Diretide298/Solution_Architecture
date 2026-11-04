@@ -1269,6 +1269,7 @@ operations:
   - cache:idempotency
   - cache:resolution
   - fnb.menu
+  - platform.outbox
 - operation: quoteWaitTime
   verb: POST
   path: /waitlist/{entryId}/quote
@@ -1299,10 +1300,12 @@ operations:
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
+  - fnb.table_visit_server
   - identity.principal
   writes:
   - cache:idempotency
   - fnb.table_visit
+  - fnb.table_visit_server
 - operation: rebalanceStationLoad
   verb: POST
   path: /kitchen-stations/rebalance
@@ -1474,6 +1477,7 @@ operations:
   - cache:resolution
   - fnb.menu
   - fnb.menu_version
+  - platform.outbox
 - operation: scheduleMenuPublish
   verb: POST
   path: /menus/{menuId}/schedule
@@ -1956,6 +1960,7 @@ operations:
   - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
+  - fnb.sub_bill
   - fnb.table_visit
   writes:
   - cache:idempotency

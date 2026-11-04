@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1003` | Hold Command Center | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1003` | Hold Command Center | C | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1004` | Hold Type Master | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1005` | Hold Pool Creation | C | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1005` | Hold Pool Creation | C | 0 | 13 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1006` | Hold Rule Assignment | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1007` | Expiration Rules | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1008` | Automatic Hold Release | C | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1009` | Release, Convert & Reassign | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1010` | Hold Approval Workflow | B | 0 | 12 | 6 | 5 | 0 | 3 | — | notStarted (—) |
-| `BO-1011` | Priority & Conflict Resolution | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1012` | Hold Utilization & Audit | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1008` | Automatic Hold Release | C | 0 | 13 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1009` | Release, Convert & Reassign | C | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1010` | Hold Approval Workflow | B | 11 | 13 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `BO-1011` | Priority & Conflict Resolution | C | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1012` | Hold Utilization & Audit | C | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -193,6 +193,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
+| Holder subject | the name it points at, never the id | The person the seats are held for, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this … |
 | ID | the name it points at, never the id | — |
 | Hold type | the name it points at, never the id | — |
 | Performance | the name it points at, never the id | — |
@@ -291,7 +292,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-1004`, `BO-1005`, `BO-1006`, `BO-1007`, `BO-1008`, `BO-1009`, `BO-1010`, `BO-1011`, `BO-1012`.
@@ -478,6 +479,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
+| Holder subject | the name it points at, never the id | The person the seats are held for, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this … |
 | ID | the name it points at, never the id | — |
 | Hold type | the name it points at, never the id | — |
 | Performance | the name it points at, never the id | — |
@@ -561,7 +563,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create seat hold pool, Cancel.
 - [ ] Every transition is wired: `BO-1003`.
@@ -861,6 +863,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
+| Holder subject | the name it points at, never the id | The person the seats are held for, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this … |
 | ID | the name it points at, never the id | — |
 | Hold type | the name it points at, never the id | — |
 | Performance | the name it points at, never the id | — |
@@ -950,7 +953,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Release seat hold pool, Cancel, What publishing changes.
 - [ ] Every transition is wired: `BO-1003`.
@@ -1000,6 +1003,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
+| Holder subject | the name it points at, never the id | The person the seats are held for, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this … |
 | ID | the name it points at, never the id | — |
 | Hold type | the name it points at, never the id | — |
 | Performance | the name it points at, never the id | — |
@@ -1087,7 +1091,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Release seat hold pool, Cancel, What publishing changes.
 - [ ] Every transition is wired: `BO-1003`.
@@ -1125,7 +1129,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Performance | picker: choose a performance | — | — | `listSeatHoldPools` ?performanceId |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Create approval request** (modal, opened by *Create approval request*; *Create approval request* calls `createApprovalRequest`, *Cancel* sends nothing)
+
+**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createApprovalRequest` body |
+| Kind `kind` | select | required | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | — | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. | `createApprovalRequest` body |
+| Subject contract `subjectContract` | text field | required | — | — | — | Which contract owns the thing being approved. | `createApprovalRequest` body |
+| Subject type `subjectType` | text field | required | — | — | — | — | `createApprovalRequest` body |
+| Subject `subjectId` | text field | required | — | — | — | A reference, never a copy. A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists. | `createApprovalRequest` body |
+| Scope path `scopePath` | text field | required | — | — | — | — | `createApprovalRequest` body |
+| Summary `summary` | text area | required | — | max length 300 | — | What the approver sees in their queue before opening it. | `createApprovalRequest` body |
+| Amount `amount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createApprovalRequest` body |
+| Attributes `attributes` | key and value settings | optional | — | — | — | — | `createApprovalRequest` body |
+| Justification `justification` | text area | optional | — | max length 1000 | — | — | `createApprovalRequest` body |
+| Is draft `isDraft` | toggle | optional | off | — | — | True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129). | `createApprovalRequest` body |
+
+Errors to draw in the form: 409 An open request already exists for this subject. Two approvals for one subject is how the same money goes out twice. (ApprovalStateProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): the request is not a draft and no active rule matches its kind and subject type at its `scopePath` (for …
 
 #### Outputs: what the screen shows and produces
 
@@ -1135,6 +1157,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
+| Holder subject | the name it points at, never the id | The person the seats are held for, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this … |
 | ID | the name it points at, never the id | — |
 | Hold type | the name it points at, never the id | — |
 | Performance | the name it points at, never the id | — |
@@ -1152,7 +1175,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create approval request (primary button) | navigation or local | — | — | — | — |
+| Create approval request (primary button) | `createApprovalRequest` POST `/approval-requests` | CreateApprovalRequest | ApprovalRequest | 409 An open request already exists for this subject. Two approvals for one subject is how the same money goes out twice. (ApprovalStateProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): the request is … | opens modal first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Data it reads**: `listSeatHoldPools` (onLoad, What is being requested)
@@ -1241,8 +1264,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409, 422).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1010?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create approval request, Cancel.
 - [ ] Every transition is wired: `BO-1003`.
@@ -1295,6 +1318,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
+| Holder subject | the name it points at, never the id | The person the seats are held for, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this … |
 | ID | the name it points at, never the id | — |
 | Hold type | the name it points at, never the id | — |
 | Performance | the name it points at, never the id | — |
@@ -1382,7 +1406,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save seat hold type, Cancel.
 - [ ] Every transition is wired: `BO-1003`.
@@ -1435,6 +1459,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
+| Holder subject | the name it points at, never the id | The person the seats are held for, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this … |
 | ID | the name it points at, never the id | — |
 | Hold type | the name it points at, never the id | — |
 | Performance | the name it points at, never the id | — |
@@ -1512,7 +1537,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1012?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1003`.
@@ -1640,7 +1665,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request + approvals.escalation + approvals.request_approver","x-ticvai-exactly-one-of":[["requestedByPrincipalId","requestedBySubjectId"]],"required":["id","kind","status","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"attributes":{"type":"object","nullable":true,"readOnly":true,"additionalProperties":true,"description":"**The attributes the raising contract sent** (`CreateApprovalRequest.attributes`), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). The rules match on them (`matchAttributes`), also when a draft is submitted later, and the contract that applies the decision reads them back with the request (`approvals#requestRecords`): Subscription's `approval.granted` consumer takes a tenant suspension's `action`, mode, reason, `effectiveAt` and notice from here. Null where none were sent."},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal","description":"The principal who raised the request, or for whom the raising contract raised it. **Null when a guest raised it** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016): a guest is a subject, not a principal, so a guest's privacy request (`exportSubjectData`, `deleteGuestAccount`) records `requestedBySubjectId` instead. Exactly one of the two is set."},"requestedBySubjectId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"pii.subject","description":"**The guest who raised the request** (ADAM CR-101; CHG-R10ID-016), set by the server from the guest session; null for a request a principal raised. Segregation of duties holds for it too: no approver decides a request raised for their own subject."},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"approvers":{"type":"array","readOnly":true,"description":"**The approver chain, fixed when the request is routed** (ADAM CR-102, option 1, accepted 15 October 2026; CHG-R10ID-015). One `approvals.request_approver` row per approver per level, written by `createApprovalRequest` (when not a draft) and `submitApprovalRequest` from the matched rule's roles and the delegations in force at that moment (`isDelegate` true for a delegate standing in). The chain is not recomputed at decision time: `decideApprovalRequest` refuses `notInApproverChain` to anyone with no row at the current level, so a role change after routing neither adds nor removes an approver of a request in flight. An escalation (`escalateApprovalRequest`, the SLA job) and a reroute (`rerouteOnNoApprover`) add rows; a returned or information-requested request keeps its chain when resubmitted. Rows are never edited or deleted.","items":{"type":"object","required":["level","principalId","isDelegate"],"properties":{"level":{"type":"integer","minimum":1,"description":"The level of the chain this approver decides at."},"principalId":{"type":"string","format":"uuid","x-ticvai-references":"identity.principal","description":"The approver, a principal of the tenant."},"isDelegate":{"type":"boolean","description":"True when the approver stands in for another through an `ApprovalDelegation` in force at routing."}}}},"pendingApprovers":{"x-ticvai-persisted":false,"description":"The rows of `approvers` at `currentLevel` who have not decided yet, with their names; derived, not stored (CHG-R10ID-015).","type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n\n**Stored as `approvals.escalation` rows, one per escalation, in order** (14 October 2026, CHG-CRD-006, ADAM CR-078: the table held only `id` and `request_id`, so `escalateApprovalRequest` wrote nothing the escalation reports could read). Written by `escalateApprovalRequest` (manual, `wasAutomatic` false) and by the SLA job on a breach (`wasAutomatic` true); read by `getApprovalAnalytics` and the SLA and escalation monitors. Append-only: an escalation is never edited.\n","items":{"type":"object","required":["at","toLevel","wasAutomatic"],"properties":{"at":{"type":"string","format":"date-time","x-ticvai-column":"escalated_at"},"reason":{"type":"string","maxLength":300,"description":"The requester's or approver's reason; for an automatic escalation, the SLA rule that fired."},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"},"escalatedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who escalated it by hand (`escalateApprovalRequest`'s caller); null for an automatic one."},"addedApproverPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The approver the escalation added at `toLevel`; the original approver stays in the chain."}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"assignmentNote":{"type":"string","maxLength":500,"nullable":true,"readOnly":true,"description":"The note `assignApprovalRequest` was given, kept with the assignment (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009)."},"approvalMatrixId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"approvals.matrix","description":"The matrix routing chose at submit (with `matrixVersion`), so a decision is checked against the matrix the request was routed by (CHG-R8MIG-009)."},"ruleId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"approvals.rule","description":"The matrix rule that matched on kind, scope, amount and `attributes` (CHG-R8MIG-009)."},"cancelReason":{"type":"string","maxLength":500,"nullable":true,"readOnly":true,"description":"Why the request was cancelled, as `cancelApprovalRequest` was given it (CHG-R8MIG-009)."},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
 "ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},
 "CreateApprovalRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["id","kind","subjectContract","subjectType","subjectId","scopePath","summary"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"subjectContract":{"type":"string","description":"Which contract owns the thing being approved."},"subjectType":{"type":"string"},"subjectId":{"type":"string","description":"**A reference, never a copy.** A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.\n"},"scopePath":{"type":"string"},"summary":{"type":"string","maxLength":300,"description":"What the approver sees in their queue before opening it."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"attributes":{"type":"object","additionalProperties":true},"justification":{"type":"string","maxLength":1000},"isDraft":{"type":"boolean","default":false,"description":"True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"}}},
-"SeatHoldPool": {"type":"object","x-ticvai-persistence":"seating.hold_pool","description":"Board 6.3. **Utilisation decides next season's allocation.**","required":["holdTypeId","performanceId"],"properties":{"id":{"type":"string","format":"uuid"},"holdTypeId":{"x-ticvai-references":"seating.hold_type","type":"string","format":"uuid"},"performanceId":{"x-ticvai-references":"catalogue.performance","type":"string","format":"uuid"},"seatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"seatCount":{"type":"integer","readOnly":true},"usedCount":{"type":"integer","readOnly":true},"releasedCount":{"type":"integer","readOnly":true},"holderName":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"releaseAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","partiallyReleased","released","expired"]},"createdBy":{"type":"string","format":"uuid"},"scopePath":{"type":"string"}}},
+"SeatHoldPool": {"type":"object","x-ticvai-persistence":"seating.hold_pool","description":"Board 6.3. **Utilisation decides next season's allocation.**","required":["holdTypeId","performanceId"],"properties":{"holderSubjectId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-subject-kind":"contact","x-ticvai-references":"pii.subject","description":"**The person the seats are held for, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind contact; null while none is given."},"id":{"type":"string","format":"uuid"},"holdTypeId":{"x-ticvai-references":"seating.hold_type","type":"string","format":"uuid"},"performanceId":{"x-ticvai-references":"catalogue.performance","type":"string","format":"uuid"},"seatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"seatCount":{"type":"integer","readOnly":true},"usedCount":{"type":"integer","readOnly":true},"releasedCount":{"type":"integer","readOnly":true},"holderName":{"x-ticvai-pii":{"store":"subject.displayName","subject":"holderSubjectId"},"x-ticvai-data-class":"personal","type":"string","nullable":true},"reason":{"type":"string","nullable":true},"releaseAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","partiallyReleased","released","expired"]},"createdBy":{"type":"string","format":"uuid"},"scopePath":{"type":"string"}}},
 "SeatHoldType": {"type":"object","x-ticvai-persistence":"seating.hold_type","description":"Board 6.2. **A hold with no release rule becomes a permanent hole in the map.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"purpose":{"type":"string","enum":["production","house","accessibility","press","sponsor","contractual","maintenance","distancing"]},"ownerRole":{"type":"string","nullable":true},"releaseRule":{"type":"string","enum":["manual","hoursBeforePerformance","onDate","onSelloutThreshold"],"default":"hoursBeforePerformance"},"releaseHoursBefore":{"type":"integer","nullable":true},"releaseTo":{"type":"string","enum":["generalSale","anotherPool","remainsHeld"],"default":"generalSale"},"countsAgainstCapacity":{"type":"boolean","default":true,"description":"**Whether held seats are still \"sold out\".** A production hold that reads as availability puts a show on sale it cannot honour.\n"},"visibleToGuest":{"type":"boolean","default":false},"scopePath":{"type":"string"}}}
 }
 ```

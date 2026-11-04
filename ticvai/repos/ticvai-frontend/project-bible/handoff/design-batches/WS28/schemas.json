@@ -9,6 +9,14 @@
    "quotedUnitPrice"
   ],
   "properties": {
+   "holderSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "guest",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The named holder of the line, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind guest; null while none is given."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -109,6 +117,11 @@
     "description": "What the client charged, from its local bundle."
    },
    "holderName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "holderSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -2102,7 +2115,21 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001): `createPayment` re-locks the quote on the order and, when `chargeTotal` changed, answers `409 quoteExpired` with the new quote before charging anything (ADAM CR-577)."
+   },
+   "termsVersion": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the `termsAndConditions` version `checkoutCart` took in `termsAccepted`, checked against the policy in force. Null when the checkout sent none; never filled in from the policy in force."
+   },
+   "termsAcceptedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the guest accepted `termsVersion`, the time `checkoutCart` wrote the order (ADAM CR-576). Null with `termsVersion`."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2332,6 +2359,7 @@
      ],
      "properties": {
       "fullName": {
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "maxLength": 200
       },
@@ -2345,16 +2373,19 @@
        "default": "participant"
       },
       "email": {
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "format": "email",
        "nullable": true
       },
       "phone": {
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "maxLength": 30,
        "nullable": true
       },
       "dateOfBirth": {
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "format": "date",
        "nullable": true
@@ -2409,12 +2440,25 @@
       "fullName"
      ],
      "properties": {
+      "subjectId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "x-ticvai-subject-kind": "guest",
+       "x-ticvai-references": "pii.subject",
+       "description": "**The participant, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `fullName`, `email`, `phone`, `dateOfBirth` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind guest; null while none is given."
+      },
       "id": {
        "type": "string",
        "format": "uuid",
        "readOnly": true
       },
       "fullName": {
+       "x-ticvai-pii": {
+        "store": "subject.displayName",
+        "subject": "subjectId"
+       },
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "maxLength": 200
       },
@@ -2427,16 +2471,31 @@
        ]
       },
       "email": {
+       "x-ticvai-pii": {
+        "store": "contact.email",
+        "subject": "subjectId"
+       },
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "format": "email",
        "nullable": true
       },
       "phone": {
+       "x-ticvai-pii": {
+        "store": "contact.phone",
+        "subject": "subjectId"
+       },
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "maxLength": 30,
        "nullable": true
       },
       "dateOfBirth": {
+       "x-ticvai-pii": {
+        "store": "subject.dateOfBirth",
+        "subject": "subjectId"
+       },
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "format": "date",
        "nullable": true
@@ -2458,10 +2517,12 @@
   "description": "**What Participants, Guest Lists & Group Structure displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "firstName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "First Name"
    },
    "lastName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "date-time",
     "description": "Last Name"
@@ -2475,10 +2536,12 @@
     "description": "Ticket Category"
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Email"
    },
    "mobile": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Mobile"
    },
@@ -2507,6 +2570,7 @@
     "description": "Credential Status"
    },
    "dateOfBirth": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "date-time",
     "description": "Age/Date of Birth where applicable"

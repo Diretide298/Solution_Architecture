@@ -221,8 +221,8 @@
  "deferredScreens": [],
  "counts": {
   "core": 524,
-  "setup": 269,
-  "allOperations": 2864
+  "setup": 271,
+  "allOperations": 2873
  },
  "services": {
   "AccessService": {
@@ -238,7 +238,7 @@
   "CatalogueService": {
    "core": 38,
    "setup": 51,
-   "total": 470
+   "total": 475
   },
   "FnbService": {
    "core": 57,
@@ -248,7 +248,7 @@
   "IdentityService": {
    "core": 35,
    "setup": 8,
-   "total": 105
+   "total": 108
   },
   "InventoryService": {
    "core": 1,
@@ -272,7 +272,7 @@
   },
   "PlatformService": {
    "core": 3,
-   "setup": 18,
+   "setup": 20,
    "total": 235
   },
   "ReportingService": {
@@ -298,7 +298,7 @@
   "WalletService": {
    "core": 8,
    "setup": 6,
-   "total": 71
+   "total": 72
   },
   "WhiteLabelService": {
    "core": 93,
@@ -952,7 +952,6 @@
    "screens": [
     "GST-009",
     "GST-032",
-    "GST-041",
     "KSK-006",
     "PTR-010",
     "WEB-010",
@@ -2204,7 +2203,7 @@
    "service": "OrderService",
    "contract": "payments",
    "verb": "POST",
-   "path": "/payment-providers",
+   "path": "/payment-provider-connections",
    "perm": "PAYMENT_PROVIDER_MANAGE",
    "platforms": [],
    "screens": [
@@ -3017,6 +3016,21 @@
    ],
    "enables": []
   },
+  "decommissionCell": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/cells/{cellId}/decommission",
+   "perm": "PLATFORM_CELL_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-003"
+   ],
+   "enables": [
+    "control.cell"
+   ]
+  },
   "deleteAccessPointGroup": {
    "part": "setup",
    "service": "AccessService",
@@ -3822,6 +3836,7 @@
    ],
    "screens": [
     "GST-007",
+    "GST-008",
     "GST-009",
     "GST-032",
     "GST-041",
@@ -3832,6 +3847,7 @@
     "WEB-006",
     "WEB-010",
     "WEB-011",
+    "WEB-012",
     "WEB-022"
    ],
    "enables": []
@@ -5030,6 +5046,7 @@
    "screens": [
     "BO-161",
     "GST-004",
+    "GST-007",
     "WEB-004"
    ],
    "enables": []
@@ -7248,6 +7265,7 @@
    "screens": [
     "BO-015",
     "BO-019",
+    "BO-1049",
     "BO-694",
     "CMS-101",
     "GST-005"
@@ -7538,7 +7556,6 @@
     "WEB"
    ],
    "screens": [
-    "ADM-342",
     "ADM-699",
     "EMP-042",
     "GST-073",
@@ -8159,6 +8176,7 @@
     "BO-008",
     "BO-012",
     "BO-048",
+    "BO-1049",
     "EMP-034",
     "GST-008",
     "GST-041",
@@ -8197,6 +8215,7 @@
     "BO-014",
     "BO-048",
     "BO-094",
+    "BO-1049",
     "BO-125",
     "BO-877",
     "CMS-006",
@@ -8811,7 +8830,8 @@
     "GST-012",
     "GST-013",
     "GST-045",
-    "WEB-018"
+    "WEB-018",
+    "WEB-030"
    ],
    "enables": []
   },
@@ -9519,6 +9539,23 @@
    ],
    "enables": []
   },
+  "provisionCell": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "subscription",
+   "verb": "POST",
+   "path": "/tenants/{tenantId}/cells",
+   "perm": "PLATFORM_CELL_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-005",
+    "ADM-012"
+   ],
+   "enables": [
+    "control.cell",
+    "control.cell_tenant"
+   ]
+  },
   "publishAiGovernancePolicy": {
    "part": "setup",
    "service": "AiService",
@@ -9917,8 +9954,11 @@
    ],
    "screens": [
     "GST-007",
+    "GST-008",
+    "GST-009",
     "WEB-006",
-    "WEB-011"
+    "WEB-011",
+    "WEB-012"
    ],
    "enables": []
   },
@@ -10146,7 +10186,8 @@
     "DEV-002"
    ],
    "enables": [
-    "control.developer_account"
+    "control.developer_account",
+    "control.developer_member"
    ]
   },
   "registerGuest": {
@@ -11691,7 +11732,8 @@
     "DEV-002"
    ],
    "enables": [
-    "control.developer_account"
+    "control.developer_account",
+    "control.developer_member"
    ]
   },
   "setDeviceAssignment": {
@@ -13458,7 +13500,6 @@
     "POS"
    ],
    "screens": [
-    "BO-488",
     "POS-005"
    ],
    "enables": []
@@ -14734,6 +14775,7 @@
   "ai.forecast_accuracy",
   "ai.training_run",
   "catalogue.rate",
+  "control.cell_endpoint",
   "identity.redirect_host",
   "identity.subject_holding",
   "inventory.serialised_item",

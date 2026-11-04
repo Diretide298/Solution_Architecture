@@ -4221,8 +4221,10 @@ paths:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-022 Membership Plans"
         - "P02 GST-007 Select Date & Time"
+        - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
@@ -5173,7 +5175,6 @@ paths:
         - "P01 WEB-033 Shop"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
-        - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-read-via:

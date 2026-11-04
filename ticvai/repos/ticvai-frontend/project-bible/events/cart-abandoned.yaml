@@ -12,7 +12,10 @@ payload:
   type: uuid
 - field: token
   type: string
-  notes: How a recovery link returns the guest to it
+  x-ticvai-secret: field-encrypted
+  notes: How a recovery link returns the guest to it. It opens the cart, so it is a credential, field-encrypted
+    through IFieldEncryption by the publisher and decrypted by the marketing consumer when it builds the link,
+    never in clear in the outbox or the broker (r13 system review C-16, CHG-R14H-004)
 - field: subjectId
   type: uuid
   notes: Null where the cart was never claimed

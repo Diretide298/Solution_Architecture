@@ -1,6 +1,6 @@
 # Contract backlog — index
 
-**182 edits raised by the requirement walk — 5 open, 175 done, 2 withdrawn.**
+**182 edits raised by the requirement walk — 3 open, 177 done, 2 withdrawn.**
 
 Generated from `handoff/contract-backlog.json` by `tools/build-backlog-index.py`.
 Every gap the walk finds lands here. **The ones carrying a decision or a cost also carry a CF** and are in `conflicts.md`; the rest are work rather than conflict, and putting them in the conflict register would bury the open decisions among them.
@@ -9,8 +9,8 @@ Every gap the walk finds lands here. **The ones carrying a decision or a cost al
 |---|---|
 | Needs a decision | **1** |
 | Deferred | **1** |
-| Settled | **3** |
-| **Total open** | **5** |
+| Settled | **1** |
+| **Total open** | **3** |
 
 
 ## Needs a decision — tracked as a conflict — 1
@@ -29,14 +29,12 @@ Crosses contracts, or has no precedent to copy. Deciding now would design it in 
 |---|---|---|---|---|---|---|
 | **BL-095** | 2.13 | 2.13.26, 2.16.4, 2.16.16 | Media stock is not modelled — neither which stock a printer is loaded with, nor how much of it is left. | `tenancy, inventory` | — | — |
 
-## Settled — made at section close — 3
+## Settled — made at section close — 1
 
 One contract, and that contract already shows how it should look.
 
 | ID | Section | Refs | What | Contracts | Blocked on | CF |
 |---|---|---|---|---|---|---|
-| **BL-180** | 12.1 | 12.1.2, 12.1.16, 12.1.18, 12.1.19, 12.1.21,… | Accreditation is contracted, but 13 requirements are only partly served. | `accreditation, reporting, public-api` | — | — |
-| **BL-181** | 18.8 | 18.8.3 | A staff user cannot verify a presented accreditation. | `accreditation, access` | — | — |
 | **BL-182** | various | 1.1.32, 1.2.57, 1.2.59, 1.3.31, 1.4.21, 1.4… | Requirements left partly covered by the build of 29 September. | `access, ai, approvals, catalogue, identity, marketing-crm, orders, payments, promotions, reporting, resources, subscription, white-label, workforce` | — | — |
 
 ## Closed
@@ -312,6 +310,8 @@ All three halves of the stated fix are there. **Signing**: `WebhookSubscription.
 **Advisory, never decisive.** It cannot reach `outcome` or `denyReason`, and `entitlementGated` stays `true` and read-only: the gate admits on the entitlement and everything else sits on top without replacing it. 3.2.45 asks for rejection and CF-130 records why the package deviates — a Ladies Night ticket is already gendered at the point of sale, and these events are staffed.
 
 **Remaining: the steward's display, which is a screen rather than a contract.** |
+| **BL-180** | 12.1 | Accreditation is contracted, but 13 requirements are only partly served. | **Done.** Built in the build pass of 29 September (commit c17dc66f), recorded as closed on 3 November 2026 when the r14 authored-inputs check found the entry open with every one of its 13 rows CONTRACTED. Item by item: `listAccreditationDocuments` reads an application's documents; `listMyAccreditationCredentials`, `issueMyAccreditationWalletPass` and `deliverAccreditationCredential` are the holder's own read and delivery; the credential kind `qr` carries `encodedIdentifier` and `symbology`; `resubmitAccreditationApplication` is the resubmit path; `renewAccreditation` and the event `accreditation.renewalDue` are renewal and its window; reporting seeds the five accreditation KPIs (12.1.50) over three accreditation sources; `accreditation.applicationDecided`, `accreditation.credentialIssued` and `accreditation.holderStatusChanged` are delivered to webhooks (12.1.53); `exportAccreditationData` is the export; `cloneAccreditationProgramme` copies a programme. accreditation.yaml no longer cites access.validateEntry, and P11 binds only accreditation operations. |
+| **BL-181** | 18.8 | A staff user cannot verify a presented accreditation. | **Done.** `verifyAccreditationCredential` (accreditation): a credential identifier in, the holder's photo, category, zones and validity out; bound on the staff scanner (screens/P07-staff-scanner.yaml). Built 29 September (commit c17dc66f); recorded as closed on 3 November 2026 by the r14 authored-inputs check. |
 | **BL-124** | 4.5 | No costing method behind stock valuation. | **Withdrawn.** Withdrawn. 4.5.35 reverdicted CONTRACTED against createInventoryItem. |
 | **BL-158** | 15.2 | No warehouse execution layer — putaway, picking, packing, dispatch or warehouse tasks. | **Withdrawn.** Withdrawn — the client decided against a warehouse execution layer at the 18 August workshop. |
 

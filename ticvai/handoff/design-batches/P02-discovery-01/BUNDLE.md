@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-063` | Explore – Search Results | A | 2 | 18 | 5 | 3 | 0 | 0 | guest | notStarted (client-verified) |
+| `GST-063` | Explore – Search Results | A | 2 | 20 | 5 | 3 | 0 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
@@ -153,6 +153,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Name localised | in the reader's language | `catalogue.product.name_localised` (ADAM CR-533); the screen shows the guest's language and falls back to `name`. |
 | Summary | text | The product's description, `catalogue.product.description` (ADAM CR-533); no summary column exists. |
 | Summary localised | in the reader's language | `catalogue.product.description_localised` (ADAM CR-533); the screen shows the guest's language and falls back to `summary`. |
+| Booking entry | chip: Date first, Product first, Venue map, Time window, Bundle | Which booking screen Book opens, by the rule on `Product.bookingEntry` (ADAM CR-591); null on staff reads and for a product with no Book. |
+| Bundle | the name it points at, never the id | The promotions bundle Book opens, set only when `bookingEntry` is `bundle` (ADAM CR-591). |
 | From price | AED 1,234.50 | The lowest price `catalogue#variantPriceRecords` gives the product's sellable variants at the venue on the caller's channel now (ADAM … |
 | Guest listing | chip: Bookable, Info only, Hidden | How a product appears to a guest (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to … |
 | Not bookable label | in the reader's language | The product's label, for an `infoOnly` result; null otherwise (decided 29 September, rev 3 REV3-14). |
@@ -251,7 +253,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-063?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-002`, `GST-004`.

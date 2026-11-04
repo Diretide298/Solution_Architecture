@@ -791,3 +791,65 @@ reads:
     transaction under the caller''s row-level security, never over the service route (tools/check-cross-module-reads.py
     XR-INPROCESS-HOST). SELECT on approvals.rule is the one the operations role lacked; the write still goes to
     approvals'' setApprovalMatrix as an operation.'
+- id: XDR-150
+  reader: operations
+  tables: [catalogue.variant, catalogue.product, catalogue.price, catalogue.price_list, catalogue.price_assignment,
+    catalogue.rate]
+  privileges: [SELECT]
+  queries: [catalogue#variantPriceRecords]
+  operations: [createMerchandise, updateMerchandise]
+  narrow: true
+  added: '2026-11-03'
+  decision_ref: 'ADAM CR-559, Chinmay, 3 November 2026 (posted on #30874 and #30876: "ask catalogue#variantPriceRecords
+    in process (the operations host already reads Catalogue''s price tables for the wishlist, so no new grant)"),
+    settled under the lead''s "Dont hold r13. approve them and rever tto the devs" of the same day'
+  why: 'retail createMerchandise and updateMerchandise (operations host, #30874, #30876) copy a merchandise item''s
+    list_price from its catalogue variant, never typed in: catalogue#variantPriceRecords with variantId, the outlet''s
+    venueId, channel pos, at now and no customerSegment, asked in process through Catalogue''s own query class in the
+    caller''s transaction under the caller''s row-level security, as variantListingFacts asks it for the wishlist. The
+    SELECT on the six tables the query reads is the one XDR-007 (variant, product, price, price_list,
+    price_assignment) and XDR-055 (rate) already grant the operations role; no grant or migration is added. Only
+    these two operations ask it under this entry.'
+- id: XDR-195
+  reader: operations
+  tables: [identity.principal]
+  columns: [id, is_active, valid_from, valid_to]
+  privileges: [SELECT]
+  queries: [identity#principalRecords]
+  operations: [reassignServer]
+  # `narrow`, as XDR-010: this entry grants its query to reassignServer only, and only these four columns.
+  narrow: true
+  added: '2026-11-04'
+  decision_ref: 'ADAM CR-595, Chinmay, 3 November 2026 (posted on #32798: "The operations host reads Identity''s
+    principalRecords in process for reassignServer only (id, is_active, valid_from, valid_to and nothing else), as was
+    done for Access''s one Identity read"), approved under the lead''s "take the recommended decision unless its very
+    very important", 4 November 2026'
+  why: 'fnb reassignServer (operations host, #32798) refuses a server who is unknown, inactive, or outside the
+    principal''s validity at recordedAt (400 validation on serverPrincipalId). identity.principal is Identity''s, in
+    commerce, and no host composes Identity''s query classes (ADR-0055 as amended 2 November). The lead chose the narrow
+    in-process read already chosen for Access (XDR-010, CR-302): the operations host asks identity#principalRecords by
+    id through Identity''s own query class, in the caller''s transaction under the caller''s row-level security, and the
+    grant is SELECT on id, is_active, valid_from and valid_to only (`columns`). No other operations host operation reads
+    identity.principal in process under this entry.'
+- id: XDR-196
+  reader: operations
+  tables: [identity.principal]
+  columns: [id, is_active, subject_id]
+  privileges: [SELECT]
+  queries: [identity#principalRecords]
+  operations: [getDeveloperAccount, createApiClient, revokeApiCredential]
+  # `narrow`, as XDR-010 and XDR-195: this entry grants its query to these three operations only, and only these
+  # three columns. The email the operations match is not a column of identity.principal since r14 (CHG-R14M-001):
+  # it is read from pii through identity#subjectDetails over Identity's service route, which needs no grant.
+  narrow: true
+  added: '2026-11-04'
+  decision_ref: 'ADAM CR-565 and CR-569 point 2, Chinmay (the correction posted on #31389, #31295 and #31383, 4
+    November 2026: "the operations role gets SELECT on identity.principal (id, email, is_active) only, as Access''s
+    XDR-010"), under the lead''s "take the recommended decision unless its very very important"; with lane m''s move
+    of identity.principal.email into pii.* (CHG-R14M-001), reconciled as CHG-R14INT-006'
+  why: 'public-api getDeveloperAccount, createApiClient and revokeApiCredential (operations host; #31389, #31295,
+    #31383) match a tenant-session caller''s verified email to an active control.developer_member. The principal is
+    read in process through Identity''s own query class under the caller''s row-level security: id, is_active and
+    subject_id only (`columns`). Its email is kept in pii.subject_contact from r14 (ADR-0023 as amended), so it is
+    asked from identity#subjectDetails over the service route, and the operations role is granted nothing in pii. No
+    other operations host operation reads identity.principal in process under this entry.'

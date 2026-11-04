@@ -1,7 +1,7 @@
 {
  "createPaymentProviderConnection": {
   "method": "POST",
-  "path": "/payment-providers",
+  "path": "/payment-provider-connections",
   "contract": "payments",
   "summary": "Connect a provider",
   "permission": "PAYMENT_PROVIDER_MANAGE",
@@ -63,7 +63,7 @@
  },
  "listPaymentProviderConnections": {
   "method": "GET",
-  "path": "/payment-providers",
+  "path": "/payment-provider-connections",
   "contract": "payments",
   "summary": "Gateways, PSPs and acquirers, and what each can do",
   "permission": "PAYMENT_VIEW",
@@ -156,7 +156,7 @@
  },
  "testPaymentProviderConnection": {
   "method": "POST",
-  "path": "/payment-providers/{connectionId}/test",
+  "path": "/payment-provider-connections/{connectionId}/test",
   "contract": "payments",
   "summary": "Prove the connection works before anybody pays through it",
   "permission": "PAYMENT_PROVIDER_MANAGE",

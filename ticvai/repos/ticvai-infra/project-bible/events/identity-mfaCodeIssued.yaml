@@ -38,9 +38,12 @@ payload:
   notes: mfa_challenge.expires_at, ten minutes after issue; the consumer retries until then
 - field: destination
   type: string
-  notes: The email address, field-encrypted through IFieldEncryption, never in clear
+  x-ticvai-secret: field-encrypted
+  notes: The email address, field-encrypted through IFieldEncryption, never in clear (the marker since the r13 system
+    review B-10, CHG-R14H-004)
 - field: code
   type: string
+  x-ticvai-secret: field-encrypted
   notes: The 6 random digits, field-encrypted through IFieldEncryption, never in clear; Identity stores only its PHC
     hash
 consumers:

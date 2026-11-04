@@ -29,7 +29,7 @@ packages:
 contracts:
 - fnb
 - reporting
-deployment:
+deployment: &id001
   target: browser
   distribution: served from the cell
   bundleUpdate: on next idle
@@ -39,6 +39,12 @@ deployment:
   networkAssumption: venue LAN, and it must survive losing it
   releaseCadence: '**Deployed when the kitchen is closed, never during service.** A display that restarts
     mid-service loses the rail a chef is reading.'
+platformProfiles:
+- platform: P15
+  formFactor: kiosk
+  runtime: reactWeb
+  offlineCapable: true
+  deployment: *id001
 screenCount: 10
 byWave:
   wave1: 10

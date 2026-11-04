@@ -898,7 +898,8 @@
        ]
       },
       "reference": {
-       "type": "string"
+       "type": "string",
+       "description": "What the item points at. For kind `termsAccepted`, the order and its `orders.sales_order.terms_version`, the terms the guest accepted at checkout (ADAM CR-576)."
       }
      }
     }

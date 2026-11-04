@@ -17,8 +17,9 @@ This check holds both ends:
                 models tj.relies_on reads)
   J-READ-MODEL  a reporting consumer keeps a separate read model or dimension: ADR-0016 rules out separate read
                 models, reports read the owning modules' data (the lead, 2 November 2026: "Drop them")
-  J-EMITTER     an event with no emitter whose emittedWhen names an operation: the operation goes in `emittedBy`
-                (an event no operation or job emits, whose text names neither, is printed)
+  J-EMITTER     an event no operation (`emittedBy`) and no declared job (`emits`) writes; where its emittedWhen
+                names an operation, that operation goes in `emittedBy` (since r14, CHG-R14J-010, an event whose text
+                names neither fails too: it was printed, and five events, two with critical consumers, had none)
   J-SHAPE       a declaration that is not well formed: module is its contract, host workers (ticvai-ai for AI;
                 `undecided` only with a `decision`), a known trigger kind (event exactly when it consumes), an
                 ISO-8601 `every`, moves and events and tables and operations that exist, writes in the module's own
@@ -208,10 +209,16 @@ def findings(jobs: dict, states: dict, events: dict, ops: dict, lineage: dict, c
         if ev.get("emittedBy") or e in job_emits:
             continue
         named = sorted({w for w in re.findall(r"\b([a-z][A-Za-z0-9]+)\b", ev.get("emittedWhen") or "") if w in ops})
+        critical = sorted({x.get("context") for x in ev.get("consumers") or [] if x.get("isCritical")})
         if named:
             bad.append(("J-EMITTER", e, f"emittedWhen names {', '.join(named)}, and emittedBy is empty"))
         else:
-            notes.append(f"NO EMITTER {e}: its emittedWhen names no operation or declared job")
+            # **An event nothing emits fails, it is not printed** (r13 system review B-09; CHG-R14J-010): five events
+            # had no emitter and were notes here, fnb.menuPublished among them, which carries allergen changes to two
+            # critical consumers; a consumer was built and waited for an event no handler wrote.
+            bad.append(("J-EMITTER", e, f"{ev.get('_file', e)}: no operation (`emittedBy`) and no declared job "
+                                        "(`emits`) writes it"
+                                        + (f", and its consumers {', '.join(critical)} are critical" if critical else "")))
     for o, x in sorted(ops.items()):
         names = handoff_names(x.get("text") or "")
         if names and o not in relied:
@@ -272,6 +279,13 @@ def self_test() -> list:
     for want in ("J-READ-MODEL", "J-EMITTER"):
         if want not in rules:
             fails.append(f"{want} did not fire")
+    orphan = json.loads(json.dumps(ev_ok))
+    orphan["menu.published"] = {"name": "menu.published", "emittedWhen": "a menu goes live",
+                                "consumers": [{"context": "ai", "purpose": "Reindex", "isCritical": True,
+                                               "operation": "reindexMenu"}]}
+    b, _ = findings(good, st, orphan, ops, lin, contracts, plan, tables)
+    if not any(r == "J-EMITTER" and k == "menu.published" and "critical" in m for r, k, m in b):
+        fails.append("J-EMITTER did not fail an event no operation or job emits (B-09)")
     b, _ = findings({}, st, ev_ok, ops, lin, contracts, plan, tables)
     rules = {r for r, _, _ in b}
     for want in ("J-TRANSITION", "J-CONSUMER", "J-HANDOFF"):

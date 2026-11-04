@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 105 operations
+title: identity — 108 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -22,6 +22,7 @@ operations:
   - identity.principal_credential_history
   writes:
   - cache:idempotency
+  - identity.offline_pin_verifier
   - identity.principal
   - identity.principal_credential
   - identity.principal_credential_history
@@ -447,6 +448,19 @@ operations:
   offline: false
   reads:
   - identity.guest_identity_verification
+  writes: []
+- operation: getOfflineStepUpPackage
+  verb: GET
+  path: /auth/offline-step-up-package
+  scope: workstation
+  permission: null
+  audience:
+  - device
+  offline: false
+  reads:
+  - identity.offline_pin_verifier
+  - identity.open_shift_marker
+  - identity.principal_credential
   writes: []
 - operation: getPasswordPolicy
   verb: GET
@@ -987,6 +1001,7 @@ operations:
   - identity.role_permission
   writes:
   - cache:idempotency
+  - identity.offline_pin_verifier
   - identity.principal_credential
   - identity.refresh_token
   - identity.session
@@ -1063,6 +1078,22 @@ operations:
   writes:
   - cache:idempotency
   - identity.subject_data_export_part
+- operation: recordSubjectDetails
+  verb: POST
+  path: /internal/subjects/details
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - pii.subject
+  - pii.subject_contact
+  - pii.subject_document
+  - pii.subject_network_identifier
 - operation: refreshToken
   verb: POST
   path: /auth/refresh
@@ -1419,6 +1450,20 @@ operations:
   - cache:idempotency
   - identity.guest_identity_verification
   - pii.subject_document
+- operation: submitSubjectDataPart
+  verb: POST
+  path: /internal/subject-data-parts
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - identity.subject_data_export_part
+  - identity.subject_erasure_part
 - operation: suggestRoleAssignment
   verb: GET
   path: /role-suggestions
@@ -1604,4 +1649,7 @@ operations:
   - identity.role_permission
   writes:
   - cache:idempotency
+  - identity.offline_pin_verifier
+  - identity.offline_step_up
   - identity.principal_credential
+  - platform.outbox

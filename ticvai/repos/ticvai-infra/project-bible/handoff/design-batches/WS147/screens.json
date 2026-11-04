@@ -1540,6 +1540,12 @@
        "kind": "secondaryButton",
        "label": "Scheduled expiry",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 13 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send for approval",
+       "operation": "createApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       }
      ]
     }
@@ -1586,6 +1592,36 @@
    "workshopBoard": "wireframes/WS87 Payment Payment Orchestration Board 1.dc.html#adm-567"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 13. 0 of 0 labels bound to a contract property; 9 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Send for approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Send for approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

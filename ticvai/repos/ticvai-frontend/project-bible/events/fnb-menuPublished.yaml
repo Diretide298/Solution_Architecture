@@ -6,7 +6,12 @@ version: 1
 publisher: fnb
 description: A menu is live at an outlet.
 aggregate: menu
-emittedWhen: Menu published or amended at an outlet
+emittedWhen: A menu version goes live at an outlet - publishMenu publishing now, rollbackMenu putting a
+  version back (a new live version), or a scheduled version reaching its outlet's local midnight
+  (the fnb#menuSchedule job)
+emittedBy:
+- fnb.publishMenu
+- fnb.rollbackMenu
 payload:
 - field: menuId
   type: uuid

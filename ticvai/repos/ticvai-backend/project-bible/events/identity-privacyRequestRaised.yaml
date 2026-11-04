@@ -60,5 +60,135 @@ consumers:
   idempotencyKey: approvalRequestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: access
+  purpose: 'access''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: accreditation
+  purpose: 'accreditation''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: ai
+  purpose: 'ai''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: approvals
+  purpose: 'approvals''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: assets
+  purpose: 'assets''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: catalogue
+  purpose: 'catalogue''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: cross-region
+  purpose: 'cross-region''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: ledger
+  purpose: 'finance''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: fnb
+  purpose: 'fnb''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: games
+  purpose: 'games''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: inventory
+  purpose: 'inventory''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: maintenance
+  purpose: 'maintenance''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: orders
+  purpose: 'orders''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: payments
+  purpose: 'payments''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: promotions
+  purpose: 'promotions''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: queue
+  purpose: 'queue''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: rental
+  purpose: 'rental''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: 'reporting''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: resources
+  purpose: 'resources''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: retail
+  purpose: 'retail''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: seating
+  purpose: 'seating''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: tenancy
+  purpose: 'tenancy''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: transport
+  purpose: 'transport''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: venue-map
+  purpose: 'venue-map''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: wallet
+  purpose: 'wallet''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: workforce
+  purpose: 'workforce''s part of the guest''s privacy request: for access, write its rows of the subject as one object in the tenant''s private storage; for deletion, erase the personal fields it keeps outside pii.*; either way record the part with identity submitSubjectDataPart (r13 review B-01, CHG-R14M-001)'
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 30 days after publication
 notes: No state model emits this.

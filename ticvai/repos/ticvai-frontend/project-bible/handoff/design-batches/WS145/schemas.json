@@ -1259,7 +1259,7 @@
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
-  "description": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).\n\n**Who sanitises, and against what.** Every operation that writes a value of this schema (`createContentPage`, `updateContentPage`, `setFaqs`, `setPolicy`), and `createContentBlock` and `updateContentBlock` for a `richText` block's `text`, runs each language's HTML through one shared sanitiser in the White-label module before storing it: Ganss.Xss (HtmlSanitizer, MIT). The stored value is the sanitised HTML, and that is what is returned and served to every reader.\n- **Allowed tags**: p, br, hr, strong, b, em, i, u, s, sub, sup, h2, h3, h4, ul, ol, li, blockquote, a, img, table, thead, tbody, tr, th, td, span.\n- **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img; colspan and rowspan on th and td.\n- **URL schemes**: https, mailto and tel for href; https only for src.\n- **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute, style, and any javascript: or data: URL is removed.\n",
+  "description": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).\n\n**Who sanitises, and against what.** Every operation that writes a value of this schema (`createContentPage`, `updateContentPage`, `setFaqs`, `setPolicy`), and `createContentBlock` and `updateContentBlock` for a `richText` block's `text`, runs each language's HTML through one shared sanitiser in the White-label module before storing it: Ganss.Xss (HtmlSanitizer, MIT). The stored value is the sanitised HTML, and that is what is returned and served to every reader.\n- **Allowed tags**: p, br, hr, strong, b, em, i, u, s, sub, sup, h2, h3, h4, ul, ol, li, blockquote, a, img, table, thead, tbody, tr, th, td, span.\n- **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img; colspan and rowspan on th and td.\n- **URL schemes**: https, mailto and tel for href, and a relative internal link, a path starting with a single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923; CHG-CR401-002); https only for src. An `http:` link is removed.\n- **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute, style, and any javascript: or data: URL is removed.\n",
   "additionalProperties": {
    "type": "string"
   }
@@ -2103,10 +2103,12 @@
   "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "nullable": true
@@ -2116,6 +2118,7 @@
     "nullable": true
    },
    "address": {
+    "x-ticvai-data-class": "business",
     "allOf": [
      {
       "$ref": "#/components/schemas/white-label::LocalisedText"

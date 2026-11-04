@@ -118,6 +118,21 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "ticvai_order_access",
+    "in": "cookie",
+    "required": false
    }
   ],
   "requestBody": "CreatePaymentRequest",
@@ -255,6 +270,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "ticvai_order_access",
+    "in": "cookie",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -353,6 +373,21 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "ticvai_order_access",
+    "in": "cookie",
+    "required": false
    }
   ],
   "requestBody": null,

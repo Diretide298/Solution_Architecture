@@ -420,6 +420,11 @@
   }
  },
  "AiMessage": {
+  "x-ticvai-index": [
+   [
+    "subjectId"
+   ]
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.message",
   "required": [
@@ -430,6 +435,13 @@
    "createdAt"
   ],
   "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The guest whose conversation the message is in, so erasure finds it** (r13 system review C-11; the lead, 3 November 2026: \"ai.conversation and the AI messages get a subject id erasure can find\"; CHG-R14M-001). Copied from the conversation's `subjectId` when the message is written; null in a staff conversation. `eraseSubject` deletes the subject's messages by it."
+   },
    "id": {
     "type": "string",
     "format": "uuid"

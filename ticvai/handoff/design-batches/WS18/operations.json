@@ -123,19 +123,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MfaMethod"
- },
  "listSegregationRules": {
   "method": "GET",
   "path": "/segregation-rules",

@@ -464,7 +464,7 @@ Set on `CMS-007` Page Builder through `createContentPage`, `updateContentPage`. 
 |---|---|---|---|---|---|---|---|
 | Slug `pages.slug` | text field | yes | pattern `^[a-z0-9-]+$` | — | the content and policy pages | — | on publish (CMS-014): web at once, the app on its next launch |
 | Content pages title `pages.title` | text, one per language | yes | English and Arabic (Arabic right to left) | — | the content and policy pages | Keyed by ISO 639-1 code. Every enabled language should be present. | on publish (CMS-014): web at once, the app on its next launch |
-| Body `pages.body` | rich text, one per language | yes | - URL schemes: https, mailto and tel for href; https only for src. | — | the content and policy pages | Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001). | on publish (CMS-014): web at once, the app on its next launch |
+| Body `pages.body` | rich text, one per language | yes | - URL schemes: https, mailto and tel for href, and a relative internal link, a path starting with a single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923 … | — | the content and policy pages | Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001). | on publish (CMS-014): web at once, the app on its next launch |
 | Content pages is enabled `pages.isEnabled` | toggle | no | — | on | the content and policy pages | BL-005. Enablement is not publication. | on publish (CMS-014): web at once, the app on its next launch |
 | Icon `pages.iconAssetRef` | upload, or pick from the media library | no | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the content and policy pages | — | on publish (CMS-014): web at once, the app on its next launch |
 | Category code `pages.categoryCode` | text field | no | — | — | GST-057 | — | on publish (CMS-014): web at once, the app on its next launch |
@@ -477,7 +477,7 @@ Set on `CMS-018` Consent & Legal through `setPolicy`. Reaches the content and po
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Body `policies.body` | rich text, one per language | yes | - URL schemes: https, mailto and tel for href; https only for src. | — | the content and policy pages | Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001). | on publish (CMS-014): web at once, the app on its next launch |
+| Body `policies.body` | rich text, one per language | yes | - URL schemes: https, mailto and tel for href, and a relative internal link, a path starting with a single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923 … | — | the content and policy pages | Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001). | on publish (CMS-014): web at once, the app on its next launch |
 | Requires reconsent `policies.requiresReconsent` | toggle | yes | — | — | the content and policy pages | True prompts existing guests to consent again on next launch. Material changes to a privacy notice generally require it. | on publish (CMS-014): web at once, the app on its next launch |
 | Effective from `policies.effectiveFrom` | date picker | no | 1 Oct 2026 (dd MMM yyyy) | — | the content and policy pages | The day the version takes effect, UTC. Missing is the publish day (UTC); before today (UTC) is `400 effective-from-in-past` (ADAM CR-392). | on publish (CMS-014): web at once, the app on its next launch |
 
@@ -494,7 +494,7 @@ Set on no CMS screen calls it yet through `setFaqs`. Reaches the FAQ screens.
 | Categories: entries `faqs.categories[].entries` | repeatable rows | yes | — | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
 | Entries: iD `faqs.categories[].entries[].id` | picker: choose an id | yes | shows names, sends the id | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
 | Entries: question `faqs.categories[].entries[].question` | text, one per language | yes | English and Arabic (Arabic right to left) | — | the FAQ screens | Keyed by ISO 639-1 code. Every enabled language should be present. | on publish (CMS-014): web at once, the app on its next launch |
-| Entries: answer `faqs.categories[].entries[].answer` | rich text, one per language | yes | - URL schemes: https, mailto and tel for href; https only for src. | — | the FAQ screens | Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001). | on publish (CMS-014): web at once, the app on its next launch |
+| Entries: answer `faqs.categories[].entries[].answer` | rich text, one per language | yes | - URL schemes: https, mailto and tel for href, and a relative internal link, a path starting with a single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923 … | — | the FAQ screens | Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001). | on publish (CMS-014): web at once, the app on its next launch |
 | Entries: sort order `faqs.categories[].entries[].sortOrder` | number field | no | — | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
 | Entries: is published `faqs.categories[].entries[].isPublished` | toggle | no | — | — | WEB-029 | — | on publish (CMS-014): web at once, the app on its next launch |
 
@@ -565,7 +565,7 @@ Set on `CMS-026` Cookie Banner & Preference Center Designer through `setCookieBa
 | Logo `cookieBanner.logoAssetId` | upload, or pick from the media library | no | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
 | Cookie banner title `cookieBanner.title` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
 | Body `cookieBanner.body` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
-| Position `cookieBanner.position` | radio group | yes | Top · Bottom · Popup · Modal | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Position `cookieBanner.position` | radio group | yes | Top · Bottom · Popup · Modal | — | GST-001, GST-007, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
 | Theme `cookieBanner.themeId` | text field | no | — | — | GST-001, WEB-001 | The white-label theme it takes colours and fonts from. | on publish (CMS-014): web at once, the app on its next launch |
 | Buttons `cookieBanner.buttons` | repeatable rows | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
 | Buttons: action `cookieBanner.buttons[].action` | radio group | yes | Accept all · Reject non essential · Manage preferences · Save preferences · Do not sell or share | — | GST-001, WEB-001, WEB-016 | — | on publish (CMS-014): web at once, the app on its next launch |
@@ -655,7 +655,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `GST-004` Item Detail | Booking settings (tenant, with per-venue overrides) (4) |
 | `GST-005` What's On | the shell only |
 | `GST-006` Item Detail – Event / Exhibition | the shell only |
-| `GST-007` Select Date & Time | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16) |
+| `GST-007` Select Date & Time | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16); Cookie banner (1) |
 | `GST-008` Tickets & Add-ons | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16); Help me choose (19) |
 | `GST-009` Review & Payment | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16) |
 | `GST-010` Booking Confirmation | the shell only |

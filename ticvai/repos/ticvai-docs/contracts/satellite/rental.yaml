@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Rental
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 40
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
@@ -55,7 +56,10 @@ info:
 
     '
 servers:
-- url: https://api.ticvai.com/v1
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 x-ticvai-jobs:
@@ -75,6 +79,15 @@ x-ticvai-jobs:
     reliesOn: [quoteRentalPrice]
     for: Rental nightly quote purge.
     source: ['contracts/satellite/rental.yaml']
+  subjectDataPart:
+    module: rental
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [rental.agreement_signature, rental.participant]
+    writes: []
+    for: 'rental''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /rental-products:
     get:
@@ -1367,6 +1380,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings:
     get:
+      x-ticvai-personal-data: gated
       operationId: listRentalBookings
       x-ticvai-consumed-by:
         - "P06 EMP-071 Rental Checkout Command Center"
@@ -1429,6 +1443,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createRentalBooking
       x-ticvai-consumed-by:
         - "P08 BO-535 New Rental Booking Wizard"
@@ -1502,6 +1517,7 @@ paths:
         type: string
         format: uuid
     get:
+      x-ticvai-personal-data: gated
       operationId: getRentalBooking
       x-ticvai-consumed-by:
         - "P06 EMP-072 Voucher Scan & Reservation Retrieval"
@@ -1545,6 +1561,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
+      x-ticvai-personal-data: gated
       operationId: updateRentalBooking
       x-ticvai-consumed-by:
         - "P08 BO-537 Customer & Participant Information"
@@ -1617,6 +1634,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: signRentalAgreement
       x-ticvai-consumed-by:
         - "P08 BO-538 Group Rental & Participant Management"
@@ -1637,6 +1655,7 @@ paths:
       - rental
       x-ticvai-permission: RENTAL_BOOK
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -1659,6 +1678,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalAgreementSignature'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: 'The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is signed.'
           x-ticvai-problem-types: [rental-booking-cancelled, rental-booking-already-settled]
@@ -1677,6 +1698,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: checkOutRental
       x-ticvai-consumed-by:
         - "P06 EMP-077 Safety & Handover Checklist"
@@ -1840,6 +1862,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: extendRental
       x-ticvai-consumed-by:
         - "P06 EMP-084 Extension Pricing & Confirmation"
@@ -1925,6 +1948,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: swapRentalEquipment
       x-ticvai-consumed-by:
         - "P06 EMP-085 Equipment Swap / Replacement"
@@ -2189,6 +2213,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/overdue:
     get:
+      x-ticvai-personal-data: gated
       operationId: listOverdueRentals
       x-ticvai-consumed-by:
         - "P06 EMP-081 Active Rental Operations Command Center"
@@ -3872,6 +3897,27 @@ components:
 
         '
       properties:
+        emergencyContactSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: contact
+          x-ticvai-references: pii.subject
+          description: '**The participant''s emergency contact, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `emergencyContact` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind contact; null while none is given.'
+        guardianSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The participant''s guardian, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `guardianName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
+        participantSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The participant, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `name`, `dateOfBirth`, `idNumber` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         scopePath:
           type: string
           readOnly: true
@@ -3880,21 +3926,31 @@ components:
           type: string
           format: uuid
         name:
+          x-ticvai-pii: {store: subject.displayName, subject: participantSubjectId}
+          x-ticvai-data-class: personal
           type: string
         isPrimaryRenter:
           type: boolean
           default: false
         dateOfBirth:
+          x-ticvai-pii: {store: subject.dateOfBirth, subject: participantSubjectId}
+          x-ticvai-data-class: personal
           type: string
           format: date
           nullable: true
         idNumber:
+          x-ticvai-pii: {store: document.number, subject: participantSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         guardianName:
+          x-ticvai-pii: {store: subject.displayName, subject: guardianSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         emergencyContact:
+          x-ticvai-pii: {store: subject.displayName, subject: emergencyContactSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         hasSignedWaiver:
@@ -3910,6 +3966,13 @@ components:
       required:
       - agreementVersion
       properties:
+        signatorySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The signatory, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `signatoryName`, `ipAddress` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string
           format: uuid
@@ -3920,6 +3983,8 @@ components:
         agreementVersion:
           type: string
         signatoryName:
+          x-ticvai-pii: {store: subject.displayName, subject: signatorySubjectId}
+          x-ticvai-data-class: personal
           type: string
         signatoryRole:
           type: string
@@ -3939,6 +4004,8 @@ components:
           type: string
           format: date-time
         ipAddress:
+          x-ticvai-pii: {store: identifier.ipAddress, subject: signatorySubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         scopePath:

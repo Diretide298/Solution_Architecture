@@ -264,6 +264,7 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "recipientEmail": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },

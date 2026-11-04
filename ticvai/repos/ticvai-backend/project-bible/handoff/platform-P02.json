@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-11-03",
+ "generated": "2026-11-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
@@ -163,11 +163,11 @@
    "operations": 15
   },
   {
-   "contract": "access",
+   "contract": "transport",
    "operations": 12
   },
   {
-   "contract": "transport",
+   "contract": "access",
    "operations": 12
   },
   {
@@ -183,11 +183,11 @@
    "operations": 7
   },
   {
-   "contract": "wallet",
+   "contract": "resources",
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "wallet",
    "operations": 6
   },
   {
@@ -199,15 +199,15 @@
    "operations": 5
   },
   {
+   "contract": "seating",
+   "operations": 4
+  },
+  {
    "contract": "retail",
    "operations": 4
   },
   {
    "contract": "promotions",
-   "operations": 4
-  },
-  {
-   "contract": "seating",
    "operations": 4
   },
   {
@@ -280,7 +280,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/select-date-and-time",
-   "operations": 11,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -289,7 +289,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/tickets-and-add-ons",
-   "operations": 7,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -298,7 +298,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/review-and-payment",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -586,7 +586,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/checkout-entry",
-   "operations": 13,
+   "operations": 12,
    "drawn": true
   },
   {

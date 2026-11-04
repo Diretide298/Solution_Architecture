@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 107
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
@@ -339,6 +340,34 @@ x-ticvai-queries:
       draft's languages for a venue-scoped caller before the tenant's first publish. Only the languages are used; the
       draft configuration stays readable by staff at the tenant root only (getTenantConfig, TENANT_CONFIGURE).
     served: [service]
+  publishedBookingFlowSteps:
+    module: white-label
+    table: whitelabel.config_version
+    inputs:
+      venueId: {type: string, format: uuid, description: 'The venue whose published booking flows resolve.'}
+      productIds: {type: array, items: {type: string, format: uuid}, description: 'The products of one page of a guest or visitor read.'}
+    returns:
+      type: array
+      description: 'One item per asked product: productId, the resolved flow type (flowTypeKey) and its enabled step
+        keys in order (stepKeys).'
+      items:
+        type: object
+        required: [productId, resolved]
+        properties:
+          productId: {type: string, format: uuid}
+          resolved: {type: boolean, description: 'True when an enabled published flow resolves for the product.'}
+          flowTypeKey: {type: string, nullable: true, description: 'The resolved flow''s type; when resolved is false, the type the kind rule picks, or null when no type lists the kind.'}
+          stepKeys: {type: array, items: {type: string}, description: 'The resolved flow''s enabled step keys in order; when resolved is false, that type''s default order.'}
+    rule: >-
+      A rule question (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). The flow rule is written once, in the
+      code behind getPublishedBookingFlow, and exposed here: for each product, against the published snapshot's
+      enabled flows of the venue, the product's own bookingFlowId, then its category's, then the venue's enabled
+      default flow for its kind with the same tie rule, exactly as getPublishedBookingFlow resolves it. It answers
+      the resolved flow type and its enabled step keys in order. A product that does not resolve is answered, never
+      refused, so a page is never an error. Asked from another deployable through WhiteLabel's service route
+      (serviceAuth), once per page, by catalogue listProducts, getProduct and searchCatalogue for
+      Product.bookingEntry, the same way Catalogue reads the published booking settings from white-label.
+    served: [service]
   storeAccountRecords:
     module: white-label
     table: whitelabel.store_account
@@ -409,6 +438,18 @@ x-ticvai-jobs:
     - events/approval-rejected.yaml
     - events/catalogue-productPublished.yaml
     - events/catalogue-productWithdrawn.yaml
+  contentPageResanitise:
+    module: white-label
+    host: workers
+    trigger: {kind: timer}
+    reads: [whitelabel.content_page]
+    writes: [whitelabel.content_page, platform.audit_record]
+    reliesOn: [createContentPage, updateContentPage]
+    for: 'The one-off re-save of pages stored before the sanitiser (ADAM CR-401, Chinmay, 3 November 2026, answering
+      #30923; CHG-CR401-002): run once, when the release that ships the link rule is deployed, it puts every published
+      page''s body through the shared sanitiser (LocalisedRichText''s allow-list) and stores the cleaned body where it
+      differs, writing one audit row per page changed; a page already clean is not written. It never runs again.'
+    source: ['contracts/satellite/white-label.yaml']
   contentSchedule:
     module: white-label
     host: workers
@@ -2092,8 +2133,8 @@ paths:
           platform.venue_settings, Tenancy''s data (XDR-004)'
       - query: tenancy#regionSettingsRecords
         route: in-process
-        for: 'the venue''s region time zone, which day is today for openingHoursToday (ADAM CR-338):
-          platform.region_settings, Tenancy''s data (XDR-004)'
+        for: 'the venue''s region time zone, which day is today for openingHoursToday (ADAM CR-338) and each venue''s
+          timeZone (ADAM CR-556 as corrected): platform.region_settings, Tenancy''s data (XDR-004)'
       x-ticvai-audience:
       - device
       - guest
@@ -3910,6 +3951,13 @@ paths:
         Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what
         the response returns, so the editor sees what was kept.
 
+
+        **Pages stored before the sanitiser** (ADAM CR-401, Chinmay, 3 November 2026, answering #30923;
+        CHG-CR401-002): a one-off re-save (the `contentPageResanitise` job) runs every published page''s `body`
+        through the same sanitiser once and stores the cleaned body, writing one audit row per page it changed.
+        After that, a published page whose cleaned body differs from the stored one is refused 409
+        `published-page-locked`, as built.
+
         '
       tags:
       - content
@@ -4249,6 +4297,10 @@ paths:
         for: 'its read of control.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
+      - service
+      security:
+      - bearerAuth: []
+      - serviceAuth: []
       x-ticvai-read-routing: replica
       summary: Read module enablement
       description: 'Shows which modules the tenant has licensed and which are enabled. A module that is
@@ -4259,6 +4311,31 @@ paths:
         in-force contract rule `LicencePosition` states (ADAM CR-449; CHG-CR449-001).
         **A platform operator sends `X-Tenant-Id`** (`TenantId`; APPROVALS-TENANCY-C44) to read a tenant''s
         enablement from the cell that holds many tenants; the cell address is `Tenant.cellHost`.
+
+
+        **Who may call it** (ADAM CR-555, Chinmay, 3 November 2026, option A with the service caller narrowed to
+        Platform; CHG-CR555-001). What it returns does not change; only who may call it. (1) **Staff, as today**: a
+        bearer token with `TENANT_CONFIGURE` at tenant scope, checked through the kernel''s ordinary permission
+        check, not by reading the session''s permission list, so a platform operator''s call works with no change
+        here once platform sign-in lands. (2) **A service call** (`serviceAuth` beside `bearerAuth`): it acts for no
+        person, so no permission is checked; the calling deployable is checked instead, and **only Platform (the
+        Control Plane)** is admitted, the one caller the contracts declare (`setSubscription`,
+        `previewSubscriptionChange` and `removeLicenceAddOn` each list `white-label.getModuleEnablement` among their
+        calls). Any other calling deployable is `403`. A missing, expired or wrong-audience token is `401`, as the
+        kernel''s service sign-in answers; the token is validated only through the kernel''s shared service sign-in,
+        with no token check of this operation''s own. The tenant is the one the kernel sets from the verified call:
+        `X-Tenant-Id` as the Control Plane sends it. A service call without it is `400 tenant-required`, and a tenant
+        this cell does not hold is `404`, as `X-Tenant-Id` in common.yaml says. The read runs at the tenant root and
+        answers exactly the rows, fields and order a staff call gets, so the Control Plane''s downgrade and add-on
+        checks read `isEnabled`, `moduleKey` and `displayName` as this cell returns them. It writes nothing. (3) **A
+        platform operator''s call** (the Platform Console sending `X-Tenant-Id`) belongs to the platform sign-in
+        ticket, which in every cell host builds the check of the Control Plane token and the platform caller, whose
+        tenant permissions are the grant''s, at the tenant root, while a platform-staff grant is open. This
+        operation builds no operator-token check, grant lookup or stand-in platform caller: until that ticket lands
+        an operator''s call is refused as any bearer token not issued for the tenant is (`401`); once it lands, an
+        operator with no open grant is `403`. (4) A Control Plane caller signing in to a cell from outside it is a
+        separate piece of work under the service sign-in ticket (#37051); this operation relies on the kernel''s
+        validation and does not wait for it (tested with a stand-in for the verified service caller).
 
          **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
@@ -4278,6 +4355,26 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ModuleEnablement'
+        '400':
+          description: 'A service call without `X-Tenant-Id` (`tenant-required`; ADAM CR-555, CHG-CR555-001). Nothing
+            is read.'
+          x-ticvai-problem-types: [tenant-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '403':
+          description: 'A staff caller without `TENANT_CONFIGURE` at tenant scope, or a service call from any
+            deployable but Platform (the Control Plane) (ADAM CR-555, CHG-CR555-001).'
+          x-ticvai-problem-types: [forbidden]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
@@ -4578,9 +4675,6 @@ paths:
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-014 Publishing Workflow"
       x-ticvai-names-for-context: [orders.ticket_template]
-      x-ticvai-reads:
-      - table: whitelabel.tenant_config
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: platform-ops#tenantDomainRecords
         route: in-process
@@ -4618,9 +4712,10 @@ paths:
 
         **It reads nothing from Catalogue or Orders** (ADAM CR-476, Chinmay, 2 November 2026). It asks no query
         of either and calls no service route, and the operations role gets no grant on `orders.ticket_template`.
-        It validates the body and writes `cache:preview:{tenantId}:{previewId}` with `expiresAt`; in the same
-        transaction it writes `preview.requested` to the outbox (`previewId`, `platform`, `language`, `outputs`,
-        `productId` as sent, `expiresAt`), then answers `201` with the Preview (CR-106). Rendering the app, the PDF
+        It validates the body and writes `cache:preview:{tenantId}:{previewId}` with `expiresAt`; then it writes
+        `preview.requested` to the outbox (`previewId`, `platform`, `language`, `outputs`, `productId`, `expiresAt`,
+        with the defaults filled in and in the order ADAM CR-586 sets below), then answers `201` with the Preview
+        (CR-106). Rendering the app, the PDF
         ticket and the Wallet passes is the white-label jobs component''s work in the workers host, triggered by
         `preview.requested`: like every consumer in the workers host it asks `catalogue#productRecords` (ids
         `[productId]`) and `orders#ticketTemplateRecords` in process, and Orders implements ticketTemplateRecords
@@ -4640,6 +4735,32 @@ paths:
         event''s `tenantId`. Its time to live is until `expiresAt`. Otherwise createPreview is unchanged: it
         validates, writes the entry and `preview.requested` to the outbox, and answers 201 Preview with
         `previewId`, `url` and `expiresAt`.
+
+
+        **Defaults, the 201, no table read and the write order** (ADAM CR-586, option A, Chinmay, 3 November 2026;
+        CHG-CR586-001). (1) The body stays optional as published. The defaults are filled in before anything is
+        written: `platform` absent means `web`; `outputs` absent means `[app]`; `expiresInHours` absent means 24. The
+        cache entry, the `preview.requested` event and the 201 all carry the values used: `platform` always one of
+        `ios`, `android` or `web`, and `outputs` always a list that is not empty. The event''s `platform` and
+        `outputs` are always present. (2) The 201 answers `previewId`, `url`, `expiresAt`, `platform` and `language`
+        (`language` only when it was sent) and no `outputPreviews`. The new cache entry also holds no
+        `outputPreviews`. The renderer in the workers host adds one entry (`output`, `url`) to the cache entry''s
+        `outputPreviews` as it finishes each output, so the list grows from absent to one entry per output asked
+        for. `getPreview` answers whatever the entry holds at that moment: an output not rendered yet is simply
+        missing from the list, not an error. Each output''s `url` expires with the preview at `expiresAt`. (3)
+        createPreview reads no table. It does not read `whitelabel.tenant_config` and does not refuse when the draft
+        is missing; it has no new error response. Its only reads are the tenant''s platform subdomain hostname,
+        through the one WhiteLabel reader it shares with getPlatformSubdomain. Reading the draft is the renderer''s
+        work, on its own ticket. (4) **Write order**: first the cache entry through the kernel''s keyed store
+        (logical key `preview:{previewId}`, time to live until `expiresAt`). Then `preview.requested` is committed to
+        the outbox in its own database transaction. Then the answer is 201. If the cache write fails, nothing is
+        written and the answer is a server error. If the outbox commit fails after the cache write, the answer is a
+        server error and the entry is left: no event names it, nothing renders it, and it expires at `expiresAt`. A
+        retry with the same `Idempotency-Key` replays as usual. **Contract tests**: a body of `{}` gives 201 with
+        `platform` `web` and no `outputPreviews`, and the event carries `platform` `web` and `outputs` `[app]`; a body
+        with `outputs` `[pdfTicket]` gives an event with `outputs` `[pdfTicket]`; no query runs against
+        `whitelabel.tenant_config`. **For the renderer ticket**: render the draft, read in the white-label module,
+        and add each output to `outputPreviews` as it finishes.
 
         '
       tags:
@@ -4663,6 +4784,8 @@ paths:
                   - ios
                   - android
                   - web
+                  description: Absent means `web` (ADAM CR-586); the value used is what the cache entry, the event
+                    and the 201 carry.
                 theme:
                   type: string
                   deprecated: true
@@ -4675,7 +4798,8 @@ paths:
                   pattern: ^[a-z]{2}$
                 outputs:
                   type: array
-                  description: What to render besides the app (CHG-CSA-041). Absent means `app` only.
+                  description: What to render besides the app (CHG-CSA-041). Absent means `[app]` (ADAM CR-586);
+                    the list used, never empty, is what the cache entry and the event carry.
                   items:
                     type: string
                     enum:
@@ -4723,7 +4847,9 @@ paths:
         not in a table; this answers it as created (its link and rendered outputs), so a reviewer who reloads the
         page sees the same preview. After `expiresAt` it is gone: 404, and the screen offers to create a new one.
         It reads the entry through the kernel''s `IKeyedState` with the logical key `preview:{previewId}`, as
-        createPreview writes it (ADAM CR-507, 3 November 2026).'
+        createPreview writes it (ADAM CR-507, 3 November 2026). It answers whatever the entry holds at that moment
+        (ADAM CR-586, Chinmay, 3 November 2026; CHG-CR586-001): `outputPreviews` grows as the renderer finishes each
+        output, and an output not rendered yet is simply missing from the list, not an error.'
       tags:
       - publishing
       x-ticvai-permission: TENANT_CONFIGURE
@@ -5457,7 +5583,7 @@ paths:
 
         **Changed booking flows and the products they reach** (r8 walk of ticket 28337). The publish gate on
         CMS-103 says which flows changed and which products are affected, and it reads both here. `changes` has an
-        area `bookingFlows` with one entry per flow added, removed or modified (`path` is the flow key).
+        area `bookingFlows` with one entry per flow added, removed or modified (`path` is the flow''s `id`, ADAM CR-547).
         `affectedProducts` lists, for the flows that differ, each product the flow serves, found by the rule
         `Product.bookingFlowId` already states: the product''s own flow, else its category''s, else the venue''s
         default flow for the product''s kind. The server applies that rule on read; nothing is stored.
@@ -5486,7 +5612,7 @@ paths:
         (`features[guestCheckout].isEnabled`). Other arrays of objects are named by index (`[0]`). An array of plain
         values (`languages.languages`, `splashImageAssetRefs`, `customFontAssetRefs`, `enabledPaymentMethods`) is
         one value, compared whole with its order. `bookingFlows` keeps its rule: one entry per flow added, removed
-        or modified, `path` the flow key. (4) One entry per changed value. `modified`: `before` and `after` are the
+        or modified, `path` the flow''s `id` (ADAM CR-547, below). (4) One entry per changed value. `modified`: `before` and `after` are the
         value''s compact JSON text, a string written without its quotes. A value or keyed item present on one side
         only is `added` (`before` null) or `removed` (`after` null), and its JSON text is the whole item. A property
         that is null counts as absent. Entries are ordered by area as listed above, then by `path`. (5)
@@ -5496,6 +5622,27 @@ paths:
         Everything else, `bookingFlows` included, is `runtime`. (6) A `version` or `against` that names no
         config_version of the tenant answers 404 `not-found`. `affectedProducts` is unchanged. The CMS-014, CMS-015,
         CMS-103 and ADM-016 screens do not change.
+
+
+        **The flow key is the booking flow''s id** (ADAM CR-547, Chinmay, 3 November 2026; CHG-CR547-001). Wherever
+        this operation says "the flow key", it means `BookingFlow.id`, the uuid as text. (1) Matching flows: the
+        `bookingFlows` list of each side (a version''s stored snapshot, or the working draft in getTenantConfig''s
+        shape) is taken and the flows are paired by `id`. A flow''s `id` is the same in the draft and in every
+        published version, because publishing copies flows unchanged. (2) `changes` entries for `bookingFlows`: one
+        entry per flow, with area `bookingFlows` and `path` the flow''s `id` (for example `3f2a…-…`). A flow on one
+        side only is `added` (`before` null, `after` the whole flow as compact JSON) or `removed` (`before` the whole
+        flow, `after` null). A flow on both sides is `modified` when any of its editable properties differ:
+        `flowTypeKey`, `name`, `isDefaultForType`, `isEnabled`, `steps` (compared whole, in order) and `settings`.
+        The read-only `id`, `venueId`, `isValid`, `scopePath` and `updatedAt` are not compared, following the rule
+        that read-only properties are not edits. For a modified flow, `before` and `after` are the whole flow from
+        each side as compact JSON. Disabled flows are compared like any other. `bookingFlows` entries are ordered by
+        `path`, after the `bookingFlow` area and before `theme`. (3) `affectedProducts`: for every flow that has a
+        `bookingFlows` entry, each product that flow serves is listed, by the rule already stated (the product''s
+        own `bookingFlowId`, else its category''s, else the venue''s default flow for the product''s kind).
+        `flowKey` is that flow''s `id`. For a removed flow, the rule is resolved against the side that holds it. A
+        product appears once per changed flow that serves it. (4) Nothing else changes: the same response shape,
+        field names, 404 rule and change scope (`bookingFlows` is `runtime`). No migration. The screens that show
+        this diff do not change; a screen that shows a flow finds its name in the snapshot by the `id`.
 
         '
       tags:
@@ -7250,6 +7397,14 @@ paths:
         enabled flow wins. If none resolves, `flowTypeKey` is tried when sent, then the answer is 404 `not-found`. An
         `eventId` that is not an event of the venue (`catalogue#eventRecords` ids [`eventId`] where {`venueId`},
         asked in process) is 404 `not-found`. GST-007 opened from an event sends `eventId`.
+
+
+        **The rule is written once and served to Catalogue** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001).
+        The resolution above lives in one place, the code behind this operation, and is exposed as the service query
+        `white-label#publishedBookingFlowSteps`: given a venue and a list of product ids, it answers for each product
+        the resolved flow type and its enabled step keys in order. Catalogue asks it once per page, by service route,
+        for `Product.bookingEntry`; it never copies the rule. A product that does not resolve is answered with the
+        kind fallback, never an error for the page.
 
         '
       tags:
@@ -9765,6 +9920,7 @@ components:
           - appleAppStore
           - googlePlay
         accountHolderName:
+          x-ticvai-data-class: business
           type: string
           maxLength: 200
           description: The client's legal entity as the store knows it.
@@ -10933,7 +11089,9 @@ components:
         - **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img;
         colspan and rowspan on th and td.
 
-        - **URL schemes**: https, mailto and tel for href; https only for src.
+        - **URL schemes**: https, mailto and tel for href, and a relative internal link, a path starting with a
+        single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923;
+        CHG-CR401-002); https only for src. An `http:` link is removed.
 
         - **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are
         removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute,
@@ -11129,6 +11287,13 @@ components:
                   closes:
                     type: string
                     pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              timeZone:
+                type: string
+                nullable: true
+                description: '**The venue''s time zone, an IANA name** (ADAM CR-556 as corrected, Chinmay, 3 November 2026;
+                  CHG-CR556-002): the venue''s `RegionSettings.timeZone`, read through `regionSettingsRecords`, the zone
+                  `openingHoursToday` already uses. Null when not set. Additive; nothing else changes. Select Date &
+                  Time (GST-007) works out the venue day in it.'
         whatsNew:
           type: array
           maxItems: 10
@@ -11274,9 +11439,11 @@ components:
         '
       properties:
         phone:
+          x-ticvai-data-class: business
           type: string
           nullable: true
         email:
+          x-ticvai-data-class: business
           type: string
           format: email
           nullable: true
@@ -11284,6 +11451,7 @@ components:
           type: string
           nullable: true
         address:
+          x-ticvai-data-class: business
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
           nullable: true
@@ -13391,6 +13559,7 @@ components:
       - previewId
       - url
       - expiresAt
+      - platform
       properties:
         previewId:
           type: string
@@ -13417,7 +13586,11 @@ components:
           type: array
           readOnly: true
           description: '**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay,
-            2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`.'
+            2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`, once
+            rendered. **Grows as the renderer finishes** (ADAM CR-586, Chinmay, 3 November 2026; CHG-CR586-001):
+            absent in the 201 and in the new cache entry; the renderer in the workers host adds one entry (`output`,
+            `url`) as it finishes each output. `getPreview` answers whatever the entry holds: an output not rendered
+            yet is missing from the list, not an error.'
           items:
             type: object
             required:
@@ -13763,7 +13936,7 @@ components:
             properties:
               productId: { type: string, format: uuid }
               name: { type: string }
-              flowKey: { type: string, description: The changed flow that serves this product. }
+              flowKey: { type: string, description: 'The changed flow that serves this product: the flow''s `BookingFlow.id`, the uuid as text (ADAM CR-547). For a removed flow, the flow of the side that holds it.' }
         changes:
           type: array
           items:
@@ -13784,7 +13957,7 @@ components:
                 description: 'The property names below the part joined with `.`; a keyed array item by its key in
                   brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other
                   arrays of objects by index ([0]); an array of plain values is one value. For bookingFlows, the
-                  flow key (ADAM CR-500).'
+                  flow''s `BookingFlow.id`, the uuid as text (ADAM CR-500, CR-547).'
               changeKind:
                 type: string
                 enum:
@@ -14488,4 +14661,5 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Cell-to-cell. The `ai` service proposing Help me choose set-ups (`proposeGuidedChoice`).
+      description: Cell-to-cell. The `ai` service proposing Help me choose set-ups (`proposeGuidedChoice`), and
+        Platform (the Control Plane) reading `getModuleEnablement` for its downgrade and add-on checks (ADAM CR-555).

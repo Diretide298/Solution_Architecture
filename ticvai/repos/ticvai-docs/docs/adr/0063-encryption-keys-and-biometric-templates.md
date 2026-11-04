@@ -106,7 +106,7 @@ algorithm. The rule, for this and every later secret of the same kind:
 - **A lookup on such a value uses the blind index of section 4**: HMAC-SHA-256 under the tenant's blind-index key,
   64 lowercase hex characters (`x-ticvai-secret: blind-index`; `marketing.guest_device.token_fingerprint`). A rotated
   blind-index key is applied by decrypting and re-hashing, never by keeping two.
-- **A password or PIN is an Argon2id PHC string** (ADR-0071, `x-ticvai-secret: argon2id-phc`).
+- **A password or PIN is an Argon2id PHC string** (ADR-0071, `x-ticvai-secret: argon2id-phc`; as amended 3 November 2026, a till's offline step-up verifier is the one unpeppered PIN hash, held field-encrypted, CHG-R14V-001).
 
 The kernel component is action 6 below (KERNEL-FIELD-ENC): one Application abstraction that encrypts, decrypts and
 blind-indexes a value for the current tenant, so no module calls Key Vault itself. `check-contract-storage`

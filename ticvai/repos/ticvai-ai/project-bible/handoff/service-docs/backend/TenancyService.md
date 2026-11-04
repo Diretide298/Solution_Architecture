@@ -13,9 +13,9 @@
 
 ## Why this is a service
 
-**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting them means three services doing the same joins.
+**`platform.scope` is the tenancy spine**: 903 of the 1,177 tables in the schema reference's lineage name it as an anchor (3 November 2026; it was named platform.org_unit until the scope rename). Workforce and approvals are folded in because each is small, both read `platform.scope` constantly and write it rarely, and splitting them means three services doing the same joins.
 
-**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
+**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.pos_shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
 
 **The coupling made it visible.** All 43 of Tenancy's cross-service touches into `orders` were the `shift` contract — 19 writes and 24 reads, the heaviest coupling in the platform, created to solve a cosmetic problem.
 
@@ -1220,6 +1220,8 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 **No route, no request** (lead's ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015). A request that is not a draft and matches no active rule (no rule of its kind and subject type at its `scopePath`, or for subject type `tenant` no active platform rule) is refused `422 no-approval-route` and nothing is written: it is never approved automatically and never left `pending` with nobody to ask. The calling operation passes the refusal on to its own caller (`suspendTenant`, `reactivateTenant`). A rule that matches but whose roles have no holder is a different case (`rerouteOnNoApprover`, `noApproverAvailable`).
 **The platform rule is read from the control plane** ("All as recommended": ADAM CR-330 option A, Chinmay, 29 October 2026). For subject type `tenant` the rule is `control.platform_approval_rule`, Platform's table in the control database, seeded once by the control database's migration (approvers holding `PLATFORM_TENANT_MANAGE`, two approvals, active). This asks `platform-ops#platformApprovalRuleFor` with the request's kind and subject type over the service route, under service sign-in between deployables (#37051), and routes the request by the rule it answers; `found` false is the `422` above. A tenant's own `approvals.matrix` and `approvals.rule` are never read for it.
 
+**Amounts, approvers and the platform rule** (ADAM CR-592, option A, Chinmay, 3 November 2026; CHG-CR592-001). This operation adds three in-process reads: `identity#delegatedAccessRecords`, `tenancy#venueSettingsRecords` (and `tenancy#regionSettingsRecords` when the venue's `currencyCode` is null) and `finance#fxRateRecords`. **Amounts**: the request's venue is the venue node of its `scopePath`. Its currency is that venue's settings `currencyCode`, or its region's currency when that is null. An amount in another currency is converted at the finance rate from the amount's currency to the venue currency, purpose `reporting`, with the latest `effectiveFrom` not after now. The converted amount is compared with the rule's `minAmount` and `maxAmount`, which are read in the venue currency. If there is no such rate, the request is refused `422 fx-rate-unavailable` and nothing is written; a missing rate is never guessed at. The amount is stored as sent. **Approvers for a tenant's own rule**: `identity#delegatedAccessRecords` is asked with where `{roleId}` for each of the matched rule's `approverRoleIds`. A principal is an approver when it has a grant with effect `ALLOW`, `revoked_at` null, `valid_from` absent or not after now, `valid_to` absent or after now, and a `scope_path` that is the request's `scopePath` or an ancestor of it, at the rule's `approverScopeLevel` or above. It must also have no live `DENY` of that role at the request's `scopePath` or above (deny wins, as decided on CR-344), be active in `identity#principalRecords`, and not be the requester (four eyes). Then the approval delegations in force apply, as now (`isDelegate` true). One `approvals.request_approver` row is written per approver per level, in the routing transaction. If the role has no holder, `rerouteOnNoApprover` decides, as already written. **Platform rule** (subject type `tenant`): no `request_approver` rows are written, and no platform operator is copied into the tenant database. The rule's `approverPermission` and `minimumApprovals` are stored on the request in two new nullable columns on `approvals.request`, `platform_approver_permission` and `platform_minimum_approvals` (`ApprovalRequestPlatformRule`), null for every request routed by a tenant rule; `mode` is `parallel` and `totalLevels` 1. `submitApprovalRequest` (#27833) and `evaluateApprovalRequirement` (#30850) match rules the same way and add the same reads; `decideApprovalRequest` (#30849) decides such a request by the stored values. Unchanged and already built: the draft path, the `409` open-request check and the platform rule read.
+
 |  |  |
 |---|---|
 | Permission | `APPROVAL_REQUEST` |
@@ -1363,6 +1365,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 Refused where the approver is the requester (11.1.24), where they do not hold the permission the rule demands, or where the rule requires MFA and the step-up token is absent (11.1.60).
 A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.20) and usually should — six months later the comment is the only record of why the exception was allowed.
 **Return and request information (decided 29 September, readiness close-out; MoM 10 Aug §5.5: Approve, Reject, Return, Request More Information).** `return` sends the request back to the requester to amend (`returned`); `requestInformation` asks the requester a question and stops the SLA clock (`informationRequested`). Neither is a rejection and neither counts against the requester in the rejection rate. Both need a comment saying what is wanted. The requester answers with `submitApprovalRequest` on the same request, and routing resumes at the level that sent it back. **Both are stored as a decision row** (`approvals.decision.decision` `return` or `requestInformation`, the comment in `comment`; R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009), so the request's `decisions[]` shows them. **The SLA restarts, it does not resume**: the answering submit sets `sla_due_at` again to now plus the rule's `slaMinutes` (states/approval-request.yaml); no remaining time is kept.
+**A request routed by the platform rule** (ADAM CR-592, Chinmay, 3 November 2026; CHG-CR592-001): for a request whose `platform_approver_permission` is set (`ApprovalRequestPlatformRule`), the chain check is replaced by this one: an operator is admitted whose platform token holds that permission, who is not the requester and has not decided this request already. The request is approved once `platform_minimum_approvals` different operators have approved, and rejected on the first rejection. The values stored at routing apply; the platform rule is never read again at decision time.
 
 |  |  |
 |---|---|
@@ -1499,6 +1502,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 Returns the matching rule and the resolved approver chain, so the caller can say *"this needs Sara, and she has four hours"* rather than *"this needs approval"*.
 Read-only and deliberately cheap. It runs on the hot path — every refund, every discount, every price override — and a slow answer here is a slow till.
 **Rules match on their condition too** (ADAM CR-102, option 1; CHG-R10ID-015, which replaces the no-condition rule of APPROVALS-TENANCY-C06): the matrix in force (`ApprovalMatrix`) is matched on kind, scope, subject type, amount and `matchAttributes`, and then on the rule's `condition`, evaluated against `attributes` in the language `ApprovalRule.condition` defines; the first rule that matches wins. `createApprovalRequest` and `submitApprovalRequest` route by the same match.
+**The same amount and approver rules** (ADAM CR-592, Chinmay, 3 November 2026; CHG-CR592-001): it matches rules as `createApprovalRequest` does, with the same reads (`identity#delegatedAccessRecords`, `tenancy#venueSettingsRecords` and `tenancy#regionSettingsRecords`, `finance#fxRateRecords`): the amount is compared in the venue currency of `scopePath`, and the approver chain it returns is resolved by the same grant rule.
 
 |  |  |
 |---|---|
@@ -1588,6 +1592,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Whether approval is required, and who would grant it |
+| 422 |  | No exchange rate (fx-rate-unavailable; ADAM CR-592): the amount is in another currency than the request's venue currency and finance has no rate from it to the venue currency, purpose reporting, with… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listApprovalRequests
@@ -3000,7 +3005,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| openShiftId | string (uuid) | yes |  |
+| openShiftId | string (uuid) | yes | The open shift claimed. |
 
 **Response**: `OpenShift`
 
@@ -3983,6 +3988,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | requested_at | timestamptz | yes |  |
 | completed_at | timestamptz | no |  |
 | ai_assessment | jsonb | no | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). |
+| platform_approver_permission | text | no | The platform rule's approverPermission, stored at routing; null for a tenant rule. |
+| platform_minimum_approvals | integer | no | The platform rule's minimumApprovals, stored at routing; null for a tenant rule. |
 
 ### `approvals.request_approver`
 

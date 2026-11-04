@@ -8,7 +8,8 @@ version: 1
 publisher: whitelabel
 description: A tenant asked for a preview of its working draft.
 aggregate: preview
-emittedWhen: createPreview writes the preview's cache entry
+emittedWhen: 'createPreview has written the preview''s cache entry; the event is committed to the outbox after it, in
+  its own database transaction (ADAM CR-586, CHG-CR586-001)'
 emittedBy:
 - createPreview
 payload:
@@ -17,13 +18,15 @@ payload:
   notes: The preview's id, the event's aggregateId
 - field: platform
   type: string
-  notes: ios, android or web
+  notes: 'ios, android or web; always present, the value used: web when the body leaves it out (ADAM CR-586,
+    CHG-CR586-001)'
 - field: language
   type: string
   required: false
 - field: outputs
   type: array
-  notes: app, pdfTicket, appleWalletPass, googleWalletPass
+  notes: 'app, pdfTicket, appleWalletPass, googleWalletPass; always present and never empty, the list used: [app]
+    when the body leaves it out (ADAM CR-586, CHG-CR586-001)'
 - field: productId
   type: uuid
   required: false
@@ -31,7 +34,7 @@ payload:
   type: timestamp
 consumers:
 - context: white-label
-  purpose: 'Render the draft for the platform and language, and the outputs asked for (the PDF ticket and the Wallet passes from the ticket and pass templates), into the preview''s cache entry, served at /previews/{previewId} on the tenant''s platform subdomain until expiresAt. The white-label jobs component in the workers host. Like every consumer in the workers host it asks catalogue#productRecords (ids [productId]) and orders#ticketTemplateRecords in process, Orders'' ticketTemplateRecords being an in-process query class; createPreview itself reads neither (ADAM CR-476, 2 November 2026). It sets the tenant from the event''s tenantId, then reads and writes the cache entry through the kernel''s IKeyedState with the logical key preview:{previewId}, as createPreview writes it and getPreview reads it (ADAM CR-507, 3 November 2026)'
+  purpose: 'Render the draft for the platform and language, and the outputs asked for (the PDF ticket and the Wallet passes from the ticket and pass templates), into the preview''s cache entry, served at /previews/{previewId} on the tenant''s platform subdomain until expiresAt. The white-label jobs component in the workers host. Like every consumer in the workers host it asks catalogue#productRecords (ids [productId]) and orders#ticketTemplateRecords in process, Orders'' ticketTemplateRecords being an in-process query class; createPreview itself reads neither (ADAM CR-476, 2 November 2026). It sets the tenant from the event''s tenantId, then reads and writes the cache entry through the kernel''s IKeyedState with the logical key preview:{previewId}, as createPreview writes it and getPreview reads it (ADAM CR-507, 3 November 2026). It renders the draft, read in the white-label module, and adds one entry (output, url) to the entry''s outputPreviews as it finishes each output (ADAM CR-586, 3 November 2026)'
   idempotencyKey: previewId
   onFailure: retryThenDeadLetter
   isCritical: false

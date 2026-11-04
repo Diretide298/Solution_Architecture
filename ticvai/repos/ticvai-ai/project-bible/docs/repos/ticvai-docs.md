@@ -2,7 +2,8 @@
 
 The documentation repository. The folders it shares with the package (`contracts`, `states`, `flows`, `events`,
 `screens`, `docs`, `frontend`, `tools`, `handoff`, `sources`, `diagrams`) are copies of the package, written by
-`tools/derive-mirrors.py`: never edit them here. The other folders hold the setup standards and older documentation.
+`tools/derive-mirrors.py`: never edit them here. `setup/` is a copy of ADAM's starter docs, `repos/` the rules page of
+each repository, and the other folders older documentation.
 
 ## Start here
 

@@ -23,10 +23,10 @@ tables**, and the distribution is the honest shape of the package:
 
 | Terminal table | Tables that reach it |
 |---|---:|
-| `platform.scope` | 903 |
-| `identity.role` | 769 |
-| `control.partner` | 748 |
-| `approvals.matrix` | 366 |
+| `platform.scope` | 908 |
+| `approvals.matrix` | 746 |
+| `identity.role` | 745 |
+| `control.partner` | 720 |
 | `ledger.legal_entity` | 337 |
 | `access.admission_rules` | 242 |
 | `platform.configuration_profile` | 226 |
@@ -68,7 +68,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `catalogue` — 89 tables
 
-**Root: `catalogue.product`**  ·  own 35 · reach 58 · out 10
+**Root: `catalogue.product`**  ·  own 35 · reach 60 · out 10
 
 - **1 step from the root** — `ai_catalogue_session`, `ai_finding`, `alternative_code`, `audit_entry`, `change_request`, `channel_incident`, `channel_sales_rule`, `configuration_template`, `demand_forecast`, `demand_signal`, `dynamic_pricing_strategy`, `group_package`, `import_job_row`, `lifecycle_action`, `package_pricing`, `price_assignment`, `price_execution`, `pricing_experiment`, `pricing_recommendation`, `pricing_simulation`, `product_channel_assignment`, `product_channel_text`, `product_eligibility_rule`, `product_link`, `product_media`, `product_owner_form`, `product_sale_permission`, `product_version`, `rollback_action`, `tax_rule`, `variant`, `variant_dimension`
 - **2 steps from the root** — `change_request_line`, `competitor_price_observation`, `entitlement_template`, `import_job`, `price`, `price_ladder`, `price_list_version`, `pricing_publication`, `pricing_recommendation_decision`, `waitlist_entry`
@@ -107,7 +107,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `access` — 78 tables
 
-**Root: `access.entitlement`**  ·  own 15 · reach 23 · out 7
+**Root: `access.entitlement`**  ·  own 15 · reach 23 · out 8
 
 > **Overridden.** The arithmetic picks `access.entitlement`. **`access_point` has more inbound edges and the schema is about entitlements.** A gate is equipment; the thing being admitted is the point. `entitlement` also did not exist as a table until 18 August, which is why the arithmetic still favours the gate.
 
@@ -118,7 +118,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `fnb` — 54 tables
+## `fnb` — 55 tables
 
 **Root: `fnb.service_order`**  ·  own 3 · reach 3 · out 4
 
@@ -127,18 +127,18 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **1 step from the root** — `kitchen_ticket`, `order_fulfilment`, `service_order_line`
 - **2 steps from the root** — `kitchen_exception`, `kitchen_ticket_line`
 
-- **Reaches the root through nothing** — `allergen_verdict`, `bill_split`, `cold_chain_event`, `combo`, `combo_slot`, `combo_slot_option`, `corrective_action`, `course_rule`, `delivery_location`, `delivery_location_outlet`, `delivery_policy`, `dining_table`, `guest_note`, `ingredient_substitute`, `kitchen_routing_rule`, `kitchen_sla`, `kitchen_station`, `location_session`, `menu`, `menu_item`, `menu_item_modifier`, `menu_schedule`, `menu_section`, `menu_version`, `modifier_group`, `modifier_option`, `outlet_template`, `prep_sheet_template`, `product_recommendation`, `production_plan`, `production_plan_line`, `production_run`, `recipe`, `recipe_ingredient`, `reservation_policy`, `reservation_table`, `service_charge_policy`, `sold_out_item`, `sub_bill`, `substitution_rule`, `table_combination`, `table_reservation`, `table_session`, `table_visit`, `temperature_checkpoint`, `temperature_log`, `waitlist_entry`, `waste_approval_policy`
+- **Reaches the root through nothing** — `allergen_verdict`, `bill_split`, `cold_chain_event`, `combo`, `combo_slot`, `combo_slot_option`, `corrective_action`, `course_rule`, `delivery_location`, `delivery_location_outlet`, `delivery_policy`, `dining_table`, `guest_note`, `ingredient_substitute`, `kitchen_routing_rule`, `kitchen_sla`, `kitchen_station`, `location_session`, `menu`, `menu_item`, `menu_item_modifier`, `menu_schedule`, `menu_section`, `menu_version`, `modifier_group`, `modifier_option`, `outlet_template`, `prep_sheet_template`, `product_recommendation`, `production_plan`, `production_plan_line`, `production_run`, `recipe`, `recipe_ingredient`, `reservation_policy`, `reservation_table`, `service_charge_policy`, `sold_out_item`, `sub_bill`, `substitution_rule`, `table_combination`, `table_reservation`, `table_session`, `table_visit`, `table_visit_server`, `temperature_checkpoint`, `temperature_log`, `waitlist_entry`, `waste_approval_policy`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `identity` — 42 tables
+## `identity` — 45 tables
 
-**Root: `identity.principal`**  ·  own 25 · reach 396 · out 3
+**Root: `identity.principal`**  ·  own 28 · reach 389 · out 4
 
-- **1 step from the root** — `access_decision`, `access_override`, `access_review_campaign`, `access_review_item`, `authz_audit`, `delegated_access`, `guest_identity_verification`, `membership_history`, `mfa_challenge`, `mfa_method`, `mfa_recovery_code`, `module_access`, `principal_credential`, `principal_external_identity`, `refresh_token`, `role_permission`, `session`
+- **1 step from the root** — `access_decision`, `access_override`, `access_review_campaign`, `access_review_item`, `authz_audit`, `delegated_access`, `guest_identity_verification`, `membership_history`, `mfa_challenge`, `mfa_method`, `mfa_recovery_code`, `module_access`, `offline_pin_verifier`, `offline_step_up`, `principal_credential`, `principal_external_identity`, `refresh_token`, `role_permission`, `session`
 - **2 steps from the root** — `principal_credential_history`
 
-- **Reaches the root through nothing** — `authorisation_policy`, `authorisation_policy_version`, `benefit_usage`, `capability_template`, `customer_membership`, `guest_credential`, `guest_session`, `guest_upload_ref`, `guest_verification_policy`, `module`, `open_shift_marker`, `otp_challenge`, `password_policy`, `permission`, `platform_staff_grant`, `redirect_host`, `role`, `segregation_rule`, `sso_group_mapping`, `sso_provider`, `subject_data_export`, `subject_data_export_part`, `subject_holding`
+- **Reaches the root through nothing** — `authorisation_policy`, `authorisation_policy_version`, `benefit_usage`, `capability_template`, `customer_membership`, `guest_credential`, `guest_session`, `guest_upload_ref`, `guest_verification_policy`, `module`, `open_shift_marker`, `otp_challenge`, `password_policy`, `permission`, `platform_staff_grant`, `redirect_host`, `role`, `segregation_rule`, `sso_group_mapping`, `sso_provider`, `subject_data_export`, `subject_data_export_part`, `subject_erasure_part`, `subject_holding`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -198,7 +198,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `workforce` — 29 tables
 
-**Root: `workforce.employee`**  ·  own 5 · reach 5 · out 2
+**Root: `workforce.employee`**  ·  own 5 · reach 5 · out 3
 
 - **1 step from the root** — `employment`, `leave_balance`, `sync_conflict`, `work_assignment`
 
@@ -379,6 +379,12 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
+## `pii` — 7 tables
+
+**Root: `pii.subject`**  ·  own 7 · reach 142 · out 1
+
+- **1 step from the root** — `consent_identifier`, `subject_biometric`, `subject_contact`, `subject_document`, `subject_identity`, `subject_network_identifier`
+
 ## `sync` — 7 tables
 
 **Root: `sync.guest_link`**  ·  own 4 · reach 5 · out 1
@@ -386,16 +392,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **1 step from the root** — `cross_cell_request`, `cross_region_entitlement`, `dsar_request`, `wallet_authorisation`
 
 - **Reaches the root through nothing** — `cell_connection`, `rejection`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
-## `pii` — 6 tables
-
-**Root: `pii.subject`**  ·  own 5 · reach 117 · out 1
-
-- **1 step from the root** — `subject_biometric`, `subject_contact`, `subject_document`, `subject_identity`
-
-- **Reaches the root through nothing** — `consent_identifier`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 

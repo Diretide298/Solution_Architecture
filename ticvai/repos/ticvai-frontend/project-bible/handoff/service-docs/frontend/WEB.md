@@ -39,7 +39,7 @@
 | [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 1 | 3 |
 | [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 14 |
 | [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 7 |
-| [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 6 |
+| [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 8 |
 | [WEB-013](#web-013-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 5 |
 | [WEB-014](#web-014-pay-for-a-booking) | Pay for a Booking | Cart & Checkout | 1 | 2 |
 | [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
@@ -57,7 +57,7 @@
 | [WEB-027](#web-027-newsletter-subscription) | Newsletter Subscription | Engagement & Support | 1 | 5 |
 | [WEB-028](#web-028-contact-venue-information) | Contact & Venue Information | Engagement & Support | 1 | 1 |
 | [WEB-029](#web-029-error-sold-out-maintenance) | Error / Sold Out / Maintenance | System States | 1 | 2 |
-| [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 4 |
+| [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 5 |
 | [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 1 | 11 |
 | [WEB-032](#web-032-offers-promotions) | Offers & Promotions | Promotions | 1 | 2 |
 | [WEB-033](#web-033-shop) | Shop | Retail | 1 | 5 |
@@ -550,7 +550,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add a suggested add-on or the offered bundle to the cart | `None` |
-| `getGuestBundle` | [CatalogueService](../backend/CatalogueService.md#getguestbundle) | onAction | A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009) | `None` |
+| `getGuestBundle` | [CatalogueService](../backend/CatalogueService.md#getguestbundle) | onAction | A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). The add-ons page uses the same read as the app's Bundle Package (GST-056). Draw the component rows from `components[].name`, and each choice group as its `label` followed by its options' names, as the approved frame shows; preselect the `isDefault` option; the look does not change. Add to basket calls `addCartLine` with `variantId` = `GuestBundle.variantId`, `quantity` = the chosen number, `attributes.bundle` = {`bundleId`: `GuestBundle.id`, `choices`: [{`choiceGroupId`: group `id`, `optionId`: option `id`}, one entry per pick]}; never a component's or an option's `variantId` as the line's. Until the backend serves this shape, build against it with mocked data; never guess ids or show bare ids (ADAM CR-597, Chinmay, 3 November 2026; CHG-CR597-001). | `None` |
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill the cart slot, maxItems 3 (DI-959) | `AI_USE` |
 | `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | background | Sent by the Suggested for you list, not a control: impressions, clicks, add-to-cart and declines of the recommended items, batched | `AI_USE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
@@ -569,8 +569,8 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-005 | Ticket Type Selection | cartId, performanceId |  |
-| WEB-006 | Date & Performance Selection | cartId, performanceId |  |
+| WEB-005 | Ticket Type Selection | cartId, performanceId, productId |  |
+| WEB-006 | Date & Performance Selection | cartId, performanceId, productId |  |
 | WEB-010 | Shopping Cart | cartId, lineId, performanceId |  |
 | WEB-016 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
 
@@ -666,7 +666,7 @@
 | `updateCartLine` | [OrderService](../backend/OrderService.md#updatecartline) | onAction | Change a quantity | `None` |
 | `removeCartLine` | [OrderService](../backend/OrderService.md#removecartline) | onAction | Take something out | `None` |
 | `extendCart` | [OrderService](../backend/OrderService.md#extendcart) | onAction | Give the guest more time | `None` |
-| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
+| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order: only on the transfer journey (F55); the Checkout button moves on without it, and the order is made at Pay now on WEB-012 (ADAM CR-576) | `None` |
 | `abandonCart` | [OrderService](../backend/OrderService.md#abandoncart) | onAction | Empty it deliberately | `None` |
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
 | `getGuestCouponCode` | [CatalogueService](../backend/CatalogueService.md#getguestcouponcode) | onLoad | In the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). Look up a code With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
@@ -752,8 +752,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-016 | Chooses to sign in rather than continue as a guest | cartId | no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart |
-| WEB-012 | Pays |  |  |
-| WEB-012 | Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms) |  |  |
+| WEB-012 | Pays | orderId |  |
+| WEB-012 | Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms) | orderId |  |
 | WEB-010 | They check out | cartId, holdId, lineId, performanceId |  |
 
 ## WEB-012 Checkout — Payment
@@ -790,10 +790,12 @@
 |---|---|---|---|---|
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart this screen is about to pay for, on load with the session's `cartId`: the summary panel's lines and totals, and the first line with no parent line for `getPublishedBookingFlow`'s `productId`; not called when an `orderId` came with the link, which reads `getOrder` instead (ADAM CR-590). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `None` |
 | `inquirePaymentStatus` | [OrderService](../backend/OrderService.md#inquirepaymentstatus) | onAction | Ask what happened to a payment that did not answer | `ORDER_CREATE` |
-| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12); `productId` from the cart's (or the order's) first line with no parent line, never called with no id (ADAM CR-590) | `None` |
 | `listPublishedPolicies` | [WhiteLabelService](../backend/WhiteLabelService.md#listpublishedpolicies) | onLoad | The current terms and conditions the guest ticks, with their version, readable before sign-in (GFIX-2) | `None` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Pay now, first step: turn the session's cart into the order pending payment, with the holder names (attendees) and opt-ins (marketingConsents) from WEB-011 when it ran | `None` |
+| `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the questions Pay now's checkoutCart refused for (422 consentRequired or consentAnswerBlocks), once, after the last question (ADAM CR-556 with CR-576) | `ORDER_CREATE` |
 
 **States**
 
@@ -1807,6 +1809,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listOwnResaleListings` | [OrderService](../backend/OrderService.md#listownresalelistings) | onLoad | The guest's own resale listings and their status, shown on the rows of Your orders with tickets (the prototype's "Listed for resale" row), matched by order; no component of its own, since the approved screen draws none: the prototype's Transfer & resale row shows it (shownBy, r8 integration, CHG-R8INT-008). Read once when the screen opens and after Create resale listing. | `None` |
+| `listTicketTransfers` | [OrderService](../backend/OrderService.md#listtickettransfers) | onLoad | The guest's sent transfers, drawn as the approved frame's sent rows in Transfer & resale, above the resale rows; no component of its own and the layout does not change (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001). Called with `direction=sent` when the screen opens, every page read until `hasMore` is false, and again after Transfer tickets succeeds. One row per transfer, in the order returned (soonest to lapse first). Title: the line of the `listMyOrders` order whose `id` is the transfer's `orderId` and whose `entitlementIds` hold its `ticketIds`, written as the order cards write that line (more order pages are read when the order is not loaded). Second line: the channel part, ' · ', the state part. Channel part from `recipientChannel`: email is 'Sent to ' plus `recipientAddressMasked` (always masked, as the server sends it), sms is 'Sent by SMS', whatsapp is 'Sent by WhatsApp'. State part: offered is 'waiting to be claimed' (no date); claimed is 'claimed' plus the day and month of `claimedAt`; expired is 'expired, tickets returned' plus the day and month of `expiresAt`; cancelled is 'cancelled'. 'N sent this year' at the top right counts the sent transfers whose `offeredAt` falls in the current calendar year in the venue's time zone; the read has no total. The loading and empty states that speak of the ticket transfer list mean this list: a guest with no sent transfers sees the first-run empty state. The rows' Details and Cancel transfer buttons are not part of this read (no operation exists for them). | `None` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The orders this guest placed | `None` |
 | `createResaleListing` | [OrderService](../backend/OrderService.md#createresalelisting) | onAction | List a ticket for resale | `ORDER_CREATE` |
@@ -1826,7 +1829,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-031 | My Reservations |  |  |
+| WEB-031 | My Reservations | productId |  |
 | GST-014 | The friend claims it in the app | orderId, transferId |  |
 
 ## WEB-031 My Reservations

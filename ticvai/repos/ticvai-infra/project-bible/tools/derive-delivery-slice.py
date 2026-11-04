@@ -33,6 +33,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import personal_data  # noqa: E402
+
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
@@ -133,6 +136,14 @@ LATER_BLOCK_OPERATIONS = {
     "publishPricingEffectiveDate": "dates a pricing change request; bulkChangePrices needs none (ADAM CR-544; CHG-R13INT-020)",
     "setPackagePricingDefinition": "defines a package price; bulkChangePrices only skips a fixed package price (ADAM CR-544; CHG-R13INT-020)",
 }
+# **A guest's privacy part reads what exists; those reads feed no setup** (r13 system review B-01; the lead, 3 November
+# 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). An owner's part of a guest's export
+# reads every table of its module that holds the guest, and an empty table is a correct answer (the part says
+# rowCount 0). A read the contract marks `feedsSetup: false` (on its x-ticvai-reads entry) makes no writer of that table
+# setup, so a module's export reach does not pull the module's screens into Block A; the reads exportSubjectData's
+# done-when needs (CHG-R11FXC-005: consent records, profile, form submissions, documents) stay unmarked and feed it.
+
+
 LATER_BLOCK_SCREENS = {
     "BO-1191": "Organisation, Block B (CHG-R6-040)",
     "BO-1192": "Entitlement Templates, Block B (CHG-R6-040)",
@@ -210,9 +221,10 @@ def main() -> int:
             core.setdefault(o, set()).add(why)
     slice_ = set(core)
     setup_for: dict[str, set[str]] = defaultdict(set)  # setup op -> tables it makes non-empty
+    quiet = personal_data.part_only_reads(ROOT)
     while True:
         read = {t for o in slice_ for t in (lineage.get(o, {}).get("reads") or [])
-                if not t.startswith("cache:")}
+                if not t.startswith("cache:") and (o, t) not in quiet}
         add = set()
         for t in read:
             if writers[t] & slice_:

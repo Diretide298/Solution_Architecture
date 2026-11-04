@@ -13,7 +13,7 @@
 
 ## Why this is a service
 
-**96 operations and 34 tables — the largest single domain after marketing.** Its own service because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second on a display that may be offline.
+**One contract and one schema, and a large one** (138 operations and 53 tables on 3 November 2026, eighth of the 33 deployable contracts by operations). Its own service because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second on a display that may be offline.
 
 ## Depends on
 
@@ -180,7 +180,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | visit.orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | visit.orders[].tableVisitId | string (uuid) |  | (nullable) |
 | visit.orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| visit.orders[].lines | array of object | yes |  |
+| visit.orders[].lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | visit.orders[].salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | visit.orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | visit.orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -1761,7 +1761,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | tableVisitId | string (uuid) |  | (nullable) |
 | status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| lines | array of object | yes |  |
+| lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | lines[].id | string (uuid) | yes |  |
 | lines[].menuItemId | string (uuid) | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
@@ -1779,6 +1779,9 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -1943,7 +1946,7 @@ Board 2. **`updateMenu` existed, so a menu edited was a menu live** — no draft
 | Config scope | outlet |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.menu`, `fnb.menu_item`, `fnb.menu_section`, `fnb.menu_version` |
-| Writes | `cache:idempotency`, `cache:resolution`, `fnb.menu` |
+| Writes | `cache:idempotency`, `cache:resolution`, `fnb.menu`, `platform.outbox` |
 | Called by | BO-045 |
 
 **Parameters**
@@ -2330,7 +2333,7 @@ Reversible. A party that asks for the bill and then orders another round is norm
 | orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | orders[].tableVisitId | string (uuid) |  | (nullable) |
 | orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| orders[].lines | array of object | yes |  |
+| orders[].lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | orders[].lines[].id | string (uuid) | yes |  |
 | orders[].lines[].menuItemId | string (uuid) | yes |  |
 | orders[].lines[].quantity | integer | yes | (min 1) |
@@ -2342,6 +2345,9 @@ Reversible. A party that asks for the bill and then orders another round is norm
 | orders[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | orders[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | orders[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| orders[].lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | orders[].salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -2415,7 +2421,7 @@ Board 2. **The reason to version a menu at all.** A price published wrong at 11a
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.menu`, `fnb.menu_item`, `fnb.menu_section`, `fnb.menu_version` |
-| Writes | `cache:idempotency`, `cache:resolution`, `fnb.menu`, `fnb.menu_version` |
+| Writes | `cache:idempotency`, `cache:resolution`, `fnb.menu`, `fnb.menu_version`, `platform.outbox` |
 | Called by | BO-045 |
 
 **Parameters**
@@ -2630,6 +2636,8 @@ A party seated at a different size from the booking is recorded as such. A booki
 Board 3. **Coursing was a per-ticket field with no default**, so every table was coursed by hand or not at all.
 **A fine-dining room and a food court do not course the same way**, and neither should have to be told twice a night.
 
+**An outlet's settings rows carry the path of the outlet's venue** (ADAM CR-561, Chinmay, 3 November 2026; CHG-CR561-001). Outlets have no scope node of their own, and none is planned. (1) The outlet in the path is looked up (`platform.outlet` by id, `tenancy#outletRecords`); it is `404` if it does not exist or is not visible to the caller. `fnb.course_rule.scope_path` is written as the path of that outlet's venue scope node in `platform.scope`, the same path the venue's own rows carry, on every write, insert or replace, and never taken from the request body; `scopePath` stays read-only in the response and returns that venue path. (2) `outlet_id` stays the key the outlet's course rules are found by, one row per outlet: reads and the replace on PUT select by `outlet_id`, not by path. Row-level security on `scope_path` then lets anyone granted at the venue, its region or the tenant read and write the row, as it does for dining tables. (3) If the outlet's venue has no scope node, the write is refused; an empty or made-up path is never written (`scope_path` is NOT NULL). (4) Nothing changes in Tenancy: no `platform.scope` row of level outlet, no new column on `platform.outlet`, no backfill and no migration.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -2678,6 +2686,7 @@ Board 3. **Coursing was a per-ticket field with no default**, so every table was
 | Code | Shape | Meaning |
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Set |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2809,6 +2818,8 @@ Board 2L. **A kitchen substitutes constantly and the package could not say which
 Board 4. **A party of nine at a restaurant of four-tops is the everyday case**, and the package had no way to say that tables 6 and 7 make a nine.
 **Declared rather than inferred.** Two adjacent tables do not always combine — a pillar, a step, a service run. **A host knows which pairs work and a floor plan does not.**
 Without it, `getTableMap` reports a full room while the venue turns away a booking it could seat.
+
+**Each row carries the path of the outlet's venue** (ADAM CR-561, Chinmay, 3 November 2026; CHG-CR561-001): `fnb.table_combination.scope_path` is written as the path of the outlet's venue scope node in `platform.scope`, as `setCourseRules` states, set by the server on every write and never taken from the request; outlets have no scope node of their own. If the outlet's venue has no scope node, the write is refused.
 
 |  |  |
 |---|---|
@@ -2980,7 +2991,7 @@ BL-125. **A shift change mid-service leaves a check with a server who has gone h
 | orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | orders[].tableVisitId | string (uuid) |  | (nullable) |
 | orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| orders[].lines | array of object | yes |  |
+| orders[].lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | orders[].lines[].id | string (uuid) | yes |  |
 | orders[].lines[].menuItemId | string (uuid) | yes |  |
 | orders[].lines[].quantity | integer | yes | (min 1) |
@@ -2992,6 +3003,9 @@ BL-125. **A shift change mid-service leaves a check with a server who has gone h
 | orders[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | orders[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | orders[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| orders[].lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | orders[].salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -4356,6 +4370,8 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 3. otherwise the outlet's `defaultStationId`. **An item is never refused at Send to kitchen for want of a station.**
 If the station a line routes to is inactive or every display assigned to it is down, its ticket goes to `fallbackStationId` instead (DI-323: the fallback display). Every station named must belong to this outlet, or to the producing outlet that serves it (`KitchenStation.servesOutletIds`); otherwise `422`.
 
+**The row carries the path of the outlet's venue** (ADAM CR-561, Chinmay, 3 November 2026; CHG-CR561-001): `fnb.kitchen_routing_rule.scope_path` is written as the path of the outlet's venue scope node in `platform.scope`, as `setCourseRules` states, set by the server on every write and never taken from the request; outlets have no scope node of their own. If the outlet's venue has no scope node, the write is refused.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -5015,6 +5031,8 @@ Quick service pays immediately; table service attaches to a visit and pays at cl
 **A line with `redeemEntitlementId` waits** (ADAM CR-277 (5)): its redemption calls access `validateAccess` on the access host, which waits for service sign-in between the apps (CR-241). Until that follow-up, a line carrying `redeemEntitlementId` is refused `400` (validation) and nothing is written.
 Offline behaviour depends on the items: an order containing only untracked items queues normally, while one containing a recipe-linked item is refused offline because stock depletes in real time.
 
+**Each new line is written `ordered`** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): `fnb.service_order_line.status` holds `FnbOrderStatus`'s values (a check, nullable), and a null status reads as `ordered`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_CREATE` |
@@ -5067,7 +5085,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | tableVisitId | string (uuid) |  | (nullable) |
 | status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| lines | array of object | yes |  |
+| lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | lines[].id | string (uuid) | yes |  |
 | lines[].menuItemId | string (uuid) | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
@@ -5085,6 +5103,9 @@ Offline behaviour depends on the items: an order containing only untracked items
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -5175,7 +5196,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | tableVisitId | string (uuid) |  | (nullable) |
 | status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| lines | array of object | yes |  |
+| lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | lines[].id | string (uuid) | yes |  |
 | lines[].menuItemId | string (uuid) | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
@@ -5193,6 +5214,9 @@ Offline behaviour depends on the items: an order containing only untracked items
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -5289,7 +5313,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | items[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | items[].tableVisitId | string (uuid) |  | (nullable) |
 | items[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| items[].lines | array of object | yes |  |
+| items[].lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | items[].lines[].id | string (uuid) | yes |  |
 | items[].lines[].menuItemId | string (uuid) | yes |  |
 | items[].lines[].quantity | integer | yes | (min 1) |
@@ -5301,6 +5325,9 @@ Offline behaviour depends on the items: an order containing only untracked items
 | items[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | items[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| items[].lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| items[].lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | items[].salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | items[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | items[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -5465,7 +5492,7 @@ May be automatic where the outlet is configured for it. The state still exists, 
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | tableVisitId | string (uuid) |  | (nullable) |
 | status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| lines | array of object | yes |  |
+| lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | lines[].id | string (uuid) | yes |  |
 | lines[].menuItemId | string (uuid) | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
@@ -5483,6 +5510,9 @@ May be automatic where the outlet is configured for it. The state still exists, 
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -5586,7 +5616,7 @@ Before acceptance this is a refusal and needs no approval. **After acceptance th
 | serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | tableVisitId | string (uuid) |  | (nullable) |
 | status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| lines | array of object | yes |  |
+| lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | lines[].id | string (uuid) | yes |  |
 | lines[].menuItemId | string (uuid) | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
@@ -5604,6 +5634,9 @@ Before acceptance this is a refusal and needs no approval. **After acceptance th
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -5830,7 +5863,7 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 | orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | orders[].tableVisitId | string (uuid) |  | (nullable) |
 | orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| orders[].lines | array of object | yes |  |
+| orders[].lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | orders[].lines[].id | string (uuid) | yes |  |
 | orders[].lines[].menuItemId | string (uuid) | yes |  |
 | orders[].lines[].quantity | integer | yes | (min 1) |
@@ -5842,6 +5875,9 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 | orders[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | orders[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | orders[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| orders[].lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | orders[].salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -5957,7 +5993,7 @@ Covers is captured at seating because it drives split-by-covers at close.
 | orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | orders[].tableVisitId | string (uuid) |  | (nullable) |
 | orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| orders[].lines | array of object | yes |  |
+| orders[].lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | orders[].lines[].id | string (uuid) | yes |  |
 | orders[].lines[].menuItemId | string (uuid) | yes |  |
 | orders[].lines[].quantity | integer | yes | (min 1) |
@@ -5969,6 +6005,9 @@ Covers is captured at seating because it drives split-by-covers at close.
 | orders[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | orders[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | orders[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| orders[].lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | orders[].salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -6169,7 +6208,7 @@ Moving a party to another table is routine and must not lose the visit. The visi
 | orders[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
 | orders[].tableVisitId | string (uuid) |  | (nullable) |
 | orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
-| orders[].lines | array of object | yes |  |
+| orders[].lines | array of object | yes | A line's status is its kitchen lifecycle (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): FnbOrderStatus's nine values, held by a check on fnb.service_order_line.status, nullable. |
 | orders[].lines[].id | string (uuid) | yes |  |
 | orders[].lines[].menuItemId | string (uuid) | yes |  |
 | orders[].lines[].quantity | integer | yes | (min 1) |
@@ -6181,6 +6220,9 @@ Moving a party to another table is routine and must not lose the visit. The visi
 | orders[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | orders[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | orders[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| orders[].lines[].compedAt | string (date-time) |  | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compReason | string |  | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. (read-only; nullable) |
+| orders[].lines[].compedByPrincipalId | string (uuid) |  | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. (read-only; nullable) |
 | orders[].salesOrderId | string (uuid) |  | Retyped 29 September (SD-046), and format: uuid since ADR-0056 (30 September): every id is a uuid, so this joins orders.sales_order.id. (nullable) |
 | orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -6709,6 +6751,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | no |  |
 | unit_price | numeric(18,4) | no |  |
 | line_total | numeric(18,4) | no |  |
+| comped_at | timestamptz | no | When the line was comped (ADAM CR-594; CHG-CR594-001): set by compItem with compReason and compedByPrincipalId; null on a line never comped. |
+| comp_reason | text | no | The reason compItem took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. |
+| comped_by_principal_id | uuid | no | Who comped the line, the caller of compItem (ADAM CR-594); null on a line never comped. |
 
 ### `fnb.sold_out_item`
 
@@ -6774,8 +6819,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | outlet_id | uuid | yes |  |
 | subject_id | uuid | no |  |
-| guest_name | text | no |  |
-| contact_point | text | no |  |
 | party_size | integer | yes |  |
 | starts_at | timestamptz | yes |  |
 | duration_minutes | integer | no | How long the cover is held. |

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Sync repos/*/project-bible/ and repos/ticvai-docs/ from the package root.
 
-`repos/update-bible.sh` says it plainly: **project-bible/ is a copy, not a source.** Nothing ran
-it. On 20 August the mirror held 21 state files against the root's 113, 54 files differed, 144
+`repos/update-bible.sh` (retired 3 November 2026, CHG-R14J-002) said it plainly: **project-bible/ is a copy, not a
+source.** Nothing ran it. On 20 August the mirror held 21 state files against the root's 113, 54 files differed, 144
 existed only in the mirror and **305 root files had never reached it.**
 
 The symptom that surfaced it was one file. `states/entitlement.yaml` was renamed to
@@ -123,7 +123,11 @@ def sync(src: Path, dst: Path, skip: frozenset = frozenset()) -> tuple[int, int,
 # ticket 27640 SETUP-CLIENTS, CHG-R8GEN-011). It was copied once on 14 August and never again: it still held
 # `spine/cross-cell.yaml` (renamed cross-region since) and lacked the satellite contracts added after, so the clients
 # SETUP-CLIENTS generates from it were two months behind the package. Synced like a bible: added, updated, removed.
-OPENAPI = (("contracts/spine", "spine"), ("contracts/satellite", "satellite"), ("contracts/shared", "shared"))
+# **Every contract folder, not a list of three** (r13 system review D-10; CHG-R14J-003): contracts/devices/ (the ticket
+# printer, OpenAPI 3.1, ADAM CR-448) was added after the list was written and never reached the repository the clients
+# are generated from. The folders are read from contracts/ itself, so a new one cannot be left out.
+OPENAPI = tuple((f"contracts/{d.name}", d.name) for d in sorted((ROOT / "contracts").iterdir())
+                if d.is_dir() and any(d.glob("*.yaml")))
 
 
 def sync_openapi() -> tuple[int, int, int]:
@@ -175,7 +179,7 @@ README_SOURCES = {
     "ticvai-infra/README.md": "docs/repos/ticvai-infra.md",
     "ticvai-infra/terraform/modules/cell/README.md": "docs/repos/ticvai-infra-cell.md",
 }
-INDEXED = ("ticvai-contracts/standards", "ticvai-backend/src/Ticvai.Migrations/Scripts")
+INDEXED = ("ticvai-contracts/standards",)
 SOURCE_HEADER = "<!-- Written by tools/derive-mirrors.py from ticvai/{src}: edit that file, not this one. -->\n\n"
 INDEX_HEADER = ("<!-- Written by tools/derive-mirrors.py: the index of this folder's files. Edit the files, "
                 "not this index. -->\n\n")
@@ -256,6 +260,100 @@ def write_readmes() -> tuple[int, int]:
     return written, same
 
 
+# **The repositories' project documents come from what developers get, and no code is kept** (the lead, 3 November
+# 2026, on the r13 system review's D-06: "Retire the code trees", keep the project documents, generated from the
+# starters; CHG-R14J-002). repos/ticvai-backend, -frontend and -ai held hand-written code trees nothing kept in step
+# with ADAM's starters, the code the setup zip really creates: every starter fix of 26 September onwards (the decimal
+# ban, the permission resolver's deny-overrides-allow, many tenants per cell, the outbox ordering, lastWriterWins)
+# never reached them, and their rules page (project-bible/repos/backend.md) still taught .NET 8, one tenant per
+# jurisdiction and ULIDs (D-04). The code is gone; what stays is written here at every refresh:
+#   - each of those repositories' CLAUDE.md, a copy of the starter's (viewer/mcp/setup/starters/<role>/CLAUDE.md);
+#   - every bible's setup/, a copy of the starter docs (the files setup.ps1 gives every clone as project-bible/setup/);
+#   - every bible's repos/ (one rules page per repository): backend, frontend and ai from the starter's CLAUDE.md,
+#     contracts, infra and docs from their authored sources in docs/repos/rules/;
+#   - the bible folders that only shadowed a mirrored docs/ folder with an older partial copy (adr/, architecture/,
+#     active/, registers/: 18 of 73 ADRs) and the August `.synced-at` stamp are removed: project-bible/docs/ holds the
+#     whole current set, and the read orders point there.
+# tools/check-repo-trees.py fails on anything else under repos/<repository>/ and on a copy that differs from its source,
+# and fails closed when the starters are not beside the package.
+STARTERS = ROOT.parent / "viewer" / "mcp" / "setup" / "starters"
+STARTER_ROLES = {"ticvai-backend": "backend", "ticvai-frontend": "frontend", "ticvai-ai": "ai"}
+RULE_PAGES = {"backend.md": ("starter", "backend/CLAUDE.md"), "frontend.md": ("starter", "frontend/CLAUDE.md"),
+              "ai.md": ("starter", "ai/CLAUDE.md"), "contracts.md": ("package", "docs/repos/rules/contracts.md"),
+              "infra.md": ("package", "docs/repos/rules/infra.md"), "docs.md": ("package", "docs/repos/rules/docs.md")}
+SHADOWED = ("adr", "architecture", "active", "registers")
+STARTER_HEADER = ("<!-- Written by tools/derive-mirrors.py from ADAM's starter viewer/mcp/setup/starters/{src}, the file "
+                  "the setup zip gives the repository: edit that file, not this one. -->\n\n")
+
+
+def rule_page(kind: str, src: str) -> str | None:
+    f = (STARTERS / src) if kind == "starter" else (ROOT / src)
+    if not f.is_file():
+        return None
+    head = STARTER_HEADER.format(src=src) if kind == "starter" else SOURCE_HEADER.format(src=src)
+    return head + f.read_text(encoding="utf-8")
+
+
+def project_documents() -> dict:
+    """{repos-relative path: text} for every project document this tool writes from a starter or a rules source."""
+    out = {}
+    for repo, role in STARTER_ROLES.items():
+        if (REPOS / repo).is_dir():
+            body = rule_page("starter", f"{role}/CLAUDE.md")
+            if body is not None:
+                out[f"{repo}/CLAUDE.md"] = body
+    bibles = [REPOS / "ticvai-docs"] + sorted(p for p in REPOS.glob("*/project-bible") if p.is_dir())
+    docs = sorted((STARTERS / "docs").glob("*.md")) if (STARTERS / "docs").is_dir() else []
+    for b in bibles:
+        if not b.is_dir():
+            continue
+        rel = b.relative_to(REPOS).as_posix()
+        for d in docs:
+            out[f"{rel}/setup/{d.name}"] = d.read_text(encoding="utf-8")
+        for name, (kind, src) in RULE_PAGES.items():
+            body = rule_page(kind, src)
+            if body is not None:
+                out[f"{rel}/repos/{name}"] = body
+    return out
+
+
+def write_project_documents() -> tuple[int, int, int]:
+    """Write project_documents(); prune what a written folder no longer has and the shadowed folders. (w, same, rm)"""
+    if not STARTERS.is_dir():
+        print(f"  ! ADAM's starters are not at {STARTERS}: the repositories' CLAUDE.md, setup/ and rules pages were not "
+              "written (check-repo-trees fails until they are)")
+        return 0, 0, 0
+    written = same = removed = 0
+    want = project_documents()
+    for rel, body in sorted(want.items()):
+        target = REPOS / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        old = target.read_text(encoding="utf-8", errors="replace") if target.is_file() else None
+        if old == body:
+            same += 1
+            continue
+        with open(target, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(body)
+        written += 1
+    bibles = [REPOS / "ticvai-docs"] + sorted(p for p in REPOS.glob("*/project-bible") if p.is_dir())
+    for b in bibles:
+        rel = b.relative_to(REPOS).as_posix()
+        for folder in ("setup", "repos"):
+            d = b / folder
+            for f in sorted(d.glob("*")) if d.is_dir() else []:
+                if f.is_file() and f.name != "README.md" and f"{rel}/{folder}/{f.name}" not in want:
+                    f.unlink()
+                    removed += 1
+        for folder in SHADOWED:
+            if (b / folder).is_dir() and (ROOT / "docs" / folder).is_dir():
+                removed += sum(1 for f in (b / folder).rglob("*") if f.is_file())
+                shutil.rmtree(b / folder)
+        if (b / ".synced-at").is_file():
+            (b / ".synced-at").unlink()
+            removed += 1
+    return written, same, removed
+
+
 def main() -> int:
     if not REPOS.is_dir():
         print("  no repos/ — nothing to mirror")
@@ -285,6 +383,8 @@ def main() -> int:
         print(f"  {len(targets)} mirror(s) already current")
     else:
         print(f"  {len(targets)} mirror(s): {total[0]} added, {total[1]} updated, {total[2]} removed")
+    w, s_, r = write_project_documents()
+    print(f"  project documents: {w} written, {s_} already current, {r} removed (ADAM's starters, docs/repos/rules)")
     # After the mirrors: an index lists its folder's files as the sync left them.
     w, s = write_readmes()
     print(f"  repository READMEs: {w} written, {s} already current (docs/repos/ sources and folder indexes)")

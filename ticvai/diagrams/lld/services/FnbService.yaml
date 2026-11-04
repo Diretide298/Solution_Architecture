@@ -1,12 +1,12 @@
 id: LLD-FnbService
-title: FnbService — 138 operations, 54 tables
+title: FnbService — 138 operations, 55 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**138 operations and 54 tables — the largest single domain after marketing.** Its own service
-  because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
-  on a display that may be offline.'
+why: '**One contract and one schema, and a large one** (138 operations and 55 tables on 3 November 2026,
+  eighth of the 33 deployable contracts by operations). Its own service because a kitchen pass has a
+  latency profile nothing else shares: a bump must land in under a second on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
@@ -17,7 +17,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 54
+  tables: 55
   stores:
   - postgres
   largestTable: fnb.table_reservation
@@ -720,7 +720,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 5
-    writes: 3
+    writes: 4
   - operation: quoteWaitTime
     verb: POST
     path: /waitlist/{entryId}/quote
@@ -735,8 +735,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 7
-    writes: 2
+    reads: 8
+    writes: 3
   - operation: rebalanceStationLoad
     verb: POST
     path: /kitchen-stations/rebalance
@@ -824,7 +824,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 5
-    writes: 4
+    writes: 5
   - operation: scheduleMenuPublish
     verb: POST
     path: /menus/{menuId}/schedule
@@ -1071,7 +1071,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 6
+    reads: 7
     writes: 4
   - operation: transferTableVisit
     verb: POST
@@ -1860,7 +1860,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.service_order_line
-  columns: 12
+  columns: 15
   store: postgres
   parent: fnb.service_order
   writtenBy:
@@ -1895,7 +1895,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.table_reservation
-  columns: 24
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -1912,6 +1912,13 @@ tables:
   columns: 17
   store: postgres
   parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.table_visit_server
+  columns: 7
+  store: postgres
+  parent: fnb.table_visit
   writtenBy:
   - fnb
   foreignWriters: null
@@ -1957,6 +1964,33 @@ readsFrom:
 - service: AiService
   operations: 1
 writesOutside:
+- service: TenancyService
+  operations: 6
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: acceptFnbOrder
+    tables:
+    - platform.outbox
+  - operation: createFnbOrder
+    tables:
+    - platform.idempotency_record
+    - platform.outbox
+  - operation: createGuestFnbOrder
+    tables:
+    - platform.outbox
+  - operation: publishMenu
+    tables:
+    - platform.outbox
+  - operation: rollbackMenu
+    tables:
+    - platform.outbox
+  - operation: setKitchenTicketStatus
+    tables:
+    - platform.outbox
 - service: InventoryService
   operations: 5
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -2000,27 +2034,6 @@ writesOutside:
   - operation: sendOrderNotification
     tables:
     - marketing.message_dispatch
-- service: TenancyService
-  operations: 4
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: acceptFnbOrder
-    tables:
-    - platform.outbox
-  - operation: createFnbOrder
-    tables:
-    - platform.idempotency_record
-    - platform.outbox
-  - operation: createGuestFnbOrder
-    tables:
-    - platform.outbox
-  - operation: setKitchenTicketStatus
-    tables:
-    - platform.outbox
 - service: OrderService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner

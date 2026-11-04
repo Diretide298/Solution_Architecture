@@ -1,5 +1,7 @@
 # Git & Merge Requests
 
+**Platform: GitLab, with GitLab CI** (`gitlab.softlabsgroup.in`; the lead, 20 October 2026, ADR-0007 amendment, r8 cause FOUNDATION-AI-C37; replaces audit R057's GitHub Actions). Every repository runs `.gitlab-ci.yml` on the group's shared runners. *Merge request* in this bible means a GitLab merge request.
+
 ## 9. Code Review
 
 Every change reviewed. Elevated-review areas per `AI_AUTHORSHIP.md` §5 need a second

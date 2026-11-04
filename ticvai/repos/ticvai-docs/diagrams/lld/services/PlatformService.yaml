@@ -4,9 +4,10 @@ generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 119 tables.** Subscription, platform operations and the public
-  API all write `control.*` — **they are one bounded context that was split into three contracts for
-  API-surface reasons, not for data reasons.**
+why: '**Three contracts, and nearly all of their tables in two schemas** (on 3 November 2026 `control`
+  held 110 of the service''s 119 tables and `subscription` 9). Subscription, platform operations and
+  the public API all write `control.*` — **they are one bounded context that was split into three contracts
+  for API-surface reasons, not for data reasons.**
 
 
   Splitting them would give three services writing two schemas, which is the arrangement every distributed-data
@@ -296,7 +297,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_VIEW
     offline: false
-    reads: 2
+    reads: 1
     writes: 0
   - operation: getCommercialMetrics
     verb: GET
@@ -433,7 +434,7 @@ operationsByContract:
     permission: PLATFORM_BILLING_MANAGE
     offline: false
     reads: 3
-    writes: 4
+    writes: 5
   - operation: launchCellCluster
     verb: POST
     path: /cell-clusters
@@ -880,7 +881,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: false
-    reads: 4
+    reads: 15
     writes: 1
   - operation: provisionCell
     verb: POST
@@ -1200,7 +1201,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_MANAGE
     offline: false
-    reads: 8
+    reads: 12
     writes: 3
   - operation: setTrialConfiguration
     verb: PUT
@@ -1630,7 +1631,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 5
+    reads: 6
     writes: 3
   - operation: createSandbox
     verb: POST
@@ -1662,8 +1663,8 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_ADMIN
     offline: false
-    reads: 3
-    writes: 3
+    reads: 2
+    writes: 2
   - operation: getApiUsage
     verb: GET
     path: /api-usage
@@ -1678,7 +1679,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: issueApiToken
     verb: POST
@@ -1846,7 +1847,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: rotateApiCredential
     verb: POST
@@ -2288,7 +2289,7 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.api_version
-  columns: 10
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2403,7 +2404,7 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.contract
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2465,7 +2466,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: control.integration_listing
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -3166,17 +3167,6 @@ writesOutside:
   - operation: reconcileBurstEnvironment
     tables:
     - sync.rejection
-- service: MarketingService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event MarketingService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: deprecateApiVersion
-    tables:
-    - marketing.message_dispatch
 - service: OrderService
   operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner

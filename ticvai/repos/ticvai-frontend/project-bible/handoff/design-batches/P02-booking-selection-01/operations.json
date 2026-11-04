@@ -329,6 +329,30 @@
   "requestBody": null,
   "responds": "Performance"
  },
+ "getProductEligibilityRule": {
+  "method": "GET",
+  "path": "/products/{productId}/eligibility-rule",
+  "contract": "catalogue",
+  "summary": "Who may take part: age, height, supervision",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductEligibilityRule"
+ },
  "getPublishedBookingFlow": {
   "method": "GET",
   "path": "/venues/{venueId}/booking-flow",

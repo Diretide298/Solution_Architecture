@@ -904,7 +904,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 127,
+     "operationCount": 132,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
@@ -1376,7 +1376,7 @@
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 12,
-   "unguardedOperations": 41,
+   "unguardedOperations": 44,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -4040,7 +4040,7 @@
      "key": "WALLET_VIEW",
      "label": "balances, lots, liability, disputes",
      "group": "Wallet and stored value",
-     "operationCount": 25,
+     "operationCount": 26,
      "operations": [
       "diffWalletConfigurationVersion",
       "getCreditConsumptionPolicy",

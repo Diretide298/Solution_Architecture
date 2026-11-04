@@ -7,7 +7,7 @@
 | Rule | Why |
 |---|---|
 | No provider SDK calls in capability code | Provider swap must be configuration |
-| **Tenant isolation is the cell where a cell holds one tenant, and a dedicated Qdrant shard where it does not** | **Corrected twice on 17 August.** The original rule — never filter-level — was right about shared placement for the wrong stated reason. The first correction dismissed it on ADR-0001 (retired — see ADR-0014 and ADR-0017)'s *Cell = Tenant × Jurisdiction*, **without checking ADR-0017, where shared placement puts every tenant in one installation behind RLS**. Postgres enforces RLS; **Qdrant enforces nothing**, so on shared placement the boundary must be a shard. See ADR-0021 |
+| **Tenant isolation is the tenant's own database in Postgres and the tenant's own Qdrant collection, each with its own token** | **Corrected three times.** The original rule, never filter-level, was right for the wrong stated reason. On 17 August a correction dismissed it on ADR-0001's *Cell = Tenant × Jurisdiction* (superseded by ADR-0014, itself superseded by ADR-0038) and a second put a shared cell's tenants behind a Qdrant shard (ADR-0021). Since then a cell is a region holding a database per tenant (ADR-0038), and Qdrant holds one collection per tenant with a collection-scoped token on every tier (ADR-0049, amending ADR-0021). Postgres enforces RLS; **Qdrant enforces nothing**, so the boundary is never a filter |
 | Read-only against the transactional core | An AI capability must not become a permission bypass |
 | Every response carries trace ID, model version, token count, sources | Cost attribution and grounding audit |
 | No capability ships without an eval baseline | Regression-gated in CI |

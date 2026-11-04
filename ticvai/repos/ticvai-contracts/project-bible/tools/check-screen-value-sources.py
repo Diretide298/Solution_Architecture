@@ -594,9 +594,8 @@ def merged_into(screen: dict):
     """The screen this one was merged into, or None (CHG-MOV-002, 2 October 2026; CHG-R10UI-016). A merged screen gets no
     build task: its target's ticket builds it and declares the reads (ticket_done.screen_hold, the test
     check-binding-ratchet's not-built screens use), so its values are judged on the target, never on the merged id."""
-    from ticket_done import MERGED_NOTE
-    m = MERGED_NOTE.search(str(screen.get("notes") or ""))
-    return m.group(1) if m else None
+    import ticket_done   # implementation.redirect first, then the notes (CHG-R14J-030)
+    return ticket_done.merged_into(screen)
 
 
 def no_such_fields(pk: Package, screen: dict) -> list:

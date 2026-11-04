@@ -1,6 +1,6 @@
 # WS57 — Sales Channel Management board 1
 
-**10 screens · 11 operations · 21 schemas · 2 permissions**
+**10 screens · 16 operations · 21 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

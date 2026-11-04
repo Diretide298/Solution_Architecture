@@ -548,7 +548,7 @@
     }
    ]
   },
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.\n\n**Stale gaps removed 4 October 2026: the content is defined and getPasswordPolicy is bound, so setPasswordPolicy saves what was read. The step-up table is bound to StepUpPolicy** (CHG-FXS-005)",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.\n\n**Stale gaps removed 4 October 2026: the content is defined and getPasswordPolicy is bound, so setPasswordPolicy saves what was read. The step-up table is bound to StepUpPolicy** (CHG-FXS-005)\n\n**listMfaMethods is not read here** (r14 gate, CHG-R14BO-003): it answers only the signed-in caller's own enrolled methods (x-ticvai-self-scoped: principal), so it could not say which methods approvers hold, and no element showed it. Each person's methods are on their own security screen (ADM-699, EMP-042).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -693,12 +693,6 @@
     "contract": "identity",
     "purpose": "Which permissions require MFA (`mfaRequiredForPermissions`) — add above the floor, never drop (decided 28 September, audit R135); and the tenant's PIN settings, chosen from drop-downs (`pinLength`, `pinReusePrevention`, `pinLockoutAfterAttempts`; CHG-CRD-002)",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Which methods approvers have enrolled, because a policy demanding a factor nobody holds locks the action",
-    "trigger": "onLoad"
    },
    {
     "operationId": "getGuestVerificationPolicy",

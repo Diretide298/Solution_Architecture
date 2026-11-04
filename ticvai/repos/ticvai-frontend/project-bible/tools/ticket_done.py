@@ -435,10 +435,22 @@ def screen_hold(s: dict, listed: dict | None = None):
     entry = (listed or {}).get(s.get("id"))
     if entry and entry.get("part") != "rest":
         return entry.get("kind") or "listed", entry.get("into") or "", entry.get("why") or ""
-    m = MERGED_NOTE.search(str(s.get("notes") or ""))
-    if m:
-        return "merged", m.group(1), f"merged into {m.group(1)}"
+    into = merged_into(s)
+    if into:
+        return "merged", into, f"merged into {into}"
     return None
+
+
+def merged_into(s: dict) -> str | None:
+    """The screen a merged screen's work is built on: its `implementation.redirect` (the id routes there; the r13
+    system review F-14, CHG-R14J-030), else the "**Merged into X**" its notes lead with (CHG-FXP-002), which also
+    covers a section of X (`implementation.sectionOf`). check-screen-redirects SR-MERGED fails a merged screen that is
+    neither a redirect nor a section, so the notes are never the only place this is said."""
+    imp = s.get("implementation") or {}
+    if imp.get("redirect"):
+        return str(imp["redirect"])
+    m = MERGED_NOTE.search(str(s.get("notes") or ""))
+    return m.group(1) if m else None
 
 
 # **The same test as check-screen-patterns NP** (4 October, CHG-RFM-008): the plan waited on one phrase and on day 5,
@@ -996,8 +1008,7 @@ def merge_bindings(screens: dict) -> dict:
     `apis` (in memory, never written), so the target's tickets build them. Returns {target: [operations added]}."""
     added = {}
     for sid, s in screens.items():
-        m = MERGED_NOTE.search(str(s.get("notes") or ""))
-        into = m.group(1) if m else None
+        into = merged_into(s)
         if not into or into not in screens or into == sid:
             continue
         t = screens[into]

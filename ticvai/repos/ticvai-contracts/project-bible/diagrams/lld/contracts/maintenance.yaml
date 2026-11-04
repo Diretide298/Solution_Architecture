@@ -124,6 +124,7 @@ operations:
   - cache:idempotency
   - maintenance.inspection_template
   - maintenance.inspection_template_item
+  - platform.outbox
 - operation: createMaintenancePlan
   verb: POST
   path: /maintenance-plans

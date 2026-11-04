@@ -681,7 +681,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "**Amounts compare in the venue's currency** (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the currency of the venue the request is raised at, at that day's FX rate (finance `listFxRates`), before it is compared with `minAmount` and `maxAmount`; a tenant- or region-level matrix's bounds are read in that same venue currency."
+    "description": "**Amounts compare in the venue's currency** (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the currency of the venue the request is raised at, before it is compared with `minAmount` and `maxAmount`; a tenant- or region-level matrix's bounds are read in that same venue currency. **Which currency and which rate** (ADAM CR-592; CHG-CR592-001): the venue is the venue node of the request's `scopePath`, its currency that venue's settings `currencyCode`, or its region's when that is null; the rate is finance's (`finance#fxRateRecords`) from the amount's currency to the venue currency, purpose `reporting`, with the latest `effectiveFrom` not after now. No such rate is `422 fx-rate-unavailable`, never a guess."
    },
    "maxAmount": {
     "allOf": [
@@ -1867,7 +1867,7 @@
    "scopePath": {
     "type": "string",
     "readOnly": true,
-    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+    "description": "Where the row is owned: the path of the session's working venue, which is the promotion's venue (ADAM CR-589, CR-217's rule), read with `tenancy#scopeRecords` by id and never taken from a request, nor a region or tenant path the caller also holds. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
    },
    "id": {
     "type": "string",

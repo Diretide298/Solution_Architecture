@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Promotions & Bundles
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 136
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
@@ -263,6 +264,15 @@ x-ticvai-jobs:
     - contracts/satellite/promotions.yaml
     - states/coupon.yaml:34
     - states/promotion-channel-publication.yaml:24
+  subjectDataPart:
+    module: promotions
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [promotions.coupon_code]
+    writes: []
+    for: 'promotions''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /promotions/{promotionId}/simulate:
     parameters:
@@ -358,6 +368,18 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-226 Campaign Experiment & A/B Test Manager"
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the session''s working venue, by id, for its path: every stored variant row''s scope_path (ADAM CR-589)'
+      x-ticvai-writes:
+      - table: promotions.promotion_variant
+        for: 'the promotion''s variant rows: the existing set deleted and the new set inserted, scope_path the working
+          venue''s path (ADAM CR-589)'
+      - table: promotions.promotion
+        for: 'version raised by one on the row locked for the write (ADAM CR-589)'
+      - table: promotions.promotion_audit
+        for: 'one promotionEdited row with the variant set before and after (ADAM CR-589)'
       summary: A/B test two versions against each other
       description: 'BL-114. **Split by a stable hash of the subject, not at random per request** — a guest
         who sees 10% on Monday and 15% on Tuesday has learned to wait.
@@ -368,6 +390,25 @@ paths:
         **Writes `promotions.promotion_variant` and `promotions.promotion_audit`** in the same
         transaction, as every promotions configuration change does (entityType `promotion`, eventType
         `promotionEdited`) (decided 29 September, writers pass).
+
+        **Where the rows are owned, the version and the audit values** (ADAM CR-589, option A with option C''s read
+        route, Chinmay, 3 November 2026; CHG-CR589-001). (1) One in-process read of Tenancy, `tenancy#scopeRecords`,
+        by the session''s working venue id, for that venue''s path. A session with no working venue is `403
+        working-venue-required`, and nothing is written. An unknown `promotionId`, or a promotion whose `venue_id` is
+        not the working venue, is 404 (as `updatePromotion` answers), and nothing is written. Every stored
+        `promotions.promotion_variant` row gets `scope_path` = the working venue''s path, which is then the
+        promotion''s venue path. It is never taken from the body, and never a region or tenant path the caller also
+        holds; the deepest of the caller''s scope paths is not used. (2) In the same transaction the promotion''s
+        existing variant rows are deleted, the new set is inserted, and `promotions.promotion.version` goes up by one
+        (`update ... set version = version + 1 returning version`, on the row locked for the write). Every successful
+        PUT counts as a saved change. The promotion''s channel publications are not touched: each keeps naming
+        the version last pushed. (3) In the same transaction, one
+        `promotions.promotion_audit` row: `venue_id` the promotion''s `venue_id`, `entity_type` `promotion`,
+        `entity_id` and `promotion_id` the promotion''s id, `event_type` `promotionEdited`, `promotion_version` the new
+        version from (2), `previous_value` `{"variants": [...]}` with the set stored before (an empty list when there
+        was none), `new_value` `{"variants": [...]}` with the set now stored, each item holding `id`, `label`,
+        `trafficPercent` and `discountPercent` as the 200 answers them, `reason` null. The `traffic-percent-not-100`
+        400 check comes before anything is written. The 200 stays as declared.
 
         '
       tags:
@@ -423,6 +464,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'The session has no working venue, so the variants have no venue to be written under
+            (`working-venue-required`; ADAM CR-589, CR-217''s rule). Nothing is written.'
+          x-ticvai-problem-types: [working-venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendations:
@@ -1750,6 +1801,19 @@ paths:
       x-ticvai-reads:
       - table: promotions.bundle
         for: 'the bundle itself, and whether it is published (variant_id), active (is_active) and in its window (ADAM CR-197, option B; CHG-R10CAT-002)'
+      - table: promotions.bundle_component
+        for: 'the bundle''s components, answered as GuestBundleComponent (ADAM CR-597)'
+      - table: promotions.bundle_choice_group
+        for: 'the bundle''s choice groups, answered as GuestBundleChoiceGroup (ADAM CR-597)'
+      - table: promotions.bundle_choice_option
+        for: 'each group''s options, those not offered left out (ADAM CR-597)'
+      - table: catalogue.product
+        for: 'the public name and description of every component''s and option''s product, in one lookup for all the
+          bundle''s variant ids under the venue the request names; Catalogue and Promotions run in the same service
+          (ADAM CR-597)'
+      - table: catalogue.variant
+        for: 'each component''s and option''s variant: its product and, where the product has more than one variant,
+          its name, in the same lookup (ADAM CR-597)'
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1782,7 +1846,22 @@ paths:
         set, `is_active` is true and now is within `valid_from` / `valid_to` (a null bound is open); any other bundle,
         draft, unpublished, withdrawn or out of its window, answers 404, never a reason. `variant_id` is set by the
         step that creates the bundle''s catalogue product, the publication step of `updateBundle`. `price` and
-        `savingsAmount` are Money in the venue''s currency and scale, read with `tenancy#venueSettingsRecords`.'
+        `savingsAmount` are Money in the venue''s currency and scale, read with `tenancy#venueSettingsRecords`.
+
+
+        **Enough to show and to add to the cart** (ADAM CR-597, option A with guest-only shapes, Chinmay, 3 November
+        2026; CHG-CR597-001). `GuestBundle.variantId` is the bundle''s own sellable variant
+        (`promotions.bundle.variant_id`), required: every bundle a guest can see has one. `components` are
+        `GuestBundleComponent` (id, variantId, name, quantity; description, componentKind, isOptional) and
+        `choiceGroups` are `GuestBundleChoiceGroup` (id, label, choose, options; allowDuplicates) with
+        `GuestBundleChoiceOption` options (id, variantId, name; description, quantity, isDefault). A name and
+        description are the catalogue''s public text for the variant: the product name, plus the variant name when the
+        product has more than one variant. Every name is looked up in the same read, from `catalogue.product` and
+        `catalogue.variant`, under the venue the request names, in one lookup for all the bundle''s variant ids, not
+        one per row. An option that is not offered (`unavailableBehaviour` `hideOption`) is left out; a group that can
+        no longer be met answers 404, as any bundle a guest cannot buy. No menu item, redemption outlet or
+        substitution field is sent, and no option price: the bundle price does not move with the choice.
+        `BundleComponent`, `BundleChoiceGroup` and `getBundle` are unchanged, and nothing new is stored.'
       tags:
       - bundle
       x-ticvai-permission: null
@@ -10056,7 +10135,10 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
+          description: 'Where the row is owned: the path of the session''s working venue, which is the promotion''s
+            venue (ADAM CR-589, CR-217''s rule), read with `tenancy#scopeRecords` by id and never taken from a request,
+            nor a region or tenant path the caller also holds. Row-level security reads it, so a venue writes and
+            reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -10914,12 +10996,22 @@ components:
       additionalProperties: false
       required:
       - id
+      - variantId
       - name
       - price
       properties:
         id:
           type: string
           format: uuid
+        variantId:
+          type: string
+          format: uuid
+          x-ticvai-references: catalogue.variant
+          description: '**The bundle''s own sellable variant**, `promotions.bundle.variant_id` (ADAM CR-597, option A,
+            Chinmay, 3 November 2026; CHG-CR597-001). Every bundle a guest can see has one, because an unpublished
+            bundle answers 404. Add to basket sends it as `addCartLine`''s `variantId`, with `attributes.bundle` =
+            `{bundleId: id, choices: [{choiceGroupId, optionId}, one per pick]}`; a component''s or an option''s
+            `variantId` is never the line''s.'
         name:
           type: string
         description:
@@ -10936,12 +11028,15 @@ components:
           nullable: true
         components:
           type: array
+          description: The bundle's components in the guest's shape (ADAM CR-597), named from the catalogue.
           items:
-            $ref: '#/components/schemas/BundleComponent'
+            $ref: '#/components/schemas/GuestBundleComponent'
         choiceGroups:
           type: array
+          description: The bundle's choice groups in the guest's shape (ADAM CR-597). An option that is not offered
+            (`unavailableBehaviour` `hideOption`) is left out; a group that can no longer be met makes the bundle 404.
           items:
-            $ref: '#/components/schemas/BundleChoiceGroup'
+            $ref: '#/components/schemas/GuestBundleChoiceGroup'
         validFrom:
           type: string
           format: date-time
@@ -10950,6 +11045,99 @@ components:
           type: string
           format: date-time
           nullable: true
+    GuestBundleComponent:
+      x-ticvai-persistence: none — guest projection of promotions.bundle_component, named from catalogue.product and catalogue.variant
+      type: object
+      description: '**A bundle component as a guest sees it** (ADAM CR-597, option A with guest-only shapes, Chinmay,
+        3 November 2026; CHG-CR597-001). `BundleComponent` stays the staff and stored shape and is unchanged; this
+        one carries the component''s public name and never its menu item, redemption outlets or substitution fields.
+        `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - id
+      - variantId
+      - name
+      - quantity
+      properties:
+        id:
+          type: string
+          format: uuid
+        variantId:
+          type: string
+          format: uuid
+          x-ticvai-references: catalogue.variant
+        name:
+          type: string
+          description: 'The catalogue''s public text for the component''s variant: the product name, plus the variant
+            name when the product has more than one variant.'
+        description:
+          type: string
+          nullable: true
+          description: The catalogue's public description of the component's product.
+        quantity:
+          type: integer
+          minimum: 1
+        componentKind:
+          $ref: '#/components/schemas/BundleComponentKind'
+        isOptional:
+          type: boolean
+    GuestBundleChoiceGroup:
+      x-ticvai-persistence: none — guest projection of promotions.bundle_choice_group
+      type: object
+      description: '**A bundle choice group as a guest sees it** (ADAM CR-597; CHG-CR597-001): its label and the
+        options still offered, each named. `BundleChoiceGroup` stays the staff and stored shape and is unchanged.
+        `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - id
+      - label
+      - choose
+      - options
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        choose:
+          type: integer
+          minimum: 1
+        allowDuplicates:
+          type: boolean
+        options:
+          type: array
+          description: The options offered; one not offered (`unavailableBehaviour` `hideOption`) is left out.
+          items:
+            $ref: '#/components/schemas/GuestBundleChoiceOption'
+    GuestBundleChoiceOption:
+      x-ticvai-persistence: none — guest projection of promotions.bundle_choice_option, named from catalogue.product and catalogue.variant
+      type: object
+      description: '**A choice option as a guest sees it** (ADAM CR-597; CHG-CR597-001). No option price: the bundle
+        price does not move with the choice (ADR-0019). `additionalProperties: false` is the point.'
+      additionalProperties: false
+      required:
+      - id
+      - variantId
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        variantId:
+          type: string
+          format: uuid
+          x-ticvai-references: catalogue.variant
+        name:
+          type: string
+          description: The catalogue's public text for the option's variant, as for a component.
+        description:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+        isDefault:
+          type: boolean
+          description: Preselected on the screen.
     GuestPromotion:
       x-ticvai-persistence: none — guest projection of promotions.promotion
       type: object

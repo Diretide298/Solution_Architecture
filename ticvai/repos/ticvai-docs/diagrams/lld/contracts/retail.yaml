@@ -68,6 +68,7 @@ operations:
   - retail.merchandise
   writes:
   - cache:idempotency
+  - platform.outbox
   - retail.merchandise
 - operation: createRetailExchange
   verb: POST
@@ -371,4 +372,5 @@ operations:
   - retail.merchandise
   writes:
   - cache:idempotency
+  - platform.outbox
   - retail.merchandise

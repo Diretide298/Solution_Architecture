@@ -65,6 +65,21 @@ same kind that nothing held:
   C-SELF-404               an `x-ticvai-self-scoped` operation addressed by a path id that declares no 404: another
                            caller's record is refused exactly as one that does not exist (contracts/README.md,
                            CHG-GCF-002), and that answer is the shared `NotFound` (r13 review, CHG-R13RVB-001)
+  C-GUEST-OWNER            an operation a guest can call (audience guest or anonymous), addressed by a path id that names
+                           somebody's object (audit_guard.private_path_ids: not published, not a cart's, not a
+                           credential), that declares neither `x-ticvai-self-scoped` nor `x-ticvai-object-owner`, or an
+                           owner outside subject | share | delegation | session | token (r13 system review C-03,
+                           CHG-R14H-003: 52 such operations, getEntitlementCredential returning the admission seed).
+                           C-SELF-404 then holds the owned ones to the shared 404
+  C-ANON-SUBJECT           an operation that admits a call with no credential (`security: []` or a `{}` alternative) and
+                           takes a `subjectId`, `guestId` or `customerId` in its body or query whose description does not
+                           say what a caller with no credential gets ("anonymous", "no credential", "no session"): a
+                           visitor naming another guest's subject (r13 system review C-06, CHG-R14H-003;
+                           decideRecommendations)
+  C-SECRET-PARAM           a path or header parameter that carries a credential (a path `{token}` or `{cardCode}`, a
+                           header named for a PIN, token, secret or key) without `x-ticvai-secret: bearer`, or a
+                           `bearer` parameter that is neither in the path nor a header (r13 system review C-13,
+                           CHG-R14H-005): logs and the edge keep the route template, never a marked value
   C-HTML-SANITISED         a schema or property whose description says its values are HTML and does not say they are
                            "sanitised on write" (a schema also states its "Allowed tags"), or a write whose body reaches
                            such a schema or property and whose description does not say it sanitises (ADAM CR-401,
@@ -132,8 +147,15 @@ RULES = {
                             "without the problem type named beside it (ADAM CR-316, CHG-CR316-001; CHG-R13RVB-002)",
     "C-LOCK-NOTE-COPIED": "two operations' x-ticvai-lock-note state the same guarded UPDATE statement, so one of "
                           "them states another's movement (r13 review, CHG-R13RVB-005)",
-    "C-SELF-404": "a self-scoped operation addressed by a path id declares no 404, the answer for another caller's "
-                  "record (contracts/README.md, CHG-GCF-002; CHG-R13RVB-001)",
+    "C-SELF-404": "a self-scoped or owned (x-ticvai-object-owner) operation addressed by a path id declares no 404, "
+                  "the answer for another caller's record (contracts/README.md, CHG-GCF-002; CHG-R13RVB-001; "
+                  "CHG-R14H-003)",
+    "C-GUEST-OWNER": "a guest-reachable operation addressed by somebody's object id says neither x-ticvai-self-scoped "
+                     "nor x-ticvai-object-owner (r13 system review C-03, CHG-R14H-003)",
+    "C-SECRET-PARAM": "a path or header parameter carrying a credential is not x-ticvai-secret: bearer (r13 system "
+                      "review C-13, CHG-R14H-005)",
+    "C-ANON-SUBJECT": "an operation callable with no credential takes a guest's subject and does not say what an "
+                      "anonymous caller's subject does (r13 system review C-06, CHG-R14H-003)",
     "C-FINDING-RULE": "a finding-kind enum whose kind table gives a kind no 'reported when' rule (ADAM CR-320, "
                       "CHG-CR320-001)",
     "C-HTML-SANITISED": "a schema documented as HTML that names no sanitising on write, or a write reaching it that "
@@ -443,6 +465,90 @@ def pure_operations() -> dict:
 PURE_OPS: dict = {}
 
 
+def guest_owner_problems(oid: str, op: dict, path: str, codes: set) -> list:
+    """C-GUEST-OWNER and the owned half of C-SELF-404 for one operation (r13 system review C-03, CHG-R14H-003)."""
+    out = []
+    aud = op.get("x-ticvai-audience") or []
+    aud = {aud} if isinstance(aud, str) else {str(a) for a in aud}
+    owner = op.get("x-ticvai-object-owner")
+    if owner is not None:
+        vals = owner if isinstance(owner, list) else [owner]
+        bad = [v for v in vals if v not in g.OBJECT_OWNERS]
+        if bad or not vals:
+            out.append(("C-GUEST-OWNER", f"{oid}:owner", f"{oid}: x-ticvai-object-owner {owner} names "
+                        f"{bad or 'nobody'}; the owners are {' | '.join(g.OBJECT_OWNERS)}"))
+        if "{" in path and "404" not in codes:
+            out.append(("C-SELF-404", oid, f"{oid}: owned ({owner}) and addressed by {path}, and declares no 404: "
+                        "another guest's object is the shared NotFound"))
+    if not aud & {"guest", "anonymous"} or op.get("x-ticvai-self-scoped") or owner is not None:
+        return out
+    ids = g.private_path_ids(path)
+    if ids:
+        out.append(("C-GUEST-OWNER", oid, f"{oid}: a guest reaches it by {', '.join('{' + i + '}' for i in ids)} "
+                    f"({path}) and it says neither x-ticvai-self-scoped nor x-ticvai-object-owner: whose object a "
+                    "guest may name is unsaid, so another guest's id is not held to the shared 404"))
+    return out
+
+
+ANON_WORDS = re.compile(r"anonymous|no credential|no session|without a session|signed[- ]out", re.I)
+SUBJECT_FIELDS = ("subjectId", "guestId", "customerId")
+
+
+def anon_subject_problems(oid: str, f: dict, docs: dict) -> list:
+    """C-ANON-SUBJECT for one operation (r13 system review C-06, CHG-R14H-003)."""
+    op = f["op"]
+    sec = op["security"] if "security" in op else (docs.get(f["contract"]) or {}).get("security")
+    if not (sec == [] or any(isinstance(x, dict) and not x for x in (sec or []))):
+        return []
+    by, _ = g.schemas()
+
+    def props(node, depth=0):
+        if not isinstance(node, dict) or depth > 6:
+            return {}
+        ref = node.get("$ref")
+        if isinstance(ref, str):
+            fpart, _, frag = ref.partition("#")
+            st = fpart.rsplit("/", 1)[-1].rsplit(".", 1)[0] if fpart else f["contract"]
+            node = by.get((st, frag.rsplit("/", 1)[-1])) or {}
+        out = dict(node.get("properties") or {})
+        for part in node.get("allOf") or []:
+            out.update(props(part, depth + 1))
+        return out
+    body = ((((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {})
+    fields = props(body)
+    fields.update({str(p.get("name")): p for p in list(f["item"].get("parameters") or []) + list(op.get("parameters") or [])
+                   if isinstance(p, dict) and p.get("in") == "query"})
+    out = []
+    for name in SUBJECT_FIELDS:
+        spec = fields.get(name)
+        if isinstance(spec, dict) and not ANON_WORDS.search(str(spec.get("description") or "")):
+            out.append(("C-ANON-SUBJECT", f"{oid}:{name}", f"{oid}: callable with no credential and takes {name}, whose "
+                        "description does not say what an anonymous caller's value does (ignored, or refused)"))
+    return out
+
+
+SECRET_HEADER = re.compile(r"(pin|token|secret|password|key)$", re.I)
+SECRET_HEADER_NOT = {"Idempotency-Key", "X-Consistency-Token", "If-Match"}
+
+
+def secret_param_problems(oid: str, params: list, path: str) -> list:
+    """C-SECRET-PARAM for one operation's parameters (r13 system review C-13, CHG-R14H-005)."""
+    out = []
+    for p in params:
+        if not isinstance(p, dict) or "$ref" in p:
+            continue
+        name, where, mark = str(p.get("name") or ""), p.get("in"), p.get("x-ticvai-secret")
+        cred = (where == "path" and name in g.BEARER_PATH_IDS and name != "code") \
+            or (where == "header" and name not in SECRET_HEADER_NOT and bool(SECRET_HEADER.search(name)))
+        if cred and mark != "bearer":
+            out.append(("C-SECRET-PARAM", f"{oid}:{name}", f"{oid}: the {where} parameter {name} carries a credential "
+                        "and is not x-ticvai-secret: bearer, so nothing keeps it out of logs and edge traces"))
+        if mark == "bearer" and where not in ("path", "header"):
+            out.append(("C-SECRET-PARAM", f"{oid}:{name}:in", f"{oid}: {name} is x-ticvai-secret: bearer in {where}: "
+                        "a credential travels in the path (route-templated) or a header (deny-listed), never a query"))
+    return out
+
+
 def main() -> int:
     g.force_utf8()
     PURE_OPS.update(pure_operations())
@@ -451,6 +557,11 @@ def main() -> int:
     docs = {stem: doc for stem, _, doc in g.contracts()}
     vocab = set()
     prose = []
+    # C-SECRET-PARAM over the shared parameters every contract can name (CHG-R14H-005)
+    for stem_, d_ in sorted(docs.items()):
+        for pname, p in sorted(((d_.get("components") or {}).get("parameters") or {}).items()):
+            for rule, key, msg in secret_param_problems(f"{stem_}#/components/parameters/{pname}", [p], ""):
+                guard.add(rule, key, msg)
 
     for oid, f in sorted(ops.items()):
         op, doc, m = f["op"], docs[f["contract"]], f["method"]
@@ -565,6 +676,13 @@ def main() -> int:
         if op.get("x-ticvai-self-scoped") and "{" in f["path"] and "404" not in codes:
             guard.add("C-SELF-404", oid, f"{oid}: self-scoped and addressed by {f['path']}, and declares no 404: "
                                          f"another caller's record is the shared NotFound")
+        for rule, key, msg in guest_owner_problems(oid, op, f["path"], codes):
+            guard.add(rule, key, msg)
+        for rule, key, msg in anon_subject_problems(oid, f, docs):
+            guard.add(rule, key, msg)
+        for rule, key, msg in secret_param_problems(oid, list(f["item"].get("parameters") or [])
+                                                    + list(op.get("parameters") or []), f["path"]):
+            guard.add(rule, key, msg)
         last = f["path"].rstrip("/").rsplit("/", 1)[-1]
         if m == "post" and re.search(r"/\{[^}]+\}/[a-z][a-z-]*$", f["path"]) and "409" not in codes \
                 and not last.endswith("s") \

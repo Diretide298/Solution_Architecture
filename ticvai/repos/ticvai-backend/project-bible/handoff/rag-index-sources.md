@@ -19,7 +19,7 @@ must not become a failure to publish a product.
 | `fnb.menu_item` | name, description, allergens | catalogue | venue | wholeRecord | `fnb.menuPublished` |
 | `retail.merchandise` | name, description | catalogue | venue | wholeRecord | `retail.merchandisePublished` |
 | `maintenance.inspection_template` | name, instructions | knowledge | venue | section | `maintenance.templatePublished` |
-| `marketing.case` | subject, resolutionNote | knowledge | tenant | wholeRecord | `marketing.caseClosed` |
+| `marketing.case` | title, resolutionNote | knowledge | tenant | wholeRecord | `marketing.caseClosed` |
 | `reporting.report_definition` | name, description | knowledge | tenant | wholeRecord | `reporting.definitionPublished` |
 | `assets.media_asset` | title, extractedText | knowledge | tenant | section | `assets.documentIndexed` |
 
@@ -60,13 +60,18 @@ fall back on, so scope is carried or it is not enforced. A venue's operating pro
 not answer a question about another venue.
 
 **Deletion is explicit.** Removing a row from Postgres does not remove its vectors from
-Qdrant — nothing cascades between the stores. `removeIndexEntry` exists for that, and it is
-the path `pii.erase_subject` must call. **A knowledge base still answering from an erased
-subject is an erasure that did not happen.**
+Qdrant — nothing cascades between the stores. `removeIndexEntry` removes one record and
+`eraseSubject` every entry of an erased subject; `deleteGuestAccount` and an erasure that
+arrives another way call them, and so does archiving (ADR-0047). **A knowledge base still
+answering from an erased subject is an erasure that did not happen.**
 
-**A full rebuild builds into a shadow collection and swaps.** Reindexing in place leaves the
-assistant answering from a half-built index, which is worse than a stale one — stale is wrong
-in a knowable way.
+**A rebuild never exposes a half-built index.** A tenant has one collection per embedding model
+holding every source (ADR-0049), so a rebuild of one source writes its new points into that
+collection under a new index epoch; retrieval filters on the old epoch until the rebuild is
+verified, then flips in one step (`reindexSource`, lead decision of 20 October 2026). **The
+shadow collection and alias swap are for a change of embedding model only**, which rebuilds every
+source. Reindexing in place would leave the assistant answering from a half-built index, which is
+worse than a stale one — stale is wrong in a knowable way.
 
 ## The seven events they need now all exist
 
@@ -84,15 +89,17 @@ declared in `events/`, and `catalogue.productPublished` is no longer the only mo
 | `assets.documentIndexed` | `events/assets-documentIndexed.yaml` | assets |
 
 **None of them is AI-specific and that was the argument for writing them** — each is a fact the
-owning service should publish anyway, and other consumers want them. 30 events are now declared.
+owning service should publish anyway, and other consumers want them. Each lists `ai` as a consumer,
+which is what makes it an invalidation and not only a notification. 113 events were declared on
+3 November 2026.
 
-## The six missing text fields: four closed, two not
+## The six text fields added on 19 September: all present now
 
-**Verified column by column on 20 September against `handoff/schema-reference.json`, and re-checked on 21 September.**
-**No source was added**: the two tables that arrived that day — `payments.dunning_policy` and `payments.dunning_case` — carry no retrievable text, and a dunning queue is transactional rather than knowledge. **The check did find one thing**: `resolveDunningCase` accepted a `note` that `DunningCase` had nowhere to store, so it was being dropped. `resolutionNote` now exists, modelled on `marketing.case.resolution_note`, which is a source here for exactly that reason — **and it is deliberately not added to the eleven**, because a note about somebody's failed payment is not knowledge anybody should be able to retrieve by asking. All
-eleven tables exist and every one is read by an AI operation in the lineage, which is what
-`check-package` enforces. **Two of the six fields added on 19 September are not where this
-register says they are**, and both are sources whose whole value is the missing field.
+**Re-verified column by column on 3 November 2026 against `handoff/schema-reference.json`**
+(earlier checks on 20 and 21 September). `tools/check-authored-inputs.py` now holds every text
+field in the table above to a column of its table, every invalidating event to `events/`, and the
+eleven tables to the ones `reindexSource` reads, so this section records history rather than
+being the check.
 
 | Source | Column | State |
 |---|---|---|
@@ -100,23 +107,39 @@ register says they are**, and both are sources whose whole value is the missing 
 | `catalogue.entitlement_template` | `description` | present |
 | `retail.merchandise` | `description` | present |
 | `maintenance.inspection_template` | `instructions` | present |
-| `marketing.case` | `resolution` | **landed as `resolution_note`.** Register corrected to `resolutionNote`; the column is right and the name here was wrong |
-| `assets.media_asset` | `extractedText` | **on the wrong schema — open** |
+| `marketing.case` | `resolution_note` | present; the register said `resolution` until 20 September |
+| `assets.media_asset` | `extracted_text` | **present since r8** (blocker ORDERS-MONEY-C19); `MediaUsage.extractedText` is kept on the wire and never written |
 
-### `extractedText` is on `MediaUsage`, not `MediaAsset`
+**`marketing.case` named a column it never had.** Until 3 November its text fields read
+*subject, resolutionNote*; the case has no subject column — `subject_id` is the guest — and the
+text a person reads is `title`. Corrected to `title`. The same check also found the sentence that
+named pii.erase_subject as the erasure path, which was never a table or an operation.
 
-`contracts/satellite/assets.yaml` carries `extractedText` on **`MediaUsage`**, whose
-`x-ticvai-persistence` is `assets.media_usage` — the row recording *where an asset is used*,
-required fields `surface` and `referenceId`. The asset itself, `MediaAsset` on
-`assets.media_asset`, does not have it.
+**`extractedText` moved to the asset.** On 20 September it sat on `MediaUsage`, the row
+recording where an asset is used, so the generic upload path indexed a column that did not exist.
+`MediaAsset.extractedText` now holds it, written by the upload's processing job, and
+`ingestKnowledgeDocument` reads it through Assets' `mediaAssetRecords`.
 
-**So the generic upload path indexes a column that does not exist**, which this register's own
-rule calls out: an index built on a missing column embeds a title and nothing else, and a PDF
-nobody can search is a PDF nobody reads. It is also inserted above `id:` at the top of
-`MediaUsage`'s properties rather than in place, which is the signature of an insertion that
-matched the wrong anchor.
+**No source was added on 21 September**: the two tables that arrived that day —
+`payments.dunning_policy` and `payments.dunning_case` — carry no retrievable text, and a dunning
+queue is transactional rather than knowledge. `resolveDunningCase` accepted a `note` that
+`DunningCase` had nowhere to store; `resolutionNote` now exists, modelled on
+`marketing.case.resolution_note`, **and it is deliberately not a source**, because a note about
+somebody's failed payment is not knowledge anybody should be able to retrieve by asking.
 
-**This is a contract change and contracts are frozen**, so it is recorded rather than made. The
-fix is to move the property to `MediaAsset`; nothing reads it yet, so nothing breaks in the
-meantime except the source it was written for.
+## What the contract now says that this register does not
 
+**Two statements in `contracts/satellite/ai.yaml` post-date this register and are not reconciled
+with it.** Both are recorded here rather than resolved, because which kind a source feeds is a
+declaration a tenant makes through `setIndexSource`, and the defaults are the AI lead's call.
+
+- **Every declaration now carries a search kind** (`IndexSource.kind`: product, entitlement,
+  knowledge, faq, report or media; R8 blocker ORDERS-MONEY-C37, the lead's answer of 20 October
+  2026). A source with no kind is indexed and searched by nothing. The *Collection* column above
+  names the knowledge collection a source lands in (`collectionId`), which is not the kind.
+- **`assets.media_asset` is described twice.** `semanticSearch` (23.1.6, 29 September) says the
+  `media` kind's source over `assets.media_asset` embeds the asset's title, description and tags;
+  this register's row embeds title and extracted text into `knowledge`. A table has at most one
+  declaration (`IndexSource.table` is unique), so one of the two is the default and the other is
+  served elsewhere — uploaded documents' text already reaches `knowledge` through
+  `ingestKnowledgeDocument`.

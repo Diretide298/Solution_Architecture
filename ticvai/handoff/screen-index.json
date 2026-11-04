@@ -1199,18 +1199,20 @@
     "trigger": "Ticket Type Selection",
     "carries": [
      "cartId",
-     "performanceId"
+     "performanceId",
+     "productId"
     ],
-    "provenance": "derived \u2014 WEB-005 declares entryState.params cartId, performanceId, productId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-005 declares entryState.params cartId, performanceId, productId and WEB-008 holds cartId, performanceId, productId, so an edge into it carries them"
    },
    {
     "to": "WEB-006",
     "trigger": "Date & Performance Selection",
     "carries": [
      "cartId",
-     "performanceId"
+     "performanceId",
+     "productId"
     ],
-    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-008 holds cartId, performanceId, productId, so an edge into it carries them"
    },
    {
     "to": "WEB-010",
@@ -1610,12 +1612,18 @@
    {
     "to": "WEB-012",
     "trigger": "Pays",
-    "provenance": "flow F01 step 6\u21927, F02 step 4\u21925"
+    "provenance": "flow F01 step 6\u21927, F02 step 4\u21925",
+    "carries": [
+     "orderId"
+    ]
    },
    {
     "to": "WEB-012",
     "trigger": "Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)",
-    "provenance": "decided 29 September 2026, W1"
+    "provenance": "decided 29 September 2026, W1",
+    "carries": [
+     "orderId"
+    ]
    },
    {
     "to": "WEB-010",
@@ -3959,7 +3967,10 @@
    {
     "to": "WEB-031",
     "trigger": "My Reservations",
-    "provenance": "derived \u2014 WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId, resourceId only pre-select (optional); WEB-031 finds productId (listGroupPackages) itself, and WEB-031 opens on its own"
+    "carries": [
+     "productId"
+    ],
+    "provenance": "derived \u2014 WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds productId, so an edge into it carries them"
    },
    {
     "to": "GST-014",
@@ -4469,7 +4480,7 @@
    {
     "to": "WEB-030",
     "trigger": "Ticket Transfer",
-    "provenance": "derived \u2014 WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: transferId only pre-selects (optional); WEB-030 finds orderId (listMyOrders) itself, and WEB-030 opens on its own"
+    "provenance": "derived \u2014 WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: transferId only pre-selects (optional); WEB-030 finds orderId (listTicketTransfers) itself, and WEB-030 opens on its own"
    },
    {
     "to": "WEB-031",
@@ -9172,9 +9183,10 @@
     "trigger": "Checkout Entry",
     "carries": [
      "lineId",
-     "performanceId"
+     "performanceId",
+     "productId"
     ],
-    "provenance": "derived \u2014 GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-026 holds lineId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-026 holds lineId, performanceId, productId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -10838,11 +10850,6 @@
     "provenance": "derived \u2014 GST-001 declares entryState.params  and GST-041 holds none of them. The edge carries nothing: GST-041 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
    },
    {
-    "to": "GST-059",
-    "trigger": "They follow it through the day",
-    "provenance": "flow F49 step 5\u21926"
-   },
-   {
     "to": "GST-009",
     "trigger": "Checkout",
     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction); no payment id since Checkout makes no order here (ADAM CR-576)",
@@ -10850,6 +10857,12 @@
      "orderId",
      "token"
     ]
+   },
+   {
+    "to": "GST-059",
+    "trigger": "They follow it through the day",
+    "provenance": "flow F49 step 5\u21926",
+    "operation": "getCart"
    }
   ],
   "machine": null,
@@ -17399,9 +17412,10 @@
     "trigger": "Sell \u2014 Ticket Catalogue",
     "carries": [
      "orderId",
+     "productId",
      "promotionId"
     ],
-    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-010 holds orderId, promotionId, so an edge into it carries them"
+    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-010 holds orderId, productId, promotionId, so an edge into it carries them"
    },
    {
     "to": "POS-003",
@@ -18940,9 +18954,10 @@
     "to": "POS-002",
     "trigger": "Sell \u2014 Ticket Catalogue",
     "carries": [
+     "productId",
      "promotionId"
     ],
-    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-021 holds promotionId, so an edge into it carries them"
+    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-021 holds productId, promotionId, so an edge into it carries them"
    },
    {
     "to": "POS-022",
@@ -19285,9 +19300,10 @@
     "to": "POS-002",
     "trigger": "Sell \u2014 Ticket Catalogue",
     "carries": [
+     "productId",
      "promotionId"
     ],
-    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-023 holds promotionId, so an edge into it carries them"
+    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-023 holds productId, promotionId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -19892,7 +19908,10 @@
    {
     "to": "POS-002",
     "trigger": "Sell \u2014 Ticket Catalogue",
-    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-027 holds none of them. The edge carries nothing: cardCode only pre-selects (optional); POS-002 finds orderId (createOrder), productId (listProducts), promotionId (evaluatePromotions) itself, and POS-002 opens on its own"
+    "carries": [
+     "productId"
+    ],
+    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-027 holds productId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -35897,6 +35916,7 @@
     "trigger": "Packages & Bundles",
     "provenance": "flow F77 step 1\u21922",
     "carries": [
+     "bundleId",
      "productId",
      "version"
     ]
@@ -37267,9 +37287,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-022 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-022 holds productId, variantId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -37596,9 +37617,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-023 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-023 holds productId, variantId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -38141,10 +38163,11 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId",
      "version"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-026 holds variantId, version, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-026 holds productId, variantId, version, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -38494,9 +38517,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-027 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-027 holds productId, variantId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -40903,9 +40927,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-047 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-047 holds productId, variantId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -180156,6 +180181,7 @@
     "crossesDevice": true,
     "back": false,
     "carries": [
+     "productId",
      "variantId"
     ]
    }

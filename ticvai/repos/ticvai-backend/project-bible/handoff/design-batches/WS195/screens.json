@@ -278,6 +278,8 @@
       {
        "kind": "secondaryButton",
        "label": "Retry Failed Event",
+       "operation": "replayEvents",
+       "notes": "Re-delivers the selected subscription's failed events, as the VM close-out of 29 September mapped it (`replayEvents`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions"
       },
       {
@@ -1459,7 +1461,7 @@
   "name": "Integration Monitoring & Exception Workbench",
   "module": "Orders & Money",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
@@ -1555,7 +1557,8 @@
         "Status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Exception Categories”, “Workflow”.",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display",
+       "operation": "getWalletIntegrationMapping"
       }
      ]
     },
@@ -1566,16 +1569,21 @@
       {
        "kind": "primaryButton",
        "label": "Retry",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+       "provenance": "contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)",
+       "operation": "replayEvents"
       },
       {
        "kind": "secondaryButton",
        "label": "Replay",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+       "provenance": "contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)",
+       "operation": "replayEvents"
       },
       {
        "kind": "secondaryButton",
        "label": "Correct mapping",
+       "reads": [
+        "getWalletIntegrationMapping"
+       ],
        "operation": "setWalletIntegrationMapping",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
       },
@@ -1623,6 +1631,44 @@
     "confirm": {
      "operation": "setApiClientStatus"
     }
+   },
+   {
+    "id": "formReplayEvents",
+    "component": "modal",
+    "trigger": "Replay",
+    "body": "**Collects what `replayEvents` sends before it is called.** Required: `from`. Optional: `to`, `eventTypes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Replay",
+     "operation": "replayEvents"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "from",
+      "to",
+      "eventTypes"
+     ]
+    },
+    "provenance": "contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   },
+   {
+    "id": "formRetryReplayEvents",
+    "component": "modal",
+    "trigger": "Retry",
+    "body": "**Collects what `replayEvents` sends before it is called.** Required: `from`. Optional: `to`, `eventTypes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Retry",
+     "operation": "replayEvents"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "from",
+      "to",
+      "eventTypes"
+     ]
+    },
+    "provenance": "contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "states": {
@@ -1633,6 +1679,13 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getWalletIntegrationMapping",
+    "contract": "wallet",
+    "purpose": "The mapping Correct mapping opens on",
+    "trigger": "onLoad",
+    "provenance": "r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)"
+   },
    {
     "operationId": "listWalletDisputes",
     "contract": "wallet",
@@ -2003,6 +2056,18 @@
        "provenance": "contract approvals.yaml GET /approval-requests; wiring fix, 2 October 2026"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Send for approval",
+       "operation": "createApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+      }
+     ]
     }
    ]
   },
@@ -2054,6 +2119,36 @@
   },
   "apisNote": "Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 124. 0 of 0 labels bound to a contract property; 17 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {},
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Send for approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Send for approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

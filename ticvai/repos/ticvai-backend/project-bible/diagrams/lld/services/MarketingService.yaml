@@ -4,9 +4,10 @@ generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**285 operations and 134 tables — the biggest thing in the package, and probably two services
-  eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
-  and written rarely; a campaign send is a burst of millions of rows nobody reads again.
+why: '**The biggest contract in the package, and probably two services eventually** (285 operations
+  and 134 tables on 3 November 2026, the most of any contract and of any schema). CRM and campaigns
+  have different write patterns: a guest profile is read constantly and written rarely; a campaign send
+  is a burst of millions of rows nobody reads again.
 
 
   **Kept as one for now** because splitting a service before it has a load profile is guessing.'
@@ -2306,8 +2307,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 5
-    writes: 2
+    reads: 35
+    writes: 4
 tables:
 - store: cache:idempotency
   kind: cache
@@ -2733,7 +2734,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.booking_consent_record
-  columns: 20
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -3043,7 +3044,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.form_submission
-  columns: 12
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3134,7 +3135,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.guest_profile
-  columns: 23
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -3155,7 +3156,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.invitation
-  columns: 10
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -3252,11 +3253,9 @@ tables:
   - fnb
   - marketing-crm
   - orders
-  - public-api
   foreignWriters:
   - fnb
   - orders
-  - public-api
 - table: marketing.message_dispatch_attempt
   columns: 15
   store: postgres
@@ -3511,7 +3510,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.suppression
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -3602,7 +3601,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.waiver_signature
-  columns: 16
+  columns: 15
   store: postgres
   parent: null
   writtenBy: []
@@ -3729,6 +3728,7 @@ screens:
 - P01:WEB-006 Date & Performance Selection
 - P01:WEB-009 Wishlist
 - P01:WEB-011 Guest Details & Attendee Forms
+- P01:WEB-012 Checkout — Payment
 - P01:WEB-016 Login / Register
 - P01:WEB-017 My Account Dashboard
 - P01:WEB-020 Profile & Preferences
@@ -3743,6 +3743,8 @@ screens:
 - P01:WEB-046 In-Venue Notifications
 - P02:GST-001 Home
 - P02:GST-007 Select Date & Time
+- P02:GST-008 Tickets & Add-ons
+- P02:GST-009 Review & Payment
 - P02:GST-020 Saved Items / Wishlist
 - P02:GST-030 In-Venue Notifications
 - P02:GST-031 AI Concierge – Home

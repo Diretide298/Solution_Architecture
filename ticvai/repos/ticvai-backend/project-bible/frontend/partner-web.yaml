@@ -38,7 +38,7 @@ contracts:
 - reporting
 - seating
 - subscription
-deployment:
+deployment: &id001
   target: browser
   distribution: served from the cell
   bundleUpdate: immediate on deploy
@@ -47,6 +47,12 @@ deployment:
   deviceOwnership: partner device, unmanaged
   networkAssumption: public internet
   releaseCadence: monthly — partners integrate against it
+platformProfiles:
+- platform: P10
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment: *id001
 screenCount: 43
 byWave:
   wave1: 1

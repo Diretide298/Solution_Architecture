@@ -33,12 +33,14 @@
     "description": "Written to the erasable store (`pii.subject`), never to the incident (ADR-0023)."
    },
    "phone": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "maxLength": 32,
     "writeOnly": true,
     "description": "Stored only with `contactConsent` true."
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email",
     "maxLength": 254,
@@ -387,6 +389,7 @@
     "nullable": true
    },
    "guestName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "readOnly": true,
@@ -976,6 +979,14 @@
    "quotedUnitPrice"
   ],
   "properties": {
+   "holderSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "guest",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The named holder of the line, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind guest; null while none is given."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -1076,6 +1087,11 @@
     "description": "What the client charged, from its local bundle."
    },
    "holderName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "holderSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -1442,6 +1458,7 @@
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "subjectId": {
+    "x-ticvai-subject-kind": "guest",
     "x-ticvai-data-class": "behavioural",
     "x-ticvai-unique": "tenant",
     "type": "string",
@@ -1449,21 +1466,37 @@
     "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n**One profile per guest** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): unique in the tenant, so `getMyProfile` and `updateMyProfile` read and write the one row of the session's subject. The profile's segment is the one it was first captured in.\n"
    },
    "displayName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-pii": {
+     "store": "contact.email",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "phone": {
+    "x-ticvai-pii": {
+     "store": "contact.phone",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredLanguage": {
+    "x-ticvai-pii": {
+     "store": "subject.preferredLanguage",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
@@ -2130,6 +2163,43 @@
    }
   }
  },
+ "OfflineStepUpEvidence": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; Identity keeps it on the step-up's identity.offline_step_up row",
+  "description": "**What the device says about an offline step-up it checked itself** (decided 3 November 2026, Chinmay, system review finding F-01, \"Offline verifier\"; CHG-R14V-001). It is evidence, never authority: the server re-checks the step-up at sync whatever this says.",
+  "required": [
+   "packageId",
+   "verifierId",
+   "verifiedAt",
+   "failedAttemptsBefore"
+  ],
+  "properties": {
+   "packageId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The offline step-up package (identity `OfflineStepUpPackage.packageId`) the device checked against. It must have been issued to the calling workstation.",
+    "x-ticvai-stored-as": "identity.offline_step_up.package_id"
+   },
+   "verifierId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The signer's verifier in that package (`OfflineStepUpSigner.verifierId`).",
+    "x-ticvai-stored-as": "identity.offline_step_up.verifier_id"
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the typed PIN matched the verifier.",
+    "x-ticvai-stored-as": "identity.offline_step_up.verified_at"
+   },
+   "failedAttemptsBefore": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Wrong PINs the device counted for this signer since its package was applied, before this one matched. Kept for review; it does not count towards the server's lockout.",
+    "x-ticvai-stored-as": "identity.offline_step_up.failed_attempts_before"
+   }
+  }
+ },
  "Order": {
   "x-ticvai-persistence": "orders.sales_order + orders.order_line",
   "x-ticvai-rls": "guest-reads-own",
@@ -2256,7 +2326,21 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001): `createPayment` re-locks the quote on the order and, when `chargeTotal` changed, answers `409 quoteExpired` with the new quote before charging anything (ADAM CR-577)."
+   },
+   "termsVersion": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the `termsAndConditions` version `checkoutCart` took in `termsAccepted`, checked against the policy in force. Null when the checkout sent none; never filled in from the policy in force."
+   },
+   "termsAcceptedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the guest accepted `termsVersion`, the time `checkoutCart` wrote the order (ADAM CR-576). Null with `termsVersion`."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2499,6 +2583,13 @@
       "format": "uuid",
       "readOnly": true,
       "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "productId": {
+      "x-ticvai-references": "catalogue.product",
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on `orders.order_line`: copied from the cart line by `checkoutCart`, as `recommendationId` is, and returned on every read of an order's lines (`getOrder` included). Orders made before this change get it filled in from their variant's product. A client never sends it."
      },
      "discounts": {
       "type": "array",
@@ -3107,6 +3198,13 @@
  },
  "Product": {
   "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
+  "x-ticvai-index": [
+   [
+    "venueId",
+    "displayOrder",
+    "id"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -3143,6 +3241,28 @@
    "description": {
     "type": "string"
    },
+   "bookingEntry": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "dateFirst",
+     "productFirst",
+     "venueMap",
+     "timeWindow",
+     "bundle"
+    ],
+    "description": "**Which booking screen Book opens** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). Worked out on read and never stored; set on every guest or visitor read that answers a product (`listProducts`, `getProduct`) and on every `searchCatalogue` result, null on staff reads, and null when the product has no Book (info-only). In this order: (a) kind `bundle` gives `bundle` while `bundleId` is set; with no such bundle it is null and the card opens Item Detail as now. (b) `requiresTimeWindow` true gives `timeWindow`. (c) Otherwise the product's published booking flow by `getPublishedBookingFlow`'s rule (the product's flow, then its category's, then the venue's enabled default for its kind, with the same tie rule), from `white-label#publishedBookingFlowSteps`: its first enabled step, skipping `location` and `helpMeChoose`; `resourceMap` gives `venueMap`; `date`, `time` or `performance` gives `dateFirst`; any other step gives `productFirst`. If no flow resolves, the same test is applied to the default order of the flow type the kind rule picks. Book opens: `dateFirst` GST-007, `productFirst` GST-008, `venueMap` GST-074, `timeWindow` GST-075, each with `productId`; `bundle` GST-056 with `bundleId`."
+   },
+   "bundleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Set only when `bookingEntry` is `bundle` (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose `variant_id` is this product's variant, while `getGuestBundle` would return it (published, active, in its window). Never taken from a search result's `id`: for a bundle that is the bundle's catalogue product, not the bundle."
+   },
    "fromPrice": {
     "oneOf": [
      {
@@ -3153,6 +3273,12 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "nullable": true,
+    "default": 100,
+    "description": "Where this product sorts among the venue's products in listProducts, lower first. Not alphabetical: the order the venue wants guests to see. (ADAM CR-581, Chinmay, 3 November 2026; CHG-CR581-001.) Stored on `catalogue.product` as `display_order`, nullable with default 100 like `catalogue.product_category.display_order`; existing rows take 100. Set by `createProduct` (100 when not sent) and `updateProduct` (changed only when the body carries it; null stores null), and returned by every operation that answers `Product`, `getProduct` and the till's catalogue bundle included. No back-office product screen shows or edits it."
    },
    "isFeatured": {
     "type": "boolean",
@@ -3605,11 +3731,13 @@
   "minProperties": 1,
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "maxLength": 32,
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "maxLength": 254,
@@ -4296,11 +4424,19 @@
  },
  "SupervisorStepUp": {
   "type": "object",
-  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n\n**Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by `identity.listStepUpSupervisors` with the operation's permission: the active principals who hold it at the caller's venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`). **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller's own principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the picker leaves the caller out.\n",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n\n**Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by `identity.listStepUpSupervisors` with the operation's permission: the active principals who hold it at the caller's venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`). **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller's own principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the picker leaves the caller out.\n\n**Offline, the till checks the PIN against its offline verifier and the server checks it again at sync** (decided 3 November 2026, Chinmay, on system review finding F-01: \"Offline verifier\" (the till keeps a verifier, re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001). On an operation that declares `x-ticvai-offline-step-up: verifier`, a till or handheld with no connection fills the picker from its offline step-up package (identity `getOfflineStepUpPackage`: the signers who may sign that operation's permission at its venue, the caller left out), checks the typed PIN locally against that signer's verifier (Argon2id, never the PIN), and queues the call with this object as online plus `offline`, the evidence of the local check. A wrong PIN counts on the device; at the package's `attemptLimit` that signer is locked on that device until its next sync. **At sync the server re-checks everything**: the PIN against the signer's PIN credential in force at the act's `recordedAt`, the verifier (issued to this workstation's package, not expired and not revoked at `recordedAt`), and the signer's permission, venue and not-self as at `recordedAt`. **An offline step-up the server does not confirm never drops the act**: the act happened at the till, so it is recorded as sent, its success response carries `X-Ticvai-Step-Up-Verdict: refusedAtSync`, Identity keeps the refusal (`identity.offline_step_up`) and publishes `identity.offlineStepUpRefused`, which raises an alert to the venue's managers. Online, nothing changes: a failure is `403 supervisor-step-up-refused` and nothing is written.\n",
   "required": [
    "credential"
   ],
   "properties": {
+   "offline": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OfflineStepUpEvidence"
+     }
+    ],
+    "description": "**Sent only by a call queued offline** whose step-up was checked on the device against its offline verifier (CHG-R14V-001). Absent online. Kept on the step-up's `identity.offline_step_up` row, which Identity writes when it re-checks the step-up at sync."
+   },
    "principalId": {
     "type": "string",
     "format": "uuid",
@@ -4315,7 +4451,7 @@
     "type": "string",
     "maxLength": 512,
     "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in."
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in. **A call queued offline carries the PIN the signer typed** (sealed in the device's encrypted outbox and deleted from it once the call syncs) so the server can check it again at sync (CHG-R14V-001); a wrong PIN found at sync is not a new attempt and does not count towards the lockout."
    }
   }
  },

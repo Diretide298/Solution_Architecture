@@ -34,7 +34,7 @@ contracts:
 - cross-region
 - identity
 - orders
-deployment:
+deployment: &id001
   target: rugged handheld — Android
   distribution: MDM
   bundleUpdate: at shift start
@@ -43,6 +43,12 @@ deployment:
   deviceOwnership: venue-owned, issued per shift
   networkAssumption: must function with none
   releaseCadence: monthly, never on an event day
+platformProfiles:
+- platform: P07
+  formFactor: handheld
+  runtime: reactNative
+  offlineCapable: true
+  deployment: *id001
 screenCount: 11
 byWave:
   wave1: 11

@@ -1247,6 +1247,12 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Check Status, Cancel Session, Regenerate Link, View Provider Events, View Decision Trace. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 75 §Depending on permissions"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Check status",
+       "operation": "inquirePaymentStatus",
+       "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       }
      ]
     }
@@ -1583,6 +1589,18 @@
        ],
        "notes": "The pack groups this record's detail under its own headings: “Exception Types”, “Timed Out”, “Depending on condition”.",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 78 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Check status",
+       "operation": "inquirePaymentStatus",
+       "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       }
      ]
     }

@@ -20,6 +20,18 @@ built in one repository (null otherwise, or when there is none yet), and its scr
 that repository (`path`), not the `apps/<app>/` folder of the old single workspace. The screen list, `screenCount`
 and `byWave` are derived from the screens on every run; until now they were carried over from the previous file
 and had drifted (audit-guest-parity's "frontend manifest" finding).
+
+**What a platform declares is said per platform** (3 November 2026, the r13 system review F-11; the lead, "All four,
+one release"; CHG-R14J-031). runtime, offlineCapable, deployment and formFactor were taken from an app's first
+platform (offlineCapable from any), so guest-app, which serves P02 (React Native, offline, the app stores) and P05
+(the kiosk: React web, online only, a kiosk-mode shell), told the kiosk developer to build a native, offline,
+store-deployed app. Each manifest now carries `platformProfiles`, one entry per platform with what that platform
+declares, and the app-level value only where every platform it serves declares the same; where they differ the
+app-level key is absent and `mixedAcross` names it. tools/check-frontend-manifests.py FM-PLATFORM fails a manifest
+whose app-level or per-platform value is not what its platforms declare.
+
+**A redirect screen is listed as a redirect** (the r13 system review F-14; CHG-R14J-030): its row carries `redirect`
+(the screen its route goes to) and no component path, since nothing is built for it.
 """
 from __future__ import annotations
 
@@ -54,6 +66,35 @@ except Exception:
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 FRONTEND = ROOT / "frontend"
+# What each platform declares for itself (screens/P*.yaml `platform`): app-level only where all agree (CHG-R14J-031).
+PER_PLATFORM = ("formFactor", "runtime", "offlineCapable", "deployment")
+
+
+def platform_profile(p: dict) -> dict:
+    """One platform's own declaration, as a manifest's platformProfiles entry."""
+    out = {"platform": p["code"]}
+    for k in PER_PLATFORM:
+        v = bool(p.get(k)) if k == "offlineCapable" else p.get(k)
+        if v is not None:
+            out[k] = v
+    return out
+
+
+def app_level(profiles: list) -> dict:
+    """{key: the value every platform declares, or None} for PER_PLATFORM, plus mixedAcross (the keys they differ on,
+    or None). Shared with tools/check-frontend-manifests.py, so the generator and the check cannot disagree."""
+    out, mixed = {}, []
+    for k in PER_PLATFORM:
+        vals = [pr.get(k) for pr in profiles]
+        if vals and all(v == vals[0] for v in vals):
+            out[k] = vals[0]
+        else:
+            out[k] = None
+            mixed.append(k)
+    out["mixedAcross"] = mixed or None
+    return out
+
+
 HANDOFF = ROOT / "handoff"
 
 
@@ -82,6 +123,7 @@ def main() -> int:
             "screens": [],
         })
         entry["offlineCapable"] = entry["offlineCapable"] or bool(p.get("offlineCapable"))
+        entry.setdefault("_profiles", []).append(platform_profile(p))
         entry["directions"] |= set(p.get("directions") or [])
         entry["platforms"].append(f"{p['code']} {p['name']}")
         entry.setdefault("_codes", []).append(p["code"])
@@ -90,7 +132,9 @@ def main() -> int:
             imp = s.get("implementation") or {}
             row = {"id": s["id"], "name": s.get("name"), "platform": p["code"], "route": imp.get("route"),
                    "repo": repo}
-            if repo and imp.get("component"):
+            if imp.get("redirect"):
+                row["redirect"] = imp["redirect"]
+            elif repo and imp.get("component"):
                 row["path"] = fr.relative_path(imp["component"], app)
             row["wave"] = s.get("wave")
             if imp.get("status"):
@@ -107,6 +151,9 @@ def main() -> int:
         e["contracts"] = sorted(e["contracts"])
         e["servesMultiplePlatforms"] = len(e["platforms"]) > 1
         codes = e.pop("_codes")
+        profiles = e.pop("_profiles")
+        e["platformProfiles"] = profiles
+        e.update(app_level(profiles))
         e["repositories"] = [{"platform": c, "repo": fr.repo_of(c), "repoUrl": fr.url_of(fr.repo_of(c)),
                               "assumed": bool(fr.platform_entry(c).get("assumed"))} for c in codes]
         one = {r["repo"] for r in e["repositories"]}
@@ -124,18 +171,22 @@ def main() -> int:
         existing = _yload(path.read_text(encoding="utf-8")) if path.exists() else {}
         e["packages"] = existing.get("packages") or ["design-tokens", "ui", "api-client"]
         for k, v in existing.items():
-            e.setdefault(k, v)
+            if k not in PER_PLATFORM + ("mixedAcross",):   # derived per platform above, never carried over
+                e.setdefault(k, v)
 
         ordered = {k: e[k] for k in (
             "app", "operator", "audience", "formFactor", "status", "runtime", "offlineCapable",
             "directions", "platforms", "servesMultiplePlatforms", "repo", "repoUrl", "repositories",
-            "packages", "contracts", "deployment", "screenCount", "byWave", "screens")
+            "packages", "contracts", "deployment", "mixedAcross", "platformProfiles", "screenCount", "byWave",
+            "screens")
             if e.get(k) is not None or k in ("repo", "repoUrl")}
         for k, v in e.items():
-            ordered.setdefault(k, v)
+            if v is not None or k not in PER_PLATFORM + ("mixedAcross",):
+                ordered.setdefault(k, v)
 
         repos = "; ".join(f"{r['platform']} {r['repo'] or 'none yet (ask the lead)'}" for r in e["repositories"])
-        head = (f"# {app} — operated by {e['operator']} · {e['audience']} on {e['formFactor']}\n"
+        on = e.get("formFactor") or " and ".join(f"{pr.get('formFactor')} ({pr['platform']})" for pr in profiles)
+        head = (f"# {app} — operated by {e['operator']} · {e['audience']} on {on}\n"
                 f"# Serves: {', '.join(e['platforms'])}\n"
                 f"# Repository: {repos} (docs/active/frontend-repos.yaml)\n"
                 f"# Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.\n\n")

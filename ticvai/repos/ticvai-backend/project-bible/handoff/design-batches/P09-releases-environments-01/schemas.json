@@ -2,14 +2,20 @@
  "ApiVersion": {
   "type": "object",
   "x-ticvai-persistence": "control.api_version",
-  "description": "13.1.31 to 13.1.35, ADR-0026. **CF-141 is sharper under D1**: a single supported production version was tenable when only Softlabs called the API, and **with third parties a breaking change with no window breaks somebody else's business.**\n",
+  "description": "13.1.31 to 13.1.35, ADR-0026. **CF-141 is sharper under D1**: a single supported production version was tenable when only Softlabs called the API, and **with third parties a breaking change with no window breaks somebody else's business.**\n**One row per version** (ADAM CR-570, Chinmay, 3 November 2026; CHG-CR570-001): `version` is unique. The forward migration that adds the index first checks for duplicate `version` rows and stops if any are found.\n",
+  "x-ticvai-unique-together": [
+   [
+    "version"
+   ]
+  ],
   "required": [
    "version",
    "status"
   ],
   "properties": {
    "version": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique-compare": "exact"
    },
    "status": {
     "type": "string",
@@ -42,6 +48,12 @@
    "migrationGuideUrl": {
     "type": "string",
     "nullable": true
+   },
+   "deprecationReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the version was deprecated: the `reason` sent to `deprecateApiVersion`, which sets it (ADAM CR-570); null until then."
    },
    "activeClientCount": {
     "type": "integer",
@@ -514,6 +526,7 @@
     "type": "integer"
    },
    "startedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid"
    },
@@ -918,6 +931,7 @@
       "$ref": "#/components/schemas/ReleaseStatus"
      },
      "createdByPrincipalId": {
+      "x-ticvai-references": "control.platform_operator",
       "type": "string",
       "format": "uuid"
      },
@@ -942,6 +956,7 @@
       "description": "The reason given by the last `rejectRelease` or `withdrawRelease` (ADAM CR-356). The control audit row keeps each move's reason, so an earlier one is not lost."
      },
      "statusChangedByPrincipalId": {
+      "x-ticvai-references": "control.platform_operator",
       "type": "string",
       "format": "uuid",
       "nullable": true,
@@ -956,6 +971,7 @@
       "description": "When the last `rejectRelease` or `withdrawRelease` was made (ADAM CR-356)."
      },
      "withdrawalApprovedByPrincipalId": {
+      "x-ticvai-references": "control.platform_operator",
       "type": "string",
       "format": "uuid",
       "nullable": true,
@@ -1125,10 +1141,12 @@
     "type": "integer"
    },
    "startedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid"
    },
    "approvedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1327,6 +1345,7 @@
     }
    },
    "publishedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid"
    },
@@ -1421,6 +1440,7 @@
     "nullable": true
    },
    "terminationRequestedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1505,6 +1525,7 @@
     "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
    },
    "accountManagerPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1705,7 +1726,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

@@ -34,9 +34,9 @@
 | [GST-004](#gst-004-item-detail) | Item Detail | Discovery & Browse | 1 | 7 |
 | [GST-005](#gst-005-what-s-on) | What's On | Discovery & Browse | 1 | 3 |
 | [GST-006](#gst-006-item-detail-event-exhibition) | Item Detail – Event / Exhibition | Discovery & Browse | 1 | 2 |
-| [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 11 |
-| [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 7 |
-| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 8 |
+| [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 12 |
+| [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 9 |
+| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 9 |
 | [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 5 |
 | [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 1 | 6 |
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 7 |
@@ -68,7 +68,7 @@
 | [GST-038](#gst-038-at-the-venue) | At the Venue | In-venue Services | 1 | 3 |
 | [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 5 |
 | [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 1 | 7 |
-| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 13 |
+| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 12 |
 | [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 14 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 3 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
@@ -327,11 +327,11 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-004 | Attraction Details | bundleId, eventId, productId |  |
-| GST-007 | Book (a dated product: date, then time, then tickets) | productId |  |
-| GST-008 | Book (an undated product, or a product-first flow such as a workshop) | productId |  |
-| GST-074 | Book (a spot on the venue map, where the flow picks on the map) | productId |  |
-| GST-075 | Book (a space by the hour) | productId |  |
-| GST-056 | Book a bundle (e.g. meal combo with admission) | bundleId |  |
+| GST-007 | Book (a dated product: date, then time, then tickets) | productId | the card's or search result's `bookingEntry` is `dateFirst` (ADAM CR-591) |
+| GST-008 | Book (an undated product, or a product-first flow such as a workshop) | productId | the card's or search result's `bookingEntry` is `productFirst` (ADAM CR-591) |
+| GST-074 | Book (a spot on the venue map, where the flow picks on the map) | productId | the card's or search result's `bookingEntry` is `venueMap` (ADAM CR-591) |
+| GST-075 | Book (a space by the hour) | productId | the card's or search result's `bookingEntry` is `timeWindow` (ADAM CR-591) |
+| GST-056 | Book a bundle (e.g. meal combo with admission) | bundleId | the card's or search result's `bookingEntry` is `bundle` (ADAM CR-591) |
 | BO-005 | A supervisor sees the queue building | queueId |  |
 
 ## GST-004 Item Detail
@@ -372,7 +372,7 @@
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | List performances of an event | `PRODUCT_VIEW` |
 | `getVenueMap` | [VenueOpsService](../backend/VenueOpsService.md#getvenuemap) | onLoad | The item's point on the 2D/3D venue map, with its description, media and featured offer (MOB-4) | `VENUE_MAP_VIEW` |
-| `getGuestBundle` | [CatalogueService](../backend/CatalogueService.md#getguestbundle) | onLoad | The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4), in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009) | `None` |
+| `getGuestBundle` | [CatalogueService](../backend/CatalogueService.md#getguestbundle) | onLoad | The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4), in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). Buy meal combo uses the same read as Bundle Package (GST-056). Draw the component rows from `components[].name`, and each choice group as its `label` followed by its options' names, as the approved frame shows; preselect the `isDefault` option; the look does not change. Add to basket calls `addCartLine` with `variantId` = `GuestBundle.variantId`, `quantity` = the chosen number, `attributes.bundle` = {`bundleId`: `GuestBundle.id`, `choices`: [{`choiceGroupId`: group `id`, `optionId`: option `id`}, one entry per pick]}; never a component's or an option's `variantId` as the line's. Until the backend serves this shape, build against it with mocked data; never guess ids or show bare ids (ADAM CR-597, Chinmay, 3 November 2026; CHG-CR597-001). | `None` |
 
 **States**
 
@@ -539,7 +539,8 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `checkBookingEligibility` | [CatalogueService](../backend/CatalogueService.md#checkbookingeligibility) | onAction | Check the party's ages and heights | `PRODUCT_VIEW` |
+| `checkBookingEligibility` | [CatalogueService](../backend/CatalogueService.md#checkbookingeligibility) | onAction | Check the party's ages and heights: once per product with a rule, `productIds` holding that one product, the whole party sent, each call with its own Idempotency-Key; `heightBandIndex` counts that product's own edges at or below the chosen chip's lower bound (ADAM CR-551) | `PRODUCT_VIEW` |
+| `getProductEligibilityRule` | [CatalogueService](../backend/CatalogueService.md#getproducteligibilityrule) | background | The eligibility rule of each product the screen knows (the product chosen first, and the chosen level's product), not a control: the drawer opens on leaving selection when any rule has a limit set; a product with no rule answers 200 with every limit empty (ADAM CR-551) | `PRODUCT_VIEW` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | List performances of an event | `PRODUCT_VIEW` |
 | `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Live remaining capacity | `PRODUCT_VIEW` |
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The experience filter with descriptions | `PRODUCT_VIEW` |
@@ -610,6 +611,8 @@
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The add-ons, and the tickets of a category | `PRODUCT_VIEW` |
 | `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | The venue's published Help me choose (404 = none) | `None` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the tickets and add-ons | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | background | Read by the screen after its addCartLine calls succeed and before leaving the step, not a control: the cart's consentQuestions, which open the consent questions pop-up when one is unanswered (ADAM CR-556); with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `None` |
+| `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions, once, after the last question (ADAM CR-556) | `ORDER_CREATE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 | `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23). | `None` |
 
@@ -672,6 +675,7 @@
 | `inquirePaymentStatus` | [OrderService](../backend/OrderService.md#inquirepaymentstatus) | onAction | Ask the provider what actually happened | `ORDER_CREATE` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
+| `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the questions Pay's checkoutCart refused for (422 consentRequired or consentAnswerBlocks), once, after the last question (ADAM CR-556, moved from GST-041 with checkoutCart) | `ORDER_CREATE` |
 | `getPaymentLink` | [OrderService](../backend/OrderService.md#getpaymentlink) | onLoad | Open a payment link sent to this guest | `ORDER_VIEW` |
 | `payByLink` | [OrderService](../backend/OrderService.md#paybylink) | onAction | Pay a booking somebody else made | `ORDER_CREATE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
@@ -1606,7 +1610,7 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | BO-048 | Collected on the way out | merchandiseId |  |
-| GST-041 | Checkout Entry | lineId, performanceId |  |
+| GST-041 | Checkout Entry | lineId, performanceId, productId |  |
 
 ## GST-027 Parking – Reserve & Pay
 
@@ -2395,7 +2399,6 @@
 |---|---|---|---|---|
 | `applyCartPromoCode` | [OrderService](../backend/OrderService.md#applycartpromocode) | onAction | Apply a promo code to the cart; refused 422 promoCodeInvalid or promoCodeNotApplicable, shown as different messages (decided 28 September, audit R073 (e)) | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
-| `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `abandonCart` | [OrderService](../backend/OrderService.md#abandoncart) | onAction | Give the inventory back | `None` |
 | `claimCart` | [OrderService](../backend/OrderService.md#claimcart) | onAction | Pick up a basket started on another device | `None` |
 | `extendCart` | [OrderService](../backend/OrderService.md#extendcart) | onAction | Keep the hold alive while the guest decides | `None` |
@@ -2424,8 +2427,8 @@
 |---|---|---|---|
 | GST-042 | Signs in, or proves the contact the tickets go to | cartId | no verified guest session. This screen is the checkout page, so the fork sits here rather than in front of the cart (matrix 2.6.1 §2.4) |
 | GST-001 | Home – Default |  |  |
+| GST-009 | Checkout | orderId, token |  |
 | GST-059 | They follow it through the day |  |  |
-| GST-009 | Checkout | orderId, paymentId, token |  |
 
 ## GST-042 Simple Registration & OTP
 
@@ -3195,8 +3198,8 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getGuestBundle` | [CatalogueService](../backend/CatalogueService.md#getguestbundle) | onLoad | Read a bundle with its components and choice groups, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009) | `None` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the bundle to the cart | `None` |
+| `getGuestBundle` | [CatalogueService](../backend/CatalogueService.md#getguestbundle) | onLoad | Read a bundle with its components and choice groups, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). Draw the component rows from `components[].name`, and each choice group as its `label` followed by its options' names, as the approved frame shows; preselect the `isDefault` option; the look does not change. Add to basket calls `addCartLine` with `variantId` = `GuestBundle.variantId`, `quantity` = the chosen number, `attributes.bundle` = {`bundleId`: `GuestBundle.id`, `choices`: [{`choiceGroupId`: group `id`, `optionId`: option `id`}, one entry per pick]}; never a component's or an option's `variantId` as the line's. Until the backend serves this shape, build against it with mocked data; never guess ids or show bare ids (ADAM CR-597, Chinmay, 3 November 2026; CHG-CR597-001). | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the bundle to the cart: `variantId` = `GuestBundle.variantId`, `attributes.bundle` with the bundle id and one choice per pick (ADAM CR-597) | `None` |
 
 **States**
 

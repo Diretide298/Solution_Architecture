@@ -205,7 +205,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-030` | In-Venue Notifications | A | 3 | 12 | 5 | 0 | 4 | 0 | guest | notStarted (client-verified) |
 | `GST-031` | AI Concierge – Home | A | 8 | 27 | 5 | 32 | 3 | 0 | guest | approved (client-verified) |
-| `GST-032` | AI Concierge – Chat | A | 46 | 23 | 6 | 31 | 3 | 0 | guest | approved (client-verified) |
+| `GST-032` | AI Concierge – Chat | A | 49 | 23 | 6 | 31 | 3 | 0 | guest | approved (client-verified) |
 | `GST-033` | AI Concierge – Contextual Help | A | 7 | 24 | 5 | 20 | 0 | 0 | guest | approved (client-verified) |
 | `GST-035` | Feedback & Ratings | A | 28 | 20 | 4 | 82 | 2 | 0 | guest | notStarted (client-verified) |
 | `GST-040` | Help & Support | A | 8 | 31 | 6 | 0 | 3 | 0 | guest | notStarted (client-verified) |

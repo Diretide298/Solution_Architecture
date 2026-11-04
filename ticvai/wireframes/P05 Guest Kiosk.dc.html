@@ -305,7 +305,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getCart · checkoutCart</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-007">KSK-007</a>  &mdash; <i>Pays at the terminal</i><br><a href="#ksk-008">KSK-008</a>  &mdash; <i>The payment does not resolve</i> <span class="car">paymentId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-007">KSK-007</a>  &mdash; <i>Pays at the terminal</i> <span class="car">orderId</span><br><a href="#ksk-008">KSK-008</a>  &mdash; <i>The payment does not resolve</i> <span class="car">paymentId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCheckoutCart &middot; <i>Pay</i> &middot; <b>Pay</b> &middot; Back</div></div>
         </div>
@@ -332,7 +332,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; createPayment</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-008">KSK-008</a>  &mdash; <i>Payment unresolved</i> <span class="car">paymentId</span><br><a href="#ksk-009">KSK-009</a>  &mdash; <i>Takes the printed ticket</i> <span class="car">orderId</span></div>
           
           

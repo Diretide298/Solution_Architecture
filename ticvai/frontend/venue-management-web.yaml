@@ -69,20 +69,53 @@ contracts:
 - wallet
 - white-label
 - workforce
-deployment:
-  target: browser, desktop
-  distribution: served from the cell
-  bundleUpdate: immediate on deploy
-  hosting: in-cell, in-region
-  storeReview: false
-  deviceOwnership: venue-owned workstation
-  networkAssumption: venue LAN
-  releaseCadence: weekly
+mixedAcross:
+- deployment
+platformProfiles:
+- platform: P08
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment:
+    target: browser, desktop
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: venue-owned workstation
+    networkAssumption: venue LAN
+    releaseCadence: weekly
+- platform: P13
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment:
+    target: browser, desktop
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell
+    storeReview: false
+    deviceOwnership: tenant workstation
+    networkAssumption: public internet
+    releaseCadence: weekly
+- platform: P16
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment:
+    target: browser
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: venue-owned workstation
+    networkAssumption: venue LAN
+    releaseCadence: fortnightly
 screenCount: 1838
 byWave:
-  wave1: 186
-  wave2: 55
-  wave3: 1597
+  wave1: 206
+  wave2: 53
+  wave3: 1579
 screens:
 - id: BO-001
   name: Queue Directory
@@ -329,7 +362,7 @@ screens:
   platform: P08
   route: /venue-operations/asset-register-bo-031
   repo: ticvai-venue-management
-  path: src/routes/venue-operations/AssetRegisterBO031Detail.tsx
+  redirect: BO-069
   wave: 1
   status: notStarted
 - id: BO-032
@@ -778,7 +811,7 @@ screens:
   route: /approvals/approval-delegations
   repo: ticvai-venue-management
   path: src/routes/approvals/ApprovalDelegations.tsx
-  wave: 2
+  wave: 1
   status: notStarted
 - id: BO-088
   name: Approval Analytics
@@ -961,7 +994,7 @@ screens:
   platform: P08
   route: /sell/recipe-bom-management
   repo: ticvai-venue-management
-  path: src/routes/sell/RecipeBomManagementList.tsx
+  redirect: BO-111
   wave: 2
   status: notStarted
 - id: BO-111
@@ -985,7 +1018,7 @@ screens:
   platform: P08
   route: /sell/central-kitchen-commissary-management
   repo: ticvai-venue-management
-  path: src/routes/sell/CentralKitchenCommissaryManagementList.tsx
+  redirect: BO-112
   wave: 2
   status: notStarted
 - id: BO-114
@@ -1153,7 +1186,7 @@ screens:
   platform: P08
   route: /food-beverage/order-routing-kds-printer-rules
   repo: ticvai-venue-management
-  path: src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx
+  redirect: BO-134
   wave: 2
   status: notStarted
 - id: BO-136
@@ -1177,7 +1210,7 @@ screens:
   platform: P08
   route: /stock-supply/production-execution-batch-management
   repo: ticvai-venue-management
-  path: src/routes/ops/ProductionExecutionBatchManagementList.tsx
+  redirect: BO-112
   wave: 2
   status: notStarted
 - id: BO-139
@@ -2402,7 +2435,7 @@ screens:
   route: /sell/membership-commercial-pricing-channel-association-bo-291
   repo: ticvai-venue-management
   path: src/routes/sell/MembershipCommercialPricingChannelAssociation.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-292
   name: Renewal, Auto-Renewal & Membership Continuity Configuration
@@ -2818,7 +2851,7 @@ screens:
   route: /access-venue/media-design-studio-command-center-bo-344
   repo: ticvai-venue-management
   path: src/routes/access-venue/MediaDesignStudioCommandCenter.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-345
   name: Digital QR & Barcode Ticket Designer
@@ -2985,7 +3018,7 @@ screens:
   platform: P08
   route: /venue-operations/my-approval-inbox-bo-365
   repo: ticvai-venue-management
-  path: src/routes/venue-operations/MyApprovalInbox.tsx
+  redirect: BO-084
   wave: 3
   status: notStarted
 - id: BO-366
@@ -3177,7 +3210,7 @@ screens:
   platform: P08
   route: /venue-operations/reminder-breach-notification-rules-bo-389
   repo: ticvai-venue-management
-  path: src/routes/venue-operations/ReminderBreachNotificationRules.tsx
+  redirect: BO-388
   wave: 3
   status: notStarted
 - id: BO-390
@@ -3185,7 +3218,7 @@ screens:
   platform: P08
   route: /venue-operations/escalation-policy-builder-bo-390
   repo: ticvai-venue-management
-  path: src/routes/venue-operations/EscalationPolicyBuilder.tsx
+  redirect: BO-388
   wave: 3
   status: notStarted
 - id: BO-391
@@ -4281,7 +4314,7 @@ screens:
   platform: P08
   route: /rentals/dynamic-pricing-ai-recommendation-bo-528
   repo: ticvai-venue-management
-  path: src/routes/rentals/DynamicPricingAiRecommendation.tsx
+  redirect: ADM-088
   wave: 3
   status: notStarted
 - id: BO-529
@@ -5401,7 +5434,7 @@ screens:
   platform: P08
   route: /access-venue/temporary-seasonal-accreditation-bo-669
   repo: ticvai-venue-management
-  path: src/routes/access-venue/TemporarySeasonalAccreditation.tsx
+  redirect: BO-666
   wave: 3
   status: notStarted
 - id: BO-670
@@ -5465,7 +5498,7 @@ screens:
   platform: P08
   route: /access-venue/communication-template-library-bo-677
   repo: ticvai-venue-management
-  path: src/routes/access-venue/CommunicationTemplateLibrary.tsx
+  redirect: BO-785
   wave: 3
   status: notStarted
 - id: BO-678
@@ -5873,7 +5906,7 @@ screens:
   platform: P08
   route: /operations/outlet-management-bo-728
   repo: ticvai-venue-management
-  path: src/routes/operations/OutletManagement.tsx
+  redirect: BO-044
   wave: 3
   status: notStarted
 - id: BO-729
@@ -5881,7 +5914,7 @@ screens:
   platform: P08
   route: /operations/create-edit-outlet-bo-729
   repo: ticvai-venue-management
-  path: src/routes/operations/CreateEditOutlet.tsx
+  redirect: BO-044
   wave: 3
   status: notStarted
 - id: BO-730
@@ -7682,7 +7715,7 @@ screens:
   route: /access-venue/venue-canvas-bo-954
   repo: ticvai-venue-management
   path: src/routes/access-venue/VenueCanvas.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-955
   name: Sections & Zones
@@ -8194,7 +8227,7 @@ screens:
   route: /access-venue/accessible-seating-master-bo-1018
   repo: ticvai-venue-management
   path: src/routes/access-venue/AccessibleSeatingMaster.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-1019
   name: Accessible Route Mapping
@@ -8322,7 +8355,7 @@ screens:
   route: /access-venue/best-seat-recommendations-bo-1034
   repo: ticvai-venue-management
   path: src/routes/access-venue/BestSeatRecommendations.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-1035
   name: Best Value Recommendations
@@ -9482,7 +9515,7 @@ screens:
   route: /orders-money/integration-monitoring-exception-workbench-bo-1179
   repo: ticvai-venue-management
   path: src/routes/orders-money/IntegrationMonitoringExceptionWorkbench.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-1180
   name: Wallet Configuration Governance & Version Control
@@ -9546,7 +9579,7 @@ screens:
   route: /transport/departures
   repo: ticvai-venue-management
   path: src/routes/transport/TransportDepartureBoard.tsx
-  wave: 2
+  wave: 1
   status: notStarted
 - id: BO-1188
   name: Transport Pass Types
@@ -9770,7 +9803,7 @@ screens:
   route: /commercial/fee-surcharge-library-adm-071
   repo: ticvai-venue-management
   path: src/routes/commercial/FeeSurchargeLibrary.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-072
   name: Fee Applicability & Charging Rule Builder
@@ -9906,7 +9939,7 @@ screens:
   route: /commercial/dynamic-pricing-strategy-command-center-adm-088
   repo: ticvai-venue-management
   path: src/routes/commercial/DynamicPricingStrategyCommandCenter.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-089
   name: Dynamic Pricing Strategy Builder
@@ -9977,7 +10010,7 @@ screens:
   platform: P08
   route: /commercial/rule-priority-conflict-resolution-dynamic-pricing-test-c-adm-097
   repo: ticvai-venue-management
-  path: src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx
+  redirect: BO-441
   wave: 3
   status: notStarted
 - id: ADM-098
@@ -10066,7 +10099,7 @@ screens:
   route: /commercial/revenue-optimization-command-center-adm-108
   repo: ticvai-venue-management
   path: src/routes/commercial/RevenueOptimizationCommandCenter.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-109
   name: Pricing Simulation Studio
@@ -11137,7 +11170,7 @@ screens:
   platform: P08
   route: /platform/approval-matrix-multi-level-approval-configuration-adm-242
   repo: ticvai-venue-management
-  path: src/routes/platform/ApprovalMatrixMultiLevelApprovalConfiguration.tsx
+  redirect: BO-086
   wave: 3
   status: notStarted
 - id: ADM-243
@@ -11193,7 +11226,7 @@ screens:
   platform: P08
   route: /platform/unified-approval-inbox-decision-workspace-adm-249
   repo: ticvai-venue-management
-  path: src/routes/platform/UnifiedApprovalInboxDecisionWorkspace.tsx
+  redirect: BO-084
   wave: 3
   status: notStarted
 - id: ADM-250
@@ -11217,7 +11250,7 @@ screens:
   platform: P08
   route: /platform/sla-escalation-bottleneck-monitor-adm-252
   repo: ticvai-venue-management
-  path: src/routes/platform/SlaEscalationBottleneckMonitor.tsx
+  redirect: BO-391
   wave: 3
   status: notStarted
 - id: ADM-253
@@ -11274,7 +11307,7 @@ screens:
   route: /commercial/channel-creation-profile-configuration-adm-259
   repo: ticvai-venue-management
   path: src/routes/commercial/ChannelCreationProfileConfiguration.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-260
   name: Product & Catalogue Assignment
@@ -11282,7 +11315,7 @@ screens:
   route: /commercial/product-catalogue-assignment-adm-260
   repo: ticvai-venue-management
   path: src/routes/commercial/ProductCatalogueAssignment.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-261
   name: Channel Pricing & Commercial Profile Assignment
@@ -11290,7 +11323,7 @@ screens:
   route: /commercial/channel-pricing-commercial-profile-assignment-adm-261
   repo: ticvai-venue-management
   path: src/routes/commercial/ChannelPricingCommercialProfileAssignment.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-262
   name: Inventory, Capacity & Channel Allocation
@@ -11306,7 +11339,7 @@ screens:
   route: /commercial/channel-sales-schedule-availability-windows-adm-263
   repo: ticvai-venue-management
   path: src/routes/commercial/ChannelSalesScheduleAvailabilityWindows.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-264
   name: Customer & Eligibility Rules by Channel
@@ -11330,7 +11363,7 @@ screens:
   route: /commercial/channel-fees-payment-fulfillment-configuration-adm-266
   repo: ticvai-venue-management
   path: src/routes/commercial/ChannelFeesPaymentFulfillmentConfiguration.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-267
   name: Channel Publication, Readiness & AI Validation
@@ -11338,7 +11371,7 @@ screens:
   route: /commercial/channel-publication-readiness-ai-validation-adm-267
   repo: ticvai-venue-management
   path: src/routes/commercial/ChannelPublicationReadinessAiValidation.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-268
   name: Channel Operations Command Center
@@ -11346,7 +11379,7 @@ screens:
   route: /commercial/channel-operations-command-center-adm-268
   repo: ticvai-venue-management
   path: src/routes/commercial/ChannelOperationsCommandCenter.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-269
   name: Channel Connection & Integration Manager
@@ -11354,7 +11387,7 @@ screens:
   route: /commercial/channel-connection-integration-manager-adm-269
   repo: ticvai-venue-management
   path: src/routes/commercial/ChannelConnectionIntegrationManager.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-270
   name: Product, Price & Availability Synchronization
@@ -12122,7 +12155,7 @@ screens:
   route: /commercial/partial-payment-failure-recovery-manager-t100-adm-606
   repo: ticvai-venue-management
   path: src/routes/commercial/PartialPaymentFailureRecoveryManagerT100.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: ADM-607
   name: Mixed Tender Transaction Trace & Allocation Audit
@@ -12161,7 +12194,7 @@ screens:
   platform: P08
   route: /commercial/refund-policy-rule-configuration-t118-adm-611
   repo: ticvai-venue-management
-  path: src/routes/commercial/RefundPolicyRuleConfigurationT118.tsx
+  redirect: BO-1146
   wave: 3
   status: notStarted
 - id: ADM-612
@@ -13201,7 +13234,7 @@ screens:
   platform: P08
   route: /platform/webhook-configuration-subscription-manager-adm-353
   repo: ticvai-venue-management
-  path: src/routes/platform/WebhookConfigurationSubscriptionManager.tsx
+  redirect: BO-1074
   wave: 3
   status: notStarted
 - id: ADM-354

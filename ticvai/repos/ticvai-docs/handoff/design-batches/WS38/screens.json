@@ -4,7 +4,7 @@
   "name": "Dynamic Pricing Strategy Command Center",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
@@ -2128,7 +2128,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/rule-priority-conflict-resolution-dynamic-pricing-test-c-adm-097",
-   "component": "src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx",
+   "redirect": "BO-441",
    "status": "notStarted"
   },
   "navigation": {

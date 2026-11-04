@@ -1,6 +1,6 @@
 # WS110 — ACCREDITATION board 3
 
-**9 screens · 15 operations · 25 schemas · 8 permissions**
+**9 screens · 16 operations · 25 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-636` | Application Review Workspace | D | 3 | 12 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 | `BO-637` | Approval Workflow Builder | B | 19 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `BO-638` | Approval Rules & Conditions | B | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-639` | Reviewer Assignment & Delegation | B | 0 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
+| `BO-639` | Reviewer Assignment & Delegation | B | 32 | 3 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 | `BO-640` | Rejection & Resubmission Management | D | 0 | 20 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-641` | Escalation & Exception Management | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-642` | Approval Decision History | D | 0 | 12 | 6 | 2 | 0 | 3 | — | notStarted (—) |

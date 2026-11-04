@@ -370,9 +370,10 @@
      "trigger": "Sell — Ticket Catalogue",
      "carries": [
       "orderId",
+      "productId",
       "promotionId"
      ],
-     "provenance": "derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-010 holds orderId, promotionId, so an edge into it carries them"
+     "provenance": "derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-010 holds orderId, productId, promotionId, so an edge into it carries them"
     },
     {
      "to": "POS-003",
@@ -1203,7 +1204,7 @@
    "emptyFirstRun": "No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`, `withdrawFromDepositBox`.",
-   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync. A withdrawal is still countersigned here: the cashier the cash came from picks their name from the till's own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001)."
   },
   "apis": [
    {

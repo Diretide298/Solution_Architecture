@@ -473,7 +473,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-policy-rule-configuration-t118-adm-611",
-   "component": "src/routes/commercial/RefundPolicyRuleConfigurationT118.tsx",
+   "redirect": "BO-1146",
    "status": "notStarted"
   },
   "navigation": {
@@ -1188,6 +1188,18 @@
        ],
        "notes": "The pack groups this record's detail under its own headings: “Refund Processing States”, “Verify Provider Status”, “Recovery Actions”.",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 121 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Check status",
+       "operation": "inquirePaymentStatus",
+       "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       }
      ]
     }

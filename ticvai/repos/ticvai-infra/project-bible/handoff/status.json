@@ -1,18 +1,18 @@
 {
  "scope": "platform",
- "generated": "2026-11-03",
+ "generated": "2026-11-04",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2864,
+  "operations": 2873,
   "contracts": 33,
-  "tables": 1173,
+  "tables": 1178,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3329,
+  "relationships": 3371,
   "states": 210,
-  "events": 113,
+  "events": 114,
   "flows": 98,
   "flowsDerived": 193,
   "adrs": 72,
@@ -26,15 +26,15 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2833,
-    "total": 2864,
+    "done": 2837,
+    "total": 2873,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2864,
-    "total": 2864,
+    "done": 2873,
+    "total": 2873,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -75,8 +75,8 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 1073,
-    "total": 1187,
+    "done": 1078,
+    "total": 1192,
     "percent": 90,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
@@ -89,7 +89,7 @@
    },
    {
     "name": "Requirements contracted",
-    "done": 3153,
+    "done": 3154,
     "total": 3165,
     "percent": 100,
     "note": "Read row by row from traceability.json. Excludes deliberately parked requirements."
@@ -103,8 +103,8 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 2577,
-    "total": 2864,
+    "done": 2583,
+    "total": 2873,
     "percent": 90,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -127,8 +127,8 @@
    {
     "name": "Tables written",
     "done": 1123,
-    "total": 1173,
-    "percent": 96,
+    "total": 1178,
+    "percent": 95,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
    {
@@ -176,9 +176,9 @@
   "build": 32
  },
  "waves": {
-  "wave1": 435,
-  "wave2": 131,
-  "wave3": 1887
+  "wave1": 455,
+  "wave2": 129,
+  "wave3": 1869
  },
  "platformBreakdown": [
   {

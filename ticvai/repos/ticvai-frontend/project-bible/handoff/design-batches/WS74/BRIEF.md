@@ -96,11 +96,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-061` | Digital Asset Management Command Center | B | 0 | 72 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-061` | Digital Asset Management Command Center | A | 0 | 72 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-062` | Central Digital Asset Library | B | 3 | 18 | 6 | 9 | 1 | 0 | — | notStarted (—) |
 | `CMS-063` | Upload & Asset Ingestion Workspace | B | 18 | 0 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `CMS-064` | Folder, Collection & Workspace Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-065` | Metadata & Taxonomy Management | B | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-065` | Metadata & Taxonomy Management | A | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-066` | Tags, Keywords & Classification | B | 4 | 0 | 6 | 8 | 1 | 0 | — | notStarted (—) |
 | `CMS-067` | Advanced Search & Discovery | B | 0 | 5 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `CMS-068` | Digital Asset 360° Profile | B | 0 | 36 | 6 | 1 | 2 | 0 | — | notStarted (—) |

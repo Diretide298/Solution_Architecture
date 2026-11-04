@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Platform Operations
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [controlPlane]
   x-ticvai-screen-count: 39
   x-ticvai-tier: satellite
   x-ticvai-module: Cross-cutting — Control Plane release and environment management
@@ -25,8 +26,11 @@ info:
     \ Each declares `x-ticvai-permission`, `x-ticvai-scope-level`, `x-ticvai-offline-capable` and `x-ticvai-conflict-policy`.\n\
     **`components.schemas` are API schemas — the shape of data on the wire.** Not database tables. Where\
     \ a mapping exists, `x-ticvai-persistence` records it.\n## Positions this encodes\n- **The orchestrator\
-    \ fans out per region, not per tenant** (ADR-0014). A tenant in three\n  regions is three cells and\
-    \ three applications, and they may legitimately sit at\n  different versions mid-rollout.\n- **A migration\
+    \ fans out per tenant database, and the canary is a tenant** (ADR-0039, under ADR-0038: a cell is a\
+    \ region holding a database per tenant; ADR-0014's per-region fan-out is superseded by ADR-0038). One\
+    \ row per tenant per run in `control.migration_run_tenant`, rolled up per cell in `migration_run_cell`;\
+    \ a wave is a set of tenants and may be part of one cell, and tenant databases may legitimately sit at\
+    \ different versions mid-rollout.\n- **A migration\
     \ is never applied blind.** Plan, then apply, then verify. The plan reports\n  what will run against\
     \ which cells and what the rollback costs, and it is computed\n  against the actual cell state rather\
     \ than assumed.\n- **Rollback is tested, not asserted.** Every migration carries a rollback that CI\
@@ -775,7 +779,8 @@ paths:
       summary: Start or continue a rollout
       description: 'Begins at the canary and continues from it once held. **The canary should be a dedicated
         cell or the smallest shared one** — a canary that is itself a busy shared cell risks many tenants
-        (ADR-0001 (retired — see ADR-0014 and ADR-0017)).
+        (ADR-0038, which supersedes ADR-0014: a cell holds many tenants). Under ADR-0039 the canary of a
+        migration run is a tenant inside the canary cell, not the cell.
 
         **Needs the platform release manager''s approval** (decided 28 September, audit R144). Each start
         or continuation raises an approval request of kind `releasePromotion`, routed to a holder of
@@ -1111,8 +1116,10 @@ paths:
         cell state that has since changed is rejected rather than applied to a different world than the
         one it was made for.
 
-        **Fans out per region** (ADR-0014). Cells advance in waves with a canary first, and a failure
-        halts the wave rather than continuing into it.
+        **Fans out per tenant database** (ADR-0039; ADR-0014''s per-region fan-out is superseded by ADR-0038).
+        The canary is a tenant inside the canary cell, then waves of tenants follow, each tenant tracked in its
+        own `control.migration_run_tenant` row and rolled up per cell; a failure halts the wave rather than
+        continuing into it.
 
         **A failed run is resumed, not restarted** (ADAM CR-160, 18 October 2026; CHG-CRA-006; PLATFORM-MIGRATE''s
         spec of 4 October). Applying the plan of a run that is `failed`, once the cause is fixed, moves that run back
@@ -2624,6 +2631,7 @@ components:
           status:
             $ref: '#/components/schemas/ReleaseStatus'
           createdByPrincipalId:
+            x-ticvai-references: control.platform_operator
             type: string
             format: uuid
           createdAt:
@@ -2644,6 +2652,7 @@ components:
             description: The reason given by the last `rejectRelease` or `withdrawRelease` (ADAM CR-356). The
               control audit row keeps each move's reason, so an earlier one is not lost.
           statusChangedByPrincipalId:
+            x-ticvai-references: control.platform_operator
             type: string
             format: uuid
             nullable: true
@@ -2656,6 +2665,7 @@ components:
             readOnly: true
             description: When the last `rejectRelease` or `withdrawRelease` was made (ADAM CR-356).
           withdrawalApprovedByPrincipalId:
+            x-ticvai-references: control.platform_operator
             type: string
             format: uuid
             nullable: true
@@ -2754,9 +2764,11 @@ components:
         cellsFailed:
           type: integer
         startedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
         approvedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           nullable: true
@@ -3263,6 +3275,7 @@ components:
         cellsFailed:
           type: integer
         startedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
         startedAt:
@@ -3431,6 +3444,7 @@ components:
             type: string
             format: uuid
         publishedByPrincipalId:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
         publishedAt:
@@ -3848,6 +3862,7 @@ components:
           nullable: true
           readOnly: true
         requestedBy:
+          x-ticvai-references: control.platform_operator
           type: string
           format: uuid
           readOnly: true

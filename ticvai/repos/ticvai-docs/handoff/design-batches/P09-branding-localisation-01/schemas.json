@@ -329,7 +329,7 @@
       },
       "flowKey": {
        "type": "string",
-       "description": "The changed flow that serves this product."
+       "description": "The changed flow that serves this product: the flow's `BookingFlow.id`, the uuid as text (ADAM CR-547). For a removed flow, the flow of the side that holds it."
       }
      }
     }
@@ -350,7 +350,7 @@
       },
       "path": {
        "type": "string",
-       "description": "The property names below the part joined with `.`; a keyed array item by its key in brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other arrays of objects by index ([0]); an array of plain values is one value. For bookingFlows, the flow key (ADAM CR-500)."
+       "description": "The property names below the part joined with `.`; a keyed array item by its key in brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other arrays of objects by index ([0]); an array of plain values is one value. For bookingFlows, the flow's `BookingFlow.id`, the uuid as text (ADAM CR-500, CR-547)."
       },
       "changeKind": {
        "type": "string",
@@ -1892,7 +1892,8 @@
   "required": [
    "previewId",
    "url",
-   "expiresAt"
+   "expiresAt",
+   "platform"
   ],
   "properties": {
    "previewId": {
@@ -1926,7 +1927,7 @@
    "outputPreviews": {
     "type": "array",
     "readOnly": true,
-    "description": "**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay, 2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`.",
+    "description": "**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay, 2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`, once rendered. **Grows as the renderer finishes** (ADAM CR-586, Chinmay, 3 November 2026; CHG-CR586-001): absent in the 201 and in the new cache entry; the renderer in the workers host adds one entry (`output`, `url`) as it finishes each output. `getPreview` answers whatever the entry holds: an output not rendered yet is missing from the list, not an error.",
     "items": {
      "type": "object",
      "required": [
@@ -2223,6 +2224,7 @@
     "nullable": true
    },
    "terminationRequestedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -2307,6 +2309,7 @@
     "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
    },
    "accountManagerPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -2790,10 +2793,12 @@
   "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "nullable": true
@@ -2803,6 +2808,7 @@
     "nullable": true
    },
    "address": {
+    "x-ticvai-data-class": "business",
     "allOf": [
      {
       "$ref": "#/components/schemas/white-label::LocalisedText"
@@ -3629,7 +3635,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

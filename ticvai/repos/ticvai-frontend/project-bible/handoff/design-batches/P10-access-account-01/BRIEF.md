@@ -130,7 +130,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `PTR-001` | Partner Login / MFA | B | 17 | 56 | 10 | 6 | 2 | 0 | — | notStarted (generated) |
 | `PTR-003` | Profile & Company Details | B | 13 | 14 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
 | `PTR-004` | Notifications | D | 4 | 10 | 5 | 10 | 0 | 0 | — | notStarted (generated) |
-| `PTR-019` | API Credentials & Integration | B | 15 | 33 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
+| `PTR-019` | API Credentials & Integration | B | 15 | 33 | 6 | 16 | 4 | 0 | — | notStarted (generated) |
 | `PTR-020` | Sub-Agent Management | B | 2 | 14 | 6 | 56 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

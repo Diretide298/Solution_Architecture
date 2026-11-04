@@ -45,6 +45,7 @@
      "crossesDevice": true,
      "back": false,
      "carries": [
+      "productId",
       "variantId"
      ]
     }

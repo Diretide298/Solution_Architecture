@@ -1,5 +1,51 @@
 # Screen definitions
 
+One file per platform, `screens/P*.yaml`: the platform (its code, name, audience, form factor, runtime, directions)
+and its screens. **How many platforms and screens there are, per platform, is in [OVERVIEW.md](../OVERVIEW.md)
+("The platforms"), derived from these files on every refresh**; this page carries no count, because a typed count on
+it was wrong within a week (r13 system review F-13).
+
+Each screen carries an id, a purpose, a module and wave, the operations it calls, its layout as
+regions and component kinds, its states, its navigation and its implementation path.
+
+## Two levels of done
+
+**Defined** means the screen exists with a purpose, a route and navigation.
+
+**Specified** means it also names its operations, its components and its states. The difference is not cosmetic:
+the states are where the behaviour lives, and on an offline surface the offline state is the most important line on
+the page.
+
+## Reading a definition
+
+```yaml
+id: SCN-004
+name: Admitted
+purpose: ...            # why the screen exists
+apis:                   # validated against the contracts' operations
+  - operationId: validateAccess
+layout:
+  template: fullscreen
+  regions: [...]        # vocabulary from _components.yaml
+states:
+  offline: ...          # required on offline-capable platforms
+navigation:
+  exitTo: [SCN-003]     # checked against the flows
+implementation:
+  app: venue-scanner
+  route: /access/admitted
+```
+
+`check-screens.py` validates the component vocabulary, every operation id, required states,
+navigation resolution, and that a `posTerminal` or `handheld` platform declares
+`offlineCapable` — a gate that cannot validate without a network is a queue.
+
+## History (17 August 2026)
+
+> **Historical.** What follows is this page as written on 17 August 2026, kept as the record of that day. Its
+> figures were true then and are not now (r13 system review F-13, CHG-R14J-041); today's are in
+> [OVERVIEW.md](../OVERVIEW.md) and in the files themselves.
+
 **364 screens across twelve platforms.** Everything inventoried is defined.
 
 Each carries an id, a purpose, a module and wave, the operations it calls, its layout as
@@ -32,30 +78,6 @@ offline surface the offline state is the most important line on the page.
 167 of these arrived on 14 August, extracted from the wireframe boards in `wireframes/`. The
 boards carry real purposes and real navigation, so those are real. They carry no states,
 because a picture does not say what happens when the network dies.
-
-## Reading a definition
-
-```yaml
-id: SCN-004
-name: Admitted
-purpose: ...            # why the screen exists
-apis:                   # validated against 689 operations
-  - operationId: validateAccess
-layout:
-  template: fullscreen
-  regions: [...]        # vocabulary from _components.yaml, 34 kinds
-states:
-  offline: ...          # required on offline-capable platforms
-navigation:
-  exitTo: [SCN-003]     # checked against the flows
-implementation:
-  app: venue-scanner
-  route: /access/admitted
-```
-
-`check-screens.py` validates the component vocabulary, every operation id, required states,
-navigation resolution, and that a `posTerminal` or `handheld` platform declares
-`offlineCapable` — a gate that cannot validate without a network is a queue.
 
 ## What to do next
 

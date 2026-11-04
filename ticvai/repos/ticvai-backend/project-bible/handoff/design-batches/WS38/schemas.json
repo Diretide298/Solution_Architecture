@@ -2253,7 +2253,7 @@
    },
    "ruleConflicts": {
     "type": "integer",
-    "description": "Rule Conflicts, the sum of the seven open-conflict counts listRulePriorityConflict's summary gives for the venue (ADAM CR-423)"
+    "description": "Rule Conflicts: always present, and 0 until conflict detection is decided (ADAM CR-423, the correction of 3 November 2026 on #35286)"
    },
    "frozenStrategies": {
     "type": "integer",
@@ -2268,7 +2268,7 @@
     "items": {
      "type": "string"
     },
-    "description": "Operational Alerts (pack p.76): a code for each condition that holds, pricesAtUpperBand, unresolvedRuleConflicts or activatingWithin48Hours; the screen words them (ADAM CR-423)"
+    "description": "Operational Alerts (pack p.76): a code for each condition that holds, pricesAtUpperBand, unresolvedRuleConflicts or activatingWithin48Hours; the screen words them (ADAM CR-423). unresolvedRuleConflicts is never listed until conflict detection is decided (the correction of 3 November 2026 on #35286)"
    }
   }
  },

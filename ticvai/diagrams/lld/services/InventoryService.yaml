@@ -807,7 +807,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: inventory.supplier
-  columns: 17
+  columns: 15
   store: postgres
   parent: null
   writtenBy:

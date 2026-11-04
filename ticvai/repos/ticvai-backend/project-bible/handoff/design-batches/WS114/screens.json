@@ -454,7 +454,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/communication-template-library-bo-677",
-   "component": "src/routes/access-venue/CommunicationTemplateLibrary.tsx",
+   "redirect": "BO-785",
    "status": "notStarted"
   },
   "navigation": {

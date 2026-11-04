@@ -272,7 +272,7 @@
   "scopeLevel": "platform",
   "parameters": [
    {
-    "name": "region",
+    "name": "regionId",
     "in": "query",
     "required": false
    },

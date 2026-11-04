@@ -560,7 +560,6 @@ operations:
   offline: false
   reads:
   - control.cell
-  - control.cell_instance
   writes: []
 - operation: getCommercialMetrics
   verb: GET
@@ -808,6 +807,7 @@ operations:
   - control.invoice_line
   writes:
   - cache:idempotency
+  - control.contract
   - control.invoice
   - control.invoice_line
   - control.invoice_number_sequence
@@ -1663,8 +1663,19 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.capacity_pack
+  - control.cell
+  - control.cell_endpoint
+  - control.cell_tenant
   - control.contract
+  - control.licence_add_on
+  - control.licence_add_on_limit
+  - control.module_listing
   - control.plan
+  - control.plan_limit
+  - control.plan_module
+  - control.tenant
+  - control.usage_record
   - platform.tenant
   writes:
   - cache:idempotency
@@ -2340,9 +2351,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.cell
+  - control.cell_endpoint
+  - control.cell_tenant
   - control.contract
   - control.licence_add_on
   - control.licence_add_on_limit
+  - control.module_listing
   - control.plan
   - control.plan_limit
   - control.plan_module

@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 56
   x-ticvai-tier: satellite
   x-ticvai-module: 21 — Seat Management & Venue Mapping
@@ -285,6 +286,15 @@ x-ticvai-jobs:
     for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
       as on the order-paid saga.'
     source: ['events/order-exchanged.yaml']
+  subjectDataPart:
+    module: seating
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [seating.group_request, seating.hold_pool, seating.seat_reservation]
+    writes: []
+    for: 'seating''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /performances/{performanceId}/assign-seats:
     parameters:
@@ -1928,6 +1938,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -1969,6 +1980,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -2032,6 +2044,7 @@ paths:
       security:
       - guestAuth: []
       - bearerAuth: []
+      x-ticvai-object-owner: [subject, session]
       x-ticvai-audience:
       - staff
       - guest
@@ -2071,6 +2084,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatHold'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: Already expired, or `VenueSettings.seating.seatHoldMaxExtensions` is reached (proposed
             default 2, audit R094). `refusedReason` says which.
@@ -2781,6 +2796,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-hold-pools:
     get:
+      x-ticvai-personal-data: gated
       operationId: listSeatHoldPools
       x-ticvai-consumed-by:
         - "P08 BO-1003 Hold Command Center"
@@ -2824,6 +2840,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createSeatHoldPool
       x-ticvai-consumed-by:
         - "P08 BO-1005 Hold Pool Creation"
@@ -2864,6 +2881,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: releaseSeatHoldPool
       x-ticvai-consumed-by:
         - "P08 BO-1008 Automatic Hold Release"
@@ -3140,6 +3158,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /group-seat-requests:
     get:
+      x-ticvai-personal-data: gated
       operationId: listGroupSeatRequests
       x-ticvai-consumed-by:
         - "P08 BO-1023 Group Reservation Center"
@@ -3185,6 +3204,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createGroupSeatRequest
       x-ticvai-consumed-by:
         - "P08 BO-1025 Group Request Intake"
@@ -3734,6 +3754,13 @@ components:
       - holdTypeId
       - performanceId
       properties:
+        holderSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: contact
+          x-ticvai-references: pii.subject
+          description: '**The person the seats are held for, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind contact; null while none is given.'
         id:
           type: string
           format: uuid
@@ -3760,6 +3787,8 @@ components:
           type: integer
           readOnly: true
         holderName:
+          x-ticvai-pii: {store: subject.displayName, subject: holderSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         reason:
@@ -3954,6 +3983,13 @@ components:
       - performanceId
       - partySize
       properties:
+        contactSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: contact
+          x-ticvai-references: pii.subject
+          description: '**The group''s contact, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `contactName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind contact; null while none is given.'
         id:
           type: string
           format: uuid
@@ -3968,6 +4004,8 @@ components:
           format: uuid
           nullable: true
         contactName:
+          x-ticvai-pii: {store: subject.displayName, subject: contactSubjectId}
+          x-ticvai-data-class: personal
           type: string
         partySize:
           type: integer

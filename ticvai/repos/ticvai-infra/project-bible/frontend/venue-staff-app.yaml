@@ -48,7 +48,7 @@ contracts:
 - tenancy
 - venue-map
 - workforce
-deployment:
+deployment: &id001
   target: iOS / Android native
   distribution: MDM, not a public store
   bundleUpdate: on launch
@@ -57,6 +57,12 @@ deployment:
   deviceOwnership: venue-owned or BYOD
   networkAssumption: venue wifi, dead zones expected
   releaseCadence: fortnightly
+platformProfiles:
+- platform: P06
+  formFactor: mobileApp
+  runtime: reactNative
+  offlineCapable: true
+  deployment: *id001
 screenCount: 96
 byWave:
   wave1: 30

@@ -154,8 +154,7 @@ def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-ticket-builds", RULES)
     plan = g.ROOT / "handoff" / "service-docs" / "plan-tasks.csv"
-    if not plan.exists():
-        guard.note("handoff/service-docs/plan-tasks.csv missing - run tools/build-service-docs.py")
+    if not guard.require(plan, "run tools/build-service-docs.py; without it no ticket's builds are judged"):
         return guard.finish()
     with plan.open(encoding="utf-8", newline="") as fh:
         rows = {r["key"]: r for r in csv.DictReader(fh) if "#" not in r["key"]}

@@ -1,6 +1,6 @@
 # P08-orders-money-02 — P08 · Orders & Money (2 of 3)
 
-**10 screens · 71 operations · 101 schemas · 28 permissions**
+**10 screens · 71 operations · 102 schemas · 28 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -164,9 +164,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-041` | Cash Movements | C | 18 | 28 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
-| `BO-042` | Banking & Safe | C | 28 | 26 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
-| `BO-043` | Daily Reconciliation | A | 37 | 66 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
-| `BO-047` | Order Corrections & Exceptions | C | 141 | 39 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
+| `BO-042` | Banking & Safe | C | 33 | 26 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `BO-043` | Daily Reconciliation | A | 52 | 66 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
+| `BO-047` | Order Corrections & Exceptions | C | 149 | 39 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
 | `BO-048` | Retail Products | A | 33 | 19 | 6 | 29 | 1 | 0 | — | notStarted (generated) |
 | `BO-059` | Sales Reports | D | 76 | 20 | 6 | 93 | 3 | 0 | — | notStarted (generated) |
 | `BO-061` | Scheduled Reports | D | 26 | 12 | 6 | 7 | 0 | 0 | — | notStarted (generated) |

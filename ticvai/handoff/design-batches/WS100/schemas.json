@@ -26,7 +26,8 @@
     "format": "uuid"
    },
    "unit": {
-    "type": "string"
+    "$ref": "#/components/schemas/UsageMetric",
+    "description": "**The metric the pack raises** (ADAM CR-560, Chinmay, 3 November 2026; CHG-CR560-001): one of the `UsageMetric` values (venues, workstations, activeUsers, devices, brandedApps, aiTokens, apiCalls, storageGb, transactions, guestProfiles). `addCapacityPack` refuses any other unit with `400 validation` naming the `unit` field. A pack counts only toward the metric its unit names, in `targetLimit` for both `setSubscription` and `previewSubscriptionChange`; it is unexpired when `validFrom` is today or earlier (or not set) and `validTo` is today or later (or null). A stored row whose unit is not a `UsageMetric` value counts toward no metric."
    },
    "quantity": {
     "type": "integer"
@@ -543,7 +544,7 @@
      },
      "isActive": {
       "type": "boolean",
-      "description": "**Only the newest version is active** (ADAM CR-510): `createPlanVersion` sets it false on every earlier version. The current version is the highest active one."
+      "description": "**Only the newest version is active** (ADAM CR-510): `createPlanVersion` sets it false on every earlier version. The current version is the highest active one.\n**One reader, `PlanReader.Current`** (ADAM CR-567, Chinmay, 3 November 2026; CHG-CR567-001): of the plan's `control.plan` rows with `is_active` true, the highest `version` compared as an integer (the text cast; never compared as text, where 9 sorts above 10). If no row is active (only rows written before that rule), the highest version the same way. It replaces the `published_at` ordering. `getPlan`, `listPlans` and `SetSubscriptionRequest.planVersion`'s default read the current version through it."
      },
      "subscriberCount": {
       "type": "integer"
@@ -589,6 +590,21 @@
     "description": "The replica load, as a percent of its limit, above which the share is enforced."
    }
   }
+ },
+ "UsageMetric": {
+  "type": "string",
+  "enum": [
+   "venues",
+   "workstations",
+   "activeUsers",
+   "devices",
+   "brandedApps",
+   "aiTokens",
+   "apiCalls",
+   "storageGb",
+   "transactions",
+   "guestProfiles"
+  ]
  },
  "VsiModel": {
   "type": "object",

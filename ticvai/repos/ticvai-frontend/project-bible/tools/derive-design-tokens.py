@@ -208,13 +208,21 @@ WEB_INPUTS = {
     "fg": "theme.textColour (Theme requires it; never derived)",
     "dark": "relLum(bg) < 0.5: dark is derived from the background's relative luminance (dark below 0.5); "
             "theme.darkMode is never used to render",
-    "surface": "surf: the opaque surface the prototype's palette carries and Theme does not (--surface-op, and "
-               "`surface` in every rule)",
-    "surf": "mix(bg, fg, 0.04): the background mixed 4% toward the ink",
-    "surf2": "mix(bg, fg, 0.08): the background mixed 8% toward the ink",
+    # **The surface is worked out as the prototype's palettes carry it** (ADAM CR-557, Chinmay, 3 November 2026;
+    # CHG-CR557-001): CR-272 derived surf (and surface) as the background mixed 4% toward the ink, which drew a light
+    # venue's header, footer, cards and basket darker than its page; the prototype's palettes carry '#ffffff' on a
+    # light page, and theme() derives surf and surf2 from that surface with the Glass alpha. Every other rule that
+    # reads `surface` gets the new surface without further change.
+    "surface": "the opaque surface (--surface-op, and `surface` in every rule): '#ffffff' when dark is false "
+               "(relLum(bg) at 0.5 or above); mix(bg, fg, 0.04) when dark is true (ADAM CR-557)",
+    "surf": "glass ? rgba(surface, dark ? 0.58 : 0.7) : surface (--surface, and --card when the bars are not "
+            "solid): the prototype's theme() rule (ADAM CR-557)",
+    "surf2": "base = mix(surface, fg, dark ? 0.07 : 0.055); glass ? rgba(base, dark ? 0.5 : 0.62) : base "
+             "(--surface-2): the prototype's theme() rule, which replaces mix(bg, fg, 0.08) (ADAM CR-557)",
     "d": "1: the density the skin defaults fix (Standard: --sp2 16px, --sp3 24px, --sp4 36px, the token defaults)",
     "flat": "false: the skin default has no solid bars (--card-bw 1.5px, the token default)",
-    "glass": "theme.surfaceStyle is Glass (Glass when it is not set), as data-glass on the root",
+    "glass": "theme.surfaceStyle is Glass (Glass when it is not set), as data-glass on the root, which adds the "
+             "blur on surfaces; the transparency comes from surf and surf2 (ADAM CR-557)",
     "r": "theme.cornerRadius, else 10",
     "btn": "theme.buttonStyle, else Solid",
     "fp": "[the heading face, the body face] from FontConfig (appliedFrom.fonts), the Arabic pair under dir=rtl",

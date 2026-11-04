@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Payment Orchestration
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 48
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
@@ -50,7 +51,10 @@ info:
 
     '
 servers:
-- url: https://api.ticvai.com/v1
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 x-ticvai-queries:
@@ -169,6 +173,16 @@ x-ticvai-queries:
       implements, under the caller's row-level security (CHG-R13INP-001). It is asked from another deployable
       through Orders' service route (serviceAuth).
     served: [in-process, service]
+x-ticvai-jobs:
+  subjectDataPart:
+    module: payments
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [payments.dunning_case, payments.instalment_plan]
+    writes: []
+    for: 'payments''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /dunning-policy:
     get:
@@ -666,7 +680,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /payment-providers:
+  /payment-provider-connections:
     get:
       operationId: listPaymentProviderConnections
       x-ticvai-consumed-by:
@@ -739,7 +753,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /payment-providers/{connectionId}/test:
+  /payment-provider-connections/{connectionId}/test:
     parameters:
     - name: connectionId
       in: path
@@ -1429,6 +1443,7 @@ paths:
         - "P08 ADM-599 Mixed Tender & Credit Command Center"
         - "P08 ADM-600 Mixed Tender Rule & Combination Builder"
         - "P08 ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules"
+        - "P08 ADM-606 Partial Payment, Failure & Recovery Manager"
       summary: Which tenders may be combined, and in what order
       tags:
       - payments

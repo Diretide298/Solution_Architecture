@@ -2059,6 +2059,12 @@
    "critical": false
   },
   {
+   "name": "identity.privacyRequestRaised",
+   "publisher": "identity",
+   "role": "consumes",
+   "critical": true
+  },
+  {
    "name": "ledger.periodClosed",
    "publisher": "ledger",
    "role": "consumes",
@@ -5001,7 +5007,13 @@
    "file": "docs\\adr\\0023-pii-separation.md",
    "title": "ADR-0023 \u2014 Personal data lives apart from the append-only ledger",
    "status": "Accepted \u00b7 17 August 2026, recording a decision already impl",
-   "mentions": 2
+   "mentions": 6
+  },
+  {
+   "file": "docs\\adr\\0026-public-api-versioning.md",
+   "title": "ADR-0026: Public API versioning, scopes and deprecation",
+   "status": "Accepted",
+   "mentions": 1
   },
   {
    "file": "docs\\adr\\0028-service-decomposition.md",
@@ -5329,11 +5341,11 @@
   "operations": 148,
   "schemas": 125,
   "states": 43,
-  "events": 53,
+  "events": 54,
   "tables": 139,
   "screens": 183,
   "flows": 11,
-  "documents": 68,
+  "documents": 69,
   "openConflicts": 1
  }
 }

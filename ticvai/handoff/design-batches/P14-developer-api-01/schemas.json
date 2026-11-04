@@ -55,7 +55,7 @@
  "ApiAnomalyRule": {
   "type": "object",
   "x-ticvai-persistence": "control.api_anomaly_rule",
-  "description": "**When API traffic is abnormal** (17 September minutes, M17-07). Platform defaults ship for every tenant; TICVAI tightens them per tenant or per client.\n",
+  "description": "**When API traffic is abnormal** (17 September minutes, M17-07). Platform defaults ship for every tenant; TICVAI tightens them per tenant or per client.\n**A platform default is per-cell configuration, never a row** (ADAM CR-566, Chinmay, 3 November 2026; CHG-CR566-001). The configuration key `ApiAnomalyRules:PlatformDefaults` is a list of rules in this shape (`id`, `ruleKey`, `measure`, `comparison`, `threshold`, `windowMinutes`, `action`, `isActive`), `clientId` always null, each with a fixed UUIDv7 `id` that never changes; the lead sets the values, and until the key is present there are no defaults. `control.api_anomaly_rule` holds only tenant rules: `tenant_id` is NOT NULL (a forward migration makes it so), `scope_path` stays NOT NULL and the row policy is unchanged.\n",
   "required": [
    "ruleKey",
    "measure",
@@ -123,13 +123,15 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
-    "description": "**The tenant a rule belongs to** (4 October 2026, CHG-FXC-003). Null for a platform default, which every tenant reads; `listApiAnomalyRules` returns the platform defaults and the caller tenant's own rules."
+    "x-ticvai-column-nullable": false,
+    "x-ticvai-references": "control.tenant",
+    "description": "**The tenant a rule belongs to** (4 October 2026, CHG-FXC-003). Null for a platform default, which every tenant reads; `listApiAnomalyRules` returns the platform defaults and the caller tenant's own rules. A platform default is per-cell configuration (`ApiAnomalyRules:PlatformDefaults`) that the list returns with `tenantId` and `scopePath` both null and that is never stored, so every stored row has a tenant (NOT NULL; ADAM CR-566)."
    },
    "scopePath": {
     "type": "string",
     "nullable": true,
     "readOnly": true,
-    "description": "The tenant's root scope path for a tenant rule (scope row-level security); null for a platform default."
+    "description": "The tenant's root scope path for a tenant rule (scope row-level security); null for a platform default, which is per-cell configuration (`ApiAnomalyRules:PlatformDefaults`) returned by the list and never stored (ADAM CR-566)."
    }
   }
  },
@@ -137,6 +139,11 @@
   "type": "object",
   "x-ticvai-persistence": "control.api_client",
   "description": "CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n",
+  "x-ticvai-unique-together": [
+   [
+    "clientId"
+   ]
+  ],
   "required": [
    "id",
    "developerId",
@@ -161,7 +168,11 @@
    },
    "clientId": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "pattern": "^tvc_(live|test)_[a-z0-9]{32}$",
+    "x-ticvai-column-nullable": false,
+    "x-ticvai-unique-compare": "exact",
+    "description": "**The public half of the credential pair** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001), made by the server whenever a client is created, in `createApiClient` and in `decideProductionAccess` alike: `tvc_live_` for a production client or `tvc_test_` for a sandbox client, then 32 lowercase letters and digits from a cryptographically secure random source. It never changes, not on rotation or on a status change. The prefix is for people and secret scanners only: what a client may reach is decided by its `environment`, never by reading the prefix. `issueApiToken` finds the client by it. It is not the uuid `id` the `/api-clients/{clientId}/...` paths take. Stored NOT NULL with a unique index; an insert that hits the index retries once with a fresh value. A forward migration gives every existing row whose `client_id` is null a value made the same way, then makes `client_id` NOT NULL with the unique index. Shown and copied on the client detail panel, so never null."
    },
    "environment": {
     "type": "string",
@@ -500,14 +511,20 @@
  "ApiVersion": {
   "type": "object",
   "x-ticvai-persistence": "control.api_version",
-  "description": "13.1.31 to 13.1.35, ADR-0026. **CF-141 is sharper under D1**: a single supported production version was tenable when only Softlabs called the API, and **with third parties a breaking change with no window breaks somebody else's business.**\n",
+  "description": "13.1.31 to 13.1.35, ADR-0026. **CF-141 is sharper under D1**: a single supported production version was tenable when only Softlabs called the API, and **with third parties a breaking change with no window breaks somebody else's business.**\n**One row per version** (ADAM CR-570, Chinmay, 3 November 2026; CHG-CR570-001): `version` is unique. The forward migration that adds the index first checks for duplicate `version` rows and stops if any are found.\n",
+  "x-ticvai-unique-together": [
+   [
+    "version"
+   ]
+  ],
   "required": [
    "version",
    "status"
   ],
   "properties": {
    "version": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique-compare": "exact"
    },
    "status": {
     "type": "string",
@@ -540,6 +557,12 @@
    "migrationGuideUrl": {
     "type": "string",
     "nullable": true
+   },
+   "deprecationReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the version was deprecated: the `reason` sent to `deprecateApiVersion`, which sets it (ADAM CR-570); null until then."
    },
    "activeClientCount": {
     "type": "integer",
@@ -598,6 +621,7 @@
     "maxLength": 300
    },
    "contactEmail": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email"
    },
@@ -643,6 +667,7 @@
     "type": "string"
    },
    "contactEmail": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email",
     "description": "The organisation's contact, who becomes its owner member on registration; unique without case (`registerDeveloper` 409 `developer-already-registered`; ADAM CR-098)."
@@ -682,6 +707,16 @@
   "type": "object",
   "x-ticvai-persistence": "control.developer_member",
   "description": "**One person at a developer organisation** (`setDeveloperMembers`, 4 October 2026, CHG-FXC-005). Developer-portal people are not tenant staff: they are kept here in the control database beside `control.developer_account`, keyed by email, and never become `identity.principal` or `identity.delegated_access` rows (the Sprint 1-2 judging found no email column on a principal and no permission a portal role could map to). A new email is invited (`status` `invited`) and becomes `active` when the person signs in to the portal with it. What each role may do in the portal: `owner` everything and the member list, `admin` everything but removing the owner, `developer` its own clients and credentials, `readOnly` view.",
+  "x-ticvai-unique-when": [
+   {
+    "columns": [
+     "email"
+    ],
+    "when": {
+     "status": "active"
+    }
+   }
+  ],
   "required": [
    "email",
    "role",
@@ -699,8 +734,10 @@
     "readOnly": true
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
-    "format": "email"
+    "format": "email",
+    "description": "Unique among active members, compared without case (ADAM CR-569, \"Go yes\"): one email acts for one developer account. Until the index is applied, an email matching active members of two accounts answers 403."
    },
    "role": {
     "type": "string",
@@ -807,6 +844,13 @@
     "type": "string",
     "nullable": true,
     "readOnly": true
+   },
+   "reviewNotes": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "maxLength": 1000,
+    "description": "The notes of the last certifyIntegration decision (certify, reject or revoke), null when none were sent; set only by that decision, and left as it is by a resubmission (ADAM CR-572). The certification decision's note CHG-R14BO-006 kept (the lead, 3 November 2026, \"Keep them\") is this field (CHG-R14INT-003)."
    },
    "listingFeeModel": {
     "type": "string",
@@ -919,7 +963,7 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
-    "x-ticvai-references": "identity.principal"
+    "x-ticvai-references": "control.platform_operator"
    },
    "decidedAt": {
     "type": "string",

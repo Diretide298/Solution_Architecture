@@ -7,6 +7,44 @@
 
 ---
 
+## Amended 3 November 2026: one server definition per host, and what `info.version` means
+
+**Source:** the r13 system review, finding B-12 (contracts disagreed on host and base path: seven served from a global
+`https://api.ticvai.com/v1`, three from `https://api.{region}.ticvai.com/<module>/v1`, the rest from `{cellHost}` or
+`{controlPlaneHost}` under `/api/v1`, and `info.version` was 0.1.0 on 17 contracts and 1.0.0 on 18 with no rule). The
+lead, 3 November 2026, on the review's fixes: "All four, one release". Change entry CHG-R14J-020.
+
+1. **A contract is served from the host where its data lives.** A tenant's data is in its cell, a database per tenant
+   (ADR-0038, amended by ADR-0040), so every module of the five deployables (ADR-0055) is served from the tenant's
+   cell host: `https://{cellHost}/api/v1`. The Control Plane's own data (ADR-0039, ADR-0043: `control`, the plan
+   catalogue, developer accounts and keys) is served from `https://{controlPlaneHost}/api/v1`: `subscription`,
+   `platform-ops` and `public-api`. `cross-region` is served from both (the Guest Link Registry and DSAR
+   orchestration on the Control Plane, redemption in the cell). **No contract is served from a global host with no
+   cell**: payments and wallet are a tenant's money, kept in its cell, and a host that cannot know the cell cannot
+   serve them. Where the Control Plane itself runs is the control-plane placement decision, not this one; the
+   contracts name it only as `{controlPlaneHost}`.
+2. **One base path per runtime.** The three .NET deployables that serve requests (`commerce`, `access`,
+   `operations`) share `/api/v1` on the cell host: the cell's ingress sends each path to the deployable that
+   composes its module (ADR-0055), so a method and path are unique on a host (check-package rule 47). The Python AI
+   runtime (`ticvai-ai`, ADR-0020 as amended by ADR-0049) is served from the same cell host under `/ai/v1`, its own
+   base, because the ingress routes it by prefix and its paths are its own. **No module puts its name in the base path**:
+   `/workforce/v1` and `/approvals/v1` were the module's name, not a runtime's, and both are `/api/v1` now.
+3. **The definitions are written once**, in `contracts/shared/common.yaml` `x-ticvai-servers` (`cell`,
+   `controlPlane`, `ai`), and each contract names the ones it is served from in `info.x-ticvai-hosts`; its `servers`
+   block is those definitions, in that order, url and variables as written there. `tools/check-contract-servers.py`
+   fails a contract whose `servers` differ, whose hosts do not include the one its module's service implies
+   (`handoff/service-decomposition.json`: the service that owns `control` is the Control Plane, `ticvai-ai` is the
+   AI runtime, every other service the cell), or whose `info.version` breaks rule 4.
+4. **`info.version` is the URL version, as `<major>.0.0`.** The major is the `v<N>` every server of the contract
+   carries (1 today), and it changes only when a new URL version is published under the two-version rule above.
+   Within a major the package's release tag (`rN`) is the contract's version: an additive change ships in the next
+   release, and a breaking one is approved in `docs/active/breaking-changes.yaml` with the tag its producer and
+   consumers move to (check-contract-compat, which since this amendment compares each operation's full route, the
+   server's base path included). Minor and patch are not used, so a generated client's package version is the major
+   and the tag.
+
+---
+
 ## Context
 
 The 30 July decision was **one supported production version**. That was tenable while the only

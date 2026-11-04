@@ -6,7 +6,10 @@ version: 1
 publisher: maintenance
 description: An inspection or procedure template is available for use.
 aggregate: inspectionTemplate
-emittedWhen: Template created or amended
+emittedWhen: Template created, or a new version of it created (createInspectionTemplate; a template is
+  superseded by a new version, never edited in place)
+emittedBy:
+- maintenance.createInspectionTemplate
 payload:
 - field: templateId
   type: uuid

@@ -878,7 +878,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `seating` module |
+| Module | Access & Venue · wave 1 · needs the `seating` module |
 | Block | Block A · ticket #28033 (APP-SETUP-BO-1018) |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |

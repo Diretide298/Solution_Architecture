@@ -1014,6 +1014,7 @@
     "description": "Agent/User"
    },
    "customerName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Customer/Guest where applicable",
     "nullable": true

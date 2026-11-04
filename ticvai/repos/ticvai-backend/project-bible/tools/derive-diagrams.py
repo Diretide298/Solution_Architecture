@@ -406,8 +406,9 @@ def write_project_hld(services, lin, schema, real, owner):
              "note": "Third parties subscribe; replay is available."},
         ],
         "regions": {
-            "model": "one cell per jurisdiction",
-            "note": ("**A cell is a deployment and a legal boundary at once** (ADR-0001). UAE data "
+            "model": "one cell per region, a database per tenant",
+            "note": ("**A cell is a region and a legal boundary at once** (ADR-0038, which supersedes "
+                     "ADR-0001 and ADR-0014): it holds many tenants, each in its own database. UAE data "
                      "residency is required and DESC review shapes it.\n\n"
                      "**Only CrossRegionService reaches another region**, and it moves a pseudonymous "
                      "guest link rather than a guest (ADR-0010) — which is what makes a membership "

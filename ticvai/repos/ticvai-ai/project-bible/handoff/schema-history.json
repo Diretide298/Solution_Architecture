@@ -1264,7 +1264,12 @@
   "catalogue.competitor_price_observation": "2026-11-01",
   "workforce.guest_broadcast": "2026-11-01",
   "catalogue.import_job_row": "2026-11-03",
-  "marketing.guest_document_upload": "2026-11-03"
+  "marketing.guest_document_upload": "2026-11-03",
+  "fnb.table_visit_server": "2026-11-04",
+  "identity.offline_pin_verifier": "2026-11-04",
+  "identity.offline_step_up": "2026-11-04",
+  "identity.subject_erasure_part": "2026-11-04",
+  "pii.subject_network_identifier": "2026-11-04"
  },
  "renames": [
   {
@@ -1680,5 +1685,5 @@
   "platform.device_heartbeat": "2026-10-14"
  },
  "baseline": "2026-09-19",
- "generated": "2026-11-03"
+ "generated": "2026-11-04"
 }

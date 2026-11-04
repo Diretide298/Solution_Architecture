@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-240` | Authorization Governance & Temporary Access | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-241` | Policy Evaluation Architecture & Offline Distribution | C | 5 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-242` | Policy Simulation, Conflict & Impact Analysis | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | C | 2 | 7 | 6 | 13 | 0 | 3 | — | notStarted (generated) |
+| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | C | 13 | 7 | 6 | 13 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -1917,6 +1917,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 targetVersion is the current version, or does not exist for this policy
 
+**Form: Submit for approval** (modal, opened by *Submit for approval*; *Submit for approval* calls `createApprovalRequest`, *Cancel* sends nothing)
+
+**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createApprovalRequest` body |
+| Kind `kind` | select | required | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | — | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. | `createApprovalRequest` body |
+| Subject contract `subjectContract` | text field | required | — | — | — | Which contract owns the thing being approved. | `createApprovalRequest` body |
+| Subject type `subjectType` | text field | required | — | — | — | — | `createApprovalRequest` body |
+| Subject `subjectId` | text field | required | — | — | — | A reference, never a copy. A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists. | `createApprovalRequest` body |
+| Scope path `scopePath` | text field | required | — | — | — | — | `createApprovalRequest` body |
+| Summary `summary` | text area | required | — | max length 300 | — | What the approver sees in their queue before opening it. | `createApprovalRequest` body |
+| Amount `amount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createApprovalRequest` body |
+| Attributes `attributes` | key and value settings | optional | — | — | — | — | `createApprovalRequest` body |
+| Justification `justification` | text area | optional | — | max length 1000 | — | — | `createApprovalRequest` body |
+| Is draft `isDraft` | toggle | optional | off | — | — | True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129). | `createApprovalRequest` body |
+
+Errors to draw in the form: 409 An open request already exists for this subject. Two approvals for one subject is how the same money goes out twice. (ApprovalStateProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): the request is not a draft and no active rule matches its kind and subject type at its `scopePath` (for …
+
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Approval decision**: Approve, Reject (reason required), Return, Request information; the requester cannot approve their own; MFA step-up where the rule demands it. *(source: contracts/spine/approvals.yaml#decideApprovalRequest)*
@@ -1948,6 +1968,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Security Approval (secondary button) | navigation or local | — | — | — | — |
 | Technical Approval (secondary button) | navigation or local | — | — | — | — |
 | ROLLBACK TO V3.4 (destructive button) | `rollbackAccessPolicy` POST `/dynamic-access-policy/{policyId}/rollback` | inline | DynamicAccessPolicyCommandCenterView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 targetVersion is the current version, or does not exist for this policy | opens confirmDialog first |
+| Submit for approval (secondary button) | `createApprovalRequest` POST `/approval-requests` | CreateApprovalRequest | ApprovalRequest | 409 An open request already exists for this subject. Two approvals for one subject is how the same money goes out twice. (ApprovalStateProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): the request is … | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -2051,10 +2072,10 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403, 404, 409, 422).
+- [ ] Every input above is drawn (13), with its required mark, default, format and its error state (403, 404, 409, 422).
 - [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-243?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Policy Owner, Business Approval, Security Approval, Technical Approval, ROLLBACK TO V3.4.
+- [ ] Every action is wired with its success and its failure: Policy Owner, Business Approval, Security Approval, Technical Approval, ROLLBACK TO V3.4, Submit for approval.
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Every gated control is gated: `ACCESS_POINT_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `SCOPE_VIEW`.
 - [ ] The module and platform inputs below are applied.

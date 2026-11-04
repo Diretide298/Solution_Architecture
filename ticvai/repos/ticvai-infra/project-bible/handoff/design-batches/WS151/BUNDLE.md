@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | A | 10 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | C | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-606` | Partial Payment, Failure & Recovery Manager | A | 0 | 4 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-606` | Partial Payment, Failure & Recovery Manager | A | 0 | 13 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-607` | Mixed Tender Transaction Trace & Allocation Audit | C | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-608` | Mixed Tender Simulator, Credit Exposure & AI Advisor | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
@@ -1121,9 +1121,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `core` module |
+| Module | Commercial · wave 1 · needs the `core` module |
 | Block | Block A · ticket #28055 (APP-SETUP-ADM-606) |
-| Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Gift Card; Card) and no metric row |
 | Offline | online only |
@@ -1166,11 +1166,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | AED 200 ✓ | text | not in the schema: `AED 200 ✓` |
 | AED 800 ✕ | text | not in the schema: `AED 800 ✕` |
 
+**Which tenders may be combined, and in what order** (detail panel, from `getMixedTenderRules`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Split payment allowed | yes / no (icon or chip) | — |
+| Maximum tenders | 1,234 | — |
+| Tender order | list or chips (count when long) | Across tender kinds. `wallet` decides the order within stored value. |
+| Allowed combinations | list or chips (count when long) | — |
+| Method kinds | list or chips (count when long) | — |
+| Allowed | yes / no (icon or chip) | — |
+| Reason | text | — |
+| Partial payment allowed | yes / no (icon or chip) | — |
+| On partial failure | chip: Reverse all, Keep and retry, Keep and hold | Three tenders in, the fourth fails. Reversing all of it is the only answer that leaves the guest and the ledger in a state anybody can … |
+
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **dunning queue**: Cases being chased with next attempt; stop chasing with a reason. *(source: contracts/satellite/payments.yaml#listDunningCases / contracts/satellite/payments.yaml#resolveDunningCase)*
 
-**Data it reads**: `getDunningPolicy` (onLoad, Read the retry schedule this venue runs); `listDunningCases` (onLoad, The queue, ordered by attempts remaining)
+**Data it reads**: `getMixedTenderRules` (onLoad, The tender rules this screen edits, as saved); `getDunningPolicy` (onLoad, Read the retry schedule this venue runs); `listDunningCases` (onLoad, The queue, ordered by attempts remaining)
 
 **Where the user goes next**
 
@@ -1201,6 +1215,7 @@ case:
 
 #### Permissions
 
+- `getMixedTenderRules` → `PAYMENT_VIEW` (read) · staff
 - `setMixedTenderRules` → `PAYMENT_CONFIGURE` (configure) · staff
 - `getDunningPolicy` → `PAYMENT_CONFIGURE` (configure) · staff
 - `setDunningPolicy` → `PAYMENT_CONFIGURE` (configure) · staff
@@ -1239,11 +1254,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412, 422).
-- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-606?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-599`.
-- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`.
+- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).

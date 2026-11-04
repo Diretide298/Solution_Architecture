@@ -1255,7 +1255,9 @@
        "derived": true,
        "impliedBy": "createApprovalRequest",
        "label": "Create approval request",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "createApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       },
       {
        "kind": "secondaryButton",
@@ -1290,6 +1292,36 @@
    "workshopBoard": "wireframes/WS152 Seat Management Venue Mapping Reference v1.0 Board 13.dc.html#bo-1080"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 56. 0 of 0 labels bound to a contract property; 0 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Create approval request",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Create approval request",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

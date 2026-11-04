@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-041` | Waiver & Consent Command Center | D | 2 | 24 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `CMS-041` | Waiver & Consent Command Center | A | 2 | 24 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
 | `CMS-042` | Waiver Template Library & Master Setup | D | 36 | 0 | 5 | 0 | 2 | 4 | — | notStarted (generated) |
 | `CMS-043` | Digital Waiver & Form Builder | D | 27 | 0 | 6 | 75 | 2 | 4 | — | notStarted (generated) |
 | `CMS-044` | Dynamic Fields, Questions & Conditional Logic | D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-047` | Waiver Trigger, Eligibility & Completion Rules | D | 15 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
 | `CMS-048` | Versioning, Effective Dates & Legal Change Control | D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `CMS-049` | Localization, Branding & Customer Experience Configuration | D | 0 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `CMS-050` | Waiver Approval, Testing & Publication Workspace | D | 4 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `CMS-050` | Waiver Approval, Testing & Publication Workspace | A | 4 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

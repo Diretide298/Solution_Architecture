@@ -1,6 +1,6 @@
 # WS18 — Approval Workflows and Governance board 6
 
-**10 screens · 17 operations · 16 schemas · 6 permissions**
+**10 screens · 16 operations · 14 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

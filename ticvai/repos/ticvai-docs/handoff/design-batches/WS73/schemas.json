@@ -213,6 +213,7 @@
       "type": "string"
      },
      "dateOfBirth": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "format": "date",
       "nullable": true
@@ -230,6 +231,7 @@
       "type": "string"
      },
      "signedName": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "description": "The name as typed or drawn at signing."
      }
@@ -347,6 +349,7 @@
     "description": "Personal data (ADR-0023); null once the subject is erased.",
     "properties": {
      "ipAddress": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "nullable": true
      },

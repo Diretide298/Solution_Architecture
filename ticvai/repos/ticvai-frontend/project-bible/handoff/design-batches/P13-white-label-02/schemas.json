@@ -324,11 +324,17 @@
     "nullable": true
    },
    "personName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "personSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "maxLength": 120,
     "nullable": true
    },
    "personSubjectId": {
+    "x-ticvai-subject-kind": "guest",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1008,7 +1014,7 @@
       },
       "flowKey": {
        "type": "string",
-       "description": "The changed flow that serves this product."
+       "description": "The changed flow that serves this product: the flow's `BookingFlow.id`, the uuid as text (ADAM CR-547). For a removed flow, the flow of the side that holds it."
       }
      }
     }
@@ -1029,7 +1035,7 @@
       },
       "path": {
        "type": "string",
-       "description": "The property names below the part joined with `.`; a keyed array item by its key in brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other arrays of objects by index ([0]); an array of plain values is one value. For bookingFlows, the flow key (ADAM CR-500)."
+       "description": "The property names below the part joined with `.`; a keyed array item by its key in brackets (navigation and homepage by id, features by featureKey, modules by moduleKey), other arrays of objects by index ([0]); an array of plain values is one value. For bookingFlows, the flow's `BookingFlow.id`, the uuid as text (ADAM CR-500, CR-547)."
       },
       "changeKind": {
        "type": "string",
@@ -2915,7 +2921,7 @@
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
-  "description": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).\n\n**Who sanitises, and against what.** Every operation that writes a value of this schema (`createContentPage`, `updateContentPage`, `setFaqs`, `setPolicy`), and `createContentBlock` and `updateContentBlock` for a `richText` block's `text`, runs each language's HTML through one shared sanitiser in the White-label module before storing it: Ganss.Xss (HtmlSanitizer, MIT). The stored value is the sanitised HTML, and that is what is returned and served to every reader.\n- **Allowed tags**: p, br, hr, strong, b, em, i, u, s, sub, sup, h2, h3, h4, ul, ol, li, blockquote, a, img, table, thead, tbody, tr, th, td, span.\n- **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img; colspan and rowspan on th and td.\n- **URL schemes**: https, mailto and tel for href; https only for src.\n- **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute, style, and any javascript: or data: URL is removed.\n",
+  "description": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).\n\n**Who sanitises, and against what.** Every operation that writes a value of this schema (`createContentPage`, `updateContentPage`, `setFaqs`, `setPolicy`), and `createContentBlock` and `updateContentBlock` for a `richText` block's `text`, runs each language's HTML through one shared sanitiser in the White-label module before storing it: Ganss.Xss (HtmlSanitizer, MIT). The stored value is the sanitised HTML, and that is what is returned and served to every reader.\n- **Allowed tags**: p, br, hr, strong, b, em, i, u, s, sub, sup, h2, h3, h4, ul, ol, li, blockquote, a, img, table, thead, tbody, tr, th, td, span.\n- **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img; colspan and rowspan on th and td.\n- **URL schemes**: https, mailto and tel for href, and a relative internal link, a path starting with a single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923; CHG-CR401-002); https only for src. An `http:` link is removed.\n- **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute, style, and any javascript: or data: URL is removed.\n",
   "additionalProperties": {
    "type": "string"
   }
@@ -3257,7 +3263,8 @@
   "required": [
    "previewId",
    "url",
-   "expiresAt"
+   "expiresAt",
+   "platform"
   ],
   "properties": {
    "previewId": {
@@ -3291,7 +3298,7 @@
    "outputPreviews": {
     "type": "array",
     "readOnly": true,
-    "description": "**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay, 2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`.",
+    "description": "**The PDF ticket and the Apple and Google Wallet passes, previewed with the app** (Chinmay, 2 October, workbook Q151: in Block A; CHG-CSA-041). One entry per output asked for in `outputs`, once rendered. **Grows as the renderer finishes** (ADAM CR-586, Chinmay, 3 November 2026; CHG-CR586-001): absent in the 201 and in the new cache entry; the renderer in the workers host adds one entry (`output`, `url`) as it finishes each output. `getPreview` answers whatever the entry holds: an output not rendered yet is missing from the list, not an error.",
     "items": {
      "type": "object",
      "required": [
@@ -3393,6 +3400,13 @@
  },
  "Product": {
   "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
+  "x-ticvai-index": [
+   [
+    "venueId",
+    "displayOrder",
+    "id"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -3429,6 +3443,28 @@
    "description": {
     "type": "string"
    },
+   "bookingEntry": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "dateFirst",
+     "productFirst",
+     "venueMap",
+     "timeWindow",
+     "bundle"
+    ],
+    "description": "**Which booking screen Book opens** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). Worked out on read and never stored; set on every guest or visitor read that answers a product (`listProducts`, `getProduct`) and on every `searchCatalogue` result, null on staff reads, and null when the product has no Book (info-only). In this order: (a) kind `bundle` gives `bundle` while `bundleId` is set; with no such bundle it is null and the card opens Item Detail as now. (b) `requiresTimeWindow` true gives `timeWindow`. (c) Otherwise the product's published booking flow by `getPublishedBookingFlow`'s rule (the product's flow, then its category's, then the venue's enabled default for its kind, with the same tie rule), from `white-label#publishedBookingFlowSteps`: its first enabled step, skipping `location` and `helpMeChoose`; `resourceMap` gives `venueMap`; `date`, `time` or `performance` gives `dateFirst`; any other step gives `productFirst`. If no flow resolves, the same test is applied to the default order of the flow type the kind rule picks. Book opens: `dateFirst` GST-007, `productFirst` GST-008, `venueMap` GST-074, `timeWindow` GST-075, each with `productId`; `bundle` GST-056 with `bundleId`."
+   },
+   "bundleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Set only when `bookingEntry` is `bundle` (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose `variant_id` is this product's variant, while `getGuestBundle` would return it (published, active, in its window). Never taken from a search result's `id`: for a bundle that is the bundle's catalogue product, not the bundle."
+   },
    "fromPrice": {
     "oneOf": [
      {
@@ -3439,6 +3475,12 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "nullable": true,
+    "default": 100,
+    "description": "Where this product sorts among the venue's products in listProducts, lower first. Not alphabetical: the order the venue wants guests to see. (ADAM CR-581, Chinmay, 3 November 2026; CHG-CR581-001.) Stored on `catalogue.product` as `display_order`, nullable with default 100 like `catalogue.product_category.display_order`; existing rows take 100. Set by `createProduct` (100 when not sent) and `updateProduct` (changed only when the body carries it; null stores null), and returned by every operation that answers `Product`, `getProduct` and the till's catalogue bundle included. No back-office product screen shows or edits it."
    },
    "isFeatured": {
     "type": "boolean",
@@ -3997,11 +4039,13 @@
   "minProperties": 1,
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "maxLength": 32,
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "maxLength": 254,
@@ -4566,6 +4610,11 @@
          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
         }
        }
+      },
+      "timeZone": {
+       "type": "string",
+       "nullable": true,
+       "description": "**The venue's time zone, an IANA name** (ADAM CR-556 as corrected, Chinmay, 3 November 2026; CHG-CR556-002): the venue's `RegionSettings.timeZone`, read through `regionSettingsRecords`, the zone `openingHoursToday` already uses. Null when not set. Additive; nothing else changes. Select Date & Time (GST-007) works out the venue day in it."
       }
      }
     }
@@ -5190,10 +5239,12 @@
   "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "nullable": true
@@ -5203,6 +5254,7 @@
     "nullable": true
    },
    "address": {
+    "x-ticvai-data-class": "business",
     "allOf": [
      {
       "$ref": "#/components/schemas/white-label::LocalisedText"

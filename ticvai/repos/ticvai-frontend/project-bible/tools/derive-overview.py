@@ -31,7 +31,8 @@ ROOT = Path(__file__).resolve().parents[1]
 HANDOFF = ROOT / "handoff"
 
 
-def main() -> int:
+def render() -> tuple:
+    """OVERVIEW.md's text, and the line main() prints; check-landing-figures LF-OVERVIEW compares the file with it."""
     status = json.loads((HANDOFF / "status.json").read_text(encoding="utf-8"))
     trace = json.loads((HANDOFF / "traceability.json").read_text(encoding="utf-8"))
     lin = json.loads((HANDOFF / "api-data-lineage.json").read_text(encoding="utf-8"))
@@ -66,6 +67,10 @@ def main() -> int:
         for t in (nav.get("entryFrom") or []):
             if t in screens:
                 out[t].add(sid)
+        # a redirect is reached when the screen its route goes to is (CHG-R14J-030, the r13 system review F-14)
+        to = (s.get("implementation") or {}).get("redirect")
+        if to in screens:
+            out[to].add(sid)
     reachable = 0
     for code, ids in by_plat.items():
         entries = {i for i in ids if (screens[i].get("navigation") or {}).get("isEntryPoint")}
@@ -80,14 +85,39 @@ def main() -> int:
             frontier = nxt
         reachable += len(seen)
 
+    # **Authored journeys and board-derived routes are counted apart** (r13 system review F-13, CHG-R14J-041), as
+    # build-status.py counts them: a route generated against every client board is scaffolding, not a journey, and
+    # "98 flows" beside 291 flow files read as a contradiction. The target is the Flows metric's own total.
     in_flow: set = set()
+    in_authored: set = set()
     flow_ops: set = set()
-    for f in (ROOT / "flows").glob("F*.yaml"):
-        for st in (yaml.safe_load(f.read_text(encoding="utf-8")).get("steps") or []):
+    n_derived = 0
+    for f in sorted((ROOT / "flows").glob("F*.yaml")):
+        text = f.read_text(encoding="utf-8")
+        derived = "provenance: derived-from-board" in text
+        n_derived += derived
+        for st in (yaml.safe_load(text).get("steps") or []):
             if st.get("screen"):
                 in_flow.add(st["screen"])
+                if not derived:
+                    in_authored.add(st["screen"])
             for o in (st.get("operations") or []):
-                flow_ops.add(o)
+                if not derived:
+                    flow_ops.add(o)
+    flows_metric = next((m for m in (status.get("metrics") or {}).get("design") or [] if m.get("name") == "Flows"), {})
+    flows_target = flows_metric.get("total")
+    by_contract: dict = defaultdict(set)
+    for op, row in lin.items():
+        by_contract[row.get("contract") or "?"].add(op)
+    no_journey = sorted(c for c, ops in by_contract.items() if not ops & flow_ops)
+    # The checks the gate runs, as tools/run-checks.py lists them, and how many of them gate.
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("run_checks", str(ROOT / "tools" / "run-checks.py"))
+    run_checks = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(run_checks)
+    n_checks = len(run_checks.CHECKS)
+    n_gating = len([c for c in run_checks.CHECKS if c not in run_checks.REPORT_ONLY])
+    n_derivers = len(list((ROOT / "tools").glob("derive-*.py")))
 
     # conflicts
     reg = (ROOT / "docs" / "registers" / "conflicts.md").read_text(encoding="utf-8")
@@ -113,16 +143,16 @@ def main() -> int:
         "",
         f"**{counts['operations']} operations · {counts['contracts']} contracts · "
         f"{counts['tables']} tables · {counts['screens']} screens · {counts['states']} state "
-        f"models · {counts['flows']} flows · {counts['adrs']} ADRs**",
+        f"models · {counts['flows']} authored flows · {counts['adrs']} ADRs**",
         "",
-        f"**Design {status['headline']['design']}% · Build {status['headline']['build']}%.**",
+        f"**Design {status['headline']['design']}% · Build {status['headline']['build']}%** (handoff/status.json).",
         "",
         "---",
         "",
         "## What this is for",
         "",
-        "**A contract-first package that refuses to contradict itself.** Nine validators run on",
-        "every change: a screen cannot call an operation that does not exist, an operation cannot",
+        f"**A contract-first package that refuses to contradict itself.** {n_checks} checks run on",
+        f"every refresh, {n_gating} of them gating: a screen cannot call an operation that does not exist, an operation cannot",
         "name a table stored nowhere, a state model cannot anchor on a schema with no values, a",
         "flow cannot step through a screen that was deleted.",
         "",
@@ -150,11 +180,14 @@ def main() -> int:
         f"| Screens drawn on a board | "
         f"{len(screens)} of "
         f"{len(screens)} | 100% |",
-        f"| Screens in a journey | {len(in_flow)} of {len(screens)} | "
+        f"| Screens in an authored journey | {len(in_authored)} of {len(screens)} | "
+        f"{pct(len(in_authored), len(screens))}% |",
+        f"| Screens on any flow, board-derived routes included | {len(in_flow)} of {len(screens)} | "
         f"{pct(len(in_flow), len(screens))}% |",
         f"| Conflicts | {status['conflicts']['closed']} closed | "
-        f"{len(open_cf)} open, none blocking |",
-        f"| **Tables written** | **0** of {counts['tables']} | **build has not started** |",
+        f"{len(open_cf)} open, {status['conflicts'].get('blocking', 0)} blocking |",
+        f"| Tables in the DDL | {counts.get('tablesWritten', 0):,} of {counts['tables']:,} | "
+        f"{pct(counts.get('tablesWritten', 0), counts['tables'])}% |",
         "",
         "---",
         "",
@@ -168,7 +201,7 @@ def main() -> int:
         "| **`handoff/TICVAI_Schema_Reference.xlsx`** | The data model as a workbook |",
         "| **`handoff/schema-roots.md`** | Which table each schema is about, and how the rest "
         "hang off it |",
-        "| **`COVERAGE.md`** | What is here and what is not |",
+        "| **`COVERAGE.md`** | The account of 17 August 2026 of what was here and what was not (historical) |",
         "| **`docs/adr/`** | Why the platform is shaped this way |",
         "",
         "**Running the viewer** renders all of it as five linked layers:",
@@ -205,8 +238,8 @@ def main() -> int:
         "| `docs/adr/` | Decisions, with the alternatives and why they lost |",
         "| `docs/registers/` | Conflicts, traceability, the backlog |",
         "| `handoff/` | Derived artefacts — the schema reference, the lineage, the graph |",
-        "| `tools/` | Nine validators and eight derivers. `bash tools/refresh.sh` runs everything |",
-        "| `repos/` | Mirrors of this package for each build repository. Also generated |",
+        f"| `tools/` | {n_checks} checks (tools/run-checks.py) and {n_derivers} derivers. `bash tools/refresh.sh` runs everything |",
+        "| `repos/` | Each repository's project documents (its README, its CLAUDE.md from ADAM's starter) and `project-bible/`, a mirror of this package; no code. Also generated |",
         "",
         "---",
         "",
@@ -215,20 +248,22 @@ def main() -> int:
         "**Put last on purpose.** A landing page that only lists what exists is a landing page "
         "that misleads.",
         "",
-        f"**Build is 0%.** {counts['tables']} tables are designed and none is written. No "
-        "migration has run, no service is scaffolded, and nothing has executed. **The design is "
-        f"{pct(verdicts['CONTRACTED'], in_scope)}% of in-scope requirements and the gap to build "
-        "is the entire remaining risk.**",
+        f"**Build is {status['headline']['build']}%** by the package's own measure (handoff/status.json). "
+        f"**The design is {pct(verdicts['CONTRACTED'], in_scope)}% of in-scope requirements and the gap to build "
+        "is the remaining risk.**",
         "",
-        f"**{counts['flows']} journeys of a target 60.** Seventeen contracts have exactly one — "
-        "`subscription` has one over 55 operations. **Every journey written so far has found a "
-        "defect**, which is the argument for writing more.",
+        f"**{counts['flows']} authored journeys"
+        + (f" of a target {flows_target}" if flows_target else "")
+        + f"**, beside {n_derived} routes derived from the client boards. "
+        f"{len(no_journey)} of {len(by_contract)} contracts have no operation in an authored journey"
+        + (" (" + ", ".join(f"`{c}`" for c in no_journey) + ")" if no_journey else "")
+        + ". **Every journey written so far has found a defect**, which is the argument for writing more.",
         "",
         f"**{len(screens) - reachable} screens cannot be reached** from their platform's entry "
         "point, and navigation is still inferred rather than designed on most of the estate.",
         "",
-        f"**{len(open_cf)} conflicts are open.** None blocks build; four need an email and one "
-        "needs a workshop.",
+        f"**{len(open_cf)} conflicts are open**, {status['conflicts'].get('blocking', 0)} of them blocking. "
+        "Each is listed with who answers it:",
         "",
     ]
     for cf, owner in open_cf:
@@ -244,8 +279,17 @@ def main() -> int:
         f"{status['conflicts']['closed'] + len(open_cf)}.*",
     ]
 
-    (ROOT / "OVERVIEW.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"  {len(plats)} platforms · {len(screens)} screens · {len(open_cf)} open conflicts")
+    return ("\n".join(lines) + "\n",
+            f"  {len(plats)} platforms · {len(screens)} screens · {len(open_cf)} open conflicts")
+
+
+def main() -> int:
+    text, said = render()
+    # **Nothing rewrites this page after it is written** (CHG-R14J-041): sync-counts.py edited it in place with bare
+    # "<n> screens" patterns and turned "2 screens cannot be reached" into "2453 screens cannot be reached".
+    with open(ROOT / "OVERVIEW.md", "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(text)
+    print(said)
     print("  → OVERVIEW.md")
     return 0
 

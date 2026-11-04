@@ -163,7 +163,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-129` | Software, Configuration & Version Management | A | 24 | 23 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
 | `BO-130` | Offline Policy & Rules Configuration | A | 13 | 19 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-131` | Connectivity & Auto-Switch Settings | B | 12 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-132` | Offline Transaction Monitor & Sync Queue | C | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
+| `BO-132` | Offline Transaction Monitor & Sync Queue | C | 44 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
 | `BO-133` | Offline Alerts, Limits & Audit | A | 24 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ---
@@ -845,6 +845,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Guest link `orders[].guestLinkId` | text field | optional | — | — | — | Present where the guest is linked across cells. | `syncOrders` body |
 | Catalogue bundle version `orders[].catalogueBundleVersion` | text field | optional | — | — | — | The bundle the client priced from. Lets the server explain a variance rather than merely report one. | `syncOrders` body |
 | Lines `orders[].lines` | repeatable rows | required | — | at least 1 | — | — | `syncOrders` body |
+| Holder subject `orders[].lines[].holderSubjectId` | picker: choose a holder subject | optional | — | — | shows names, sends the id | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure … | `syncOrders` body |
 | ID `orders[].lines[].id` | picker: choose an id | required | — | — | shows names, sends the id | Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these. | `syncOrders` body |
 | Variant `orders[].lines[].variantId` | picker: choose a variant | required | — | — | shows names, sends the id | — | `syncOrders` body |
 | Recommendation `orders[].lines[].recommendationId` | picker: choose a recommendation | optional | — | — | shows names, sends the id | The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation … | `syncOrders` body |
@@ -988,7 +989,7 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (43), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (44), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-132?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Sync orders.

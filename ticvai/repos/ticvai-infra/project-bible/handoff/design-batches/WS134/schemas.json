@@ -133,9 +133,10 @@
    "mobileHandset",
    "handheldScanner",
    "accessPodium",
-   "bleBeacon"
+   "bleBeacon",
+   "workstationTerminal"
   ],
-  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n`workstationTerminal` (r14 review C-04, CHG-R14H-001; the lead, 3 November 2026: \"All four, one release\"): the computer a device door runs on (a till, a kiosk), enrolled like any device and bound to its workstation. Its `deviceAuth` credential is how the door proves which workstation it is, which a `workstationId` in a body never proves. A shared handheld or scanner proves it with its own `handheldScanner` credential.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"
  },
  "FnbServiceChargePolicy": {
   "type": "object",

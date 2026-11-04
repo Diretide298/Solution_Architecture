@@ -19231,7 +19231,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-012 Checkout — Payment"
         - "P02 GST-007 Select Date & Time"
+        - "P02 GST-008 Tickets & Add-ons"
+        - "P02 GST-009 Review & Payment"
       x-ticvai-read-via:
       - query: orders#cartRecords
         route: in-process

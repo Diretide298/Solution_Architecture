@@ -1157,7 +1157,7 @@
   "name": "Transport Departure Board",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 2,
+  "wave": 1,
   "permission": "TRANSPORT_VIEW",
   "implementation": {
    "app": "venue-management-web",

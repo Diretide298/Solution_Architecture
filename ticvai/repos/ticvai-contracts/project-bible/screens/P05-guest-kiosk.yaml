@@ -650,6 +650,8 @@ screens:
     - to: KSK-007
       trigger: Pays at the terminal
       provenance: flow F07 step 6→7, F75 step 4→5
+      carries:
+      - orderId
     - to: KSK-008
       trigger: The payment does not resolve
       provenance: flow F57 step 1→2
@@ -857,6 +859,13 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  entryState:
+    params:
+    - name: orderId
+      from: navigation
+      notes: 'The order being paid for, brought by the screen that made it: the basket''s checkout (KSK-006,
+        `checkoutCart`) or the food order (KSK-016, `createGuestFnbOrder`). `createPayment` takes it as
+        `orderId` (r14 gate, CHG-R14BO-003).'
 - id: KSK-008
   name: Payment unresolved
   module: Sell

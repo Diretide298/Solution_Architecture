@@ -236,6 +236,9 @@
  "document:docs\\adr\\0023-pii-separation.md": [
   "ai:names it"
  ],
+ "document:docs\\adr\\0026-public-api-versioning.md": [
+  "ai:names it"
+ ],
  "document:docs\\adr\\0028-service-decomposition.md": [
   "ai:names it"
  ],
@@ -393,6 +396,9 @@
   "ai:consumes"
  ],
  "event:identity.loginRecorded": [
+  "ai:consumes"
+ ],
+ "event:identity.privacyRequestRaised": [
   "ai:consumes"
  ],
  "event:ledger.periodClosed": [

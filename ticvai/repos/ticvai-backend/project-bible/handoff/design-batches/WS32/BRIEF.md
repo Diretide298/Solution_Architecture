@@ -1,6 +1,6 @@
 # WS32 — Order   Reservation Management board 2
 
-**9 screens · 18 operations · 32 schemas · 9 permissions**
+**9 screens · 18 operations · 33 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-314` | Amendment & After-Sales Command Center | C | 2 | 48 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-315` | Order Amendment Workspace | C | 66 | 30 | 6 | 32 | 0 | 0 | — | notStarted (generated) |
+| `BO-315` | Order Amendment Workspace | C | 68 | 30 | 6 | 32 | 0 | 0 | — | notStarted (generated) |
 | `BO-316` | Amendment Eligibility & Policy Rule Builder | C | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-317` | Cancellation & Partial Cancellation Policy Configuration | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-318` | Refund Policy & Refund Calculation Configuration | C | 16 | 12 | 5 | 0 | 3 | 6 | — | notStarted (generated) |

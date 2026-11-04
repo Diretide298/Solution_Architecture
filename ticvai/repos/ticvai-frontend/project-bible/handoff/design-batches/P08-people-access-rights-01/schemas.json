@@ -16,6 +16,14 @@
    "lastSeenAt"
   ],
   "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "employee",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The signed-in person (their principal's subject), as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `ipAddress` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind employee; null while none is given."
+   },
    "status": {
     "allOf": [
      {
@@ -88,6 +96,11 @@
     "nullable": true
    },
    "ipAddress": {
+    "x-ticvai-pii": {
+     "store": "identifier.ipAddress",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -1019,7 +1032,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "**Amounts compare in the venue's currency** (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the currency of the venue the request is raised at, at that day's FX rate (finance `listFxRates`), before it is compared with `minAmount` and `maxAmount`; a tenant- or region-level matrix's bounds are read in that same venue currency."
+    "description": "**Amounts compare in the venue's currency** (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the currency of the venue the request is raised at, before it is compared with `minAmount` and `maxAmount`; a tenant- or region-level matrix's bounds are read in that same venue currency. **Which currency and which rate** (ADAM CR-592; CHG-CR592-001): the venue is the venue node of the request's `scopePath`, its currency that venue's settings `currencyCode`, or its region's when that is null; the rate is finance's (`finance#fxRateRecords`) from the amount's currency to the venue currency, purpose `reporting`, with the latest `effectiveFrom` not after now. No such rate is `422 fx-rate-unavailable`, never a guess."
    },
    "maxAmount": {
     "allOf": [
@@ -1878,6 +1891,43 @@
     "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
+   }
+  }
+ },
+ "OfflineStepUpEvidence": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; Identity keeps it on the step-up's identity.offline_step_up row",
+  "description": "**What the device says about an offline step-up it checked itself** (decided 3 November 2026, Chinmay, system review finding F-01, \"Offline verifier\"; CHG-R14V-001). It is evidence, never authority: the server re-checks the step-up at sync whatever this says.",
+  "required": [
+   "packageId",
+   "verifierId",
+   "verifiedAt",
+   "failedAttemptsBefore"
+  ],
+  "properties": {
+   "packageId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The offline step-up package (identity `OfflineStepUpPackage.packageId`) the device checked against. It must have been issued to the calling workstation.",
+    "x-ticvai-stored-as": "identity.offline_step_up.package_id"
+   },
+   "verifierId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The signer's verifier in that package (`OfflineStepUpSigner.verifierId`).",
+    "x-ticvai-stored-as": "identity.offline_step_up.verifier_id"
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the typed PIN matched the verifier.",
+    "x-ticvai-stored-as": "identity.offline_step_up.verified_at"
+   },
+   "failedAttemptsBefore": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Wrong PINs the device counted for this signer since its package was applied, before this one matched. Kept for review; it does not count towards the server's lockout.",
+    "x-ticvai-stored-as": "identity.offline_step_up.failed_attempts_before"
    }
   }
  },
@@ -2903,11 +2953,19 @@
  },
  "SupervisorStepUp": {
   "type": "object",
-  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n\n**Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by `identity.listStepUpSupervisors` with the operation's permission: the active principals who hold it at the caller's venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`). **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller's own principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the picker leaves the caller out.\n",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n\n**Where `principalId` comes from, on every operation that takes this** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C31, option A; CHG-R8SPN-035). The PIN prompt shows a picker filled by `identity.listStepUpSupervisors` with the operation's permission: the active principals who hold it at the caller's venue, by display name. The supervisor picks their own name and types their PIN; the prompt sends the picked `principalId` (or, where the prompt asks for an employee number instead, `supervisorUsername`). **Nobody signs their own act**: a `principalId` (or resolved `supervisorUsername`) equal to the caller's own principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the picker leaves the caller out.\n\n**Offline, the till checks the PIN against its offline verifier and the server checks it again at sync** (decided 3 November 2026, Chinmay, on system review finding F-01: \"Offline verifier\" (the till keeps a verifier, re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001). On an operation that declares `x-ticvai-offline-step-up: verifier`, a till or handheld with no connection fills the picker from its offline step-up package (identity `getOfflineStepUpPackage`: the signers who may sign that operation's permission at its venue, the caller left out), checks the typed PIN locally against that signer's verifier (Argon2id, never the PIN), and queues the call with this object as online plus `offline`, the evidence of the local check. A wrong PIN counts on the device; at the package's `attemptLimit` that signer is locked on that device until its next sync. **At sync the server re-checks everything**: the PIN against the signer's PIN credential in force at the act's `recordedAt`, the verifier (issued to this workstation's package, not expired and not revoked at `recordedAt`), and the signer's permission, venue and not-self as at `recordedAt`. **An offline step-up the server does not confirm never drops the act**: the act happened at the till, so it is recorded as sent, its success response carries `X-Ticvai-Step-Up-Verdict: refusedAtSync`, Identity keeps the refusal (`identity.offline_step_up`) and publishes `identity.offlineStepUpRefused`, which raises an alert to the venue's managers. Online, nothing changes: a failure is `403 supervisor-step-up-refused` and nothing is written.\n",
   "required": [
    "credential"
   ],
   "properties": {
+   "offline": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OfflineStepUpEvidence"
+     }
+    ],
+    "description": "**Sent only by a call queued offline** whose step-up was checked on the device against its offline verifier (CHG-R14V-001). Absent online. Kept on the step-up's `identity.offline_step_up` row, which Identity writes when it re-checks the step-up at sync."
+   },
    "principalId": {
     "type": "string",
     "format": "uuid",
@@ -2922,7 +2980,7 @@
     "type": "string",
     "maxLength": 512,
     "writeOnly": true,
-    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in."
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned. Exactly the tenant's `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004), and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in. **A call queued offline carries the PIN the signer typed** (sealed in the device's encrypted outbox and deleted from it once the call syncs) so the server can check it again at sync (CHG-R14V-001); a wrong PIN found at sync is not a new attempt and does not count towards the lockout."
    }
   }
  },
@@ -3241,7 +3299,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

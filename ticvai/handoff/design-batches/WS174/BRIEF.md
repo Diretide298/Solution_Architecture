@@ -1,6 +1,6 @@
 # WS174 — Seat Management Venue Mapping Reference v1.0 board 10
 
-**8 screens · 8 operations · 13 schemas · 4 permissions**
+**8 screens · 11 operations · 22 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1046` | Inventory Forecasting | B | 0 | 20 | 6 | 3 | 0 | 4 | — | notStarted (—) |
 | `BO-1047` | Section Revenue Forecast | B | 0 | 20 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-1048` | Seat Upsell Recommendations | D | 0 | 0 | 6 | 40 | 0 | 6 | — | notStarted (—) |
-| `BO-1049` | Scenario & What-If Planning | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1049` | Scenario & What-If Planning | B | 15 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
 | `BO-1050` | Revenue Analytics & Audit | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

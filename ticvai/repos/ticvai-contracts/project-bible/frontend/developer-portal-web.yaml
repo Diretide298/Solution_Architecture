@@ -28,7 +28,7 @@ packages:
 - api-client
 contracts:
 - public-api
-deployment:
+deployment: &id001
   target: browser
   distribution: served from the cell
   bundleUpdate: immediate on deploy
@@ -40,6 +40,12 @@ deployment:
     **The portal may change weekly; the contract it describes may not.**
 
     '
+platformProfiles:
+- platform: P14
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment: *id001
 screenCount: 8
 byWave:
   wave1: 4

@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `wallet` |
 | Schemas owned | `wallet` |
-| Operations in the slice | 14 of 71 |
+| Operations in the slice | 14 of 72 |
 | Scale | Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. Latency-critical in a way LedgerService is not, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither. |
 | If it is down | It holds a liability owed to a customer. A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller. |
 
@@ -39,7 +39,7 @@
 | wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 1 | BO-1162 |
 | wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 1 | BO-1094, BO-1098 |
 | wallet | [`setWalletTransferRules`](#setwallettransferrules) | PUT | `/wallet-transfer-rules` | setup | 1 | BO-1144, BO-1145 |
-| wallet | [`topUpWallet`](#topupwallet) | POST | `/wallets/{subjectId}/top-ups` | core | 1 | BO-488, POS-005 |
+| wallet | [`topUpWallet`](#topupwallet) | POST | `/wallets/{subjectId}/top-ups` | core | 1 | POS-005 |
 | wallet | [`updateCreditType`](#updatecredittype) | PUT | `/credit-types/{creditTypeId}` | setup | 1 | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
 
 ## Group: card
@@ -1043,7 +1043,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | Guest callable | True |
 | Reads | `cache:idempotency`, `wallet.balance`, `wallet.credit_lot`, `wallet.credit_type`, `wallet.funding_rule`, `wallet.wallet` |
 | Writes | `cache:idempotency`, `platform.outbox`, `wallet.balance`, `wallet.credit_lot`, `wallet.wallet`, `wallet.wallet_transaction` |
-| Called by | BO-488, POS-005 |
+| Called by | POS-005 |
 | State model | Guest wallet ([states/wallet.yaml](../../../states/wallet.yaml)): created as `active` |
 
 **Parameters**
@@ -1062,7 +1062,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| tender | string | yes |  |
+| tender | string | yes | The receipt's label for how the sale was paid, as the description says ("tender stays the receipt's label"). |
 | orderLineId | string (uuid) |  | The top-up line this credits (r8 gate, CHG-R8RW-009): a walletTopUp product line of the paid order, quantity 1, its gross amount amount. |
 | paymentId | string (uuid) |  | A captured payment of the top-up line's order (r8 walk fix, CHG-R8WFC-003; CHG-R8RW-009), kept as the credit lot's source reference. |
 | bonusAmount | object |  | Promotional bonus on top of the paid amount. |
@@ -1490,11 +1490,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-57 operations, added to this service in later releases without changing any of the above.
+58 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | card | `adjustGameCard` |
+| drafted | `getWalletIntegrationMapping` |
 | giftCard | `blockGiftCard`, `issueGiftCard` |
 | retail | `activateGiftCard`, `closeWallet`, `getWalletExitBalance`, `redeemGiftCard`, `reinstateWallet`, `settleWalletAtExit`, `suspendWallet` |
 | wallet | `adjustWallet`, `captureWalletHold`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `expireCreditLots`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletMovementSummary`, `getWalletPreCloseChecks`, `getWalletReconciliation`, `getWalletRefundPolicy`, `getWalletRiskRules`, `getWalletTransferRules`, `holdWalletFunds`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `raiseWalletDispute`, `releaseWalletHold`, `resolveWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `simulateCreditConsumption`, `updateWalletType`, `withdrawWalletDispute` |

@@ -633,6 +633,30 @@
   "x-ticvai-persistence": "rental.participant",
   "description": "Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n",
   "properties": {
+   "emergencyContactSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "contact",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The participant's emergency contact, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `emergencyContact` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind contact; null while none is given."
+   },
+   "guardianSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "guest",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The participant's guardian, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `guardianName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind guest; null while none is given."
+   },
+   "participantSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "guest",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The participant, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `name`, `dateOfBirth`, `idNumber` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind guest; null while none is given."
+   },
    "scopePath": {
     "type": "string",
     "readOnly": true,
@@ -643,6 +667,11 @@
     "format": "uuid"
    },
    "name": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "participantSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "isPrimaryRenter": {
@@ -650,19 +679,39 @@
     "default": false
    },
    "dateOfBirth": {
+    "x-ticvai-pii": {
+     "store": "subject.dateOfBirth",
+     "subject": "participantSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "date",
     "nullable": true
    },
    "idNumber": {
+    "x-ticvai-pii": {
+     "store": "document.number",
+     "subject": "participantSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "guardianName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "guardianSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "emergencyContact": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "emergencyContactSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },

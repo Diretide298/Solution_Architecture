@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,864 operations and 1,177 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,873 operations and 1,182 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -36,14 +36,14 @@ tiers:
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 105
-    tables: 48
+    operations: 108
+    tables: 52
     schemas:
     - identity
     - pii
     contracts:
     - identity
-    flowCoverage: 20%
+    flowCoverage: 19%
     scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
     ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
     ref: diagrams/lld/services/IdentityService.yaml
@@ -51,7 +51,7 @@ tiers:
   meaning: The sale path. Highest availability and the highest write rate in the platform.
   services:
   - service: CatalogueService
-    operations: 470
+    operations: 475
     tables: 145
     schemas:
     - catalogue
@@ -62,7 +62,7 @@ tiers:
     - catalogue
     - promotions
     - seating
-    flowCoverage: 51%
+    flowCoverage: 50%
     scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output**
       (ADR-0013).
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
@@ -106,7 +106,7 @@ tiers:
       one that is briefly wrong is not.'
     ref: diagrams/lld/services/LedgerService.yaml
   - service: WalletService
-    operations: 71
+    operations: 72
     tables: 32
     schemas:
     - wallet
@@ -151,7 +151,7 @@ tiers:
     ref: diagrams/lld/services/VenueOpsService.yaml
   - service: FnbService
     operations: 138
-    tables: 54
+    tables: 55
     schemas:
     - fnb
     contracts:
@@ -308,7 +308,7 @@ crossServiceWrites:
   kind: strong
 - from: IdentityService
   to: TenancyService
-  writes: 20
+  writes: 21
   reads: 9
   kind: strong
 - from: PlatformService
@@ -351,15 +351,20 @@ crossServiceWrites:
   writes: 10
   reads: 49
   kind: strong
+- from: FnbService
+  to: TenancyService
+  writes: 7
+  reads: 9
+  kind: strong
 - from: MarketingService
   to: TenancyService
   writes: 6
   reads: 3
   kind: strong
-- from: FnbService
+- from: VenueOpsService
   to: TenancyService
-  writes: 5
-  reads: 9
+  writes: 6
+  reads: 4
   kind: strong
 - from: FnbService
   to: InventoryService
@@ -373,11 +378,6 @@ crossServiceWrites:
   kind: strong
 - from: RetailService
   to: InventoryService
-  writes: 5
-  reads: 4
-  kind: strong
-- from: VenueOpsService
-  to: TenancyService
   writes: 5
   reads: 4
   kind: strong
@@ -456,6 +456,11 @@ crossServiceWrites:
   writes: 2
   reads: 4
   kind: ordinary
+- from: RetailService
+  to: TenancyService
+  writes: 2
+  reads: 3
+  kind: ordinary
 - from: WalletService
   to: VenueOpsService
   writes: 2
@@ -495,11 +500,6 @@ crossServiceWrites:
   to: WalletService
   writes: 1
   reads: 2
-  kind: ordinary
-- from: PlatformService
-  to: MarketingService
-  writes: 1
-  reads: 0
   kind: ordinary
 - from: PlatformService
   to: CrossRegionService

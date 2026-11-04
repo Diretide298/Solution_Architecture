@@ -28,7 +28,7 @@ packages:
 - ui
 contracts:
 - accreditation
-deployment:
+deployment: &id001
   target: browser
   distribution: public, served from the cell
   bundleUpdate: immediate on deploy
@@ -37,6 +37,12 @@ deployment:
   deviceOwnership: applicant device, unmanaged
   networkAssumption: public internet
   releaseCadence: monthly
+platformProfiles:
+- platform: P11
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment: *id001
 screenCount: 8
 byWave:
   wave3: 8

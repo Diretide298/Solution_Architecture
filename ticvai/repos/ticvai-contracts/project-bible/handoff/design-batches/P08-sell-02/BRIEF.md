@@ -1,6 +1,6 @@
 # P08-sell-02 — P08 · Sell (2 of 4)
 
-**10 screens · 56 operations · 68 schemas · 14 permissions**
+**10 screens · 56 operations · 69 schemas · 14 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -158,8 +158,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-017` | Capacity Management | B | 25 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
 | `BO-018` | Allocation & Holds | B | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-019` | Closures & Blackouts | B | 50 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
-| `BO-037` | Offline Package Status | B | 51 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `BO-019` | Closures & Blackouts | B | 55 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
+| `BO-037` | Offline Package Status | B | 52 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-063` | Opening Hours & Calendar | B | 17 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
 | `BO-102` | Sell | A | 2 | 39 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
 | `BO-109` | Menu Builder & POS Layout Designer | A | 53 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |

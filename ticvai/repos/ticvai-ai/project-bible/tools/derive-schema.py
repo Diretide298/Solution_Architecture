@@ -35,6 +35,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import personal_data  # noqa: E402
+
 # **The last line of this tool crashed on Windows** — a `→` in the closing print against a
 # cp1252 console, after the file had already been written. Every other deriver carries this guard;
 # this one did not, so the tool reported a traceback on a run that had succeeded.
@@ -106,6 +109,20 @@ def column_nullable(spec) -> bool:
     (`Workstation.saleBoard`, the till's own board or else its outlet's) keeps the stored column nullable, holding
     only the override."""
     return is_nullable(spec) or (isinstance(spec, dict) and spec.get("x-ticvai-column-nullable") is True)
+
+
+def column_required(prop, required, spec) -> bool:
+    """Whether the stored column is NOT NULL: the field is required and cannot be null, or the contract says the column
+    is never null whatever the wire allows.
+
+    **A wire field that may be null or absent can still be a column that never is** (ADAM CR-566 and CR-571, Chinmay,
+    3 November 2026; CHG-CR566-001, CHG-CR571-001): `x-ticvai-column-nullable: false` makes the column NOT NULL.
+    `ApiAnomalyRule.tenantId` is null on the wire for a platform default, which is configuration and never a row, so
+    every stored row has a tenant; `ApiClient.clientId` is set by the server on every client and is not a required
+    member of the create body."""
+    if isinstance(spec, dict) and spec.get("x-ticvai-column-nullable") is False:
+        return True
+    return prop in required and not column_nullable(spec)
 
 
 def is_nullable(spec) -> bool:
@@ -699,6 +716,27 @@ def _declared_renames(name: str = "RENAMES") -> list[dict]:
     return []
 
 
+def _data_class(spec) -> dict:
+    """`{"dataClass": "personal"}` for a column whose field is a person's data kept on the row (not an identifier,
+    which `x-ticvai-pii` keeps in pii.*): the module's erasure must reach it (CHG-R14M-001)."""
+    cls = personal_data.data_class(spec)
+    return {"dataClass": cls} if cls == "personal" else {}
+
+
+def _record_moved(moved: dict, retired: dict, table: str, source: str, prop: str, column: str, spec: dict,
+                  siblings: dict) -> None:
+    """A property kept in pii.* (`x-ticvai-pii`): no column on `table`, recorded for derive-ddl (CHG-R14M-001)."""
+    mark = personal_data.pii_mark(spec) or {}
+    subj = mark.get("subject") or "subjectId"
+    sspec = siblings.get(subj) if isinstance(siblings, dict) else None
+    scol = (sspec.get("x-ticvai-column") if isinstance(sspec, dict) else None) or snake(subj)
+    moved.setdefault(table, {})[column] = {
+        "field": prop, "source": source, "store": mark.get("store"), "subject": subj, "subjectColumn": scol,
+        "subjectKind": (sspec or {}).get("x-ticvai-subject-kind") if isinstance(sspec, dict) else None,
+    }
+    retired.setdefault(table, set()).add(column)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--dry-run", action="store_true")
@@ -711,6 +749,11 @@ def main() -> int:
     persisted: dict[str, str] = {}          # schema name -> table
     owner: dict[str, str] = {}              # table -> contract
     retired: dict[str, set[str]] = {}       # table -> columns the contract has withdrawn
+    # **A natural person's field is kept in pii.*, not on the module's row** (r13 review B-01; the lead, 3 November 2026,
+    # "Move the columns"; CHG-R14M-001). A property marked `x-ticvai-pii` gets no column: its value lives in the pii.*
+    # store it names, for the subject its `subject` property holds (tools/personal_data.py). Recorded as `personal` in
+    # the schema reference, so derive-ddl retires the column the databases hold and writes the copy for a person.
+    moved: dict[str, dict[str, dict]] = {}  # table -> column -> {field, store, subject, subjectColumn}
     schema_contract: dict[str, str] = {}    # schema name -> contract it was registered from
     for name, (_, doc) in contracts.items():
         for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
@@ -1004,14 +1047,19 @@ def main() -> int:
             if not ptype:
                 continue
             chosen = pspec.get("x-ticvai-column") if isinstance(pspec, dict) else None
+            if personal_data.pii_mark(pspec):
+                _record_moved(moved, retired, child, f"{owner.get(child, '')}.{parent_schema}.{key}[].{prop}", prop,
+                              chosen or conventional_name(snake(prop), ptype, fk), pspec, items.get("properties") or {})
+                continue
             cols.append({
                 "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in req and not column_nullable(pspec) else "no",
+                "required": "yes" if column_required(prop, req, pspec) else "no",
                 "source": f"{owner.get(child, '')}.{parent_schema}.{key}[].{prop}",
                 "description": describe(pspec),
                 "table": child,
                 **({"references": fk} if fk else {}),
+                **_data_class(pspec),
             })
         # **A table cannot be its own parent.** `whitelabel.navigation_item` derived a
         # `navigation_item_id` referencing itself on 20 August — a key that points at the row it
@@ -1116,6 +1164,11 @@ def main() -> int:
                     homeless.append(f"{table} <- {sname}.{prop}")
                 continue
             chosen = spec.get("x-ticvai-column") if isinstance(spec, dict) else None
+            if personal_data.pii_mark(spec):
+                _record_moved(moved, retired, table, f"{owner.get(table, '')}.{sname}.{prop}", prop,
+                              chosen or conventional_name(snake(prop), ptype, fk), spec,
+                              properties_of(body, all_schemas))
+                continue
             cols.append({
                 # **`x-ticvai-column` names the column when the field's name would break the standard**
                 # (24 September): naming-and-style 5.1 bans `total`, `price` and `value` alone, so
@@ -1123,11 +1176,12 @@ def main() -> int:
                 # Without one, the mechanical parts of the standard apply (`conventional_name`).
                 "column": chosen or conventional_name(snake(prop), ptype, fk),
                 "type": ptype,
-                "required": "yes" if prop in required and not column_nullable(spec) else "no",
+                "required": "yes" if column_required(prop, required, spec) else "no",
                 "source": f"{owner.get(table, '')}.{sname}.{prop}",
                 "description": describe(spec),
                 "table": table,
                 **({"references": fk} if fk else {}),
+                **_data_class(spec),
             })
         _path_cols.update({(table, str(c.get("source") or "").rsplit(".", 1)[-1]): c["column"] for c in cols})
         if table in parent_key and not any(c["column"] == parent_key[table]["column"] for c in cols):
@@ -1770,6 +1824,9 @@ def main() -> int:
         S["store"].pop(_t, None)
         print(f"  {_t}: a contract persists to it, so it is a Postgres table (was redis)")
     S["cols"] = existing
+    S["personal"] = {t: [dict(v, column=c) for c, v in sorted(moved[t].items())] for t in sorted(moved)}
+    print(f"  personal fields kept in pii.* instead of a column (x-ticvai-pii): "
+          f"{sum(len(v) for v in moved.values())} on {len(moved)} table(s)")
     ref_path.write_text(json.dumps(S), encoding="utf-8")
 
     empty = [t for t in (set(S["cols"]) | set(S.get("storage", {}))) if not S["cols"].get(t)]

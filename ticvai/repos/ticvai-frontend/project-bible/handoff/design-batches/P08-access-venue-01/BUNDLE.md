@@ -128,11 +128,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-001` | Queue Directory | A | 61 | 46 | 6 | 23 | 1 | 6 | — | notStarted (generated) |
-| `BO-002` | Queue Configuration | D | 59 | 18 | 6 | 21 | 4 | 6 | — | notStarted (generated) |
+| `BO-001` | Queue Directory | A | 61 | 46 | 6 | 22 | 1 | 6 | — | notStarted (generated) |
+| `BO-002` | Queue Configuration | D | 59 | 18 | 6 | 20 | 4 | 6 | — | notStarted (generated) |
 | `BO-003` | Queue Integration Setup | D | 11 | 23 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-004` | Manual Wait Time Entry | D | 6 | 32 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
-| `BO-005` | Queue Monitor | A | 55 | 52 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
+| `BO-005` | Queue Monitor | A | 55 | 52 | 6 | 33 | 3 | 6 | — | notStarted (generated) |
 | `BO-006` | Parking Configuration | A | 12 | 6 | 6 | 3 | 2 | 2 | — | notStarted (generated) |
 | `BO-030` | Work Order Verification | A | 7 | 22 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
 | `BO-031` | Asset Register | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
@@ -495,12 +495,11 @@ Screen guard: `QUEUE_VIEW`
 
 #### Requirements it meets
 
-23 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+22 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 5.6.4 | VIP / Priority Handling: Separate or fast-track queues for premium guests. | F&B & Guest Management | CONTRACTED | `createQueue` |
-| 5.6.7 | Support priority queueing for VIP guests, annual pass holders, premium packages, loyalty tiers, and accessibility requirements. | F&B & Guest Management | CONTRACTED_PARTIAL | `createQueue` |
 | 5.6.12 | Automatically expire queue reservations after configurable grace periods. | F&B & Guest Management | CONTRACTED | `createQueue` |
 | 19.2.37 | Estimated Waiting Time - System shall provide estimated waiting times. | Guest Mobile App & Branding | CONTRACTED | `getWaitTimes` |
 | 5.6.3 | Display queue lengths, wait times, throughput, capacity utilization, occupancy, and customer flow metrics. | F&B & Guest Management | CONTRACTED | `getWaitTimes` |
@@ -511,7 +510,8 @@ Screen guard: `QUEUE_VIEW`
 | 5.6.24 | Automatically recover queue reservations after operational disruptions. | F&B & Guest Management | CONTRACTED | `setQueueStatus` |
 | 5.6.25 | Support automatic queue suspension and guest reallocation when attractions become unavailable. | F&B & Guest Management | CONTRACTED | `setQueueStatus` |
 | 19.2.38 | Queue Notifications - System shall provide queue notifications. | Guest Mobile App & Branding | CONTRACTED | data `CreateQueueRequest` |
-| … 11 more | | | | `traceability.json` |
+| 5.6.1 | Multiple Queue Types: First-come-first-serve, priority/VIP, group queues. | F&B & Guest Management | CONTRACTED | data `CreateQueueRequest` |
+| … 10 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -823,12 +823,11 @@ Screen guard: `QUEUE_VIEW`
 
 #### Requirements it meets
 
-21 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+20 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 5.6.4 | VIP / Priority Handling: Separate or fast-track queues for premium guests. | F&B & Guest Management | CONTRACTED | `createQueue` |
-| 5.6.7 | Support priority queueing for VIP guests, annual pass holders, premium packages, loyalty tiers, and accessibility requirements. | F&B & Guest Management | CONTRACTED_PARTIAL | `createQueue` |
 | 5.6.12 | Automatically expire queue reservations after configurable grace periods. | F&B & Guest Management | CONTRACTED | `createQueue` |
 | 19.2.37 | Estimated Waiting Time - System shall provide estimated waiting times. | Guest Mobile App & Branding | CONTRACTED | `getWaitTimes` |
 | 5.6.3 | Display queue lengths, wait times, throughput, capacity utilization, occupancy, and customer flow metrics. | F&B & Guest Management | CONTRACTED | `getWaitTimes` |
@@ -839,7 +838,8 @@ Screen guard: `QUEUE_VIEW`
 | 19.2.38 | Queue Notifications - System shall provide queue notifications. | Guest Mobile App & Branding | CONTRACTED | data `CreateQueueRequest` |
 | 5.6.1 | Multiple Queue Types: First-come-first-serve, priority/VIP, group queues. | F&B & Guest Management | CONTRACTED | data `CreateQueueRequest` |
 | 5.6.5 | Load Balancing: Redirect customers to less busy queues/rides/entry points. | F&B & Guest Management | CONTRACTED | data `CreateQueueRequest` |
-| … 9 more | | | | `traceability.json` |
+| 5.6.1 | Support First-Come-First-Served, Virtual Queue, Fast Pass, VIP Queue, Express Queue, Group Queue, Membership Queue, Accessibility Queue, and Staff Queue. | F&B & Guest Management | CONTRACTED | data `CreateQueueRequest` |
+| … 8 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1682,7 +1682,7 @@ Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 
-34 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+33 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1693,12 +1693,12 @@ Screen guard: `REPORT_VIEW_VENUE`
 | 5.6.15 | Continuously calculate and display estimated waiting times. | F&B & Guest Management | CONTRACTED | `getWaitTimes` |
 | 5.6.16 | Allow guests to view their live queue position and estimated service time. | F&B & Guest Management | CONTRACTED | `getWaitTimes` |
 | 5.6.4 | VIP / Priority Handling: Separate or fast-track queues for premium guests. | F&B & Guest Management | CONTRACTED | `createQueue` |
-| 5.6.7 | Support priority queueing for VIP guests, annual pass holders, premium packages, loyalty tiers, and accessibility requirements. | F&B & Guest Management | CONTRACTED_PARTIAL | `createQueue` |
 | 5.6.12 | Automatically expire queue reservations after configurable grace periods. | F&B & Guest Management | CONTRACTED | `createQueue` |
 | 5.6.24 | Automatically recover queue reservations after operational disruptions. | F&B & Guest Management | CONTRACTED | `setQueueStatus` |
 | 5.6.25 | Support automatic queue suspension and guest reallocation when attractions become unavailable. | F&B & Guest Management | CONTRACTED | `setQueueStatus` |
 | 2.1.28 | Kiosks shall provide an AI assistant to guide guests through ticket selection, promotions, FAQs, recommendations, and checkout. | Ticketing Sales | CONTRACTED | `requestSuggestion` |
-| … 22 more | | | | `traceability.json` |
+| 4.1.16 | Analyze menu performance and profitability. | Bundles and Promotions | CONTRACTED | `requestSuggestion` |
+| … 21 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 

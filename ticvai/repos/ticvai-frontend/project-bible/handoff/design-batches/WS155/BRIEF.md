@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-860` | Resource Dependency Rules | D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-861` | Resource Package & Bundle Configuration | A | 59 | 25 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-862` | Multi-Venue Resource Assignment | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-863` | Resource Lifecycle, Governance & Audit | D | 9 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
+| `BO-863` | Resource Lifecycle, Governance & Audit | D | 41 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

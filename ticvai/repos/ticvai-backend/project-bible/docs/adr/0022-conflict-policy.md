@@ -118,3 +118,17 @@ other.
 
 **The vocabulary is now enforced.** Adding a fifth policy means changing the closed set in
 `check-package.py`, which is a deliberate act rather than a typo that spreads.
+---
+
+## Amendment — 3 November 2026: an offline step-up the server does not confirm never turns an `append` act into a rejection (Chinmay, CHG-R14V-001)
+
+**Decided by Chinmay, 3 November 2026, on system review finding F-01: "Offline verifier" (the till keeps a verifier,
+re-checked at sync); ADR-0013 amendment of the same date.** `voidOrder`, `recordNoSale` and `withdrawFromDepositBox`
+are `append` and offline-capable, and take a supervisor's or a witness's PIN that the till now checks against its
+offline verifier. **When the server re-checks that step-up at sync and does not confirm it, the act is still
+appended**: it happened at the till, and the drawer or the cash box cannot be put back by refusing the write. The
+refusal travels beside the act, never instead of it: the success response carries `X-Ticvai-Step-Up-Verdict:
+refusedAtSync`, Identity keeps an `identity.offline_step_up` row and publishes `identity.offlineStepUpRefused` for the
+managers' alert. **So the drain rule "4xx that retrying cannot fix: rejected, surfaced to the operator" does not apply
+to an offline step-up**; it still applies to everything else such an operation can refuse (a shift already closed, a
+box being counted). Online, a failed step-up is a `403` and nothing is written, as before.

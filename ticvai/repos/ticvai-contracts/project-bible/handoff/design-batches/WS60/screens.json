@@ -4,7 +4,7 @@
   "name": "Media Design Studio Command Center",
   "module": "Access & Venue",
   "requiresModule": "access",
-  "wave": 3,
+  "wave": 1,
   "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",

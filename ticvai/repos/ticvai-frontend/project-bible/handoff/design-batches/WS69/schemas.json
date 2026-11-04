@@ -430,6 +430,7 @@
     ]
    },
    "address": {
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "principalId": {
@@ -623,6 +624,7 @@
     "nullable": true
    },
    "recipients": {
+    "x-ticvai-data-class": "personal",
     "x-ticvai-persistence-column": "jsonb",
     "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
@@ -635,6 +637,7 @@
        "nullable": true
       },
       "email": {
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "nullable": true
       },

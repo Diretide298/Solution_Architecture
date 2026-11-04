@@ -1,7 +1,7 @@
 {
  "generatedBy": "tools/derive-sizing.py",
  "algorithm": "replicas = max(floor, ceil(load_rps x share / rps_per_replica))",
- "note": "**Two loads, two mixes, and they are not the same shape.** Under a sale Catalogue is 62% of the calls and F&B is absent; under normal operation Catalogue is 23.3%, F&B 5.3% and Order 15.8%.\n\n**A shared cell sized from the burst mix would run eight Catalogue replicas and one F&B** — backwards for 363 days of the year.",
+ "note": "**Two loads, two mixes, and they are not the same shape.** Under a sale Catalogue is 62% of the calls and F&B is absent; under normal operation Catalogue is 23.3%, F&B 5.3% and Order 15.7%.\n\n**A shared cell sized from the burst mix would run eight Catalogue replicas and one F&B** — backwards for 363 days of the year.",
  "unmeasured": "`rpsPerReplica` comes from ADR-0032's autoscale triggers and is a hypothesis until `tools/bench.py` runs. Everything else here is arithmetic on top of it.",
  "venueTiers": {
   "small": {
@@ -29,7 +29,7 @@
  "normal": {
   "mix": {
    "CatalogueService": 23.3,
-   "OrderService": 15.8,
+   "OrderService": 15.7,
    "AccessService": 15.6,
    "MarketingService": 9.5,
    "PlatformService": 7.0,
@@ -58,7 +58,7 @@
     "services": {
      "CatalogueService": {
       "share": 23.3,
-      "rpsAtLoad": 88.9,
+      "rpsAtLoad": 89.0,
       "rpsPerReplica": 400,
       "impliedByLoad": 1,
       "floor": 2,
@@ -71,15 +71,15 @@
       "drivenBy": "survivability floor"
      },
      "OrderService": {
-      "share": 15.8,
-      "rpsAtLoad": 60.3,
+      "share": 15.7,
+      "rpsAtLoad": 60.2,
       "rpsPerReplica": 250,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.121,
+      "utilisationAtSteady": 0.12,
       "scaleOutAt": 150,
       "stepAddsAt": 162,
       "drivenBy": "survivability floor"
@@ -308,7 +308,7 @@
        "WalletService"
       ],
       "share": 48.6,
-      "rpsAtLoad": 185.8,
+      "rpsAtLoad": 185.7,
       "impliedByLoad": 1,
       "floor": 3,
       "steadyState": 3,
@@ -338,7 +338,7 @@
        "WhiteLabelService"
       ],
       "share": 34.6,
-      "rpsAtLoad": 132.1,
+      "rpsAtLoad": 132.2,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
@@ -385,7 +385,7 @@
     "services": {
      "CatalogueService": {
       "share": 23.3,
-      "rpsAtLoad": 527.0,
+      "rpsAtLoad": 527.2,
       "rpsPerReplica": 400,
       "impliedByLoad": 3,
       "floor": 2,
@@ -398,22 +398,22 @@
       "drivenBy": "load"
      },
      "OrderService": {
-      "share": 15.8,
-      "rpsAtLoad": 357.5,
+      "share": 15.7,
+      "rpsAtLoad": 356.6,
       "rpsPerReplica": 250,
       "impliedByLoad": 3,
       "floor": 2,
       "steadyState": 3,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.477,
+      "utilisationAtSteady": 0.475,
       "scaleOutAt": 150,
       "stepAddsAt": 162,
       "drivenBy": "load"
      },
      "AccessService": {
       "share": 15.6,
-      "rpsAtLoad": 352.9,
+      "rpsAtLoad": 353.1,
       "rpsPerReplica": 800,
       "impliedByLoad": 1,
       "floor": 2,
@@ -427,7 +427,7 @@
      },
      "MarketingService": {
       "share": 9.5,
-      "rpsAtLoad": 216.2,
+      "rpsAtLoad": 216.3,
       "rpsPerReplica": 400,
       "impliedByLoad": 1,
       "floor": 2,
@@ -441,7 +441,7 @@
      },
      "PlatformService": {
       "share": 7.0,
-      "rpsAtLoad": 157.7,
+      "rpsAtLoad": 157.8,
       "rpsPerReplica": 400,
       "impliedByLoad": 1,
       "floor": 2,
@@ -455,7 +455,7 @@
      },
      "FnbService": {
       "share": 5.3,
-      "rpsAtLoad": 120.3,
+      "rpsAtLoad": 120.4,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -469,7 +469,7 @@
      },
      "VenueOpsService": {
       "share": 4.5,
-      "rpsAtLoad": 102.8,
+      "rpsAtLoad": 102.9,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -483,7 +483,7 @@
      },
      "TenancyService": {
       "share": 4.5,
-      "rpsAtLoad": 102.8,
+      "rpsAtLoad": 102.9,
       "rpsPerReplica": 500,
       "impliedByLoad": 1,
       "floor": 2,
@@ -539,7 +539,7 @@
      },
      "WhiteLabelService": {
       "share": 2.2,
-      "rpsAtLoad": 50.2,
+      "rpsAtLoad": 50.3,
       "rpsPerReplica": 500,
       "impliedByLoad": 1,
       "floor": 2,
@@ -635,7 +635,7 @@
        "WalletService"
       ],
       "share": 48.6,
-      "rpsAtLoad": 1100.7,
+      "rpsAtLoad": 1100.1,
       "impliedByLoad": 6,
       "floor": 3,
       "steadyState": 6,
@@ -646,7 +646,7 @@
        "AccessService"
       ],
       "share": 15.6,
-      "rpsAtLoad": 352.9,
+      "rpsAtLoad": 353.1,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
@@ -665,7 +665,7 @@
        "WhiteLabelService"
       ],
       "share": 34.6,
-      "rpsAtLoad": 782.9,
+      "rpsAtLoad": 783.3,
       "impliedByLoad": 4,
       "floor": 2,
       "steadyState": 4,
@@ -712,7 +712,7 @@
     "services": {
      "CatalogueService": {
       "share": 23.3,
-      "rpsAtLoad": 1636.6,
+      "rpsAtLoad": 1637.5,
       "rpsPerReplica": 400,
       "impliedByLoad": 7,
       "floor": 2,
@@ -725,22 +725,22 @@
       "drivenBy": "load"
      },
      "OrderService": {
-      "share": 15.8,
-      "rpsAtLoad": 1110.4,
+      "share": 15.7,
+      "rpsAtLoad": 1107.4,
       "rpsPerReplica": 250,
       "impliedByLoad": 8,
       "floor": 2,
       "steadyState": 8,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.555,
+      "utilisationAtSteady": 0.554,
       "scaleOutAt": 150,
       "stepAddsAt": 162,
       "drivenBy": "load"
      },
      "AccessService": {
       "share": 15.6,
-      "rpsAtLoad": 1095.9,
+      "rpsAtLoad": 1096.5,
       "rpsPerReplica": 800,
       "impliedByLoad": 3,
       "floor": 2,
@@ -754,21 +754,21 @@
      },
      "MarketingService": {
       "share": 9.5,
-      "rpsAtLoad": 671.3,
+      "rpsAtLoad": 671.7,
       "rpsPerReplica": 400,
       "impliedByLoad": 3,
       "floor": 2,
       "steadyState": 3,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.559,
+      "utilisationAtSteady": 0.56,
       "scaleOutAt": 240,
       "stepAddsAt": 260,
       "drivenBy": "load"
      },
      "PlatformService": {
       "share": 7.0,
-      "rpsAtLoad": 489.9,
+      "rpsAtLoad": 490.2,
       "rpsPerReplica": 400,
       "impliedByLoad": 3,
       "floor": 2,
@@ -782,49 +782,49 @@
      },
      "FnbService": {
       "share": 5.3,
-      "rpsAtLoad": 373.8,
+      "rpsAtLoad": 374.0,
       "rpsPerReplica": 300,
       "impliedByLoad": 3,
       "floor": 2,
       "steadyState": 3,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.415,
+      "utilisationAtSteady": 0.416,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "load"
      },
      "VenueOpsService": {
       "share": 4.5,
-      "rpsAtLoad": 319.3,
+      "rpsAtLoad": 319.5,
       "rpsPerReplica": 300,
       "impliedByLoad": 2,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.532,
+      "utilisationAtSteady": 0.533,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
      },
      "TenancyService": {
       "share": 4.5,
-      "rpsAtLoad": 319.3,
+      "rpsAtLoad": 319.5,
       "rpsPerReplica": 500,
       "impliedByLoad": 2,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.319,
+      "utilisationAtSteady": 0.32,
       "scaleOutAt": 300,
       "stepAddsAt": 325,
       "drivenBy": "survivability floor"
      },
      "InventoryService": {
       "share": 3.1,
-      "rpsAtLoad": 217.7,
+      "rpsAtLoad": 217.8,
       "rpsPerReplica": 300,
       "impliedByLoad": 2,
       "floor": 2,
@@ -838,21 +838,21 @@
      },
      "LedgerService": {
       "share": 2.5,
-      "rpsAtLoad": 177.8,
+      "rpsAtLoad": 177.9,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
       "steadyState": 2,
       "max": null,
       "targetUtilisation": 0.6,
-      "utilisationAtSteady": 0.296,
+      "utilisationAtSteady": 0.297,
       "scaleOutAt": 180,
       "stepAddsAt": 195,
       "drivenBy": "survivability floor"
      },
      "IdentityService": {
       "share": 2.3,
-      "rpsAtLoad": 163.3,
+      "rpsAtLoad": 163.4,
       "rpsPerReplica": 600,
       "impliedByLoad": 1,
       "floor": 2,
@@ -866,7 +866,7 @@
      },
      "WhiteLabelService": {
       "share": 2.2,
-      "rpsAtLoad": 156.0,
+      "rpsAtLoad": 156.1,
       "rpsPerReplica": 500,
       "impliedByLoad": 1,
       "floor": 2,
@@ -894,7 +894,7 @@
      },
      "AiService": {
       "share": 1.3,
-      "rpsAtLoad": 90.7,
+      "rpsAtLoad": 90.8,
       "rpsPerReplica": 100,
       "impliedByLoad": 2,
       "floor": 2,
@@ -908,7 +908,7 @@
      },
      "RetailService": {
       "share": 1.3,
-      "rpsAtLoad": 90.7,
+      "rpsAtLoad": 90.8,
       "rpsPerReplica": 300,
       "impliedByLoad": 1,
       "floor": 2,
@@ -962,7 +962,7 @@
        "WalletService"
       ],
       "share": 48.6,
-      "rpsAtLoad": 3418.4,
+      "rpsAtLoad": 3416.5,
       "impliedByLoad": 17,
       "floor": 3,
       "steadyState": 17,
@@ -973,7 +973,7 @@
        "AccessService"
       ],
       "share": 15.6,
-      "rpsAtLoad": 1095.9,
+      "rpsAtLoad": 1096.5,
       "impliedByLoad": 3,
       "floor": 2,
       "steadyState": 3,
@@ -992,7 +992,7 @@
        "WhiteLabelService"
       ],
       "share": 34.6,
-      "rpsAtLoad": 2431.4,
+      "rpsAtLoad": 2432.6,
       "impliedByLoad": 12,
       "floor": 2,
       "steadyState": 12,
@@ -1003,7 +1003,7 @@
        "AiService"
       ],
       "share": 1.3,
-      "rpsAtLoad": 90.7,
+      "rpsAtLoad": 90.8,
       "impliedByLoad": 2,
       "floor": 4,
       "steadyState": 4,

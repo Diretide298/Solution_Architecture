@@ -585,6 +585,11 @@
   "type": "object",
   "x-ticvai-persistence": "control.api_client",
   "description": "CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n",
+  "x-ticvai-unique-together": [
+   [
+    "clientId"
+   ]
+  ],
   "required": [
    "id",
    "developerId",
@@ -609,7 +614,11 @@
    },
    "clientId": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "pattern": "^tvc_(live|test)_[a-z0-9]{32}$",
+    "x-ticvai-column-nullable": false,
+    "x-ticvai-unique-compare": "exact",
+    "description": "**The public half of the credential pair** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001), made by the server whenever a client is created, in `createApiClient` and in `decideProductionAccess` alike: `tvc_live_` for a production client or `tvc_test_` for a sandbox client, then 32 lowercase letters and digits from a cryptographically secure random source. It never changes, not on rotation or on a status change. The prefix is for people and secret scanners only: what a client may reach is decided by its `environment`, never by reading the prefix. `issueApiToken` finds the client by it. It is not the uuid `id` the `/api-clients/{clientId}/...` paths take. Stored NOT NULL with a unique index; an insert that hits the index retries once with a fresh value. A forward migration gives every existing row whose `client_id` is null a value made the same way, then makes `client_id` NOT NULL with the unique index. Shown and copied on the client detail panel, so never null."
    },
    "environment": {
     "type": "string",
@@ -1804,9 +1813,10 @@
    "mobileHandset",
    "handheldScanner",
    "accessPodium",
-   "bleBeacon"
+   "bleBeacon",
+   "workstationTerminal"
   ],
-  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n`workstationTerminal` (r14 review C-04, CHG-R14H-001; the lead, 3 November 2026: \"All four, one release\"): the computer a device door runs on (a till, a kiosk), enrolled like any device and bound to its workstation. Its `deviceAuth` credential is how the door proves which workstation it is, which a `workstationId` in a body never proves. A shared handheld or scanner proves it with its own `handheldScanner` credential.\n**One kind vocabulary for every device** (ADR-0067, 1 October). `handheldScanner`, `accessPodium` and `bleBeacon` came from Access's register; the finer hardware type (a speed gate under `turnstileController`, a tablet under `handheldScanner`) is `RegisteredDevice.hardwareType` (common `DeviceHardwareType`).\n"
  },
  "Direction": {
   "type": "string",
@@ -3161,6 +3171,7 @@
     ]
    },
    "address": {
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "principalId": {
@@ -3345,7 +3356,7 @@
    "cellName": {
     "type": "string",
     "readOnly": true,
-    "description": "The cell serving this region. One cell per tenant per region (ADR-0014).\n"
+    "description": "The cell serving this region. A region is one cell, and the cell holds many tenants (ADR-0038, which supersedes ADR-0014).\n"
    }
   }
  },
@@ -5172,6 +5183,7 @@
     "type": "string"
    },
    "holderName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Present only where the entitlement is name-bound. Identity and entitlement are separate concerns; most entitlements carry no holder.\n"

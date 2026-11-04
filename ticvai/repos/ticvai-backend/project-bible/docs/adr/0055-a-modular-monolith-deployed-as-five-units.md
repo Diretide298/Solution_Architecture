@@ -298,7 +298,8 @@ load). It should not share a process with Marketing sends.
 2. [ ] Package: amend ADR-0028's status line and rule text; fix `data-model.md:19`; fix "Sixteen services" (SD-006). (1 pt)
 3. [ ] Package: add a `deployable` field to `handoff/service-decomposition.json`. Keep the 17 services as modules. Re-derive diagrams, `sizing.json`, the four `deploy/*.yml`, then mirrors, then `check-package`. (2 pts)
 4. [ ] Tickets: `SVC-*` tickets stay keyed per module; no ticket rewrite. Add **SETUP-HOSTS**: three .NET hosts (`commerce`, `access`, `operations`) and a `workers` host, each composing its modules. (3 pts)
-5. [x] Fix the stale line in `repos/ticvai-backend/AGENTS.md` (and the same line in its `CLAUDE.md`): *"One deployment serves one tenant in one jurisdiction"* is no longer true after ADR-0038.
+5. [x] Fix the stale line in the package's ticvai-backend AGENTS.md (and the same line in its CLAUDE.md; the AGENTS.md
+   was retired with the code trees on 3 November 2026, CHG-R14J-002, and the CLAUDE.md is now ADAM's starter's): *"One deployment serves one tenant in one jurisdiction"* is no longer true after ADR-0038.
 
 **Sprint 1 (5–23 October)**
 

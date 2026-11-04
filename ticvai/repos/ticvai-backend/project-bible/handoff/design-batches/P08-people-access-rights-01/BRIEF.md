@@ -1,6 +1,6 @@
 # P08-people-access-rights-01 — P08 · People & Access Rights (1 of 2)
 
-**10 screens · 48 operations · 44 schemas · 13 permissions**
+**10 screens · 48 operations · 45 schemas · 13 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-053` | Staff Directory | B | 30 | 25 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `BO-053` | Staff Directory | B | 34 | 25 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `BO-054` | Role Assignment | A | 22 | 16 | 6 | 6 | 1 | 5 | — | notStarted (generated) |
 | `BO-055` | Rota & Scheduling | A | 32 | 19 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
 | `BO-056` | Time & Attendance | D | 5 | 19 | 6 | 2 | 0 | 0 | — | notStarted (generated) |

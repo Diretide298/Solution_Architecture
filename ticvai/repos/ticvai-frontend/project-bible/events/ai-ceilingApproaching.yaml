@@ -6,7 +6,8 @@ version: 1
 publisher: ai
 description: AI spend has reached the configured warning threshold for a scope.
 aggregate: aiPolicy
-emittedWhen: Metered spend crosses ceilingWarningPercent, and again at 100%
+emittedWhen: Metered spend crosses ceilingWarningPercent, and again at 100% - the ai#spendMetering job,
+  which evaluates spend against the scope's ceiling (no operation emits it)
 payload:
 - field: scopePath
   type: string

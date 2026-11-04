@@ -658,7 +658,7 @@
    },
    {
     "operationId": "setRolePermissions",
-    "contract": "tenancy",
+    "contract": "identity",
     "purpose": "Set what this role may do",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-021)"
@@ -2394,6 +2394,7 @@
   "pattern": "listDetail",
   "patternReason": "`listApprovalMatrices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "What needs approval here, and who grants it.",
+  "division": "Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-333, ADM-334, ADM-335, BO-639; this screen is Approval Matrix: what needs approval here, and who grants it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -2563,7 +2564,7 @@
   "name": "Approval Delegations",
   "module": "People & Access Rights",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "permission": "APPROVAL_VIEW",
   "capability": "C00",
   "implementation": {

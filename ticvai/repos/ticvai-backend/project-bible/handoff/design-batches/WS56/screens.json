@@ -330,7 +330,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/unified-approval-inbox-decision-workspace-adm-249",
-   "component": "src/routes/platform/UnifiedApprovalInboxDecisionWorkspace.tsx",
+   "redirect": "BO-084",
    "status": "notStarted"
   },
   "navigation": {
@@ -1008,7 +1008,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/sla-escalation-bottleneck-monitor-adm-252",
-   "component": "src/routes/platform/SlaEscalationBottleneckMonitor.tsx",
+   "redirect": "BO-391",
    "status": "notStarted"
   },
   "navigation": {

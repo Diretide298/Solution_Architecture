@@ -36,6 +36,11 @@ committed bundle was r11's, and #27985 APP-SETUP-DEV-008 lost those lines. One m
                    r<N> tag: the committed bundle's `release` is not r<N>. Rebuild it at r<N>
                    (`python3 tools/op-release.py --release r<N>`) and commit it before the tag.
 
+    LR-COMMITS     with --tag r<N> (or an r<N> tag on HEAD): `check-changelog.py --since r<N-1>` fails, so a commit
+                   since the last release touches an authored input and names no change id. The tag is refused
+                   (r14, review E-03, CHG-R14I-003): r10 and r11 were tagged with three such commits, because the
+                   commit rule was a manual runbook step; it is now in the gate (run-checks.py ARGS) and here.
+
 What ADAM serves cannot be read offline; the runbook's closing adam_pull is the check on the server itself.
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
@@ -45,6 +50,7 @@ Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -62,6 +68,8 @@ RULES = {
     "LR-TAG-REMOTE": "with --remotes: the newest r<N> tag is on origin and github (P-20, CHG-GTE-006)",
     "LR-BUNDLE": "the tag being cut carries its own release bundle: op-release.json's release is r<N> (R12, "
                  "CHG-R13R12-001)",
+    "LR-COMMITS": "the tag being cut: every commit since the last release names its change id (check-changelog "
+                  "--since; review E-03, CHG-R14I-003)",
 }
 BUNDLE = g.ROOT / "handoff" / "service-docs" / "op-release.json"
 REMOTES = ("origin", "github")
@@ -199,6 +207,38 @@ def bundle_rule(guard, argv) -> None:
         guard.add("LR-BUNDLE", f"bundle:{tag}", msg)
     else:
         guard.note(f"the bundle is {tag}'s, the tag being cut")
+    commits_rule(guard, tag)
+
+
+def previous_release(tag):
+    """The newest r<M> tag with M < N, or None."""
+    try:
+        out = subprocess.run(["git", "-C", str(g.ROOT), "tag", "-l", "r*"], capture_output=True, text=True).stdout
+    except OSError:
+        return None
+    n = int(tag[1:])
+    older = [t for t in out.split() if re.fullmatch(r"r\d+", t) and int(t[1:]) < n]
+    return max(older, key=lambda t: int(t[1:])) if older else None
+
+
+def commits_rule(guard, tag) -> None:
+    """LR-COMMITS: every commit since the last release names its change (check-changelog's commit rule)."""
+    prev = previous_release(tag)
+    if prev is None:
+        if int(tag[1:]) > 1:
+            guard.add("LR-COMMITS", f"commits:{tag}", f"no release tag before {tag} in this clone: the commit rule "
+                                                      "cannot be checked (git fetch --tags origin)", strict=True)
+        return
+    p = subprocess.run([sys.executable, str(g.ROOT / "tools" / "check-changelog.py"), "--since", prev],
+                       cwd=str(g.ROOT), capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       env=dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8"))
+    if p.returncode != 0:
+        bad = [l.strip() for l in (p.stdout or "").splitlines() if "names no change id" in l][:3]
+        guard.add("LR-COMMITS", f"commits:{tag}", f"check-changelog --since {prev} fails: the tag {tag} is refused "
+                                                  f"until every commit since {prev} names its change id"
+                                                  + (" (" + "; ".join(bad)[:300] + ")" if bad else ""), strict=True)
+    else:
+        guard.note(f"every commit since {prev} names its change id (check-changelog --since {prev})")
 
 
 def self_test() -> int:

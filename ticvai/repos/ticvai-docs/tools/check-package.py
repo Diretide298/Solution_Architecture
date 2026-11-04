@@ -412,6 +412,126 @@ def _contract_rules(C: Path, H: Path, shared: set) -> None:
                                 f"/{plural[0]} — one sub-resource, one spelling")
 
 
+# ---- 15c. Supersession chains, in the documents developers read first (r13 system review A-06 and A-07; CHG-R14J-050)
+# Rule 15 read docs/adr/ and 15b deploy/, and nothing else. The summary pages labelled "Settled" and "read this first"
+# (docs/architecture/cells-and-tenancy.md, docs/principles.md, backend/README.md, backend/MIGRATIONS.md), the
+# contracts' own prose (platform-ops.yaml: "fans out per region, not per tenant (ADR-0014)") and a generator's string
+# literals (derive-ddl's 002 header) still taught ADR-0001/0014's one-tenant cell after ADR-0038, and a redirect added
+# for ADR-0001, "(retired — see ADR-0014 and ADR-0017)", sent the reader to ADR-0014, itself superseded. So in these
+# files a line citing a SUPERSEDED ADR (status "Superseded", not merely amended: an amended ADR still holds, with its
+# amendment) passes only when, within one line either way, it says so (a supersession word) and **every superseded
+# ADR the window names has one of its live successors named beside it**, the chain followed to its end
+# (0001 -> 0014 -> 0038). Naming a successor that is itself superseded does not count.
+SUPERSESSION_WORDS = ("upersed", "retired", "no longer", "replaced")
+# **A superseded decision is also taught without its number.** docs/architecture/cells-and-tenancy.md, "Settled",
+# headed "Cell = Tenant × Jurisdiction" and cited no ADR at all, so a citation rule could not see it; nor the one-line
+# summaries of it in docs/architecture/README.md and docs/STRUCTURE.md. A superseded ADR's own formula, written
+# without the ADR, counts as citing it: (pattern, the ADR whose decision it is).
+RETIRED_FORMULAE = ((re.compile(r"\bcell\s*=\s*tenant\b", re.I), "0014"),)
+
+
+def adr_supersession(adr_dir: Path) -> dict:
+    """{num: [successor num, ...]} for every ADR whose Status line says Superseded, from that line's ADR links."""
+    out = {}
+    for f in sorted(adr_dir.glob("0*.md")):
+        for ln in f.read_text(encoding="utf-8").split("\n")[:8]:
+            if ln.startswith("**Status:**"):
+                if ln.replace("**Status:**", "").strip().lower().startswith("superseded"):
+                    out[f.name[:4]] = [n for n in re.findall(r"ADR-(\d{4})", ln) if n != f.name[:4]]
+                break
+    return out
+
+
+def live_successors(num: str, superseded: dict, seen=None) -> set:
+    """The ADRs the chain from `num` ends at: every successor that is not itself superseded."""
+    seen = set() if seen is None else seen
+    if num in seen:
+        return set()
+    seen.add(num)
+    out = set()
+    for s in superseded.get(num, []):
+        out |= live_successors(s, superseded, seen) if s in superseded else {s}
+    return out
+
+
+def supersession_findings(text: str, superseded: dict) -> list:
+    """[(line number, ADR num, why)] for each citation of a superseded ADR that the text does not resolve."""
+    lines = text.split("\n")
+    out = []
+    for i, ln in enumerate(lines):
+        cited = set(re.findall(r"ADR-(\d{4})", ln)) | {n for rx, n in RETIRED_FORMULAE if rx.search(ln)}
+        for num in sorted(cited):
+            if num not in superseded:
+                continue
+            window = " ".join(lines[max(0, i - 1):i + 2])
+            named = set(re.findall(r"ADR-(\d{4})", window))
+            if not any(w in window for w in SUPERSESSION_WORDS):
+                out.append((i + 1, num, "does not say it is superseded"))
+                continue
+            for old in sorted(n for n in named if n in superseded):
+                live = live_successors(old, superseded)
+                if not (live & named):
+                    out.append((i + 1, num, f"ADR-{old} is superseded and its live successor "
+                                            f"({', '.join('ADR-' + s for s in sorted(live))}) is not named beside it"))
+                    break
+    return out
+
+
+def string_literal_text(source: str) -> str:
+    """A Python file reduced to its string literals, each kept on its own source lines (comments and code blanked)."""
+    import io
+    import tokenize
+    keep = [""] * (source.count("\n") + 2)
+    try:
+        for tok in tokenize.generate_tokens(io.StringIO(source).readline):
+            if tok.type == tokenize.STRING:
+                for k, part in enumerate(tok.string.split("\n")):
+                    keep[tok.start[0] - 1 + k] += " " + part
+    except (tokenize.TokenError, IndentationError):
+        return ""
+    return "\n".join(keep)
+
+
+def supersession_files(root: Path) -> list:
+    """The files 15c reads: the contracts and their README, backend/*.md, docs/architecture, docs/principles.md,
+    docs/repos, docs/STRUCTURE.md, and the derive tools (string literals only)."""
+    files = sorted((root / "contracts").rglob("*.yaml")) + sorted((root / "contracts").rglob("*.md"))
+    files += sorted((root / "backend").glob("*.md"))
+    files += sorted((root / "docs" / "architecture").rglob("*.md"))
+    files += [p for p in (root / "docs" / "principles.md", root / "docs" / "STRUCTURE.md") if p.exists()]
+    files += sorted((root / "docs" / "repos").glob("*.md"))
+    files += sorted((root / "tools").glob("derive-*.py"))
+    return files
+
+
+def self_test_supersession() -> list:
+    """The rule on made-up text (run before every check-package, and by --self-test)."""
+    sup = {"0001": ["0014", "0017"], "0014": ["0038"], "0036": ["0038"]}
+    cases = [
+        ("cites a superseded ADR as live", "Fans out per region (ADR-0014).", 1),
+        ("redirect to a superseded successor", "a canary (ADR-0001 (retired — see ADR-0014 and ADR-0017)).", 2),
+        ("names the live successor", "Fans out per tenant (ADR-0039; ADR-0014 is superseded by ADR-0038).", 0),
+        ("chain named in full", "ADR-0001's decision no longer held (superseded by ADR-0014, itself superseded\nby ADR-0038)", 0),
+        ("successor on the next line", "per region under ADR-0036, which is\nsuperseded by ADR-0038", 0),
+        ("live successor of one branch", "ADR-0001 is superseded; its cell kinds live on in ADR-0017.", 0),
+        ("an amended ADR is not judged", "Pooling (ADR-0032).", 0),
+        ("says superseded, names no successor", "ADR-0014 (superseded) says one tenant per cell.", 1),
+        ("the formula without its number", "## Cell = Tenant × Jurisdiction", 1),
+        ("the formula, retired beside it", "`Cell = Tenant × Region`, superseded by ADR-0038", 0),
+    ]
+    fails = []
+    for name, text, want in cases:
+        got = supersession_findings(text, sup)
+        if len(got) != want:
+            fails.append(f"rule 15c self-test '{name}': {len(got)} finding(s), expected {want}")
+    if live_successors("0001", sup) != {"0038", "0017"}:
+        fails.append("rule 15c self-test: the chain from ADR-0001 does not end at ADR-0017 and ADR-0038")
+    py = 'x = 1  # ADR-0014 in a comment is history\ny = "fans out per region (ADR-0014)"\n'
+    if len(supersession_findings(string_literal_text(py), sup)) != 1:
+        fails.append("rule 15c self-test: a generator string literal is not read, or a comment is")
+    return fails
+
+
 def main() -> int:
     C = ROOT / "contracts"
     if not C.exists():
@@ -1572,6 +1692,18 @@ def main() -> int:
                                       "or amended, without saying so on or beside any line that "
                                       "mentions it")
 
+        # 15c. The documents developers read first, the contracts and the generators' text, with the supersession
+        # chain followed to its live end (A-06, A-07; CHG-R14J-050). See supersession_findings().
+        for _e in self_test_supersession():
+            ERRORS.append(_e)
+        _chains = adr_supersession(adr_dir)
+        for f in supersession_files(ROOT):
+            text = f.read_text(encoding="utf-8", errors="replace")
+            if f.suffix == ".py":
+                text = string_literal_text(text)
+            for _ln, _num, _why in supersession_findings(text, _chains):
+                ERRORS.append(f"{f.relative_to(ROOT).as_posix()}:{_ln} cites ADR-{_num}, which is superseded: {_why}")
+
     # 11. no document names a platform code that no longer exists
     import re as _re
     real_codes = {yaml.safe_load(f.read_text(encoding="utf-8"))["platform"]["code"]
@@ -1827,4 +1959,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    if "--self-test" in sys.argv[1:]:
+        _fails = self_test_supersession()
+        print("\n".join(_fails) if _fails else "PASS - rule 15c self-test (supersession chains)")
+        sys.exit(1 if _fails else 0)
     sys.exit(main())

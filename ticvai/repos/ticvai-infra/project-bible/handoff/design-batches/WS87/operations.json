@@ -297,25 +297,6 @@
   "requestBody": null,
   "responds": "WalletExitSettlement"
  },
- "topUpWallet": {
-  "method": "POST",
-  "path": "/wallets/{subjectId}/top-ups",
-  "contract": "wallet",
-  "summary": "Add value to a wallet",
-  "permission": "WALLET_OPERATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Wallet"
- },
  "updateKioskConfig": {
   "method": "PATCH",
   "path": "/kiosk-configs/{kioskConfigId}",

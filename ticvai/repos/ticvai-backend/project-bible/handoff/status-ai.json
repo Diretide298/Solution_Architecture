@@ -22,7 +22,7 @@
   {
    "name": "Every model call leaves an audit record",
    "holds": true,
-   "detail": "17 operations write an `ai.interaction` (8.3.55).",
+   "detail": "18 operations write an `ai.interaction` (8.3.55).",
    "enforcedBy": "tools/check-package.py \u2014 a model-calling operation with no interaction fails"
   },
   {
@@ -38,17 +38,17 @@
   "redis": 9,
   "qdrant": 1
  },
- "generated": "2026-11-03",
+ "generated": "2026-11-04",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 148,
   "schemas": 125,
   "states": 43,
-  "events": 53,
+  "events": 54,
   "tables": 139,
   "screens": 183,
   "flows": 11,
-  "documents": 68,
+  "documents": 69,
   "openConflicts": 1
  },
  "metrics": {
@@ -76,8 +76,8 @@
    },
    {
     "name": "Events with a critical consumer",
-    "done": 37,
-    "total": 53,
+    "done": 38,
+    "total": 54,
     "percent": 70,
     "note": "An event whose loss breaks something must say which consumer."
    }
@@ -278,7 +278,7 @@
   }
  ],
  "governedOperations": {
-  "count": 17,
+  "count": 18,
   "note": "Operations that call a model and write an ai.activity (8.3.55)."
  },
  "guestCallable": {
@@ -540,6 +540,11 @@
    "file": "docs\\adr\\0023-pii-separation.md",
    "title": "ADR-0023 \u2014 Personal data lives apart from the append-only ledger",
    "status": "Accepted \u00b7 17 August 2026, recording a decision already impl"
+  },
+  {
+   "file": "docs\\adr\\0026-public-api-versioning.md",
+   "title": "ADR-0026: Public API versioning, scopes and deprecation",
+   "status": "Accepted"
   },
   {
    "file": "docs\\adr\\0028-service-decomposition.md",

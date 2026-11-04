@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2864
+  operations: 2873
   contracts: 33
-  tables: 1177
+  tables: 1182
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -30,7 +30,7 @@ scale:
   screens: 2453
   flows: 291
   stateModels: 210
-  events: 113
+  events: 114
   decisions: 73
   requirements: 3184
   buildPercent: 0
@@ -51,7 +51,7 @@ actors:
   - P08
   - P15
   - P16
-  operations: 2649
+  operations: 2655
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
@@ -80,7 +80,7 @@ actors:
   reaches:
   - P07
   - P15
-  operations: 22
+  operations: 23
   note: Turnstiles, scanners, kitchen displays. **A device authenticates and does not authorise.**
 surfaces:
 - platform: P01
@@ -518,10 +518,10 @@ services:
     workers: []
 stores:
 - store: postgres
-  operations: 2850
+  operations: 2859
   usedBy:
   - service: CatalogueService
-    operations: 470
+    operations: 475
   - service: OrderService
     operations: 305
   - service: VenueOpsService
@@ -541,11 +541,11 @@ stores:
   - service: WhiteLabelService
     operations: 110
   - service: IdentityService
-    operations: 100
+    operations: 103
   - service: LedgerService
     operations: 72
   - service: WalletService
-    operations: 71
+    operations: 72
   - service: InventoryService
     operations: 59
   - service: ReportingService
@@ -557,10 +557,10 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 2079
+  operations: 2088
   usedBy:
   - service: CatalogueService
-    operations: 415
+    operations: 420
   - service: AccessService
     operations: 245
   - service: OrderService
@@ -575,10 +575,10 @@ stores:
     operations: 136
   - service: FnbService
     operations: 114
+  - service: IdentityService
+    operations: 99
   - service: WhiteLabelService
     operations: 97
-  - service: IdentityService
-    operations: 96
   - service: LedgerService
     operations: 46
   - service: InventoryService
@@ -586,7 +586,7 @@ stores:
   - service: ReportingService
     operations: 37
   - service: WalletService
-    operations: 35
+    operations: 36
   - service: RetailService
     operations: 17
   - service: CrossRegionService
@@ -639,7 +639,6 @@ external:
   - FnbService
   - MarketingService
   - OrderService
-  - PlatformService
   reachedThrough: marketing.message_dispatch
   note: '**One dispatch table, six services.** A payment link from Order, a booking confirmation from
     Order, an OTP from Identity, a rota change from Tenancy, an allergen alert from F&B, a campaign
@@ -667,9 +666,10 @@ external:
   reachedThrough: control.webhook_subscription
   note: Third parties subscribe; replay is available.
 regions:
-  model: one cell per jurisdiction
-  note: '**A cell is a deployment and a legal boundary at once** (ADR-0001). UAE data residency is required
-    and DESC review shapes it.
+  model: one cell per region, a database per tenant
+  note: '**A cell is a region and a legal boundary at once** (ADR-0038, which supersedes ADR-0001 and
+    ADR-0014): it holds many tenants, each in its own database. UAE data residency is required and DESC
+    review shapes it.
 
 
     **Only CrossRegionService reaches another region**, and it moves a pseudonymous guest link rather
@@ -681,9 +681,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2864 operations across 28 contracts — the join
+  holds: 2873 operations across 28 contracts — the join
 - layer: backend
-  holds: 1177 tables in 26 schemas, 910 relationships
+  holds: 1182 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

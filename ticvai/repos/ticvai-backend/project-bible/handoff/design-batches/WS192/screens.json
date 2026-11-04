@@ -1393,6 +1393,9 @@
       {
        "kind": "primaryButton",
        "label": "Multi-level approval",
+       "collectedBy": "What requires approval here",
+       "operation": "setApprovalMatrix",
+       "notes": "Requires multi-level approval of balance adjustments on the selected matrix, as the VM close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 81 §Support"
       }
      ]

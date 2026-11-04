@@ -280,6 +280,23 @@ themselves as audit control. Both principals are resolved independently against
 
 ## 7. Enforcement
 
+**Before any of this: the token's tenant is the request's tenant** (decided 3 November 2026, Chinmay, "All four,
+one release", on the r13 system review's finding C-05; CHG-R14H-002; stated on `bearerAuth` and `guestAuth` in
+`contracts/shared/common.yaml`). A cell holds many tenants (ADR-0038) and signs every token with one key, so a valid
+signature proves the cell, never the tenant. The request's tenant is the one its host resolves to
+(`resolveTenantHost`; no tenant header or body field is ever read). Authentication refuses, `401 unauthenticated`
+and before any permission, scope or row is looked at:
+
+- a staff or guest token whose `tenant` claim is not the host's tenant (a prospect token carries no tenant and reaches only its onboarding application);
+- a token whose `sid` names a session registry entry of another tenant (the entry records the tenant it was
+  opened for);
+- a Control Plane platform-staff token for a tenant with no open platform-staff grant on the host's tenant.
+
+A `serviceAuth` call takes its tenant from the cell token's `tid` (section 7.1) and the same rule holds for it:
+a `tid` the cell does not hold is refused. Only then is a tenant database chosen, so tenant A's token never
+reaches tenant B's database in the same cell. The tenant's root scope label is made from the tenant's id
+(`t_` and the id's 32 hex digits, `backend/provision-tenant.sh`), so two tenants can never share a root path.
+
 ### 7.1 Data layer — authoritative
 
 ```sql
@@ -314,7 +331,9 @@ at the tenant root and is audited as the calling cell. The full rule is in backe
 ADAM CR-198 option A; CHG-R10ID-010; stated once on `guestAuth` in `contracts/shared/common.yaml`): the path's
 `{venueId}` or a required `venueId` query parameter, else the `X-Venue-Id` header; the server checks it is one of the tenant's venues (else `404`) and sets
 `ticvai.scope_paths` to that venue's path, read-only, for the request. An anonymous guest session (CR-183) carries the
-same venue scope. Row-level security stays the line of defence; browsing needs no session.
+same venue scope. Row-level security keeps the read inside that venue; browsing needs no session. **Inside the
+venue it admits every row** (r13 system review C-06, CHG-R14H-003), so the operation's query and its guest projection,
+not the database, keep staff-only rows and fields out of a public answer.
 
 ### 7.2 Service layer — defence in depth
 

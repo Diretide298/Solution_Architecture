@@ -205,7 +205,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/outlet-management-bo-728",
-   "component": "src/routes/operations/OutletManagement.tsx",
+   "redirect": "BO-044",
    "status": "notStarted"
   },
   "navigation": {
@@ -290,7 +290,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/create-edit-outlet-bo-729",
-   "component": "src/routes/operations/CreateEditOutlet.tsx",
+   "redirect": "BO-044",
    "status": "notStarted"
   },
   "navigation": {

@@ -726,6 +726,7 @@
     ]
    },
    "address": {
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "principalId": {

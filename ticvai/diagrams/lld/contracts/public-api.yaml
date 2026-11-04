@@ -34,6 +34,7 @@ operations:
   - control.api_client
   - control.api_licence
   - control.developer_account
+  - control.developer_member
   - control.integration_listing
   writes:
   - cache:idempotency
@@ -97,12 +98,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.api_client
   - control.api_version
   writes:
   - cache:idempotency
   - control.api_version
-  - marketing.message_dispatch
 - operation: getApiUsage
   verb: GET
   path: /api-usage
@@ -126,6 +125,7 @@ operations:
   offline: false
   reads:
   - control.developer_account
+  - control.developer_member
   writes: []
 - operation: issueApiToken
   verb: POST
@@ -399,6 +399,7 @@ operations:
   reads:
   - cache:idempotency
   - control.api_client
+  - control.developer_member
   writes:
   - cache:idempotency
   - control.api_client

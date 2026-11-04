@@ -4,14 +4,14 @@ generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 305 operations, 117 tables, and the highest write rate in the platform.
-  Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
-  morning.
+why: '**The transactional core**, with the highest write rate in the platform (its operation and table
+  counts are the derived `operations` and `tables` fields). Separate because its scaling profile is
+  unlike anything else — a Saturday evening is ten times a Tuesday morning.
 
 
   **`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like
   a tenancy concern — but **venue scope is the platform''s default rather than a service boundary**:
-  675 of 1,014 operations are venue-scoped.
+  2,079 of 2,864 operations declared venue scope on 3 November 2026.
 
 
   **What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles
@@ -311,7 +311,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: true
     reads: 7
-    writes: 10
+    writes: 11
   - operation: createPaymentLink
     verb: POST
     path: /payment-links
@@ -1342,7 +1342,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 5
+    reads: 8
     writes: 8
   - operation: previewProductTickets
     verb: GET
@@ -1901,7 +1901,7 @@ operationsByContract:
     writes: 2
   - operation: createPaymentProviderConnection
     verb: POST
-    path: /payment-providers
+    path: /payment-provider-connections
     scope: tenant
     permission: PAYMENT_PROVIDER_MANAGE
     offline: false
@@ -2029,7 +2029,7 @@ operationsByContract:
     writes: 0
   - operation: listPaymentProviderConnections
     verb: GET
-    path: /payment-providers
+    path: /payment-provider-connections
     scope: tenant
     permission: PAYMENT_VIEW
     offline: false
@@ -2253,7 +2253,7 @@ operationsByContract:
     writes: 2
   - operation: testPaymentProviderConnection
     verb: POST
-    path: /payment-providers/{connectionId}/test
+    path: /payment-provider-connections/{connectionId}/test
     scope: tenant
     permission: PAYMENT_PROVIDER_MANAGE
     offline: false
@@ -2949,7 +2949,7 @@ tables:
   - marketing-crm
   - venue-map
 - table: orders.cart_line
-  columns: 21
+  columns: 22
   store: postgres
   parent: orders.cart
   writtenBy:
@@ -3068,7 +3068,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.group_customer_organisation_contact
-  columns: 6
+  columns: 4
   store: postgres
   parent: orders.group_customer_organisation
   writtenBy:
@@ -3082,7 +3082,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.group_participant
-  columns: 7
+  columns: 4
   store: postgres
   parent: orders.group_participant_list
   writtenBy:
@@ -3163,7 +3163,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.invitation
-  columns: 13
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -3226,7 +3226,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.order_line
-  columns: 23
+  columns: 24
   store: postgres
   parent: orders.sales_order
   writtenBy:
@@ -3425,7 +3425,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.sales_order
-  columns: 26
+  columns: 28
   store: postgres
   parent: null
   writtenBy:
@@ -3472,7 +3472,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.ticket_transfer
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:

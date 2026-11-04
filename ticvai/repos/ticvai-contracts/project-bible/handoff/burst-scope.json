@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2864,
+  "ofTotalOperations": 2873,
   "tables": 68,
-  "ofTotalTables": 1173
+  "ofTotalTables": 1178
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2832,
-    "tables": 1173,
+    "operations": 2841,
+    "tables": 1178,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -227,7 +227,7 @@
   {
    "table": "catalogue.product",
    "schema": "catalogue",
-   "columns": 52,
+   "columns": 53,
    "burstOperations": 6,
    "written": false,
    "contention": null,
@@ -238,7 +238,7 @@
   {
    "table": "orders.sales_order",
    "schema": "orders",
-   "columns": 26,
+   "columns": 28,
    "burstOperations": 6,
    "written": true,
    "contention": null,
@@ -310,7 +310,7 @@
   {
    "table": "catalogue.performance",
    "schema": "catalogue",
-   "columns": 12,
+   "columns": 13,
    "burstOperations": 4,
    "written": false,
    "contention": null,
@@ -321,7 +321,7 @@
   {
    "table": "orders.order_line",
    "schema": "orders",
-   "columns": 23,
+   "columns": 24,
    "burstOperations": 4,
    "written": true,
    "contention": null,
@@ -571,7 +571,7 @@
   {
    "table": "orders.cart_line",
    "schema": "orders",
-   "columns": 21,
+   "columns": 22,
    "burstOperations": 2,
    "written": true,
    "contention": null,
@@ -681,7 +681,7 @@
   {
    "table": "approvals.request",
    "schema": "approvals",
-   "columns": 36,
+   "columns": 38,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -764,7 +764,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.scope`. **Reached by**: 18"
+   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.scope`. **Reached by**: 16"
   },
   {
    "table": "ledger.journal_line",
@@ -791,7 +791,7 @@
   {
    "table": "marketing.guest_profile",
    "schema": "marketing",
-   "columns": 23,
+   "columns": 19,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -1303,6 +1303,7 @@
     "ledger.journal_line",
     "orders.order_event",
     "orders.payment",
+    "orders.sales_order",
     "payments.payment_attempt",
     "platform.idempotency_record",
     "platform.outbox"

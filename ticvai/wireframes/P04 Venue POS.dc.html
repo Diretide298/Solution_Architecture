@@ -651,7 +651,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getMediaEntitlements · appendEntitlementToMedia · getCart · exchangeOrderLines</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, cartId&larr;session, orderId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">orderId · promotionId</span><br><a href="#pos-003">POS-003</a>  &mdash; <i>Sell — Timed Entry</i><br><a href="#pos-004">POS-004</a>  &mdash; <i>Sell — Seat Map</i> <span class="car">performanceId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Payment</i> <span class="car">paymentId</span><br><a href="#pos-011">POS-011</a>  &mdash; <i>They change their mind about the locker</i> <span class="car">orderId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">orderId · productId · promotionId</span><br><a href="#pos-003">POS-003</a>  &mdash; <i>Sell — Timed Entry</i><br><a href="#pos-004">POS-004</a>  &mdash; <i>Sell — Seat Map</i> <span class="car">performanceId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Payment</i> <span class="car">paymentId</span><br><a href="#pos-011">POS-011</a>  &mdash; <i>They change their mind about the locker</i> <span class="car">orderId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAppendEntitlementToMedia &middot; <i>Append entitlement to media</i> &middot; <b>Append entitlement to media</b> &middot; Cancel <span class="dis">discards id · lines · recordedAt · paymentMethod · note</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div></div>
         </div>
@@ -1487,7 +1487,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getGuestMenu · addCartLine · evaluatePromotions · setItemAvailability +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied · soldOutByCount</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, cartId&larr;session, itemId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-005">POS-005</a>  &mdash; <i>Charge</i> <span class="car">discount</span><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">promotionId</span><br><a href="#pos-022">POS-022</a>  &mdash; <i>The order goes to the pass before the guest </i></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-005">POS-005</a>  &mdash; <i>Charge</i> <span class="car">discount</span><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">productId · promotionId</span><br><a href="#pos-022">POS-022</a>  &mdash; <i>The order goes to the pass before the guest </i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div><div class="ov"><b>modal</b> formSetItemAvailability &middot; <i>Save item availability</i> &middot; <b>Save item availability</b> &middot; Cancel <span class="dis">discards isAvailable · recordedAt · reason · restoreAt</span></div></div>
         </div>
@@ -1525,7 +1525,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; lookupMerchandise · addCartLine · evaluatePromotions</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied · stockConflict</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, cartId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-005">POS-005</a>  &mdash; <i>Charge</i> <span class="car">discount</span><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">promotionId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-005">POS-005</a>  &mdash; <i>Charge</i> <span class="car">discount</span><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">productId · promotionId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div></div>
         </div>
@@ -1796,7 +1796,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; searchGuests · identifyGuest · getGuestLoyalty · addCartLine +1</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, subjectId&larr;navigation, cartId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-002">POS-002</a>  &mdash; <i>Sell — Ticket Catalogue</i> <span class="car">productId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTopUpWallet &middot; <i>Top up wallet</i> &middot; <b>Top up wallet</b> &middot; Cancel</div></div>
         </div>

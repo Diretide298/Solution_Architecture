@@ -27,18 +27,24 @@
     "format": "uuid"
    },
    "subjectId": {
+    "x-ticvai-subject-kind": "guest",
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
    "recipientEmail": {
+    "x-ticvai-pii": {
+     "store": "contact.email",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email",
     "nullable": true
    },
    "token": {
     "type": "string",
-    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
+    "description": "**Single-use and unguessable**: at least 128 bits from a cryptographic random source (22 or more base64url characters), never logged (`x-ticvai-secret: bearer` on the path; r13 system review C-13, CHG-R14H-005). An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
    },
    "plusOnes": {
     "type": "integer",
@@ -150,7 +156,7 @@
     "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
-    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
+    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered. **Answered from booking consent records** (ADAM CR-583; CHG-CR583-001): `answered` and the `consentBlocksBooking` conflicts are worked out from Marketing's current booking consent records (`marketing-crm#bookingConsentRecords`) of this cart at the shown version, as `getCart` states; until the consent ticket lands this list is empty.\n",
     "items": {
      "allOf": [
       {
@@ -169,7 +175,7 @@
         },
         "answered": {
          "type": "boolean",
-         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."
+         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer. For `perPerson`, true when every one of the persons on every line in `lineIds` has an answer: a line of quantity n has persons 0 to n-1 (`personIndex`), on a line with an `eligibilityDeclaration` its rows (ADAM CR-556, 3 November 2026; CHG-CR556-001)."
         }
        }
       }
@@ -242,14 +248,16 @@
   ],
   "properties": {
    "cart": {
-    "$ref": "#/components/schemas/Cart"
+    "$ref": "#/components/schemas/Cart",
+    "description": "The surviving cart (ADAM CR-553): the guest's own open cart after a merge, else the claimed cart; priced by the cart pricing rule."
    },
    "mergedLineCount": {
-    "type": "integer"
+    "type": "integer",
+    "description": "The lines moved into the guest's cart; 0 when there was nothing to merge (ADAM CR-553)."
    },
    "droppedLines": {
     "type": "array",
-    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout.\n",
+    "description": "**Reported, never silent.** Lines that could not be re-leased on merge are named, so a guest signing in is told what they lost rather than discovering it at checkout. They stay on the anonymous cart, which becomes `abandoned` (ADAM CR-553): `expired` for an inventory hold that did not move or a resource hold that expired, was converted or was released; `duplicate` for a table booking or resource hold a line of the surviving cart already holds.\n",
     "items": {
      "type": "object",
      "properties": {
@@ -621,6 +629,14 @@
    "changeVersion"
   ],
   "properties": {
+   "holderSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "guest",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The named holder, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person's subject where the caller names one, else a new pii.subject of kind guest; null while none is given."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -857,6 +873,11 @@
     "default": false
    },
    "holderName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "holderSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -1282,6 +1303,7 @@
     ]
    },
    "documentNumber": {
+    "x-ticvai-data-class": "business",
     "type": "string"
    },
    "language": {
@@ -1642,6 +1664,7 @@
     "maxLength": 300
    },
    "address": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "maxLength": 1000,
     "nullable": true,
@@ -1777,6 +1800,7 @@
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "subjectId": {
+    "x-ticvai-subject-kind": "guest",
     "x-ticvai-data-class": "behavioural",
     "x-ticvai-unique": "tenant",
     "type": "string",
@@ -1784,21 +1808,37 @@
     "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n**One profile per guest** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): unique in the tenant, so `getMyProfile` and `updateMyProfile` read and write the one row of the session's subject. The profile's segment is the one it was first captured in.\n"
    },
    "displayName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-pii": {
+     "store": "contact.email",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "phone": {
+    "x-ticvai-pii": {
+     "store": "contact.phone",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredLanguage": {
+    "x-ticvai-pii": {
+     "store": "subject.preferredLanguage",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
@@ -2213,7 +2253,8 @@
     "type": "boolean"
    },
    "isPrimary": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "**At most one primary among a principal's active methods** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). `enrolMfaMethod` writes false on the pending method; `verifyMfaEnrolment` sets it true when the method becomes active and the principal has no other active method marked primary, else false; `removeMfaMethod` moves the mark to the newest remaining active method when the primary one is removed. A row with `is_primary` null counts as false: `listMfaMethods` and any `MfaMethod` answer return false for null, never null. There is no operation to choose a primary."
    },
    "enrolledAt": {
     "type": "string",
@@ -2352,7 +2393,21 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001): `createPayment` re-locks the quote on the order and, when `chargeTotal` changed, answers `409 quoteExpired` with the new quote before charging anything (ADAM CR-577)."
+   },
+   "termsVersion": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the `termsAndConditions` version `checkoutCart` took in `termsAccepted`, checked against the policy in force. Null when the checkout sent none; never filled in from the policy in force."
+   },
+   "termsAcceptedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the guest accepted `termsVersion`, the time `checkoutCart` wrote the order (ADAM CR-576). Null with `termsVersion`."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2536,6 +2591,13 @@
       "format": "uuid",
       "readOnly": true,
       "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "productId": {
+      "x-ticvai-references": "catalogue.product",
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on `orders.order_line`: copied from the cart line by `checkoutCart`, as `recommendationId` is, and returned on every read of an order's lines (`getOrder` included). Orders made before this change get it filled in from their variant's product. A client never sends it."
      },
      "discounts": {
       "type": "array",
@@ -3243,7 +3305,19 @@
     "description": "Set only on claim. Ownership moves then, not at offer."
    },
    "recipientAddressMasked": {
-    "type": "string"
+    "type": "string",
+    "description": "The recipient's address as the server masks it. A screen shows it as sent and never unmasked (ADAM CR-593)."
+   },
+   "recipientChannel": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp"
+    ],
+    "description": "**The channel the transfer was sent by** (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): `transferOrderTickets` stores its `recipient.channel` in `orders.ticket_transfer.recipient_channel` (text, email, sms or whatsapp, nullable), and every answer that returns a transfer returns it. Null on rows written before this change. WEB-030 draws a sent row's channel part from it: email is 'Sent to ' plus `recipientAddressMasked`, sms is 'Sent by SMS', whatsapp is 'Sent by WhatsApp'."
    },
    "status": {
     "type": "string",
@@ -3677,7 +3751,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

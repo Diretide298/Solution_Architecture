@@ -43,6 +43,26 @@ info:
     — treat accordingly.
 
     '
+# **One server definition per host** (ADR-0026, amended 3 November 2026; the r13 system review B-12; CHG-R14J-020). A
+# contract names the hosts it is served from in `info.x-ticvai-hosts` and its `servers` block is these entries, in that
+# order: a tenant's data is served from its cell, the Control Plane's from the Control Plane, the Python AI runtime from
+# the cell under its own base. tools/check-contract-servers.py holds every contract to it.
+x-ticvai-servers:
+  cell:
+    url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+  controlPlane:
+    url: https://{controlPlaneHost}/api/v1
+    variables:
+      controlPlaneHost:
+        default: control.ticvai.local
+  ai:
+    url: https://{cellHost}/ai/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
 components:
   parameters:
     PageSize:
@@ -86,7 +106,9 @@ components:
       description: '**The venue a guest app or site is browsing, named on every public read of venue data** (decided 25
         October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on `guestAuth`). The server checks it
         is one of the tenant''s venues (`404` when it is not) and runs the read under a read-only scope of that venue''s
-        path, so row-level security stays the line of defence and browsing needs no session. Not declared where the
+        path, so row-level security keeps the read inside that venue and browsing needs no session. **Within the venue
+        row-level security admits every row of it** (r13 system review C-06, CHG-R14H-003): what keeps a staff-only
+        row or field out of a public answer is the operation''s query and its guest projection, never the database. Not declared where the
         path (`/venues/{venueId}/...`) or a required `venueId` query parameter already names the venue, which then serves
         the same purpose. Optional in the schema
         so an r1 client still validates.'
@@ -182,6 +204,7 @@ components:
     AdmissionToken:
       name: X-Admission-Token
       in: header
+      x-ticvai-secret: bearer
       required: false
       description: '**The on-sale waiting room''s admission token** (ADR-0066, accepted 1 October). A short-lived
         signed token (tenant, performance, expiry, a unique id; the signing key is a Key Vault secret) that catalogue
@@ -230,6 +253,16 @@ components:
         '
       schema:
         type: string
+    StepUpVerdict:
+      description: '**What the server found when it re-checked an offline step-up at sync** (decided 3 November
+        2026, Chinmay, system review finding F-01, "Offline verifier"; CHG-R14V-001). Sent as
+        `X-Ticvai-Step-Up-Verdict` on the success response of an operation that declares
+        `x-ticvai-offline-step-up: verifier`, only when the call carried `SupervisorStepUp.offline`. `confirmed`:
+        the step-up holds. `refusedAtSync`: it does not; the act is still recorded (it happened at the till), the
+        till tells the operator, and the venue''s managers get the alert `identity.offlineStepUpRefused` raises.'
+      schema:
+        type: string
+        enum: [confirmed, refusedAtSync]
     RetryAfter:
       description: 'Whole seconds to wait before retrying. **A real figure, jittered** (ADR-0032). A fixed
         value synchronises every client into the same retry instant. An offline till treats a `429`
@@ -402,10 +435,34 @@ components:
         principal is refused `403 supervisor-step-up-refused`, even when the caller holds the permission, and the
         picker leaves the caller out.
 
+
+        **Offline, the till checks the PIN against its offline verifier and the server checks it again at sync**
+        (decided 3 November 2026, Chinmay, on system review finding F-01: "Offline verifier" (the till keeps a
+        verifier, re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001). On an operation that
+        declares `x-ticvai-offline-step-up: verifier`, a till or handheld with no connection fills the picker from
+        its offline step-up package (identity `getOfflineStepUpPackage`: the signers who may sign that operation''s
+        permission at its venue, the caller left out), checks the typed PIN locally against that signer''s verifier
+        (Argon2id, never the PIN), and queues the call with this object as online plus `offline`, the evidence of
+        the local check. A wrong PIN counts on the device; at the package''s `attemptLimit` that signer is locked on
+        that device until its next sync. **At sync the server re-checks everything**: the PIN against the
+        signer''s PIN credential in force at the act''s `recordedAt`, the verifier (issued to this workstation''s
+        package, not expired and not revoked at `recordedAt`), and the signer''s permission, venue and not-self as
+        at `recordedAt`. **An offline step-up the server does not confirm never drops the act**: the act happened
+        at the till, so it is recorded as sent, its success response carries `X-Ticvai-Step-Up-Verdict:
+        refusedAtSync`, Identity keeps the refusal (`identity.offline_step_up`) and publishes
+        `identity.offlineStepUpRefused`, which raises an alert to the venue''s managers. Online, nothing changes:
+        a failure is `403 supervisor-step-up-refused` and nothing is written.
+
         '
       required:
       - credential
       properties:
+        offline:
+          allOf:
+          - $ref: '#/components/schemas/OfflineStepUpEvidence'
+          description: '**Sent only by a call queued offline** whose step-up was checked on the device against its
+            offline verifier (CHG-R14V-001). Absent online. Kept on the step-up''s `identity.offline_step_up` row,
+            which Identity writes when it re-checks the step-up at sync.'
         principalId:
           type: string
           format: uuid
@@ -428,7 +485,44 @@ components:
             `PasswordPolicy.pinLength` digits (4, 6 or 8, the tenant's choice; CHG-CRD-002), which the prompt's
             keypad takes from `WorkstationContext.pinLength`. The operation never reads Identity's tables to
             check it; it asks Identity's `verifySupervisorStepUp` query (`x-ticvai-read-via`, CHG-CRD-004),
-            and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in.
+            and a wrong PIN counts towards `PasswordPolicy.pinLockoutAfterAttempts` as at sign-in. **A call queued
+            offline carries the PIN the signer typed** (sealed in the device's encrypted outbox and deleted from it
+            once the call syncs) so the server can check it again at sync (CHG-R14V-001); a wrong PIN found at
+            sync is not a new attempt and does not count towards the lockout.
+    OfflineStepUpEvidence:
+      type: object
+      x-ticvai-persistence: none — request only; Identity keeps it on the step-up's identity.offline_step_up row
+      description: '**What the device says about an offline step-up it checked itself** (decided 3 November 2026,
+        Chinmay, system review finding F-01, "Offline verifier"; CHG-R14V-001). It is evidence, never authority:
+        the server re-checks the step-up at sync whatever this says.'
+      required:
+      - packageId
+      - verifierId
+      - verifiedAt
+      - failedAttemptsBefore
+      properties:
+        packageId:
+          type: string
+          format: uuid
+          description: The offline step-up package (identity `OfflineStepUpPackage.packageId`) the device checked
+            against. It must have been issued to the calling workstation.
+          x-ticvai-stored-as: identity.offline_step_up.package_id
+        verifierId:
+          type: string
+          format: uuid
+          description: The signer's verifier in that package (`OfflineStepUpSigner.verifierId`).
+          x-ticvai-stored-as: identity.offline_step_up.verifier_id
+        verifiedAt:
+          type: string
+          format: date-time
+          description: Device time the typed PIN matched the verifier.
+          x-ticvai-stored-as: identity.offline_step_up.verified_at
+        failedAttemptsBefore:
+          type: integer
+          minimum: 0
+          description: Wrong PINs the device counted for this signer since its package was applied, before this
+            one matched. Kept for review; it does not count towards the server's lockout.
+          x-ticvai-stored-as: identity.offline_step_up.failed_attempts_before
     SalesChannel:
       type: string
       description: '**Where a sale came from.** Restored 24 August — this was lost in the `Money` rewrite
@@ -1089,6 +1183,15 @@ components:
         key''s `kid`. The key rotates yearly, and the previous key still verifies for 24 hours after a rotation.
 
 
+        **The token''s tenant is the request''s tenant** (decided 3 November 2026, Chinmay, "All four, one release",
+        r13 system review finding C-05; CHG-R14H-002). One key signs every tenant''s tokens in a cell, so the
+        signature proves the cell and never the tenant. The request''s tenant is the one its host resolves to
+        (`resolveTenantHost`; no tenant header or body field is read), and authentication refuses `401
+        unauthenticated`, before any permission, scope or row is looked at, a token whose `tenant` claim is not that
+        tenant, or whose `sid` names a session registry entry opened for another tenant. Only then is the tenant''s
+        database chosen. The rule in full: `docs/architecture/specs/permission-resolution.md` section 7.
+
+
         **A Control Plane platform-staff token** is accepted by a cell only for `openPlatformStaffGrant`,
         and for any other operation only while an open platform-staff grant exists for that tenant.
         The cell then resolves the caller''s permissions from the grant, not from a role in the tenant,
@@ -1106,6 +1209,11 @@ components:
         guest''s own resources — a guest token can never widen to another subject.
 
 
+        **Bound to its tenant as a staff token is** (r13 system review finding C-05; CHG-R14H-002): a guest token whose
+        `tenant` claim is not the tenant the request''s host resolves to, or whose session belongs to another tenant, is
+        `401 unauthenticated` before anything is read (`bearerAuth`).
+
+
         **An anonymous guest session** (20 October 2026, R8 blocker cause GPS-C23; CHG-R8SPN-031) is a guest token with
         no subject, opened by `orders.createCart` for a visitor with no credential and bound to that cart; it reaches the
         cart operations and nothing that needs a known guest, and it ends when `claimCart` moves the cart to an account.
@@ -1116,7 +1224,9 @@ components:
         `{venueId}`, or a required `venueId` query parameter, where the operation has one, else the `X-Venue-Id` header
         (the `GuestVenue` parameter, declared on each such read). The server checks the venue is one of the tenant''s venues (a venue not of the tenant is
         `404`) and builds, for that request only, a read-only scope of the venue''s path (`ticvai.scope_paths` the
-        venue''s path, nothing written), so row-level security stays the line of defence and browsing needs no session.
+        venue''s path, nothing written), so row-level security keeps the read inside that venue and browsing needs no
+        session. **Inside the venue it admits every row** (r13 system review C-06, CHG-R14H-003): the operation''s query
+        and its guest projection, not the database, are what keep staff-only rows and fields out of a public answer.
         **A read that names no venue is 400 `venue-required`** and reads nothing (the lead, 25 October 2026, r10 round
         3; CHG-R10ID-022); each such read declares it. **A guest read that reaches venue data through an in-process
         scoped query** (`getOrderCalendarEvent`, `createCart`, and any like them) runs that query under the same request
@@ -1167,7 +1277,24 @@ components:
         device id). The server checks it against an active, unrevoked `device_credential` row, resolves the device
         (`platform.device`) and through it the workstation and scope the device is bound to, and acts as that device:
         no person, no role, no permission. A device can only report about itself; a call naming another device is
-        `404`. A retired or unapproved device, or a revoked credential, is `401`.'
+        `404`. A retired or unapproved device, or a revoked credential, is `401`.
+
+
+        **The device doors use it** (r14 review C-04, CHG-R14H-001; the lead, 3 November 2026: "All four, one
+        release"). A call that names a workstation and has no staff session (the till, handheld and scanner
+        sign-in through `login` or `completeSsoAuthorization`, and the till''s session-less supervisor step-up on
+        `listActiveSessions` and `forceLogout`) authenticates the device it runs on with this scheme, and the
+        workstation is the one that device is bound to (`x-ticvai-workstation-from: device`): a `workstationId` in
+        the request that is not that workstation is `403 workstation-mismatch`, and one sent without this scheme is
+        `401 device-unauthenticated`, answered before any PIN or password is checked, so it spends no attempt and
+        moves no lockout. A device-bound PIN is therefore tried only from a registered, unrevoked device.
+
+
+        **Which devices may call an operation** (the same change): every operation a device credential reaches,
+        by this scheme or a device key (`apiKeyAuth`), lists the device kinds it accepts in
+        `x-ticvai-device-kinds` (`DeviceKind` values, or `all` for an operation about the device itself, such as
+        its heartbeat). A device of another kind is `403 device-kind-not-allowed` and nothing is read or written:
+        a signage display''s key never captures stored value.'
     apiKeyAuth:
       type: apiKey
       in: header
@@ -1181,6 +1308,8 @@ components:
         one device and its venue; it is shown once when issued (`issueDeviceCredential`) and revoked per device
         (`revokeDeviceCredential`). A request with it opens a device session scoped to that venue: a `venueId` or
         `queueId` outside it is `403`, and a missing, wrong or revoked key is `401`. One device-key sign-in serves
-        every `apiKeyAuth` operation (issue, hash and store, verify, revoke).
+        every `apiKeyAuth` operation (issue, hash and store, verify, revoke). **It also checks the operation''s
+        `x-ticvai-device-kinds`** (r14 review C-04, CHG-R14H-001): a device whose kind the operation does not list is
+        `403 device-kind-not-allowed`, as for `deviceAuth`.
 
         '

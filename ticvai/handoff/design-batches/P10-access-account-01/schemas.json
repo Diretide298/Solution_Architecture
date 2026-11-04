@@ -3,6 +3,11 @@
   "type": "object",
   "x-ticvai-persistence": "control.api_client",
   "description": "CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n",
+  "x-ticvai-unique-together": [
+   [
+    "clientId"
+   ]
+  ],
   "required": [
    "id",
    "developerId",
@@ -27,7 +32,11 @@
    },
    "clientId": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "pattern": "^tvc_(live|test)_[a-z0-9]{32}$",
+    "x-ticvai-column-nullable": false,
+    "x-ticvai-unique-compare": "exact",
+    "description": "**The public half of the credential pair** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001), made by the server whenever a client is created, in `createApiClient` and in `decideProductionAccess` alike: `tvc_live_` for a production client or `tvc_test_` for a sandbox client, then 32 lowercase letters and digits from a cryptographically secure random source. It never changes, not on rotation or on a status change. The prefix is for people and secret scanners only: what a client may reach is decided by its `environment`, never by reading the prefix. `issueApiToken` finds the client by it. It is not the uuid `id` the `/api-clients/{clientId}/...` paths take. Stored NOT NULL with a unique index; an insert that hits the index retries once with a fresh value. A forward migration gives every existing row whose `client_id` is null a value made the same way, then makes `client_id` NOT NULL with the unique index. Shown and copied on the client detail panel, so never null."
    },
    "environment": {
     "type": "string",
@@ -519,7 +528,7 @@
    "workstationId": {
     "type": "string",
     "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n\n**Sent by a device door, never by a browser** (CHG-DOOR-001, 2 October 2026). Required in effect for the device-bound methods `pin`, `card` and `rfid` (400 `workstation-required` without it); absent on the TICVAI Console, Venue Management and partner portal sign-ins, which have no workstation.\n"
+    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n\n**Sent by a device door, never by a browser** (CHG-DOOR-001, 2 October 2026). Required in effect for the device-bound methods `pin`, `card` and `rfid` (400 `workstation-required` without it); absent on the TICVAI Console, Venue Management and partner portal sign-ins, which have no workstation.\n\n**Believed only from the device** (r14 review C-04, CHG-R14H-001): the call authenticates the device with `deviceAuth`, and this must be the workstation that device is bound to (403 `workstation-mismatch`). Sent without `deviceAuth` it is 401 `device-unauthenticated`, and a device-bound method without `deviceAuth` is 400 `workstation-required`.\n"
    },
    "deviceFingerprint": {
     "type": "string",
@@ -589,7 +598,7 @@
   ]
  },
  "MessageDispatch": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "grant-holder-write",
   "x-ticvai-append-only": "queuedAt",
   "x-ticvai-index": [
    [
@@ -849,7 +858,8 @@
     "type": "boolean"
    },
    "isPrimary": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "**At most one primary among a principal's active methods** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). `enrolMfaMethod` writes false on the pending method; `verifyMfaEnrolment` sets it true when the method becomes active and the principal has no other active method marked primary, else false; `removeMfaMethod` moves the mark to the newest remaining active method when the primary one is removed. A row with `is_primary` null counts as false: `listMfaMethods` and any `MfaMethod` answer return false for null, never null. There is no operation to choose a primary."
    },
    "enrolledAt": {
     "type": "string",
@@ -1023,7 +1033,7 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
-    "x-ticvai-references": "identity.principal"
+    "x-ticvai-references": "control.platform_operator"
    },
    "decidedAt": {
     "type": "string",
@@ -1299,7 +1309,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

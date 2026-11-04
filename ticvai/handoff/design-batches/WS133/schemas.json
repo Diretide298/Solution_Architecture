@@ -45,6 +45,12 @@
     "type": "string",
     "format": "date-time"
    },
+   "admissionStartsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**When admission opens for the performance** (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): stored as `catalogue.performance.admission_starts_at`, nullable. A sales window anchored on `admissionStart` (`eventRelativeWindows.anchor`) uses it, and falls back to `startsAt` while it is null."
+   },
    "approvalRequestId": {
     "type": "string",
     "format": "uuid",

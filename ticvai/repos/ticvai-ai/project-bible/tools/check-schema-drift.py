@@ -530,15 +530,17 @@ def judge_review(row, S):
             explains
     t, _, c = obj.rpartition(".")
     if t not in S.ttab:
-        return ("done" if kind in ("column dropped", "column retired") and t not in S.ptab else "table not built"), \
-            explains
+        return ("done" if kind in ("column dropped", "column retired", "personal data moved") and t not in S.ptab
+                else "table not built"), explains
     k = ("column", obj)
     explains.add(k)
     have = T.get(k)
-    if kind in ("column dropped", "column retired"):
+    # **A personal column moved to pii.* is judged as a retired one** (CHG-R14M-001): the target keeps it until its copy
+    # into pii.* is counted and the four-step drop ends; gone, it is done
+    if kind in ("column dropped", "column retired", "personal data moved"):
         if have is None:
             return "done", explains
-        return ("kept" if kind == "column retired" else "open"), explains
+        return ("kept" if kind in ("column retired", "personal data moved") else "open"), explains
     if have is None:
         return "column not built", explains
     if kind == "not null":
@@ -562,7 +564,8 @@ def judge_review(row, S):
     return "unjudged", explains
 
 
-REVIEW_KINDS = ("not null", "column changed", "column dropped", "column retired", "constraint added",
+REVIEW_KINDS = ("not null", "column changed", "column dropped", "column retired", "personal data moved",
+                "constraint added",
                 "constraint dropped", "table dropped", "index duplicates a unique index", "statement dropped",
                 "file changed", "function changed")
 

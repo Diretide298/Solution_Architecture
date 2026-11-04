@@ -77,7 +77,7 @@ and usually enough to predict what an ADR says.
 | [0062](0062-e-invoicing-through-a-provider-adapter.md) | E-invoicing goes through a provider adapter, and a rejection stops for a person | **Proposed** — waiting on the client (provider, mandate date, B2C scope, VAT 201 layout) | **SD-035**, CF-133 |
 | [0063](0063-encryption-keys-and-biometric-templates.md) | Encryption and keys; biometric templates stay with the biometric vendor | **Accepted in part** — the biometric consent, enrolment-channel, minors, image-viewing and face-matching rules decided 2 October; the rest waits on the client's DPO (template location, retention floor) and the facial-reader vendor | SD-058, CF-35 |
 | [0064](0064-per-tenant-limits.md) | Every tenant has a request budget, and a busy tenant cannot starve the others | Accepted 1 October | SD-042, SD-043 — amends 0032 |
-| [0065](0065-on-sale-availability-is-read-from-a-short-cache.md) | Browse availability is read from a one-second cache; the hold decides | **Proposed** — waiting on Chinmay: it reverses F01/F07's "never cached" | **SD-038** |
+| [0065](0065-on-sale-availability-is-read-from-a-short-cache.md) | Browse availability is read from a one-second cache; the hold decides | Accepted 1 October — reverses F01/F07's "never cached"; the hold decides | **SD-038** |
 | [0066](0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md) | The on-sale waiting room sits at the edge, apart from the ride queue | Accepted 1 October — amended 6 October (sized and load-tested at 50,000+ arrivals; the sale behind it accepted at 3,000 concurrent) | **SD-039** — amends 0012 |
 | [0067](0067-one-device-register.md) | One device register; Access keeps only where a device is placed | Accepted 1 October | SD-004 — amends 0015 |
 | [0068](0068-guest-admission-policy-lives-in-access-only.md) | Guest admission policy lives in Access only, and the offline package carries it | Accepted 1 October | SD-005, SD-052 |
@@ -92,9 +92,9 @@ and usually enough to predict what an ADR says.
 > number after the review drafts so none of them had to be renumbered.
 > **0052–0054 and 0060–0068 joined on 1 October** (plan item 2.5), moved from the review drafts in
 > `audit/ticvai/steps/SD/adr-drafts/` and brought in line with 0049 and 0055–0058 (the broker is RabbitMQ
-> or Kafka per 0057, never Service Bus; Redis is Azure Managed Redis). Eight are Accepted. Four are
+> or Kafka per 0057, never Service Bus; Redis is Azure Managed Redis). Eight are Accepted. Four were
 > Proposed with the open question and who answers in their status line: 0060, 0062 and 0063 wait on the
-> client, and 0065 on Chinmay.
+> client, and 0065 on Chinmay (who accepted it on 1 October).
 > **2 October:** Chinmay's decisions on the open questions amend 0009, 0020 and 0028, extend 0029, add a
 > pending item to 0047, move 0063 to Accepted in part, and add **0070**
 > (`docs/registers/decisions-2-october.md` lists each decision).

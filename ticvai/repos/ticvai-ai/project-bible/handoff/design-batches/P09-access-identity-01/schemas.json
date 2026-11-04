@@ -16,6 +16,14 @@
    "lastSeenAt"
   ],
   "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "employee",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The signed-in person (their principal's subject), as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `ipAddress` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind employee; null while none is given."
+   },
    "status": {
     "allOf": [
      {
@@ -88,6 +96,11 @@
     "nullable": true
    },
    "ipAddress": {
+    "x-ticvai-pii": {
+     "store": "identifier.ipAddress",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -346,7 +359,7 @@
    "workstationId": {
     "type": "string",
     "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n\n**Sent by a device door, never by a browser** (CHG-DOOR-001, 2 October 2026). Required in effect for the device-bound methods `pin`, `card` and `rfid` (400 `workstation-required` without it); absent on the TICVAI Console, Venue Management and partner portal sign-ins, which have no workstation.\n"
+    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n\n**Sent by a device door, never by a browser** (CHG-DOOR-001, 2 October 2026). Required in effect for the device-bound methods `pin`, `card` and `rfid` (400 `workstation-required` without it); absent on the TICVAI Console, Venue Management and partner portal sign-ins, which have no workstation.\n\n**Believed only from the device** (r14 review C-04, CHG-R14H-001): the call authenticates the device with `deviceAuth`, and this must be the workstation that device is bound to (403 `workstation-mismatch`). Sent without `deviceAuth` it is 401 `device-unauthenticated`, and a device-bound method without `deviceAuth` is 400 `workstation-required`.\n"
    },
    "deviceFingerprint": {
     "type": "string",
@@ -535,7 +548,8 @@
     "type": "boolean"
    },
    "isPrimary": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "**At most one primary among a principal's active methods** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). `enrolMfaMethod` writes false on the pending method; `verifyMfaEnrolment` sets it true when the method becomes active and the principal has no other active method marked primary, else false; `removeMfaMethod` moves the mark to the newest remaining active method when the primary one is removed. A row with `is_primary` null counts as false: `listMfaMethods` and any `MfaMethod` answer return false for null, never null. There is no operation to choose a primary."
    },
    "enrolledAt": {
     "type": "string",
@@ -1216,6 +1230,7 @@
     "nullable": true
    },
    "terminationRequestedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1300,6 +1315,7 @@
     "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
    },
    "accountManagerPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1420,7 +1436,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

@@ -433,6 +433,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| holderSubjectId | string (uuid) |  | The named holder, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes it there. (nullable) |
 | id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | templateId | string (uuid) | yes | The definition it was issued against. |
 | productId | string (uuid) | yes |  |
@@ -489,6 +490,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 **`GET /entitlements/{entitlementId}/credential`**: The thing that gets scanned
 
 The QR payload, wallet pass reference or wristband serial. **Separated from `getEntitlement` because it is the sensitive half** — a list of a guest's tickets is a convenience, and the credential admits somebody.
+**Whose credential a guest may read** (r13 system review C-03, CHG-R14H-003; the lead, 3 November 2026: "All four, one release"): as `getEntitlement`, the guest's own entitlement, one shared with them (`shareEntitlement`, not revoked) and one a guest has delegated to them with `ORDER_VIEW` (`x-ticvai-object-owner`), and nothing else. Any other entitlement id is the shared `404`, exactly as one that does not exist, so another guest's rotation seed is never returned and an id reveals nothing.
 **Rotates without reissuing.** A guest whose phone was stolen gets a new payload against the same entitlement, and the old one stops scanning.
 **The code rotates offline too** (decided 28 September, audit R230). While online the app fetches `rotation`, a time-based seed: the secret, the time step, the digits and the algorithm, valid from `validFrom` to `validTo`. The app derives the current rotating code on the device from the seed and the clock, with no signal, and shows it with a countdown to the next step (GST-013, GST-055, WEB-018; no screenshot blocking on web, audit R077 (c)). **Gates verify the code offline against the same seed**, which they hold in their offline package, accepting the current step and one step either side for clock drift. `rotate=true` replaces the seed, so a stolen phone's codes stop verifying once gates have the new one.
 
@@ -535,6 +537,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Credential |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getEntitlementHistory
@@ -569,6 +572,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | History, most recent first |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getFacePassEnrolment
@@ -665,6 +669,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Entitlement | yes |  |
+| items[].holderSubjectId | string (uuid) |  | The named holder, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes it there. (nullable) |
 | items[].id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | items[].templateId | string (uuid) | yes | The definition it was issued against. |
 | items[].productId | string (uuid) | yes |  |
@@ -757,6 +762,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Entitlement | yes |  |
+| items[].holderSubjectId | string (uuid) |  | The named holder, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes it there. (nullable) |
 | items[].id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | items[].templateId | string (uuid) | yes | The definition it was issued against. |
 | items[].productId | string (uuid) | yes |  |
@@ -2824,6 +2830,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| holder_subject_id | uuid | no | The named holder, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes it there. |
 | id | uuid | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | template_id | uuid | yes | The definition it was issued against. |
 | product_id | uuid | yes |  |
@@ -2854,7 +2861,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | frozen_from | date | no | The freeze window's first day (ADAM CR-543; Chinmay, 3 November 2026): written by freezeEntitlement from its from. |
 | frozen_until | date | no | The freeze window's last day (ADAM CR-543): written by freezeEntitlement from its to; null means open-ended. |
 | is_name_bound | boolean | no |  |
-| holder_name | text | no |  |
 | shared_with_subject_ids | text[] | no | shareEntitlement. |
 | issued_via | text | no | How it came to exist, and it matters to finance. |
 | supersedes_entitlement_id | uuid | no | For a reissue or a resale. |

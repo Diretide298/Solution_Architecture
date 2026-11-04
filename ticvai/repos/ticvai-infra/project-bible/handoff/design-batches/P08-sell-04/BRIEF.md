@@ -161,11 +161,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-125` | Product & Category Button Configuration | B | 21 | 6 | 6 | 14 | 3 | 0 | — | notStarted (generated) |
 | `BO-126` | Deployment, Preview & Audit | B | 25 | 50 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-142` | Store Rules, Controls & Permissions | B–D | 10 | 5 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
-| `BO-143` | Retail Global Settings & Controls | C | 9 | 9 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-143` | Retail Global Settings & Controls | C | 12 | 12 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**BO-142, BO-143 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-142 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

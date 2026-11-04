@@ -207,6 +207,7 @@ def shape(contract_name: str, root: Path = ROOT) -> dict:
     if f is None:
         raise SystemExit(f"no contract named {contract_name}")
     c = sd.contract(f)
+    base = server_base(c)
     ops = {}
     for path, item in (c.get("paths") or {}).items():
         shared = item.get("parameters") or []
@@ -233,10 +234,22 @@ def shape(contract_name: str, root: Path = ROOT) -> dict:
                     if sch:
                         resp = fields(sch, rbase)
                     break
-            ops[op["operationId"]] = {"verb": verb.upper(), "path": path, "params": params,
+            ops[op["operationId"]] = {"verb": verb.upper(), "path": path, "base": base, "params": params,
                                       "request": req, "response": resp, "semantics": semantics(op, c)}
     return {"contract": contract_name, "version": str((c.get("info") or {}).get("version", "")),
             "operations": ops}
+
+
+# **The route is the server's base path and the operation's path** (ADR-0026, amended 3 November 2026; the r13 system
+# review B-12; CHG-R14J-020). This compared the path key alone, so a contract whose `servers` moved from
+# `https://api.{region}.ticvai.com/workforce/v1` to `https://{cellHost}/api/v1` changed every route a client calls and
+# passed as compatible. The base is the path part of the first server's url (every server of a contract shares it,
+# check-contract-servers); a move of the base alone reads "base path moved from X to Y", so one approval can name it.
+def server_base(c: dict) -> str:
+    servers = [s for s in (c.get("servers") or []) if isinstance(s, dict) and s.get("url")]
+    if not servers:
+        return ""
+    return re.sub(r"^[a-z]+://[^/]*", "", str(servers[0]["url"])).rstrip("/")
 
 
 def major(v: str) -> int:
@@ -253,8 +266,11 @@ def compare(old: dict, new: dict) -> list[str]:
         if b is None:
             bad.append(f"{o}: operation removed")
             continue
+        ab, bb = a.get("base", b.get("base", "")), b.get("base", "")
         if (a["verb"], a["path"]) != (b["verb"], b["path"]):
-            bad.append(f"{o}: moved from {a['verb']} {a['path']} to {b['verb']} {b['path']}")
+            bad.append(f"{o}: moved from {a['verb']} {ab}{a['path']} to {b['verb']} {bb}{b['path']}")
+        elif ab != bb:
+            bad.append(f"{o}: base path moved from {ab or '(none)'} to {bb or '(none)'}")
         for where, inbound in (("params", True), ("request", True), ("response", False)):
             fa, fb = a[where], b[where]
             for k, x in fa.items():
@@ -360,6 +376,10 @@ def load_breaking() -> tuple[list[dict], list[str]]:
         if str(e.get("approved-by")).strip().lower().startswith("pending"):
             errors.append(f"{e.get('id')}: approved-by is pending ({e.get('approved-by')}); it approves nothing yet")
             continue
+        if e.get("operations") == "all" and not str(e.get("change") or "").strip():
+            errors.append(f"{e.get('id')}: operations: all without a `change` would approve every breaking change to "
+                          "its contracts; name the change it approves")
+            continue
         entries.append(e)
     return entries, errors
 
@@ -371,8 +391,19 @@ def approval(entries: list[dict], contract: str, line: str) -> dict | None:
     later whoCanActivate change was reported under it and its own entry, BC-530, read as matching nothing."""
     o, _, why = line.partition(": ")
     hits = [e for e in entries
-            if str(e["contract"]) == contract and o in entry_operations(e) and str(e.get("change") or "") in why]
+            if contract in entry_contracts(e) and (e.get("operations") == "all" or o in entry_operations(e))
+            and str(e.get("change") or "") in why]
     return next((e for e in hits if e.get("change")), hits[0] if hits else None)
+
+
+def entry_contracts(e: dict) -> set:
+    """`contract`, plus `contracts` where one move covers several contracts (3 November 2026, CHG-R14J-020: the base
+    path of nine contracts moved to their host's one definition, ADR-0026 amended). Such an entry names its `change`
+    and may say `operations: all`: every operation of those contracts, for that change and no other."""
+    out = {str(e["contract"])}
+    if isinstance(e.get("contracts"), list):
+        out |= {str(x) for x in e["contracts"] if x}
+    return out
 
 
 def entry_operations(e: dict) -> set:
@@ -380,7 +411,8 @@ def entry_operations(e: dict) -> set:
     CHG-SHP-003: 123 writes took a path key for one reason, grouped per contract). `operation` names the first, so a
     reader that knows only that field still finds the entry."""
     out = {str(e["operation"])}
-    out |= {str(x) for x in (e.get("operations") or []) if x}
+    ops = e.get("operations")
+    out |= {str(x) for x in (ops if isinstance(ops, list) else []) if x}
     return out
 
 

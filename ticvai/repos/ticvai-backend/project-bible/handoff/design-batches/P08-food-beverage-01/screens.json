@@ -1973,7 +1973,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/food-beverage/order-routing-kds-printer-rules",
-   "component": "src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx",
+   "redirect": "BO-134",
    "status": "notStarted"
   },
   "navigation": {

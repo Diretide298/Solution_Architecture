@@ -43,7 +43,7 @@ contracts:
 - tenancy
 - white-label
 - workforce
-deployment:
+deployment: &id001
   target: browser, desktop
   distribution: served from the Control Plane
   bundleUpdate: immediate on deploy
@@ -52,6 +52,12 @@ deployment:
   deviceOwnership: platform staff device
   networkAssumption: corporate network, IP-restricted
   releaseCadence: weekly
+platformProfiles:
+- platform: P09
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment: *id001
 screenCount: 211
 byWave:
   wave1: 28

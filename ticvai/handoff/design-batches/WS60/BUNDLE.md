@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `access` module |
+| Module | Access & Venue · wave 1 · needs the `access` module |
 | Block | Block A · ticket #28057 (APP-SETUP-BO-344) |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `ORDER_REPRINT`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (2 configure, 1 operate, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |

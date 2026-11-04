@@ -375,7 +375,7 @@
     "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
-    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
+    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered. **Answered from booking consent records** (ADAM CR-583; CHG-CR583-001): `answered` and the `consentBlocksBooking` conflicts are worked out from Marketing's current booking consent records (`marketing-crm#bookingConsentRecords`) of this cart at the shown version, as `getCart` states; until the consent ticket lands this list is empty.\n",
     "items": {
      "allOf": [
       {
@@ -394,7 +394,7 @@
         },
         "answered": {
          "type": "boolean",
-         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."
+         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer. For `perPerson`, true when every one of the persons on every line in `lineIds` has an answer: a line of quantity n has persons 0 to n-1 (`personIndex`), on a line with an `eligibilityDeclaration` its rows (ADAM CR-556, 3 November 2026; CHG-CR556-001)."
         }
        }
       }
@@ -462,7 +462,7 @@
  "CartConflict": {
   "type": "object",
   "x-ticvai-persistence": "none — computed on read",
-  "description": "2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n",
+  "description": "2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n**Which kinds are produced** (ADAM CR-583, Chinmay, 3 November 2026; CHG-CR583-001; the rules are on `getCart`): `overlappingTime` (two lines whose time ranges overlap, not on the same performance; not blocking), `requiresPrerequisite` (a line whose parent line is missing or unavailable; blocking) and, with the consent ticket, `consentBlocksBooking` (blocking). `exceedsPartySize` and `sameSessionDifferentVenue` stay in the list but are never produced: nothing defines a party size or a session yet.\n",
   "properties": {
    "kind": {
     "type": "string",
@@ -510,6 +510,13 @@
    "productName": {
     "type": "string",
     "readOnly": true
+   },
+   "productId": {
+    "x-ticvai-references": "catalogue.product",
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by `getCart`; a client never sends it. `checkoutCart` copies it to the order line."
    },
    "quantity": {
     "type": "integer",
@@ -589,10 +596,22 @@
     "description": "**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"
    },
    "unitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "By the cart pricing rule (`getCart`; ADAM CR-550): `catalogue#variantPriceRecords` for the variant at the cart's venue on its channel at now, or the rule's exceptions. Null, with `isAvailable` false, when no price list prices the variant there."
    },
    "lineTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "quantity x `unitPrice` (ADAM CR-550); null when `unitPrice` is."
    },
    "inventoryHoldId": {
     "x-ticvai-column": "inventory_reservation_id",
@@ -610,7 +629,7 @@
    "isAvailable": {
     "type": "boolean",
     "readOnly": true,
-    "description": "Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"
+    "description": "Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here. So does a line that has no price any more (ADAM CR-550): its `unitPrice` and `lineTotal` are null and it is left out of the cart's totals.\n"
    }
   }
  },
@@ -2005,7 +2024,21 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001): `createPayment` re-locks the quote on the order and, when `chargeTotal` changed, answers `409 quoteExpired` with the new quote before charging anything (ADAM CR-577)."
+   },
+   "termsVersion": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the `termsAndConditions` version `checkoutCart` took in `termsAccepted`, checked against the policy in force. Null when the checkout sent none; never filled in from the policy in force."
+   },
+   "termsAcceptedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the guest accepted `termsVersion`, the time `checkoutCart` wrote the order (ADAM CR-576). Null with `termsVersion`."
    },
    "droppedPromotions": {
     "type": "array",
@@ -2189,6 +2222,13 @@
       "format": "uuid",
       "readOnly": true,
       "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "productId": {
+      "x-ticvai-references": "catalogue.product",
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on `orders.order_line`: copied from the cart line by `checkoutCart`, as `recommendationId` is, and returned on every read of an order's lines (`getOrder` included). Orders made before this change get it filled in from their variant's product. A client never sends it."
      },
      "discounts": {
       "type": "array",
@@ -2604,6 +2644,13 @@
  },
  "Product": {
   "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
+  "x-ticvai-index": [
+   [
+    "venueId",
+    "displayOrder",
+    "id"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -2640,6 +2687,28 @@
    "description": {
     "type": "string"
    },
+   "bookingEntry": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "dateFirst",
+     "productFirst",
+     "venueMap",
+     "timeWindow",
+     "bundle"
+    ],
+    "description": "**Which booking screen Book opens** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). Worked out on read and never stored; set on every guest or visitor read that answers a product (`listProducts`, `getProduct`) and on every `searchCatalogue` result, null on staff reads, and null when the product has no Book (info-only). In this order: (a) kind `bundle` gives `bundle` while `bundleId` is set; with no such bundle it is null and the card opens Item Detail as now. (b) `requiresTimeWindow` true gives `timeWindow`. (c) Otherwise the product's published booking flow by `getPublishedBookingFlow`'s rule (the product's flow, then its category's, then the venue's enabled default for its kind, with the same tie rule), from `white-label#publishedBookingFlowSteps`: its first enabled step, skipping `location` and `helpMeChoose`; `resourceMap` gives `venueMap`; `date`, `time` or `performance` gives `dateFirst`; any other step gives `productFirst`. If no flow resolves, the same test is applied to the default order of the flow type the kind rule picks. Book opens: `dateFirst` GST-007, `productFirst` GST-008, `venueMap` GST-074, `timeWindow` GST-075, each with `productId`; `bundle` GST-056 with `bundleId`."
+   },
+   "bundleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Set only when `bookingEntry` is `bundle` (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose `variant_id` is this product's variant, while `getGuestBundle` would return it (published, active, in its window). Never taken from a search result's `id`: for a bundle that is the bundle's catalogue product, not the bundle."
+   },
    "fromPrice": {
     "oneOf": [
      {
@@ -2650,6 +2719,12 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "nullable": true,
+    "default": 100,
+    "description": "Where this product sorts among the venue's products in listProducts, lower first. Not alphabetical: the order the venue wants guests to see. (ADAM CR-581, Chinmay, 3 November 2026; CHG-CR581-001.) Stored on `catalogue.product` as `display_order`, nullable with default 100 like `catalogue.product_category.display_order`; existing rows take 100. Set by `createProduct` (100 when not sent) and `updateProduct` (changed only when the body carries it; null stores null), and returned by every operation that answers `Product`, `getProduct` and the till's catalogue bundle included. No back-office product screen shows or edits it."
    },
    "isFeatured": {
     "type": "boolean",
@@ -3102,11 +3177,13 @@
   "minProperties": 1,
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "maxLength": 32,
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "maxLength": 254,
@@ -3839,6 +3916,11 @@
          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
         }
        }
+      },
+      "timeZone": {
+       "type": "string",
+       "nullable": true,
+       "description": "**The venue's time zone, an IANA name** (ADAM CR-556 as corrected, Chinmay, 3 November 2026; CHG-CR556-002): the venue's `RegionSettings.timeZone`, read through `regionSettingsRecords`, the zone `openingHoursToday` already uses. Null when not set. Additive; nothing else changes. Select Date & Time (GST-007) works out the venue day in it."
       }
      }
     }
@@ -4087,10 +4169,12 @@
   "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "nullable": true
@@ -4100,6 +4184,7 @@
     "nullable": true
    },
    "address": {
+    "x-ticvai-data-class": "business",
     "allOf": [
      {
       "$ref": "#/components/schemas/white-label::LocalisedText"

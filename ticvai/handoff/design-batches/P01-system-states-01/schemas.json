@@ -1237,6 +1237,11 @@
          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
         }
        }
+      },
+      "timeZone": {
+       "type": "string",
+       "nullable": true,
+       "description": "**The venue's time zone, an IANA name** (ADAM CR-556 as corrected, Chinmay, 3 November 2026; CHG-CR556-002): the venue's `RegionSettings.timeZone`, read through `regionSettingsRecords`, the zone `openingHoursToday` already uses. Null when not set. Additive; nothing else changes. Select Date & Time (GST-007) works out the venue day in it."
       }
      }
     }
@@ -1470,10 +1475,12 @@
   "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "nullable": true
@@ -1483,6 +1490,7 @@
     "nullable": true
    },
    "address": {
+    "x-ticvai-data-class": "business",
     "allOf": [
      {
       "$ref": "#/components/schemas/white-label::LocalisedText"

@@ -57,6 +57,13 @@ RETIRED = {
 }
 
 
+# **Not a migration, so not frozen** (r13 system review A-13; CHG-R14J-011): backend/990-cross-database-references.sql
+# is applied to neither database (its header says so); it states the cross-database references each caller keeps, and
+# derive-ddl.py rewrites it at every run so the rules follow the contracts. Only this file: every other .sql that
+# existed at r1 stays frozen.
+NOT_APPLIED = {"backend/990-cross-database-references.sql"}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--baseline", default=None, help="commit-ish to freeze against (default: the tag r1)")
@@ -70,7 +77,7 @@ def main() -> int:
 
     errors, forward = [], []
     for status, path in changed_since(commit, "backend"):
-        if not path.endswith(".sql"):
+        if not path.endswith(".sql") or (status == "M" and path in NOT_APPLIED):
             continue
         if status == "M":
             errors.append(f"changed   {path} differs from {describe(a.baseline, commit)}")

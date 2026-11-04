@@ -7,13 +7,13 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 21 of 235 |
+| Operations in the slice | 23 of 235 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
 ## Why this is a service
 
-**Three contracts, one schema, 41 tables.** Subscription, platform operations and the public API all write `control.*` — **they are one bounded context that was split into three contracts for API-surface reasons, not for data reasons.**
+**Three contracts, and nearly all of their tables in one schema** (on 3 November 2026 `control` held 110 of the service's 119 tables and `subscription` 9). Subscription, platform operations and the public API all write `control.*` — **they are one bounded context that was split into three contracts for API-surface reasons, not for data reasons.**
 
 Splitting them would give three services writing one schema, which is the arrangement every distributed-data guide warns about.
 
@@ -25,6 +25,8 @@ Nothing outside itself.
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
+| cell | [`decommissionCell`](#decommissioncell) | POST | `/cells/{cellId}/decommission` | setup | 1 | ADM-003 |
+| cell | [`provisionCell`](#provisioncell) | POST | `/tenants/{tenantId}/cells` | setup | 1 | ADM-005, ADM-012 |
 | licensing | [`addLicenceAddOn`](#addlicenceaddon) | POST | `/tenants/{tenantId}/licences/add-ons` | setup | 1 | ADM-005, ADM-007, ADM-011 |
 | licensing | [`getTenantLicences`](#gettenantlicences) | GET | `/tenants/{tenantId}/licences` | core | 1 | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009 … |
 | plan | [`createPlan`](#createplan) | POST | `/plans` | setup | 1 | ADM-008, ADM-392 |
@@ -46,6 +48,119 @@ Nothing outside itself.
 | tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 1 | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008 … |
 | tenant | [`terminateTenant`](#terminatetenant) | POST | `/tenants/{tenantId}/terminate` | setup | 1 | ADM-005 |
 | tenant | [`updateTenant`](#updatetenant) | PATCH | `/tenants/{tenantId}` | setup | 1 | ADM-005, ADM-006 |
+
+## Group: cell
+
+### decommissionCell
+
+**`POST /cells/{cellId}/decommission`**: Begin decommissioning a cell
+
+**Refused while any tenant remains on it.** Migrate them first — `planTenantMigration` exists for exactly this.
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_CELL_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.cell` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.cell` |
+| Writes | `cache:idempotency`, `control.cell` |
+| Called by | ADM-003 |
+| State model | Cell ([states/cell.yaml](../../../states/cell.yaml)): moves `active` -> `decommissioning` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| cellId | path | yes | string |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| reason | string | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Done |
+| 409 |  | Not in a state that permits this |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### provisionCell
+
+**`POST /tenants/{tenantId}/cells`**: Provision a cell for a region
+
+Every region is its own cell. **Jurisdiction is enforced here, not trusted**: a region in a different country must be placed in that country, and a placement that would put it elsewhere is refused.
+Where no in-region cloud exists, `clientHosted` is the mechanism rather than a workaround.
+
+|  |  |
+|---|---|
+| Permission | `PLATFORM_CELL_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.cell`, `control.cell_tenant` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.cell` |
+| Writes | `cache:idempotency`, `control.cell`, `control.cell_instance`, `control.cell_tenant` |
+| Called by | ADM-005, ADM-012 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| tenantId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `ProvisionCellRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| regionId | string (uuid) | yes |  |
+| countryCode | string | yes | Determines the jurisdiction. (pattern ^[A-Z]{2}$) |
+| tier | CellTier: enum (shared, dedicated, isolated, clientHosted) | yes |  |
+| cloudProvider | string |  |  |
+| cloudRegion | string |  |  |
+| clientHostedEndpoint | string |  | Required for clientHosted, where no in-region cloud exists. (nullable) |
+
+**Response**: `Cell`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| name | string | yes |  |
+| kind | CellKind: enum (shared, dedicated, onPremiseIsolated, onPremiseConnected, controlPlane, burst) |  | Two deployment locations (ADR-0017, amended by ADR-0046). |
+| clusterId | string (uuid) |  | (nullable) |
+| isReachable | boolean |  | False for onPremiseIsolated, true for onPremiseConnected (ADR-0046). (default True) |
+| lastContactAt | string (date-time) |  | When the site last called out. (nullable) |
+| licenceExpiresAt | string (date-time) |  | On-premise only. (nullable) |
+| participatesInCrossCell | boolean |  | False by default for onPremiseIsolated, available for onPremiseConnected (ADR-0046). (default True) |
+| regionId | string (uuid) | yes |  |
+| regionName | string |  |  |
+| countryCode | string | yes |  |
+| tier | CellTier: enum (shared, dedicated, isolated, clientHosted) | yes |  |
+| status | CellStatus: enum (provisioning, active, migrating, suspended, decommissioning, failed) | yes |  |
+| cloudProvider | string |  | (nullable) |
+| cloudRegion | string |  | (nullable) |
+| apiEndpoint | string |  | (nullable) |
+| venueCount | integer |  |  |
+| provisionedAt | string (date-time) |  | (nullable) |
+| deploymentRef | string |  | A pointer to where this cell runs, not a description of it. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Provisioning started |
+| 400 |  | Placement is outside the region's jurisdiction, or the target cloud has no region in that country. |
+| 409 |  | A cell already exists for this region |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: licensing
 
@@ -474,6 +589,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 13.1.49. **Certification expires**, because an integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at in two years.
 **It is also what production access rests on** (17 September minutes, M17-06). Revoking a certification, or letting it lapse, suspends the production clients issued against it (`setApiClientStatus` `suspended`, reason `certificationLapsed`); sandbox clients are untouched.
+**The decision's words are kept on the listing, and certifying always sets an expiry** (ADAM CR-572, Chinmay, 3 November 2026, and "Go yes"; CHG-CR572-001). Every decision (`certify`, `reject`, `revoke`) sets `review_notes` to the `notes` sent, or null when none are sent, in the same transaction as the status change; no other operation writes it, and a resubmission leaves it as it is. `notes` longer than 1000 characters is 400 `validation` (the shared type). A `reject` without notes (absent, null or blank) is 422 `reason-required`, the type `decideProductionAccess` uses for a reject without a reason. A `certify` without `certifiedUntil`, or with a date that is not after today, is 422 `certified-until-required`; a certify that passes sets `certified_until` to the date sent, and `revoke` and `reject` leave it as it is. Listings already certified with `certified_until` null stay as they are, and the marketplace read keeps treating null as unexpired. `certify` and `reject` are accepted from `submitted` or `inReview`; certifyIntegration never writes `inReview`. Any other state is 409 `integration-listing-not-in-review`, and `revoke` only from `certified` (409 `integration-listing-not-certified`). Nothing is written on a refusal. The certify form on DEV-008 is unchanged.
 
 |  |  |
 |---|---|
@@ -486,7 +602,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Reads | `cache:idempotency`, `control.api_version`, `control.integration_listing` |
 | Writes | `cache:idempotency`, `control.integration_listing` |
 | Called by | DEV-008 |
-| State model | Integration listing ([states/integration-listing.yaml](../../../states/integration-listing.yaml)): moves `submitted` -> `inReview`, `inReview` -> `certified`, `inReview` -> `rejected`, `certified` -> `revoked` |
+| State model | Integration listing ([states/integration-listing.yaml](../../../states/integration-listing.yaml)): moves `submitted` -> `certified`, `submitted` -> `rejected`, `inReview` -> `certified`, `inReview` -> `rejected`, `certified` -> `revoked` |
 
 **Parameters**
 
@@ -499,9 +615,9 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| decision | enum (certify, reject, revoke) | yes |  |
+| decision | enum (certify, reject, revoke) | yes | Stored as the listing's status, certified, rejected or revoked (r14 gate, CHG-R14BO-002). |
 | certifiedUntil | string (date) |  | (nullable) |
-| notes | string |  | (nullable) |
+| notes | string |  | Stored as control.integration_listing.review_notes and returned as reviewNotes; longer than 1000 characters is 400 validation (ADAM CR-572). (max length 1000; nullable) |
 
 **Response**: `IntegrationListing`
 
@@ -517,6 +633,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | status | enum (draft, submitted, inReview, certified, rejected, revoked, delisted) | yes | (read-only) |
 | certifiedUntil | string (date) |  | Certification expires. (read-only; nullable) |
 | certifiedAgainstVersion | string |  | (read-only; nullable) |
+| reviewNotes | string |  | The notes of the last certifyIntegration decision (certify, reject or revoke), null when none were sent; set only by that decision, and left as it is by a resubmission (ADAM CR-572). (max length 1000; read-only; nullable) |
 | listingFeeModel | enum (none, flat, revenueShare) |  | (nullable) |
 | visibility | enum (public, private) |  | private: certified for production access and never shown in the marketplace (17 September minutes, M17-06). (default public) |
 
@@ -525,7 +642,9 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Decided |
+| 400 | BadRequest | Validation failed |
 | 409 |  | certify or reject on a listing that is not submitted or inReview (integration-listing-not-in-review), or revoke on one that is not certified (integration-listing-not-certified). |
+| 422 |  | reject without notes (absent, null or blank: reason-required), or certify without a certifiedUntil after today (certified-until-required) (ADAM CR-572). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createApiClient
@@ -537,6 +656,16 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 **Production keys only after certification** (17 September minutes, M17-06; decided again 29 September). A developer creates `sandbox` clients here freely. A `production` client is refused 409 `certification-required` unless it names a certified integration (`certificationListingId`, an `IntegrationListing` in `certified` within `certifiedUntil`) and the caller is TICVAI staff (`issuedBy: ticvai`). The developer's route is `requestProductionAccess`, which TICVAI decides with `decideProductionAccess`; approving it creates the production client. **A production client needs an IP allow-list** (M17-07): an empty `ipAllowList` on a production client is refused 422 `ip-allow-list-required`.
 **Scopes are module scopes** (M17-05): each is `{module}.read` or `{module}.write` from `listApiScopes`, so a CRM integration partner is granted CRM scopes and nothing else. An unknown scope is refused 422 `unknown-scope`. **No scope grants a catalogue write** (M17-04): partners read assigned products and partner prices; the product, price and capacity writes are open only through a platform-staff `ApiLicence.catalogueWriteException`. Keys expire: `credentialTtlDays` (default 365 for production, 90 for sandbox) sets `expiresAt`, and rotation renews it.
 **The secret is a row of its own** (ADAM CR-098, accepted for r10; CHG-R10ID-011): the client secret returned once here is stored only as a `control.api_client_secret` row (`ApiClientSecret`), its keyed hash under the platform's client-secret key (ADR-0063, amendment of 25 October 2026), with `expiresAt` the client's. A partner caller creates clients only for its own developer account, and only once that account is `verified` (409 `developer-not-verified`).
+**Who may call it** (ADAM CR-569, Chinmay, 3 November 2026; CHG-CR569-001; the caller kinds in this contract's description, from the token, never from a permission; `DEVELOPER_ADMIN` marks nothing here). On every partner request the caller's `control.developer_member` row is read again: one no longer active is 401, and role `readOnly` is 403. Nothing is written on a refusal. An email that matches active members of two accounts answers 403 until a member's email is unique among active members (Chinmay, 3 November 2026, "Go yes"). - **TICVAI staff**: any developer account, `sandbox` or `production`; a production client is `issuedBy`
+  `ticvai` and keeps the certification and IP allow-list rules above.
+- **A partner caller**: `developerId` must be its own account (any other is 404 `not-found`), and the account
+  must be `verified` (409 `developer-not-verified`). It creates `sandbox` only, `issuedBy` `partner`; a
+  `production` client is 409 `certification-required` (the route is `requestProductionAccess`).
+- **Tenant staff** (BO-1177): `sandbox` clients only; `developerId` must name a verified account (404 or 409 as
+  above); `allowedTenantIds` is set to the caller's tenant alone, whatever is sent; `issuedBy` `partner`; a
+  `production` client is 409 `certification-required`.
+
+**The client id** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001). The server makes `clientId` (see `ApiClient.clientId`) whenever it creates a client; an insert that hits its unique index retries once with a fresh value. **A replay never carries a secret**: the first answer is 201 `{client, clientSecret}`, and what is kept as the Idempotency-Key's stored answer is that answer with `clientSecret` removed, so a request repeating the key gets 201 with the same client and no `clientSecret`, and nothing is written a second time. The secret exists only as its keyed hash in `control.api_client_secret`; a caller who lost the first answer takes a new secret with `rotateApiCredential`.
 
 |  |  |
 |---|---|
@@ -546,7 +675,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.api_client`, `control.api_licence`, `control.developer_account`, `control.integration_listing` |
+| Reads | `cache:idempotency`, `control.api_client`, `control.api_licence`, `control.developer_account`, `control.developer_member`, `control.integration_listing` |
 | Writes | `cache:idempotency`, `control.api_client`, `control.api_client_secret` |
 | Called by | BO-1177, DEV-003, PTR-019 |
 
@@ -563,7 +692,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | id | string (uuid) | yes | (read-only) |
 | developerId | string (uuid) | yes |  |
 | name | string | yes |  |
-| clientId | string |  | (read-only) |
+| clientId | string |  | The public half of the credential pair (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001), made by the server whenever a client is created, in createApiClient and in decideProductionAccess alike:… (pattern ^tvc_(live\|test)_[a-z0-9]{32}$; read-only) |
 | environment | enum (sandbox, production) | yes | Bound to one, stated on the object rather than by naming convention. |
 | scopes | array of string | yes | Resolved against the tenant's licence at token issue (13.3.24). |
 | issuedBy | enum (partner, ticvai) |  | Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved requestProductionAccess. (read-only) |
@@ -584,7 +713,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | client.id | string (uuid) | yes | (read-only) |
 | client.developerId | string (uuid) | yes |  |
 | client.name | string | yes |  |
-| client.clientId | string |  | (read-only) |
+| client.clientId | string |  | The public half of the credential pair (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001), made by the server whenever a client is created, in createApiClient and in decideProductionAccess alike:… (pattern ^tvc_(live\|test)_[a-z0-9]{32}$; read-only) |
 | client.environment | enum (sandbox, production) | yes | Bound to one, stated on the object rather than by naming convention. |
 | client.scopes | array of string | yes | Resolved against the tenant's licence at token issue (13.3.24). |
 | client.issuedBy | enum (partner, ticvai) |  | Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved requestProductionAccess. (read-only) |
@@ -603,7 +732,10 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created. |
-| 409 |  | A production client without a current certification, or asked for by a developer rather than issued by TICVAI (certification-required, M17-06). |
+| 401 |  | A partner caller whose control.developer_member row is no longer active (ADAM CR-569). |
+| 403 |  | A partner caller whose member role is readOnly, which never writes (ADAM CR-569). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | A production client without a current certification, or asked for by a partner caller or tenant staff rather than issued by TICVAI (certification-required, M17-06; ADAM CR-569). |
 | 422 |  | A production client with an empty ipAllowList (ip-allow-list-required, M17-07), or a scope that is not in the scope catalogue (unknown-scope, M17-05). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -612,6 +744,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 **`POST /production-access-requests/{requestId}/decide`**: Approve or reject production access
 
 **TICVAI issues production keys** (M17-06). Approving creates the production `ApiClient` (`environment: production`, `issuedBy: ticvai`, the certified listing, the scopes, tenants and allow-list as approved or narrowed, `credentialTtlDays` as set) with no secret yet; the developer takes the secret once with `rotateApiCredential`. Rejecting needs a reason the developer can act on. A request whose certification lapsed since it was made is refused 409 `certification-required`.
+**The production client's name and client id** (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001). On approve the client's `name` is the sandbox client's name as it stands at the decision (the request's `sandbox_client_id`, its `control.api_client.name`); the decide body and the request body take no name. Its `clientId` is made by the server as for every client (`ApiClient.clientId`, `tvc_live_`). It has no secret, so the answer stored for a replay is the whole answer.
 
 |  |  |
 |---|---|
@@ -636,7 +769,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| decision | enum (approve, reject) | yes |  |
+| decision | enum (approve, reject) | yes | Stored as the request's status, approved or rejected, with decidedByPrincipalId and decidedAt (r14 gate, CHG-R14BO-002). |
 | reason | string |  | (max length 1000; nullable) |
 | scopes | array of string |  | Narrow the requested scopes. |
 | credentialTtlDays | integer |  | (min 1; max 730; default 365) |
@@ -672,10 +805,11 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 ### deprecateApiVersion
 
-**`POST /api-versions/{version}/deprecate`**: Announce a sunset date and notify subscribers
+**`POST /api-versions/{version}/deprecate`**: Announce a sunset date; the notice job notifies subscribers
 
 13.1.32 and 13.1.34. **Deprecation is an announcement with a date, not a switch.**
-Notifies every client using the version, and **the notification names which operations they actually call** — a generic *"v1 is retiring"* to somebody using three of two hundred endpoints is a message they will ignore.
+**The notice is sent by the notice job, and it names which operations each developer account actually calls** — a generic *"v1 is retiring"* to somebody using three of two hundred endpoints is a message they will ignore.
+**What this operation does** (ADAM CR-570, Chinmay, 3 November 2026; CHG-CR570-001): it records the deprecation and its reason, enforces the minimum notice, and leaves the notice waiting for its job. It finds the `control.api_version` row by `version` (unique): an unknown version is 404 `not-found`; one that is not `current` is 409 `api-version-not-current`. A `sunsetAt` earlier than now plus the row's `minimum_notice_months` months is 422 `notice-too-short`, and nothing changes. Otherwise it sets `status` `deprecated`, `deprecated_at` now, `sunset_at`, `migration_guide_url` and `deprecation_reason` (the body's `reason`), leaves `deprecation_notified_at` null, and returns the `ApiVersion` with `deprecationReason`. **It notifies nobody**: the deprecation notice job (`deprecationNotice`) finds deprecated rows with `deprecation_notified_at` null and sends each affected developer account the notice, naming the operations it calls; that job and the per-client, per-version, per-operation usage record it needs are separate work. It reads and writes `control.api_version` and nothing else.
 
 |  |  |
 |---|---|
@@ -685,8 +819,8 @@ Notifies every client using the version, and **the notification names which oper
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.api_client`, `control.api_version` |
-| Writes | `cache:idempotency`, `control.api_version`, `marketing.message_dispatch` |
+| Reads | `cache:idempotency`, `control.api_version` |
+| Writes | `cache:idempotency`, `control.api_version` |
 | Called by | ADM-026, DEV-008 |
 
 **Parameters**
@@ -701,7 +835,7 @@ Notifies every client using the version, and **the notification names which oper
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | sunsetAt | string (date-time) | yes |  |
-| reason | string | yes |  |
+| reason | string | yes | Stored as control.api_version.deprecation_reason and returned as deprecationReason (ADAM CR-570). |
 | migrationGuideUrl | string |  | (nullable) |
 
 **Response**: `ApiVersion`
@@ -715,6 +849,7 @@ Notifies every client using the version, and **the notification names which oper
 | sunsetAt | string (date-time) |  | (nullable) |
 | minimumNoticeMonths | integer |  | The commitment, not the intention. (default 12) |
 | migrationGuideUrl | string |  | (nullable) |
+| deprecationReason | string |  | Why the version was deprecated: the reason sent to deprecateApiVersion, which sets it (ADAM CR-570); null until then. (read-only; nullable) |
 | activeClientCount | integer |  | (read-only) |
 | changes | array of object |  | The developer changelog for this version (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. |
 | changes[].operationId | string | yes |  |
@@ -728,7 +863,9 @@ Notifies every client using the version, and **the notification names which oper
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Deprecated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The version is not current (still preview, or already deprecated or sunset); only the current version is deprecated. |
+| 422 |  | sunsetAt is earlier than now plus the version's minimumNoticeMonths months (notice-too-short; ADAM CR-570). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### registerDeveloper
@@ -743,7 +880,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 |---|---|
 | Permission | `None` |
 | Scope level | platform |
-| Part of slice | setup, makes `control.developer_account` non-empty |
+| Part of slice | setup, makes `control.developer_account`, `control.developer_member` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -879,7 +1016,7 @@ Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paus
 | id | string (uuid) | yes | (read-only) |
 | developerId | string (uuid) | yes |  |
 | name | string | yes |  |
-| clientId | string |  | (read-only) |
+| clientId | string |  | The public half of the credential pair (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001), made by the server whenever a client is created, in createApiClient and in decideProductionAccess alike:… (pattern ^tvc_(live\|test)_[a-z0-9]{32}$; read-only) |
 | environment | enum (sandbox, production) | yes | Bound to one, stated on the object rather than by naming convention. |
 | scopes | array of string | yes | Resolved against the tenant's licence at token issue (13.3.24). |
 | issuedBy | enum (partner, ticvai) |  | Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved requestProductionAccess. (read-only) |
@@ -995,7 +1132,7 @@ identity tables; the portal signs a member in by the email.
 |---|---|
 | Permission | `DEVELOPER_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `control.developer_account` non-empty |
+| Part of slice | setup, makes `control.developer_account`, `control.developer_member` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -1193,10 +1330,13 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 Upgrades take effect immediately. **Downgrades are checked first**: if the target plan licenses fewer modules than the tenant currently has enabled, or lower limits than they are currently using, the change is refused and the conflicts are named.
 Silently switching off a module a venue is trading on is not an acceptable consequence of a billing change.
 
-**How the downgrade check works** (ADAM CR-541, Chinmay, 3 November 2026; CHG-CR541-001), the way `removeLicenceAddOn` checks, before anything is written. A change is a downgrade, and is checked, when the target plan version licenses fewer modules or a lower limit for any metric. **Modules**: what would be licensed after the change is the target plan version's modules, every in-force add-on (add-ons survive a plan change) and `core`, combined by the one method that builds `LicencePosition` (ADAM CR-531). The Control Plane asks the tenant's cell, at `Tenant.cellHost` with `serviceAuth` and `X-Tenant-Id`, for white-label `getModuleEnablement`; each row with `isEnabled` true whose licence module (the feature-to-module table on `ModuleKey` in common.yaml) is not in that set goes into `modulesInUse`, with `moduleKey` (the white-label feature key, as the cell returns it, so the tenant knows what to switch off), `displayName` and `isEnabled` as the cell returned them. A cell that does not answer refuses the call 503 and nothing changes; the check never decides on a guess. **Limits**: for each metric, `targetLimit` is the target plan's limit, plus every in-force add-on's limit, plus every unexpired capacity pack, null (unlimited) if any of them is null; `currentUsage` is worked out as `getEntitlementUsage` works out `current`. Where `targetLimit` is not null and `currentUsage` is above it, the metric goes into `limitsExceeded` with both figures. If either list has entries the answer is 409 `DowngradeConflictProblem` naming every conflict, and nothing is written; otherwise the downgrade is scheduled as above. `previewSubscriptionChange` returns the same conflicts from the same check.
+**How the downgrade check works** (ADAM CR-541, Chinmay, 3 November 2026; CHG-CR541-001), the way `removeLicenceAddOn` checks, before anything is written. A change is a downgrade, and is checked, when the target plan version licenses fewer modules or a lower limit for any metric. **Modules**: what would be licensed after the change is the target plan version's modules, every in-force add-on (add-ons survive a plan change) and `core`, combined by the one method that builds `LicencePosition` (ADAM CR-531). The Control Plane asks the tenant's home cell with `serviceAuth` and `X-Tenant-Id` (**the home cell**, ADAM CR-560 point (2) as corrected by Chinmay, 4 November 2026, CHG-CR560-002: the tenant's home region is `control.tenant.region_id`; the home cell is the one whose `control.cell_tenant` row for the tenant has `status` `live` and whose `control.cell` has that `region_id`, and its address the `control.cell_endpoint` of that cell with `status` `active`; `Tenant.cellHost` is not read. No live row in the home region, or no active endpoint, is the cell that does not answer), for white-label `getModuleEnablement`; each row with `isEnabled` true whose licence module (the feature-to-module table on `ModuleKey` in common.yaml) is not in that set goes into `modulesInUse`, with `moduleKey` (the white-label feature key, as the cell returns it, so the tenant knows what to switch off), `displayName` and `isEnabled` as the cell returned them. A cell that does not answer refuses the call 503 and nothing changes; the check never decides on a guess. **Limits**: for each metric, `targetLimit` is the target plan's limit, plus every in-force add-on's limit, plus every unexpired capacity pack, null (unlimited) if any of them is null; `currentUsage` is worked out as `getEntitlementUsage` works out `current`. Where `targetLimit` is not null and `currentUsage` is above it, the metric goes into `limitsExceeded` with both figures. If either list has entries the answer is 409 `DowngradeConflictProblem` naming every conflict, and nothing is written; otherwise the downgrade is scheduled as above. `previewSubscriptionChange` returns the same conflicts from the same check.
+**How the cell is called** (ADAM CR-560, Chinmay, 3 November 2026; CHG-CR560-001): CR-541 stands; the package already says how a cell is called, so nothing new is invented. (1) The call goes through a seam, `ITenantModuleEnablement`, with a test double; its default stays 'cell unreachable', so a downgrade answers 503 until the real client lands. Upgrades, first plans and reactivation never call it. (3) The call uses `serviceAuth` as common.yaml defines it: a short-lived token issued to the control plane's own cell identity, `sub` the control plane's cell, `aud` `cell`, `tid` the tenant in the path (never the request's tenant, never the operator's token), over mutual TLS with the control plane's client certificate. `X-Tenant-Id` carries the same tenant, and the cell refuses a mismatch. A timeout (5 seconds), any 5xx or a connection failure is 503 with nothing written. (4) The real client is kernel work on its own ticket: a cross-cell service client beside `IServiceClient` that takes a target cell and tenant, finds the address, gets the token and certificate from the control plane's service identity, and calls; when it lands it replaces the seam's default, and this operation's code does not change. The tenant's current contract is read by `getSubscription`'s reader, `SubscriptionReader.Current`, and the default `planVersion` by `PlanReader.Current` (ADAM CR-567; CHG-CR567-001). (5) **Capacity packs in `targetLimit`**: a pack counts only toward the metric its `unit` names (`CapacityPack.unit`, a `UsageMetric`), for both this operation and `previewSubscriptionChange`. A pack is unexpired when `validFrom` is today or earlier (or not set) and `validTo` is today or later (or null). A stored row whose `unit` is not a `UsageMetric` value counts toward no metric.
 **When a change takes effect, and what is prorated** (decided 28 September, audit R214 (1)). **An upgrade takes effect immediately and is always prorated**: the tenant pays the difference for the rest of the current term. **A downgrade takes effect at the next renewal** (`renewsAt`), is not prorated, and until then is held on `Subscription.scheduledChange`. `effectiveFrom` is therefore set by the server, today for an upgrade and `renewsAt` for a downgrade; a request that sends any other date is refused with 422 `effective-date-not-allowed`.
 **A tenant's first plan starts `active`**, not in `trial`, with `startsAt` today and `renewsAt` one term (`billingPeriod`) after it (decided 28 September, audit R214 (2)). A trial is a separate, explicit choice.
 **A cancelled subscription is reactivated here, on the same record, only within its paid period** (decided 28 September, audit STATE-SUBSCRIPTION). After the period ends it is `expired` and this call refuses with 409 `subscription-expired`; the tenant needs a new subscription.
+**The two 409s, each with its own type** (ADAM CR-585, Chinmay, 3 November 2026; CHG-CR585-001), in the one URI form `https://api.ticvai.com/problems/<slug>`. (1) The subscription is expired and cannot be reactivated: type `https://api.ticvai.com/problems/subscription-expired`, status 409, with no `modulesInUse` or `limitsExceeded`. This is checked first, before the downgrade check: an expired subscription is refused without asking the tenant's cell. (2) The downgrade check finds conflicts: type `https://api.ticvai.com/problems/downgrade-conflict`, status 409, title 'Downgrade conflicts with current usage', body `DowngradeConflictProblem` with `modulesInUse` and `limitsExceeded` filled as above (at least one has entries), and nothing written. A modules conflict and a limits conflict are the same refusal with the same type; they are never split or chosen between. Clients tell the two apart by type alone, never by whether the lists are present.
+**An upgrade changes the tenant's one subscription record in place and records its prorated charge on it** (ADAM CR-584, Chinmay, 3 November 2026; CHG-CR584-001). (1) In one transaction the tenant's current `control.contract` row (the in-force row with the latest `starts_at`, greatest `id` on a tie) is updated in place: `plan_id`, `plan_name`, `plan_version` (the target plan's latest version) and `current_price` = the target package price, worked out as `previewSubscriptionChange` works it out (the version's `basePrice` plus each `plan_module` row's `control.module_listing` price unless its `pricingBasis` is `metered`). `id`, `status`, `starts_at`, `renews_at`, `billing_period`, `currency_code` and `issuing_legal_entity` do not change, and no new contract row is written. `control.tenant.subscription_id` stays as it is; `control.tenant.plan_id` becomes the target plan. (2) On an upgrade the same transaction adds to `control.contract.pending_proration` (`SubscriptionPendingProration`; null counts as 0) the `proratedAmount` `previewSubscriptionChange` returns for the same request on the same day, by the same formula, so two upgrades in one term add up. The request's `prorate` field does not change this. A downgrade, a scheduled change applied at renewal, a first plan and a reactivation never touch the column. The `Subscription` response does not change. `generateInvoice` bills the amount once and `issueInvoice` clears it. Tests: an upgrade keeps the contract id and sets the new price; `pending_proration` equals the preview's amount on the same day; two upgrades add up; a downgrade leaves it alone; the invoice carries one `oneOff` line; issuing clears it; a cancelled draft does not.
 
 |  |  |
 |---|---|
@@ -1206,7 +1346,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.contract`, `control.licence_add_on`, `control.licence_add_on_limit`, `control.plan`, `control.plan_limit`, `control.plan_module`, `control.tenant` |
+| Reads | `cache:idempotency`, `control.cell`, `control.cell_endpoint`, `control.cell_tenant`, `control.contract`, `control.licence_add_on`, `control.licence_add_on_limit`, `control.module_listing`, `control.plan`, `control.plan_limit`, `control.plan_module`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.contract`, `control.tenant` |
 | Called by | ADM-008, ADM-410, ADM-417 |
 | State model | Tenant subscription ([states/subscription.yaml](../../../states/subscription.yaml)): moves `trial` -> `active`, `pastDue` -> `active`, `cancelled` -> `active` |
@@ -1223,7 +1363,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | planId | string (uuid) | yes |  |
-| planVersion | string |  | Defaults to the current version, the plan's highest active version (ADAM CR-510). |
+| planVersion | string |  | Defaults to the current version, the plan's highest active version (ADAM CR-510), through the same reader getPlan uses, PlanReader.Current (ADAM CR-567; CHG-CR567-001). |
 | effectiveFrom | string (date) |  | Optional, and set by the server if omitted. |
 | prorate | boolean |  | An upgrade is always prorated and a downgrade, which starts at renewal, never is (audit R214 (1)). (default True) |
 | note | string |  | (max length 500) |
@@ -1257,7 +1397,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Applied |
-| 409 |  | Downgrade conflicts with current usage. |
+| 409 |  | Two causes, each with its own type (ADAM CR-585; CHG-CR585-001). |
 | 503 | ServiceUnavailable | The dependency is unavailable or its circuit breaker is open (system-design review SD-043, 29 September; ADR-0032). |
 | 422 |  | effectiveFrom was sent and is not the date the change must take effect: today for an upgrade, the next renewal for a downgrade (effective-date-not-allowed, audit R214 (1)). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -1563,7 +1703,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | developer_id | uuid | yes |  |
 | name | text | yes |  |
-| client_id | text | no |  |
+| client_id | text | yes | The public half of the credential pair (ADAM CR-571, Chinmay, 3 November 2026; CHG-CR571-001), made by the server whenever a client is created, in createApiClient and in decideProductionAccess alike:… |
 | environment | text | yes | Bound to one, stated on the object rather than by naming convention. |
 | scopes | text[] | yes | Resolved against the tenant's licence at token issue (13.3.24). |
 | issued_by | text | no | Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved requestProductionAccess. |
@@ -1613,9 +1753,82 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sunset_at | timestamptz | no |  |
 | minimum_notice_months | integer | no | The commitment, not the intention. |
 | migration_guide_url | text | no |  |
+| deprecation_reason | text | no | Why the version was deprecated: the reason sent to deprecateApiVersion, which sets it (ADAM CR-570); null until then. |
 | active_client_count | integer | no |  |
 | changes | jsonb | no | The developer changelog for this version (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. |
+| deprecation_notified_at | timestamptz | no | When the deprecation notice was sent; null until the notice job sends it. |
 | id | uuid | yes | Synthesised key. |
+
+### `control.cell`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| name | text | yes |  |
+| kind | text | no |  |
+| cluster_id | uuid | no |  |
+| is_reachable | boolean | no | False for onPremiseIsolated, true for onPremiseConnected (ADR-0046). |
+| last_contact_at | timestamptz | no | When the site last called out. |
+| licence_expires_at | timestamptz | no | On-premise only. |
+| participates_in_cross_cell | boolean | no | False by default for onPremiseIsolated, available for onPremiseConnected (ADR-0046). |
+| region_id | uuid | yes |  |
+| region_name | text | no |  |
+| country_code | text | yes |  |
+| tier | text | yes |  |
+| status | text | yes |  |
+| cloud_provider | text | no |  |
+| cloud_region | text | no |  |
+| api_endpoint | text | no |  |
+| venue_count | integer | no |  |
+| provisioned_at | timestamptz | no |  |
+| deployment_ref | text | no | A pointer to where this cell runs, not a description of it. |
+| health | jsonb | no |  |
+
+### `control.cell_endpoint`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| cell_id | uuid | yes |  |
+| service_name | text | yes |  |
+| url | text | yes |  |
+| contract_version | text | no |  |
+| authentication_type | text | no |  |
+| credential_reference | text | no |  |
+| status | text | yes |  |
+| last_health_check_at | timestamptz | no |  |
+| created_at | timestamptz | yes |  |
+| updated_at | timestamptz | no |  |
+
+### `control.cell_instance`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| cell_id | uuid | yes |  |
+| name | text | yes | Unique within the cell. |
+| status | text | yes | draining takes no new tenants and still serves the ones it has. |
+| role | text | no | What the instance is for, which decides whether a tenant may be placed on it. |
+| supports_synchronous_replication | boolean | no | CF-64. |
+| max_connections | integer | no | The instance's own max_connections. |
+| created_at | timestamptz | no |  |
+| retired_at | timestamptz | no | Set rather than the row deleted, for the reason CellTenant.droppedAt is: a migration run records the host it touched by name, and that record has to stay readable. |
+
+### `control.cell_tenant`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| root_scope_path | text | yes | The tenant database's root scope path (ADAM CR-163, option A, 18 October 2026; CHG-CRA-005): the path of the level tenant node the cell creates in that database at provisioning (provision-tenant.sh),… |
+| cell_id | uuid | yes |  |
+| tenant_id | uuid | yes |  |
+| instance_id | uuid | yes | Which instance of the cell holds this database. |
+| replication_mode | text | no | CF-64, decided 21 September. |
+| is_instance_pinned | boolean | no | True where this tenant was placed by hand and the balancer must leave it. |
+| database_name | text | yes | Unique within the cell. |
+| status | text | yes |  |
+| provisioned_at | timestamptz | no |  |
+| dropped_at | timestamptz | no | Set rather than the row deleted. |
 
 ### `control.contract`
 
@@ -1634,6 +1847,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scheduled_change | jsonb | no | A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). |
 | current_price | numeric(18,4) | no |  |
 | billing_period | text | no |  |
+| pending_proration | numeric(18,4) | no | The prorated upgrade charges not yet on an issued invoice, in the contract's currency_code; null when none is pending. |
 | id | uuid | yes | Synthesised key. |
 
 ### `control.developer_account`
@@ -1655,7 +1869,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | developer_account_id | uuid | no |  |
-| email | text | yes |  |
+| email | text | yes | Unique among active members, compared without case (ADAM CR-569, "Go yes"): one email acts for one developer account. |
 | role | text | yes |  |
 | status | text | yes |  |
 | invited_at | timestamptz | no |  |
@@ -1675,6 +1889,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | yes |  |
 | certified_until | date | no | Certification expires. |
 | certified_against_version | text | no |  |
+| review_notes | text | no | The notes of the last certifyIntegration decision (certify, reject or revoke), null when none were sent; set only by that decision, and left as it is by a resubmission (ADAM CR-572). |
 | listing_fee_model | text | no |  |
 | visibility | text | no | private: certified for production access and never shown in the marketplace (17 September minutes, M17-06). |
 
@@ -1819,12 +2034,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-214 operations, added to this service in later releases without changing any of the above.
+212 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | billing | `cancelInvoice`, `disputeInvoice`, `generateInvoice`, `getBillingEntity`, `issueCreditNote`, `issueInvoice`, `listCreditNotes`, `listPlatformTaxRates`, `listSubscriptionInvoices`, `recordInvoicePayment`, `resolveInvoiceDispute`, `setBillingEntity`, `setPlatformTaxRate` |
-| cell | `cancelDecommission`, `decommissionCell`, `executeTenantMigration`, `getCell`, `getCellCapacity`, `getCellHealth`, `launchCellCluster`, `listCellClusters`, `listCellJobs`, `listCells`, `listTenantCells`, `listTenantMigrations`, `planTenantMigration`, `provisionCell`, `rollbackTenantMigration`, `updateCellTier` |
+| cell | `cancelDecommission`, `executeTenantMigration`, `getCell`, `getCellCapacity`, `getCellHealth`, `launchCellCluster`, `listCellClusters`, `listCellJobs`, `listCells`, `listTenantCells`, `listTenantMigrations`, `planTenantMigration`, `rollbackTenantMigration`, `updateCellTier` |
 | drafted | `approveBookingLimitCommercial`, `approveMembershipProductValidation`, `approvePartnerStatuLifecycle`, `getMembershipProductValidation`, `listCommercialAgreement`, `listCommercialAgreementHealth`, `listCommercialAllocationQuota`, `listCommissionCalculationSettlement`, `listCommissionMarginIncentive`, `listCreditLimitExposure`, `listDepositGuaranteeFinancial`, `listMember`, `listMemberExceptionOverride`, `listMemberLifecycleCase`, `listMembershipActivationCredential`, `listMembershipAnnualPass`, `listMembershipCommercialPricing`, `listMembershipFreezeSuspension`, `listMembershipRenewalRetention`, `listMembershipUpgradeDowngrade`, `listMembershipUsageVisit`, `listPartner`, `listPartner2`, `listPartnerAccessRole`, `listPartnerCancellationRefund`, `listPartnerContactUser`, `listPartnerDisputeCase`, `listPartnerDocumentationCompliance`, `listPartnerOnboardingApplication`, `listPartnerOrderBooking`, `listPartnerPerformanceScorecard`, `listPartnerProfileReadiness`, `listPartnerReconciliationException`, `listPartnerRelationship`, `listPartnerStatementAccount`, `listRenewalAuto`, `listReservationHoldRelease`, `listTerritoryMarketDistribution`, `listVisitAdmissionEntitlement`, `setAgreementContractTerm`, `setFamilyHouseholdDependent`, `setMemberMembershipAccount`, `setMembershipEligibilityQualification`, `setMembershipEntitlementAdmission`, `setMembershipProductTier`, `setPartnerBrandVenue`, `setPartnerProfileOrganization`, `setPartnerRateNet`, `setPaymentTermBilling`, `setRenewalAutoMembership`, `setValidityActivationExpiry` |
 | environment | `listEnvironments`, `registerEnvironment` |
 | general | `getDeveloperAccount`, `listApiAnomalyRules`, `listApiLicences`, `listApiQuotas` |

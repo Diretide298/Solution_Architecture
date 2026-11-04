@@ -39,10 +39,12 @@
     "description": "Name"
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Email"
    },
    "mobile": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Mobile"
    },

@@ -45,6 +45,7 @@
     "description": "**The currency TICVAI invoices this tenant in** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013), an ISO 4217 code. Required on save (`setBillingEntity`, 400 otherwise); null only while the record rides on an onboarding application. `generateInvoice` copies it onto each new invoice as `currencyCode`, so a later change never moves an invoice already generated."
    },
    "address": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "maxLength": 1000,
     "nullable": true
@@ -230,10 +231,12 @@
     "type": "string"
    },
    "contactEmail": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email"
    },
    "contactPhone": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -341,6 +344,7 @@
   ],
   "properties": {
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email",
     "maxLength": 256,
@@ -397,6 +401,7 @@
     "nullable": true
    },
    "contactEmail": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },

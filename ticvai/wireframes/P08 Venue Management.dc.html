@@ -3631,7 +3631,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><span class="kind">no components declared</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Policy Owner</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Business Approval</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Security Approval</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Technical Approval</div></div><div class="panel btn"><span class="kind">destructiveButton</span><div class="chip">ROLLBACK TO V3.4</div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected policy approval audit</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack groups this record&#x27;s detail under its own headings: “Draft”, “Test”, “Impact Analysis”, “Approval”, “Schedule”, “Publish”.</span></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><span class="kind">no components declared</span></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Policy Owner</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Business Approval</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Security Approval</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Technical Approval</div></div><div class="panel btn"><span class="kind">destructiveButton</span><div class="chip">ROLLBACK TO V3.4</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Submit for approval</div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected policy approval audit</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack groups this record&#x27;s detail under its own headings: “Draft”, “Test”, “Impact Analysis”, “Approval”, “Schedule”, “Publish”.</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -3641,7 +3641,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; policyId&larr;navigation, requestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-234">BO-234</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRollbackToV &middot; <i>ROLLBACK TO V3.4</i> &middot; <b>confirm</b></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRollbackToV &middot; <i>ROLLBACK TO V3.4</i> &middot; <b>confirm</b></div><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Submit for approval</i> &middot; <b>Submit for approval</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="bo-244" class="scr" data-ws="WS11">
@@ -4495,7 +4495,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Media Design Studio Command Center</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -5731,17 +5731,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Approval matrices, the one being changed among them</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>kind</span><span>scopeLevel</span><span>isActive</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setApprovalMatrix</div>
+          <div><b>OPERATIONS</b> &middot; setApprovalMatrix · listApprovalMatrices</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; matrixId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-635">BO-635</a>  &mdash; <i>Back to Accreditation Review Queue</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval matrix</i> &middot; <b>Save approval matrix</b> &middot; Cancel <span class="dis">discards kind · scopeLevel · rules · isActive</span></div></div>
         </div>
       </div>
       <div id="bo-640" class="scr" data-ws="WS110">
@@ -7267,7 +7267,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Venue Canvas</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -8849,7 +8849,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1003">BO-1003</a>  &mdash; <i>Back to Hold Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Create approval request</i> &middot; <b>Create approval request</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="bo-1011" class="scr" data-ws="WS170">
@@ -9059,7 +9059,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Accessible Seating Master</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -9437,7 +9437,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1023">BO-1023</a>  &mdash; <i>Back to Group Reservation Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Create approval request</i> &middot; <b>Create approval request</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="bo-1032" class="scr" data-ws="WS172">
@@ -9507,7 +9507,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Best Seat Recommendations</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -9931,17 +9931,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Run simulation</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; simulatePriceBreakdownCalculation</div>
+          <div><b>OPERATIONS</b> &middot; simulatePriceBreakdownCalculation · listEvents · listProducts · listProductVariants</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1043">BO-1043</a>  &mdash; <i>Back to Revenue Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSimulatePriceBreakdownCalculation &middot; <i>Run simulation</i> &middot; <b>Run simulation</b> &middot; Cancel <span class="dis">discards customerId · productId · productVariantId · quantity · venueId · eventId · channel · date · timeslotId · membershipId · promotionCode · paymentMethod · deliveryMethod · currency · compareChannels</span></div></div>
         </div>
       </div>
       <div id="bo-1050" class="scr" data-ws="WS174">
@@ -10781,7 +10781,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1071">BO-1071</a>  &mdash; <i>Back to Integration Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Create approval request</i> &middot; <b>Create approval request</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div></div><div class="grp">02 — Sell · 112 screens</div><div class="stack">
       <div id="bo-007" class="scr">
@@ -10977,7 +10977,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getChannelAllocations · setChannelAllocations · createChannelCapacity · listChannelCapacities +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; channelCapacityId&larr;deepLink, listingId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · version</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-011">BO-011</a>  &mdash; <i>Packages &amp; Bundles</i> <span class="car">productId · version</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · version</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-011">BO-011</a>  &mdash; <i>Packages &amp; Bundles</i> <span class="car">bundleId · productId · version</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetChannelAllocations &middot; <i>Save channel allocations</i> &middot; <b>Save channel allocations</b> &middot; Cancel <span class="dis">discards allocations</span></div><div class="ov"><b>modal</b> formCreateChannelCapacity &middot; <i>Create channel capacity</i> &middot; <b>Create channel capacity</b> &middot; Cancel <span class="dis">discards performanceId · name · capacity · seatCategoryId</span></div><div class="ov"><b>modal</b> formRelinquishChannelAllocation &middot; <i>Release channel allocation</i> &middot; <b>Release channel allocation</b> &middot; Cancel <span class="dis">discards channels · reason</span></div><div class="ov"><b>modal</b> formUpdateChannelCapacity &middot; <i>Save channel capacity</i> &middot; <b>Save channel capacity</b> &middot; Cancel <span class="dis">discards name · capacity</span></div><div class="ov"><b>modal</b> formPublishBundle &middot; <i>Publish bundle</i> &middot; <b>Publish bundle</b> &middot; Cancel <span class="dis">discards venueId · note · staleAfterHours</span></div><div class="ov"><b>modal</b> formSetChannelListing &middot; <i>Save channel listing</i> &middot; <b>Save channel listing</b> &middot; Cancel <span class="dis">discards channelName · productId · status · externalProductRef · allocationUnits · priceListId · adapter · adapterCredentialRef · pushIntervalMinutes · guestDataScope · lastPushedAt · scopePath</span></div></div>
         </div>
@@ -11783,7 +11783,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Search retail global settings</b><span class="kind">searchField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Return policy</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Save return policy</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Find dropped goods</b><span class="kind">searchField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">By entitlement, drop reference or receipt, as the till finds them.</span></div><div class="panel"><b>The dropped goods found</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Search retail global settings</b><span class="kind">searchField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Return policy</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Save return policy</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Dispose of dropped goods</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -11793,7 +11793,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, dropId&larr;navigation, outletId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-102">BO-102</a>  &mdash; <i>Sell</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetReturnPolicy &middot; <i>Save return policy</i> &middot; <b>Save return policy</b> &middot; Cancel</div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetReturnPolicy &middot; <i>Save return policy</i> &middot; <b>Save return policy</b> &middot; Cancel</div><div class="ov"><b>modal</b> formDisposeShopAndDrop &middot; <i>Dispose of dropped goods</i> &middot; <b>Dispose of dropped goods</b> &middot; Cancel <span class="dis">discards method · note</span></div></div>
         </div>
       </div>
       <div id="bo-264" class="scr" data-ws="WS27">
@@ -12563,7 +12563,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Membership Commercial, Pricing &amp; Channel Ass</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -12847,7 +12847,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Eligibility Override</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Expiry Extension</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Complimentary Renewal</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Complimentary Benefit</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Entitlement Adjustment</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Freeze Exception</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Suspension Override</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Replacement Credential</div></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><span class="kind">no components declared</span></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Eligibility Override</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Expiry Extension</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Complimentary Renewal</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Complimentary Benefit</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Entitlement Adjustment</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Freeze Exception</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Suspension Override</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Replacement Credential</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Request approval</div></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><span class="kind">no components declared</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -12857,7 +12857,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; membershipId&larr;navigation, entitlementId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-294">BO-294</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Request approval</i> &middot; <b>Request approval</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="bo-302" class="scr" data-ws="WS30">
@@ -13641,7 +13641,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#bo-716">BO-716</a>  &mdash; <i>Back to Event Lifecycle &amp; Change Command Cen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Create approval request</i> &middot; <b>Create approval request</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="bo-719" class="scr" data-ws="WS131">
@@ -14172,7 +14172,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listOrders · getOrder · createOrder · applyManualDiscount +15</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, documentId&larr;navigation, invoiceId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">variantId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · variantId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div><div class="ov"><b>modal</b> formIssueTaxInvoice &middot; <i>Issue tax invoice</i> &middot; <b>Issue tax invoice</b> &middot; Cancel <span class="dis">discards invoiceType · orderIds · recipient · languages · supersedesInvoiceId · deliverToEmail</span></div></div>
         </div>
@@ -14200,7 +14200,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listOrderRefunds · createRefund · applyManualDiscount · exchangeOrderLines +13</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, venueId&larr;session, documentId&larr;navigation, invoiceId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">variantId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · variantId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i> &middot; <b>confirm</b></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div><div class="ov"><b>modal</b> formCreateBulkRefund &middot; <i>Refund every order</i> &middot; <b>Refund every order</b> &middot; Cancel</div></div>
         </div>
@@ -14284,7 +14284,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createGroupBooking · getGroupBooking · updateGroupBooking · listOrders +13</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, groupBookingId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">variantId · version</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · variantId · version</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formCreateGroupBooking &middot; <i>Create group booking</i> &middot; <b>Create group booking</b> &middot; Cancel <span class="dis">discards orderId · leaderSubjectId · expectedSize · kind · packageProductId · yearGroup · accessAndDietaryNeeds · celebrantName · celebrantTurningAge · allergiesAndRequests · finalHeadcountDueBy · organisationName · minimumSize · attendeeCaptureRequired · attendeeCaptureDueBy</span></div><div class="ov"><b>modal</b> formUpdateGroupBooking &middot; <i>Save group booking</i> &middot; <b>Save group booking</b> &middot; Cancel <span class="dis">discards packageProductId · yearGroup · accessAndDietaryNeeds · celebrantName · celebrantTurningAge · allergiesAndRequests · finalHeadcountDueBy · leaderSubjectId · organisationName · expectedSize · confirmedSize · minimumSize · attendeeCaptureRequired · attendeeCaptureDueBy · status</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div></div>
         </div>
@@ -14312,7 +14312,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getMediaEntitlements · appendEntitlementToMedia · listTicketReissueFulfillment · listCredentialReplacementReissue +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, mediaId&larr;deepLink, credentialId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">variantId</span><br><a href="#bo-314">BO-314</a>  &mdash; <i>Back to Amendment &amp; After-Sales Command Cent</i><br><a href="#bo-644">BO-644</a>  &mdash; <i>Back to Credential Issuance Command Center</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · variantId</span><br><a href="#bo-314">BO-314</a>  &mdash; <i>Back to Amendment &amp; After-Sales Command Cent</i><br><a href="#bo-644">BO-644</a>  &mdash; <i>Back to Credential Issuance Command Center</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAppendEntitlementToMedia &middot; <i>Append entitlement to media</i> &middot; <b>Append entitlement to media</b> &middot; Cancel <span class="dis">discards id · lines · recordedAt · paymentMethod · note</span></div><div class="ov"><b>modal</b> formReplaceCredential &middot; <i>Replace media</i> &middot; <b>Replace media</b> &middot; Cancel</div></div>
         </div>
@@ -14536,7 +14536,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listOrders · getOrder · createOrder · applyManualDiscount +10</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">variantId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · variantId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div></div>
         </div>
@@ -18444,7 +18444,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Integration Monitoring &amp; Exception Workbench</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -18453,12 +18453,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWalletDisputes · replayEvents · listApiClients · listWebhookSubscriptions +4</div>
+          <div><b>OPERATIONS</b> &middot; getWalletIntegrationMapping · listWalletDisputes · replayEvents · listApiClients +5</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; clientId&larr;navigation, disputeId&larr;navigation, subscriptionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1173">BO-1173</a>  &mdash; <i>Back to Wallet Integration Command Center</i> <span class="car">clientId · subscriptionId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmSuspendIntegration &middot; <i>Suspend integration</i> &middot; <b>confirm</b></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmSuspendIntegration &middot; <i>Suspend integration</i> &middot; <b>confirm</b></div><div class="ov"><b>modal</b> formReplayEvents &middot; <i>Replay</i> &middot; <b>Replay</b> &middot; Cancel <span class="dis">discards from · to · eventTypes</span></div><div class="ov"><b>modal</b> formRetryReplayEvents &middot; <i>Retry</i> &middot; <b>Retry</b> &middot; Cancel <span class="dis">discards from · to · eventTypes</span></div></div>
         </div>
       </div>
       <div id="bo-1180" class="scr" data-ws="WS195">
@@ -18504,7 +18504,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Immediate publication</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Scheduled publication</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Tenant-specific rollout</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue-specific rollout</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Effective date</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Pilot rollout</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Emergency rollback</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>What publishing changes</b><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.</span></div><div class="panel"><b>Wallet configuration versions, newest first</b><span class="kind">dataTable</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div></div><div class="panel"><b>Requests awaiting a decision, or already decided</b><span class="kind">dataTable</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Immediate publication</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Scheduled publication</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Tenant-specific rollout</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue-specific rollout</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Effective date</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Pilot rollout</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Emergency rollback</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>What publishing changes</b><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.</span></div><div class="panel"><b>Wallet configuration versions, newest first</b><span class="kind">dataTable</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div></div><div class="panel"><b>Requests awaiting a decision, or already decided</b><span class="kind">dataTable</span><div class="rows"><div class="row nocol"><span>columns not declared</span></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Send for approval</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -18514,7 +18514,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1173">BO-1173</a>  &mdash; <i>Back to Wallet Integration Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Send for approval</i> &middot; <b>Send for approval</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="bo-1182" class="scr" data-ws="WS195">
@@ -20517,7 +20517,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Approval Delegations</h2>
-                <small>Venue Management &middot; wave 2 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -23298,7 +23298,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; topUpWallet · getWallet</div>
+          <div><b>OPERATIONS</b> &middot; getWallet</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-484">BO-484</a>  &mdash; <i>Back to Self-Service Experience Command Cent</i></div>
@@ -28175,7 +28175,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-913">BO-913</a>  &mdash; <i>Back to Event Resource Planning Command Cent</i> <span class="car">eventId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Create approval request</i> &middot; <b>Create approval request</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="bo-923" class="scr" data-ws="WS162">
@@ -30891,7 +30891,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; campaignId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-764">BO-764</a>  &mdash; <i>Back to Campaign Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Create approval request</i> &middot; <b>Create approval request</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="bo-772" class="scr" data-ws="WS138">
@@ -32879,7 +32879,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#bo-834">BO-834</a>  &mdash; <i>Back to Digital Experience Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetSeoMetadata &middot; <i>Save SEO metadata</i> &middot; <b>Save SEO metadata</b> &middot; Cancel <span class="dis">discards entityKind · entityId · locale · title · metaDescription · keywords · canonicalUrl · slug · hreflang · schemaOrgType · openGraph · isAutoGenerated · noIndex</span></div></div>
         </div>
       </div>
       <div id="bo-843" class="scr" data-ws="WS145">
@@ -33341,7 +33341,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Transport Departure Board</h2>
-                <small>Venue Management &middot; wave 2 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -34041,7 +34041,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Fee &amp; Surcharge Library</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -34517,7 +34517,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Dynamic Pricing Strategy Command Center</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -35077,7 +35077,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Revenue Optimization Command Center</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -38185,7 +38185,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Channel Creation &amp; Profile Configuration</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -38194,7 +38194,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createChannelProfile</div>
+          <div><b>OPERATIONS</b> &middot; getChannelProfile · createChannelProfile</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-258">ADM-258</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -38213,7 +38213,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Product &amp; Catalogue Assignment</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -38222,7 +38222,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setProductCatalogue</div>
+          <div><b>OPERATIONS</b> &middot; getProductCatalogue · setProductCatalogue</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-258">ADM-258</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -38241,7 +38241,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Channel Pricing &amp; Commercial Profile Assignm</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -38250,7 +38250,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setChannelPricingCommercial</div>
+          <div><b>OPERATIONS</b> &middot; getChannelPricingCommercial · setChannelPricingCommercial</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-258">ADM-258</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -38297,7 +38297,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Channel Sales Schedule &amp; Availability Window</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -38381,7 +38381,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Channel Fees, Payment &amp; Fulfillment Configur</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -38390,7 +38390,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setChannelFeePayment</div>
+          <div><b>OPERATIONS</b> &middot; getChannelFeePayment · setChannelFeePayment</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-258">ADM-258</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -38409,7 +38409,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Channel Publication, Readiness &amp; AI Validati</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -38418,7 +38418,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; publishChannelReadinessValidation</div>
+          <div><b>OPERATIONS</b> &middot; getChannelReadinessValidation · publishChannelReadinessValidation</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-258">ADM-258</a> </div>
@@ -38437,7 +38437,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Channel Operations Command Center</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -38465,7 +38465,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Channel Connection &amp; Integration Manager</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
@@ -40065,7 +40065,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Changed by</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Date/time</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Old value</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>New value</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Reason</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Approval</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Effective date</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Effective from</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Scheduled expiry</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Changed by</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Date/time</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Old value</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>New value</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Reason</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Approval</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Effective date</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Effective from</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Scheduled expiry</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Send for approval</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -40075,7 +40075,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           
           <div><b>GOES TO</b> &middot; <a href="#adm-559">ADM-559</a>  &mdash; <i>Back to Payment Command Center\t7</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Send for approval</i> &middot; <b>Send for approval</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div></div>
         </div>
       </div>
       <div id="adm-568" class="scr" data-ws="WS147">
@@ -40457,7 +40457,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Tenant</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Legal Entity</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Location</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>POS</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Provider</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Acquirer</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Merchant Account</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Terminal Profile</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Device reference</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Receipt configuration</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Connection profile</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Tenant</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Legal Entity</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Location</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>POS</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Provider</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Acquirer</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Merchant Account</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Terminal Profile</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Device reference</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Receipt configuration</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Connection profile</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Activate terminal</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -40467,7 +40467,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; deviceId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-579">ADM-579</a>  &mdash; <i>Back to Terminal &amp; Card-Present Command Cent</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formEnrolDevice &middot; <i>Activate terminal</i> &middot; <b>Activate terminal</b> &middot; Cancel <span class="dis">discards state · configurationProfileId · reason · enrolmentCode · testResult</span></div></div>
         </div>
       </div>
       <div id="adm-582" class="scr" data-ws="WS149">
@@ -40849,7 +40849,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBodyFilters</span><div class="panel"><b>Search digital payment session</b><span class="kind">searchField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Filter by</b><span class="kind">multiSelect</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack filters this screen by payment id, order, payment link, customer reference, provider transaction, channel and 5 more — which are present is a decision the pack a</span></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Every digital payment session</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(12,minmax(0,1fr))"><span>TICVAI Payment ID</span><span>Order ID</span><span>Payment method</span><span>Provider</span><span>Gateway</span><span>Amount</span><span>Currency</span><span>Created</span><span>Session expiry</span><span>Customer journey stage</span><span>Provider status</span><span>TICVAI status</span></div><div class="row" style="grid-template-columns:repeat(12,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(12,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(12,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel"><b>Permissions this screen separates</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The pack separates these permissions and no action on the screen claims them yet:** Check Status, Cancel Session, Regenerate Link, View Provider Events, View Decision T</span></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected digital payment session</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBodyFilters</span><div class="panel"><b>Search digital payment session</b><span class="kind">searchField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Filter by</b><span class="kind">multiSelect</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack filters this screen by payment id, order, payment link, customer reference, provider transaction, channel and 5 more — which are present is a decision the pack a</span></div></div><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Every digital payment session</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(12,minmax(0,1fr))"><span>TICVAI Payment ID</span><span>Order ID</span><span>Payment method</span><span>Provider</span><span>Gateway</span><span>Amount</span><span>Currency</span><span>Created</span><span>Session expiry</span><span>Customer journey stage</span><span>Provider status</span><span>TICVAI status</span></div><div class="row" style="grid-template-columns:repeat(12,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(12,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(12,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel"><b>Permissions this screen separates</b><span class="kind">banner</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The pack separates these permissions and no action on the screen claims them yet:** Check Status, Cancel Session, Regenerate Link, View Provider Events, View Decision T</span></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Check status</div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected digital payment session</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -40905,7 +40905,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Every digital payment exception</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>Age</span><span>Severity</span><span>Owner</span><span>Status</span><span>Resolution</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected digital payment exception</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack groups this record&#x27;s detail under its own headings: “Exception Types”, “Timed Out”, “Depending on condition”.</span></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Every digital payment exception</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>Age</span><span>Severity</span><span>Owner</span><span>Status</span><span>Resolution</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(5,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Check status</div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected digital payment exception</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack groups this record&#x27;s detail under its own headings: “Exception Types”, “Timed Out”, “Depending on condition”.</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -41153,16 +41153,16 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div class="body">
             <div class="top">
               <div><h2>Partial Payment, Failure &amp; Recovery Manager</h2>
-                <small>Venue Management &middot; wave 3 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Every partial payment failure</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>AED 200 ✓</span><span>AED 800 ✕</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected partial payment failure</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack groups this record&#x27;s detail under its own headings: “AED 200 successfully consumed”, “Partial Payment States”, “Timeout”, “Partially Paid”.</span></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Every partial payment failure</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>AED 200 ✓</span><span>AED 800 ✕</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected partial payment failure</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack groups this record&#x27;s detail under its own headings: “AED 200 successfully consumed”, “Partial Payment States”, “Timeout”, “Partially Paid”.</span></div><div class="panel"><b>Which tenders may be combined, and in what order</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setMixedTenderRules · getDunningPolicy · setDunningPolicy · listDunningCases +1</div>
+          <div><b>OPERATIONS</b> &middot; getMixedTenderRules · setMixedTenderRules · getDunningPolicy · setDunningPolicy +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; caseId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-599">ADM-599</a>  &mdash; <i>Back to Mixed Tender &amp; Credit Command Center</i></div>
@@ -41409,7 +41409,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Every refund processing provider</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(10,minmax(0,1fr))"><span>Provider</span><span>Merchant account</span><span>Original provider transaction</span><span>Refund transaction ID</span><span>Refund amount</span><span>Currency</span><span>Submitted timestamp</span><span>Provider status</span><span>Provider response</span><span>Expected completion</span></div><div class="row" style="grid-template-columns:repeat(10,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(10,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(10,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected refund processing provider</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack groups this record&#x27;s detail under its own headings: “Refund Processing States”, “Verify Provider Status”, “Recovery Actions”.</span></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Every refund processing provider</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(10,minmax(0,1fr))"><span>Provider</span><span>Merchant account</span><span>Original provider transaction</span><span>Refund transaction ID</span><span>Refund amount</span><span>Currency</span><span>Submitted timestamp</span><span>Provider status</span><span>Provider response</span><span>Expected completion</span></div><div class="row" style="grid-template-columns:repeat(10,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(10,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(10,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Check status</div></div></div></div><div class="side"><div class="region"><span class="kind">contextPanel</span><div class="panel"><b>The selected refund processing provider</b><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The pack groups this record&#x27;s detail under its own headings: “Refund Processing States”, “Verify Provider Status”, “Recovery Actions”.</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -44433,7 +44433,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Show the approval matrices, the one being changed among them</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>kind</span><span>scopeLevel</span><span>isActive</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>User</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Role</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Position</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Department</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Business Unit</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Legal Entity</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Region</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Delegator</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Delegate</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Scope</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Start</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>End</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Reason</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Event operations</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Show the approval matrices, the one being changed among them</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>kind</span><span>scopeLevel</span><span>isActive</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>User</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Role</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The approver role of the selected matrix&#x27;s rule (`ApprovalRule.approverRoleIds`), saved with `setApprovalMatrix` on the matrix picked in the table above (r14 gate, CHG-R1</span></div><div class="panel"><b>Position</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Department</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Business Unit</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Legal Entity</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Region</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Delegator</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Delegate</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Scope</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Start</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>End</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Reason</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="region"><span class="kind">actionBar</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Event operations</div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -45385,7 +45385,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Active Approval Matrices</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Approval Rules</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Tenants Covered</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Venues Covered</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Departments Covered</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Unassigned Rules</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Routing Conflicts</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Governance Warnings</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Active Approval Matrices</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div><span class="why">The matrices in force (`isActive`), counted from `listApprovalMatrices` (r14 gate, CHG-R14BO-003).</span></div><div class="panel"><b>Approval Rules</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div><span class="why">The rules across the matrices listed, counted from `listApprovalMatrices` (r14 gate, CHG-R14BO-003).</span></div><div class="panel"><b>Tenants Covered</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Venues Covered</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Departments Covered</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Unassigned Rules</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Routing Conflicts</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div><div class="panel"><b>Governance Warnings</b><span class="kind">metricTile</span><div class="kpi"><span>—</span></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -45413,7 +45413,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Role</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>User</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Department</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Tenant</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Business process</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Transaction value</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Percentage</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Risk level</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Role</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The rule&#x27;s `approverRoleIds`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).</span></div><div class="panel"><b>User</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Department</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Tenant</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Business process</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Transaction value</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The rule&#x27;s `minAmount` and `maxAmount`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).</span></div><div class="panel"><b>Percentage</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Risk level</b><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The rule&#x27;s `riskScoreAbove`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).</span></div></div></div></div>
             </div>
           </div>
         </div>
@@ -45441,17 +45441,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Approval matrices, the one being changed among them</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>kind</span><span>scopeLevel</span><span>isActive</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setApprovalMatrix</div>
+          <div><b>OPERATIONS</b> &middot; setApprovalMatrix · listApprovalMatrices</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; matrixId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-329">ADM-329</a>  &mdash; <i>Back to Approval Matrix Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval matrix</i> &middot; <b>Save approval matrix</b> &middot; Cancel <span class="dis">discards kind · scopeLevel · rules · isActive</span></div></div>
         </div>
       </div>
       <div id="adm-332" class="scr" data-ws="WS15">
@@ -45497,17 +45497,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Approval matrices, the one being changed among them</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>kind</span><span>scopeLevel</span><span>isActive</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setApprovalMatrix</div>
+          <div><b>OPERATIONS</b> &middot; setApprovalMatrix · listApprovalMatrices</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; matrixId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-329">ADM-329</a>  &mdash; <i>Back to Approval Matrix Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval matrix</i> &middot; <b>Save approval matrix</b> &middot; Cancel <span class="dis">discards kind · scopeLevel · rules · isActive</span></div></div>
         </div>
       </div>
       <div id="adm-334" class="scr" data-ws="WS15">
@@ -45525,17 +45525,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Approval matrices, the one being changed among them</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>kind</span><span>scopeLevel</span><span>isActive</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setApprovalMatrix</div>
+          <div><b>OPERATIONS</b> &middot; setApprovalMatrix · listApprovalMatrices</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; matrixId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-329">ADM-329</a>  &mdash; <i>Back to Approval Matrix Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval matrix</i> &middot; <b>Save approval matrix</b> &middot; Cancel <span class="dis">discards kind · scopeLevel · rules · isActive</span></div></div>
         </div>
       </div>
       <div id="adm-335" class="scr" data-ws="WS15">
@@ -45553,17 +45553,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             </div>
             
             <div class="canvas gen">
-              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="region"><span class="kind">contentBody</span><div class="panel"><b>Approval matrices, the one being changed among them</b><span class="kind">dataTable</span><div class="rows"><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>kind</span><span>scopeLevel</span><span>isActive</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row" style="grid-template-columns:repeat(3,minmax(0,1fr))"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel btn"><span class="kind">primaryButton</span><div class="chip cta">Save approval matrix</div></div><div class="panel btn"><span class="kind">secondaryButton</span><div class="chip">Cancel</div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setApprovalMatrix</div>
+          <div><b>OPERATIONS</b> &middot; setApprovalMatrix · listApprovalMatrices</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; matrixId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-329">ADM-329</a>  &mdash; <i>Back to Approval Matrix Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval matrix</i> &middot; <b>Save approval matrix</b> &middot; Cancel <span class="dis">discards kind · scopeLevel · rules · isActive</span></div></div>
         </div>
       </div>
       <div id="adm-336" class="scr" data-ws="WS15">
@@ -45754,7 +45754,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listStepUpPolicies · setStepUpPolicy · setPasswordPolicy · listMfaMethods +3</div>
+          <div><b>OPERATIONS</b> &middot; listStepUpPolicies · setStepUpPolicy · setPasswordPolicy · getGuestVerificationPolicy +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-339">ADM-339</a>  &mdash; <i>Back to Governance &amp; Compliance Command Cent</i></div>

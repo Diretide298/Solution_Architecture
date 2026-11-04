@@ -2098,16 +2098,22 @@
       {
        "kind": "secondaryButton",
        "label": "Manager approval",
+       "operation": "setApprovalMatrix",
+       "notes": "Routes resource changes to this approver group, as the VM close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
       },
       {
        "kind": "secondaryButton",
        "label": "Finance approval",
+       "operation": "setApprovalMatrix",
+       "notes": "Routes resource changes to this approver group, as the VM close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
       },
       {
        "kind": "secondaryButton",
        "label": "Operations approval",
+       "operation": "setApprovalMatrix",
+       "notes": "Routes resource changes to this approver group, as the VM close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require"
       },
       {

@@ -65,7 +65,7 @@ RULES = {
 }
 # 3 November 2026 (CHG-R13RVB-006): the LO-FIELD members the r13 review's class sweep found besides the two it fixed,
 # each needing the lead's ruling on which field orders the list. Lower it as they are ruled; never raise it.
-LO_FIELD_CEILING = 60
+LO_FIELD_CEILING = 59   # 3 November 2026: listProducts ruled (ADAM CR-581, CHG-CR581-001)
 # The generated order phrases and the fields they name.
 GENERATED_ORDER = (
     re.compile(r"\b(?:Newest|Oldest|Soonest|Latest|Earliest)(?: \w+)? first, by `(\w+)` (?:ascending|descending)"

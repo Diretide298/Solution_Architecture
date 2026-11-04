@@ -81,7 +81,8 @@
     "format": "uuid"
    },
    "unit": {
-    "type": "string"
+    "$ref": "#/components/schemas/UsageMetric",
+    "description": "**The metric the pack raises** (ADAM CR-560, Chinmay, 3 November 2026; CHG-CR560-001): one of the `UsageMetric` values (venues, workstations, activeUsers, devices, brandedApps, aiTokens, apiCalls, storageGb, transactions, guestProfiles). `addCapacityPack` refuses any other unit with `400 validation` naming the `unit` field. A pack counts only toward the metric its unit names, in `targetLimit` for both `setSubscription` and `previewSubscriptionChange`; it is unexpired when `validFrom` is today or earlier (or not set) and `validTo` is today or later (or null). A stored row whose unit is not a `UsageMetric` value counts toward no metric."
    },
    "quantity": {
     "type": "integer"

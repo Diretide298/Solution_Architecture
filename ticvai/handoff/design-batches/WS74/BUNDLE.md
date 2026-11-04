@@ -96,11 +96,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-061` | Digital Asset Management Command Center | B | 0 | 72 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-061` | Digital Asset Management Command Center | A | 0 | 72 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-062` | Central Digital Asset Library | B | 3 | 18 | 6 | 9 | 1 | 0 | — | notStarted (—) |
 | `CMS-063` | Upload & Asset Ingestion Workspace | B | 18 | 0 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `CMS-064` | Folder, Collection & Workspace Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-065` | Metadata & Taxonomy Management | B | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-065` | Metadata & Taxonomy Management | A | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-066` | Tags, Keywords & Classification | B | 4 | 0 | 6 | 8 | 1 | 0 | — | notStarted (—) |
 | `CMS-067` | Advanced Search & Discovery | B | 0 | 5 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `CMS-068` | Digital Asset 360° Profile | B | 0 | 36 | 6 | 1 | 2 | 0 | — | notStarted (—) |
@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 1 · needs the `core` module |
-| Block | Block B · ticket #29607 (APP-CMS-CMS-061) |
+| Block | Block A · ticket #29607 (APP-CMS-CMS-061) |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
@@ -883,7 +883,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 1 · needs the `core` module |
-| Block | Block B · ticket #29608 (APP-CMS-CMS-065) |
+| Block | Block A · ticket #29608 (APP-CMS-CMS-065) |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

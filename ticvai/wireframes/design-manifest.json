@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-11-03",
+ "generated": "2026-11-04",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -1025,6 +1025,26 @@
    "status": "pending"
   },
   {
+   "id": "P08-sell-04",
+   "kind": "module",
+   "label": "P08 · Sell (4 of 4)",
+   "platform": "P08",
+   "screens": [
+    "BO-121",
+    "BO-122",
+    "BO-123",
+    "BO-124",
+    "BO-125",
+    "BO-126",
+    "BO-142",
+    "BO-143"
+   ],
+   "drawable": 7,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "P08-setup-go-live-01",
    "kind": "module",
    "label": "P08 · Setup & Go-Live",
@@ -1651,26 +1671,6 @@
     "BO-112"
    ],
    "drawable": 8,
-   "thin": 2,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P08-sell-04",
-   "kind": "module",
-   "label": "P08 · Sell (4 of 4)",
-   "platform": "P08",
-   "screens": [
-    "BO-121",
-    "BO-122",
-    "BO-123",
-    "BO-124",
-    "BO-125",
-    "BO-126",
-    "BO-142",
-    "BO-143"
-   ],
-   "drawable": 6,
    "thin": 2,
    "frames": 0,
    "status": "pending"

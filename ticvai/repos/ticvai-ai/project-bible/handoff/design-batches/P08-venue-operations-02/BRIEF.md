@@ -163,7 +163,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-129` | Software, Configuration & Version Management | A | 24 | 23 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
 | `BO-130` | Offline Policy & Rules Configuration | A | 13 | 19 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-131` | Connectivity & Auto-Switch Settings | B | 12 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-132` | Offline Transaction Monitor & Sync Queue | C | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
+| `BO-132` | Offline Transaction Monitor & Sync Queue | C | 44 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
 | `BO-133` | Offline Alerts, Limits & Audit | A | 24 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

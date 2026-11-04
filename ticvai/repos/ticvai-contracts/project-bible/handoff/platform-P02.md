@@ -75,9 +75,9 @@
 | `GST-004` | Item Detail | Discovery & Browse | 1 | 7 | yes |
 | `GST-005` | What's On | Discovery & Browse | 1 | 3 | yes |
 | `GST-006` | Item Detail – Event / Exhibition | Discovery & Browse | 1 | 2 | yes |
-| `GST-007` | Select Date & Time | Booking & Selection | 1 | 11 | yes |
-| `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 7 | yes |
-| `GST-009` | Review & Payment | Cart & Checkout | 1 | 8 | yes |
+| `GST-007` | Select Date & Time | Booking & Selection | 1 | 12 | yes |
+| `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 9 | yes |
+| `GST-009` | Review & Payment | Cart & Checkout | 1 | 9 | yes |
 | `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 5 | yes |
 | `GST-011` | Wallet Overview | Membership, Loyalty & Value | 1 | 6 | yes |
 | `GST-012` | My Tickets | Account & Self-Service | 1 | 7 | yes |
@@ -109,7 +109,7 @@
 | `GST-038` | At the Venue | In-venue Services | 1 | 3 | yes |
 | `GST-039` | Profile | Account & Self-Service | 1 | 5 | yes |
 | `GST-040` | Help & Support | Engagement & Support | 1 | 7 | yes |
-| `GST-041` | Checkout Entry | Cart & Checkout | 1 | 13 | yes |
+| `GST-041` | Checkout Entry | Cart & Checkout | 1 | 12 | yes |
 | `GST-042` | Simple Registration & OTP | Account & Self-Service | 1 | 14 | yes |
 | `GST-043` | Arabic / RTL Experience | System States | 1 | 3 | yes |
 | `GST-044` | Multi-Currency & Pricing | Ticketing | 1 | 2 | yes |

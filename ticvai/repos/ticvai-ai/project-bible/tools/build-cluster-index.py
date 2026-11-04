@@ -4,8 +4,8 @@ import json, pathlib, sys
 
 def main():
     root = pathlib.Path(__file__).resolve().parent.parent
-    c = json.loads((root/'handoff/backlog-clusters.json').read_text())
-    b = {e['id']: e for e in json.loads((root/'handoff/contract-backlog.json').read_text())['entries']}
+    c = json.loads((root/'handoff/backlog-clusters.json').read_text(encoding='utf-8'))
+    b = {e['id']: e for e in json.loads((root/'handoff/contract-backlog.json').read_text(encoding='utf-8'))['entries']}
     cl = sorted(c['clusters'], key=lambda x: -x['rowCitations'])
     covered = {i for x in cl for i in x['entries']} | set(c['unclustered'])
     still = sorted(i for i in covered if b.get(i, {}).get('status') != 'done')

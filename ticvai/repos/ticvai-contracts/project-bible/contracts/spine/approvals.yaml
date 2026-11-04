@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Approvals
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 47
   x-ticvai-module: 11 — Approval Workflows and Governance
   x-ticvai-platforms:
@@ -77,10 +78,10 @@ info:
   contact:
     name: TICVAI Platform
 servers:
-- url: https://api.{region}.ticvai.com/approvals/v1
+- url: https://{cellHost}/api/v1
   variables:
-    region:
-      default: ae
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 tags:
@@ -227,6 +228,15 @@ x-ticvai-jobs:
     writes: [approvals.workflow_instance, approvals.workflow_intervention, approvals.workflow_version]
     for: 'Approvals workflow engine: run workflow instances and activate versions.'
     source: ['states/workflow-instance.yaml:25', 'states/workflow-version.yaml:74']
+  subjectDataPart:
+    module: approvals
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [approvals.accreditation_badge, approvals.request]
+    writes: []
+    for: 'approvals''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /approval-requests:
     get:
@@ -352,6 +362,20 @@ paths:
       - query: ai#approvalRequestScoreRecords
         route: service
         for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'the holders of the matched rule''s approverRoleIds (where {roleId}), for the approver chain (ADAM CR-592)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the request''s venue currency (currencyCode of the venue node of its scopePath), which amounts compare in
+          (ADAM CR-592)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the venue''s region currency, when the venue''s currencyCode is null (ADAM CR-592)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'the rate from the amount''s currency to the venue currency, purpose reporting, latest effectiveFrom not
+          after now (ADAM CR-592)'
       - query: platform-ops#platformApprovalRuleFor
         route: service
         for: 'the platform rule a request of subject type tenant is routed by: control.platform_approval_rule, Platform''s
@@ -397,6 +421,33 @@ paths:
         and routes the request by the rule it answers; `found` false is the `422` above. A tenant''s own
         `approvals.matrix` and `approvals.rule` are never read for it.
 
+
+        **Amounts, approvers and the platform rule** (ADAM CR-592, option A, Chinmay, 3 November 2026;
+        CHG-CR592-001). This operation adds three in-process reads: `identity#delegatedAccessRecords`,
+        `tenancy#venueSettingsRecords` (and `tenancy#regionSettingsRecords` when the venue''s `currencyCode` is null)
+        and `finance#fxRateRecords`. **Amounts**: the request''s venue is the venue node of its `scopePath`. Its
+        currency is that venue''s settings `currencyCode`, or its region''s currency when that is null. An amount in
+        another currency is converted at the finance rate from the amount''s currency to the venue currency, purpose
+        `reporting`, with the latest `effectiveFrom` not after now. The converted amount is compared with the rule''s
+        `minAmount` and `maxAmount`, which are read in the venue currency. If there is no such rate, the request is
+        refused `422 fx-rate-unavailable` and nothing is written; a missing rate is never guessed at. The amount is
+        stored as sent. **Approvers for a tenant''s own rule**: `identity#delegatedAccessRecords` is asked with where
+        `{roleId}` for each of the matched rule''s `approverRoleIds`. A principal is an approver when it has a grant
+        with effect `ALLOW`, `revoked_at` null, `valid_from` absent or not after now, `valid_to` absent or after now,
+        and a `scope_path` that is the request''s `scopePath` or an ancestor of it, at the rule''s
+        `approverScopeLevel` or above. It must also have no live `DENY` of that role at the request''s `scopePath` or
+        above (deny wins, as decided on CR-344), be active in `identity#principalRecords`, and not be the requester
+        (four eyes). Then the approval delegations in force apply, as now (`isDelegate` true). One
+        `approvals.request_approver` row is written per approver per level, in the routing transaction. If the role
+        has no holder, `rerouteOnNoApprover` decides, as already written. **Platform rule** (subject type `tenant`):
+        no `request_approver` rows are written, and no platform operator is copied into the tenant database. The
+        rule''s `approverPermission` and `minimumApprovals` are stored on the request in two new nullable columns on
+        `approvals.request`, `platform_approver_permission` and `platform_minimum_approvals`
+        (`ApprovalRequestPlatformRule`), null for every request routed by a tenant rule; `mode` is `parallel` and
+        `totalLevels` 1. `submitApprovalRequest` (#27833) and `evaluateApprovalRequirement` (#30850) match rules the
+        same way and add the same reads; `decideApprovalRequest` (#30849) decides such a request by the stored
+        values. Unchanged and already built: the draft path, the `409` open-request check and the platform rule read.
+
         '
       tags:
       - request
@@ -437,8 +488,11 @@ paths:
           description: 'No approval route (`no-approval-route`; CHG-R8SPN-015): the request is not a draft and no
             active rule matches its kind and subject type at its `scopePath` (for subject type `tenant`, no active
             platform rule: `platform-ops#platformApprovalRuleFor` answers `found` false; ADAM CR-330). Nothing is
-            written; the calling operation passes this refusal on.'
-          x-ticvai-problem-types: [no-approval-route]
+            written; the calling operation passes this refusal on. Or no exchange rate (`fx-rate-unavailable`; ADAM
+            CR-592): the amount is in another currency than the request''s venue currency and finance has no rate from
+            it to the venue currency, purpose reporting, with `effectiveFrom` not after now. Nothing is written; a
+            missing rate is never guessed at.'
+          x-ticvai-problem-types: [no-approval-route, fx-rate-unavailable]
           content:
             application/problem+json:
               schema:
@@ -461,7 +515,23 @@ paths:
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001; R8 lineage request)'
       - query: identity#delegatedAccessRecords
         route: in-process
-        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request)'
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request); the holders of
+          the matched rule''s approverRoleIds, as createApprovalRequest resolves them (ADAM CR-592)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the request''s venue currency (currencyCode of the venue node of its scopePath), which amounts compare in
+          (ADAM CR-592)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the venue''s region currency, when the venue''s currencyCode is null (ADAM CR-592)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'the rate from the amount''s currency to the venue currency, purpose reporting, latest effectiveFrom not
+          after now (ADAM CR-592)'
+      - query: platform-ops#platformApprovalRuleFor
+        route: service
+        for: 'the platform rule a request of subject type tenant is routed by, as createApprovalRequest reads it (ADAM
+          CR-592)'
       - query: ai#approvalRequestScoreRecords
         route: service
         for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
@@ -492,6 +562,13 @@ paths:
         as `aiAssessment`; the same call is repeated on each SLA tick while the request is pending. The call is
         outside the routing decision and the transaction: a slow or failed call leaves `aiAssessment` null
         and changes nothing else. **Context only (MoM 8 September)**.
+
+        **Routed as `createApprovalRequest` routes** (ADAM CR-592, Chinmay, 3 November 2026; CHG-CR592-001): rules
+        are matched the same way, with the same reads (`identity#delegatedAccessRecords`,
+        `tenancy#venueSettingsRecords` and `tenancy#regionSettingsRecords`, `finance#fxRateRecords`): the amount is
+        compared in the request''s venue currency, the approvers are resolved by the same grant rule, and a request
+        of subject type `tenant` is routed by the platform rule read from `platform-ops#platformApprovalRuleFor` over
+        the service route, storing its `approverPermission` and `minimumApprovals` on the request.
 
         '
       tags:
@@ -553,6 +630,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalStateProblem'
+        '422':
+          description: 'No exchange rate (`fx-rate-unavailable`; ADAM CR-592): the amount is in another currency than the
+            request''s venue currency and finance has no rate from it to the venue currency, purpose reporting, with
+            `effectiveFrom` not after now. Nothing is written; a missing rate is never guessed at.'
+          x-ticvai-problem-types: [fx-rate-unavailable]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/evaluate:
@@ -569,7 +655,19 @@ paths:
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001; R8 lineage request)'
       - query: identity#delegatedAccessRecords
         route: in-process
-        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001); the holders of the matched rule''s
+          approverRoleIds, as createApprovalRequest resolves them (ADAM CR-592)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the request''s venue currency (currencyCode of the venue node of its scopePath), which amounts compare in
+          (ADAM CR-592)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the venue''s region currency, when the venue''s currencyCode is null (ADAM CR-592)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'the rate from the amount''s currency to the venue currency, purpose reporting, latest effectiveFrom not
+          after now (ADAM CR-592)'
       x-ticvai-audience:
       - staff
       summary: Does this need approval, and from whom
@@ -587,6 +685,12 @@ paths:
         scope, subject type, amount and `matchAttributes`, and then on the rule''s `condition`, evaluated against
         `attributes` in the language `ApprovalRule.condition` defines; the first rule that matches wins.
         `createApprovalRequest` and `submitApprovalRequest` route by the same match.
+
+        **The same amount and approver rules** (ADAM CR-592, Chinmay, 3 November 2026; CHG-CR592-001): it matches
+        rules as `createApprovalRequest` does, with the same reads (`identity#delegatedAccessRecords`,
+        `tenancy#venueSettingsRecords` and `tenancy#regionSettingsRecords`, `finance#fxRateRecords`): the amount is
+        compared in the venue currency of `scopePath`, and the approver chain it returns is resolved by the same
+        grant rule.
 
         '
       tags:
@@ -625,6 +729,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalRequirement'
+        '422':
+          description: 'No exchange rate (`fx-rate-unavailable`; ADAM CR-592): the amount is in another currency than the
+            request''s venue currency and finance has no rate from it to the venue currency, purpose reporting, with
+            `effectiveFrom` not after now. Nothing is written; a missing rate is never guessed at.'
+          x-ticvai-problem-types: [fx-rate-unavailable]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/decide:
@@ -690,6 +803,13 @@ paths:
         request''s `decisions[]` shows them. **The SLA restarts, it does not resume**: the answering submit sets
         `sla_due_at` again to now plus the rule''s `slaMinutes` (states/approval-request.yaml); no remaining time
         is kept.
+
+        **A request routed by the platform rule** (ADAM CR-592, Chinmay, 3 November 2026; CHG-CR592-001): for a
+        request whose `platform_approver_permission` is set (`ApprovalRequestPlatformRule`), the chain check is
+        replaced by this one: an operator is admitted whose platform token holds that permission, who is not the
+        requester and has not decided this request already. The request is approved once
+        `platform_minimum_approvals` different operators have approved, and rejected on the first rejection. The
+        values stored at routing apply; the platform rule is never read again at decision time.
 
         '
       tags:
@@ -871,6 +991,12 @@ paths:
         cancelPricingRollback cancels its rollback''s waiting request with it, and setDynamicPricingGuardrailPolicy
         its control''s open automation raise (ADAM CR-425). A request that is no longer waiting is left as it is.
 
+
+        **A draft is refused** (ADAM CR-582, Chinmay, 3 November 2026; CHG-CR582-001): a request at `draft` is `409`
+        `ApprovalStateProblem` with `refusedReason` `notSubmitted` and `currentStatus` draft, problem type
+        `not-submitted`. Nothing is stored and the draft stays a draft; a draft is not answered `404`. The other
+        refusals (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`) stay as they are.
+
         '
       tags:
       - request
@@ -905,10 +1031,11 @@ paths:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
           description: 'The request is not waiting. `refusedReason` says which: `alreadyDecided` (approved or rejected),
-            `withdrawn`, `expired` or `cancelled`, and `currentStatus` names the status it is in.
+            `withdrawn`, `expired`, `cancelled`, or `notSubmitted` (still a draft; ADAM CR-582), and `currentStatus`
+            names the status it is in.
 
             '
-          x-ticvai-problem-types: [already-decided, withdrawn, expired, cancelled]
+          x-ticvai-problem-types: [already-decided, withdrawn, expired, cancelled, not-submitted]
           content:
             application/problem+json:
               schema:
@@ -1001,6 +1128,16 @@ paths:
       - query: ai#approvalRequestScoreRecords
         route: service
         for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
+      x-ticvai-reads:
+      - table: platform.scope
+        for: 'assigneeDepartmentId''s eligibility: a row of level department (the decision''s kind department), in the
+          request''s tenant, whose path equals the request''s scopePath or lies under it; TenancyService''s own table
+          (ADAM CR-582)'
+      - table: approvals.request
+        for: 'the request: its status (a draft is 409 not-submitted), scopePath, current level and requester (ADAM
+          CR-582)'
+      - table: approvals.request_approver
+        for: 'assigneePrincipalId''s eligibility: an approver row at the request''s current level (ADAM CR-582)'
       x-ticvai-audience:
       - staff
       summary: Assign, reassign or claim a request in a shared queue
@@ -1012,6 +1149,22 @@ paths:
         among the request''s eligible approvers (`422 assignee-not-eligible`) or is the requester. A request already
         claimed by someone else is `409 already-claimed` unless the caller holds APPROVAL_DELEGATE, which reassigns.
         Assignment narrows who acts; it never widens who may approve, which stays the matrix''s.
+
+
+        **Who is eligible, and a draft** (ADAM CR-582, Chinmay, 3 November 2026; CHG-CR582-001): a department queue is
+        eligible when it is a department of the request''s tenant inside the request''s scope. (1) `assigneeDepartmentId`
+        is eligible when it names a `platform.scope` row of kind department (its `level`), in the request''s tenant,
+        whose path equals the request''s `scopePath` or lies under it; `platform.scope` is the service''s own table,
+        read here. Anything else, an unknown id or a unit of another kind included, is `422 assignee-not-eligible`. No
+        department is refused for being a department. (2) `assigneePrincipalId` is eligible as now: a principal with an
+        `approvals.request_approver` row at the request''s current level, and not the requester. Both fields may be given
+        together; each is checked on its own, and either failing is `422 assignee-not-eligible`. (3) A department
+        assignment only routes the request; it gives nobody the right to decide: `decideApprovalRequest` still refuses
+        anyone without a chain row at the current level (`notInApproverChain`). A department assignment does not stop a
+        chain approver from claiming: claiming sets `assignedToPrincipalId` and keeps `assignedToDepartmentId`. Both
+        fields null returns the request to the shared queue, as now. (4) A request at `draft` is `409`, problem type
+        `not-submitted`, the response schema unchanged. A request that does not exist stays `404`; a request that is no
+        longer waiting keeps `already-decided`.
 
         '
       tags:
@@ -1055,16 +1208,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRequest'
         '409':
-          description: Claimed by somebody else (`already-claimed`), or no longer waiting (`already-decided`).
+          description: Claimed by somebody else (`already-claimed`), no longer waiting (`already-decided`), or still a
+            draft (`not-submitted`; ADAM CR-582).
           x-ticvai-problem-types:
           - already-claimed
           - already-decided
+          - not-submitted
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: The assignee is not an eligible approver of this request, or is its requester (`assignee-not-eligible`).
+          description: The assignee is not an eligible approver of this request, or is its requester, or the department
+            is not a department inside the request's scope, an unknown id or a unit of another kind included
+            (`assignee-not-eligible`; ADAM CR-582).
           x-ticvai-problem-types:
           - assignee-not-eligible
           content:
@@ -1227,11 +1384,16 @@ paths:
         - "P08 ADM-223 Campaign Approval Workflow Designer"
         - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
         - "P08 ADM-329 Approval Matrix Command Center"
+        - "P08 ADM-331 Organizational Hierarchy Routing"
+        - "P08 ADM-333 Venue & Tenant Approval Matrix"
+        - "P08 ADM-334 Value & Threshold Routing"
+        - "P08 ADM-335 Risk-Based & Conditional Routing"
         - "P08 ADM-338 AI Routing Advisor & Matrix Optimization"
         - "P08 BO-086 Approval Matrix"
         - "P08 BO-087 Approval Delegations"
         - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
         - "P08 BO-1149 Administrative Balance Adjustment Studio"
+        - "P08 BO-639 Reviewer Assignment & Delegation"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
       x-ticvai-audience:
@@ -1710,6 +1872,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-badges:
     get:
+      x-ticvai-personal-data: gated
       operationId: listAccreditationBadges
       x-ticvai-audience:
       - staff
@@ -1742,6 +1905,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: issueAccreditationBadge
       x-ticvai-audience:
       - staff
@@ -5751,6 +5915,13 @@ components:
       - id
       - scopePath
       properties:
+        holderSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: applicant
+          x-ticvai-references: pii.subject
+          description: '**The badge holder, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind applicant; null while none is given.'
         scopePath:
           type: string
           readOnly: true
@@ -5763,6 +5934,8 @@ components:
           type: string
           format: uuid
         holderName:
+          x-ticvai-pii: {store: subject.displayName, subject: holderSubjectId}
+          x-ticvai-data-class: personal
           type: string
         zones:
           type: array
@@ -5909,9 +6082,12 @@ components:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           description: '**Amounts compare in the venue''s currency** (the lead, 25 October 2026, r10 round 3, ADAM CR-102;
             CHG-R10ID-020): a request amount in another currency (a supplier''s, a tender''s) is converted into the
-            currency of the venue the request is raised at, at that day''s FX rate (finance `listFxRates`), before it is
-            compared with `minAmount` and `maxAmount`; a tenant- or region-level matrix''s bounds are read in that same
-            venue currency.'
+            currency of the venue the request is raised at, before it is compared with `minAmount` and `maxAmount`; a
+            tenant- or region-level matrix''s bounds are read in that same venue currency. **Which currency and which
+            rate** (ADAM CR-592; CHG-CR592-001): the venue is the venue node of the request''s `scopePath`, its
+            currency that venue''s settings `currencyCode`, or its region''s when that is null; the rate is finance''s
+            (`finance#fxRateRecords`) from the amount''s currency to the venue currency, purpose `reporting`, with the
+            latest `effectiveFrom` not after now. No such rate is `422 fx-rate-unavailable`, never a guess.'
         maxAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -6704,6 +6880,30 @@ components:
             assessedAt:
               type: string
               format: date-time
+    ApprovalRequestPlatformRule:
+      type: object
+      x-ticvai-persistence: approvals.request
+      description: '**What a request routed by the platform rule is decided by** (ADAM CR-592, option A, Chinmay, 3
+        November 2026; CHG-CR592-001). Two nullable columns of the request record, written at routing from the
+        platform rule `platform-ops#platformApprovalRuleFor` answers for a request of subject type `tenant`, and
+        null for every request routed by a tenant rule. No `approvals.request_approver` rows are written for such a
+        request and no platform operator is copied into the tenant database. `decideApprovalRequest` admits an
+        operator whose platform token holds `platformApproverPermission`, who is not the requester and has not
+        decided the request already, and approves it once `platformMinimumApprovals` different operators have
+        approved; the rule is never read again at decision time. **Never returned by any operation**.'
+      properties:
+        platformApproverPermission:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-column: platform_approver_permission
+          description: The platform rule's `approverPermission`, stored at routing; null for a tenant rule.
+        platformMinimumApprovals:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-column: platform_minimum_approvals
+          description: The platform rule's `minimumApprovals`, stored at routing; null for a tenant rule.
     ApprovalDelegation:
       type: object
       x-ticvai-persistence: approvals.delegation
@@ -6824,7 +7024,8 @@ components:
         value per cause, so "someone already approved it" and "it timed out" are told apart.
         Since 2 October 2026 also `cancelApprovalRequest` (`alreadyDecided`, `withdrawn`, `expired`,
         `cancelled`) and `reopenApprovalRequest` (`openRequestExists`, `alreadyDecided`, `withdrawn`),
-        with the values above (CHG-CSP-043). `levelFellBack` is `recordExternalApprovalDecision` answering after the level
+        with the values above (CHG-CSP-043). `notSubmitted` is `cancelApprovalRequest` refusing a request still at
+        `draft` (ADAM CR-582). `levelFellBack` is `recordExternalApprovalDecision` answering after the level
         it was sent to timed out and fell back to people (R8 blocker fix, APPROVALS-TENANCY-C04). The same shape comes from
         `approveUnifiedDecision` (`alreadyDecided`, `withdrawn`, `expired`, `cancelled`). `approvalNoLongerRequired`
         and `noApproverAvailable` are `submitApprovalRequest` finding that the matrix in force now cannot route the
@@ -6849,6 +7050,7 @@ components:
             - levelFellBack
             - approvalNoLongerRequired
             - noApproverAvailable
+            - notSubmitted
           requestId:
             type: string
             format: uuid

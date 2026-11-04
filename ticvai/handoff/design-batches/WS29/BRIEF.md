@@ -130,11 +130,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-284` | Membership & Annual Pass Command Center | B | 11 | 228 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-284` | Membership & Annual Pass Command Center | A | 11 | 228 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-285` | Membership Product & Tier Builder | B | 48 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-286` | Membership Eligibility & Qualification Rule Builder | B | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-287` | Validity, Activation & Expiry Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-288` | Membership Entitlement & Admission Benefit Builder | B | 59 | 0 | 5 | 45 | 0 | 0 | — | notStarted (generated) |
+| `BO-288` | Membership Entitlement & Admission Benefit Builder | A | 59 | 0 | 5 | 45 | 0 | 0 | — | notStarted (generated) |
 | `BO-289` | Membership Usage, Visit & Consumption Rules | B | 19 | 20 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
 | `BO-290` | Family, Household & Dependent Membership Configuration | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-291` | Membership Commercial, Pricing & Channel Association | A | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |

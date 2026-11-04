@@ -1176,7 +1176,7 @@
    "cellName": {
     "type": "string",
     "readOnly": true,
-    "description": "The cell serving this region. One cell per tenant per region (ADR-0014).\n"
+    "description": "The cell serving this region. A region is one cell, and the cell holds many tenants (ADR-0038, which supersedes ADR-0014).\n"
    }
   }
  },
@@ -1261,6 +1261,7 @@
     "nullable": true
    },
    "terminationRequestedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1345,6 +1346,7 @@
     "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
    },
    "accountManagerPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true

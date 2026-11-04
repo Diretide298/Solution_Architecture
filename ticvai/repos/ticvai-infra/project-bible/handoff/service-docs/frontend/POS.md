@@ -629,7 +629,7 @@
 |---|---|---|
 | loading | Checking the credential. The keypad stays visible and disabled. | the shimmer tiles, `wireframes/states/P04 Venue POS states.dc.html#pos-state-loading` (pulled as `wireframe-pos-state-loading.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 | emptyFirstRun | A till nobody has signed into yet. No recent operators, so the quick-login row is not there and the keypad is the whole screen. This is the state on the morning a terminal is first plugged in, and it is the one a venue sees when it opens - not a fault, and it must not read as one. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
-| error | Identity could not be reached. Says so rather than saying the PIN is wrong -- telling an operator their PIN failed when the network did sends them to a supervisor with the wrong question. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| error | Identity could not be reached. Says so rather than saying the PIN is wrong -- telling an operator their PIN failed when the network did sends them to a supervisor with the wrong question. On `401 device-unauthenticated` or `403 workstation-mismatch` it says "This device is not registered" rather than that the PIN is wrong: the device's own credential was refused before any PIN was checked, so no attempt is spent (ADR-0071 amendment of 3 November 2026, CHG-R14H-001; CHG-R14INT-002). | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 | denied | The employee number and PIN do not match, or the account is locked. Names which, and how many attempts remain before the lock. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 | emptyNoAccess | Authentication succeeded and the operator holds no role on this workstation. A real outcome on a shared till -- a steward badged for the gate is not a cashier -- and it is the session that succeeded and the authorisation that did not. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 | mfaRequired | Signed in, not yet through. The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. Email me a code instead is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126). A cashier never reaches this state. | the second-factor modal, `wireframes/states/P04 Venue POS states.dc.html#pos-state-mfa` (pulled as `wireframe-pos-state-mfa.html`); drawn by the package from the approved design (r9), not yet seen by the client |
@@ -1291,7 +1291,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-002 | Sell — Ticket Catalogue | orderId, promotionId |  |
+| POS-002 | Sell — Ticket Catalogue | orderId, productId, promotionId |  |
 | POS-003 | Sell — Timed Entry |  |  |
 | POS-004 | Sell — Seat Map | performanceId |  |
 | POS-005 | Payment | paymentId |  |
@@ -1406,7 +1406,7 @@
 | emptyFirstRun | No omnichannel order fulfilment yet. Offers Record order handover (`recordOrderHandover`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
 | emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the omnichannel order fulfilment are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 | emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `SHIFT_OPEN` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`; `ORDER_MODIFY` for `recordOrderHandover`, `collectShopAndDrop`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. Hand over dropped goods (`collectShopAndDrop`) waits for the connection: it is disabled offline. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1514,7 +1514,7 @@
 | error | Could not load. Names which read failed and leaves the sales exceptions controls untouched. | the could-not-load panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-error` (pulled as `wireframe-pos-state-error.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 | emptyFirstRun | No sales exceptions controls configured. The form opens empty and `recordNoSale` saves the first one; it says what the platform does in the meantime. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
 | emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. A void or a no-sale that needs a supervisor is still signed here: the supervisor picks their name from the till's own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001). | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 | approvalRejected | The supervisor declined the no-sale or void; the drawer stays shut and the reason is shown. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
@@ -1724,7 +1724,7 @@
 | emptyFirstRun | No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
 | emptyNoResults | Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 | emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`, `withdrawFromDepositBox`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
-| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| offline | Working from the local journal. The till keeps taking money; this reconciles on sync. A withdrawal is still countersigned here: the cashier the cash came from picks their name from the till's own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001). | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 
 **Goes to**
 
@@ -1898,7 +1898,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-005 | Charge | discount | payment.take |
-| POS-002 | Sell — Ticket Catalogue | promotionId |  |
+| POS-002 | Sell — Ticket Catalogue | productId, promotionId |  |
 | POS-022 | The order goes to the pass before the guest pays |  |  |
 
 ## POS-022 Send to Kitchen
@@ -2012,7 +2012,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-005 | Charge | discount | payment.take |
-| POS-002 | Sell — Ticket Catalogue | promotionId |  |
+| POS-002 | Sell — Ticket Catalogue | productId, promotionId |  |
 
 ## POS-024 Outlet Setup
 
@@ -2251,7 +2251,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-025 | Till Home |  |  |
-| POS-002 | Sell — Ticket Catalogue |  |  |
+| POS-002 | Sell — Ticket Catalogue | productId |  |
 
 ## POS-028 Table Service
 

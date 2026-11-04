@@ -31,7 +31,7 @@ contracts:
 - identity
 - orders
 - subscription
-deployment:
+deployment: &id001
   target: browser
   distribution: public, served from the Control Plane
   bundleUpdate: immediate on deploy
@@ -41,6 +41,12 @@ deployment:
   deviceOwnership: prospect device, unmanaged
   networkAssumption: public internet
   releaseCadence: monthly
+platformProfiles:
+- platform: P17
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment: *id001
 screenCount: 24
 byWave:
   wave3: 24

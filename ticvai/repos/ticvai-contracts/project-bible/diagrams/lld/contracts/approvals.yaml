@@ -117,6 +117,7 @@ operations:
   - approvals.request
   - approvals.request_approver
   - cache:idempotency
+  - platform.scope
   writes:
   - approvals.request
   - approvals.request_approver

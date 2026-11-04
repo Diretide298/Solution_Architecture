@@ -18,6 +18,101 @@
   "requestBody": "ChannelCreationProfileConfigurationInput",
   "responds": "ChannelCreationProfileConfigurationView"
  },
+ "getChannelFeePayment": {
+  "method": "GET",
+  "path": "/channel-fee-payment",
+  "contract": "catalogue",
+  "summary": "A sales channel's fees, payment and fulfilment configuration, as saved",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channelId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelFeesPaymentFulfillmentConfigurationView"
+ },
+ "getChannelPricingCommercial": {
+  "method": "GET",
+  "path": "/channel-pricing-commercial",
+  "contract": "catalogue",
+  "summary": "A sales channel's pricing and commercial profile, as saved",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channelId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelPricingCommercialProfileAssignmentView"
+ },
+ "getChannelProfile": {
+  "method": "GET",
+  "path": "/channel-profile",
+  "contract": "catalogue",
+  "summary": "A sales channel's profile, as saved",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channelId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelCreationProfileConfigurationView"
+ },
+ "getChannelReadinessValidation": {
+  "method": "GET",
+  "path": "/channel-readiness-validation",
+  "contract": "catalogue",
+  "summary": "A sales channel's readiness and publication state, as last validated",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channelId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelPublicationReadinessAiValidationView"
+ },
+ "getProductCatalogue": {
+  "method": "GET",
+  "path": "/product-catalogue",
+  "contract": "catalogue",
+  "summary": "A sales channel's product assignment, as saved",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channelId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductCatalogueAssignmentView"
+ },
  "listChannelSaleRule": {
   "method": "GET",
   "path": "/channel-sale-rule",

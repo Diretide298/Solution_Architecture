@@ -70,7 +70,7 @@ for (did,dn,sid,sn),v in sec.items():
         'signal_1':f'{top[0][0]}:{top[0][1]:.1f}','signal_2':f'{top[1][0]}:{top[1][1]:.1f}',
         'signal_3':f'{top[2][0]}:{top[2][1]:.1f}','mismatch':'YES' if mismatch else ''})
 
-with open('/mnt/user-data/outputs/TICVAI_domain_drift_scan.csv','w',newline='') as f:
+with open('/mnt/user-data/outputs/TICVAI_domain_drift_scan.csv','w',newline='',encoding='utf-8') as f:
     w=csv.DictWriter(f,fieldnames=list(out[0].keys())); w.writeheader(); w.writerows(out)
 
 flag=[o for o in out if o['mismatch']]

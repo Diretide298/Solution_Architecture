@@ -6,7 +6,12 @@ version: 1
 publisher: tenancy
 description: A firmware rollout finished — completed, halted on its failure threshold, or rolled back.
 aggregate: deviceRollout
-emittedWhen: DeviceFirmwareRollout.status reaches completed, halted or rolledBack
+emittedWhen: DeviceFirmwareRollout.status reaches completed, halted or rolledBack - rollbackDeviceFirmware
+  (rolledBack), setDeviceFirmwareStatus withdrawing a released firmware (its running rollouts halted), or
+  the tenancy#firmwareRollout job (the last wave done, or halted on its failure threshold)
+emittedBy:
+- tenancy.rollbackDeviceFirmware
+- tenancy.setDeviceFirmwareStatus
 payload:
 - field: rolloutId
   type: uuid

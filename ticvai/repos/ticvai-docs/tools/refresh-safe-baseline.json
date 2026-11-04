@@ -1,38 +1,45 @@
 {
- "note": "What refresh-safe.sh accepts as a known failure. A gating checker (run-checks.py CHECKS minus REPORT_ONLY) may fail only if it is listed here AND every error line it prints (FAIL / STALE / ISSUE) matches one of its `known` patterns (Python regex, re.search). Anything else is a NEW failure and the refresh is not merged. Report-only checkers (check-bindings and the others in run-checks.py REPORT_ONLY) never gate, so they are not listed. Remove an entry when its failure is fixed; never widen a pattern to let a new failure through. Also judged: refresh.sh's closing tools/ coverage block (refresh_tools_coverage). Recorded 1 October 2026 at 278cc437.",
+ "note": "The release gate's allowlist: a gating checker (run-checks.py CHECKS minus REPORT_ONLY) may fail at a release only when this file names every finding line it prints. run-checks.py applies it itself (tools/gate_allowlist.py), so a bare `python tools/run-checks.py` and refresh-safe.sh give the same verdict, and a pass over an allowlisted failure says `PASS with N allowlisted failure(s)`, never a bare PASS. Since r14 (3 November 2026, CHG-R14I-001; the r13 system review E-01, E-02, E-04): an entry carries `added`, `expires` (at most 14 days after `added`, CLAUDE.md rule 15), `approved_by` (the lead), `change` (the CHG-/CR- id) and `why`; each `known` pattern (Python regex, re.search) names ONE finding, never a count or a verdict line; a checker that crashed is never let through. An undated, unapproved, expired or count-pinned entry fails the gate itself (run-checks.py, and check-baseline-ratchet.py on every run). Emptied at r14: the three checkers listed until r13 (check-authored-inputs, check-screen-patterns, check-screen-permissions) had undated entries 14 to 33 days old and are fixed; the one entry since is the lead's dated exception of 3 November 2026 for the NP ratchet (CHG-R14I-012).",
+ "format": {
+  "checkers": {
+   "<checker name>": {
+    "added": "YYYY-MM-DD",
+    "expires": "YYYY-MM-DD (at most 14 days after added)",
+    "approved_by": "the lead",
+    "change": "CHG-XXX-nnn or CR-nnn",
+    "why": "what fails and why it may ship once",
+    "known": [
+     "one pattern per finding line"
+    ]
+   }
+  },
+  "refresh_tools_coverage": {
+   "known_unexcused": [
+    {
+     "name": "<tool>",
+     "added": "",
+     "expires": "",
+     "approved_by": "",
+     "change": "",
+     "why": ""
+    }
+   ]
+  }
+ },
  "checkers": {
-  "check-package": {
-   "why": "two errors in docs about build-readiness-21-september.md: a platform code/name mismatch and a platform code (P03) no screen file defines; the document is historical",
-   "known": []
-  },
-  "check-authored-inputs": {
-   "why": "seven authored inputs written against an older contract surface; nothing in tools/ rebuilds them (docs/regenerating-authored-docs.md)",
-   "known": [
-    "^handoff/service-decomposition\\.json\\s",
-    "^handoff/contract-backlog\\.json\\s",
-    "^handoff/backlog-clusters\\.json\\s",
-    "^handoff/traceability\\.json\\s",
-    "^handoff/artefact-audit\\.md\\s",
-    "^handoff/schema-viewer-notes\\.md\\s",
-    "^handoff/rag-index-sources\\.md\\s"
-   ]
-  },
   "check-screen-patterns": {
-   "why": "known on main at e875d996 and named by the lead's brief of 5 October 2026 as not to be chased in r2 (CHG-R4-004): the NP ceiling (ADM-340 fixed at r4, CHG-R6-042, 12 October 2026) (284 later-sprint findings above 191), and the P8/READ findings the bundle (handoff/service-docs/op-release.json) gives BO-087, BO-344, BO-1018, BO-1034, BO-1179, BO-1187 and ADM-606, plus BO-954 Venue Canvas, whose setup task the r4 bundle created in Block A (APP-SETUP-BO-954, live since the r4 apply) while the screen still says wave 3; the r4 gate ran before the bundle was committed and never saw it (13 October 2026). NP is 285 with it. Re-pinned 18 October 2026 (r7 integration gate) at 39: the r6 bundle (785d8013, committed after the r6 gate ran on ee22b123 and saw 11) builds 21 more screens in Block A by the r6 plan's deliberate changes (CHG-TKT-008: the command centres ADM-088, ADM-108, ADM-268; the Block A setup app-module AM-SETUP-TICKETING-GUEST-COMMERCE-P08: ADM-071, -089, -090, -091, -094, -095, -106, -109, -115, -259, -260, -261, -263, -266, -267, -269, BO-291, BO-441), while their screen files still say wave 2 or 3 (P8 +21), and seven of them show data with no read (READ +7: ADM-109, -115, -259, -260, -261, -266, -267), counted outside Block A before. CHG-TKT-008's notes leave ADM-106, ADM-259..267 and BO-291 to the lead. Identical at origin/main 34a12fe0 and at a3db4cb5: no class fix changed them. The count is pinned: one more finding is a new failure. Re-pinned 3 November 2026 at 28 (CHG-R13INT-015), approved by the lead (\"OKay\", after being told it only lowers the pin): every one of the 28 is one the pin of 39 held; ADM-089, -090, -091, -094, -095, -106, -109, -115 and BO-441 are no longer findings, and BO-288 and CMS-050 read what they edit (CHG-R13INT-014)",
+   "added": "2026-11-03",
+   "expires": "2026-11-17",
+   "approved_by": "Chinmay",
+   "change": "CHG-R14I-012",
+   "why": "279 later-sprint screens wait for a person to define them (back-office wireframes not yet signed; held tasks). The lead, 3 November 2026, on lane i's stop: \"Dated exception, 14 days\". Only the NP ratchet's one finding at exactly 312 over the ceiling of 191 is let through: one more later-sprint screen that needs a person is a new line and fails.",
    "known": [
-    "^28 finding\\(s\\): NP 1, P8 20, READ 7$"
-   ]
-  },
-  "check-screen-permissions": {
-   "why": "DEV-001 (developer portal home): its no-access text names DEVELOPER_VIEW, which listApiVersions and listApiScopes stopped requiring when they became public (R8 blocker FOUNDATION-AI-C17, CHG-R8SAT-001). The text is visible content under check-approved-ui, so it changes only with the client's approval: the new wording is in Friday's client note and audit lane-screens-pending-ui.json (DEV-001-followup), and the screen carries a build note. Added 20 October 2026 (r8 integration). BO-293 (membership product validation): its no-access text names PLATFORM_CELL_MANAGE, which its operations stopped requiring when the membership operations moved to MEMBERSHIP_VIEW / MEMBERSHIP_MANAGE (GPS-C33, answer A; BC-395); the same rule, parked as GPS-C33 in lane-screens-pending-ui.json (r8 integration, CHG-R8INT-017). Remove each when its approved wording is applied.",
-   "known": [
-    "^SP-NOACCESS\\s+P14-developer-portal\\.yaml DEV-001: emptyNoAccess names DEVELOPER_VIEW, which none of its operations requires \\(none\\)$",
-    "^SP-NOACCESS\\s+P08-venue-back-office\\.yaml BO-293: emptyNoAccess names PLATFORM_CELL_MANAGE, which none of its operations requires \\(MEMBERSHIP_MANAGE, MEMBERSHIP_VIEW\\)$"
+    "^NP-CEILING\\s+312 > 191 NP findings in Sprints 3 and later above the ceiling: "
    ]
   }
  },
  "refresh_tools_coverage": {
-  "why": "refresh.sh ends by failing when tools/ holds a .py it neither runs nor names in _EXCLUDED. At 278cc437 it fails on these, and nobody saw, because refresh.sh stops at run-checks (two known gate failures) before reaching it. refresh-safe.sh runs the block and fails only on a name not listed here. Deciding each one (run it, or excuse it in _EXCLUDED with the reason) is refresh.sh's owner's call. Emptied 1 October: every tool is now run or excused in _EXCLUDED.",
+  "why": "refresh.sh ends by failing when tools/ holds a .py it neither runs nor names in _EXCLUDED; refresh-safe.sh runs the block and fails on a name not allowlisted here (entries as above). Empty since 1 October: every tool is run or excused in _EXCLUDED.",
   "known_unexcused": []
  }
 }

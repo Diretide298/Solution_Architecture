@@ -4092,10 +4092,42 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.attribution_touch
+  - marketing.booking_consent_record
+  - marketing.case
+  - marketing.case_service_action
+  - marketing.challenge_progress
+  - marketing.communication_policy_decision
   - marketing.consent_record
+  - marketing.conversation
+  - marketing.device_consent
   - marketing.form_submission
+  - marketing.guest_device
   - marketing.guest_document
+  - marketing.guest_document_upload
+  - marketing.guest_note
+  - marketing.guest_preference
   - marketing.guest_profile
+  - marketing.guest_relationship
+  - marketing.invitation
+  - marketing.journey_enrollment
+  - marketing.lost_item
+  - marketing.loyalty_position
+  - marketing.message_dispatch
+  - marketing.privacy_action
+  - marketing.privacy_audit_event
+  - marketing.privacy_exception
+  - marketing.privacy_request
+  - marketing.referral
+  - marketing.review
+  - marketing.subscription
+  - marketing.suppression
+  - marketing.touch_point
+  - marketing.waiver_requirement
+  - marketing.waiver_signature
+  - marketing.wishlist_item
   writes:
   - cache:idempotency
+  - marketing.guest_profile
+  - marketing.suppression
   - platform.outbox

@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 89 of 470 |
+| Operations in the slice | 89 of 475 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -72,7 +72,7 @@
 | event | [`enterWaitingRoom`](#enterwaitingroom) | POST | `/performances/{performanceId}/waiting-room/entries` | core | 1 | GST-046, WEB-015 |
 | event | [`getPerformance`](#getperformance) | GET | `/performances/{performanceId}` | core | 1 | BO-015, BO-019, BO-726, GST-006, GST-041, GST-049 … |
 | event | [`getWaitingRoomPosition`](#getwaitingroomposition) | GET | `/performances/{performanceId}/waiting-room/entries/{waitingEntryId}` | core | 1 | GST-046, WEB-015 |
-| event | [`listEvents`](#listevents) | GET | `/events` | core | 1 | BO-015, BO-019, BO-694, CMS-101, GST-005 |
+| event | [`listEvents`](#listevents) | GET | `/events` | core | 1 | BO-015, BO-019, BO-1049, BO-694, CMS-101, GST-005 |
 | event | [`listPerformances`](#listperformances) | GET | `/events/{eventId}/performances` | core | 1 | BO-015, BO-019, BO-725, GST-003, GST-004, GST-005 … |
 | event | [`updateEvent`](#updateevent) | PATCH | `/events/{eventId}` | setup | 1 | BO-015, BO-019 |
 | event | [`updatePerformance`](#updateperformance) | PATCH | `/performances/{performanceId}` | setup | 1 | BO-015, BO-019, BO-978 |
@@ -90,10 +90,10 @@
 | product | [`checkBookingEligibility`](#checkbookingeligibility) | POST | `/eligibility-checks` | core | 1 | GST-007, WEB-006 |
 | product | [`getGroupPackageDefinition`](#getgrouppackagedefinition) | GET | `/products/{productId}/group-package` | core | 1 | BO-011, GST-072, WEB-031 |
 | product | [`getProduct`](#getproduct) | GET | `/products/{productId}` | core | 1 | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-004 … |
-| product | [`getProductEligibilityRule`](#getproducteligibilityrule) | GET | `/products/{productId}/eligibility-rule` | core | 1 | BO-161, GST-004, WEB-004 |
+| product | [`getProductEligibilityRule`](#getproducteligibilityrule) | GET | `/products/{productId}/eligibility-rule` | core | 1 | BO-161, GST-004, GST-007, WEB-004 |
 | product | [`listAlternativeCodes`](#listalternativecodes) | GET | `/products/{productId}/alternative-codes` | core | 1 | BO-007, BO-012, EMP-034, POS-002, POS-003, PTR-006 |
 | product | [`listGroupPackages`](#listgrouppackages) | GET | `/group-packages` | core | 1 | BO-268, GST-072, WEB-031 |
-| product | [`listProductVariants`](#listproductvariants) | GET | `/products/{productId}/variants` | core | 1 | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008 … |
+| product | [`listProductVariants`](#listproductvariants) | GET | `/products/{productId}/variants` | core | 1 | BO-007, BO-008, BO-012, BO-048, BO-1049, EMP-034 … |
 | product | [`listProducts`](#listproducts) | GET | `/products` | core | 1 | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048 … |
 | product | [`resolveProductByCode`](#resolveproductbycode) | GET | `/products/resolve` | core | 1 | BO-007, BO-012, EMP-034, POS-002, POS-003, PTR-006 |
 | product | [`setAlternativeCodes`](#setalternativecodes) | PUT | `/products/{productId}/alternative-codes` | setup | 1 | BO-007, BO-012 |
@@ -384,6 +384,8 @@ A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32,
 **Read under the venue the request names** (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule for every public guest read is on `guestAuth`): the guest app or site sends `X-Venue-Id`; the server checks it is one of the tenant's venues (else 404) and reads under a read-only scope of that venue's path, so `promotions.bundle`'s venue row-level security finds the venue's bundles with no session. An anonymous guest session carries the same venue scope (CR-183).
 **What a guest sees** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002). A bundle is **published** when `promotions.bundle.variant_id` is not null (r8, CHG-R8MIG-023: "null until published"), and **withdrawn** when `is_active` is false. A guest or a visitor gets the bundle only when `variant_id` is set, `is_active` is true and now is within `valid_from` / `valid_to` (a null bound is open); any other bundle, draft, unpublished, withdrawn or out of its window, answers 404, never a reason. `variant_id` is set by the step that creates the bundle's catalogue product, the publication step of `updateBundle`. `price` and `savingsAmount` are Money in the venue's currency and scale, read with `tenancy#venueSettingsRecords`.
 
+**Enough to show and to add to the cart** (ADAM CR-597, option A with guest-only shapes, Chinmay, 3 November 2026; CHG-CR597-001). `GuestBundle.variantId` is the bundle's own sellable variant (`promotions.bundle.variant_id`), required: every bundle a guest can see has one. `components` are `GuestBundleComponent` (id, variantId, name, quantity; description, componentKind, isOptional) and `choiceGroups` are `GuestBundleChoiceGroup` (id, label, choose, options; allowDuplicates) with `GuestBundleChoiceOption` options (id, variantId, name; description, quantity, isDefault). A name and description are the catalogue's public text for the variant: the product name, plus the variant name when the product has more than one variant. Every name is looked up in the same read, from `catalogue.product` and `catalogue.variant`, under the venue the request names, in one lookup for all the bundle's variant ids, not one per row. An option that is not offered (`unavailableBehaviour` `hideOption`) is left out; a group that can no longer be met answers 404, as any bundle a guest cannot buy. No menu item, redemption outlet or substitution field is sent, and no option price: the bundle price does not move with the choice. `BundleComponent`, `BundleChoiceGroup` and `getBundle` are unchanged, and nothing new is stored.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -393,7 +395,7 @@ A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32,
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
+| Reads | `catalogue.product`, `catalogue.variant`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
 | Writes | - |
 | Called by | GST-004, GST-056, WEB-008 |
 
@@ -409,6 +411,7 @@ A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32,
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
+| variantId | string (uuid) | yes | The bundle's own sellable variant, promotions.bundle.variant_id (ADAM CR-597, option A, Chinmay, 3 November 2026; CHG-CR597-001). |
 | name | string | yes |  |
 | description | string |  | (nullable) |
 | kind | BundleKind: enum (fixed, dynamic, mandatory, optional, promotional) |  |  |
@@ -421,30 +424,26 @@ A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32,
 | savingsAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | savingsAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | savingsPercentage | number |  | (nullable) |
-| components | array of BundleComponent |  |  |
-| components[].id | string (uuid) |  | Added 20 August. (read-only) |
+| components | array of GuestBundleComponent |  | The bundle's components in the guest's shape (ADAM CR-597), named from the catalogue. |
+| components[].id | string (uuid) | yes |  |
 | components[].variantId | string (uuid) | yes |  |
-| components[].componentKind | BundleComponentKind: enum (admission, fnbMenuItem, retail, addOn, other) |  | What a bundle component entitles the guest to (decided 29 September, MOB-4). (default admission) |
-| components[].menuItemId | string (uuid) |  | The F&B menu item a fnbMenuItem component entitles the guest to (decided 29 September, MOB-4): the meal of a *meal combo with admission*. (nullable) |
-| components[].redeemAtOutletIds | array of string (uuid) |  | Outlets that redeem an fnbMenuItem component; empty means any outlet of the component's venue that has the menu item on a live menu (MOB-4). (max items 20) |
+| components[].name | string | yes | The catalogue's public text for the component's variant: the product name, plus the variant name when the product has more than one variant. |
+| components[].description | string |  | The catalogue's public description of the component's product. (nullable) |
 | components[].quantity | integer | yes | (min 1) |
-| components[].isOptional | boolean |  | (default False) |
-| components[].substituteVariantIds | array of string (uuid) |  | For dynamic bundles — guest chooses among these. |
-| components[].substitutionTriggers | array of enum (soldOut, capacityExhausted, productSuspended, venueClosed, externalApiUnavailable, inventoryBelowThreshold) |  | When a substitute from substituteVariantIds may replace this component (Dynamic Component Substitution Engine). (nullable) |
-| components[].substitutionPriceEffect | enum (samePrice, surcharge, reducedPrice) |  | What a substitution does to the bundle price. (default samePrice) |
-| components[].substitutionApproval | enum (none, customer, operator) |  | Who must accept a substitution before it stands. (default customer) |
-| components[].venueId | string (uuid) |  | Where this component is redeemed. (nullable) |
-| choiceGroups | array of BundleChoiceGroup |  |  |
-| choiceGroups[].id | string (uuid) |  | (read-only) |
-| choiceGroups[].label | string | yes | What the guest is asked. |
-| choiceGroups[].choose | integer | yes | How many options the guest picks. (min 1) |
-| choiceGroups[].allowDuplicates | boolean |  | Whether the same option may be picked twice. (default False) |
-| choiceGroups[].options | array of object | yes | The rows of promotions.bundle_choice_option, one per option, each keyed to its group. (min items 2) |
-| choiceGroups[].options[].id | string (uuid) |  | (read-only) |
+| components[].componentKind | BundleComponentKind: enum (admission, fnbMenuItem, retail, addOn, other) |  | What a bundle component entitles the guest to (decided 29 September, MOB-4). (default admission) |
+| components[].isOptional | boolean |  |  |
+| choiceGroups | array of GuestBundleChoiceGroup |  | The bundle's choice groups in the guest's shape (ADAM CR-597). |
+| choiceGroups[].id | string (uuid) | yes |  |
+| choiceGroups[].label | string | yes |  |
+| choiceGroups[].choose | integer | yes | (min 1) |
+| choiceGroups[].allowDuplicates | boolean |  |  |
+| choiceGroups[].options | array of GuestBundleChoiceOption | yes | The options offered; one not offered (unavailableBehaviour hideOption) is left out. |
+| choiceGroups[].options[].id | string (uuid) | yes |  |
 | choiceGroups[].options[].variantId | string (uuid) | yes |  |
-| choiceGroups[].options[].quantity | integer |  | (default 1) |
-| choiceGroups[].options[].isDefault | boolean |  | (default False) |
-| choiceGroups[].unavailableBehaviour | enum (hideOption, hideBundle) |  | An option that has sold out for the chosen date is not offered. (default hideOption) |
+| choiceGroups[].options[].name | string | yes | The catalogue's public text for the option's variant, as for a component. |
+| choiceGroups[].options[].description | string |  | (nullable) |
+| choiceGroups[].options[].quantity | integer |  |  |
+| choiceGroups[].options[].isDefault | boolean |  | Preselected on the screen. |
 | validFrom | string (date-time) |  | (nullable) |
 | validTo | string (date-time) |  | (nullable) |
 
@@ -769,7 +768,9 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 Repricing every adult admission before a season is routine and currently means one call per product. **Runs as a dry run first**, for the reason `assessProductChange` exists.
 **Escalates to `PRICE_CONFIGURE` above a value threshold** (decided 28 September, audit R197): a run that changes any price by more than the venue setting `catalogue.bulkPriceChangeEscalationPercent` (proposed 10%) or touches more than `catalogue.bulkPriceChangeEscalationCount` prices (proposed 50) needs `PRICE_CONFIGURE`; below both, `PRODUCT_CONFIGURE` is enough. Both are venue settings with a tenant default in `tenancy.VenueSettings`, proposed, client to correct. The dry run reports whether the run escalates; a real run that escalates without `PRICE_CONFIGURE` is a `403` (`price-escalation-required`).
 
-**What a run touches and what it leaves** (ADAM CR-544; Chinmay, 3 November 2026; CHG-CR544-001): it leaves untouched what its contract says it cannot touch, by rules on stored columns, and its result says whether the run escalates. **Selection:** `categoryId` (that exact category), `productKind` (the `ProductKind` enum), `priceListId` and `channel` combine with AND; with none given, every product of the venue is selected. `channel` is the catalogue `Channel` enum (pos, kiosk, web, mobile, b2b, ota, callCentre) and matches price lists whose `channels` contain it. A run changes `catalogue.price` (`Price.amount`) for the matched products' variants on the matched price lists, except these, which stay unchanged and are named in `skipped`: `partnerNetRate`, the price list's `price_list_type` is b2b, reseller or ota; `fixedPriceBundle`, the product has a `catalogue.package_pricing` row with `pricing_model` fixedPackagePrice, for that price list or with no price list; `openChangeRequest`, the product is named, by `change_request.product_id` or by a `change_request_line` with `object_type` product, in a pricing change request whose status is not rejected, published or rolledBack. `skipped` has one {productId, reason} per product and reason. `productsMatched` counts the products matched; `pricesChanged` counts the price rows changed, or that would change. **Adjustment:** `roundTo` rounds to the nearest multiple, half away from zero; without it, the result is rounded to the currency's scale. Any result below zero refuses the whole run with `400 validation` naming the price, and nothing changes. **Escalation:** `BulkPriceResult.escalates` is true when any changed price moves by more than `catalogue.bulkPriceChangeEscalationPercent`, or `pricesChanged` exceeds `catalogue.bulkPriceChangeEscalationCount` (venue settings). The dry run answers it. A real run that escalates, from a caller without `PRICE_CONFIGURE`, answers `403 price-escalation-required` and changes nothing. **effectiveFrom:** null, now or past applies now. A future `effectiveFrom` answers `400 validation` saying a future-dated change goes through a pricing change request, since `catalogue.price` stores no validity. Every changed price writes what `setPrices` writes: audit entry and versions.
+**What a run touches and what it leaves** (ADAM CR-544; Chinmay, 3 November 2026; CHG-CR544-001): it leaves untouched what its contract says it cannot touch, by rules on stored columns, and its result says whether the run escalates. **Selection:** `categoryId` (that exact category), `productKind` (the `ProductKind` enum), `priceListId` and `channel` combine with AND; with none given, every product of the venue is selected. `channel` is the catalogue `Channel` enum (pos, kiosk, web, mobile, b2b, ota, callCentre) and matches price lists whose `channels` contain it. A run changes `catalogue.price` (`Price.amount`) for the matched products' variants on the matched price lists, except these, which stay unchanged and are named in `skipped`: `partnerNetRate`, the price list's `price_list_type` is b2b, reseller or ota; `fixedPriceBundle`, the product has a `catalogue.package_pricing` row with `pricing_model` fixedPackagePrice, for that price list or with no price list; `openChangeRequest`, the product is named, by `change_request.product_id` or by a `change_request_line` with `object_type` product, in a pricing change request whose status is not rejected, published or rolledBack. `skipped` has one {productId, reason} per product and reason. `productsMatched` counts the products matched; `pricesChanged` counts the price rows changed, or that would change. **Adjustment:** `roundTo` rounds to the nearest multiple, half away from zero; without it, the result is rounded to the currency's scale. Any result below zero refuses the whole run with `400 validation` naming the price, and nothing changes. **Escalation:** `BulkPriceResult.escalates` is true when any changed price moves by more than `catalogue.bulkPriceChangeEscalationPercent`, or `pricesChanged` exceeds `catalogue.bulkPriceChangeEscalationCount` (venue settings). The dry run answers it. A real run that escalates, from a caller without `PRICE_CONFIGURE`, answers `403 price-escalation-required` and changes nothing. **effectiveFrom:** null, now or past applies now. A future `effectiveFrom` answers `400 validation` saying a future-dated change goes through a pricing change request, since `catalogue.price` stores no validity.
+
+**What a run writes besides prices** (ADAM CR-580, Chinmay, 3 November 2026, superseding CR-558; CHG-CR580-001): a bulk price change is recorded in Catalogue's audit, one entry per changed price, and writes no version rows. A real run that changes prices writes, in the same transaction as the `catalogue.price` updates, one `catalogue.audit_entry` per changed price through the shared `AuditEntries.InsertAsync`, filled as the other pricing handlers fill it: `domain` pricing, `entity_type` price, `entity_id` the price id, `product_id` the price's product, `field` list_price, `previous_value` and `new_value` the old and new amount as decimal strings, the caller as actor, `occurred_at` the run's time. It writes no product version row: a product version is defined once by `updateProduct`, whose content hash and snapshot cover the product and its media, channel texts, sale permissions and owner forms, not prices, so a price-only change leaves that hash unchanged and there is no version. It writes no price-list version row: price-list versions are created only when an approved pricing change request publishes, and pricing rollback restores them from their snapshot; a price change that must be reversible by rollback goes through a pricing change request. A dry run, a skipped product, a price whose new amount equals the old one, and a refused run (400 or 403) write no audit entry. Not the kernel's audit trail (`IAuditTrail`): this operation's audit is `catalogue.audit_entry`.
 
 |  |  |
 |---|---|
@@ -780,7 +781,7 @@ Repricing every adult admission before a season is routine and currently means o
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.change_request`, `catalogue.change_request_line`, `catalogue.package_pricing`, `catalogue.price`, `catalogue.price_list`, `catalogue.product` |
-| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price`, `catalogue.price_list`, `catalogue.product_version` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.price`, `catalogue.price_list` |
 | Called by | BO-009 |
 
 **Parameters**
@@ -863,7 +864,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 |---|---|---|---|
 | code | string | yes | The clone's code, exactly as CreateProductRequest.code (ADAM CR-545) - unique per tenant compared ignoring case; a used code is 409 duplicate-code, from the unique index on insert. (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | As Product.name (ADAM CR-545). (max length 200) |
-| includeVariants | boolean |  | (default True) |
+| includeVariants | boolean |  | Whether the source's variants are copied (under new ids). (default True) |
 | includePrices | boolean |  | When true, every catalogue.price row of each copied source variant is copied to the matching new variant, on the same price list (ADAM CR-545). (default False) |
 
 **Response**: `Product`
@@ -875,7 +876,10 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| bookingEntry | enum (dateFirst, productFirst, venueMap, timeWindow, bundle) |  | Which booking screen Book opens (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). (read-only; nullable) |
+| bundleId | string (uuid) |  | Set only when bookingEntry is bundle (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose variant_id is this product's variant, while getGuestBundle would return it (published, active,… (read-only; nullable) |
 | fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
+| displayOrder | integer |  | Where this product sorts among the venue's products in listProducts, lower first. (default 100; nullable) |
 | isFeatured | boolean |  | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. (default False) |
 | compareAtPrice | object |  | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. (nullable) |
 | compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1196,6 +1200,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Left |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMembershipBenefits
@@ -1278,6 +1283,7 @@ Retail Board 2. **`listSeatCategories` existed and a product category did not** 
 **`GET /search`**: Find something by name
 
 **The guest app browses by category and cannot search.** On a venue with two hundred products that is the difference between finding a thing and giving up.
+**Where Book goes: `bookingEntry` and `bundleId`** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). On a guest or visitor read every answered product carries the two read-only fields, worked out on read and never stored; both are null on staff reads. `Product.bookingEntry` states the rule. The flow rule is WhiteLabel's, asked once per page through `white-label#publishedBookingFlowSteps` (service route), the way the published booking settings are read from white-label; Catalogue never copies the rule, and a product that does not resolve gets the kind fallback, never an error for the page.
 Distinct from `semanticSearch`, which is AI and retrieves from documents. This is a keyword search over the sellable catalogue, and it works with no AI configured — a venue without an assistant still needs a search box.
 Scoped to what is on sale at the venue and channel, so a guest never finds a product they cannot buy, **with one exception: information-only products** (decided 29 September, rev 3 REV3-14). A product with `guestListing: infoOnly` is returned whether or not it is on sale, flagged with its `guestListing` and `notBookableLabel`, so a guest finds it, reads it and is told it cannot be booked online; the result opens the product's details and never offers to add it to the basket. The old rule *a guest never finds what they cannot buy* still holds for `bookable` products and is superseded for `infoOnly` ones. A `hidden` product is never returned to a guest. When the venue's `BookingFlowConfig.showInfoOnly` is off, `infoOnly` products are left out as well.
 **Help me choose narrows the search too** (decided 29 September, W4): `guidedAnswerIds` applies the chosen answers' filters, exactly as on `listProducts`.
@@ -3345,6 +3351,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | performances[].eventId | string (uuid) | yes |  |
 | performances[].startsAt | string (date-time) | yes |  |
 | performances[].endsAt | string (date-time) | yes |  |
+| performances[].admissionStartsAt | string (date-time) |  | When admission opens for the performance (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): stored as catalogue.performance.admission_starts_at, nullable. (nullable) |
 | performances[].approvalRequestId | string (uuid) |  | BL-048. (nullable) |
 | performances[].requiresApprovalToCancel | boolean |  | Cancelling a sold performance is the one transition that needs a name against it. (default True) |
 | performances[].status | enum (scheduled, onSale, soldOut, suspended, cancelled, completed) | yes |  |
@@ -3455,6 +3462,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | eventId | string (uuid) | yes |  |
 | startsAt | string (date-time) | yes |  |
 | endsAt | string (date-time) | yes |  |
+| admissionStartsAt | string (date-time) |  | When admission opens for the performance (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): stored as catalogue.performance.admission_starts_at, nullable. (nullable) |
 | approvalRequestId | string (uuid) |  | BL-048. (nullable) |
 | requiresApprovalToCancel | boolean |  | Cancelling a sold performance is the one transition that needs a name against it. (default True) |
 | status | enum (scheduled, onSale, soldOut, suspended, cancelled, completed) | yes |  |
@@ -3551,7 +3559,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Guest callable | True |
 | Reads | `catalogue.event` |
 | Writes | - |
-| Called by | BO-015, BO-019, BO-694, CMS-101, GST-005 |
+| Called by | BO-015, BO-019, BO-1049, BO-694, CMS-101, GST-005 |
 
 **Parameters**
 
@@ -3636,6 +3644,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | items[].eventId | string (uuid) | yes |  |
 | items[].startsAt | string (date-time) | yes |  |
 | items[].endsAt | string (date-time) | yes |  |
+| items[].admissionStartsAt | string (date-time) |  | When admission opens for the performance (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): stored as catalogue.performance.admission_starts_at, nullable. (nullable) |
 | items[].approvalRequestId | string (uuid) |  | BL-048. (nullable) |
 | items[].requiresApprovalToCancel | boolean |  | Cancelling a sold performance is the one transition that needs a name against it. (default True) |
 | items[].status | enum (scheduled, onSale, soldOut, suspended, cancelled, completed) | yes |  |
@@ -3721,6 +3730,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 Moving a performance that has sold tickets is refused. Use cancellation, which notifies holders and refunds them — silently relocating a guest's booking is not a change, it is a surprise.
 
+**How the refusal is decided** (ADAM CR-579, Chinmay, 3 November 2026, option A; CHG-CR579-001), in this operation's transaction under the caller's grant. (1) The performance row is read; unknown or out of scope is `404` as today. (2) **Sold tickets:** the performance has sold tickets when any `catalogue.channel_capacity` row with its `performance_id` has `sold` greater than 0, the same test event cancellation uses; it is read only when the body carries `startsAt` or `endsAt`. (3) **A timing change** is a `startsAt` or `endsAt` that differs from the stored `starts_at` or `ends_at`; a value equal to the stored one is not a change. A timing change on a performance with sold tickets is `409 performance-has-sold-tickets` and nothing is written. `status`, `language`, `format`, `minutesOnScreen` and `admissionRulesId` are accepted whether tickets are sold or not; status moves follow `states/performance.yaml` as today (`409 performance-transition-not-allowed`). (4) `admissionRulesId` is stored as sent in `admission_rules_id`. When the database refuses it on the column's foreign key to Access's admission rules, the answer is `400 validation` naming `admissionRulesId`, and nothing is written; Access's tables are not read. (5) `catalogue.channel_capacity` is read-only here: `sold` and every other column of it are never written.
+
 |  |  |
 |---|---|
 | Permission | `PERFORMANCE_CONFIGURE` |
@@ -3729,7 +3740,7 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.performance` |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance` |
 | Writes | `cache:idempotency`, `catalogue.performance` |
 | Called by | BO-015, BO-019, BO-978 |
 | State model | Performance ([states/performance.yaml](../../../states/performance.yaml)): moves `scheduled` -> `onSale`, `onSale` -> `suspended`, `suspended` -> `onSale` |
@@ -3761,6 +3772,7 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 | eventId | string (uuid) | yes |  |
 | startsAt | string (date-time) | yes |  |
 | endsAt | string (date-time) | yes |  |
+| admissionStartsAt | string (date-time) |  | When admission opens for the performance (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): stored as catalogue.performance.admission_starts_at, nullable. (nullable) |
 | approvalRequestId | string (uuid) |  | BL-048. (nullable) |
 | requiresApprovalToCancel | boolean |  | Cancelling a sold performance is the one transition that needs a name against it. (default True) |
 | status | enum (scheduled, onSale, soldOut, suspended, cancelled, completed) | yes |  |
@@ -3775,6 +3787,8 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 |  | admissionRulesId names no admission rules: the database refused it on the column's foreign key to Access's admission rules; errors[] names admissionRulesId and nothing is written (ADAM CR-579). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A timing change on a performance with sold tickets, or a status move the state model does not allow. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4039,6 +4053,7 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Extended |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Already expired, or VenueSettings.seating.seatHoldMaxExtensions is reached (proposed default 2, audit R094). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4398,6 +4413,8 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 Currency must match the region's currency and scale. A price in a currency the region does not use is rejected — money carries its scale, and a mismatched scale silently truncates.
 **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation.
 
+**What it writes besides prices** (ADAM CR-580, Chinmay, 3 November 2026; CHG-CR580-001): the rule `bulkChangePrices` states. One `catalogue.audit_entry` per changed price, and no version rows: no product version and no price-list version.
+
 |  |  |
 |---|---|
 | Permission | `PRICE_CONFIGURE` |
@@ -4407,7 +4424,7 @@ Currency must match the region's currency and scale. A price in a currency the r
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.price_list` |
-| Writes | `cache:idempotency`, `cache:resolution`, `catalogue.price_list` |
+| Writes | `cache:idempotency`, `cache:resolution`, `catalogue.audit_entry`, `catalogue.price_list` |
 | Called by | BO-009, BO-291, BO-601 |
 
 **Parameters**
@@ -4658,6 +4675,7 @@ Checks a party's declared ages and heights against every product in the booking 
 **`GET /products/{productId}`**: Read a product
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a product that is published, and nothing in draft or unpublished; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Where Book goes: `bookingEntry` and `bundleId`** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). On a guest or visitor read every answered product carries the two read-only fields, worked out on read and never stored; both are null on staff reads. `Product.bookingEntry` states the rule. The flow rule is WhiteLabel's, asked once per page through `white-label#publishedBookingFlowSteps` (service route), the way the published booking settings are read from white-label; Catalogue never copies the rule, and a product that does not resolve gets the kind fallback, never an error for the page.
 **One exception: a withdrawn product is returned to a guest or visitor** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C07, option A; CHG-R8SPN-023), so WEB-004's approved withdrawn banner can show. It comes in the same guest projection, with `lifecycleState` `withdrawn` and `isSellable` false, and only when it was once published; a draft or unpublished product is still not found. Nothing else widens: `listProducts` and the other lists leave withdrawn products out for a guest, and `addCartLine` still refuses one.
 
 |  |  |
@@ -4691,7 +4709,10 @@ Checks a party's declared ages and heights against every product in the booking 
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| bookingEntry | enum (dateFirst, productFirst, venueMap, timeWindow, bundle) |  | Which booking screen Book opens (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). (read-only; nullable) |
+| bundleId | string (uuid) |  | Set only when bookingEntry is bundle (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose variant_id is this product's variant, while getGuestBundle would return it (published, active,… (read-only; nullable) |
 | fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
+| displayOrder | integer |  | Where this product sorts among the venue's products in listProducts, lower first. (default 100; nullable) |
 | isFeatured | boolean |  | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. (default False) |
 | compareAtPrice | object |  | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. (nullable) |
 | compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4787,7 +4808,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Guest callable | True |
 | Reads | `catalogue.product_eligibility_rule` |
 | Writes | - |
-| Called by | BO-161, GST-004, WEB-004 |
+| Called by | BO-161, GST-004, GST-007, WEB-004 |
 
 **Parameters**
 
@@ -4948,7 +4969,7 @@ Where `name` is null the row sorts after the rows that have it (NULLS LAST), and
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.variant` |
 | Writes | - |
-| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-048, GST-050, GST-075, KSK-004, KSK-015, POS-002, POS-003, PTR-006, WEB-005, WEB-022, WEB-048 |
+| Called by | BO-007, BO-008, BO-012, BO-048, BO-1049, EMP-034, GST-008, GST-041, GST-048, GST-050, GST-075, KSK-004, KSK-015, POS-002, POS-003, PTR-006, WEB-005, WEB-022, WEB-048 |
 
 **Parameters**
 
@@ -4994,6 +5015,7 @@ Where `name` is null the row sorts after the rows that have it (NULLS LAST), and
 **`GET /products`**: List products
 
 For guest, partner and back-office callers. **A point-of-sale terminal does not call this on the server** — on a till it is answered from the local catalogue bundle (`getLatestBundle`, ADR-0013), which is what `x-ticvai-offline-capable` means here. A till screen that lists this operation is reading the bundle.
+**Where Book goes: `bookingEntry` and `bundleId`** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). On a guest or visitor read every answered product carries the two read-only fields, worked out on read and never stored; both are null on staff reads. `Product.bookingEntry` states the rule. The flow rule is WhiteLabel's, asked once per page through `white-label#publishedBookingFlowSteps` (service route), the way the published booking settings are read from white-label; Catalogue never copies the rule, and a product that does not resolve gets the kind fallback, never an error for the page.
 **What a guest caller gets** (decided 29 September, rev 3 REV3-14). Products with `guestListing: bookable` that are on sale at the caller's channel, plus products with `guestListing: infoOnly` whose lifecycle is live, whether or not they are on sale, each carrying its `guestListing` and `notBookableLabel` so the screen shows the label and opens details instead of adding to the basket. `hidden` products are never returned to a guest, and `infoOnly` ones are left out when the venue's `BookingFlowConfig.showInfoOnly` is off. Staff and partner callers see every product, whatever its `guestListing`.
 **Category and tag filters** (decided 29 September, rev 3 REV3-16 and REV3-19). `categoryId` narrows to one category of the `listProductCategories` tree, so a guest can go from a category tile to that category's tickets; `segmentTag` narrows by tag, e.g. a surf level.
 **Help me choose filters the list** (decided 29 September, W4). `guidedAnswerIds` applies the filter of each chosen answer on the server; the guest screen offers *Show everything*, which is the same call without it. **A partner caller reads here** what is assigned to its channel (M17-04): partners never write products, prices or performances.
@@ -5002,7 +5024,9 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 **Each product carries its lowest list price** (ADAM CR-358, Chinmay, 30 October 2026, option (a); CHG-CR358-001). `fromPrice` is the lowest `listPrice` among the product's sellable variants on the caller's channel now, in the venue's trading currency (read through `tenancy#venueSettingsRecords`), by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`; null where no price list prices it on that channel. The channel is the caller's: a credential names it, a visitor sends `channel` (`web` or `mobile`), and absent with no credential it is `web`. Other operations that answer `Product` leave `fromPrice` null for now. WEB-035 and GST-044 show it as the price charged, and converted at the selected rate as the price shown, marked approx. where the currency is not chargeable.
 
 
-**Order.** Sorted by `displayOrder` ascending, then by `id`.
+**Order.** Sorted by `displayOrder` ascending, then by `id`. A product with no displayOrder sorts after those that have one.
+
+**How the order is kept** (ADAM CR-581, Chinmay, 3 November 2026; CHG-CR581-001): `display_order` ascending NULLS LAST, then `id` ascending; the order is total because `id` is unique. The cursor is opaque and encodes the last row's (`display_order`, `id`): the next page starts after that row in this same order, and a null `display_order` sorts after every number. Every filter (`venueId`, `kind`, `isSellable`, `categoryId`, `entitlementTemplateId`, `segmentTag`, `guidedAnswerIds`) and the guest visibility rules narrow the rows only; they never change the order. On the till, the bundle answer uses the same order. Guest screens show products in the order the list returns them; no approved screen changes.
 
 |  |  |
 |---|---|
@@ -5017,7 +5041,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.product_category`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `whitelabel.guided_choice_answer` |
 | Writes | - |
-| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048, BO-094, BO-125, BO-877, CMS-006, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
+| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048, BO-094, BO-1049, BO-125, BO-877, CMS-006, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
 
 **Parameters**
 
@@ -5045,7 +5069,10 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | items[].name | string | yes | (max length 200) |
 | items[].description | string |  |  |
+| items[].bookingEntry | enum (dateFirst, productFirst, venueMap, timeWindow, bundle) |  | Which booking screen Book opens (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). (read-only; nullable) |
+| items[].bundleId | string (uuid) |  | Set only when bookingEntry is bundle (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose variant_id is this product's variant, while getGuestBundle would return it (published, active,… (read-only; nullable) |
 | items[].fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
+| items[].displayOrder | integer |  | Where this product sorts among the venue's products in listProducts, lower first. (default 100; nullable) |
 | items[].isFeatured | boolean |  | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. (default False) |
 | items[].compareAtPrice | object |  | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. (nullable) |
 | items[].compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -5674,6 +5701,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | compareAtPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | compareAtPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | highlightBadge | object |  | The card's highlight badge per language, at most 20 characters each (longer is 400 validation); null clears it (Product.highlightBadge; ADAM CR-504). (nullable) |
+| displayOrder | integer |  | Where the product sorts in listProducts, lower first (Product.displayOrder; ADAM CR-581). (nullable) |
 
 **Response**: `Product`
 
@@ -5684,7 +5712,10 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| bookingEntry | enum (dateFirst, productFirst, venueMap, timeWindow, bundle) |  | Which booking screen Book opens (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). (read-only; nullable) |
+| bundleId | string (uuid) |  | Set only when bookingEntry is bundle (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose variant_id is this product's variant, while getGuestBundle would return it (published, active,… (read-only; nullable) |
 | fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
+| displayOrder | integer |  | Where this product sorts among the venue's products in listProducts, lower first. (default 100; nullable) |
 | isFeatured | boolean |  | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. (default False) |
 | compareAtPrice | object |  | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. (nullable) |
 | compareAtPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -6555,6 +6586,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 BL-114. **Split by a stable hash of the subject, not at random per request** — a guest who sees 10% on Monday and 15% on Tuesday has learned to wait.
 **The `trafficPercent` of all variants must sum to exactly 100; there is no minimum per variant** (decided 28 September, audit R101). A variant at 0 is kept but receives no traffic.
 **Writes `promotions.promotion_variant` and `promotions.promotion_audit`** in the same transaction, as every promotions configuration change does (entityType `promotion`, eventType `promotionEdited`) (decided 29 September, writers pass).
+**Where the rows are owned, the version and the audit values** (ADAM CR-589, option A with option C's read route, Chinmay, 3 November 2026; CHG-CR589-001). (1) One in-process read of Tenancy, `tenancy#scopeRecords`, by the session's working venue id, for that venue's path. A session with no working venue is `403 working-venue-required`, and nothing is written. An unknown `promotionId`, or a promotion whose `venue_id` is not the working venue, is 404 (as `updatePromotion` answers), and nothing is written. Every stored `promotions.promotion_variant` row gets `scope_path` = the working venue's path, which is then the promotion's venue path. It is never taken from the body, and never a region or tenant path the caller also holds; the deepest of the caller's scope paths is not used. (2) In the same transaction the promotion's existing variant rows are deleted, the new set is inserted, and `promotions.promotion.version` goes up by one (`update ... set version = version + 1 returning version`, on the row locked for the write). Every successful PUT counts as a saved change. The promotion's channel publications are not touched: each keeps naming the version last pushed. (3) In the same transaction, one `promotions.promotion_audit` row: `venue_id` the promotion's `venue_id`, `entity_type` `promotion`, `entity_id` and `promotion_id` the promotion's id, `event_type` `promotionEdited`, `promotion_version` the new version from (2), `previous_value` `{"variants": [...]}` with the set stored before (an empty list when there was none), `new_value` `{"variants": [...]}` with the set now stored, each item holding `id`, `label`, `trafficPercent` and `discountPercent` as the 200 answers them, `reason` null. The `traffic-percent-not-100` 400 check comes before anything is written. The 200 stays as declared.
 
 |  |  |
 |---|---|
@@ -6580,7 +6612,7 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | variants | array of PromotionVariant | yes | (min items 2; max items 4) |
-| variants[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| variants[].scopePath | string | yes | Where the row is owned: the path of the session's working venue, which is the promotion's venue (ADAM CR-589, CR-217's rule), read with tenancy#scopeRecords by id and never taken from a request, nor… (read-only) |
 | variants[].id | string (uuid) |  | (read-only) |
 | variants[].promotionId | string (uuid) |  | Taken from the path. (read-only) |
 | variants[].label | string | yes |  |
@@ -6593,7 +6625,7 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 |---|---|---|---|
 | promotionId | string (uuid) | yes |  |
 | variants | array of PromotionVariant | yes |  |
-| variants[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| variants[].scopePath | string | yes | Where the row is owned: the path of the session's working venue, which is the promotion's venue (ADAM CR-589, CR-217's rule), read with tenancy#scopeRecords by id and never taken from a request, nor… (read-only) |
 | variants[].id | string (uuid) |  | (read-only) |
 | variants[].promotionId | string (uuid) |  | Taken from the path. (read-only) |
 | variants[].label | string | yes |  |
@@ -6606,6 +6638,8 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 |---|---|---|
 | 200 |  | Set. |
 | 400 |  | The variants' trafficPercent values do not sum to 100 (audit R101) |
+| 403 |  | The session has no working venue, so the variants have no venue to be written under (working-venue-required; ADAM CR-589, CR-217's rule). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -7476,6 +7510,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | event_id | uuid | yes |  |
 | starts_at | timestamptz | yes |  |
 | ends_at | timestamptz | yes |  |
+| admission_starts_at | timestamptz | no | When admission opens for the performance (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): stored as catalogue.performance.admission_starts_at, nullable. |
 | approval_request_id | uuid | no | BL-048. |
 | requires_approval_to_cancel | boolean | no | Cancelling a sold performance is the one transition that needs a name against it. |
 | status | text | yes |  |
@@ -7581,6 +7616,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | family_key | text | no | The same product at another location (decided 29 September, rev 3 REV3-18). |
 | name | text | yes |  |
 | description | text | no |  |
+| display_order | integer | no | Where this product sorts among the venue's products in listProducts, lower first. |
 | is_featured | boolean | no | The plan card's Most popular badge (ADAM CR-482, decided by Chinmay on 2 November 2026): the venue marks a product featured. |
 | compare_at_amount | numeric(18,4) | no | What the same visits cost bought singly (ADAM CR-482): the comparison price behind the plan card's saving. |
 | highlight_badge | jsonb | no | The card's highlight badge (ADAM CR-504; Chinmay, 3 November 2026; CHG-CR504-001), e.g. |
@@ -7867,7 +7903,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | performance_id | uuid | yes |  |
 | variant_id | uuid | no |  |
 | subject_id | uuid | no |  |
-| contact_point | text | no | Where the offer goes. |
 | party_size | integer | yes |  |
 | status | text | no | Set by the server. |
 | position | integer | no | First in, first offered. |
@@ -8136,7 +8171,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
+| scope_path | text | yes | Where the row is owned: the path of the session's working venue, which is the promotion's venue (ADAM CR-589, CR-217's rule), read with tenancy#scopeRecords by id and never taken from a request, nor… |
 | id | uuid | yes |  |
 | promotion_id | uuid | no | Taken from the path. |
 | label | text | yes |  |
@@ -8309,7 +8344,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-381 operations, added to this service in later releases without changing any of the above.
+386 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -8320,7 +8355,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | catalogue | `assessProductChange`, `bulkUpdateCatalogueProducts`, `cancelPricingRollback`, `createDonationCampaign`, `decideCatalogueAiFinding`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listGuestMemberships`, `listMembershipProgrammes`, `listProductCategoryUsage`, `listProductTags`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `requestPricingRollback`, `restoreProductVersion`, `retryChannelIncident`, `setChannelSyncSetting`, `setConfigurationTemplate`, `setCurrencyRoundingRule`, `setDemandSignalConfiguration`, `setDynamicPriceRule`, `setDynamicPricingGuardrailPolicy`, `setMarketPricingConfiguration`, `setMembershipProgramme`, `setPackagePricingDefinition`, `setPriceCalculationPolicy`, `setPriceCategoryRateType`, `setPriceLadderMatrix`, `setProductLinks`, `setProductTagDefinition`, `setSignalRegistryPolicy`, `testChannelConnection`, `transitionDynamicPricingStrategy`, `updateChannelIncident`, `updateDonationCampaign` |
 | category | `listSeatCategories` |
 | coupon | `assignCoupon`, `getCouponCode`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
-| drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `getChannelAvailability`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductApprovalWorkflows`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSeatPricingRules`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listTaxProfiles`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishPricingEffectiveDate`, `setBookingVelocityTime`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setDemandOccupancyAvailability`, `setDynamicPricingStrategy`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductContextOwnership`, `setPromotionStackingRule`, `setRulePriorityConflict`, `setRuleTestRecommendation`, `setSeatPricingRule`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
+| drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `getChannelAvailability`, `getChannelFeePayment`, `getChannelPricingCommercial`, `getChannelProfile`, `getChannelReadinessValidation`, `getProductCatalogue`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductApprovalWorkflows`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSeatPricingRules`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listTaxProfiles`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishPricingEffectiveDate`, `setBookingVelocityTime`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setDemandOccupancyAvailability`, `setDynamicPricingStrategy`, `setFeeApplicabilityCharging`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductContextOwnership`, `setPromotionStackingRule`, `setRulePriorityConflict`, `setRuleTestRecommendation`, `setSeatPricingRule`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
 | entitlement | `archiveEntitlementTemplate`, `getEntitlementTemplate`, `listEntitlementTemplates`, `suspendEntitlement`, `updateEntitlementTemplate` |
 | event | `cancelPerformance`, `getEvent`, `getWaitingRoomStatus`, `setWaitingRoomSetting` |
 | events | `assignPerformanceMedia`, `estimateEventResourceCost`, `getEventChangeTreatmentPolicy`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventChangeTreatmentPolicy`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |

@@ -1582,21 +1582,33 @@
       {
        "kind": "primaryButton",
        "label": "Post-spend review",
+       "collectedBy": "What requires approval here",
+       "operation": "setApprovalMatrix",
+       "notes": "Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Single approval",
+       "collectedBy": "What requires approval here",
+       "operation": "setApprovalMatrix",
+       "notes": "Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Multi-level approval",
+       "collectedBy": "What requires approval here",
+       "operation": "setApprovalMatrix",
+       "notes": "Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Exception approval",
+       "collectedBy": "What requires approval here",
+       "operation": "setApprovalMatrix",
+       "notes": "Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support"
       }
      ]

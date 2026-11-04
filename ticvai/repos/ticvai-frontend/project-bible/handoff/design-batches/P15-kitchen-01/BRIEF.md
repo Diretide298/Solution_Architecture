@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `KIT-006` | Expeditor & Order Assembly | A | 14 | 34 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
 | `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 0 | 40 | 6 | 6 | 2 | 0 | — | notStarted (generated) |
 | `KIT-008` | Exceptions, Re-Fire & Unavailable Items | A | 14 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `KIT-009` | SLA, Priority & Service Rules | A | 0 | 55 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `KIT-009` | SLA, Priority & Service Rules | A | 9 | 55 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `KIT-010` | Kitchen Performance, AI & Operational Optimization | A | 4 | 1 | 6 | 1 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch

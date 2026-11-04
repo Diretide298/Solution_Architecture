@@ -1,6 +1,6 @@
 # Design principles
 
-**Read this before the ADRs.** There are twenty-four of them and they are long; the principles
+**Read this before the ADRs.** There are more than seventy of them and they are long; the principles
 beneath them are fewer, they repeat, and knowing them is usually enough to predict what an ADR
 says.
 
@@ -11,16 +11,18 @@ wrong first**, and those are the ones to trust most — they have been tested ag
 
 ## Isolation
 
-### Tenant isolation is structural, not a filter — where a cell holds one tenant
+### Tenant isolation is structural, not a filter
 
-*Corrected twice, 17 August. ADR-0021, CF-97.*
+*Corrected twice, 17 August (ADR-0021, CF-97), and restated 3 November 2026 from ADR-0038 and ADR-0049.*
 
 **Postgres enforces row-level security. Qdrant enforces nothing.** On shared Postgres a careless
 join returns no rows because the database stops you. On shared Qdrant a query missing its filter
 returns every tenant's vectors, and nothing stops it.
 
-So the boundary is the cell where a cell holds one tenant, and a dedicated shard where it does
-not. **Rules out**: relying on a filter alone anywhere the isolation is between paying customers.
+So the boundary is the tenant's own database (ADR-0038: a cell is a region holding a database per
+tenant, and a cell holds many tenants), with row security by scope inside it, and in Qdrant the
+tenant's own collection with a collection-scoped token (ADR-0049, which amends ADR-0021).
+**Rules out**: relying on a filter alone anywhere the isolation is between paying customers.
 
 ### The scope a caller acts under is resolved, never supplied
 
@@ -30,10 +32,11 @@ True of RLS, of `scope_path` in retrieval, of the shard key, of every `x-ticvai-
 question and offers no way to ask about somebody else's data — not by convention, by having no
 parameter for it.
 
-### Venues are partitioned, not separated
+### Venues share the tenant database, not separated
 
-*ADR-0005.* List partitioning on `venue_id` inside the tenant database. **Rules out**: a database
-per venue, and the operational cost that comes with it.
+*ADR-0005, amended by ADR-0056.* Venues are rows of one tenant database; in release 1 they are
+isolated by row security by scope, and venue partitioning is deferred, not cancelled. **Rules out**:
+a database per venue, and the operational cost that comes with it.
 
 ### AI is read-only against the transactional core
 
@@ -185,7 +188,7 @@ not a case.
 
 ### A label nobody reads is not a control
 
-Three separate labels said ADR-0001 (retired — see ADR-0014 and ADR-0017)'s decision no longer held, and it was built on anyway. **The
+Three separate labels said ADR-0001's decision no longer held (superseded by ADR-0014, itself superseded by ADR-0038), and it was built on anyway. **The
 fix was not a fourth label** — it was a checker that fails any ADR citing a superseded one without
 naming the supersession.
 
@@ -203,9 +206,9 @@ These were wrong first, which is why they are the load-bearing ones.
 
 | | Was | Is |
 |---|---|---|
-| **Qdrant partitioning** | Collection per tenant | One collection per model, tenant is the shard *(twice corrected)* |
+| **Qdrant partitioning** | One collection per model, tenant is the shard | A collection per tenant, each with its own token (ADR-0049) *(corrected three times)* |
 | **Configuration floor** | Configurable at every level | Venue is the floor |
 | **Offline architecture** | Online-primary with offline fallback | Three data classes, three strategies |
-| **Cell tenancy** | A cell holds one tenant | True of dedicated placement only |
+| **Cell tenancy** | A cell holds one tenant | A cell is a region holding a database per tenant (ADR-0038) |
 | **AI scope** | Guest assistant deferred | In Phase 1, bounded and capped |
 | **Support conversations** | A case | A live session that may create one |

@@ -70,8 +70,20 @@ DIAGRAMS = ["diagrams/*.yaml", "diagrams/hld/*.yaml", "diagrams/lld/*/*.yaml"]
 SCHEMA = ["handoff/schema-reference.json"]
 DB_FILES = ["handoff/schema-reference.json", "handoff/relationship-graph.json", "handoff/relationships.csv",
             "handoff/ddl-column-types.json", "backend/*/V*.sql", "backend/*.sh", "handoff/migration-review.md"]
-# Kept and put back like the rest, never compared: the dated header of the migration review.
-UNCOMPARED = {"handoff/migration-review.md"}
+# Kept and put back like the rest, never compared: the dated header of the migration review, and the plan's
+# workbooks (openpyxl stamps the time it saves; their rows are tasks.csv's, which is compared).
+TICKET_WORKBOOKS = ["handoff/service-docs/TICVAI_Backend_Build_Plan.xlsx", "handoff/service-docs/TICVAI_First_Release.xlsx",
+                    "handoff/service-docs/TICVAI_First_Release_Client.xlsx"]
+UNCOMPARED = {"handoff/migration-review.md", *TICKET_WORKBOOKS}
+# **The ticket-text generators are in the chain** (r14, review E-09, CHG-R14I-005). build-service-docs wrote
+# MIGRATIONS.md in an order that followed Python's hash seed (`frontier = list(rel)`, a set), so two refreshes of the
+# same inputs gave different "referenced by" reasons; the chain never ran it, so nothing saw. It writes tasks.csv, the
+# plan and every service and frontend document a ticket points at; the schedule and the ticket descriptions are built
+# from them. Each chain step runs in a fresh process with PYTHONHASHSEED removed from its environment, so its seed
+# differs from the refresh's: a set-order dependence is a second regeneration that changes a file.
+TICKET_TEXT = ["handoff/service-docs/tasks.csv", "handoff/service-docs/plan-tasks.csv", "handoff/service-docs/README.md",
+               "handoff/service-docs/client-summary.md", "handoff/service-docs/backend/*.md",
+               "handoff/service-docs/frontend/*.md"] + TICKET_WORKBOOKS
 
 WRITE_BACK = [
     ("derive-lineage", ["--apply"], ["handoff/api-data-lineage.json"]),
@@ -102,6 +114,10 @@ WRITE_BACK = [
     # (P-31, CHG-R11DES-002: derive-diagrams ran before the screen steps, so every refresh drew the previous run's
     # screens; r10's second rebuild changed P01 and P02, fixed by hand in cd306cce).
     ("derive-diagrams", [], DIAGRAMS),
+    ("build-service-docs", [], TICKET_TEXT),
+    ("derive-block-a-schedule", [], ["handoff/service-docs/block-a-schedule.json"]),
+    ("op-descriptions", ["--schedule", "handoff/service-docs/block-a-schedule.json"],
+     ["handoff/service-docs/op-descriptions.json"]),
 ]
 
 
@@ -155,7 +171,9 @@ def restore(snap, globs, root=ROOT):
 
 
 def run_step(name, args):
-    env = dict(os.environ, PYTHONIOENCODING="utf-8")
+    # No fixed hash seed: each step draws its own, so output that follows a set's order shows up (review E-09).
+    env = {k: v for k, v in os.environ.items() if k != "PYTHONHASHSEED"}
+    env.update(PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
     t = time.time()
     r = subprocess.run([sys.executable, os.path.join("tools", name + ".py")] + list(args), cwd=ROOT, env=env,
                        capture_output=True, text=True, encoding="utf-8", errors="replace")

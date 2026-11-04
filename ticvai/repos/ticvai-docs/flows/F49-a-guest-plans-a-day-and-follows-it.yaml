@@ -63,8 +63,8 @@ steps:
   action: They check out.
   operations:
   - getCart
-  - checkoutCart
-  outcome: Paid like any other basket; the tickets land on the Tickets tab.
+  outcome: 'Paid like any other basket: Checkout moves on to Review & Payment (GST-009), where Pay makes the order
+    with `checkoutCart` and pays it (ADAM CR-576); the tickets land on the Tickets tab.'
 - step: 6
   screen: GST-059
   action: They follow it through the day.

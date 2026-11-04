@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-298` | Membership Freeze, Suspension & Reactivation Management | B | 7 | 0 | 5 | 4 | 1 | 0 | — | notStarted (generated) |
 | `BO-299` | Membership Upgrade, Downgrade & Product Migration Operations | B | 4 | 0 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
 | `BO-300` | Renewal Operations & Auto-Renewal Management | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-301` | Member Exceptions, Overrides & Service Recovery | B | 6 | 0 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `BO-301` | Member Exceptions, Overrides & Service Recovery | B | 17 | 0 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
 | `BO-302` | Member Lifecycle History, Audit & Case Timeline | B | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-303` | Membership Analytics, Renewal Intelligence & AI Retention Center | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 

@@ -1722,7 +1722,7 @@
   "name": "Membership Commercial, Pricing & Channel Association",
   "module": "Sell",
   "requiresModule": "membership",
-  "wave": 3,
+  "wave": 1,
   "permission": "MEMBERSHIP_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
@@ -2346,7 +2346,7 @@
    "loading": "The version's checks and impact load first.",
    "error": "Could not load. Names the read that failed; no action is offered until it loads.",
    "emptyFirstRun": "Not used: the screen opens on one product version.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_MANAGE`, which `approveMembershipProductValidation` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MEMBERSHIP_VIEW`, which `getMembershipProductValidation` requires to show this screen, or `MEMBERSHIP_MANAGE`, which `approveMembershipProductValidation` requires to approve it, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {

@@ -125,11 +125,11 @@ screens:
       is not there and the keypad is the whole screen. This is the state on the morning a terminal is
       first plugged in, and it is the one a venue sees when it opens - not a fault, and it must not read
       as one.'
-    error: 'Identity could not be reached. **Says so rather than saying the PIN is wrong** -- telling an
-      operator their PIN failed when the network did sends them to a supervisor with the wrong question. **On
-      `401 device-unauthenticated` or `403 workstation-mismatch` it says "This device is not registered"**
-      rather than that the PIN is wrong: the device''s own credential was refused before any PIN was checked, so
-      no attempt is spent (ADR-0071 amendment of 3 November 2026, CHG-R14H-001; CHG-R14INT-002).'
+    error: 'Identity could not be reached. **Says so rather than saying the PIN is wrong** -- telling
+      an operator their PIN failed when the network did sends them to a supervisor with the wrong question.
+      **On `401 device-unauthenticated` or `403 workstation-mismatch` it says "This device is not registered"**
+      rather than that the PIN is wrong: the device''s own credential was refused before any PIN was checked,
+      so no attempt is spent (ADR-0071 amendment of 3 November 2026, CHG-R14H-001; CHG-R14INT-002).'
     denied: The employee number and PIN do not match, or the account is locked. Names which, and how many
       attempts remain before the lock.
     emptyNoAccess: Authentication succeeded and the operator holds no role on this workstation. **A real
@@ -5113,9 +5113,10 @@ screens:
       trigger: Sell — Ticket Catalogue
       carries:
       - orderId
+      - productId
       - promotionId
       provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-010 holds orderId, promotionId, so an edge into it carries them
+        and POS-010 holds orderId, productId, promotionId, so an edge into it carries them
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-010
@@ -6447,7 +6448,10 @@ screens:
       somebody to support with the wrong question. A caller who can see the screen but lacks what an action
       needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT`
       for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`.'
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync. A void or a no-sale that needs a supervisor is still signed here: the supervisor picks their name from the till''s own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001).'
+    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.
+      A void or a no-sale that needs a supervisor is still signed here: the supervisor picks their name
+      from the till''s own list and types their PIN, which the till checks itself and the server confirms
+      when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001).'
     approvalRejected: The supervisor declined the no-sale or void; the drawer stays shut and the reason
       is shown.
   apis:
@@ -7253,7 +7257,10 @@ screens:
       and sends somebody to support with the wrong question. A caller who can see the screen but lacks
       what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`,
       `withdrawFromDepositBox`.'
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync. A withdrawal is still countersigned here: the cashier the cash came from picks their name from the till''s own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001).'
+    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.
+      A withdrawal is still countersigned here: the cashier the cash came from picks their name from the
+      till''s own list and types their PIN, which the till checks itself and the server confirms when
+      it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001).'
   apis:
   - operationId: createCashMovement
     contract: shift
@@ -7916,9 +7923,10 @@ screens:
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       carries:
+      - productId
       - promotionId
       provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-021 holds promotionId, so an edge into it carries them
+        and POS-021 holds productId, promotionId, so an edge into it carries them
     - to: POS-022
       trigger: The order goes to the pass before the guest pays
       provenance: flow F108 step 2→3
@@ -8514,9 +8522,10 @@ screens:
     - to: POS-002
       trigger: Sell — Ticket Catalogue
       carries:
+      - productId
       - promotionId
       provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-023 holds promotionId, so an edge into it carries them
+        and POS-023 holds productId, promotionId, so an edge into it carries them
     uses:
     - posPrimaryRail
     - posSaleToPayment
@@ -9525,10 +9534,10 @@ screens:
         its own state'
     - to: POS-002
       trigger: Sell — Ticket Catalogue
-      provenance: 'derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
-        and POS-027 holds none of them. The edge carries nothing: cardCode only pre-selects (optional);
-        POS-002 finds orderId (createOrder), productId (listProducts), promotionId (evaluatePromotions)
-        itself, and POS-002 opens on its own'
+      carries:
+      - productId
+      provenance: derived — POS-002 declares entryState.params cardCode, orderId, productId, promotionId
+        and POS-027 holds productId, so an edge into it carries them
   notes: '**`identifyGuest` was called from the catalogue and had no screen of its own**, so the model
     could attach a guest to a sale and could not say how the cashier found them. The prototype makes lookup
     a surface, which is also where the wallet and open reservations become visible before the sale rather

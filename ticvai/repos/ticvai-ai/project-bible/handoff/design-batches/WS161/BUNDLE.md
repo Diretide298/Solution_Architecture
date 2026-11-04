@@ -163,7 +163,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-919` | AI Event Resource Forecasting | A | 10 | 19 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 | `BO-920` | Event Resource Cost Estimator | B | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-921` | Multi-Event Allocation & Conflict Optimizer | D | 4 | 15 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-922` | Event Resource Approval & Readiness Gate | B | 0 | 20 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `BO-922` | Event Resource Approval & Readiness Gate | B | 11 | 20 | 6 | 5 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -1799,7 +1799,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Create approval request** (modal, opened by *Create approval request*; *Create approval request* calls `createApprovalRequest`, *Cancel* sends nothing)
+
+**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createApprovalRequest` body |
+| Kind `kind` | select | required | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | — | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. | `createApprovalRequest` body |
+| Subject contract `subjectContract` | text field | required | — | — | — | Which contract owns the thing being approved. | `createApprovalRequest` body |
+| Subject type `subjectType` | text field | required | — | — | — | — | `createApprovalRequest` body |
+| Subject `subjectId` | text field | required | — | — | — | A reference, never a copy. A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists. | `createApprovalRequest` body |
+| Scope path `scopePath` | text field | required | — | — | — | — | `createApprovalRequest` body |
+| Summary `summary` | text area | required | — | max length 300 | — | What the approver sees in their queue before opening it. | `createApprovalRequest` body |
+| Amount `amount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createApprovalRequest` body |
+| Attributes `attributes` | key and value settings | optional | — | — | — | — | `createApprovalRequest` body |
+| Justification `justification` | text area | optional | — | max length 1000 | — | — | `createApprovalRequest` body |
+| Is draft `isDraft` | toggle | optional | off | — | — | True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129). | `createApprovalRequest` body |
+
+Errors to draw in the form: 409 An open request already exists for this subject. Two approvals for one subject is how the same money goes out twice. (ApprovalStateProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): the request is not a draft and no active rule matches its kind and subject type at its `scopePath` (for …
 
 #### Outputs: what the screen shows and produces
 
@@ -1834,7 +1852,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create approval request (primary button) | navigation or local | — | — | — | — |
+| Create approval request (primary button) | `createApprovalRequest` POST `/approval-requests` | CreateApprovalRequest | ApprovalRequest | 409 An open request already exists for this subject. Two approvals for one subject is how the same money goes out twice. (ApprovalStateProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): the request is … | opens modal first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -1910,7 +1928,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-922?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create approval request, Cancel.

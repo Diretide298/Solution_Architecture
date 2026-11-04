@@ -1658,6 +1658,25 @@
      "components": [
       {
        "kind": "searchField",
+       "label": "Find dropped goods",
+       "operation": "lookupShopAndDrop",
+       "notes": "By entitlement, drop reference or receipt, as the till finds them.",
+       "provenance": "contract retail.yaml GET /shop-and-drop/lookup; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dropped goods found",
+       "operation": "lookupShopAndDrop",
+       "bindsTo": "ShopAndDrop",
+       "columns": [
+        "ShopAndDrop.dropReference",
+        "ShopAndDrop.status",
+        "ShopAndDrop.collectionPointName"
+       ],
+       "provenance": "contract retail.yaml GET /shop-and-drop/lookup; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+      },
+      {
+       "kind": "searchField",
        "label": "Search retail global settings",
        "provenance": "carried from the previous definition"
       },
@@ -1679,6 +1698,12 @@
        "label": "Save return policy",
        "operation": "setReturnPolicy",
        "provenance": "contract retail.yaml PUT /outlets/{outletId}/return-policy; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Dispose of dropped goods",
+       "operation": "disposeShopAndDrop",
+       "provenance": "contract retail.yaml POST /shop-and-drop/{dropId}/dispose; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       }
      ]
     }
@@ -1765,6 +1790,24 @@
      "label": "Cancel"
     },
     "provenance": "contract retail.yaml PUT /outlets/{outletId}/return-policy; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formDisposeShopAndDrop",
+    "component": "modal",
+    "trigger": "Dispose of dropped goods",
+    "body": "**Collects what `disposeShopAndDrop` sends before it is called.** Required: `method`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Dispose of dropped goods",
+     "operation": "disposeShopAndDrop"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "method",
+      "note"
+     ]
+    },
+    "provenance": "contract retail.yaml POST /shop-and-drop/{dropId}/dispose; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "gaps": [

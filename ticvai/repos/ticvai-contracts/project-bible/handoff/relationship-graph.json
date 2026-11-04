@@ -130,6 +130,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "inventory.supplier",
+   "col": "contact_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "inventory.quotation_line",
    "col": "quotation_id",
    "to": "inventory.quotation",
@@ -238,6 +247,24 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "control.rollout",
+   "col": "started_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.rollout",
+   "col": "approved_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "control.rollout_cell",
    "col": "rollout_id",
    "to": "control.rollout",
@@ -265,12 +292,30 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "control.migration_run",
+   "col": "started_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "control.upgrade_schedule",
    "col": "tenant_id",
    "to": "control.tenant",
    "how": "declared",
    "cross": "",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.support_notice",
+   "col": "published_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -482,6 +527,15 @@
   },
   {
    "frm": "control.tenant",
+   "col": "termination_requested_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.tenant",
    "col": "plan_id",
    "to": "control.plan",
    "how": "declared",
@@ -491,8 +545,26 @@
   },
   {
    "frm": "control.tenant",
+   "col": "account_manager_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.tenant",
    "col": "subscription_id",
    "to": "control.contract",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.licence_add_on",
+   "col": "removed_by_principal_id",
+   "to": "control.platform_operator",
    "how": "declared",
    "cross": "",
    "required": "",
@@ -661,6 +733,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "identity.principal",
+   "col": "subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "identity.delegated_access",
    "col": "granted_by_principal_id",
    "to": "identity.principal",
@@ -698,6 +779,15 @@
   },
   {
    "frm": "orders.order_line",
+   "col": "holder_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "orders.order_line",
    "col": "variant_id",
    "to": "catalogue.variant",
    "how": "declared",
@@ -709,6 +799,15 @@
    "frm": "orders.order_line",
    "col": "inventory_reservation_id",
    "to": "catalogue.inventory_reservation",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "orders.order_line",
+   "col": "product_id",
+   "to": "catalogue.product",
    "how": "declared",
    "cross": "yes",
    "required": "",
@@ -855,6 +954,15 @@
    "to": "approvals.rule",
    "how": "declared",
    "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "orders.cart_line",
+   "col": "product_id",
+   "to": "catalogue.product",
+   "how": "declared",
+   "cross": "yes",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -1021,6 +1129,33 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "control.release",
+   "col": "created_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.release",
+   "col": "status_changed_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.release",
+   "col": "withdrawal_approved_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "identity.mfa_challenge",
    "col": "principal_id",
    "to": "identity.principal",
@@ -1049,6 +1184,15 @@
   },
   {
    "frm": "identity.mfa_recovery_code",
+   "col": "subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "identity.session",
    "col": "subject_id",
    "to": "pii.subject",
    "how": "declared",
@@ -1144,6 +1288,15 @@
    "how": "declared",
    "cross": "",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "orders.invitation",
+   "col": "recipient_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -1364,6 +1517,15 @@
   },
   {
    "frm": "access.entitlement",
+   "col": "holder_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "access.entitlement",
    "col": "template_id",
    "to": "catalogue.entitlement_template",
    "how": "declared",
@@ -1579,6 +1741,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "approvals.accreditation_badge",
+   "col": "holder_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "marketing.subscription",
    "col": "subject_id",
    "to": "pii.subject",
@@ -1706,6 +1877,15 @@
   },
   {
    "frm": "seating.group_request",
+   "col": "contact_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "seating.group_request",
    "col": "performance_id",
    "to": "catalogue.performance",
    "how": "declared",
@@ -1728,6 +1908,15 @@
    "to": "assets.media_asset",
    "how": "declared",
    "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "assets.share",
+   "col": "recipient_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -1800,6 +1989,15 @@
    "to": "rental.product",
    "how": "declared",
    "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "rental.agreement_signature",
+   "col": "signatory_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -1912,6 +2110,33 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "rental.participant",
+   "col": "emergency_contact_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "rental.participant",
+   "col": "guardian_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "rental.participant",
+   "col": "participant_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "resources.resource_block",
    "col": "resource_id",
    "to": "resources.resource",
@@ -1944,6 +2169,15 @@
    "to": "resources.resource",
    "how": "declared",
    "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "seating.hold_pool",
+   "col": "holder_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -2408,6 +2642,33 @@
   },
   {
    "frm": "marketing.waiver_signature",
+   "col": "guardian_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "marketing.waiver_signature",
+   "col": "signer_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "marketing.waiver_signature",
+   "col": "participant_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "marketing.waiver_signature",
    "col": "form_definition_id",
    "to": "marketing.form_definition",
    "how": "declared",
@@ -2584,6 +2845,15 @@
    "how": "declared",
    "cross": "",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "workforce.employee",
+   "col": "employee_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -2818,6 +3088,15 @@
    "how": "declared",
    "cross": "",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "orders.reservation_line",
+   "col": "holder_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -3097,6 +3376,15 @@
    "how": "declared",
    "cross": "",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "orders.group_participant",
+   "col": "subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -6169,6 +6457,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "control.credit_note",
+   "col": "issued_by_principal_id",
+   "to": "control.platform_operator",
+   "how": "declared",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "wallet.exit_settlement",
    "col": "wallet_id",
    "to": "wallet.wallet",
@@ -6331,6 +6628,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "control.api_anomaly_rule",
+   "col": "tenant_id",
+   "to": "control.tenant",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "payments.provider_event",
    "col": "provider_connection_id",
    "to": "payments.provider_connection",
@@ -6378,9 +6684,9 @@
   {
    "frm": "control.production_access_request",
    "col": "decided_by_principal_id",
-   "to": "identity.principal",
+   "to": "control.platform_operator",
    "how": "declared",
-   "cross": "yes",
+   "cross": "",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -6505,6 +6811,15 @@
    "frm": "control.outbox_republish",
    "col": "tenant_id",
    "to": "control.tenant",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "control.outbox_republish",
+   "col": "requested_by_principal_id",
+   "to": "control.platform_operator",
    "how": "declared",
    "cross": "",
    "required": "yes",
@@ -6697,6 +7012,15 @@
    "how": "declared",
    "cross": "",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "orders.group_customer_organisation_contact",
+   "col": "contact_subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -7207,6 +7531,78 @@
    "frm": "marketing.guest_document_upload",
    "col": "subject_id",
    "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "identity.offline_pin_verifier",
+   "col": "principal_id",
+   "to": "identity.principal",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "identity.offline_step_up",
+   "col": "caller_principal_id",
+   "to": "identity.principal",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "identity.offline_step_up",
+   "col": "signer_principal_id",
+   "to": "identity.principal",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "identity.subject_erasure_part",
+   "col": "subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "pii.subject_network_identifier",
+   "col": "subject_id",
+   "to": "pii.subject",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "fnb.table_visit_server",
+   "col": "table_visit_id",
+   "to": "fnb.table_visit",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "fnb.table_visit_server",
+   "col": "server_principal_id",
+   "to": "identity.principal",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "fnb.table_visit_server",
+   "col": "recorded_by_principal_id",
+   "to": "identity.principal",
    "how": "declared",
    "cross": "yes",
    "required": "yes",
@@ -8284,24 +8680,6 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "control.rollout",
-   "col": "started_by_principal_id",
-   "to": "identity.principal",
-   "how": "declared",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.rollout",
-   "col": "approved_by_principal_id",
-   "to": "identity.principal",
-   "how": "declared",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
    "frm": "control.rollout_cell",
    "col": "cell_id",
    "to": "control.cell",
@@ -8338,30 +8716,12 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "control.migration_run",
-   "col": "started_by_principal_id",
-   "to": "identity.principal",
-   "how": "declared",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
    "frm": "control.environment",
    "col": "cell_id",
    "to": "control.cell",
    "how": "declared",
    "cross": "",
    "required": "yes",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.support_notice",
-   "col": "published_by_principal_id",
-   "to": "identity.principal",
-   "how": "declared",
-   "cross": "yes",
-   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -8956,15 +9316,6 @@
    "how": "declared",
    "cross": "",
    "required": "yes",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.tenant",
-   "col": "account_manager_principal_id",
-   "to": "identity.principal",
-   "how": "declared",
-   "cross": "yes",
-   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -12416,15 +12767,6 @@
   },
   {
    "frm": "control.tenant",
-   "col": "termination_requested_by_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.tenant",
    "col": "region_id",
    "to": "platform.scope",
    "how": "precedent",
@@ -12438,15 +12780,6 @@
    "to": "control.tenant",
    "how": "convention",
    "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.licence_add_on",
-   "col": "removed_by_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "yes",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -12937,6 +13270,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "ai.message",
+   "col": "subject_id",
+   "to": "pii.subject",
+   "how": "convention",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "ai.policy",
    "col": "fallback_provider_id",
    "to": "ai.provider",
@@ -13281,33 +13623,6 @@
   {
    "frm": "approvals.escalation",
    "col": "added_approver_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.release",
-   "col": "created_by_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.release",
-   "col": "status_changed_by_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.release",
-   "col": "withdrawal_approved_by_principal_id",
    "to": "identity.principal",
    "how": "convention",
    "cross": "yes",
@@ -15273,6 +15588,15 @@
    "to": "wallet.credit_type",
    "how": "convention",
    "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "fnb.service_order_line",
+   "col": "comped_by_principal_id",
+   "to": "identity.principal",
+   "how": "convention",
+   "cross": "yes",
    "required": "",
    "edgeKind": "foreignKey"
   },
@@ -20578,6 +20902,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "pii.consent_identifier",
+   "col": "subject_id",
+   "to": "pii.subject",
+   "how": "convention",
+   "cross": "",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "marketing.device_consent",
    "col": "banner_design_id",
    "to": "marketing.cookie_banner_design",
@@ -20776,15 +21109,6 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "control.credit_note",
-   "col": "issued_by_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
    "frm": "tenancy.data_retention_setting",
    "col": "updated_by_principal_id",
    "to": "identity.principal",
@@ -20869,15 +21193,6 @@
    "frm": "workforce.staff_conversation_participant",
    "col": "last_read_message_id",
    "to": "workforce.staff_message",
-   "how": "convention",
-   "cross": "",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.api_anomaly_rule",
-   "col": "tenant_id",
-   "to": "control.tenant",
    "how": "convention",
    "cross": "",
    "required": "",
@@ -20976,15 +21291,6 @@
   {
    "frm": "maintenance.priority_scoring_model",
    "col": "updated_by_principal_id",
-   "to": "identity.principal",
-   "how": "convention",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "control.outbox_republish",
-   "col": "requested_by_principal_id",
    "to": "identity.principal",
    "how": "convention",
    "cross": "yes",
@@ -21364,6 +21670,15 @@
    "frm": "catalogue.product",
    "col": "via updateProduct",
    "to": "catalogue.product_version",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "catalogue.audit_entry",
+   "col": "via setPrices",
+   "to": "catalogue.price_list",
    "how": "lineage",
    "cross": "",
    "required": "",
@@ -21960,33 +22275,6 @@
    "to": "orders.cash_movement",
    "how": "lineage",
    "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "identity.principal_credential",
-   "col": "via login",
-   "to": "identity.refresh_token",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "identity.principal_credential",
-   "col": "via login",
-   "to": "identity.session",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "identity.principal_credential",
-   "col": "via login",
-   "to": "platform.outbox",
-   "how": "lineage",
-   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
@@ -22873,6 +23161,24 @@
    "edgeKind": "ambient"
   },
   {
+   "frm": "platform.outbox",
+   "col": "via createMerchandise",
+   "to": "retail.merchandise",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "platform.outbox",
+   "col": "via updateMerchandise",
+   "to": "retail.merchandise",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
    "frm": "inventory.movement",
    "col": "via createRetailSale",
    "to": "retail.sale",
@@ -23022,6 +23328,15 @@
    "to": "maintenance.inspection_template_item",
    "how": "lineage",
    "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "maintenance.inspection_template",
+   "col": "via createInspectionTemplate",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
@@ -24124,15 +24439,6 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "catalogue.audit_entry",
-   "col": "via bulkChangePrices",
-   "to": "catalogue.product_version",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
    "frm": "catalogue.import_job",
    "col": "via importProductCatalogue",
    "to": "catalogue.import_job_row",
@@ -24574,15 +24880,6 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "control.api_version",
-   "col": "via deprecateApiVersion",
-   "to": "marketing.message_dispatch",
-   "how": "lineage",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
    "frm": "whitelabel.footer_config",
    "col": "via setFooter",
    "to": "whitelabel.footer_config_column",
@@ -24727,9 +25024,27 @@
    "edgeKind": "ambient"
   },
   {
+   "frm": "fnb.table_visit",
+   "col": "via reassignServer",
+   "to": "fnb.table_visit_server",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
    "frm": "fnb.kitchen_ticket_line",
    "col": "via refireItem",
    "to": "inventory.movement",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "fnb.menu",
+   "col": "via publishMenu",
+   "to": "platform.outbox",
    "how": "lineage",
    "cross": "yes",
    "required": "",
@@ -24741,6 +25056,15 @@
    "to": "fnb.menu_version",
    "how": "lineage",
    "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "fnb.menu",
+   "col": "via rollbackMenu",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
@@ -26449,33 +26773,6 @@
    "frm": "access.biometric_audit_event",
    "col": "via verifyIdentity",
    "to": "access.scan_event",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "identity.principal",
-   "col": "via changeOwnCredential",
-   "to": "identity.principal_credential",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "identity.principal",
-   "col": "via changeOwnCredential",
-   "to": "identity.principal_credential_history",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "identity.principal",
-   "col": "via changeOwnCredential",
-   "to": "identity.session",
    "how": "lineage",
    "cross": "",
    "required": "",
@@ -29182,6 +29479,33 @@
    "edgeKind": "ambient"
   },
   {
+   "frm": "identity.offline_pin_verifier",
+   "col": "via verifySupervisorStepUp",
+   "to": "identity.offline_step_up",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "identity.offline_pin_verifier",
+   "col": "via verifySupervisorStepUp",
+   "to": "identity.principal_credential",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "identity.offline_pin_verifier",
+   "col": "via verifySupervisorStepUp",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
    "frm": "platform.dead_letter",
    "col": "via requeueDeadLetter",
    "to": "platform.outbox",
@@ -29911,15 +30235,6 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "ai.chunk_embedding",
-   "col": "via eraseSubject",
-   "to": "ai.index_entry",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
    "frm": "assets.guest_upload",
    "col": "via createGuestUpload",
    "to": "assets.media_upload",
@@ -29938,7 +30253,16 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "control.invoice",
+   "frm": "control.contract",
+   "col": "via issueInvoice",
+   "to": "control.invoice",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "control.contract",
    "col": "via issueInvoice",
    "to": "control.invoice_line",
    "how": "lineage",
@@ -29947,7 +30271,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "control.invoice",
+   "frm": "control.contract",
    "col": "via issueInvoice",
    "to": "control.invoice_number_sequence",
    "how": "lineage",
@@ -29961,6 +30285,60 @@
    "to": "platform.outbox",
    "how": "lineage",
    "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "marketing.guest_profile",
+   "col": "via writeSubjectDataExportPart",
+   "to": "marketing.suppression",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "marketing.guest_profile",
+   "col": "via writeSubjectDataExportPart",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "pii.subject",
+   "col": "via recordSubjectDetails",
+   "to": "pii.subject_contact",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "pii.subject",
+   "col": "via recordSubjectDetails",
+   "to": "pii.subject_document",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "pii.subject",
+   "col": "via recordSubjectDetails",
+   "to": "pii.subject_network_identifier",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "identity.subject_data_export_part",
+   "col": "via submitSubjectDataPart",
+   "to": "identity.subject_erasure_part",
+   "how": "lineage",
+   "cross": "",
    "required": "",
    "edgeKind": "ambient"
   }
@@ -30126,6 +30504,7 @@
    "getMembershipProductValidation",
    "listTaxProfiles",
    "getKioskConfigValidation",
+   "getGuestBundle",
    "setProductClassification",
    "listSalePermissionTargets",
    "createInvitationCampaign",
@@ -30218,7 +30597,6 @@
    "updateProduct",
    "listProductVersions",
    "restoreProductVersion",
-   "bulkChangePrices",
    "commitCatalogueImport",
    "approveReviewDecision",
    "listProductGovernance",
@@ -30263,6 +30641,7 @@
    "bookVisitPlan",
    "generateVisitPlan",
    "issueOrderEntitlements",
+   "getGuestBundle",
    "getWishlist",
    "addToWishlist"
   ],
@@ -30391,6 +30770,72 @@
    "getWishlist",
    "addToWishlist"
   ],
+  "catalogue.audit_entry": [
+   "setPrices",
+   "restoreProductVersion",
+   "bulkChangePrices",
+   "commitCatalogueImport",
+   "approvePricingWorkflowAuthority",
+   "approveReviewDecision",
+   "approveWorkflow",
+   "createChannelProfile",
+   "createLiveDynamicPrice",
+   "listChannelLogTransaction",
+   "listPricingCompliance",
+   "listProductTrailChange",
+   "publishActivationScheduler",
+   "publishChannelAvailability",
+   "publishChannelReadinessValidation",
+   "publishPricingEffectiveDate",
+   "setBookingVelocityTime",
+   "setCatalogueReview",
+   "setChannelFeePayment",
+   "setChannelPricingCommercial",
+   "setDemandOccupancyAvailability",
+   "setDynamicPricingStrategy",
+   "setFeeApplicabilityCharging",
+   "setLifecycleStatuWorkflow",
+   "setPriceHierarchyInheritance",
+   "setPricingChangeRequest",
+   "setPricingExperiment",
+   "setProductCatalogue",
+   "setProductContextOwnership",
+   "setProductServicePrice",
+   "setTaxProfileJurisdiction",
+   "setTaxRuleTreatment",
+   "relinquishChannelAllocation",
+   "decidePricingChangeRequest",
+   "setRulePriorityConflict",
+   "submitPricingChangeRequest",
+   "cancelPricingRollback",
+   "decideCatalogueAiFinding",
+   "requestPricingRollback",
+   "retryChannelIncident",
+   "setChannelConnectionConfiguration",
+   "setChannelSalesRule",
+   "setChannelSyncSetting",
+   "setConfigurationTemplate",
+   "setCurrencyRoundingRule",
+   "setDemandSignalConfiguration",
+   "setDynamicPricingGuardrailPolicy",
+   "setFeeDefinition",
+   "setMarketPricingConfiguration",
+   "setPackagePricingDefinition",
+   "setPriceCalculationPolicy",
+   "setPriceCategoryRateType",
+   "setPriceLadderMatrix",
+   "setProductLinks",
+   "setSignalRegistryPolicy",
+   "testChannelConnection",
+   "transitionDynamicPricingStrategy",
+   "updateChannelIncident",
+   "setEntitlementTemplateBlackoutDates",
+   "setProductTagDefinition",
+   "setProductClassification",
+   "setProductChannelTexts",
+   "setProductOwnerForms",
+   "setProductSalePermissionRules"
+  ],
   "catalogue.event": [
    "listEvents",
    "createEvent",
@@ -30483,6 +30928,7 @@
    "renewInventoryHold",
    "forceReleaseInventoryHold",
    "getAvailability",
+   "updatePerformance",
    "updateChannelCapacity",
    "createPayment",
    "capturePayment",
@@ -30786,10 +31232,13 @@
    "createSeatBlock",
    "postStockCount",
    "createGoodsReceipt",
+   "createMerchandise",
+   "updateMerchandise",
    "topUpWallet",
    "adjustWallet",
    "completeWorkOrder",
    "verifyWorkOrder",
+   "createInspectionTemplate",
    "askReportingQuestion",
    "saveNaturalLanguageQuery",
    "pausePromotion",
@@ -30820,6 +31269,8 @@
    "broadcastToGuests",
    "verifyGuestEmail",
    "payByLink",
+   "publishMenu",
+   "rollbackMenu",
    "claimCustomDomain",
    "verifyCustomDomain",
    "listDeadLetters",
@@ -30889,6 +31340,7 @@
    "regenerateDomainToken",
    "setPrimaryDomain",
    "giveShiftVarianceReason",
+   "verifySupervisorStepUp",
    "requeueDeadLetter",
    "mergeGuests",
    "handoverToAgent",
@@ -30963,7 +31415,8 @@
    "setPartnerBrandVenue",
    "getOrderCalendarEvent",
    "getOfflinePolicy",
-   "setPartnerDistributionRights"
+   "setPartnerDistributionRights",
+   "assignApprovalRequest"
   ],
   "platform.region_settings": [
    "getRegionSettings",
@@ -31089,6 +31542,7 @@
    "splitOrder",
    "convertToTermProduct",
    "getPaymentLink",
+   "payByLink",
    "compItem",
    "listMyOrders",
    "reconcileBurstEnvironment",
@@ -31479,6 +31933,7 @@
    "checkoutCart",
    "convertToTermProduct",
    "getPaymentLink",
+   "payByLink",
    "listMyOrders",
    "getBillingStatement",
    "listBillingStatements",
@@ -31497,6 +31952,7 @@
    "checkoutCart",
    "convertToTermProduct",
    "getPaymentLink",
+   "payByLink",
    "listMyOrders",
    "listOrderLineProduct",
    "mergeOrders"
@@ -31875,7 +32331,8 @@
    "listMinorGuardianGroup",
    "listWaiverVerificationQueue",
    "listMissingExpiredInvalid",
-   "listComplianceEvidenceWaiver"
+   "listComplianceEvidenceWaiver",
+   "recordSubjectDetails"
   ],
   "orders.ticket_template": [
    "reprintOrder",
@@ -32518,6 +32975,12 @@
    "verifyMfaChallenge",
    "guestPasswordLogin"
   ],
+  "identity.offline_pin_verifier": [
+   "login",
+   "changeOwnCredential",
+   "verifySupervisorStepUp",
+   "getOfflineStepUpPackage"
+  ],
   "identity.password_policy": [
    "login",
    "selectRole",
@@ -32539,7 +33002,8 @@
    "createPrincipal",
    "changeOwnCredential",
    "resetPrincipalCredential",
-   "verifySupervisorStepUp"
+   "verifySupervisorStepUp",
+   "getOfflineStepUpPackage"
   ],
   "identity.refresh_token": [
    "login",
@@ -32682,7 +33146,8 @@
    "guestPasswordLogin",
    "getGuestProfile",
    "listCustomerServiceProfile",
-   "listMinorGuardianGroup"
+   "listMinorGuardianGroup",
+   "recordSubjectDetails"
   ],
   "identity.sso_provider": [
    "guestSocialLogin",
@@ -32704,7 +33169,8 @@
    "guestUaePassLogin",
    "decideGuestIdentityVerification",
    "listGuestIdentityVerifications",
-   "submitGuestIdentityDocument"
+   "submitGuestIdentityDocument",
+   "recordSubjectDetails"
   ],
   "identity.subject_holding": [
    "linkGuestCheckout",
@@ -32905,6 +33371,7 @@
    "createPlan",
    "createPlanVersion",
    "setSubscription",
+   "previewSubscriptionChange",
    "getTenantLicences",
    "addLicenceAddOn",
    "removeLicenceAddOn",
@@ -32916,6 +33383,8 @@
   ],
   "control.cell": [
    "getTenant",
+   "setSubscription",
+   "previewSubscriptionChange",
    "listTenantCells",
    "provisionCell",
    "getCell",
@@ -32929,6 +33398,8 @@
   ],
   "control.cell_tenant": [
    "getTenant",
+   "setSubscription",
+   "previewSubscriptionChange",
    "listTenantCells",
    "provisionCell",
    "getCell",
@@ -32951,6 +33422,7 @@
    "getBillingReconciliation",
    "getLicenceEnforcement",
    "getPlanRecommendations",
+   "issueInvoice",
    "getTenantRequestLimits"
   ],
   "control.outbox": [
@@ -32979,6 +33451,7 @@
    "getPlan",
    "createPlanVersion",
    "setSubscription",
+   "previewSubscriptionChange",
    "getTenantLicences",
    "removeLicenceAddOn",
    "getLicenceEnforcement",
@@ -32990,13 +33463,20 @@
    "getPlan",
    "createPlanVersion",
    "setSubscription",
+   "previewSubscriptionChange",
    "getTenantLicences",
    "removeLicenceAddOn",
    "generateInvoice",
    "getPlanRecommendations"
   ],
+  "control.cell_endpoint": [
+   "setSubscription",
+   "previewSubscriptionChange",
+   "listCellEndpoints"
+  ],
   "control.licence_add_on": [
    "setSubscription",
+   "previewSubscriptionChange",
    "getTenantLicences",
    "addLicenceAddOn",
    "removeLicenceAddOn",
@@ -33008,6 +33488,7 @@
   ],
   "control.licence_add_on_limit": [
    "setSubscription",
+   "previewSubscriptionChange",
    "getTenantLicences",
    "addLicenceAddOn",
    "removeLicenceAddOn",
@@ -33016,11 +33497,24 @@
    "simulateCommercialPackage",
    "getPlanRecommendations"
   ],
-  "platform.tenant": [
+  "control.module_listing": [
+   "setSubscription",
    "previewSubscriptionChange",
-   "createPartnerAgreement"
+   "generateInvoice",
+   "listModuleCatalogue",
+   "setModuleListing",
+   "simulateCommercialPackage",
+   "getPlanRecommendations"
+  ],
+  "control.capacity_pack": [
+   "previewSubscriptionChange",
+   "addCapacityPack",
+   "getLicenceEnforcement",
+   "simulateCommercialPackage",
+   "getPlanRecommendations"
   ],
   "control.usage_record": [
+   "previewSubscriptionChange",
    "getEntitlementUsage",
    "getUsageMetering",
    "recordUsage",
@@ -33030,10 +33524,13 @@
    "getLicenceEnforcement",
    "getPlanRecommendations"
   ],
+  "platform.tenant": [
+   "previewSubscriptionChange",
+   "createPartnerAgreement"
+  ],
   "control.cell_instance": [
    "provisionCell",
    "getCell",
-   "getCellHealth",
    "listCells"
   ],
   "control.cell_job": [
@@ -33081,7 +33578,8 @@
    "runAiControlTest",
    "startConfigurationSession",
    "suggestGuidedChoice",
-   "listAiCapabilityHealth"
+   "listAiCapabilityHealth",
+   "eraseSubject"
   ],
   "control.invoice": [
    "recordInvoicePayment",
@@ -33114,13 +33612,6 @@
    "generateInvoice",
    "issueCreditNote",
    "listCreditNotes"
-  ],
-  "control.module_listing": [
-   "generateInvoice",
-   "listModuleCatalogue",
-   "setModuleListing",
-   "simulateCommercialPackage",
-   "getPlanRecommendations"
   ],
   "control.platform_tax_rate": [
    "generateInvoice",
@@ -33422,7 +33913,8 @@
    "splitBill"
   ],
   "fnb.sub_bill": [
-   "splitBill"
+   "splitBill",
+   "transferOrderItems"
   ],
   "fnb.recipe": [
    "listRecipes",
@@ -34593,7 +35085,8 @@
   "ai.conversation": [
    "listAiConversations",
    "createAiConversation",
-   "sendAiMessage"
+   "sendAiMessage",
+   "eraseSubject"
   ],
   "ai.assistant_profile": [
    "sendAiMessage",
@@ -34682,7 +35175,8 @@
   ],
   "ai.message": [
    "sendAiMessage",
-   "recordAnswerFeedback"
+   "recordAnswerFeedback",
+   "eraseSubject"
   ],
   "ai.proposed_action": [
    "sendAiMessage",
@@ -34811,7 +35305,8 @@
    "getGuestLoyalty",
    "adjustLoyaltyPoints",
    "listCustomerServiceProfile",
-   "getGuestIntelligence"
+   "getGuestIntelligence",
+   "writeSubjectDataExportPart"
   ],
   "queue.entry": [
    "joinQueue",
@@ -35153,7 +35648,8 @@
    "listCustomerSatisfactionFeedback",
    "listServiceRootCause",
    "getGuestTimeline",
-   "setServiceQueueDefinition"
+   "setServiceQueueDefinition",
+   "writeSubjectDataExportPart"
   ],
   "approvals.decision": [
    "listApprovalRequests",
@@ -35635,71 +36131,6 @@
    "relinquishStoredValue",
    "redeemLoyaltyPoints"
   ],
-  "catalogue.audit_entry": [
-   "restoreProductVersion",
-   "bulkChangePrices",
-   "commitCatalogueImport",
-   "approvePricingWorkflowAuthority",
-   "approveReviewDecision",
-   "approveWorkflow",
-   "createChannelProfile",
-   "createLiveDynamicPrice",
-   "listChannelLogTransaction",
-   "listPricingCompliance",
-   "listProductTrailChange",
-   "publishActivationScheduler",
-   "publishChannelAvailability",
-   "publishChannelReadinessValidation",
-   "publishPricingEffectiveDate",
-   "setBookingVelocityTime",
-   "setCatalogueReview",
-   "setChannelFeePayment",
-   "setChannelPricingCommercial",
-   "setDemandOccupancyAvailability",
-   "setDynamicPricingStrategy",
-   "setFeeApplicabilityCharging",
-   "setLifecycleStatuWorkflow",
-   "setPriceHierarchyInheritance",
-   "setPricingChangeRequest",
-   "setPricingExperiment",
-   "setProductCatalogue",
-   "setProductContextOwnership",
-   "setProductServicePrice",
-   "setTaxProfileJurisdiction",
-   "setTaxRuleTreatment",
-   "relinquishChannelAllocation",
-   "decidePricingChangeRequest",
-   "setRulePriorityConflict",
-   "submitPricingChangeRequest",
-   "cancelPricingRollback",
-   "decideCatalogueAiFinding",
-   "requestPricingRollback",
-   "retryChannelIncident",
-   "setChannelConnectionConfiguration",
-   "setChannelSalesRule",
-   "setChannelSyncSetting",
-   "setConfigurationTemplate",
-   "setCurrencyRoundingRule",
-   "setDemandSignalConfiguration",
-   "setDynamicPricingGuardrailPolicy",
-   "setFeeDefinition",
-   "setMarketPricingConfiguration",
-   "setPackagePricingDefinition",
-   "setPriceCalculationPolicy",
-   "setPriceCategoryRateType",
-   "setPriceLadderMatrix",
-   "setProductLinks",
-   "setSignalRegistryPolicy",
-   "testChannelConnection",
-   "transitionDynamicPricingStrategy",
-   "updateChannelIncident",
-   "setEntitlementTemplateBlackoutDates",
-   "setProductTagDefinition",
-   "setProductClassification",
-   "setProductChannelTexts",
-   "setProductOwnerForms",
-   "setProductSalePermissionRules"
-  ],
   "catalogue.rollback_action": [
    "restoreProductVersion",
    "listPricingGovernance",
@@ -35956,7 +36387,6 @@
   ],
   "marketing.message_dispatch": [
    "createPaymentLink",
-   "deprecateApiVersion",
    "resendPaymentLink",
    "notifyWaitlistParty",
    "notifyServer",
@@ -35984,6 +36414,7 @@
    "getGuestTimeline",
    "listMyNotifications",
    "markMyNotificationsRead",
+   "writeSubjectDataExportPart",
    "sendGuestOneTimeCode",
    "sendGuestBroadcast"
   ],
@@ -36201,9 +36632,12 @@
   "control.developer_member": [
    "registerDeveloper",
    "setDeveloperMembers",
+   "createApiClient",
+   "revokeApiCredential",
    "listIntegrationListings",
    "listProductionAccessRequests",
    "requestProductionAccess",
+   "getDeveloperAccount",
    "listDeveloperMembers"
   ],
   "control.api_client": [
@@ -36215,7 +36649,6 @@
    "createWebhookSubscription",
    "setApiQuota",
    "getApiUsage",
-   "deprecateApiVersion",
    "listPartner",
    "setApiClientStatus",
    "setApprovalExternalProvider",
@@ -36391,6 +36824,9 @@
    "getHaccpStatus",
    "getStockTransfer"
   ],
+  "fnb.table_visit_server": [
+   "reassignServer"
+  ],
   "fnb.course_rule": [
    "setCourseRules",
    "getCourseRules"
@@ -36461,7 +36897,8 @@
    "requestSuggestion",
    "decideRecommendations",
    "getCustomerRecommendationProfile",
-   "recordRecommendationEvents"
+   "recordRecommendationEvents",
+   "eraseSubject"
   ],
   "ai.release": [
    "requestSuggestion",
@@ -36495,7 +36932,8 @@
    "requestSuggestion",
    "getJourneyPerformance",
    "launchCampaign",
-   "getCampaignPerformance"
+   "getCampaignPerformance",
+   "writeSubjectDataExportPart"
   ],
   "venuemap.visit_plan": [
    "requestSuggestion",
@@ -38066,12 +38504,6 @@
   "approvals.workflow_trigger": [
    "setTriggerActionCross"
   ],
-  "control.capacity_pack": [
-   "addCapacityPack",
-   "getLicenceEnforcement",
-   "simulateCommercialPackage",
-   "getPlanRecommendations"
-  ],
   "seating.group_request": [
    "allocateGroupSeats",
    "createGroupSeatRequest",
@@ -38775,7 +39207,8 @@
    "publishWalletConfiguration",
    "diffWalletConfigurationVersion",
    "restoreWalletConfigurationVersion",
-   "setWalletIntegrationMapping"
+   "setWalletIntegrationMapping",
+   "getWalletIntegrationMapping"
   ],
   "wallet.refund_policy": [
    "publishWalletConfiguration",
@@ -39027,9 +39460,6 @@
   ],
   "sync.cell_connection": [
    "listCellConnections"
-  ],
-  "control.cell_endpoint": [
-   "listCellEndpoints"
   ],
   "sync.cross_cell_request": [
    "listCrossCellRequests"
@@ -39462,7 +39892,8 @@
    "explainRecommendationDecision",
    "getCustomerRecommendationProfile",
    "recordRecommendationEvents",
-   "simulateRecommendationDecision"
+   "simulateRecommendationDecision",
+   "eraseSubject"
   ],
   "accreditation.mobile_credential_delivery": [
    "deliverAccreditationCredential",
@@ -39488,7 +39919,8 @@
   ],
   "ai.rec_event": [
    "getCustomerRecommendationProfile",
-   "recordRecommendationEvents"
+   "recordRecommendationEvents",
+   "eraseSubject"
   ],
   "ai.forecast_accuracy": [
    "getForecastAccuracy"
@@ -39635,7 +40067,8 @@
    "getCampaignPerformance"
   ],
   "ai.answer_feedback": [
-   "recordAnswerFeedback"
+   "recordAnswerFeedback",
+   "eraseSubject"
   ],
   "wallet.exit_settlement": [
    "settleWalletAtExit"
@@ -39789,6 +40222,9 @@
    "publishKioskConfigs",
    "restoreKioskConfigVersion"
   ],
+  "identity.offline_step_up": [
+   "verifySupervisorStepUp"
+  ],
   "pii.consent_identifier": [
    "recordConsentIdentifier",
    "recordDeviceConsent"
@@ -39833,21 +40269,24 @@
   ],
   "marketing.guest_note": [
    "addGuestNote",
-   "getGuestTimeline"
+   "getGuestTimeline",
+   "writeSubjectDataExportPart"
   ],
   "marketing.guest_preference": [
    "updateGuestPreferences",
    "getMyProfile",
    "updateMyProfile",
    "listCustomerPrivacyConsent",
-   "listCustomerServiceProfile"
+   "listCustomerServiceProfile",
+   "writeSubjectDataExportPart"
   ],
   "marketing.invitation_campaign": [
    "createInvitationCampaign",
    "respondToInvitation"
   ],
   "marketing.invitation": [
-   "respondToInvitation"
+   "respondToInvitation",
+   "writeSubjectDataExportPart"
   ],
   "marketing.privacy_incident": [
    "recordPrivacyIncident",
@@ -39918,7 +40357,8 @@
    "setWaiverException",
    "listComplianceEvidenceWaiver",
    "listWaiverComplianceOperational",
-   "listWaiverComplianceRisk"
+   "listWaiverComplianceRisk",
+   "writeSubjectDataExportPart"
   ],
   "marketing.waiver_requirement_event": [
    "submitForm",
@@ -39946,6 +40386,7 @@
   ],
   "marketing.guest_document_upload": [
    "uploadGuestDocument",
+   "writeSubjectDataExportPart",
    "createGuestDocumentUpload"
   ],
   "marketing.challenge": [
@@ -39956,7 +40397,8 @@
    "getMyChallenges"
   ],
   "marketing.challenge_progress": [
-   "getMyChallenges"
+   "getMyChallenges",
+   "writeSubjectDataExportPart"
   ],
   "marketing.seo_metadata": [
    "getSeoMetadata",
@@ -39969,10 +40411,12 @@
    "listLostItems",
    "recordLostItem",
    "getLostItemMatches",
-   "matchLostItem"
+   "matchLostItem",
+   "writeSubjectDataExportPart"
   ],
   "marketing.referral": [
-   "createReferral"
+   "createReferral",
+   "writeSubjectDataExportPart"
   ],
   "marketing.conversation": [
    "setCallDisposition",
@@ -39987,7 +40431,8 @@
    "listContact",
    "listAgentWorkloadAvailability",
    "listServiceRootCause",
-   "getGuestTimeline"
+   "getGuestTimeline",
+   "writeSubjectDataExportPart"
   ],
   "marketing.journey": [
    "recordTouchPoint",
@@ -39999,7 +40444,8 @@
   "marketing.touch_point": [
    "recordTouchPoint",
    "getGuestTimeline",
-   "getGuestIntelligence"
+   "getGuestIntelligence",
+   "writeSubjectDataExportPart"
   ],
   "marketing.journey_step": [
    "listJourneys",
@@ -40007,7 +40453,8 @@
    "activateJourney"
   ],
   "marketing.journey_enrollment": [
-   "getJourneyPerformance"
+   "getJourneyPerformance",
+   "writeSubjectDataExportPart"
   ],
   "marketing.message_trigger": [
    "listMessageTriggers",
@@ -40026,7 +40473,8 @@
    "previewSegmentDraft",
    "listConsentPreferenceCommunication",
    "listCustomerServiceProfile",
-   "getAudienceOverlap"
+   "getAudienceOverlap",
+   "writeSubjectDataExportPart"
   ],
   "marketing.conversation_message_attachment": [
    "listConversations",
@@ -40076,12 +40524,14 @@
   "marketing.wishlist_item": [
    "getWishlist",
    "addToWishlist",
-   "removeFromWishlist"
+   "removeFromWishlist",
+   "writeSubjectDataExportPart"
   ],
   "marketing.guest_device": [
    "listGuestDevices",
    "registerGuestDevice",
    "revokeGuestDevice",
+   "writeSubjectDataExportPart",
    "sendGuestBroadcast"
   ],
   "marketing.campaign_variant": [
@@ -40102,7 +40552,8 @@
   ],
   "marketing.communication_policy_decision": [
    "sendTransactionalMessage",
-   "listConsentPreferenceCommunication"
+   "listConsentPreferenceCommunication",
+   "writeSubjectDataExportPart"
   ],
   "marketing.message_dispatch_attempt": [
    "sendTransactionalMessage",
@@ -40130,7 +40581,8 @@
    "submitReview",
    "respondToReview",
    "listCustomerSatisfactionFeedback",
-   "getGuestTimeline"
+   "getGuestTimeline",
+   "writeSubjectDataExportPart"
   ],
   "marketing.review_response": [
    "listReviews",
@@ -40138,7 +40590,8 @@
   ],
   "marketing.subscription": [
    "getMarketingSubscription",
-   "setMarketingSubscription"
+   "setMarketingSubscription",
+   "writeSubjectDataExportPart"
   ],
   "marketing.business_event": [
    "listCommunicationService",
@@ -40221,20 +40674,23 @@
    "listDeletionAnonymizationRestriction",
    "setPrivacyAction",
    "listPrivacyCompliance",
-   "runDataRetention"
+   "runDataRetention",
+   "writeSubjectDataExportPart"
   ],
   "marketing.privacy_exception": [
    "listPrivacy",
    "listPrivacyComplianceExceptions",
    "setPrivacyComplianceException",
-   "listPrivacyCompliance"
+   "listPrivacyCompliance",
+   "writeSubjectDataExportPart"
   ],
   "marketing.privacy_request": [
    "listPrivacy",
    "listCustomerPrivacyConsent",
    "listDataSubjectCustomer",
    "setPrivacyRequest",
-   "listPrivacyCompliance"
+   "listPrivacyCompliance",
+   "writeSubjectDataExportPart"
   ],
   "marketing.retention_policy": [
    "listPrivacy",
@@ -40251,7 +40707,8 @@
   "marketing.privacy_audit_event": [
    "listCustomerPrivacyConsent",
    "listPrivacyEvidenceCompliance",
-   "runDataRetention"
+   "runDataRetention",
+   "writeSubjectDataExportPart"
   ],
   "marketing.privacy_export_package": [
    "setDataDiscoveryAccess"
@@ -40262,7 +40719,8 @@
    "listDeviceConsents",
    "getDeviceConsentHistory",
    "claimDeviceConsent",
-   "getCookieConsentRuntime"
+   "getCookieConsentRuntime",
+   "writeSubjectDataExportPart"
   ],
   "marketing.device_consent_category": [
    "listPrivacyCompliance",
@@ -40318,7 +40776,8 @@
    "getCaseInvestigationResolution"
   ],
   "marketing.case_service_action": [
-   "setOrderBookingTicket"
+   "setOrderBookingTicket",
+   "writeSubjectDataExportPart"
   ],
   "marketing.case_resolution": [
    "listCaseResolutionClosure",
@@ -40375,7 +40834,8 @@
    "listWaiverVerificationQueue",
    "listComplianceEvidenceWaiver",
    "getGuestTimeline",
-   "listWaiverSignatures"
+   "listWaiverSignatures",
+   "writeSubjectDataExportPart"
   ],
   "marketing.waiver_localisation": [
    "setLocalizationBrandingCustomer",
@@ -40404,7 +40864,8 @@
    "actOnWaiverRequirements",
    "listMinorGuardianGroup",
    "getGuestRelationships",
-   "setGuestRelationships"
+   "setGuestRelationships",
+   "writeSubjectDataExportPart"
   ],
   "marketing.guest_attribute_model": [
    "getGuestAttributeModel",
@@ -40467,7 +40928,8 @@
   ],
   "marketing.booking_consent_record": [
    "listConsentAnswers",
-   "recordConsentAnswers"
+   "recordConsentAnswers",
+   "writeSubjectDataExportPart"
   ],
   "marketing.cookie_scan_finding": [
    "recordCookieScan",
@@ -40491,7 +40953,17 @@
    "completeGuestUpload"
   ],
   "identity.subject_data_export_part": [
-   "recordSubjectDataExportPart"
+   "recordSubjectDataExportPart",
+   "submitSubjectDataPart"
+  ],
+  "pii.subject_network_identifier": [
+   "recordSubjectDetails"
+  ],
+  "identity.subject_erasure_part": [
+   "submitSubjectDataPart"
+  ],
+  "identity.open_shift_marker": [
+   "getOfflineStepUpPackage"
   ]
  },
  "tab_screens": {
@@ -40744,6 +41216,7 @@
    "BO-920",
    "BO-1043",
    "BO-1044",
+   "BO-1049",
    "BO-1050",
    "ADM-063",
    "ADM-066",
@@ -41238,6 +41711,7 @@
    "BO-125",
    "BO-725",
    "BO-877",
+   "BO-1049",
    "BO-1192",
    "ADM-070",
    "ADM-118",
@@ -41295,6 +41769,7 @@
    "BO-125",
    "BO-161",
    "BO-877",
+   "BO-1049",
    "BO-1192",
    "PTR-006",
    "CMS-006",
@@ -41348,6 +41823,7 @@
    "BO-094",
    "BO-125",
    "BO-877",
+   "BO-1049",
    "BO-1192",
    "ADM-119",
    "PTR-006",
@@ -41379,6 +41855,7 @@
    "GST-001",
    "GST-002",
    "GST-003",
+   "GST-004",
    "GST-007",
    "GST-008",
    "GST-020",
@@ -41554,7 +42031,6 @@
    "GST-026",
    "GST-027",
    "GST-032",
-   "GST-041",
    "GST-048",
    "GST-050",
    "GST-056",
@@ -41615,7 +42091,6 @@
    "GST-031",
    "GST-032",
    "GST-033",
-   "GST-041",
    "GST-042",
    "GST-045",
    "GST-049",
@@ -41693,8 +42168,10 @@
    "BO-037",
    "BO-040",
    "BO-043",
+   "BO-045",
    "BO-046",
    "BO-047",
+   "BO-048",
    "BO-052",
    "BO-053",
    "BO-058",
@@ -41706,6 +42183,7 @@
    "BO-085",
    "BO-089",
    "BO-090",
+   "BO-116",
    "BO-129",
    "BO-132",
    "BO-190",
@@ -41734,7 +42212,6 @@
    "BO-422",
    "BO-443",
    "BO-487",
-   "BO-488",
    "BO-578",
    "BO-581",
    "BO-593",
@@ -41756,6 +42233,7 @@
    "BO-746",
    "BO-835",
    "BO-843",
+   "BO-911",
    "BO-940",
    "BO-962",
    "BO-972",
@@ -42077,6 +42555,7 @@
    "BO-094",
    "BO-125",
    "BO-877",
+   "BO-1049",
    "BO-1192",
    "PTR-006",
    "CMS-006",
@@ -42570,6 +43049,7 @@
    "BO-015",
    "BO-017",
    "BO-018",
+   "BO-019",
    "BO-024",
    "BO-037",
    "BO-117",
@@ -42585,6 +43065,7 @@
    "BO-716",
    "BO-717",
    "BO-946",
+   "BO-978",
    "BO-1043",
    "BO-1046",
    "BO-1047",
@@ -42634,6 +43115,7 @@
    "WEB-050",
    "GST-004",
    "GST-007",
+   "GST-008",
    "GST-009",
    "GST-032",
    "GST-041",
@@ -42796,6 +43278,7 @@
    "WEB-008",
    "WEB-010",
    "WEB-011",
+   "WEB-012",
    "WEB-016",
    "WEB-022",
    "WEB-033",
@@ -42965,11 +43448,13 @@
    "WEB-006",
    "WEB-010",
    "WEB-011",
+   "WEB-012",
    "WEB-022",
    "WEB-032",
    "WEB-040",
    "WEB-043",
    "GST-007",
+   "GST-008",
    "GST-009",
    "GST-023",
    "GST-032",
@@ -43114,7 +43599,10 @@
   "marketing.booking_consent_record": [
    "WEB-006",
    "WEB-011",
+   "WEB-012",
    "GST-007",
+   "GST-008",
+   "GST-009",
    "CMS-018"
   ],
   "pii.subject": [
@@ -43770,7 +44258,6 @@
    "GST-032",
    "GST-035",
    "GST-039",
-   "GST-041",
    "GST-042",
    "GST-065",
    "GST-066",
@@ -43817,7 +44304,6 @@
    "WEB-033",
    "GST-009",
    "GST-032",
-   "GST-041",
    "KSK-006",
    "BO-024",
    "BO-026",
@@ -43834,7 +44320,6 @@
    "WEB-033",
    "GST-009",
    "GST-032",
-   "GST-041",
    "GST-067",
    "POS-006",
    "POS-011",
@@ -43872,7 +44357,6 @@
    "GST-028",
    "GST-032",
    "GST-035",
-   "GST-041",
    "GST-067",
    "POS-002",
    "POS-004",
@@ -44067,7 +44551,6 @@
    "GST-028",
    "GST-032",
    "GST-035",
-   "GST-041",
    "GST-067",
    "POS-002",
    "POS-004",
@@ -44124,7 +44607,6 @@
    "GST-028",
    "GST-032",
    "GST-035",
-   "GST-041",
    "GST-067",
    "POS-002",
    "POS-004",
@@ -44184,7 +44666,6 @@
    "GST-028",
    "GST-032",
    "GST-035",
-   "GST-041",
    "GST-067",
    "POS-002",
    "POS-004",
@@ -44355,7 +44836,6 @@
    "GST-028",
    "GST-032",
    "GST-035",
-   "GST-041",
    "GST-067",
    "GST-072",
    "POS-002",
@@ -44926,7 +45406,6 @@
    "BO-284",
    "BO-293",
    "ADM-247",
-   "ADM-342",
    "PTR-029",
    "PTR-035",
    "PTR-036",
@@ -45849,7 +46328,6 @@
    "BO-090",
    "BO-416",
    "BO-487",
-   "BO-488",
    "BO-1111",
    "BO-1116",
    "BO-1121",
@@ -45862,7 +46340,6 @@
    "POS-005",
    "BO-415",
    "BO-420",
-   "BO-488",
    "BO-722",
    "BO-1083",
    "BO-1088",
@@ -45927,7 +46404,6 @@
    "BO-453",
    "BO-469",
    "BO-487",
-   "BO-488",
    "BO-1081",
    "BO-1102",
    "BO-1111",
@@ -48076,13 +48552,11 @@
    "ADM-045",
    "ADM-046",
    "ADM-047",
-   "ADM-026",
    "PTR-004",
    "SUP-011",
    "CMS-053",
    "CMS-056",
    "CMS-059",
-   "DEV-008",
    "KIT-002"
   ],
   "maintenance.work_order": [
@@ -48230,7 +48704,6 @@
    "BO-416",
    "BO-417",
    "BO-418",
-   "BO-488",
    "BO-1092",
    "BO-1093",
    "BO-1094",
@@ -48438,6 +48911,15 @@
    "KIT-002",
    "ANL-003",
    "ANL-070"
+  ],
+  "identity.offline_pin_verifier": [
+   "POS-000",
+   "EMP-001",
+   "SCN-001",
+   "ADM-001",
+   "ADM-699",
+   "PTR-001",
+   "SUP-001"
   ],
   "identity.principal_credential": [
    "POS-000",
@@ -50560,6 +51042,9 @@
    "BO-742",
    "BO-796"
   ],
+  "fnb.table_visit_server": [
+   "EMP-058"
+  ],
   "accreditation.application": [
    "EMP-060",
    "BO-005",
@@ -51426,7 +51911,6 @@
   "catalogue.product_version": [
    "BO-007",
    "BO-008",
-   "BO-009",
    "BO-012",
    "BO-117",
    "ADM-118",
@@ -52083,7 +52567,6 @@
    "ADM-354",
    "ADM-356",
    "ADM-015",
-   "ADM-026",
    "PTR-019",
    "PTR-022",
    "DEV-003",
@@ -54023,6 +54506,7 @@
    "ADM-410",
    "ADM-411",
    "ADM-412",
+   "ADM-414",
    "ADM-417",
    "ADM-420",
    "ADM-421",
@@ -54034,6 +54518,7 @@
    "ADM-450",
    "ADM-457",
    "ADM-460",
+   "ADM-463",
    "ADM-469",
    "ADM-470",
    "ADM-471",
@@ -54126,7 +54611,8 @@
    "ADM-558",
    "ADM-619",
    "CMS-017",
-   "DEV-008"
+   "DEV-008",
+   "SGN-022"
   ],
   "control.go_live_readiness": [
    "BO-595",
@@ -56097,7 +56583,12 @@
    "ADM-015",
    "ADM-029",
    "ADM-030",
-   "ADM-033"
+   "ADM-033",
+   "ADM-410",
+   "ADM-414",
+   "ADM-417",
+   "ADM-463",
+   "SGN-022"
   ],
   "control.cell_tenant": [
    "ADM-002",
@@ -56114,7 +56605,12 @@
    "ADM-014",
    "ADM-015",
    "ADM-029",
-   "ADM-033"
+   "ADM-033",
+   "ADM-410",
+   "ADM-414",
+   "ADM-417",
+   "ADM-463",
+   "SGN-022"
   ],
   "control.contract": [
    "ADM-002",
@@ -56171,6 +56667,7 @@
    "ADM-406",
    "ADM-407",
    "ADM-410",
+   "ADM-414",
    "ADM-416",
    "ADM-417",
    "ADM-422",
@@ -56179,12 +56676,14 @@
    "ADM-450",
    "ADM-452",
    "ADM-457",
+   "ADM-463",
    "ADM-465",
    "ADM-466",
    "CMS-001",
    "CMS-007",
    "SGN-011",
-   "SGN-012"
+   "SGN-012",
+   "SGN-022"
   ],
   "control.licence_add_on_limit": [
    "ADM-002",
@@ -56205,6 +56704,7 @@
    "ADM-406",
    "ADM-407",
    "ADM-410",
+   "ADM-414",
    "ADM-416",
    "ADM-417",
    "ADM-422",
@@ -56214,10 +56714,12 @@
    "ADM-452",
    "ADM-454",
    "ADM-457",
+   "ADM-463",
    "ADM-465",
    "ADM-466",
    "SGN-011",
-   "SGN-012"
+   "SGN-012",
+   "SGN-022"
   ],
   "control.plan": [
    "ADM-002",
@@ -56278,14 +56780,17 @@
    "ADM-398",
    "ADM-400",
    "ADM-410",
+   "ADM-414",
    "ADM-417",
    "ADM-422",
    "ADM-424",
    "ADM-450",
    "ADM-452",
    "ADM-454",
+   "ADM-463",
    "ADM-465",
-   "SGN-012"
+   "SGN-012",
+   "SGN-022"
   ],
   "control.plan_module": [
    "ADM-002",
@@ -56303,14 +56808,17 @@
    "ADM-398",
    "ADM-400",
    "ADM-410",
+   "ADM-414",
    "ADM-417",
    "ADM-422",
    "ADM-424",
    "ADM-450",
    "ADM-452",
    "ADM-460",
+   "ADM-463",
    "ADM-465",
-   "SGN-012"
+   "SGN-012",
+   "SGN-022"
   ],
   "control.usage_record": [
    "ADM-002",
@@ -56326,6 +56834,7 @@
    "ADM-373",
    "ADM-377",
    "ADM-378",
+   "ADM-414",
    "ADM-449",
    "ADM-451",
    "ADM-452",
@@ -56335,8 +56844,10 @@
    "ADM-458",
    "ADM-460",
    "ADM-461",
+   "ADM-463",
    "ADM-465",
-   "ADM-468"
+   "ADM-468",
+   "SGN-022"
   ],
   "control.cell_instance": [
    "ADM-003",
@@ -56357,6 +56868,40 @@
   ],
   "control.outbox": [
    "ADM-005"
+  ],
+  "control.capacity_pack": [
+   "ADM-008",
+   "ADM-011",
+   "ADM-377",
+   "ADM-378",
+   "ADM-396",
+   "ADM-397",
+   "ADM-399",
+   "ADM-400",
+   "ADM-405",
+   "ADM-406",
+   "ADM-407",
+   "ADM-414",
+   "ADM-416",
+   "ADM-452",
+   "ADM-454",
+   "ADM-455",
+   "ADM-463",
+   "ADM-465",
+   "ADM-466",
+   "SGN-011",
+   "SGN-012",
+   "SGN-017",
+   "SGN-022"
+  ],
+  "control.cell_endpoint": [
+   "ADM-008",
+   "ADM-011",
+   "ADM-410",
+   "ADM-414",
+   "ADM-417",
+   "ADM-463",
+   "SGN-022"
   ],
   "control.credit_note": [
    "ADM-008",
@@ -56392,6 +56937,7 @@
   "control.module_listing": [
    "ADM-008",
    "ADM-009",
+   "ADM-011",
    "ADM-377",
    "ADM-378",
    "ADM-386",
@@ -56404,11 +56950,15 @@
    "ADM-404",
    "ADM-406",
    "ADM-407",
+   "ADM-410",
+   "ADM-414",
    "ADM-416",
+   "ADM-417",
    "ADM-423",
    "ADM-424",
    "ADM-452",
    "ADM-460",
+   "ADM-463",
    "ADM-465",
    "ADM-466",
    "SGN-008",
@@ -56417,7 +56967,8 @@
    "SGN-013",
    "SGN-014",
    "SGN-015",
-   "SGN-016"
+   "SGN-016",
+   "SGN-022"
   ],
   "control.platform_tax_rate": [
    "ADM-008",
@@ -56592,26 +57143,6 @@
    "ADM-468",
    "SGN-011",
    "SGN-012"
-  ],
-  "control.capacity_pack": [
-   "ADM-377",
-   "ADM-378",
-   "ADM-396",
-   "ADM-397",
-   "ADM-399",
-   "ADM-400",
-   "ADM-405",
-   "ADM-406",
-   "ADM-407",
-   "ADM-416",
-   "ADM-452",
-   "ADM-454",
-   "ADM-455",
-   "ADM-465",
-   "ADM-466",
-   "SGN-011",
-   "SGN-012",
-   "SGN-017"
   ],
   "control.enforcement_policy": [
    "ADM-377",

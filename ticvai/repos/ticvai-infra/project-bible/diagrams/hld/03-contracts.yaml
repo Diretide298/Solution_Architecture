@@ -32,11 +32,11 @@ contracts:
   ref: diagrams/lld/contracts/marketing-crm.yaml
 - contract: catalogue
   tier: spine
-  operations: 269
+  operations: 274
   holds: null
   service: CatalogueService
   verbs:
-    GET: 140
+    GET: 145
     PUT: 69
     POST: 49
     PATCH: 9
@@ -200,12 +200,12 @@ contracts:
   ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity
   tier: spine
-  operations: 105
+  operations: 108
   holds: null
   service: IdentityService
   verbs:
-    POST: 47
-    GET: 42
+    POST: 49
+    GET: 43
     PUT: 9
     DELETE: 4
     PATCH: 3
@@ -218,8 +218,25 @@ contracts:
   - identity-guestRegistered
   - identity-loginRecorded
   - identity-mfaCodeIssued
+  - identity-offlineStepUpRefused
   - identity-privacyRequestRaised
   ref: diagrams/lld/contracts/identity.yaml
+- contract: wallet
+  tier: satellite
+  operations: 72
+  holds: null
+  service: WalletService
+  verbs:
+    POST: 31
+    GET: 25
+    PUT: 16
+  guestCallable: 12
+  offlineCapable: 1
+  events:
+  - wallet-creditExpired
+  - wallet-credited
+  - wallet-debited
+  ref: diagrams/lld/contracts/wallet.yaml
 - contract: finance
   tier: spine
   operations: 72
@@ -234,22 +251,6 @@ contracts:
   offlineCapable: 4
   events: null
   ref: diagrams/lld/contracts/finance.yaml
-- contract: wallet
-  tier: satellite
-  operations: 71
-  holds: null
-  service: WalletService
-  verbs:
-    POST: 31
-    GET: 24
-    PUT: 16
-  guestCallable: 12
-  offlineCapable: 1
-  events:
-  - wallet-creditExpired
-  - wallet-credited
-  - wallet-debited
-  ref: diagrams/lld/contracts/wallet.yaml
 - contract: resources
   tier: satellite
   operations: 62

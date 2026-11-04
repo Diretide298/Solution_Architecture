@@ -512,7 +512,7 @@
    "domain": "Guest Mobile App & Branding",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "No family or dependent portfolio structure. access.FacePassEnrolment.guardianSubjectId exists but is biometric consent for a minor, not a household. 5.5.5B requires a primary account holder over dependents. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "No family or dependent portfolio structure. access.FacePassEnrolment.guardianSubjectId exists but is biometric consent for a minor, not a household. 5.5.5B requires a primary account holder over dependents. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -1692,7 +1692,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Family ticket products with composition rules and age restrictions. No family or household model anywhere — same gap as BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Family ticket products with composition rules and age restrictions. No family or household model anywhere — same gap as BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -2361,7 +2361,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Family memberships. No household model — BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Family memberships. No household model — BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -2533,7 +2533,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Family ticket management. BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Family ticket management. BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -3933,7 +3933,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "catalogue",
-   "note": "Deliberate oversell for free events. An envelope may be increased freely and reducing below sold is refused; overselling is not modelled. **Contracted by BL-046 — `Envelope`.**",
+   "note": "Deliberate oversell for free events. An envelope may be increased freely and reducing below sold is refused; overselling is not modelled. **Contracted by BL-046 — `ChannelCapacity.oversellAllowance` and `ChannelCapacity.oversellBasis`** (the envelope BL-046 named Envelope).",
    "backlog": "BL-046",
    "evidence": "ChannelCapacity"
   },
@@ -6005,7 +6005,7 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "One account managing family and friends, assigning tickets, memberships, passes and wallet. **Third appearance** — BL-013 at 19.2 and 5.5.5B. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "One account managing family and friends, assigning tickets, memberships, passes and wallet. **Third appearance** — BL-013 at 19.2 and 5.5.5B. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -8319,7 +8319,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "Group sales ride a multi-line order. A family or group structure with a lead booker and assignable members is **the fourth appearance** of BL-013. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Group sales ride a multi-line order. A family or group structure with a lead booker and assignable members is **the fourth appearance** of BL-013. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013"
   },
   {
@@ -8447,7 +8447,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "Annual, season and VIP are product kinds with entitlement templates. **Family and corporate are structures the package does not have** — BL-013 and BL-035. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Annual, season and VIP are product kinds with entitlement templates. **Family and corporate are structures the package does not have** — BL-013 and BL-035. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013"
   },
   {
@@ -8516,7 +8516,7 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "No primary member and dependent relationship. **Fifth appearance** of the family gap after 19.2.8, 5.5.5B, 2.6.47 and 2.13.42. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "No primary member and dependent relationship. **Fifth appearance** of the family gap after 19.2.8, 5.5.5B, 2.6.47 and 2.13.42. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -8877,7 +8877,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "MediaEntitlements.canAcceptMore and appendEntitlementToMedia give one code carrying several entitlements. A single group ticket admitting N people in one scan is not distinguished from N entitlements on one medium. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "MediaEntitlements.canAcceptMore and appendEntitlementToMedia give one code carrying several entitlements. A single group ticket admitting N people in one scan is not distinguished from N entitlements on one medium. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013"
   },
   {
@@ -9914,7 +9914,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "Group access validates in one scan. A group product with a leader and named members is BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Group access validates in one scan. A group product with a leader and named members is BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013"
   },
   {
@@ -11759,7 +11759,7 @@
    "domain": "Bundles and Promotions",
    "verdict": "CONTRACTED",
    "contract": "orders",
-   "note": "No unified payment layer and no gateway routing. `providerName` records which provider was used and **nothing abstracts or selects one** — `paymentGateway`, `gatewayRouting` and `tokenization` return nothing anywhere. Routing by country, currency, card type or cost is a commercial lever a multi-region operator expects. **Contracted 18 August by BL-116.**",
+   "note": "No unified payment layer and no gateway routing. `providerName` records which provider was used and **nothing abstracts or selects one** — on 18 August searches for paymentGateway, gatewayRouting and tokenization returned nothing anywhere. Routing by country, currency, card type or cost is a commercial lever a multi-region operator expects. **Contracted 18 August by BL-116** as `PaymentRouting`, `PaymentRoutingRule` and `PaymentToken`.",
    "backlog": "BL-116",
    "cf": "CF-131",
    "evidence": "PaymentProvider"
@@ -11772,7 +11772,7 @@
    "domain": "Bundles and Promotions",
    "verdict": "CONTRACTED",
    "contract": "orders",
-   "note": "No unified payment layer and no gateway routing. `providerName` records which provider was used and **nothing abstracts or selects one** — `paymentGateway`, `gatewayRouting` and `tokenization` return nothing anywhere. Routing by country, currency, card type or cost is a commercial lever a multi-region operator expects. **Contracted 18 August by BL-116.**",
+   "note": "No unified payment layer and no gateway routing. `providerName` records which provider was used and **nothing abstracts or selects one** — on 18 August searches for paymentGateway, gatewayRouting and tokenization returned nothing anywhere. Routing by country, currency, card type or cost is a commercial lever a multi-region operator expects. **Contracted 18 August by BL-116** as `PaymentRouting`, `PaymentRoutingRule` and `PaymentToken`.",
    "backlog": "BL-116",
    "cf": "CF-131",
    "evidence": "PaymentProvider"
@@ -12193,7 +12193,7 @@
    "domain": "Bundles and Promotions",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "No shared family wallet and no corporate spending wallet. `Wallet.subjectId` is one guest, so a shared balance has no owner and no spend rules. Seventh appearance of BL-013 and second of BL-035. **BL-013 closed 18 August and this row is scoped to `retail` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "No shared family wallet and no corporate spending wallet. `Wallet.subjectId` is one guest, so a shared balance has no owner and no spend rules. Seventh appearance of BL-013 and second of BL-035. **BL-013 closed 18 August and this row is scoped to `retail` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -12205,7 +12205,7 @@
    "domain": "Bundles and Promotions",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "No shared family wallet and no corporate spending wallet. `Wallet.subjectId` is one guest, so a shared balance has no owner and no spend rules. Seventh appearance of BL-013 and second of BL-035. **BL-013 closed 18 August and this row is scoped to `retail` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "No shared family wallet and no corporate spending wallet. `Wallet.subjectId` is one guest, so a shared balance has no owner and no spend rules. Seventh appearance of BL-013 and second of BL-035. **BL-013 closed 18 August and this row is scoped to `retail` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -14286,7 +14286,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Household and family profiles with dependants, and relationship mapping to corporate, school and agency groups. **Eighth appearance of BL-013.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Household and family profiles with dependants, and relationship mapping to corporate, school and agency groups. **Eighth appearance of BL-013.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -14428,7 +14428,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Household and family profiles with dependants, and relationship mapping to corporate, school and agency groups. **Eighth appearance of BL-013.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Household and family profiles with dependants, and relationship mapping to corporate, school and agency groups. **Eighth appearance of BL-013.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -14501,7 +14501,7 @@
    "verdict": "CONTRACTED",
    "contract": "cross-region",
    "evidence": "createDsarRequest",
-   "note": "**DSAR with erasure — `pii.erase_subject` propagates, and `ai.removeIndexEntry` is the vector-store erasure path.** `maintenance` keeps opaque subject references so an incident record survives an erasure."
+   "note": "**DSAR with erasure — `deleteGuestAccount` tombstones the subject (`pii.subject.is_erased`, `pii.subject.erased_at`), `ai.eraseSubject` removes their index entries, and `ai.removeIndexEntry` is the per-record vector-store path**. (re-traced 3 November 2026: the earlier note named pii.erase_subject, which was never a table or an operation) `maintenance` keeps opaque subject references so an incident record survives an erasure."
   },
   {
    "packageRef": "5.3.33",
@@ -14721,7 +14721,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Pooled family loyalty and corporate programmes. Ninth appearance of BL-013 and third of BL-035. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Pooled family loyalty and corporate programmes. Ninth appearance of BL-013 and third of BL-035. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -14733,7 +14733,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Pooled family loyalty and corporate programmes. Ninth appearance of BL-013 and third of BL-035. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Pooled family loyalty and corporate programmes. Ninth appearance of BL-013 and third of BL-035. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -14938,7 +14938,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Multiple portfolios under one account. Superseded by 5.5.2b. **No portfolio entity exists** — BL-013. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Multiple portfolios under one account. Superseded by 5.5.2b. **No portfolio entity exists** — BL-013. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "evidence": "DelegatedAccess"
   },
@@ -14974,7 +14974,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "Tickets, passes, memberships and entitlements held and consumed under one subject. **A portfolio as a container distinct from the subject does not exist.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Tickets, passes, memberships and entitlements held and consumed under one subject. **A portfolio as a container distinct from the subject does not exist.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013"
   },
   {
@@ -14985,7 +14985,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -14998,7 +14998,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -15011,7 +15011,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -15024,7 +15024,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -15037,7 +15037,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -15088,7 +15088,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "Per-ticket transfer with claim exists between subjects. Transfer between portfolios of one account is BL-013. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Per-ticket transfer with claim exists between subjects. Transfer between portfolios of one account is BL-013. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013"
   },
   {
@@ -15505,10 +15505,10 @@
    "xlsxRow": 1220,
    "section": "5.6",
    "domain": "F&B & Guest Management",
-   "verdict": "CONTRACTED_PARTIAL",
+   "verdict": "CONTRACTED",
    "contract": "queue",
-   "evidence": "createQueue",
-   "note": "re-traced 29 September: priority is granted by holding an entitlement from QueueFastPass.entitlementProductIds (VIP, annual pass or premium package products), with reserved fastPassAllocationPercent capacity. Missing: priority by loyalty tier or by accessibility need, which the queue does not evaluate",
+   "evidence": "QueueFastPass",
+   "note": "re-traced 3 November 2026: priority queueing has four ways in, resolved by the server at join (decided 29 September, build pass; 5.6.7, 5.6.34): an entitlement from `QueueFastPass.entitlementProductIds` (VIP, annual pass, premium package), a tier in `QueueFastPass.loyaltyTierIds`, a live promotion in `QueueFastPass.promotionIds`, or a declared accessibility need where `QueueFastPass.accessibilityPriority` is on (`JoinQueueRequest.accessibilityNeedDeclared`); the basis is recorded as `WaitingGuest.priorityBasis`. The 29 September note listed loyalty tier and accessibility as missing; both are in the contract.",
    "backlog": "BL-037"
   },
   {
@@ -15647,7 +15647,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "No group or family queueing. `partySize` puts several people in one entry and **linked profiles reserving and managing positions together is the portfolio gap** — CF-132. **BL-013 closed 18 August and this row is scoped to `queue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "No group or family queueing. `partySize` puts several people in one entry and **linked profiles reserving and managing positions together is the portfolio gap** — CF-132. **BL-013 closed 18 August and this row is scoped to `queue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -15660,7 +15660,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "No group or family queueing. `partySize` puts several people in one entry and **linked profiles reserving and managing positions together is the portfolio gap** — CF-132. **BL-013 closed 18 August and this row is scoped to `queue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "No group or family queueing. `partySize` puts several people in one entry and **linked profiles reserving and managing positions together is the portfolio gap** — CF-132. **BL-013 closed 18 August and this row is scoped to `queue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -20412,7 +20412,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Primary account holder with linked family members purchasing on their behalf. **CF-132.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Primary account holder with linked family members purchasing on their behalf. **CF-132.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -20529,7 +20529,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "A family pass. **CF-132** — a pass admitting a defined household needs the portfolio. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "A family pass. **CF-132** — a pass admitting a defined household needs the portfolio. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -26180,7 +26180,7 @@
    "domain": "Approval Workflows & Governance",
    "verdict": "PARKED",
    "contract": "ai",
-   "note": "AI approval recommendations, risk assessment and priority scoring. CF-73; `riskScoreAbove` is the field they would feed."
+   "note": "AI approval recommendations: an approve or reject recommendation is not built, because AI never influences approve or reject (MoM 8 September, recorded on `ApprovalRule.riskScoreAbove`). What AI gives the reviewer is `ApprovalRequest.aiAssessment` from `ai.scoreApprovalRequest`: a risk score, a priority score and an escalation suggestion (11.1.73 to 11.1.75), context only. Re-traced 3 November 2026; the earlier note parked it under CF-73 as the input riskScoreAbove would read, which the contract now refuses."
   },
   {
    "packageRef": "11.1.73",
@@ -27499,8 +27499,8 @@
    "domain": "Developer & API Management",
    "verdict": "CONTRACTED",
    "contract": "public-api",
-   "evidence": "ApiClient",
-   "note": "**Contracted 18 August.** API audit and security monitoring resolve against `identity.audit_event`, which every public-api operation writes.",
+   "evidence": "listApiAnomalies",
+   "note": "**Contracted 18 August; re-traced 3 November 2026.** API security events are monitored by anomaly rules: `setApiAnomalyRule` sets a rule, the `anomalyMonitor` job records an `ApiAnomaly` in `control.api_anomaly` and publishes `apiClient.anomalyDetected`, and `listApiAnomalies` reads them; `setApiClientStatus` suspends a client. The 18 August note named identity.audit_event, a table the schema never had.",
    "cf": "CF-69",
    "backlog": "BL-156"
   },
@@ -32166,7 +32166,7 @@
    "verdict": "CONTRACTED",
    "contract": "seating",
    "evidence": "createSeatBlock",
-   "note": "Blocks with a reason and releaseAt; `releaseSeatBlock` and `allocateBlockedSeats`."
+   "note": "Blocks with a reason and releaseAt; `relinquishSeatBlock` (renamed from releaseSeatBlock on 8 September) and `allocateBlockedSeats`."
   },
   {
    "packageRef": "21.3.6",
@@ -32177,7 +32177,7 @@
    "verdict": "CONTRACTED",
    "contract": "seating",
    "evidence": "createSeatBlock",
-   "note": "Blocks with a reason and releaseAt; `releaseSeatBlock` and `allocateBlockedSeats`."
+   "note": "Blocks with a reason and releaseAt; `relinquishSeatBlock` (renamed from releaseSeatBlock on 8 September) and `allocateBlockedSeats`."
   },
   {
    "packageRef": "21.3.7",
@@ -32787,7 +32787,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "Allocation works. **A school or tour group as an entity with a leader and members is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Allocation works. **A school or tour group as an entity with a leader and members is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132"
   },
@@ -32800,7 +32800,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "Allocation works. **A school or tour group as an entity with a leader and members is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Allocation works. **A school or tour group as an entity with a leader and members is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132"
   },
@@ -32857,7 +32857,7 @@
    "verdict": "CONTRACTED",
    "contract": "identity",
    "evidence": "DelegatedAccess",
-   "note": "Contiguous groups with `allowSplitAcrossRows` serve a family. **Family as a known relationship is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Contiguous groups with `allowSplitAcrossRows` serve a family. **Family as a known relationship is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132"
   },
@@ -33407,7 +33407,7 @@
    "domain": "Marketing & CRM",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Household, family, corporate and group relationships. **CF-132 — eleventh appearance, and 22.2 is where the CRM expects them to live.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Household, family, corporate and group relationships. **CF-132 — eleventh appearance, and 22.2 is where the CRM expects them to live.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -33420,7 +33420,7 @@
    "domain": "Marketing & CRM",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "note": "Household, family, corporate and group relationships. **CF-132 — eleventh appearance, and 22.2 is where the CRM expects them to live.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `Grant`.**",
+   "note": "Household, family, corporate and group relationships. **CF-132 — eleventh appearance, and 22.2 is where the CRM expects them to live.**. **Refiled to `identity` 18 August** — the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 — `DelegatedAccess`** (BL-013 extended it under its earlier name, Grant).",
    "backlog": "BL-013",
    "cf": "CF-132",
    "evidence": "DelegatedAccess"
@@ -36514,7 +36514,7 @@
    "verdict": "CONTRACTED",
    "contract": "cross-region",
    "evidence": "createDsarRequest",
-   "note": "**`pii.erase_subject` propagates and `ai.removeIndexEntry` is the vector-store erasure path**; `maintenance` keeps opaque subject references so an incident survives erasure."
+   "note": "**`deleteGuestAccount` tombstones the subject (`pii.subject.is_erased`, `pii.subject.erased_at`), `ai.eraseSubject` removes their index entries, and `ai.removeIndexEntry` is the per-record vector-store path** (re-traced 3 November 2026: the earlier note named pii.erase_subject, which was never a table or an operation); `maintenance` keeps opaque subject references so an incident survives erasure."
   },
   {
    "packageRef": "22.13.16",
@@ -36525,7 +36525,7 @@
    "verdict": "CONTRACTED",
    "contract": "cross-region",
    "evidence": "createDsarRequest",
-   "note": "**`pii.erase_subject` propagates and `ai.removeIndexEntry` is the vector-store erasure path**; `maintenance` keeps opaque subject references so an incident survives erasure."
+   "note": "**`deleteGuestAccount` tombstones the subject (`pii.subject.is_erased`, `pii.subject.erased_at`), `ai.eraseSubject` removes their index entries, and `ai.removeIndexEntry` is the per-record vector-store path** (re-traced 3 November 2026: the earlier note named pii.erase_subject, which was never a table or an operation); `maintenance` keeps opaque subject references so an incident survives erasure."
   },
   {
    "packageRef": "22.13.15",

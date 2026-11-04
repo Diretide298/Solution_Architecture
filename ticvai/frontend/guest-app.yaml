@@ -1,4 +1,4 @@
-# guest-app — operated by guest · guest on mobileApp
+# guest-app — operated by guest · guest on mobileApp (P02) and kiosk (P05)
 # Serves: P02 Guest App — Mobile, P05 Guest Kiosk — Self-Service
 # Repository: P02 ticvai-guest-app; P05 ticvai-kiosk (docs/active/frontend-repos.yaml)
 # Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
@@ -6,10 +6,7 @@
 app: guest-app
 operator: guest
 audience: guest
-formFactor: mobileApp
 status: scaffolded
-runtime: reactNative
-offlineCapable: true
 directions:
 - ltr
 - rtl
@@ -52,15 +49,38 @@ contracts:
 - venue-map
 - wallet
 - white-label
-deployment:
-  target: iOS / Android native
-  distribution: App Store + Play, tenant developer account
-  bundleUpdate: over-the-air for JS; store release for native
-  hosting: n/a — installed
-  storeReview: true
-  deviceOwnership: guest device
-  networkAssumption: mobile data, intermittent
-  releaseCadence: fortnightly, gated by review
+mixedAcross:
+- formFactor
+- runtime
+- offlineCapable
+- deployment
+platformProfiles:
+- platform: P02
+  formFactor: mobileApp
+  runtime: reactNative
+  offlineCapable: true
+  deployment:
+    target: iOS / Android native
+    distribution: App Store + Play, tenant developer account
+    bundleUpdate: over-the-air for JS; store release for native
+    hosting: n/a — installed
+    storeReview: true
+    deviceOwnership: guest device
+    networkAssumption: mobile data, intermittent
+    releaseCadence: fortnightly, gated by review
+- platform: P05
+  formFactor: kiosk
+  runtime: reactWeb
+  offlineCapable: false
+  deployment:
+    target: kiosk hardware, kiosk-mode shell
+    distribution: device management push
+    bundleUpdate: on deploy
+    hosting: in-cell
+    storeReview: false
+    deviceOwnership: venue-owned, unattended
+    networkAssumption: venue LAN, generally reliable
+    releaseCadence: monthly, out of hours
 screenCount: 94
 byWave:
   wave1: 79

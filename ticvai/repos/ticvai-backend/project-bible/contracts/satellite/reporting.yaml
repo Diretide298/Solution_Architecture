@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Reporting & Analytics
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 49
   x-ticvai-tier: satellite
   x-ticvai-module: 8 — Unified Operations Dashboard  ·  cross-cutting
@@ -46,8 +47,8 @@ info:
     \ is versioned and reusable; an\n  execution is a dated artefact with its own parameters and result.\
     \ A report someone can\n  no longer reproduce is not evidence.\n- **Large exports are asynchronous.**\
     \ A synchronous export of a year of scan events is a\n  timeout, and a retry of a timeout is two.\n\
-    - Cross-cell and cross-tenant reporting comes from the central warehouse\n  (ADR-0001 (retired — see\
-    \ ADR-0014 and ADR-0017), ADR-0014). **Cells are never queried directly**, and aggregates only.\n"
+    - Cross-cell and cross-tenant reporting comes from the central warehouse\n  (ADR-0017, and\
+    \ ADR-0038, which supersedes ADR-0001's and ADR-0014's cell model: a cell is a region holding many tenants). **Cells are never queried directly**, and aggregates only.\n"
 servers:
 - url: https://{cellHost}/api/v1
   variables:
@@ -109,12 +110,13 @@ x-ticvai-jobs:
     module: reporting
     host: workers
     trigger: {kind: event}
-    consumes: [apiClient.anomalyDetected, device.tamperDetected]
+    consumes: [apiClient.anomalyDetected, device.tamperDetected, identity.offlineStepUpRefused]
     reads: [reporting.alert_rule]
     writes: [reporting.alert]
-    for: 'Reporting''s alert consumers: raise an API anomaly to the tenant''s and TICVAI''s API administrators (ADM-015, DEV-006)
-      and a device tamper alert to the venue''s security roles.'
-    source: ['events/apiClient-anomalyDetected.yaml', 'events/device-tamperDetected.yaml']
+    for: 'Reporting''s alert consumers: raise an API anomaly to the tenant''s and TICVAI''s API administrators (ADM-015, DEV-006),
+      a device tamper alert to the venue''s security roles, and an offline supervisor step-up the server did not confirm at
+      sync to the venue''s managers (the roles that hold the act''s permission there; POS-020, BO-133; CHG-R14V-001).'
+    source: ['events/apiClient-anomalyDetected.yaml', 'events/device-tamperDetected.yaml', 'events/identity-offlineStepUpRefused.yaml']
   execution:
     module: reporting
     host: workers
@@ -144,6 +146,15 @@ x-ticvai-jobs:
     writes: [reporting.alert]
     for: 'Platform''s sync-rejection alert: raise an operator alert (BO-133 Offline Alerts) for each refused offline entry.'
     source: ['events/sync-rejectionRaised.yaml']
+  subjectDataPart:
+    module: reporting
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [reporting.schedule_recipient, reporting.subscription]
+    writes: [reporting.schedule_recipient, reporting.subscription]
+    for: 'reporting''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (a recipient row names no subject: matched on the subject''s email, read through identity#subjectDetails) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it erases the personal fields its tables keep outside pii.* (reporting.schedule_recipient.address, reporting.subscription.recipients) for the subject. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /reports/seeded:
     get:
@@ -1327,6 +1338,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createReportSchedule
       x-ticvai-consumed-by:
         - "P08 BO-058 Reporting Home"
@@ -1386,6 +1398,7 @@ paths:
         type: string
         format: uuid
     patch:
+      x-ticvai-personal-data: gated
       operationId: updateReportSchedule
       x-ticvai-consumed-by:
         - "P08 BO-061 Scheduled Reports"
@@ -3051,6 +3064,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /report-subscriptions:
     get:
+      x-ticvai-personal-data: gated
       operationId: listReportSubscriptions
       x-ticvai-consumed-by:
         - "P16 ANL-043 Subscription Manager"
@@ -3083,6 +3097,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: createReportSubscription
       x-ticvai-consumed-by:
         - "P16 ANL-043 Subscription Manager"
@@ -4001,6 +4016,7 @@ components:
           format: uuid
           nullable: true
         recipients:
+          x-ticvai-data-class: personal
           x-ticvai-persistence-column: jsonb
           x-ticvai-persistence-kind: valueObject
           type: array
@@ -4012,6 +4028,7 @@ components:
                 format: uuid
                 nullable: true
               email:
+                x-ticvai-data-class: personal
                 type: string
                 nullable: true
               external:
@@ -5255,6 +5272,7 @@ components:
           - sftp
           - webhook
         address:
+          x-ticvai-data-class: personal
           type: string
         principalId:
           type: string

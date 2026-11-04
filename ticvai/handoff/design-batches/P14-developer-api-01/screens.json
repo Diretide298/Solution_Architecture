@@ -5,7 +5,6 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 1,
-  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/reference",
@@ -145,7 +144,7 @@
    "error": "Could not load the reference. **Names which contract failed** — 28 files load independently and one missing does not mean the API is down.\n",
    "emptyFirstRun": "**Never empty in practice** — the contracts are the documentation and they ship with the platform. An empty reference means the artefacts did not load, which is an error rather than a first run.\n",
    "emptyNoResults": "No operation matches this search. **Search covers the summary and the description**, not just the operationId, because a developer looking for *\"how do I refund\"* does not know it is called `createRefund`.\n",
-   "emptyNoAccess": "Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiVersions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "**There is no permission to name — `listApiVersions` and `listApiScopes` are open to anyone.** No access here means the portal itself could not be reached (a gateway refusal or an unknown tenant), and the screen says so. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {

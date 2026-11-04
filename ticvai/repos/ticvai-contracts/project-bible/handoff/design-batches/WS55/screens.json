@@ -711,7 +711,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-matrix-multi-level-approval-configuration-adm-242",
-   "component": "src/routes/platform/ApprovalMatrixMultiLevelApprovalConfiguration.tsx",
+   "redirect": "BO-086",
    "status": "notStarted"
   },
   "navigation": {
@@ -956,6 +956,9 @@
       {
        "kind": "selectField",
        "label": "Role",
+       "operation": "setApprovalMatrix",
+       "bindsTo": "ApprovalMatrix.rules",
+       "notes": "The approver role of the selected matrix's rule (`ApprovalRule.approverRoleIds`), saved with `setApprovalMatrix` on the matrix picked in the table above (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Define by"
       },
       {

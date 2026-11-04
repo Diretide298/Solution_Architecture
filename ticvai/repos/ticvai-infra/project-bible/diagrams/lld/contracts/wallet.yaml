@@ -1,5 +1,5 @@
 id: LLD-wallet
-title: wallet — 71 operations
+title: wallet — 72 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -295,6 +295,17 @@ operations:
   offline: false
   reads:
   - wallet.funding_rule
+  writes: []
+- operation: getWalletIntegrationMapping
+  verb: GET
+  path: /wallet-integration-mappings
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.integration_mapping
   writes: []
 - operation: getWalletLiability
   verb: GET

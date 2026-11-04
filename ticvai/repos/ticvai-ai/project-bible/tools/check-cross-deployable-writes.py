@@ -80,6 +80,12 @@ def yl(p):
     return yaml.load(io.open(p, encoding="utf-8"), Loader=yaml.CSafeLoader) or {}
 
 
+def schema_cols() -> dict:
+    """`schema.table` -> its column records, from handoff/schema-reference.json (a granted read's `columns`)."""
+    p = os.path.join(ROOT, "handoff", "schema-reference.json")
+    return (json.load(io.open(p, encoding="utf-8")) if os.path.exists(p) else {}).get("cols") or {}
+
+
 def contract_routes() -> dict:
     """operationId -> [{table, event|operation}] from `x-ticvai-write-via` in the contracts."""
     out = {}
@@ -187,6 +193,12 @@ def analyse():
             continue
         if [str(p).upper() for p in r["privileges"]] != ["SELECT"]:
             bad.append(("X-READ", r["id"], "grants %s; a read grants SELECT only" % "/".join(r["privileges"])))
+        # `columns` limits the grant to those columns of its one table (ADAM CR-595, CHG-CR595-001).
+        if r.get("columns") is not None:
+            have = {str(c.get("column")) for c in (schema_cols().get(str((r["tables"] or [""])[0])) or [])}
+            if len(r["tables"]) != 1 or not isinstance(r["columns"], list) or not r["columns"]                     or not set(map(str, r["columns"])) <= have:
+                bad.append(("X-READ", r["id"], "columns must name columns of its one table (%s)"
+                            % ", ".join(sorted(set(map(str, r["columns"] or [])) - have)) ))
         for t in r["tables"]:
             osvc = owner_of_schema.get(str(t).split(".", 1)[0])
             if not osvc or dep_of.get(osvc) == r["reader"]:

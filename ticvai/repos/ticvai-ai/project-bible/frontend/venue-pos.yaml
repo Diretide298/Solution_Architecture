@@ -48,7 +48,7 @@ contracts:
 - tenancy
 - wallet
 - workforce
-deployment:
+deployment: &id001
   target: POS terminal — Windows or Android
   distribution: device management push
   bundleUpdate: catalogue bundle applies at shift open; app on a scheduled window
@@ -57,6 +57,12 @@ deployment:
   deviceOwnership: venue-owned, staffed
   networkAssumption: venue LAN with expected outages
   releaseCadence: monthly, never during trading
+platformProfiles:
+- platform: P04
+  formFactor: posTerminal
+  runtime: reactNativeTablet
+  offlineCapable: true
+  deployment: *id001
 screenCount: 32
 byWave:
   wave1: 32

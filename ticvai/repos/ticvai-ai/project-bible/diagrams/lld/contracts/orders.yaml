@@ -627,6 +627,7 @@ operations:
   - ledger.journal_line
   - orders.order_event
   - orders.payment
+  - orders.sales_order
   - payments.payment_attempt
   - platform.idempotency_record
   - platform.outbox
@@ -2579,6 +2580,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.order_line
+  - orders.order_line_discount
+  - orders.order_line_eligibility
   - orders.payment_link
   - orders.reservation
   - orders.sales_order

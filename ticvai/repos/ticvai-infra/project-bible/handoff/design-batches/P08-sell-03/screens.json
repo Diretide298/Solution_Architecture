@@ -8,7 +8,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/central-kitchen-commissary-management",
-   "component": "src/routes/sell/CentralKitchenCommissaryManagementList.tsx",
+   "redirect": "BO-112",
    "status": "notStarted"
   },
   "navigation": {

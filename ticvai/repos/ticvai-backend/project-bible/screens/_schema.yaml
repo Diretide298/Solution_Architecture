@@ -878,6 +878,18 @@ properties:
                 their ids, routes and operations but render in their host's component; this says so,
                 so a shared component reads as the design and not as a screen wearing another's.
                 `tools/check-screen-patterns.py` (P7b) allows a shared component only this way.
+            redirect:
+              type: string
+              description: >
+                **The screen this id routes to, and nothing else** (3 November 2026, the r13 system review
+                F-14; CHG-R14J-030). A screen merged into another whose notes say "One implementation, both
+                ids kept ... routes to X" (CHG-WIR-001, CHG-WIR-008, CHG-WIR-021, CHG-SBO-021, CHG-MOV-002,
+                CHG-CLN-003): the id and its route stay for traceability and the route redirects to X. It has
+                no component and no build task of its own (tools/ticket_done.py screen_hold), its operations
+                are X's (merge_bindings), and it is reached when X is. Not `sectionOf`, which renders a screen
+                inside its host as a section. `tools/check-screen-redirects.py` fails a merged screen without
+                it, a redirect to a screen that is not real, on another app, a redirect itself or a section,
+                and a redirect that still names a component.
         density:
           type: string
           enum: [compact, comfortable, touchLarge]

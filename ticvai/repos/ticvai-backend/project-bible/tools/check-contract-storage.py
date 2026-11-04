@@ -17,7 +17,8 @@ A property is stored when one of its schema's persistence tables has a column
   - whose `source` in `handoff/schema-reference.json` is this schema's field,
 or a child table carries it (`<table>_<field>`, `<schema>.<field>`, or a table listed after `+`).
 It is exempt when it says it is not stored: `readOnly` with `x-ticvai-derived`,
-`x-ticvai-persisted: false`, or a `$ref` to a schema the reference lists as embedded/jsonb.
+`x-ticvai-persisted: false`, or a `$ref` to a schema the reference lists as embedded/jsonb, or marked `x-ticvai-pii` (kept
+in pii.* for the row's subject, ADR-0023 as amended 3 November 2026; CHG-R14M-001).
 
 Also: S-OFFLINE-RECORDED-AT (R113) -- a schema written by an offline-capable operation persists to
 a table with no `recorded_at`. ST-PROPERTY-PERSISTENCE and ST-STALE-COLUMN (CHG-MKT-002, ADAM CR-087) -- a
@@ -26,7 +27,11 @@ persistence tag on a property, which derive-schema never reads, and a column the
 ST-SECRET-FORM (CHG-MKT-001, CR-086) -- a stored write-only secret that does not say how it is stored
 (`x-ticvai-secret`, ADR-0063 as amended 14 October 2026, ADR-0071). ST-BLIND-INDEX-REHASH (CHG-CR339-001, CR-339) -- a
 tenant-database blind index that does not say whether a key rotation can re-hash it (`x-ticvai-blind-index-of`, ADR-0063
-as amended 30 October 2026).
+as amended 30 October 2026). ST-EVENT-SECRET (r13 system review B-10 and C-16; CHG-R14H-004) -- an event payload field
+that is a contact or a secret (named `destination`, `email`, `phone`, `mobile`, `code`, `otp`, `token`, `secret`, `pin`,
+`password` or `credential`) without `x-ticvai-secret: field-encrypted`: the outbox, the broker and their backups would
+hold it in clear. One rule for every event, not one per event: `identity.mfaCodeIssued` said "field-encrypted" in its
+notes only, `order.ticketsResent` and `cart.abandoned` said nothing.
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -58,6 +63,8 @@ RULES = {
                             "(CR-145, CHG-CRA-002)",
     "ST-DEFAULT-DESCRIBED": "a stored enum's description names its starting value (`x` until ...) and the contract "
                             "declares no default (CR-151, CHG-CRA-002)",
+    "ST-EVENT-SECRET": "an event payload field that is a contact or a secret (destination, email, phone, code, token "
+                       "...) is not x-ticvai-secret: field-encrypted (r13 system review B-10, C-16; CHG-R14H-004)",
     "ST-CROSS-DATABASE": "a declared reference crosses the control/tenant database boundary and is not one of the "
                          "known crossings: data about a tenant sits in the tenant template (ADR-0039; CR-150, "
                          "CHG-CRA-003)",
@@ -276,8 +283,10 @@ def main() -> int:
             continue
         have = set().union(*(colnames[t] for t in present))
         for p, ps in sorted(props_of(s, stem, by).items()):
+            # a natural person's field kept in pii.* for the row's subject has no column here by design (x-ticvai-pii;
+            # ADR-0023 as amended 3 November 2026, CHG-R14M-001): check-personal-data PD-STORE holds its store
             if ps.get("x-ticvai-persisted") is False or ps.get("x-ticvai-derived") \
-                    or ps.get("x-ticvai-persistence") or p.startswith("_"):
+                    or ps.get("x-ticvai-persistence") or p.startswith("_") or ps.get("x-ticvai-pii"):
                 continue
             items = ps.get("items") if isinstance(ps.get("items"), dict) else {}
             target = g.ref_name(ps.get("$ref") or items.get("$ref") or "")
@@ -352,7 +361,50 @@ def main() -> int:
         guard.add("ST-BLIND-INDEX-REHASH", key, msg)
     check_described_shape(guard, cols, by)
     check_cross_database(guard, cols)
+    event_self_test()
+    for key, msg in event_secret_findings(_events()):
+        guard.add("ST-EVENT-SECRET", key, msg)
     return guard.finish()
+
+
+# A payload field with one of these names carries a person's contact or a secret (CHG-R14H-004).
+EVENT_SECRET_FIELD = re.compile(r"^(destination|email|emailAddress|phone|phoneNumber|mobile|msisdn|code|otp|token|"
+                                r"secret|pin|password|credential)$", re.I)
+
+
+def _events() -> dict:
+    out = {}
+    for p in sorted((g.ROOT / "events").glob("*.yaml")):
+        if p.name.startswith("_"):
+            continue
+        out[p.stem] = g.load_yaml(p) or {}
+    return out
+
+
+def event_secret_findings(events: dict) -> list:
+    """ST-EVENT-SECRET: (key, message) for every contact or secret field an event carries unencrypted."""
+    out = []
+    for stem, ev in sorted(events.items()):
+        for f in ev.get("payload") or []:
+            if not isinstance(f, dict):
+                continue
+            name = str(f.get("field") or "")
+            if EVENT_SECRET_FIELD.match(name) and f.get("x-ticvai-secret") != "field-encrypted":
+                out.append((f"{ev.get('name') or stem}.{name}",
+                            f"{ev.get('name') or stem}: payload field {name} is a contact or a secret and is not "
+                            "x-ticvai-secret: field-encrypted, so the outbox and the broker hold it in clear "
+                            "(events/_schema.yaml; ADR-0063)"))
+    return out
+
+
+def event_self_test() -> None:
+    """In memory: an unmarked code and destination fail, a marked one and an unrelated field pass."""
+    evs = {"a": {"name": "x.codeIssued", "payload": [{"field": "code", "notes": "field-encrypted, never in clear"},
+                                                    {"field": "destination", "x-ticvai-secret": "field-encrypted"},
+                                                    {"field": "categoryCode"}, {"field": "tokensUsed"}]}}
+    got = sorted(k for k, _ in event_secret_findings(evs))
+    if got != ["x.codeIssued.code"]:
+        raise SystemExit(f"ST-EVENT-SECRET self-test failed: {got}")
 
 
 def check_cross_database(guard, cols: dict) -> None:

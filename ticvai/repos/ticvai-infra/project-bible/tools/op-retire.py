@@ -113,6 +113,30 @@ OTHER = {
                                  "(CHG-R12PL-036)")
        for sid in ("ADM-089", "ADM-090", "ADM-091", "ADM-094", "ADM-095", "ADM-106", "BO-441")},
 }
+# **App-modules an earlier re-cut renamed, and their module tests** (r14 plan pass, CHG-R14PL-031; the lead, 4 November
+# 2026: "take the recommended decision unless its very very important"). Each was a feature (an app-module) or the module
+# test of one before r12; the sprint plan has since cut its module and platform into other parts (the key on the right
+# carries that work now, or none where the module has no app-module on that platform any more), so op-release.py's
+# regroup, which reads only the previous release's structure, never reached them and they stood unexplained since r12
+# (17 at r13, 19 at r14). They go the regroup way: closed with one comment, and only once nothing is under them
+# (tools/op-release.rb); a started one is listed and left alone, as every retirement is.
+REGROUPED_R14 = {
+    "AM-AI-P05-BLOCK-A": "", "TEST-AM-AI-P05-BLOCK-A": "",
+    "AM-AI-P09-5": "AM-AI-P09-4", "AM-AI-P09-6": "AM-AI-P09-4",
+    "AM-DIGITAL-ASSETS-P13-4": "AM-DIGITAL-ASSETS-P13-3", "TEST-AM-DIGITAL-ASSETS-P13-4": "TEST-AM-DIGITAL-ASSETS-P13-3",
+    "AM-FINANCE-TAX-P09": "",
+    "AM-IDENTITY-SECURITY-P10-BLOCK-A": "AM-IDENTITY-SECURITY-P10",
+    "TEST-AM-IDENTITY-SECURITY-P10-BLOCK-A": "TEST-AM-IDENTITY-SECURITY-P10",
+    "AM-MARKETING-CRM-P13-4": "AM-MARKETING-CRM-P13-3",
+    "AM-PAYMENTS-P01": "", "TEST-AM-PAYMENTS-P01": "", "AM-PAYMENTS-P02": "", "TEST-AM-PAYMENTS-P02": "",
+    "AM-PLATFORM-OPERATIONS-P09-2": "AM-PLATFORM-OPERATIONS-P09",
+    "TEST-AM-PLATFORM-OPERATIONS-P09-2": "TEST-AM-PLATFORM-OPERATIONS-P09",
+    "AM-TICKETING-P08-10": "", "TEST-AM-TICKETING-P08-10": "",
+    "AM-WORKFORCE-P08-2": "AM-WORKFORCE-P08",
+}
+REGROUPED_R14_DECIDED = "4 November 2026"
+
+
 # The day an OTHER retirement was decided, where it is not the 28 September of the first ones (its note says so).
 OTHER_DECIDED = {"APP-SETUP-ADM-603-REST": "14 October 2026", "APP-SETUP-BO-1146-REST": "14 October 2026"}
 
@@ -240,6 +264,17 @@ def build_plan(release=None, day=None):
             note = (f"**Out of the first release** (decided {decided}): {why}. The ticket is on hold and off "
                     "the board; it comes back when its release is planned.")
         plan += [(x, kind, note) for x in [key] + [s_ for s_ in mp if s_.startswith(key + "#")]]
+        covered.add(key)
+    for key, into in REGROUPED_R14.items():
+        if key not in mp or key in planned or key in covered:
+            continue
+        where = (f"{into} ({f'#{mp[into]}' if into in mp else 'in the plan'}) carries that work now" if into and into in planned
+                 else "the plan has no app-module of that module on that platform now, and its tickets are under the "
+                      "app-modules that build them")
+        note = (f"**Replaced by the sprint plan** (release {release or 'r14'}, decided {REGROUPED_R14_DECIDED}): an earlier "
+                f"re-cut of the plan renamed this app-module or its module test; {where}. Every planned ticket that was "
+                "under this one has moved under its app-module, so this one is closed once nothing is under it.")
+        plan.append((key, "regroup", note))
         covered.add(key)
     for key, (into, op, how) in REPLACED.items():
         if key not in mp or key in planned:

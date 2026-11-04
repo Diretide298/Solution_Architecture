@@ -1601,6 +1601,12 @@
        "label": "Replacement Credential",
        "operation": "createMemberException",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request approval",
+       "operation": "createApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       }
      ]
     },
@@ -1674,6 +1680,36 @@
    "workshopBoard": "wireframes/WS83 Membership   Annual Pass Management Board 2.dc.html#bo-301"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 9 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `createMemberException`.",
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Request approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Request approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Maintenance & Safety
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 44
   x-ticvai-tier: satellite
   x-ticvai-module: "17 — Maintenance & Safety Management"
@@ -84,10 +85,10 @@ info:
     - Compliance inspections are retained for seven years alongside the financial trail.
 
 servers:
-  - url: https://{cellHost}/api/v1
-    variables:
-      cellHost:
-        default: cell.ticvai.local
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 
 security:
   - bearerAuth: []
@@ -139,6 +140,15 @@ x-ticvai-jobs:
     reliesOn: [createMaintenancePlan, updateMaintenancePlan]
     for: 'Maintenance plan generator: create preventive work orders ahead of time.'
     source: ['contracts/satellite/maintenance.yaml']
+  subjectDataPart:
+    module: maintenance
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [maintenance.incident_involved_party]
+    writes: []
+    for: 'maintenance''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   # ---------------------------------------------------------------- assets
   /assets:
@@ -3785,11 +3795,13 @@ components:
           writeOnly: true
           description: Written to the erasable store (`pii.subject`), never to the incident (ADR-0023).
         phone:
+          x-ticvai-data-class: personal
           type: string
           maxLength: 32
           writeOnly: true
           description: Stored only with `contactConsent` true.
         email:
+          x-ticvai-data-class: personal
           type: string
           format: email
           maxLength: 254

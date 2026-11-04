@@ -45,9 +45,10 @@
      "trigger": "Checkout Entry",
      "carries": [
       "lineId",
-      "performanceId"
+      "performanceId",
+      "productId"
      ],
-     "provenance": "derived — GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-026 holds lineId, performanceId, so an edge into it carries them"
+     "provenance": "derived — GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-026 holds lineId, performanceId, productId, so an edge into it carries them"
     }
    ]
   },

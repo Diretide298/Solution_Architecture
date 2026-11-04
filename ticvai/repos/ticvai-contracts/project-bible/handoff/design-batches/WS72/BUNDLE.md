@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-041` | Waiver & Consent Command Center | D | 2 | 24 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `CMS-041` | Waiver & Consent Command Center | A | 2 | 24 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
 | `CMS-042` | Waiver Template Library & Master Setup | D | 36 | 0 | 5 | 0 | 2 | 4 | — | notStarted (generated) |
 | `CMS-043` | Digital Waiver & Form Builder | D | 27 | 0 | 6 | 75 | 2 | 4 | — | notStarted (generated) |
 | `CMS-044` | Dynamic Fields, Questions & Conditional Logic | D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-047` | Waiver Trigger, Eligibility & Completion Rules | D | 15 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
 | `CMS-048` | Versioning, Effective Dates & Legal Change Control | D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `CMS-049` | Localization, Branding & Customer Experience Configuration | D | 0 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `CMS-050` | Waiver Approval, Testing & Publication Workspace | D | 4 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `CMS-050` | Waiver Approval, Testing & Publication Workspace | A | 4 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 
 ---
 
@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 1 · needs the `core` module |
-| Block | Block D · task APP-CMS-CMS-041 |
+| Block | Block A · ticket #37397 (APP-CMS-CMS-041) |
 | Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should display) — counts over a population, then the population |
@@ -1555,7 +1555,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 1 · needs the `core` module |
-| Block | Block D · task APP-CMS-CMS-050 |
+| Block | Block A · ticket #37398 (APP-SETUP-CMS-050) |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Fields; Configuration experience; Board 1 Configuration Flow) and no display directory — it is settings, not a population |

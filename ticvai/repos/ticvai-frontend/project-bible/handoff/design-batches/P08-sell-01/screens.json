@@ -3620,6 +3620,7 @@
      "trigger": "Packages & Bundles",
      "provenance": "flow F77 step 1→2",
      "carries": [
+      "bundleId",
       "productId",
       "version"
      ]

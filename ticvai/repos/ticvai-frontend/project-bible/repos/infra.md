@@ -1,6 +1,17 @@
+<!-- Written by tools/derive-mirrors.py from ticvai/docs/repos/rules/infra.md: edit that file, not this one. -->
+
 # Infrastructure Runtime
 
-Terraform + Kubernetes. One `cell` module instance = one tenant in one jurisdiction.
+Terraform + Kubernetes. One `cell` module instance = one cell of one environment: a region of one jurisdiction
+holding a database per tenant (ADR-0038, ADR-0040). Tenants are rows in the control database (ADR-0039), never
+module inputs; a tenant is placed on a cell (r8 cause FOUNDATION-AI-C55, 20 October 2026).
+
+**Environments** (the lead, 20 October 2026, FOUNDATION-AI-C52 and C23): dev runs on laptops with docker compose
+and has no cell; `staging` is one shared pre-production environment in the Softlabs Azure subscription
+(`terraform/environments/staging`, state in a storage account there, `backend.hcl.example`); `production` is hosted
+by the client later (`terraform/environments/production/<cell>.tfvars`). The environment is part of every resource
+name (`stg-ae1`, `prd-ae1`), and staging turns the heavy parts down with the module's switches
+(`system_min_nodes`, `nat_gateway_enabled`, `ai_gpu_enabled`, no replicas, no high availability).
 
 ## Cell rules
 
@@ -11,19 +22,20 @@ Terraform + Kubernetes. One `cell` module instance = one tenant in one jurisdict
 - Size `database_sku` against **tenant aggregate** load, not per-venue. Venue peaks within a
   tenant are correlated — Eid, National Day, school holidays
 - `prevent_destroy` on databases and key vaults
-- Key vault per cell — a compromise is contained to one tenant
+- Key vault per cell. A cell holds many tenants (ADR-0038), so the field keys inside it are per tenant
+  (ADR-0063): a compromise of one tenant's data key is contained to that tenant
 
 ## Placement
 
-Region carries `shared` | `dedicated:{cloud}:{region}` | `client_hosted:{endpoint}`.
-A tenant may be **mixed** across regions.
+A cell's tier is `shared`, `dedicated`, `isolated` or `clientHosted` (`control.cell.tier`). A tenant's database
+sits on one instance of one cell (`control.cell_tenant`, ADR-0042) and is never split (ADR-0040); a tenant may
+have a database in more than one cell, one row each.
 
 ## Migration rollout
 
-Every migration runs **once per cell**. Errors multiply by tenant count.
-
-Canary cell -> 10% -> remainder, gated on health. Version skew between cells is expected;
-contracts tolerate N-3 minor versions.
+Every migration runs **once per tenant database** (ADR-0039): the fan-out unit is a tenant database and the
+canary is a tenant, then waves, gated on health. Version skew between databases is expected while a run is in
+flight; contracts tolerate N-3 minor versions.
 
 **Rollback tested before merge, not after.**
 

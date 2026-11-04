@@ -22,7 +22,7 @@ since 13 October 2026; a rule its lint cannot express yet is still the rule, che
 |---|---|
 | Apps importing a SQLite driver directly | Everything goes through the one offline store (`offline-core`). Six sync engines is six divergent bug surfaces |
 | Packages importing apps, where the repository has shared packages | Dependencies point one way |
-| Local permission computation | Clients consume `effectivePermissions`. Client-side authz is a security hole and a divergence source |
+| Local permission computation | Clients never compute permissions (CR-367). `effectivePermissions` from the session is for coarse filtering only; a node is looked up in `Session.permissionsByScope` by the entry of the deepest listed path that contains the node. A client never unions ancestors' entries and never applies a deny itself. Client-side authz is a security hole and a divergence source |
 | `localStorage` / `sessionStorage` in artefacts | Unsupported in the target runtime |
 
 An HttpOnly cookie the edge sets, which no script reads, is not client storage: the on-sale waiting room's admission
@@ -77,7 +77,16 @@ mutation goes through the outbox: only the writes below do.
   offline store). It calls the generated API client (`@ticvai/api-client`) directly. Queuing a write the
   server will not accept later is worse than refusing it now.
 - Conflict policy is declared per entity at the call site, as the contract's `x-ticvai-conflict-policy`
-  says. There is no global default.
+  says. There is no global default. A `serverWins` write the server rejects means the server's version
+  stands: the client re-reads and tells the user (ADR-0022; `offline-core`'s `onServerWins` hook).
+- **The outbox keeps strict per-device order, after a failure too** (ADR-0013). Each entry's `sequence` is
+  allocated in the same transaction as its insert and is unique. The drain sends one entry at a time in
+  `sequence` order; a transient failure stops it at that entry, and nothing after it is sent until it
+  succeeds, so a void never reaches the server before its sale. A permanent rejection is marked rejected,
+  shown to the operator, and the drain carries on. While the drain is held the sync state says so (halted,
+  with the error), never "online" with entries waiting.
+- `recordedAt` is the device's time; `syncedAt` is the server's, taken from its answer, and stays empty
+  when the answer carries none. The device's own acknowledgement time is a separate, device-named field.
 - The offline indicator reflects real transport state, never an optimistic guess.
 
 ### 4.5 The API client

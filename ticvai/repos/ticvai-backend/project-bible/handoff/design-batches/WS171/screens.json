@@ -816,7 +816,7 @@
   "name": "Accessible Seating Master",
   "module": "Access & Venue",
   "requiresModule": "seating",
-  "wave": 3,
+  "wave": 1,
   "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",

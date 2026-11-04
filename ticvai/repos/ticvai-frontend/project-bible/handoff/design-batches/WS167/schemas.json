@@ -417,6 +417,12 @@
     "type": "string",
     "format": "date-time"
    },
+   "admissionStartsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**When admission opens for the performance** (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): stored as `catalogue.performance.admission_starts_at`, nullable. A sales window anchored on `admissionStart` (`eventRelativeWindows.anchor`) uses it, and falls back to `startsAt` while it is null."
+   },
    "approvalRequestId": {
     "type": "string",
     "format": "uuid",
@@ -731,6 +737,14 @@
    "performanceId"
   ],
   "properties": {
+   "holderSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "contact",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The person the seats are held for, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind contact; null while none is given."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -765,6 +779,11 @@
     "readOnly": true
    },
    "holderName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "holderSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },

@@ -545,7 +545,7 @@
   "name": "Fee & Surcharge Library",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",

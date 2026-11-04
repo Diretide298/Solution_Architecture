@@ -726,7 +726,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (409, 412).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (404, 409, 412).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1086?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: One wallet → multiple users, Primary wallet owner, Delegated wallet administration.

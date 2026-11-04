@@ -3,7 +3,7 @@ info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
   x-ticvai-hosts: [cell]
-  x-ticvai-screen-count: 63
+  x-ticvai-screen-count: 64
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -4091,6 +4091,8 @@ paths:
   /wallet-integration-mappings:
     get:
       operationId: getWalletIntegrationMapping
+      x-ticvai-consumed-by:
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
       x-ticvai-audience:
         - staff
       summary: How one integration's fields, currencies, statuses and credit types map, as saved

@@ -957,7 +957,10 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "simulatePriceBreakdownCalculation",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "label": "Run simulation",
+       "operation": "simulatePriceBreakdownCalculation",
+       "provenance": "contract catalogue.yaml PUT /price-breakdown-calculation; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       },
       {
        "kind": "secondaryButton",
@@ -984,6 +987,27 @@
     "purpose": "What-if on price",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listEvents",
+    "contract": "catalogue",
+    "purpose": "The events, to pick the simulated event in Run simulation",
+    "trigger": "onLoad",
+    "provenance": "design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "The products, to pick the simulated product in Run simulation",
+    "trigger": "onLoad",
+    "provenance": "design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "The picked product's variants, to pick the simulated variant in Run simulation",
+    "trigger": "onAction",
+    "provenance": "design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "wireframe": {
@@ -992,6 +1016,55 @@
    "workshopBoard": "wireframes/WS149 Seat Management Venue Mapping Reference v1.0 Board 10.dc.html#bo-1049"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 44. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSimulatePriceBreakdownCalculation",
+    "component": "modal",
+    "reads": [
+     "listEvents",
+     "listProducts",
+     "listProductVariants"
+    ],
+    "trigger": "Run simulation",
+    "body": "**Collects what `simulatePriceBreakdownCalculation` sends before it is called.** Required: nothing. Optional: `customerId`, `productId`, `productVariantId`, `quantity`, `venueId`, `eventId`, `channel`, `date`, `timeslotId`, `membershipId`, `promotionCode`, `paymentMethod`, `deliveryMethod`, `currency`, `compareChannels`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PriceBreakdownCalculationSimulationExplainabilityInput",
+    "confirm": {
+     "label": "Run simulation",
+     "operation": "simulatePriceBreakdownCalculation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "customerId",
+      "productId",
+      "productVariantId",
+      "quantity",
+      "venueId",
+      "eventId",
+      "channel",
+      "date",
+      "timeslotId",
+      "membershipId",
+      "promotionCode",
+      "paymentMethod",
+      "deliveryMethod",
+      "currency",
+      "compareChannels"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /price-breakdown-calculation; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "productId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listProducts`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

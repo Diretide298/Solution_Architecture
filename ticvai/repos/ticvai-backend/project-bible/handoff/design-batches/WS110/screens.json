@@ -842,6 +842,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage reviewers and approval responsibilities.",
+  "division": "Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-333, ADM-334, ADM-335, BO-086; this screen is Reviewer Assignment & Delegation (pack ACCREDITATION.pdf, board 3.5, page 23): manage reviewers and approval responsibilities.",
   "gaps": [
    {
     "operation": null,
@@ -861,11 +862,25 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Approval matrices, the one being changed among them",
+       "operation": "listApprovalMatrices",
+       "bindsTo": "ApprovalMatrix",
+       "columns": [
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.isActive"
+       ],
+       "provenance": "contract approvals.yaml GET /approval-matrices; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "setApprovalMatrix",
        "label": "Save approval matrix",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setApprovalMatrix",
+       "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       },
       {
        "kind": "secondaryButton",
@@ -892,6 +907,13 @@
     "purpose": "Reviewer assignment",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "The matrices, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "wireframe": {
@@ -910,6 +932,29 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

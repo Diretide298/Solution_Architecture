@@ -1250,6 +1250,7 @@
     "nullable": true
    },
    "terminationRequestedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1334,6 +1335,7 @@
     "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
    },
    "accountManagerPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true

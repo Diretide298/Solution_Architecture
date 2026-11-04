@@ -339,7 +339,7 @@
   "name": "Channel Creation & Profile Configuration",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
@@ -458,6 +458,9 @@
       {
        "kind": "primaryButton",
        "label": "Create",
+       "reads": [
+        "getChannelProfile"
+       ],
        "provenance": "contract operation createChannelProfile"
       }
      ]
@@ -472,6 +475,13 @@
   },
   "apis": [
    {
+    "operationId": "getChannelProfile",
+    "contract": "catalogue",
+    "purpose": "The channel profile as saved, when the screen opens on a channel",
+    "trigger": "onLoad",
+    "provenance": "r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)"
+   },
+   {
     "operationId": "createChannelProfile",
     "contract": "catalogue",
     "purpose": "Channel Creation & Profile Configuration",
@@ -485,13 +495,7 @@
    "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-259"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 14 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of a channel profile (createChannelProfile has no get or list).",
-    "source": "contracts/spine/catalogue.yaml#createChannelProfile | screens/P08-venue-back-office.yaml#ADM-259"
-   }
-  ],
+  "gaps": [],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -520,7 +524,7 @@
   "name": "Product & Catalogue Assignment",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
@@ -561,13 +565,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Assign Products, Remove Products, Disable, Copy Assignment, Import Assignment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 2 operations** (setProductCatalogue and its read getProductCatalogue). Unserved: Assign Products, Remove Products, Disable, Copy Assignment, Import Assignment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 7 §Support"
-   },
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of product-to-channel catalogue assignments.",
-    "source": "contracts/spine/catalogue.yaml#setProductCatalogue | screens/P08-venue-back-office.yaml#ADM-260"
    }
   ],
   "layout": {
@@ -580,6 +579,9 @@
       {
        "kind": "dataTable",
        "label": "Every product catalogue",
+       "reads": [
+        "getProductCatalogue"
+       ],
        "columns": [
         "ProductCatalogueAssignmentView.product",
         "ProductCatalogueAssignmentView.productType",
@@ -619,7 +621,8 @@
         "ProductCatalogueAssignmentView.effectiveTo"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Administrators can assign”, “Global Channel Catalogue”, “Venue Catalogue”, “For example”, “Important Architecture”, “This screen only determines”.",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 7 §Display"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 7 §Display",
+       "operation": "getProductCatalogue"
       }
      ]
     },
@@ -686,6 +689,13 @@
   },
   "apis": [
    {
+    "operationId": "getProductCatalogue",
+    "contract": "catalogue",
+    "purpose": "The channel's product assignment as saved",
+    "trigger": "onLoad",
+    "provenance": "r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)"
+   },
+   {
     "operationId": "setProductCatalogue",
     "contract": "catalogue",
     "purpose": "Product & Catalogue Assignment",
@@ -737,7 +747,7 @@
   "name": "Channel Pricing & Commercial Profile Assignment",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
@@ -784,11 +794,6 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 8"
-   },
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel pricing and commercial profile assignments.",
-    "source": "contracts/spine/catalogue.yaml#setChannelPricingCommercial | screens/P08-venue-back-office.yaml#ADM-261"
    }
   ],
   "layout": {
@@ -801,6 +806,9 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
+       "reads": [
+        "getChannelPricingCommercial"
+       ],
        "provenance": "contract operation setChannelPricingCommercial"
       }
      ]
@@ -827,6 +835,13 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getChannelPricingCommercial",
+    "contract": "catalogue",
+    "purpose": "The channel's pricing and commercial profile as saved",
+    "trigger": "onLoad",
+    "provenance": "r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)"
+   },
    {
     "operationId": "setChannelPricingCommercial",
     "contract": "catalogue",
@@ -1016,7 +1031,7 @@
   "name": "Channel Sales Schedule & Availability Windows",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
@@ -1715,7 +1730,7 @@
   "name": "Channel Fees, Payment & Fulfillment Configuration",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
@@ -1832,6 +1847,9 @@
       {
        "kind": "primaryButton",
        "label": "Save changes",
+       "reads": [
+        "getChannelFeePayment"
+       ],
        "provenance": "contract operation setChannelFeePayment"
       }
      ]
@@ -1846,6 +1864,13 @@
   },
   "apis": [
    {
+    "operationId": "getChannelFeePayment",
+    "contract": "catalogue",
+    "purpose": "The channel's fees, payment and fulfilment as saved",
+    "trigger": "onLoad",
+    "provenance": "r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)"
+   },
+   {
     "operationId": "setChannelFeePayment",
     "contract": "catalogue",
     "purpose": "Channel Fees, Payment & Fulfillment Configuration",
@@ -1859,13 +1884,7 @@
    "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-266"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 11 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel fee, payment and fulfilment configuration.",
-    "source": "contracts/spine/catalogue.yaml#setChannelFeePayment | screens/P08-venue-back-office.yaml#ADM-266"
-   }
-  ],
+  "gaps": [],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1894,7 +1913,7 @@
   "name": "Channel Publication, Readiness & AI Validation",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
@@ -1956,6 +1975,9 @@
       {
        "kind": "publishGate",
        "label": "What publishing changes",
+       "reads": [
+        "getChannelReadinessValidation"
+       ],
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens for publishChannelReadinessValidation",
        "operation": "publishChannelReadinessValidation"
@@ -1972,6 +1994,13 @@
   },
   "apis": [
    {
+    "operationId": "getChannelReadinessValidation",
+    "contract": "catalogue",
+    "purpose": "The channel's readiness checklist and status",
+    "trigger": "onLoad",
+    "provenance": "r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)"
+   },
+   {
     "operationId": "publishChannelReadinessValidation",
     "contract": "catalogue",
     "purpose": "Channel Publication, Readiness & AI Validation",
@@ -1985,13 +2014,7 @@
    "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-267"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 8 of 88 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel readiness and validation results.",
-    "source": "contracts/spine/catalogue.yaml#publishChannelReadinessValidation | screens/P08-venue-back-office.yaml#ADM-267"
-   }
-  ],
+  "gaps": [],
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -1,6 +1,6 @@
 # P02-cart-checkout-01 — P02 · Cart & Checkout
 
-**3 screens · 23 operations · 35 schemas · 4 permissions**
+**3 screens · 24 operations · 38 schemas · 4 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -96,9 +96,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-009` | Review & Payment | A | 14 | 74 | 5 | 21 | 23 | 0 | guest | approved (client-verified) |
+| `GST-009` | Review & Payment | A | 25 | 74 | 5 | 21 | 23 | 0 | guest | approved (client-verified) |
 | `GST-010` | Booking Confirmation | A | 22 | 5 | 5 | 14 | 4 | 6 | guest | notStarted (client-verified) |
-| `GST-041` | Checkout Entry | A | 14 | 34 | 6 | 27 | 14 | 6 | guest | notStarted (client-verified) |
+| `GST-041` | Checkout Entry | A | 4 | 35 | 6 | 18 | 14 | 6 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings
 

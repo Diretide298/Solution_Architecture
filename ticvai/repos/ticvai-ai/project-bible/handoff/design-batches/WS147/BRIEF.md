@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-564` | Currency & Payment Currency Configuration | C | 5 | 20 | 6 | 0 | 0 | 4 | — | notStarted (—) |
 | `ADM-565` | Payment Eligibility & Availability Rule Builder | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-566` | Payment Fees, Surcharges & Commercial Rules | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-567` | Payment Policy, Governance & Approval Manager | C | 7 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `ADM-567` | Payment Policy, Governance & Approval Manager | C | 18 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
 | `ADM-568` | Payment Configuration Simulator & Validation Center | C | 0 | 28 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

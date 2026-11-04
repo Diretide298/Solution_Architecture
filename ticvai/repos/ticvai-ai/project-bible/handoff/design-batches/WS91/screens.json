@@ -706,7 +706,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/dynamic-pricing-ai-recommendation-bo-528",
-   "component": "src/routes/rentals/DynamicPricingAiRecommendation.tsx",
+   "redirect": "ADM-088",
    "status": "notStarted"
   },
   "navigation": {

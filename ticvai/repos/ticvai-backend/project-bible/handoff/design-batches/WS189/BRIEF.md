@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1117` | Allowance & Budget Allocation Engine | C | 12 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1118` | Member Spending Controls & Permissions | C | 23 | 18 | 6 | 0 | 1 | 5 | — | notStarted (—) |
 | `BO-1119` | Corporate Wallet & Organizational Hierarchy | C | 11 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1120` | Corporate Budget, Policy & Approval Rules | C | 9 | 38 | 6 | 49 | 1 | 3 | — | notStarted (—) |
+| `BO-1120` | Corporate Budget, Policy & Approval Rules | C | 41 | 38 | 6 | 49 | 1 | 3 | — | notStarted (—) |
 | `BO-1121` | Shared Wallet Transfers & Balance Reallocation | C | 11 | 6 | 6 | 4 | 1 | 6 | — | notStarted (—) |
 | `BO-1122` | Shared Wallet Simulator, Monitoring & Audit | C | 0 | 18 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 

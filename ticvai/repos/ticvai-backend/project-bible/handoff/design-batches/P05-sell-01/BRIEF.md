@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `KSK-003` | What are you buying | B | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-004` | Choose tickets | B | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
 | `KSK-005` | Choose a performance | C | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
-| `KSK-006` | Review | C | 10 | 31 | 5 | 11 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-006` | Review | C | 13 | 31 | 5 | 11 | 1 | 0 | guest | notStarted (generated) |
 | `KSK-007` | Payment | C | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
 | `KSK-008` | Payment unresolved | C | 0 | 1 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-009` | Ticket issued | C | 6 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |

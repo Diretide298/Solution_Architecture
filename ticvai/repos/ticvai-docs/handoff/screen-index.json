@@ -1199,18 +1199,20 @@
     "trigger": "Ticket Type Selection",
     "carries": [
      "cartId",
-     "performanceId"
+     "performanceId",
+     "productId"
     ],
-    "provenance": "derived \u2014 WEB-005 declares entryState.params cartId, performanceId, productId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-005 declares entryState.params cartId, performanceId, productId and WEB-008 holds cartId, performanceId, productId, so an edge into it carries them"
    },
    {
     "to": "WEB-006",
     "trigger": "Date & Performance Selection",
     "carries": [
      "cartId",
-     "performanceId"
+     "performanceId",
+     "productId"
     ],
-    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-008 holds cartId, performanceId, productId, so an edge into it carries them"
    },
    {
     "to": "WEB-010",
@@ -1610,12 +1612,18 @@
    {
     "to": "WEB-012",
     "trigger": "Pays",
-    "provenance": "flow F01 step 6\u21927, F02 step 4\u21925"
+    "provenance": "flow F01 step 6\u21927, F02 step 4\u21925",
+    "carries": [
+     "orderId"
+    ]
    },
    {
     "to": "WEB-012",
     "trigger": "Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)",
-    "provenance": "decided 29 September 2026, W1"
+    "provenance": "decided 29 September 2026, W1",
+    "carries": [
+     "orderId"
+    ]
    },
    {
     "to": "WEB-010",
@@ -1674,12 +1682,15 @@
   "operations": [
    "createPayment",
    "getOrder",
+   "getCart",
    "inquirePaymentStatus",
    "getPublishedBookingFlow",
    "listPublishedPolicies",
-   "checkoutCart"
+   "checkoutCart",
+   "recordConsentAnswers"
   ],
   "services": [
+   "MarketingService",
    "OrderService",
    "WhiteLabelService"
   ],
@@ -1689,11 +1700,14 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.inventory_reservation",
    "catalogue.product",
    "catalogue.product_category",
    "ledger.fx_rate",
+   "marketing.booking_consent_record",
    "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
    "orders.fraud_rule",
@@ -1703,6 +1717,7 @@
    "orders.payment",
    "orders.sales_order",
    "payments.provider_connection",
+   "promotions.promotion",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version"
@@ -1713,6 +1728,7 @@
    "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
+   "marketing.booking_consent_record",
    "marketing.consent_record",
    "orders.cart",
    "orders.deposit",
@@ -1785,7 +1801,26 @@
    "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "consentQuestions",
+    "component": "modal",
+    "trigger": "Pay now's checkoutCart refuses 422 consentRequired or consentAnswerBlocks",
+    "body": "**The same consent pop-up as WEB-006, for the questions still unanswered** (ADAM CR-556 with CR-576, CHG-R14INT-001; then Pay now sends `checkoutCart` once more). **The venue's consent questions for this booking**, e.g. *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*: one or several, in the order `Cart.consentQuestions` gives (the booking flow's `BookingFlowLevelSettings.consentQuestionIds` and every cart product's `consentQuestionIds`, each question once). A question asked **per person** is asked for each member of the party; one asked **per booking** once. Themed as the prototype's pop-up (Yes / No, Next). Next sends the answers to `recordConsentAnswers`, which stores each as a consent record (question version, answer, who answered, when). **A blocking answer** (e.g. *No* to the swim question) marks the lines it blocks and says so; the guest removes them or answers again. There is no tenant on/off toggle: a question is attached to a product or a flow by the venue (decided 29 September, rev 3 REV3-26).",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Next",
+     "operation": "recordConsentAnswers"
+    },
+    "dismiss": {
+     "label": "Back",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "the pop-up as WEB-006 has it (client-verified), opened on this screen for checkoutCart's 422 (ADAM CR-556 with CR-576, 3 November 2026; CHG-R14INT-001)"
+   }
+  ]
  },
  "WEB-013": {
   "name": "Booking Confirmation",
@@ -3883,6 +3918,7 @@
   "route": "/ticket-transfer",
   "operations": [
    "listOwnResaleListings",
+   "listTicketTransfers",
    "transferOrderTickets",
    "listMyOrders",
    "createResaleListing"
@@ -3931,7 +3967,10 @@
    {
     "to": "WEB-031",
     "trigger": "My Reservations",
-    "provenance": "derived \u2014 WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId, resourceId only pre-select (optional); WEB-031 finds productId (listGroupPackages) itself, and WEB-031 opens on its own"
+    "carries": [
+     "productId"
+    ],
+    "provenance": "derived \u2014 WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds productId, so an edge into it carries them"
    },
    {
     "to": "GST-014",
@@ -4441,7 +4480,7 @@
    {
     "to": "WEB-030",
     "trigger": "Ticket Transfer",
-    "provenance": "derived \u2014 WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: transferId only pre-selects (optional); WEB-030 finds orderId (listMyOrders) itself, and WEB-030 opens on its own"
+    "provenance": "derived \u2014 WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them. The edge carries nothing: transferId only pre-selects (optional); WEB-030 finds orderId (listTicketTransfers) itself, and WEB-030 opens on its own"
    },
    {
     "to": "WEB-031",
@@ -6608,6 +6647,7 @@
     "carries": [
      "productId"
     ],
+    "precondition": "the card's or search result's `bookingEntry` is `dateFirst` (ADAM CR-591)",
     "provenance": "decided 29 September 2026, MOB-2"
    },
    {
@@ -6616,6 +6656,7 @@
     "carries": [
      "productId"
     ],
+    "precondition": "the card's or search result's `bookingEntry` is `productFirst` (ADAM CR-591)",
     "provenance": "decided 29 September 2026, MOB-2, W8"
    },
    {
@@ -6624,6 +6665,7 @@
     "carries": [
      "productId"
     ],
+    "precondition": "the card's or search result's `bookingEntry` is `venueMap` (ADAM CR-591)",
     "provenance": "decided 29 September 2026, MOB-2, W6"
    },
    {
@@ -6632,12 +6674,14 @@
     "carries": [
      "productId"
     ],
+    "precondition": "the card's or search result's `bookingEntry` is `timeWindow` (ADAM CR-591)",
     "provenance": "decided 29 September 2026, MOB-2, W9"
    },
    {
     "to": "GST-056",
     "trigger": "Book a bundle (e.g. meal combo with admission)",
-    "provenance": "decided 29 September 2026, MOB-2, MOB-4. Carries the card's bundleId (r8, ORDERS-MONEY-C05): GST-056 needs it to open",
+    "precondition": "the card's or search result's `bookingEntry` is `bundle` (ADAM CR-591)",
+    "provenance": "decided 29 September 2026, MOB-2, MOB-4. Carries the card's bundleId (r8, ORDERS-MONEY-C05): GST-056 needs it to open. The bundleId is the card's or result's `bundleId` (ADAM CR-591), never a search result's `id`, which for a bundle is the bundle's catalogue product",
     "carries": [
      "bundleId"
     ]
@@ -6697,6 +6741,7 @@
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
+   "catalogue.variant",
    "promotions.bundle",
    "promotions.bundle_choice_group",
    "promotions.bundle_choice_option",
@@ -6974,6 +7019,7 @@
   "route": "/general/select-date-and-time",
   "operations": [
    "checkBookingEligibility",
+   "getProductEligibilityRule",
    "listPerformances",
    "getAvailability",
    "listProductCategories",
@@ -7107,8 +7153,8 @@
    {
     "id": "eligibilityDeclaration",
     "component": "drawer",
-    "trigger": "Once, on leaving selection, when a chosen product has an eligibility rule",
-    "body": "**The party's age and height, asked once per person** (DI-1037; REV3 DG-3) for the products that set a rule, then checked with `checkBookingEligibility`. A person who does not meet a rule is named with the product, and the guest changes the selection; never a button, and never a form of product ids.",
+    "trigger": "Once, on leaving selection, when any chosen product's rule has a limit set",
+    "body": "**The party's age and height, asked once per person** (DI-1037; REV3 DG-3) for the products that set a rule, then checked with `checkBookingEligibility`, once per product with a rule (ADAM CR-551). A person who does not meet a rule is named with the product, and the guest changes the selection; never a button, and never a form of product ids. **Who's coming?** (as built in 614c7ee, ADAM CR-552): a bottom sheet with the title and a guest-count badge; one card per person, only the person being filled in open (age, height as chips from the merged band edges, the guardian tick, Remove person); entered people fold to one line with a green Completed badge (e.g. *8 years \u00b7 Under 120 cm*) and tapping a folded card opens it; Add another person opens a new card and folds the rest; the reason a person cannot take part, with the product's name, stays under their card even when folded. Back and Continue are equal pills 48 high: Continue solid black with white text, Back white with a light border, a spinner while saving, faded when disabled.",
     "confirm": {
      "label": "Continue",
      "operation": "checkBookingEligibility"
@@ -7124,8 +7170,8 @@
    {
     "id": "consentQuestions",
     "component": "modal",
-    "trigger": "Once, after the session or date is picked, when the cart has consent questions",
-    "body": "**The venue's consent questions for this booking** (e.g. *Are you able to swim?*), **one question at a time**, in the order `Cart.consentQuestions` gives (the flow's `consentQuestionIds` and every cart product's, each once). The question text is a centred large title under the icon for its kind (a swimmer for swim, `colors.consentIcon` #00BFFF), with the question's `helpText` under it when it has one; no *Question n of m* kicker. A per-person question is asked once for each person, naming them. **Yes** (black) and **No** (red) answer and go on. When the tapped answer is the question's `blockingAnswer`, the pop-up warns first (*...Tap No again to carry on.*, or Yes when Yes blocks) and records it on the second tap. `recordConsentAnswers` sends every answer once, after the last question (question version, answer, who, when), then the cart is read again. A blocking answer marks the lines it blocks. **A close (x) in the pop-up's top corner, on every platform**, discards the answers given so far and records nothing, the same as the system back on Android. No tenant on/off toggle (decided 29 September, rev 3 REV3-26; as built, ADAM CR-493, 3 November 2026).",
+    "trigger": "Once, right after this screen's own addCartLine, when the cart has an unanswered consent question",
+    "body": "**The venue's consent questions for this booking** (e.g. *Are you able to swim?*), **one question at a time**, in the order `Cart.consentQuestions` gives (the flow's `consentQuestionIds` and every cart product's, each once). The question text is a centred large title under the icon for its kind (a swimmer for swim, `colors.consentIcon` #00BFFF), with the question's `helpText` under it when it has one; no *Question n of m* kicker. A per-person question is asked once for each person on each line in its `lineIds`, naming them by ticket type and number (*Adult 1*, *Child 2*), or *Person n* when the line has a declaration (ADAM CR-556); a question already `answered` is not asked again. **Yes** (black) and **No** (red) answer and go on. When the tapped answer is the question's `blockingAnswer`, the pop-up warns first (*...Tap No again to carry on.*, or Yes when Yes blocks) and records it on the second tap. `recordConsentAnswers` sends every answer once, after the last question (question version, answer, who, when), then the cart is read again. A blocking answer marks the lines it blocks. **A close (x) in the pop-up's top corner, on every platform**, discards the answers given so far and records nothing, the same as the system back on Android. No tenant on/off toggle (decided 29 September, rev 3 REV3-26; as built, ADAM CR-493, 3 November 2026).",
     "bindsTo": "ConsentQuestion",
     "confirm": {
      "label": "Yes / No",
@@ -7157,6 +7203,24 @@
     "provenance": "ADAM CR-493 (design change, 3 November 2026)"
    },
    {
+    "id": "joinWaitlist",
+    "component": "modal",
+    "trigger": "Join the waitlist, on a sold-out time",
+    "body": "**The waitlist pop-up** (as built in 614c7ee, ADAM CR-552, 3 November 2026): the party size and how to be told, then Cancel and Join, equal pills 48 high: Join solid black with white text, Cancel white with a light border, a spinner while saving, faded when disabled. Joining reserves nothing; after it the waitlist confirmation card shows.",
+    "bindsTo": "WaitlistEntry",
+    "confirm": {
+     "label": "Join",
+     "operation": "joinWaitlist"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "the party size and the contact choice"
+     ]
+    },
+    "provenance": "ADAM CR-552 (design change, 3 November 2026)"
+   },
+   {
     "id": "quickTour",
     "component": "modal",
     "trigger": "First booking visit on this device, or Quick tour, when the flow's quickTour is on",
@@ -7182,11 +7246,14 @@
    "listProducts",
    "getPublishedGuidedChoice",
    "addCartLine",
+   "getCart",
+   "recordConsentAnswers",
    "getPublishedBookingFlow",
    "createCart"
   ],
   "services": [
    "CatalogueService",
+   "MarketingService",
    "OrderService",
    "WhiteLabelService"
   ],
@@ -7197,18 +7264,21 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
+   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
    "catalogue.variant",
+   "marketing.booking_consent_record",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
    "pii.subject",
    "platform.scope",
+   "promotions.promotion",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version",
@@ -7218,6 +7288,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.booking_consent_record",
    "orders.cart",
    "orders.cart_line",
    "platform.idempotency_record"
@@ -7317,6 +7388,24 @@
      ]
     },
     "provenance": "client-verified"
+   },
+   {
+    "id": "consentQuestions",
+    "component": "modal",
+    "trigger": "After this step's addCartLine calls succeed, before leaving the step, when the cart has an unanswered consent question",
+    "body": "**The same consent pop-up component as GST-007** (ADAM CR-556, 3 November 2026; as accepted under CR-493): one question at a time, Yes / No, the second tap on a blocking answer, and a close (x) that discards the answers and records nothing. A per-booking question is asked once. A per-person question is asked once for each person on each line in its `lineIds`: a line of quantity n has persons 0 to n-1, named by ticket type and number (*Adult 1*, *Child 2*), or *Person n* as the eligibility drawer labels them when the line has a declaration. A question whose `answered` is true is not asked again. After the last question one `recordConsentAnswers` is sent, per-person answers with `cartLineId`, `personIndex` and `personName` (the label shown); then the cart is read again.",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Yes / No",
+     "operation": "recordConsentAnswers"
+    },
+    "dismiss": {
+     "label": "Close (x)",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "ADAM CR-556 (3 November 2026); the pop-up as accepted under CR-493"
    }
   ]
  },
@@ -7332,12 +7421,14 @@
    "inquirePaymentStatus",
    "checkoutCart",
    "getCart",
+   "recordConsentAnswers",
    "getPaymentLink",
    "payByLink",
    "getPublishedBookingFlow",
    "listPublishedPolicies"
   ],
   "services": [
+   "MarketingService",
    "OrderService",
    "WhiteLabelService"
   ],
@@ -7352,6 +7443,7 @@
    "catalogue.product",
    "catalogue.product_category",
    "ledger.fx_rate",
+   "marketing.booking_consent_record",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -7379,6 +7471,7 @@
    "catalogue.inventory_reservation",
    "ledger.journal_entry",
    "ledger.journal_line",
+   "marketing.booking_consent_record",
    "marketing.consent_record",
    "orders.cart",
    "orders.deposit",
@@ -7452,7 +7545,26 @@
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "consentQuestions",
+    "component": "modal",
+    "trigger": "Pay's checkoutCart refuses 422 consentRequired or consentAnswerBlocks",
+    "body": "**The same consent pop-up component as GST-007, for the unanswered questions** (ADAM CR-556, 3 November 2026; as accepted under CR-493): one question at a time, Yes / No, the second tap on a blocking answer, and a close (x) that discards the answers and records nothing. A per-booking question is asked once. A per-person question is asked once for each person on each line in its `lineIds`: a line of quantity n has persons 0 to n-1, named by ticket type and number (*Adult 1*, *Child 2*), or *Person n* as the eligibility drawer labels them when the line has a declaration. A question whose `answered` is true is not asked again. After the last question one `recordConsentAnswers` is sent, per-person answers with `cartLineId`, `personIndex` and `personName` (the label shown); then the cart is read again and Pay sends `checkoutCart` once more.",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Yes / No",
+     "operation": "recordConsentAnswers"
+    },
+    "dismiss": {
+     "label": "Close (x)",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "ADAM CR-556 (3 November 2026), moved here from GST-041 with checkoutCart (ADAM CR-576; CHG-R14INT-001); the pop-up as accepted under CR-493"
+   }
+  ]
  },
  "GST-010": {
   "name": "Booking Confirmation",
@@ -9071,9 +9183,10 @@
     "trigger": "Checkout Entry",
     "carries": [
      "lineId",
-     "performanceId"
+     "performanceId",
+     "productId"
     ],
-    "provenance": "derived \u2014 GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-026 holds lineId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-026 holds lineId, performanceId, productId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -10647,7 +10760,6 @@
   "operations": [
    "applyCartPromoCode",
    "getCart",
-   "checkoutCart",
    "abandonCart",
    "claimCart",
    "extendCart",
@@ -10681,12 +10793,6 @@
    "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
-   "orders.fraud_rule",
-   "orders.order_line",
-   "orders.order_line_discount",
-   "orders.order_line_eligibility",
-   "orders.payment",
-   "orders.sales_order",
    "pii.subject",
    "platform.scope",
    "promotions.coupon_campaign",
@@ -10700,16 +10806,8 @@
   "writes": [
    "cache:idempotency",
    "catalogue.inventory_reservation",
-   "marketing.consent_record",
    "orders.cart",
-   "orders.cart_line",
-   "orders.deposit",
-   "orders.order_line",
-   "orders.order_line_discount",
-   "orders.order_line_eligibility",
-   "orders.sales_order",
-   "platform.idempotency_record",
-   "platform.outbox"
+   "orders.cart_line"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -10752,19 +10850,19 @@
     "provenance": "derived \u2014 GST-001 declares entryState.params  and GST-041 holds none of them. The edge carries nothing: GST-041 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
    },
    {
-    "to": "GST-059",
-    "trigger": "They follow it through the day",
-    "provenance": "flow F49 step 5\u21926"
-   },
-   {
     "to": "GST-009",
     "trigger": "Checkout",
-    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction); no payment id since Checkout makes no order here (ADAM CR-576)",
     "carries": [
      "orderId",
-     "paymentId",
      "token"
     ]
+   },
+   {
+    "to": "GST-059",
+    "trigger": "They follow it through the day",
+    "provenance": "flow F49 step 5\u21926",
+    "operation": "getCart"
    }
   ],
   "machine": null,
@@ -14516,6 +14614,7 @@
    "cache:resolution",
    "identity.mfa_challenge",
    "identity.mfa_recovery_code",
+   "identity.offline_pin_verifier",
    "identity.principal",
    "identity.principal_credential",
    "identity.principal_credential_history",
@@ -14549,7 +14648,7 @@
   "states": {
    "loading": "Checking the credential. The keypad stays visible and disabled.",
    "emptyFirstRun": "**A till nobody has signed into yet.** No recent operators, so the quick-login row is not there and the keypad is the whole screen. This is the state on the morning a terminal is first plugged in, and it is the one a venue sees when it opens - not a fault, and it must not read as one.",
-   "error": "Identity could not be reached. **Says so rather than saying the PIN is wrong** -- telling an operator their PIN failed when the network did sends them to a supervisor with the wrong question.",
+   "error": "Identity could not be reached. **Says so rather than saying the PIN is wrong** -- telling an operator their PIN failed when the network did sends them to a supervisor with the wrong question. **On `401 device-unauthenticated` or `403 workstation-mismatch` it says \"This device is not registered\"** rather than that the PIN is wrong: the device's own credential was refused before any PIN was checked, so no attempt is spent (ADR-0071 amendment of 3 November 2026, CHG-R14H-001; CHG-R14INT-002).",
    "denied": "The employee number and PIN do not match, or the account is locked. Names which, and how many attempts remain before the lock.",
    "emptyNoAccess": "Authentication succeeded and the operator holds no role on this workstation. **A real outcome on a shared till** -- a steward badged for the gate is not a cashier -- and it is the session that succeeded and the authorisation that did not.",
    "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126). A cashier never reaches this state.",
@@ -17313,9 +17412,10 @@
     "trigger": "Sell \u2014 Ticket Catalogue",
     "carries": [
      "orderId",
+     "productId",
      "promotionId"
     ],
-    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-010 holds orderId, promotionId, so an edge into it carries them"
+    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-010 holds orderId, productId, promotionId, so an edge into it carries them"
    },
    {
     "to": "POS-003",
@@ -17734,7 +17834,7 @@
    "emptyFirstRun": "No omnichannel order fulfilment yet. Offers Record order handover (`recordOrderHandover`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the omnichannel order fulfilment are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `SHIFT_OPEN` and say so in their own panels). **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`; `ORDER_MODIFY` for `recordOrderHandover`, `collectShopAndDrop`.",
-   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync. Hand over dropped goods (`collectShopAndDrop`) waits for the connection: it is disabled offline."
   },
   "overlays": [
    {
@@ -18046,7 +18146,7 @@
    "error": "Could not load. Names which read failed and leaves the sales exceptions controls untouched.",
    "emptyFirstRun": "No sales exceptions controls configured. The form opens empty and `recordNoSale` saves the first one; it says what the platform does in the meantime.",
    "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_NO_SALE` for `recordNoSale`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_VOID` for `voidOrder`.",
-   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync.",
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync. A void or a no-sale that needs a supervisor is still signed here: the supervisor picks their name from the till's own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001).",
    "approvalRejected": "The supervisor declined the no-sale or void; the drawer stays shut and the reason is shown."
   },
   "overlays": [
@@ -18445,7 +18545,7 @@
    "emptyFirstRun": "No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`, `withdrawFromDepositBox`.",
-   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync. A withdrawal is still countersigned here: the cashier the cash came from picks their name from the till's own list and types their PIN, which the till checks itself and the server confirms when it syncs (the `supervisorPinPrompt` offline state, CHG-R14V-001)."
   },
   "overlays": [
    {
@@ -18854,9 +18954,10 @@
     "to": "POS-002",
     "trigger": "Sell \u2014 Ticket Catalogue",
     "carries": [
+     "productId",
      "promotionId"
     ],
-    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-021 holds promotionId, so an edge into it carries them"
+    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-021 holds productId, promotionId, so an edge into it carries them"
    },
    {
     "to": "POS-022",
@@ -19199,9 +19300,10 @@
     "to": "POS-002",
     "trigger": "Sell \u2014 Ticket Catalogue",
     "carries": [
+     "productId",
      "promotionId"
     ],
-    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-023 holds promotionId, so an edge into it carries them"
+    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-023 holds productId, promotionId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -19806,7 +19908,10 @@
    {
     "to": "POS-002",
     "trigger": "Sell \u2014 Ticket Catalogue",
-    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-027 holds none of them. The edge carries nothing: cardCode only pre-selects (optional); POS-002 finds orderId (createOrder), productId (listProducts), promotionId (evaluatePromotions) itself, and POS-002 opens on its own"
+    "carries": [
+     "productId"
+    ],
+    "provenance": "derived \u2014 POS-002 declares entryState.params cardCode, orderId, productId, promotionId and POS-027 holds productId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -20981,7 +21086,10 @@
    {
     "to": "KSK-007",
     "trigger": "Pays at the terminal",
-    "provenance": "flow F07 step 6\u21927, F75 step 4\u21925"
+    "provenance": "flow F07 step 6\u21927, F75 step 4\u21925",
+    "carries": [
+     "orderId"
+    ]
    },
    {
     "to": "KSK-008",
@@ -21051,6 +21159,7 @@
    "ledger.journal_line",
    "orders.order_event",
    "orders.payment",
+   "orders.sales_order",
    "payments.payment_attempt",
    "platform.idempotency_record",
    "platform.outbox"
@@ -21999,6 +22108,7 @@
    "identity.delegated_access",
    "identity.mfa_challenge",
    "identity.mfa_recovery_code",
+   "identity.offline_pin_verifier",
    "identity.principal",
    "identity.principal_credential",
    "identity.principal_credential_history",
@@ -22039,7 +22149,7 @@
   "states": {
    "loading": "Checking the credential. The form stays visible and disabled.",
    "emptyFirstRun": "**Nobody signed in** - the normal state of a door. A shared handheld between shifts shows nothing until somebody identifies themselves.",
-   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed.",
+   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed. **On `401 device-unauthenticated` or `403 workstation-mismatch` it says \"This device is not registered\"** rather than that the password is wrong: the device's own credential was refused before any password was checked, so no attempt is spent (ADR-0071 amendment of 3 November 2026, CHG-R14H-001; CHG-R14INT-002).",
    "denied": "The credential does not match, or the account is locked. One message for both, with the attempts left before the lock; a locked account says when to try again.",
    "emptyNoAccess": "Signed in, and the person holds no role in this app. Says who at the tenant grants access; distinct from a wrong password. A door has no permission of its own to name, because the person is not signed in until it succeeds.",
    "emptyNoResults": "Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider shows no SSO buttons at all, and the form is the whole door.",
@@ -25298,6 +25408,7 @@
    "ledger.journal_line",
    "orders.order_event",
    "orders.payment",
+   "orders.sales_order",
    "payments.payment_attempt",
    "platform.idempotency_record",
    "platform.outbox"
@@ -28447,6 +28558,7 @@
    "fnb.service_order_line",
    "fnb.table_reservation",
    "fnb.table_visit",
+   "fnb.table_visit_server",
    "identity.principal"
   ],
   "writes": [
@@ -28459,6 +28571,7 @@
    "fnb.table_reservation",
    "fnb.table_session",
    "fnb.table_visit",
+   "fnb.table_visit_server",
    "platform.idempotency_record",
    "platform.outbox"
   ],
@@ -28761,6 +28874,7 @@
    "orders.order_event",
    "orders.order_line",
    "orders.payment",
+   "orders.sales_order",
    "payments.payment_attempt",
    "platform.idempotency_record",
    "platform.outbox"
@@ -31901,6 +32015,7 @@
    "cache:resolution",
    "identity.mfa_challenge",
    "identity.mfa_recovery_code",
+   "identity.offline_pin_verifier",
    "identity.principal",
    "identity.principal_credential",
    "identity.principal_credential_history",
@@ -31934,7 +32049,7 @@
   "states": {
    "loading": "Checking the credential. The form stays visible and disabled.",
    "emptyFirstRun": "**Nobody signed in** - the normal state of a door. A scanner between shifts shows the keypad and a badge prompt.",
-   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed.",
+   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed. **On `401 device-unauthenticated` or `403 workstation-mismatch` it says \"This device is not registered\"** rather than that the password is wrong: the device's own credential was refused before any password was checked, so no attempt is spent (ADR-0071 amendment of 3 November 2026, CHG-R14H-001; CHG-R14INT-002).",
    "denied": "The credential does not match, or the account is locked. One message for both, with the attempts left before the lock; a locked account says when to try again.",
    "emptyNoAccess": "Signed in, and the person holds no role in this app. Says who at the tenant grants access; distinct from a wrong password. A door has no permission of its own to name, because the person is not signed in until it succeeds.",
    "sessionHeld": "`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004). Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory (BO-053), and signing in never ends it by itself.",
@@ -34774,7 +34889,6 @@
    "catalogue.audit_entry",
    "catalogue.price",
    "catalogue.price_list",
-   "catalogue.product_version",
    "pricing.dynamic_price_action",
    "pricing.dynamic_price_condition",
    "pricing.dynamic_price_rule"
@@ -35802,6 +35916,7 @@
     "trigger": "Packages & Bundles",
     "provenance": "flow F77 step 1\u21922",
     "carries": [
+     "bundleId",
      "productId",
      "version"
     ]
@@ -36632,6 +36747,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.event",
    "catalogue.performance",
    "catalogue.product",
@@ -37171,9 +37287,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-022 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-022 holds productId, variantId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -37500,9 +37617,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-023 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-023 holds productId, variantId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -38045,10 +38163,11 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId",
      "version"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-026 holds variantId, version, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-026 holds productId, variantId, version, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -38398,9 +38517,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-027 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-027 holds productId, variantId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -40422,7 +40542,8 @@
    "fnb.menu_section",
    "fnb.menu_version",
    "fnb.modifier_group",
-   "fnb.modifier_option"
+   "fnb.modifier_option",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -40806,9 +40927,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
+     "productId",
      "variantId"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-047 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-047 holds productId, variantId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -41053,6 +41175,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "retail.merchandise"
   ],
   "storedProcedures": [],
@@ -46407,7 +46530,7 @@
    "cache:idempotency"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -51444,6 +51567,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "platform.sale_board",
    "platform.sale_board_page",
    "platform.sale_board_tile",
@@ -54130,6 +54254,24 @@
      "label": "Cancel"
     },
     "provenance": "contract retail.yaml PUT /outlets/{outletId}/return-policy; wiring fix, 2 October 2026"
+   },
+   {
+    "id": "formDisposeShopAndDrop",
+    "component": "modal",
+    "trigger": "Dispose of dropped goods",
+    "body": "**Collects what `disposeShopAndDrop` sends before it is called.** Required: `method`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Dispose of dropped goods",
+     "operation": "disposeShopAndDrop"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "method",
+      "note"
+     ]
+    },
+    "provenance": "contract retail.yaml POST /shop-and-drop/{dropId}/dispose; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ]
  },
@@ -61568,6 +61710,34 @@
     "confirm": {
      "operation": "rollbackAccessPolicy"
     }
+   },
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Submit for approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Submit for approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ]
  },
@@ -65105,7 +65275,7 @@
    "subscription.membership_product_history"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -65294,7 +65464,7 @@
    "loading": "The version's checks and impact load first.",
    "error": "Could not load. Names the read that failed; no action is offered until it loads.",
    "emptyFirstRun": "Not used: the screen opens on one product version.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_MANAGE`, which `approveMembershipProductValidation` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MEMBERSHIP_VIEW`, which `getMembershipProductValidation` requires to show this screen, or `MEMBERSHIP_MANAGE`, which `approveMembershipProductValidation` requires to approve it, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "overlays": []
  },
@@ -65886,7 +66056,36 @@
    "emptyNoResults": "The filter narrowed it and the member exceptions overrides are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Request approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Request approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-302": {
   "name": "Member Lifecycle History, Audit & Case Timeline",
@@ -68699,7 +68898,7 @@
    "orders.ticket_template_channel"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -78153,32 +78352,19 @@
   "app": "venue-management-web",
   "route": "/games-rides/self-service-wallet-top-up-bo-488",
   "operations": [
-   "topUpWallet",
    "getWallet"
   ],
   "services": [
    "WalletService"
   ],
   "stores": [
-   "postgres",
-   "redis"
+   "postgres"
   ],
   "reads": [
-   "cache:idempotency",
-   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.credit_type",
-   "wallet.funding_rule",
    "wallet.wallet"
   ],
-  "writes": [
-   "cache:idempotency",
-   "platform.outbox",
-   "wallet.balance",
-   "wallet.credit_lot",
-   "wallet.wallet",
-   "wallet.wallet_transaction"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -87836,7 +88022,8 @@
   "app": "venue-management-web",
   "route": "/access-venue/reviewer-assignment-delegation-bo-639",
   "operations": [
-   "setApprovalMatrix"
+   "setApprovalMatrix",
+   "listApprovalMatrices"
   ],
   "services": [
    "TenancyService"
@@ -87884,7 +88071,29 @@
    "emptyNoResults": "The filter narrowed it and the reviewer delegation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-640": {
   "name": "Rejection & Resubmission Management",
@@ -92841,7 +93050,36 @@
    "emptyNoResults": "The filter narrowed it and the event change request are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Create approval request",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Create approval request",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-719": {
   "name": "Event Cancellation Workflow Configuration",
@@ -96455,7 +96693,36 @@
    "emptyNoResults": "The filter narrowed it and the budget goals forecast are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Create approval request",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Create approval request",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-772": {
   "name": "A/B & AI Optimization",
@@ -101116,7 +101383,38 @@
    "emptyNoResults": "The filter narrowed it and the seo are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSetSeoMetadata",
+    "component": "modal",
+    "trigger": "Save SEO metadata",
+    "body": "**Collects what `setSeoMetadata` sends before it is called.** Required: `entityKind`, `entityId`. Optional: `locale`, `title`, `metaDescription`, `keywords`, `canonicalUrl`, `slug`, `hreflang`, `schemaOrgType`, `openGraph`, `isAutoGenerated`, `noIndex`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeoMetadata",
+    "confirm": {
+     "label": "Save SEO metadata",
+     "operation": "setSeoMetadata"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "entityKind",
+      "entityId",
+      "locale",
+      "title",
+      "metaDescription",
+      "keywords",
+      "canonicalUrl",
+      "slug",
+      "hreflang",
+      "schemaOrgType",
+      "openGraph",
+      "isAutoGenerated",
+      "noIndex"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /seo-metadata; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-843": {
   "name": "Publishing, Analytics & Audit",
@@ -105806,7 +106104,8 @@
    "maintenance.inspection",
    "maintenance.inspection_item",
    "maintenance.inspection_template",
-   "maintenance.inspection_template_item"
+   "maintenance.inspection_template_item",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -106628,7 +106927,36 @@
    "emptyNoResults": "The filter narrowed it and the event resource approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Create approval request",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Create approval request",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-923": {
   "name": "AI Resource Intelligence Command Center",
@@ -108796,7 +109124,7 @@
    "seating.section_row"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -110474,6 +110802,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.performance",
    "seating.seat_map"
   ],
@@ -112589,7 +112918,36 @@
    "emptyNoResults": "The filter narrowed it and the hold approval workflow are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Create approval request",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Create approval request",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-1011": {
   "name": "Priority & Conflict Resolution",
@@ -113049,7 +113407,7 @@
    "seating.accessible"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -113881,7 +114239,36 @@
    "emptyNoResults": "The filter narrowed it and the contracts approval workflow are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Create approval request",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Create approval request",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-1032": {
   "name": "Group Reporting & Audit",
@@ -114070,7 +114457,7 @@
    "seating.recommendation_rule"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -114959,7 +115346,10 @@
   "app": "venue-management-web",
   "route": "/access-venue/scenario-what-if-planning-bo-1049",
   "operations": [
-   "simulatePriceBreakdownCalculation"
+   "simulatePriceBreakdownCalculation",
+   "listEvents",
+   "listProducts",
+   "listProductVariants"
   ],
   "services": [
    "CatalogueService"
@@ -114972,6 +115362,7 @@
    "cache:idempotency",
    "catalogue.calculation_profile",
    "catalogue.calculation_step",
+   "catalogue.event",
    "catalogue.fee",
    "catalogue.fee_rule",
    "catalogue.membership_programme",
@@ -114981,6 +115372,9 @@
    "catalogue.price_list",
    "catalogue.price_resolution_policy",
    "catalogue.product",
+   "catalogue.product_category",
+   "catalogue.product_eligibility_rule",
+   "catalogue.product_media",
    "catalogue.rate",
    "catalogue.rounding_profile",
    "catalogue.sales_channel",
@@ -114989,7 +115383,8 @@
    "catalogue.variant",
    "pricing.dynamic_price_action",
    "pricing.dynamic_price_condition",
-   "pricing.dynamic_price_rule"
+   "pricing.dynamic_price_rule",
+   "whitelabel.guided_choice_answer"
   ],
   "writes": [
    "cache:idempotency"
@@ -115021,7 +115416,45 @@
    "emptyNoResults": "The filter narrowed it and the scenario what-if planning are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSimulatePriceBreakdownCalculation",
+    "component": "modal",
+    "reads": [
+     "listEvents",
+     "listProducts",
+     "listProductVariants"
+    ],
+    "trigger": "Run simulation",
+    "body": "**Collects what `simulatePriceBreakdownCalculation` sends before it is called.** Required: nothing. Optional: `customerId`, `productId`, `productVariantId`, `quantity`, `venueId`, `eventId`, `channel`, `date`, `timeslotId`, `membershipId`, `promotionCode`, `paymentMethod`, `deliveryMethod`, `currency`, `compareChannels`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PriceBreakdownCalculationSimulationExplainabilityInput",
+    "confirm": {
+     "label": "Run simulation",
+     "operation": "simulatePriceBreakdownCalculation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "customerId",
+      "productId",
+      "productVariantId",
+      "quantity",
+      "venueId",
+      "eventId",
+      "channel",
+      "date",
+      "timeslotId",
+      "membershipId",
+      "promotionCode",
+      "paymentMethod",
+      "deliveryMethod",
+      "currency",
+      "compareChannels"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /price-breakdown-calculation; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-1050": {
   "name": "Revenue Analytics & Audit",
@@ -117045,7 +117478,36 @@
    "emptyNoResults": "The filter narrowed it and the integration approval compliance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Create approval request",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Create approval request",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-1081": {
   "name": "Finance Dashboard",
@@ -123387,6 +123849,7 @@
   "app": "venue-management-web",
   "route": "/orders-money/integration-monitoring-exception-workbench-bo-1179",
   "operations": [
+   "getWalletIntegrationMapping",
    "listWalletDisputes",
    "replayEvents",
    "listApiClients",
@@ -123420,7 +123883,7 @@
    "wallet.integration_mapping"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -123461,6 +123924,44 @@
     "confirm": {
      "operation": "setApiClientStatus"
     }
+   },
+   {
+    "id": "formReplayEvents",
+    "component": "modal",
+    "trigger": "Replay",
+    "body": "**Collects what `replayEvents` sends before it is called.** Required: `from`. Optional: `to`, `eventTypes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Replay",
+     "operation": "replayEvents"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "from",
+      "to",
+      "eventTypes"
+     ]
+    },
+    "provenance": "contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   },
+   {
+    "id": "formRetryReplayEvents",
+    "component": "modal",
+    "trigger": "Retry",
+    "body": "**Collects what `replayEvents` sends before it is called.** Required: `from`. Optional: `to`, `eventTypes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Retry",
+     "operation": "replayEvents"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "from",
+      "to",
+      "eventTypes"
+     ]
+    },
+    "provenance": "contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ]
  },
@@ -123612,7 +124113,36 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it \u2014 naming which is what stops somebody concluding the record does not exist"
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Send for approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Send for approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "BO-1182": {
   "name": "Wallet Platform Health, Audit & Administration Center",
@@ -124183,7 +124713,7 @@
    "transport.departure"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -126376,7 +126906,7 @@
    "catalogue.fee"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -127636,7 +128166,7 @@
    "catalogue.dynamic_pricing_strategy"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -129315,7 +129845,7 @@
   ],
   "writes": [],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -139323,6 +139853,7 @@
   "app": "venue-management-web",
   "route": "/commercial/channel-creation-profile-configuration-adm-259",
   "operations": [
+   "getChannelProfile",
    "createChannelProfile"
   ],
   "services": [
@@ -139342,7 +139873,7 @@
    "catalogue.sales_channel"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -139377,6 +139908,7 @@
   "app": "venue-management-web",
   "route": "/commercial/product-catalogue-assignment-adm-260",
   "operations": [
+   "getProductCatalogue",
    "setProductCatalogue"
   ],
   "services": [
@@ -139400,7 +139932,7 @@
    "catalogue.product_channel_assignment"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -139451,6 +139983,7 @@
   "app": "venue-management-web",
   "route": "/commercial/channel-pricing-commercial-profile-assignment-adm-261",
   "operations": [
+   "getChannelPricingCommercial",
    "setChannelPricingCommercial"
   ],
   "services": [
@@ -139472,7 +140005,7 @@
    "catalogue.price_assignment"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -139589,7 +140122,7 @@
    "catalogue.channel_sales_rule"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -139841,6 +140374,7 @@
   "app": "venue-management-web",
   "route": "/commercial/channel-fees-payment-fulfillment-configuration-adm-266",
   "operations": [
+   "getChannelFeePayment",
    "setChannelFeePayment"
   ],
   "services": [
@@ -139861,7 +140395,7 @@
    "catalogue.sales_channel"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -139896,6 +140430,7 @@
   "app": "venue-management-web",
   "route": "/commercial/channel-publication-readiness-ai-validation-adm-267",
   "operations": [
+   "getChannelReadinessValidation",
    "publishChannelReadinessValidation"
   ],
   "services": [
@@ -139923,7 +140458,7 @@
    "catalogue.sales_channel"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -139973,7 +140508,7 @@
   ],
   "writes": [],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -140094,7 +140629,7 @@
    "catalogue.channel_connection"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -143855,7 +144390,36 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it \u2014 naming which is what stops somebody concluding the record does not exist"
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Send for approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Send for approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "ADM-568": {
   "name": "Payment Configuration Simulator & Validation Center",
@@ -144736,7 +145300,30 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it \u2014 naming which is what stops somebody concluding the record does not exist"
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formEnrolDevice",
+    "component": "modal",
+    "trigger": "Activate terminal",
+    "body": "**Collects what `enrolDevice` sends before it is called.** Required: `state`. Optional: `configurationProfileId`, `reason`, `enrolmentCode`, `testResult`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DeviceEnrolment",
+    "confirm": {
+     "label": "Activate terminal",
+     "operation": "enrolDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "state",
+      "configurationProfileId",
+      "reason",
+      "enrolmentCode",
+      "testResult"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /devices/{deviceId}/enrolment; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "ADM-582": {
   "name": "POS, Kiosk & Terminal Assignment Manager",
@@ -146239,6 +146826,7 @@
   "app": "venue-management-web",
   "route": "/commercial/partial-payment-failure-recovery-manager-t100-adm-606",
   "operations": [
+   "getMixedTenderRules",
    "setMixedTenderRules",
    "getDunningPolicy",
    "setDunningPolicy",
@@ -146264,7 +146852,7 @@
    "payments.mixed_tender_rules"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -153497,7 +154085,8 @@
   "app": "venue-management-web",
   "route": "/platform/organizational-hierarchy-routing-adm-331",
   "operations": [
-   "setApprovalMatrix"
+   "setApprovalMatrix",
+   "listApprovalMatrices"
   ],
   "services": [
    "TenancyService"
@@ -153545,7 +154134,29 @@
    "emptyNoResults": "The filter narrowed it and the organizational hierarchy routing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "ADM-332": {
   "name": "Department-Based Approval Matrix",
@@ -153612,7 +154223,8 @@
   "app": "venue-management-web",
   "route": "/platform/venue-tenant-approval-matrix-adm-333",
   "operations": [
-   "setApprovalMatrix"
+   "setApprovalMatrix",
+   "listApprovalMatrices"
   ],
   "services": [
    "TenancyService"
@@ -153660,7 +154272,29 @@
    "emptyNoResults": "The filter narrowed it and the venue tenant approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "ADM-334": {
   "name": "Value & Threshold Routing",
@@ -153670,7 +154304,8 @@
   "app": "venue-management-web",
   "route": "/platform/value-threshold-routing-adm-334",
   "operations": [
-   "setApprovalMatrix"
+   "setApprovalMatrix",
+   "listApprovalMatrices"
   ],
   "services": [
    "TenancyService"
@@ -153718,7 +154353,29 @@
    "emptyNoResults": "The filter narrowed it and the value threshold routing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "ADM-335": {
   "name": "Risk-Based & Conditional Routing",
@@ -153728,7 +154385,8 @@
   "app": "venue-management-web",
   "route": "/platform/risk-based-conditional-routing-adm-335",
   "operations": [
-   "setApprovalMatrix"
+   "setApprovalMatrix",
+   "listApprovalMatrices"
   ],
   "services": [
    "TenancyService"
@@ -153776,7 +154434,29 @@
    "emptyNoResults": "The filter narrowed it and the risk-based conditional routing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "ADM-336": {
   "name": "Approver Group & Decision Policy",
@@ -154198,7 +154878,6 @@
    "listStepUpPolicies",
    "setStepUpPolicy",
    "setPasswordPolicy",
-   "listMfaMethods",
    "getGuestVerificationPolicy",
    "setGuestVerificationPolicy",
    "getPasswordPolicy"
@@ -154215,7 +154894,6 @@
    "approvals.step_up_policy",
    "cache:idempotency",
    "identity.guest_verification_policy",
-   "identity.mfa_method",
    "identity.password_policy"
   ],
   "writes": [
@@ -156645,6 +157323,7 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.offline_pin_verifier",
    "identity.principal",
    "identity.principal_credential",
    "identity.principal_credential_history",
@@ -158203,7 +158882,9 @@
   "reads": [
    "cache:idempotency",
    "control.billing_entity",
+   "control.capacity_pack",
    "control.cell",
+   "control.cell_endpoint",
    "control.cell_tenant",
    "control.contract",
    "control.credit_note",
@@ -158615,11 +159296,14 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.capacity_pack",
    "control.cell",
+   "control.cell_endpoint",
    "control.cell_tenant",
    "control.contract",
    "control.licence_add_on",
    "control.licence_add_on_limit",
+   "control.module_listing",
    "control.plan",
    "control.plan_limit",
    "control.plan_module",
@@ -160190,6 +160874,7 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.offline_pin_verifier",
    "identity.principal",
    "identity.principal_credential",
    "identity.principal_credential_history",
@@ -160752,7 +161437,6 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.api_client",
    "control.api_version",
    "control.support_notice",
    "control.tenant",
@@ -160762,8 +161446,7 @@
    "cache:idempotency",
    "control.api_version",
    "control.support_notice",
-   "identity.platform_staff_grant",
-   "marketing.message_dispatch"
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165043,9 +165726,13 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.cell",
+   "control.cell_endpoint",
+   "control.cell_tenant",
    "control.contract",
    "control.licence_add_on",
    "control.licence_add_on_limit",
+   "control.module_listing",
    "control.plan",
    "control.plan_limit",
    "control.plan_module",
@@ -165360,8 +166047,19 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.capacity_pack",
+   "control.cell",
+   "control.cell_endpoint",
+   "control.cell_tenant",
    "control.contract",
+   "control.licence_add_on",
+   "control.licence_add_on_limit",
+   "control.module_listing",
    "control.plan",
+   "control.plan_limit",
+   "control.plan_module",
+   "control.tenant",
+   "control.usage_record",
    "platform.tenant"
   ],
   "writes": [
@@ -165537,9 +166235,13 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.cell",
+   "control.cell_endpoint",
+   "control.cell_tenant",
    "control.contract",
    "control.licence_add_on",
    "control.licence_add_on_limit",
+   "control.module_listing",
    "control.plan",
    "control.plan_limit",
    "control.plan_module",
@@ -167432,8 +168134,19 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.capacity_pack",
+   "control.cell",
+   "control.cell_endpoint",
+   "control.cell_tenant",
    "control.contract",
+   "control.licence_add_on",
+   "control.licence_add_on_limit",
+   "control.module_listing",
    "control.plan",
+   "control.plan_limit",
+   "control.plan_module",
+   "control.tenant",
+   "control.usage_record",
    "platform.tenant"
   ],
   "writes": [
@@ -177591,6 +178304,7 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.offline_pin_verifier",
    "identity.principal",
    "identity.principal_credential",
    "identity.principal_credential_history",
@@ -179152,6 +179866,7 @@
    "ledger.journal_line",
    "orders.order_event",
    "orders.payment",
+   "orders.sales_order",
    "payments.payment_attempt",
    "platform.idempotency_record",
    "platform.outbox"
@@ -179466,6 +180181,7 @@
     "crossesDevice": true,
     "back": false,
     "carries": [
+     "productId",
      "variantId"
     ]
    }
@@ -182611,6 +183327,7 @@
    "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
+   "identity.offline_pin_verifier",
    "identity.principal",
    "identity.principal_credential",
    "identity.principal_credential_history",
@@ -193881,7 +194598,7 @@
    "error": "Could not load the reference. **Names which contract failed** \u2014 28 files load independently and one missing does not mean the API is down.\n",
    "emptyFirstRun": "**Never empty in practice** \u2014 the contracts are the documentation and they ship with the platform. An empty reference means the artefacts did not load, which is an error rather than a first run.\n",
    "emptyNoResults": "No operation matches this search. **Search covers the summary and the description**, not just the operationId, because a developer looking for *\"how do I refund\"* does not know it is called `createRefund`.\n",
-   "emptyNoAccess": "Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiVersions` requires, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "**There is no permission to name \u2014 `listApiVersions` and `listApiScopes` are open to anyone.** No access here means the portal itself could not be reached (a gateway refusal or an unknown tenant), and the screen says so. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "overlays": []
  },
@@ -194522,8 +195239,7 @@
    "control.api_limit",
    "control.api_version",
    "control.integration_listing",
-   "control.production_access_request",
-   "marketing.message_dispatch"
+   "control.production_access_request"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -195591,7 +196307,27 @@
    "emptyNoAccess": "This display is not assigned to a station. **Assignment is a back-office act** \u2014 a kitchen screen does not choose what it shows. Shown when the caller lacks `PRODUCT_VIEW`, which `getKitchenSla` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setKitchenSla`.",
    "offline": "**Amber, and it keeps working.** The kitchen still has to send food out \u2014 a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formSetKitchenSla",
+    "component": "modal",
+    "trigger": "Edit targets",
+    "body": "**Collects what `setKitchenSla` sends before it is called.** Required: nothing. Optional: `targets`, `priorityWeights`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "KitchenSla",
+    "confirm": {
+     "label": "Edit targets",
+     "operation": "setKitchenSla"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targets",
+      "priorityWeights"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/kitchen-sla; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ]
  },
  "KIT-010": {
   "name": "Kitchen Performance, AI & Operational Optimization",
@@ -202686,8 +203422,19 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.capacity_pack",
+   "control.cell",
+   "control.cell_endpoint",
+   "control.cell_tenant",
    "control.contract",
+   "control.licence_add_on",
+   "control.licence_add_on_limit",
+   "control.module_listing",
    "control.plan",
+   "control.plan_limit",
+   "control.plan_module",
+   "control.tenant",
+   "control.usage_record",
    "platform.tenant"
   ],
   "writes": [

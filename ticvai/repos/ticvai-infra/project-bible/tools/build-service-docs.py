@@ -59,6 +59,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ticket_done  # noqa: E402  (what finishes a ticket: shared with op-release.py, CHG-GTR-002)
 import sprint_plan as sp  # noqa: E402  (the calendar, app-modules and scheduler the plan generators share)
 import frontend_repos as fr  # noqa: E402  (the repository a screen is built in, CHG-R6-060)
+import personal_data  # noqa: E402  (the reads a privacy part makes of its own tables, CHG-R14M-001)
 import ticvai_jobs as tj  # noqa: E402  (the declared jobs, timers and consumers: one task each, CHG-R13JOB-001)
 
 try:
@@ -499,18 +500,29 @@ def prior_migration_files() -> dict[str, str]:
     # release handed the developer. The working plan-tasks.csv is this branch's last derive, which at r8 had already
     # renumbered seven first-release files on delivered tickets (MIG-KERNEL V0003 -> V0004 ...), so reading only it
     # kept the renumbering.
+    # **No release tag in a released package is an error, not "the working plan alone"** (r14, review E-05,
+    # CHG-R14I-004): a clone without tags silently read only the working plan, which is the renumbering bug
+    # CHG-R8WFM-002 fixed. Before the first release (release_baseline.released() is None) there is no last plan.
+    import subprocess as _sp
+    sys.path.insert(0, str(ROOT / "tools"))
+    from release_baseline import released as _released
     try:
-        import subprocess as _sp
         tags = _sp.run(["git", "tag", "--merged", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.split()
-        rel = max((t for t in tags if re.fullmatch(r"r\d+", t)), key=lambda t: int(t[1:]), default=None)
-        if rel:
-            top = _sp.run(["git", "rev-parse", "--show-prefix"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-            txt = _sp.run(["git", "show", f"{rel}:{top}handoff/service-docs/plan-tasks.csv"], cwd=ROOT,
-                          capture_output=True, text=True, encoding="utf-8").stdout
-            if txt:
-                read(csv.DictReader(io.StringIO(txt, newline="")))
-    except Exception:          # noqa: BLE001 -- no git or no release: the working plan alone
-        pass
+    except OSError:
+        tags = []
+    rel = max((t for t in tags if re.fullmatch(r"r\d+", t)), key=lambda t: int(t[1:]), default=None)
+    if rel:
+        top = _sp.run(["git", "rev-parse", "--show-prefix"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        got = _sp.run(["git", "show", f"{rel}:{top}handoff/service-docs/plan-tasks.csv"], cwd=ROOT,
+                      capture_output=True, text=True, encoding="utf-8")
+        if got.returncode != 0 or not got.stdout:
+            raise SystemExit(f"build-service-docs: the last release's plan ({rel}:handoff/service-docs/plan-tasks.csv) "
+                             f"cannot be read: {got.stderr.strip()[:200]}")
+        read(csv.DictReader(io.StringIO(got.stdout, newline="")))
+    elif _released(ROOT):
+        raise SystemExit(f"build-service-docs: no r* release tag in this clone, but {_released(ROOT)}: the planned "
+                         "migration numbers would be read from the working plan alone and renumber delivered "
+                         "tickets (CHG-R8WFM-002). Fetch the tags (git fetch --tags origin) and run again.")
     if p.exists():
         with p.open(encoding="utf-8", newline="") as fh:
             read(csv.DictReader(fh))
@@ -1749,9 +1761,15 @@ def main() -> int:
     # migrations with a tested ROLLBACK section (backend/MIGRATIONS.md), not writing tables anew.
     ddl = read_ddl()
     used = defaultdict(lambda: {"reads": set(), "writes": set()})
+    # **A privacy part's read of a table its module keeps brings no migration** (r13 review B-01, CHG-R14M-001): the
+    # part leaves out a table the tenant database does not have yet (personal_data.part_only_reads), so the first
+    # release migrates only what its other operations need, as before the part read every table of its module.
+    part_only = personal_data.part_only_reads(ROOT)
     for o in slice_ops:
         for k in ("reads", "writes"):
             for t in lineage[o].get(k) or []:
+                if k == "reads" and (o, t) in part_only:
+                    continue
                 used[t][k].add(o)
     not_tables = sorted(t for t in used if t not in ddl and ":" not in t)
     rel = {t for t in used if t in ddl}
@@ -1790,7 +1808,10 @@ def main() -> int:
                     rel.add(x)
                     why[x] = (f"built by {k_} as " + ", ".join(sorted(a for a, b in moved_.items() if b == x))
                               + ", before a declared move (CHG-TKT-013)")
-    frontier = list(rel)
+    # sorted, not list(rel): rel is a set of strings, and a set's order follows Python's hash seed, so the
+    # "referenced by" reason MIGRATIONS.md prints changed from run to run with no input change (review E-09,
+    # CHG-R14I-005; PYTHONHASHSEED=1 and 2 gave marketing.message_template and ai.policy for the same table).
+    frontier = sorted(rel, reverse=True)
     while frontier:
         t = frontier.pop()
         for x in sorted(ddl[t]["fks"]):
@@ -3557,6 +3578,13 @@ def main() -> int:
                name="AI engine · Block A2: the AI work moved out of A1 (" + ", ".join(
                    sorted(k.replace("AI-ENGINE-", "").lower() for k, v in ai_drop.items() if v == "A2")) + ")")
 
+    extra_screen_of = {}
+    if EXTRA.exists():
+        for e_ in json.loads(EXTRA.read_text(encoding="utf-8")).get("tasks") or []:
+            s_ = next((b_.split(" ", 1)[1] for b_ in e_.get("builds") or [] if b_.startswith("screen ")), None)
+            if s_ and e_.get("area") not in (None, "backend", "database", "devops"):
+                extra_screen_of[e_["key"]] = s_
+
     def foundation_am(k):
         if k.startswith("SETUP-"):
             return "AM-FOUNDATION-SETUP"
@@ -3585,7 +3613,12 @@ def main() -> int:
         if f_:
             am_of[k] = f_
         elif t_["track"] == "Frontend":
-            sid = key_identity(k)[1]
+            # **A hand-written [FE] task beside a screen's own ticket** (r14 plan pass, CHG-R14PL-001: CR-551's waiting-room
+            # move under GST-008) has no screen key: it lands in the app-module of the first screen its `builds` names
+            ident_ = key_identity(k)
+            sid = ident_[1] if ident_ else extra_screen_of.get(k)
+            if not sid:
+                raise SystemExit(f"block-a-extra-tasks.json {k}: a frontend task with no screen key names no screen in builds")
             mod, pf = screen_module(sid), plat_of(sid)
             if k.startswith("APP-SETUP-"):
                 am_of[k] = setup_am(sid)
@@ -3660,7 +3693,7 @@ def main() -> int:
             return "ai"
         if t_["track"] == "Frontend":
             ident = key_identity(t_["key"]) or (None, None)
-            sid = ident[1] if ident[0] == "screen" else re.sub(r"-REST$", "", t_["key"]).split("-", 2)[-1]
+            sid = ident[1] if ident[0] == "screen" else extra_screen_of.get(t_["key"]) or                 re.sub(r"-REST$", "", t_["key"]).split("-", 2)[-1]
             return sp.POOL_OF_PLATFORM.get(plat_of(sid), "web") if sid in screens else "web"
         if t_["track"] == "Onboarding":
             return "web"

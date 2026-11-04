@@ -1553,6 +1553,12 @@
        "label": "ROLLBACK TO V3.4",
        "operation": "rollbackAccessPolicy",
        "provenance": "pack Access Control Module_Reference.pdf, page 146 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Submit for approval",
+       "operation": "createApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       }
      ]
     }
@@ -1568,6 +1574,34 @@
     "confirm": {
      "operation": "rollbackAccessPolicy"
     }
+   },
+   {
+    "id": "formCreateApprovalRequest",
+    "component": "modal",
+    "trigger": "Submit for approval",
+    "body": "**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateApprovalRequest",
+    "confirm": {
+     "label": "Submit for approval",
+     "operation": "createApprovalRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "subjectContract",
+      "subjectType",
+      "subjectId",
+      "scopePath",
+      "summary",
+      "amount",
+      "attributes",
+      "justification",
+      "isDraft"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /approval-requests; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "states": {

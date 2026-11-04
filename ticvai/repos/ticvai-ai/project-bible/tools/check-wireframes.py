@@ -218,16 +218,17 @@ def check_unmatched_boards(referenced: set) -> None:
 
 def main() -> int:
     referenced: set = set()
-    if not BOARDS.exists():
-        print("no wireframes directory — nothing to check")
-        return 0
+    if not BOARDS.exists() or not any(BOARDS.glob("*.html")):
+        # A missing input is a failure, not "nothing to check" (r14, review E-07, CHG-R14I-007).
+        print("FAIL - no wireframe boards (wireframes/*.html): the boards are not judged")
+        return 1
 
     files = {f.name: f for f in BOARDS.glob("*.html")}
     # **Case- and element-agnostic.** The pattern was `<div id="[a-z0-9-]+"` — lowercase, and only
     # on a div. The Kiosk pack arrived 31 August anchoring on `KSK-001` in uppercase, and every one
     # of its nine frames read as a click that does nothing. **The board was right and the check was
     # wrong**, which is the worse of the two failures because it sends somebody to fix a good file.
-    anchors = {n: set(re.findall(r'(?<![-\\w])id="([A-Za-z0-9_-]+)"', f.read_text(errors="replace")))
+    anchors = {n: set(re.findall(r'(?<![-\\w])id="([A-Za-z0-9_-]+)"', f.read_text(encoding="utf-8", errors="replace")))
                for n, f in files.items()}
     screen_anchors = {n: {a.upper() for a in v if re.fullmatch(r"[a-z]{2,5}-\d{3,4}", a)}
                       for n, v in anchors.items()}
@@ -327,7 +328,7 @@ def main() -> int:
     # 4. hrefs across every board
     n_href = 0
     for n, f in files.items():
-        text = f.read_text(errors="replace")
+        text = f.read_text(encoding="utf-8", errors="replace")
         for href in re.findall(r'href="([^"]+)"', text):
             if href.startswith(("http", "mailto")):
                 continue

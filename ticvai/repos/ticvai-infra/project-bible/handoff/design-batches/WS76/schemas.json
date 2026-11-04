@@ -198,7 +198,8 @@
    "filename",
    "validTo",
    "isExpired",
-   "isInUse"
+   "isInUse",
+   "liveUsageCount"
   ],
   "properties": {
    "assetId": {
@@ -210,21 +211,25 @@
    },
    "thumbnailUrl": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "Null when the asset has none (ADAM CR-573)."
    },
    "licensor": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "Null when the asset has none (ADAM CR-573)."
    },
    "validTo": {
     "type": "string",
     "format": "date"
    },
    "daysRemaining": {
-    "type": "integer"
+    "type": "integer",
+    "description": "`validTo` minus today (UTC) in whole days, 0 on the last day; left out for an expired asset (ADAM CR-573)."
    },
    "isExpired": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "True exactly when `validTo` is earlier than today in UTC, worked out from `validTo` on every read, never a stored flag (ADAM CR-573)."
    },
    "isInUse": {
     "type": "boolean",
@@ -232,7 +237,7 @@
    },
    "liveUsageCount": {
     "type": "integer",
-    "description": "References from live (published) content only (audit R106 (10)). Expired and live is the combination that matters."
+    "description": "References from live (published) content only (audit R106 (10)). Expired and live is the combination that matters. The number of `assets.media_usage` rows for the asset with `is_live` true; always sent, 0 when there are none (ADAM CR-573)."
    }
   }
  },
@@ -675,6 +680,14 @@
    "expiresAt"
   ],
   "properties": {
+   "recipientSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "contact",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The recipient, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `recipientEmail` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person's subject where the caller names one, else a new pii.subject of kind contact; null while none is given."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -687,6 +700,11 @@
     }
    },
    "recipientEmail": {
+    "x-ticvai-pii": {
+     "store": "contact.email",
+     "subject": "recipientSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },

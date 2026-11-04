@@ -3506,6 +3506,7 @@ screens:
       crossesDevice: true
       back: false
       carries:
+      - productId
       - variantId
   notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived

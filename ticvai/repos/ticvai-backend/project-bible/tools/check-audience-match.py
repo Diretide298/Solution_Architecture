@@ -28,6 +28,11 @@ The kiosk (P05) runs on a registered device, so `device` operations are its own.
                     neither `x-ticvai-guest-callable` (a guest may call it: published data, or their own
                     session) nor `x-ticvai-self-scoped` (it answers only for the caller). A guest holds no
                     permission, so nothing says what the guest is allowed or what they get back.
+                    **Guest-callable no longer answers for somebody's object** (r13 system review C-03,
+                    CHG-R14H-003): an operation addressed by a path id that names somebody's object
+                    (audit_guard.private_path_ids) passes only with `x-ticvai-self-scoped` or
+                    `x-ticvai-object-owner`, which say whose object a guest may name; `x-ticvai-guest-callable`
+                    (published data, or a purchase within the guest's own session) does not.
 
     AM-TICKET-OP    a feature ticket of an app lists (builds) an operation whose audience that app may not call:
                     a staff operation on a guest app's ticket, a guest-only one on a staff app's (14 October 2026,
@@ -68,7 +73,7 @@ RULES = {
     "AM-STAFF-OP": "staff screen binds an operation staff may not call",
     "AM-GUEST-SECURITY": "operation declares a guest audience its security lets no guest call",
     "AM-GUEST-PERMISSION": "guest screen binds a staff-permission operation that is neither guest-callable "
-                           "nor self-scoped",
+                           "(on published or its own session's data) nor self-scoped nor owned (CHG-R14H-003)",
     "AM-TICKET-OP": "an app's feature ticket lists an operation that app's audience may not call (#27741, "
                     "CHG-SWP-002)",
 }
@@ -123,14 +128,17 @@ def main() -> int:
                 if aud == "guest":
                     x = ops[op]["op"]
                     perms = staff_permissions(x)
-                    if perms and not x.get("x-ticvai-guest-callable") and not x.get("x-ticvai-self-scoped"):
+                    owned = x.get("x-ticvai-self-scoped") or x.get("x-ticvai-object-owner") is not None
+                    callable_ok = x.get("x-ticvai-guest-callable") and not g.private_path_ids(ops[op]["path"])
+                    if perms and not callable_ok and not owned:
                         why = GUEST_PERMISSION_EXEMPT.get((sid, op)) or GUEST_PERMISSION_EXEMPT.get(("*", op))
                         if why:
                             exempted.append(f"{sid}:{op} ({why})")
                         else:
                             guard.add("AM-GUEST-PERMISSION", f"{sid}:{op}",
                                       f"{code} {sid} {s.get('name', '')[:40]}: {op} ({where}) needs "
-                                      f"{', '.join(sorted(perms))} and is neither guest-callable nor self-scoped")
+                                      f"{', '.join(sorted(perms))} and is neither guest-callable (on published "
+                                      f"or its own session's data) nor self-scoped nor owned (x-ticvai-object-owner)")
                             per_screen[(code, sid)] += 1
                 continue
             rule = "AM-GUEST-OP" if aud == "guest" else "AM-STAFF-OP"

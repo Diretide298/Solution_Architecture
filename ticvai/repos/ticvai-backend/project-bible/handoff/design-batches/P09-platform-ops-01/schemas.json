@@ -167,6 +167,7 @@
     "readOnly": true
    },
    "requestedBy": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "readOnly": true,

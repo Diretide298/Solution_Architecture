@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 470 operations, 145 tables
+title: CatalogueService — 475 operations, 145 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -16,9 +16,9 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 470
+  operations: 475
   inAFlow: 239
-  percent: 51%
+  percent: 50%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -44,7 +44,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 269
+  count: 274
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -109,7 +109,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 7
-    writes: 5
+    writes: 4
   - operation: bulkUpdateCatalogueProducts
     verb: POST
     path: /products/bulk-update
@@ -358,6 +358,38 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: getChannelFeePayment
+    verb: GET
+    path: /channel-fee-payment
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getChannelPricingCommercial
+    verb: GET
+    path: /channel-pricing-commercial
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getChannelProfile
+    verb: GET
+    path: /channel-profile
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getChannelReadinessValidation
+    verb: GET
+    path: /channel-readiness-validation
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getDynamicPriceRule
     verb: GET
     path: /pricing/dynamic-rules/{ruleId}
@@ -469,6 +501,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: getProductCatalogue
+    verb: GET
+    path: /product-catalogue
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: getProductChannelTexts
     verb: GET
@@ -1893,7 +1933,7 @@ operationsByContract:
     permission: PRICE_CONFIGURE
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: setPricing
     verb: PUT
     path: /pricing-2
@@ -2172,7 +2212,7 @@ operationsByContract:
     scope: venue
     permission: PERFORMANCE_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: updatePriceList
     verb: PATCH
@@ -2375,7 +2415,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 4
+    reads: 6
     writes: 0
   - operation: getGuestCouponCode
     verb: GET
@@ -4240,6 +4280,7 @@ tables:
     setPrices:
       role: evicts
       resolvers: &id001
+      - catalogue.audit_entry
       - price-list
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: INCR resver:{tenantId}:{resolver}
@@ -4264,6 +4305,7 @@ tables:
     listPrices:
       role: fills
       resolvers:
+      - catalogue.audit_entry
       - price-list
       key: res:{tenantId}:{resolver}:{scopePath}
       bump: null
@@ -4585,7 +4627,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.performance
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -4734,7 +4776,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product
-  columns: 52
+  columns: 53
   store: postgres
   parent: null
   writtenBy:
@@ -4905,7 +4947,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.waitlist_entry
-  columns: 11
+  columns: 10
   store: postgres
   parent: null
   writtenBy:

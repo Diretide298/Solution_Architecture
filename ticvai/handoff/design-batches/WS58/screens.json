@@ -4,7 +4,7 @@
   "name": "Channel Operations Command Center",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
@@ -304,7 +304,7 @@
   "name": "Channel Connection & Integration Manager",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",

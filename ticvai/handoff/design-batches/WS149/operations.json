@@ -278,7 +278,7 @@
  },
  "testPaymentProviderConnection": {
   "method": "POST",
-  "path": "/payment-providers/{connectionId}/test",
+  "path": "/payment-provider-connections/{connectionId}/test",
   "contract": "payments",
   "summary": "Prove the connection works before anybody pays through it",
   "permission": "PAYMENT_PROVIDER_MANAGE",

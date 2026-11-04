@@ -1,3 +1,5 @@
+<!-- Written by tools/derive-mirrors.py from ticvai/docs/repos/rules/contracts.md: edit that file, not this one. -->
+
 # Contract Rules
 
 **Spec-first, never code-first.** Specs are hand-authored; servers and clients are generated.
@@ -36,7 +38,7 @@ Redocly rejects any operation missing the first four.
 Money `{amount: string, currency, scale}` — never a float, never fixed 2dp ·
 `ScopeRef` with level, id and ltree path · errors RFC 9457 with enumerated `type` ·
 **cursor pagination, never offset** — offset drifts under concurrent writes ·
-ULID for edge-created entities, UUID for configuration.
+UUIDv7 for every id, edge-created or not, minted by the application (ADR-0056; never generated in SQL).
 
 ## Versioning
 

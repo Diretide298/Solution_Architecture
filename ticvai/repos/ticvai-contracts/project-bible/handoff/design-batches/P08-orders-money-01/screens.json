@@ -23,9 +23,10 @@
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
+      "productId",
       "variantId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-022 holds variantId, so an edge into it carries them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-022 holds productId, variantId, so an edge into it carries them"
     }
    ]
   },
@@ -730,9 +731,10 @@
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
+      "productId",
       "variantId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-023 holds variantId, so an edge into it carries them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-023 holds productId, variantId, so an edge into it carries them"
     }
    ],
    "entryFrom": [
@@ -1937,10 +1939,11 @@
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
+      "productId",
       "variantId",
       "version"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-026 holds variantId, version, so an edge into it carries them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-026 holds productId, variantId, version, so an edge into it carries them"
     }
    ]
   },
@@ -2693,9 +2696,10 @@
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
+      "productId",
       "variantId"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-027 holds variantId, so an edge into it carries them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-027 holds productId, variantId, so an edge into it carries them"
     }
    ]
   },

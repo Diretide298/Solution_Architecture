@@ -61,7 +61,7 @@
    "scopePath": {
     "type": "string",
     "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Operations write it at `outlet` scope."
+    "description": "**The partition key** (ADR-0005). Operations write it at `outlet` scope, which means: the server writes the scope path of the venue the outlet belongs to (its venue's `platform.scope` node), on every write and never from a request, as `DiningTable.scopePath` does; outlets have no scope node of their own (ADAM CR-561, Chinmay, 3 November 2026)."
    }
   }
  },
@@ -376,6 +376,10 @@
    },
    "lines": {
     "type": "array",
+    "x-ticvai-item-checks": [
+     "status"
+    ],
+    "description": "**A line's `status` is its kitchen lifecycle** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): `FnbOrderStatus`'s nine values, held by a check on `fnb.service_order_line.status`, nullable. `createFnbOrder` and `amendFnbOrder` write `ordered` on each new line, and a null status reads as `ordered`. Paid, voided and comped are not statuses: voided is `cancelled` or `refunded`, paid is read from the service order and the sub-bills, and comped from `compedAt` (`transferOrderItems`).",
     "items": {
      "allOf": [
       {
@@ -392,6 +396,26 @@
         },
         "lineTotal": {
          "$ref": "../shared/common.yaml#/components/schemas/Money"
+        },
+        "compedAt": {
+         "type": "string",
+         "format": "date-time",
+         "nullable": true,
+         "readOnly": true,
+         "description": "**When the line was comped** (ADAM CR-594; CHG-CR594-001): set by `compItem` with `compReason` and `compedByPrincipalId`; null on a line never comped. A line with `compedAt` set is comped and is not transferable."
+        },
+        "compReason": {
+         "type": "string",
+         "nullable": true,
+         "readOnly": true,
+         "description": "The reason `compItem` took, one of its reasons (qualityIssue, wait, wrongItem, allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line never comped. The note an `other` reason requires stays on the comp's write to Orders."
+        },
+        "compedByPrincipalId": {
+         "type": "string",
+         "format": "uuid",
+         "nullable": true,
+         "readOnly": true,
+         "description": "Who comped the line, the caller of `compItem` (ADAM CR-594); null on a line never comped."
         }
        }
       }
@@ -1134,6 +1158,7 @@
     "type": "string"
    },
    "guestName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },

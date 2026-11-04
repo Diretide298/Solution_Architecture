@@ -57,13 +57,13 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 832
+  operationCalls: 840
 - service: VenueOpsService
   operationCalls: 532
 - service: TenancyService
-  operationCalls: 490
+  operationCalls: 495
 - service: OrderService
-  operationCalls: 423
+  operationCalls: 424
 - service: AccessService
   operationCalls: 298
 - service: MarketingService
@@ -83,7 +83,7 @@ servicesCalled:
 - service: InventoryService
   operationCalls: 82
 - service: IdentityService
-  operationCalls: 67
+  operationCalls: 66
 - service: WhiteLabelService
   operationCalls: 23
 - service: RetailService
@@ -2882,7 +2882,7 @@ screens:
   name: Approval Delegations
   module: People & Access Rights
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createApprovalDelegation
@@ -8361,7 +8361,7 @@ screens:
   name: Membership Commercial, Pricing & Channel Association
   module: Sell
   requiresModule: membership
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getChannelAvailability
@@ -9599,7 +9599,7 @@ screens:
   name: Media Design Studio Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - archiveMediaTemplate
@@ -13048,7 +13048,6 @@ screens:
   density: compact
   operations:
   - getWallet
-  - topUpWallet
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -16683,6 +16682,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listApprovalMatrices
   - setApprovalMatrix
   states:
   - emptyFirstRun
@@ -24419,7 +24419,7 @@ screens:
   name: Venue Canvas
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createSeatMap
@@ -26006,7 +26006,7 @@ screens:
   name: Accessible Seating Master
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getAccessibleSeating
@@ -26390,7 +26390,7 @@ screens:
   name: Best Seat Recommendations
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getSeatRecommendationRules
@@ -26743,6 +26743,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listEvents
+  - listProductVariants
+  - listProducts
   - simulatePriceBreakdownCalculation
   states:
   - emptyFirstRun
@@ -26751,7 +26754,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - productId<-navigation
   goesTo:
   - BO-1043
   boardFrames: null
@@ -29922,9 +29926,10 @@ screens:
   name: Integration Monitoring & Exception Workbench
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - getWalletIntegrationMapping
   - listApiClients
   - listWalletDisputes
   - listWebhookSubscriptions
@@ -30144,7 +30149,7 @@ screens:
   name: Transport Departure Board
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - cancelPerformance
@@ -30833,7 +30838,7 @@ screens:
   name: Fee & Surcharge Library
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listFeeSurcharge
@@ -31235,7 +31240,7 @@ screens:
   name: Dynamic Pricing Strategy Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listDynamicPricingStrategy
@@ -31715,7 +31720,7 @@ screens:
   name: Revenue Optimization Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listRevenue
@@ -35261,10 +35266,11 @@ screens:
   name: Channel Creation & Profile Configuration
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createChannelProfile
+  - getChannelProfile
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -35282,9 +35288,10 @@ screens:
   name: Product & Catalogue Assignment
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - getProductCatalogue
   - setProductCatalogue
   states:
   - emptyFirstRun
@@ -35304,9 +35311,10 @@ screens:
   name: Channel Pricing & Commercial Profile Assignment
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - getChannelPricingCommercial
   - setChannelPricingCommercial
   states:
   - emptyFirstRun
@@ -35348,7 +35356,7 @@ screens:
   name: Channel Sales Schedule & Availability Windows
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listChannelSaleSchedule
@@ -35418,9 +35426,10 @@ screens:
   name: Channel Fees, Payment & Fulfillment Configuration
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - getChannelFeePayment
   - setChannelFeePayment
   states:
   - emptyFirstRun
@@ -35439,9 +35448,10 @@ screens:
   name: Channel Publication, Readiness & AI Validation
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - getChannelReadinessValidation
   - publishChannelReadinessValidation
   states:
   - emptyFirstRun
@@ -35460,7 +35470,7 @@ screens:
   name: Channel Operations Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listChannel
@@ -35491,7 +35501,7 @@ screens:
   name: Channel Connection & Integration Manager
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listChannelConnectionIntegration
@@ -37775,10 +37785,11 @@ screens:
   name: Partial Payment, Failure & Recovery Manager
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getDunningPolicy
+  - getMixedTenderRules
   - listDunningCases
   - resolveDunningCase
   - setDunningPolicy
@@ -40516,6 +40527,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listApprovalMatrices
   - setApprovalMatrix
   states:
   - emptyFirstRun
@@ -40561,6 +40573,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listApprovalMatrices
   - setApprovalMatrix
   states:
   - emptyFirstRun
@@ -40584,6 +40597,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listApprovalMatrices
   - setApprovalMatrix
   states:
   - emptyFirstRun
@@ -40607,6 +40621,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listApprovalMatrices
   - setApprovalMatrix
   states:
   - emptyFirstRun
@@ -40777,7 +40792,6 @@ screens:
   operations:
   - getGuestVerificationPolicy
   - getPasswordPolicy
-  - listMfaMethods
   - listStepUpPolicies
   - setGuestVerificationPolicy
   - setPasswordPolicy

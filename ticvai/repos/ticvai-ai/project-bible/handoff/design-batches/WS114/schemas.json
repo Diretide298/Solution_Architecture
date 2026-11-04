@@ -191,6 +191,7 @@
     "format": "uuid"
    },
    "subjectId": {
+    "x-ticvai-subject-kind": "applicant",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -199,6 +200,11 @@
     "type": "string"
    },
    "fullName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "photoAssetId": {
@@ -207,21 +213,41 @@
     "nullable": true
    },
    "dateOfBirth": {
+    "x-ticvai-pii": {
+     "store": "subject.dateOfBirth",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "date",
     "nullable": true
    },
    "nationality": {
+    "x-ticvai-pii": {
+     "store": "subject.nationality",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-pii": {
+     "store": "contact.email",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email",
     "nullable": true,
     "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
    },
    "phone": {
+    "x-ticvai-pii": {
+     "store": "contact.phone",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "12.1.16. E.164"

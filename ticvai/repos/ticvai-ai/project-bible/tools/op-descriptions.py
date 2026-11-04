@@ -378,7 +378,7 @@ def build(schedule, keys):
                 kinds.add("guest")
             if isinstance(o.get("security"), list) and not o["security"]:
                 kinds.add("public")
-            elif o.get("x-ticvai-self-scoped"):
+            elif o.get("x-ticvai-self-scoped") or o.get("x-ticvai-object-owner") is not None:
                 kinds.add("self")
             elif o.get("x-ticvai-permission") and (not aud or any(x in HOLDS_PERMISSION for x in aud)):
                 kinds.add("perm")
@@ -394,7 +394,10 @@ def build(schedule, keys):
             parts.append("a signed-in guest succeeds without any permission, and another guest's id gets 404 "
                          "(`not-found`: outside the caller's scope)")
         if "self" in kinds:
-            parts.append("another caller's id gets 403 on self-scoped operations")
+            # 404, never 403: a self-scoped or owned operation answers another caller's record exactly as one that
+            # does not exist (contracts/README.md, CHG-GCF-002; r13 system review C-03, CHG-R14H-003)
+            parts.append("another caller's id gets 404 on self-scoped and owned operations, exactly as an id that "
+                         "does not exist")
         if "public" in kinds:
             parts.append("public operations need no credential")
         return "- [ ] Access: " + "; ".join(parts) + ", each with a test"

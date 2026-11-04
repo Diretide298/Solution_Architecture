@@ -1,6 +1,6 @@
 # ADR-0071: Passwords and PINs are stored as Argon2id PHC strings; a PIN also takes a Key Vault pepper
 
-**Status:** Accepted · 14 October 2026 · Chinmay Parab (the r6 settlement of ADAM CR-078: "fix all nine, plus the class each belongs to")
+**Status:** Accepted · 14 October 2026 · Chinmay Parab (the r6 settlement of ADAM CR-078: "fix all nine, plus the class each belongs to") · **amended 3 November 2026**: the offline step-up verifier ([below](#amendment--3-november-2026-the-offline-step-up-verifier-the-one-unpeppered-pin-hash-and-why-it-is-allowed-chinmay-chg-r14v-001))
 **Date:** 2026-10-14 · **Deciders:** Chinmay Parab
 **Source:** ADAM CR-078 (ticket 27750, `identity.principal_credential` held only `id` and `principal_id`); change entries CHG-CRD-001 (the staff credential), CHG-CRD-002 (the tenant's PIN settings), CHG-CRD-003 (this ADR); CHG-FXC-003 (the guest credential of 4 October, which said "Argon2id, with its parameters" and had no ADR behind it)
 **Related:** ADR-0004 (IdentityService issues the JWT; one session per user) · ADR-0063 (encryption and keys; Key Vault) · ADR-0047 (retention and erasure) · ADR-0055 (as amended 14 October 2026: a rule question is asked of its owner by a declared query) · audit R126 (password floor, lockout), R132 (reuse prevention), R123 (7) (a supervisor step-up is a PIN, never a password)
@@ -103,3 +103,48 @@ destination has to be read to send it, so neither can be a one-way Argon2id hash
 ADR-0063), write-only and never returned (`maskedTarget` is the only form of a destination a client sees). The one-time
 codes themselves stay hashes under this ADR: an enrolment code is an `identity.mfa_challenge` row with `action` `enrol`
 and its `codeHash`, so `identity.mfa_method` holds no code.
+---
+
+## Amendment — 3 November 2026: the offline step-up verifier, the one unpeppered PIN hash, and why it is allowed (Chinmay, CHG-R14V-001)
+
+**Decided by Chinmay, 3 November 2026, on system review finding F-01: "Offline verifier" (the till keeps a verifier,
+re-checked at sync); ADR-0013 amendment of the same date.** A till with no connection must check a supervisor's PIN
+itself, and point 3 above (a PIN is peppered with a Key Vault secret the database never holds) cannot hold on a
+device: the device would need the pepper. **The exception, and its limits:**
+
+1. **The offline verifier is an Argon2id PHC string over the PIN with its own 16-byte salt and point 1's parameters,
+   with no pepper.** It is a second hash of the PIN, never the PIN and never the peppered `credential_hash`.
+2. **On the server it is never stored in the clear**: `identity.offline_pin_verifier.verifier_hash` is encrypted
+   with the tenant's field key (`x-ticvai-secret: field-encrypted`, ADR-0063), as an MFA secret is (the section
+   above), so a copy of the table without the key yields nothing, which is what point 3 protects.
+3. **It is minted only where Identity has just checked the PIN** (a correct `pin` sign-in, a correct online
+   step-up, a new PIN), so the PIN is never kept to mint one later; it expires 30 days after minting and stops
+   counting at once when the PIN is changed, reset or locked.
+4. **It reaches only a registered device of the venue** (`getOfflineStepUpPackage` under `deviceAuth`), for at most
+   24 hours, held in the device's encrypted local store and replaced whole at each sync.
+5. **It never decides alone**: every step-up checked offline is checked again by the server at sync against the
+   peppered credential in force at the act's time (ADR-0013 amendment, point 4).
+
+The residual risk is the one ADR-0013's amendment states: a stolen, unlocked till's verifiers can be brute-forced,
+for that venue's signers, within their 24 hours. **Open: a security review of the device store and the package**
+(the one CHG-R8SPN-027 named for offline sign-in), before the first venue trades offline with it.
+
+## Amendment, 3 November 2026: a registered workstation is proven by its device credential
+
+**Decided by Chinmay, 3 November 2026** ("All four, one release", on the r13 system review's triage; review
+finding C-04; CHG-R14H-001). Point 6 says a PIN "is valid only on a registered workstation", and `login` said the
+device is what bounds a PIN; but the workstation was a `workstationId` the caller typed into the body, and the
+session-less supervisor step-up on the till (`listActiveSessions`, `forceLogout`) admitted a call with no credential
+at all. Anyone who learned a workstation id could try PINs from the internet, list who was signed in, end sessions
+and lock every supervisor's PIN at will (point 5's lockout used as denial of service).
+
+**The workstation is proven, never named.** A device door (the till, the shared handheld, the scanner) calls with
+`deviceAuth` (`contracts/shared/common.yaml`): the credential `enrolDevice` issued to the device it runs on, a
+`workstationTerminal` for a till or kiosk computer and the device's own `handheldScanner` credential for a handheld.
+The workstation is the one that device is bound to; a `workstationId` in the request that is not it is `403
+workstation-mismatch`, and one sent without `deviceAuth` is `401 device-unauthenticated`. Both are answered before any
+PIN or password is checked, so neither spends an attempt nor moves a lockout. A device-bound method (`pin`, `card`,
+`rfid`) without `deviceAuth` is `400 workstation-required`. An operation that takes its workstation this way says so
+with `x-ticvai-workstation-from: device`, and lists the device kinds it accepts in `x-ticvai-device-kinds`; a session-less
+step-up is never admitted by `{}`. `tools/check-doors.py` (D-DEVICE-DOOR, D-DEVICE-KINDS) fails an operation that names a
+workstation with no session and does not authenticate the device, or a device-reachable operation that lists no kinds.

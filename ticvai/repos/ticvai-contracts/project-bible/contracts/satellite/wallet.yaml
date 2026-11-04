@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 63
+  x-ticvai-hosts: [cell]
+  x-ticvai-screen-count: 64
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -64,7 +65,10 @@ info:
 
     '
 servers:
-- url: https://api.ticvai.com/v1
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 # **The rule questions Wallet answers for other modules** (ADR-0055 amendment, 14 October 2026; the r6 shared
@@ -202,6 +206,15 @@ x-ticvai-jobs:
     writes: [wallet.gift_card]
     for: Wallet hold sweeper and card expiry timers.
     source: ['contracts/satellite/wallet.yaml', 'states/game-card.yaml:31', 'states/gift-card.yaml:58']
+  subjectDataPart:
+    module: wallet
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [wallet.auto_reload_setting, wallet.gift_card, wallet.shared_wallet_member, wallet.wallet, wallet.wallet_transaction]
+    writes: []
+    for: 'wallet''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /wallet-types:
     get:
@@ -1196,6 +1209,7 @@ paths:
       - wallet
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -1217,6 +1231,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/SharedWalletMember'
       responses:
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
@@ -2282,6 +2298,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -2538,7 +2555,6 @@ paths:
       operationId: topUpWallet
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
-        - "P08 BO-488 Self-Service Wallet Top-Up"
       x-ticvai-names-for-context: [platform.scope]
       x-ticvai-read-via:
       - query: orders#paymentRecords
@@ -2681,7 +2697,12 @@ paths:
               properties:
                 id: { type: string, format: uuid }
                 amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-                tender: { type: string }
+                tender:
+                  type: string
+                  x-ticvai-persisted: false
+                  description: The receipt's label for how the sale was paid, as the description says ("`tender` stays
+                    the receipt's label"). Wallet does not store it; the payment itself is kept as the lot's
+                    `source_reference` (`paymentId`) (r14 gate, CHG-R14BO-002).
                 orderLineId:
                   type: string
                   format: uuid
@@ -2709,7 +2730,9 @@ paths:
                     applying `bonusRules` entry's `bonusAmount`, or its `bonusPercent` of `amount`.
                     Any other value, or a bonus when no rule applies, is `422 bonus-not-applicable`
                     and nothing is credited. It is credited as a lot of that rule's
-                    `bonusCreditTypeId`.
+                    `bonusCreditTypeId`: stored as that bonus lot's `issued_amount` (source_kind `promotion`;
+                    r14 gate, CHG-R14BO-002).
+                  x-ticvai-stored-as: wallet.credit_lot.issued_amount
                 recordedAt: { type: string, format: date-time }
       responses:
         '201':
@@ -2941,6 +2964,7 @@ paths:
     parameters:
       - name: cardCode
         in: path
+        x-ticvai-secret: bearer
         required: true
         schema: { type: string }
     get:
@@ -2992,6 +3016,7 @@ paths:
     parameters:
       - name: cardCode
         in: path
+        x-ticvai-secret: bearer
         required: true
         schema: { type: string }
     post:
@@ -3171,6 +3196,7 @@ paths:
     parameters:
     - name: cardCode
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -3299,6 +3325,7 @@ paths:
     parameters:
     - name: cardCode
       in: path
+      x-ticvai-secret: bearer
       required: true
       schema:
         type: string
@@ -4062,6 +4089,43 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-integration-mappings:
+    get:
+      operationId: getWalletIntegrationMapping
+      x-ticvai-consumed-by:
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+      x-ticvai-audience:
+        - staff
+      summary: How one integration's fields, currencies, statuses and credit types map, as saved
+      description: '**The read of what `setWalletIntegrationMapping` saves** (r14, CHG-R14I-013; the lead, 3 November 2026: "Add the six
+        reads"). The screen that edits it opens on the saved record: BO-1179''s Correct mapping opens on the mapping it corrects. One record per `apiClientId` within the caller''s
+        tenant, the same key the write takes in its body; an `apiClientId` with nothing saved yet is `404 not-found`, and the
+        screen opens empty for a first save.'
+      tags:
+        - drafted
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: apiClientId
+          in: query
+          required: true
+          description: The `public-api` client the integration authenticates as.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: How one integration's fields, currencies, statuses and credit types map, as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletIntegrationMapping'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletIntegrationMapping
       x-ticvai-consumed-by:
@@ -4257,6 +4321,7 @@ paths:
       - wallet
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -4315,6 +4380,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
@@ -4355,6 +4421,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
@@ -4422,6 +4489,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: primary
@@ -4474,6 +4542,7 @@ paths:
       tags: [retail]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience: [staff, guest]
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6661,7 +6730,10 @@ components:
           type: string
           description: Required for physical cards, which are pre-printed. Generated for digital.
         faceValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        recipientEmail: { type: string, nullable: true }
+        recipientEmail:
+          x-ticvai-data-class: personal
+          type: string
+          nullable: true
         recipientPhone: { type: string, nullable: true }
         message: { type: string, maxLength: 500 }
         validMonths: { type: integer, minimum: 1 }

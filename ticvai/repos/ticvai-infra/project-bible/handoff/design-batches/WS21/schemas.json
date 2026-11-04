@@ -295,11 +295,13 @@
     "description": "Estimated annual business value."
    },
    "contactName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Applicant contact name."
    },
    "contactEmail": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email",
     "description": "Applicant contact email."
@@ -927,12 +929,14 @@
     "description": "Department."
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email",
     "nullable": true,
     "description": "Email."
    },
    "mobile": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Mobile."
@@ -1043,11 +1047,13 @@
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "format": "email",
     "nullable": true
    },
    "mobile": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -1100,11 +1106,13 @@
     "description": "Department"
    },
    "email": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Email",
     "format": "email"
    },
    "mobile": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Mobile"
    },
@@ -1209,6 +1217,7 @@
     "description": "Document Type code from the configurable list, seeded with tradeLicence, taxVatCertificate, commercialRegistration, bankDetails, insurance, signedAgreement, nda, apiAgreement, complianceDocument, authorizedSignatoryId, other"
    },
    "documentNumber": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Document Number"
    },
@@ -1528,6 +1537,7 @@
     "description": "Estimated annual business value"
    },
    "contactName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Applicant contact name"
    },
@@ -1579,6 +1589,7 @@
     "nullable": true
    },
    "contactEmail": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Applicant contact email",
     "format": "email"
@@ -2317,7 +2328,7 @@
    },
    "cellName": {
     "type": "string",
-    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
+    "description": "The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes ADR-0014): the host fills it from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the host's configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513, CHG-CR513-001); optional, for diagnostics only.\n"
    },
    "deploymentProfile": {
     "type": "string",

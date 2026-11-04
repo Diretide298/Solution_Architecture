@@ -483,8 +483,15 @@ operations:
   reads:
   - cache:idempotency
   writes:
+  - ai.activity
+  - ai.answer_feedback
   - ai.chunk_embedding
+  - ai.conversation
   - ai.index_entry
+  - ai.message
+  - ai.rec_decision
+  - ai.rec_decline
+  - ai.rec_event
   - cache:idempotency
 - operation: evaluateAiGovernance
   verb: POST

@@ -253,6 +253,7 @@
     "description": "The guest's `subjectId`."
    },
    "customerName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Null unless the caller holds GUEST_VIEW_PII."
@@ -295,10 +296,12 @@
     "description": "Masked (e.g. `j***@example.com`, `+971 ** *** 4821`) unless the caller holds GUEST_VIEW_PII.",
     "properties": {
      "email": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "nullable": true
      },
      "phone": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "nullable": true
      }
@@ -712,6 +715,7 @@
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "subjectId": {
+    "x-ticvai-subject-kind": "guest",
     "x-ticvai-data-class": "behavioural",
     "x-ticvai-unique": "tenant",
     "type": "string",
@@ -719,21 +723,37 @@
     "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n**One profile per guest** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): unique in the tenant, so `getMyProfile` and `updateMyProfile` read and write the one row of the session's subject. The profile's segment is the one it was first captured in.\n"
    },
    "displayName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "email": {
+    "x-ticvai-pii": {
+     "store": "contact.email",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "phone": {
+    "x-ticvai-pii": {
+     "store": "contact.phone",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
    "preferredLanguage": {
+    "x-ticvai-pii": {
+     "store": "subject.preferredLanguage",
+     "subject": "subjectId"
+    },
     "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true

@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Digital Media Library
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 26
   x-ticvai-tier: satellite
   x-ticvai-module: "23 — Digital Asset Management"
@@ -86,10 +87,10 @@ info:
       through the API.
 
 servers:
-  - url: https://{cellHost}/api/v1
-    variables:
-      cellHost:
-        default: cell.ticvai.local
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 
 security:
   - bearerAuth: []
@@ -213,6 +214,15 @@ x-ticvai-jobs:
     - contracts/satellite/assets.yaml
     - contracts/satellite/assets.yaml
     - states/media.yaml:17
+  subjectDataPart:
+    module: assets
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [assets.guest_upload, assets.share]
+    writes: []
+    for: 'assets''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /media:
     get:
@@ -953,6 +963,32 @@ paths:
         an asset counts as in use only while a published page, block, menu or other content that
         is live references it. A reference from a draft, an archived item or a collection does
         not count, so an expired asset only a draft uses sorts with the unused ones.
+
+
+        **The readings, with their edges** (ADAM CR-573, Chinmay, 3 November 2026: the readings as built
+        stand; CHG-CR573-001). **Which assets:** an asset is listed when its rights have a `validTo` and
+        either the licence has ended (`validTo` earlier than today) or it ends within the window (`validTo`
+        from today up to and including today plus `withinDays`). Today is the current date in UTC. A
+        licence is valid through its `validTo` day, so an asset whose `validTo` is today is expiring, not
+        expired. An asset with no rights or no `validTo` is never listed. Expired assets are listed however
+        long ago they expired. Every status is listed (processing, ready, quarantined, failed, archived),
+        as `searchMedia` returns every status. **`withinDays`:** a whole number, 0 or more, default 60, no
+        upper bound; 0 lists the expired assets and those ending today. A negative or non-whole value is
+        refused with the service's usual `400` for a bad query parameter. A value whose end date would pass
+        the last date the calendar can hold lists every dated asset instead of failing. **Fields:**
+        `isExpired` is true exactly when `validTo` is earlier than today in UTC, worked out from `validTo` on
+        every read (not taken from a stored flag), so it always agrees with the date shown. `daysRemaining`
+        is `validTo` minus today in whole days (0 on the last day) and is left out for an expired asset.
+        `liveUsageCount` is the number of `assets.media_usage` rows for the asset with `is_live` true,
+        always sent, 0 when there are none; `isInUse` is `liveUsageCount` above zero. References from
+        drafts, archived items and collections do not count. `thumbnailUrl` and `licensor` are null when
+        the asset has none. **Order, total:** expired and in use; expired and not in use; expiring and in
+        use; expiring and not in use. Within each group, `validTo` earliest first, then `assetId`. **The
+        answer is a plain array with no paging:** every matching asset in this order, never a first 50.
+        **Dependency:** nothing writes `assets.media_usage` yet, so until something does every asset reads
+        as not in use (`liveUsageCount` 0, `isInUse` false) and the list falls to expired, then expiring.
+        That is correct behaviour, not a defect. The Media Library, DAM Governance & Rights Command Center,
+        Rights Expiry, Renewal & Usage Impact and Governance Risk screens show these fields unchanged.
       tags: [rights]
       x-ticvai-permission: ASSET_LIBRARY_VIEW
       x-ticvai-scope-level: venue
@@ -961,8 +997,11 @@ paths:
       parameters:
         - name: withinDays
           in: query
-          schema: { type: integer, default: 60 }
+          description: Days ahead from today (UTC), a whole number, 0 or more, no upper bound; 0 lists the expired
+            assets and those ending today. Negative or not whole is `400` (ADAM CR-573).
+          schema: { type: integer, minimum: 0, default: 60 }
       responses:
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '200':
           description: Expiring assets
           content:
@@ -1426,6 +1465,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-shares:
     post:
+      x-ticvai-personal-data: gated
       operationId: createMediaShare
       x-ticvai-consumed-by:
         - "P13 CMS-087 Secure Internal & External Sharing"
@@ -2064,6 +2104,13 @@ components:
       - assetIds
       - expiresAt
       properties:
+        recipientSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: contact
+          x-ticvai-references: pii.subject
+          description: '**The recipient, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `recipientEmail` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind contact; null while none is given.'
         id:
           type: string
           format: uuid
@@ -2073,6 +2120,8 @@ components:
             type: string
             format: uuid
         recipientEmail:
+          x-ticvai-pii: {store: contact.email, subject: recipientSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         recipientOrganisation:
@@ -2729,15 +2778,21 @@ components:
     ExpiringMedia:
       x-ticvai-persistence: "none — computed"
       type: object
-      required: [assetId, filename, validTo, isExpired, isInUse]
+      required: [assetId, filename, validTo, isExpired, isInUse, liveUsageCount]
       properties:
         assetId: { type: string, format: uuid }
         filename: { type: string }
-        thumbnailUrl: { type: string, nullable: true }
-        licensor: { type: string, nullable: true }
+        thumbnailUrl: { type: string, nullable: true, description: Null when the asset has none (ADAM CR-573). }
+        licensor: { type: string, nullable: true, description: Null when the asset has none (ADAM CR-573). }
         validTo: { type: string, format: date }
-        daysRemaining: { type: integer }
-        isExpired: { type: boolean }
+        daysRemaining:
+          type: integer
+          description: '`validTo` minus today (UTC) in whole days, 0 on the last day; left out for an expired asset
+            (ADAM CR-573).'
+        isExpired:
+          type: boolean
+          description: True exactly when `validTo` is earlier than today in UTC, worked out from `validTo` on every
+            read, never a stored flag (ADAM CR-573).
         isInUse:
           type: boolean
           description: True while `liveUsageCount` is above zero, that is, while live (published)
@@ -2745,7 +2800,8 @@ components:
         liveUsageCount:
           type: integer
           description: References from live (published) content only (audit R106 (10)). Expired and
-            live is the combination that matters.
+            live is the combination that matters. The number of `assets.media_usage` rows for the asset with
+            `is_live` true; always sent, 0 when there are none (ADAM CR-573).
 
   securitySchemes:
     bearerAuth:

@@ -13,9 +13,9 @@
 
 ## Why this is a service
 
-**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.
+**The transactional core**, with the highest write rate in the platform (its operation and table counts are the derived `operations` and `tables` fields). Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.
 
-**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.
+**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 2,079 of 2,864 operations declared venue scope on 3 November 2026.
 
 **What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.
 
@@ -40,11 +40,11 @@
 | cart | [`abandonCart`](#abandoncart) | DELETE | `/carts/{cartId}` | core | 1 | GST-041, WEB-010 |
 | cart | [`addCartLine`](#addcartline) | POST | `/carts/{cartId}/lines` | core | 1 | GST-007, GST-008, GST-026, GST-027, GST-032, GST-048 … |
 | cart | [`applyCartPromoCode`](#applycartpromocode) | POST | `/carts/{cartId}/promo-codes` | core | 1 | GST-041, WEB-010 |
-| cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010 … |
+| cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-032, KSK-006, PTR-010, WEB-010, WEB-012 … |
 | cart | [`claimCart`](#claimcart) | POST | `/carts/{cartId}/claim` | core | 1 | GST-041, WEB-016 |
 | cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | GST-008, GST-041, GST-050, GST-075, WEB-006, WEB-010 … |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
-| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-048, KSK-006 … |
+| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-008, GST-009, GST-032, GST-041, GST-048 … |
 | cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010, WEB-022 |
 | cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010, WEB-022 |
 | cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-041, BO-042, POS-017, POS-018 |
@@ -64,7 +64,7 @@
 | order | [`getVisitReminder`](#getvisitreminder) | GET | `/orders/{orderId}/reminder` | core | 1 | GST-018 |
 | order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006 … |
 | order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101 … |
-| order | [`listTicketTransfers`](#listtickettransfers) | GET | `/ticket-transfers` | core | 1 | GST-012, GST-013, GST-045, WEB-018 |
+| order | [`listTicketTransfers`](#listtickettransfers) | GET | `/ticket-transfers` | core | 1 | GST-012, GST-013, GST-045, WEB-018, WEB-030 |
 | order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
 | order | [`reprintOrder`](#reprintorder) | POST | `/orders/{orderId}/reprints` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
@@ -98,7 +98,7 @@
 | payment | [`capturePayment`](#capturepayment) | POST | `/payments/{paymentId}/capture` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
 | payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004 … |
 | payment | [`inquirePaymentStatus`](#inquirepaymentstatus) | POST | `/payments/{paymentId}/inquiry` | core | 1 | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009 … |
-| payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-providers` | setup | 1 | ADM-570, ADM-571 |
+| payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-provider-connections` | setup | 1 | ADM-570, ADM-571 |
 | payments | [`setDunningPolicy`](#setdunningpolicy) | PUT | `/dunning-policy` | setup | 1 | ADM-606 |
 | policy | [`getGuestRefundPolicy`](#getguestrefundpolicy) | GET | `/venues/{venueId}/guest-refund-policy` | core | 1 | GST-067 |
 | policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | BO-062, BO-065, BO-1146, BO-318 |
@@ -186,6 +186,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 **Parking is sold here like any other line** (decided 28 September, audit R166). A parking product goes through the cart and `checkoutCart`, so the parking entitlement is issued at payment carrying this order's id. There is no live space count in the first release: a car park at its capacity refuses the line with `soldOutForDay`.
 **Refused rather than added where capacity has gone.** A line added optimistically and removed at checkout is a guest who thinks they bought something.
 **A line added from a recommendation carries its `recommendationId`** (29 September, build; AI system design 2.2 A step 8): the `trackingId` of the ai `decideRecommendations` item, kept on the cart line and the order line so the purchase is attributed rather than guessed.
+**The line's product is set by the server** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): `CartLine.productId` is the catalogue product of the line's variant, set when the line is added and returned by `getCart`; the request body is unchanged, and a client never sends it.
 **An hourly product carries its booked window** (decided 29 September, rev 3 REV3-13). A meeting room is a product with a `length` variant, and the line sends `bookedWindow` `{startsAt, endsAt}`, which must span exactly the variant's length. The lease holds capacity of that room type for the window; the room is picked at checkout by `resources.allocateResources`.
 **A table deposit is a line only where the venue enabled one** (decided 29 September, rev 3 REV3-8b and REV3-8). The line names the booking in `tableReservationId` and is priced from its deposit; a table booking with no deposit is confirmed by `fnb.createTableReservation` and never added here.
 **A resource picked on a venue map is a line carrying its hold** (decided 29 September, rev 3 REV3-15 and GAP-C2). The guest held cabana B09 with `resources.createResourceHold`; the line sends `resourceHoldId` with `variantId` = the placed resource's price-band variant (for the Coastal Aqua cabanas: Family 6, Medium 10, Large 15, XL 20) and `quantity` 1. **The hold is the capacity**: no catalogue inventory hold is taken and `catalogue.getAvailability` is not consulted for this line, and the line's `leaseExpiresAt` is the hold's `expiresAt`, so the one countdown the guest sees (audit R169) is the hold's. A hold that has expired, been converted or released, or is not the caller's is refused 409 `resourceHoldInvalid`.
@@ -195,6 +196,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 **Behind the on-sale waiting room when it is on** (ADR-0066, accepted 1 October). For a performance whose waiting room is active (catalogue `WaitingRoomSetting`), the line needs the admission token the guest was given when admitted (`getWaitingRoomPosition`), sent as `X-Admission-Token`; missing, expired, forged or for another performance, it is refused `403 admission-required` and nothing is held. The check is a signature check in middleware with no database read, and the order service forwards the token to `catalogue.acquireInventoryHold`. A guest who skips the waiting page no longer goes straight to the sale.
 Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:00 already in the cart and karting at 13:00 being added is a prompt, not a refusal, because a party of four may legitimately split.
 **Whether the variant may be sold on this channel is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-081; CHG-TEN-002; ADR-0055 rule 2). Orders calls Catalogue's declared query `variantsSellableAt(venueId, [variantId], channel)` in process, in the cart's transaction, with the caller's channel (`pos` at a till), rather than reading `catalogue.variant` and `catalogue.product` itself; a variant that fails it is `409 notSellableOnChannel`.
+**Priced by the cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the rule is on `getCart`). The new line's unit price is `catalogue#variantPriceRecords` at the cart's venue on its channel at now (its exceptions as the rule states), each line's tax comes from the tax step of Catalogue's price calculation component, and the call writes `unit_price` and `line_total` on the line and the cart's totals. A variant with no price is refused `409 notSellableOnChannel` and nothing is held.
 
 |  |  |
 |---|---|
@@ -266,6 +268,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | lines[].id | string (uuid) | yes |  |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].productName | string |  | (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
@@ -287,11 +290,11 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
 | lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
-| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice | object |  | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. (nullable) |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal | object |  | quantity x unitPrice (ADAM CR-550); null when unitPrice is. (nullable) |
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -350,7 +353,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Added, and the cart re-priced |
 | 403 | AdmissionRequired | The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066). |
-| 409 |  | No capacity, or the product is not sellable on this channel (notSellableOnChannel). |
+| 409 |  | No capacity, or the product is not sellable on this channel (notSellableOnChannel), which includes a variant catalogue#variantPriceRecords prices at no amount there (ADAM CR-550). |
 | 422 |  | The booked window is missing, not allowed or the wrong length for the variant (windowRequired, windowNotAllowed, windowLengthMismatch; rev 3 REV3-13), or a table deposit line names a booking that is… |
 
 ### applyCartPromoCode
@@ -361,6 +364,8 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 The code is evaluated the way the cart already evaluates promotions: the cart's lines, venue, channel and subject are sent to `promotions.evaluatePromotions` with the cart's `couponCodes` plus this one. **A code that unlocks nothing is refused, not stored**, so the guest learns at once rather than at checkout. An accepted code is kept on `Cart.couponCodes` and re-evaluated on every read, like `appliedPromotionIds`.
 Applying a code the cart already holds returns the cart unchanged.
 **A promotion's own code is accepted as well as a coupon campaign's** (decided 20 October 2026, Chinmay, R8 blocker cause ORDERS-MONEY-C11: option A for automatic promotions, B for code promotions; CHG-R8SPN-026). The code is looked up first among the venue's live promotions that need a code (`promotions.Promotion` with a code), then among coupon campaign codes; either way it is kept on `Cart.couponCodes` and evaluated as above. This is what WEB-032's "Use this offer" does for a promotion that needs a code: it carries the code to the cart through this call, so the offer shows on the price before the guest pays. An automatic promotion needs no call: `evaluatePromotions` already applies it at the basket, and the button only returns to the list. No new cart field.
+
+**Until promotions evaluation (#28136) is built** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the cart pricing rule is on `getCart`): after the cart checks (`404`, `410 cartExpired`), the call answers `422 promotion-evaluation-unavailable`, stores nothing and leaves `couponCodes` unchanged, as the price simulation does with a promotion code. It reads no promotion, coupon campaign or coupon code record meanwhile. Once evaluation is built, the rules above apply and the cart is priced by the cart pricing rule.
 
 |  |  |
 |---|---|
@@ -404,6 +409,7 @@ Applying a code the cart already holds returns the cart unchanged.
 | lines[].id | string (uuid) | yes |  |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].productName | string |  | (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
@@ -425,11 +431,11 @@ Applying a code the cart already holds returns the cart unchanged.
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
 | lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
-| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice | object |  | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. (nullable) |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal | object |  | quantity x unitPrice (ADAM CR-550); null when unitPrice is. (nullable) |
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -488,7 +494,7 @@ Applying a code the cart already holds returns the cart unchanged.
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Applied, and the cart re-priced |
 | 410 |  | Expired (cartExpired), as for getCart. |
-| 422 |  | The code is not accepted: no such code, voided or used up (promoCodeInvalid), or a real code that nothing in this cart qualifies for (promoCodeNotApplicable). |
+| 422 |  | Until promotions evaluation (#28136) is built, every code answers promotion-evaluation-unavailable (promotionEvaluationUnavailable) and nothing is stored (ADAM CR-550). |
 
 ### checkoutCart
 
@@ -503,14 +509,20 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 **A verified contact that matches an existing profile attaches the order to it automatically** (ADR-0045 section 4; decided 28 September, audit R120 (b)). The guest is not asked, and gets no session on that profile: they see this order and nothing else of its history until they sign in as its owner. Only a verified contact attaches automatically; any other candidate match goes to staff review.
 **A promotion whose budget this order would exceed is not applied** (decided 28 September, audit R101 (8)). At checkout each promotion's remaining `budgetCap` is checked against the discount this order would take from it; where the discount would exceed it, the order is re-priced without that promotion, and the order names it in `droppedPromotions` so the guest sees why the price changed before paying. Budget is refused at checkout, not only reported.
 **Merchandise bought for collection is paid here, online, first** (decided 28 September, audit R236). When the order is paid, each retail line marked for collection becomes a shop-and-drop (`retail.createShopAndDrop`) for the guest to collect on the way out. Nothing is reserved unpaid from this channel.
-**Consent questions are answered before the order exists** (decided 29 September, rev 3 REV3-26). While a required question in `Cart.consentQuestions` has no answer the call is refused 422 `consentRequired`; where an answer is the one the venue set to block the booking it is refused 422 `consentAnswerBlocks`, naming the lines. On success the answers are bound to the new order, so each consent record names the order and line it was given for.
+**Consent questions are answered before the order exists** (decided 29 September, rev 3 REV3-26). While a required question in `Cart.consentQuestions` has no answer the call is refused 422 `consentRequired`; where an answer is the one the venue set to block the booking it is refused 422 `consentAnswerBlocks`, naming the lines. On success the answers are bound to the new order, so each consent record names the order and line it was given for. **Both checks read `getCart`'s computed `consentQuestions[].answered` and `consentBlocksBooking` conflicts and no other source** (ADAM CR-583, CHG-CR583-001); `checkoutCart` is not released before the consent ticket lands.
 **A table deposit line becomes an `orders.deposit` row, not revenue** (rev 3 REV3-8b): authorised or taken as `DepositPolicy.dining.collection` says, with the booking's id, and the booking moves from `awaitingDeposit` to `booked` when the payment is authorised. **A booked window is carried to the order line** (rev 3 REV3-13) and `resources.allocateResources` assigns the room for it.
 **A line carrying `resourceHoldId` keeps its hold into the order** (rev 3 REV3-15): the hold is converted to a `ResourceBooking` as `createOrder` describes, never released and re-taken. An expired hold is refused 409 `resourceHoldInvalid`, naming the line. **A transport line keeps its `attributes.transport`** on the order line (rev 3 REV3-21), so the ticket shows the route, the stations and the departure.
 **Transaction risk before the charge** (29 September, build; AI system design 2.2 B). After the orders `FraudRule` charge rules, checkout calls ai `scoreTransactionRisk` (service audience, 80 ms timeout) with the order id, amount, channel, product mix, payment token reference (never card data), hashed device id, account, subject and attempt number, and (29 September, build pass, group G2, from group G1's handoff; 8.3.8, 8.3.40) `ipHash` and `ipCountry` computed at the edge from the caller's address (the address itself is not passed) and `sessionRef`, the storefront session the checkout came from, which joins the browsing in `storefront.sessionEvent`. `allow` and `monitor` proceed; `stepUp` asks for 3-D Secure through Payments; `holdForReview` takes the same hold a `FraudRule` `hold` takes, so the order waits for review and is not declined. **On a timeout or an error checkout proceeds on its own rules** (fail-open); a tenant set to fail closed holds, and never declines.
-**A line's `recommendationId` is carried to the order line** (design 2.2 A step 8), so `order.completed` attributes the purchase to the recommendation it came from.
-**The guest may pay in the currency they selected** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule of 10 August, MoM 10 Aug 2026 4.7 option (a) and DI-211, in favour of its option (b), charging in the guest's currency at the gateway). `chargeCurrency` names it. The order stays in the venue's base currency (ADR-0018) and the ledger posts in base currency; the order carries the charge currency, the rate used, its source and the converted total, locked until `chargeRateLockedUntil` (the cart lease, `VenueSettings.cartLeaseSeconds`). A payment started after the lock lapses is re-quoted at the rate then in force and the guest sees the new amount before confirming.
+**A line's `recommendationId` is carried to the order line** (design 2.2 A step 8), so `order.completed` attributes the purchase to the recommendation it came from. **So is its `productId`** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): copied from the cart line to `orders.order_line.product_id` in the same way, and returned on every read of the order's lines.
+**The guest may pay in the currency they selected** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule of 10 August, MoM 10 Aug 2026 4.7 option (a) and DI-211, in favour of its option (b), charging in the guest's currency at the gateway). `chargeCurrency` names it. The order stays in the venue's base currency (ADR-0018) and the ledger posts in base currency; the order carries the charge currency, the rate used, its source and the converted total, locked until `chargeRateLockedUntil` (the cart lease, `VenueSettings.cartLeaseSeconds`). A payment started after the lock lapses is re-quoted at the rate then in force and the guest sees the new amount before confirming (`createPayment`'s `409 quoteExpired`, ADAM CR-577).
 
 **The order access token is minted here** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004), as `Order.orderAccessToken` describes: bound to the new order and to the device in `X-Device-Id` (the device that built the cart). Without `X-Device-Id` no token is minted and `orderAccessToken` is null; the order is read with a session as before.
+
+**The token also travels in a cookie the API sets itself** (ADAM CR-575, Chinmay, 3 November 2026: "the guest web keeps a visitor's access to the order they just checked out across the card round trip ... in an HttpOnly cookie the API sets itself, as the waiting room's admission cookie does"; CHG-CR575-001). When it mints `orderAccessToken` on a guest web call, the answer also sends `Set-Cookie: ticvai_order_access` = that same token; `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, host-only on the API host the guest web calls, `Max-Age` = the seconds left until the token's `exp`. A later checkout replaces it. The JSON field is unchanged and the app keeps using the header. Nothing goes into browser storage or a URL. No cookie is set for the anonymous cart session. The cookie only works when the API is same-site with the guest web page, which the waiting-room cookie already depends on.
+
+**Priced afresh by the cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the rule is on `getCart`). Checkout prices every line again by the rule and writes the order from that pricing; with no promotions applied (until promotions evaluation, #28136, is built), `droppedPromotions` is empty and the budget rule above has nothing to drop. A line with no price is refused `409 notSellableOnChannel`, naming it in `lineIds`, as a line whose units are gone is refused, and the cart is kept.
+
+**The order records which terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026: "option A, with the field optional in the contract"; CHG-CR576-001). The optional body field `termsAccepted` (`{kind: termsAndConditions, version}`) is compared, when it is sent, with the `termsAndConditions` policy in force for the venue (the version `listPublishedPolicies` returns, read through `white-label#policyRecords`). If they differ the call is refused `422 termsVersionNotCurrent` and the cart is kept; nothing else changes. When they match, the order is written with the version (`orders.sales_order.terms_version`) and the time of acceptance (`terms_accepted_at`), and `order.created` carries `termsVersion`. When it is omitted, the order records no terms version; it is never filled in from the policy in force. **The order is made at Pay now**, as WEB-011 and WEB-012 (and GST-009 on the app) say: the Checkout buttons on WEB-010 and GST-041 move on without calling this, so the tick reaches the call that creates the order.
 
 |  |  |
 |---|---|
@@ -522,7 +534,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.inventory_reservation`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `marketing.consent_record`, `orders.cart`, `orders.deposit`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
-| Called by | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-012, WEB-033 |
+| Called by | GST-009, GST-032, KSK-006, PTR-010, WEB-010, WEB-012, WEB-033 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
 
 **Parameters**
@@ -547,6 +559,9 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | attendees | array of object |  | The named holder for each cart line that needs one. |
 | attendees[].lineId | string (uuid) | yes | A CartLine.id in this cart. |
 | attendees[].holderName | string | yes |  |
+| termsAccepted | object |  | The terms the guest ticked (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001). |
+| termsAccepted.kind | enum (termsAndConditions) | yes |  |
+| termsAccepted.version | string | yes | The PublishedPolicy.version shown; kept as orders.sales_order.terms_version. (max length 40) |
 
 **Response**: `Order`
 
@@ -586,6 +601,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -595,6 +612,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -647,6 +665,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | lines[].discounts[].id | string (uuid) | yes |  |
 | lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
@@ -711,7 +730,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | An order, pending payment |
 | 403 |  | The contact the tickets would go to is not proven — an unverified session (sessionNotVerified), or a guest checkout with no confirmed one-time code (contactNotConfirmed: the cart's anonymous guest se… |
-| 409 |  | A lease expired between the last read and checkout (leaseExpired), or a resource hold did (resourceHoldInvalid, rev 3 REV3-15). |
+| 409 |  | A lease expired between the last read and checkout (leaseExpired), or a resource hold did (resourceHoldInvalid, rev 3 REV3-15), or a line has no price on the cart's channel any more (notSellableOnCha… |
 | 400 |  | chargeCurrency is not one the venue takes (problem type currency-not-chargeable, CHG-FIN-001). |
 | 422 |  | A required consent question is unanswered (consentRequired), or an answer blocks the booking (consentAnswerBlocks), with the lines in lineIds (decided 29 September, rev 3 REV3-26). |
 
@@ -727,6 +746,8 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 **The anonymous session ends with the claim** (ADAM CR-183, option A; CHG-R9CR-002): in the same transaction, claimCart asks Identity's in-process API `identity#endAnonymousGuestSession` with the cart's id, so the anonymous token stops working; the cart is then the guest's by its `subject_id`.
 
 **Which grant reads the anonymous cart** (r13 root R28, CHG-R13R28-001; the pattern of ADAM CR-471 and of getOrder's token path). The anonymous cart has `subject_id` null, and `orders.cart`'s policy shows a session with a guest subject only the carts whose `subject_id` is that subject, so under the caller's own grant the claim finds no cart. Under the caller's grant, claimCart reads the guest's own open cart, if any. Then, for the path's `cartId` only, the connection switches to the routed tenant's root grant (ITenantRootGrant) inside the request's transaction: read that cart; a cart that does not exist is the shared `404`, as for any cart the caller cannot see; one that is not `open` is `409 cart-not-open`; one whose `subject_id` is set and is not the caller's is `409 cart-already-claimed`; a `cartToken` that is missing or does not equal the cart's `token` is `403 cart-token-mismatch`, and nothing has been written. Once every check has passed, and still under the root grant for exactly these statements: set the cart's `subject_id` to the session's subject and rotate its `token`, or, where the guest already has an open cart, the merge described above, which writes the anonymous cart and its lines; then the caller's grant is put back before anything else runs, `identity#endAnonymousGuestSession` included. Nothing else runs under the root grant. No migration.
+
+**Which cart survives a merge, and how its holds move** (ADAM CR-553, Chinmay, 3 November 2026: "when a guest claims an anonymous cart and already has an open cart, the guest's cart survives and the anonymous cart's holds move to it without being released"; CHG-CR553-001). (1) The checks are as above: not found `404`; `checkedOut` or `abandoned` `409 cart-not-open`; claimed by another guest `409 cart-already-claimed`; token missing or wrong `403 cart-token-mismatch`. **Open** means `active`, `expiring` or `expired`: an expired anonymous cart can be claimed. (2) Under the caller's grant, claimCart looks for the guest's own cart with status `active` or `expiring` at the same venue and on the same channel as the anonymous cart. (3) **None found** (none at all, or only at another venue or channel, or only expired): the anonymous cart becomes the guest's: `subject_id` set and the token rotated; `mergedLineCount` 0; `droppedLines` empty. (4) **Found**: every anonymous cart line moves into it (the same rows, `cart_id` changed, ids kept), except: a line whose inventory hold did not move is dropped with reason `expired`; a line whose resource hold has expired, been converted or been released is dropped with reason `expired`; a line with the same `tableReservationId` or `resourceHoldId` as a line already in the surviving cart is dropped with reason `duplicate`. Lines with no hold (stock products) always move. Dropped lines stay on the anonymous cart and are named in `droppedLines` (`productName`, `reason`); `mergedLineCount` is the number of lines moved. The anonymous cart becomes `abandoned` and its token is rotated. Abandoned sends no recovery email: `cart.abandoned` is sent only on expiry. The surviving cart's `expiresAt` is recomputed (the earliest lease) and it is priced by the cart pricing rule (`getCart`, ADAM CR-550); it is answered as `CartMergeResult.cart`. (5) **The holds move by Catalogue's `catalogue#transferInventoryHolds(fromCartId, toCartId)`**, in process, in claimCart's transaction, called the way `addCartLine` calls `acquireInventoryHold` for a cart, after the root-grant statements. It moves every active, unexpired hold the anonymous cart holds in one statement (its rule is in catalogue.yaml), moves no units, locks no capacity row, and answers the moved hold ids; running it twice moves nothing more. (6) Identity's `endAnonymousGuestSession` runs as now, under the caller's grant. (7) **Until the Catalogue command is merged**, the case with nothing to merge (3) ships, and the found case (4) answers `409 cart-not-open` naming no lines, writing nothing; that refusal is removed once the command is in.
 
 |  |  |
 |---|---|
@@ -757,7 +778,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| cart | Cart | yes |  |
+| cart | Cart | yes | The surviving cart (ADAM CR-553): the guest's own open cart after a merge, else the claimed cart; priced by the cart pricing rule. |
 | cart.id | string (uuid) | yes |  |
 | cart.anonymousSessionToken | string |  | The guestAuth token of the anonymous session createCart opened for a visitor with no credential (GPS-C23, CHG-R8SPN-031); null on every other answer. (read-only; nullable) |
 | cart.token | string |  | How an anonymous guest returns to their cart, including from a recovery email. (read-only; nullable) |
@@ -771,6 +792,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.lines[].id | string (uuid) | yes |  |
 | cart.lines[].variantId | string (uuid) | yes |  |
 | cart.lines[].productName | string |  | (read-only) |
+| cart.lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… (read-only) |
 | cart.lines[].quantity | integer | yes | (min 1) |
 | cart.lines[].performanceId | string (uuid) |  | (nullable) |
 | cart.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
@@ -783,8 +805,8 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | cart.lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
 | cart.lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
-| cart.lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
-| cart.lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| cart.lines[].unitPrice | object |  | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. (nullable) |
+| cart.lines[].lineTotal | object |  | quantity x unitPrice (ADAM CR-550); null when unitPrice is. (nullable) |
 | cart.lines[].inventoryHoldId | string |  | The capacity held for this line — a catalogue.InventoryHold.id, typed as that id is. (nullable) |
 | cart.lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | cart.lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
@@ -831,7 +853,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.locale | string |  |  |
 | cart.createdAt | string (date-time) |  |  |
 | cart.updatedAt | string (date-time) |  |  |
-| mergedLineCount | integer |  |  |
+| mergedLineCount | integer |  | The lines moved into the guest's cart; 0 when there was nothing to merge (ADAM CR-553). |
 | droppedLines | array of object |  | Reported, never silent. |
 | droppedLines[].productName | string |  |  |
 | droppedLines[].reason | enum (noCapacity, expired, notSellableOnChannel, duplicate) |  |  |
@@ -840,7 +862,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 409 |  | The cart is checkedOut or abandoned (cart-not-open), or already belongs to another guest (cart-already-claimed). |
+| 409 |  | The cart is checkedOut or abandoned (cart-not-open; an expired anonymous cart is open and can be claimed, ADAM CR-553), or already belongs to another guest (cart-already-claimed). |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 403 |  | The cart's token was not sent, or does not match (R8 blocker IDENTITY-C49, the lead's answer A; CHG-R8MIG-021): only the device that built the anonymous cart holds its token, so it is the proof. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -865,6 +887,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 **The new cart's window and cap** (ADAM CR-184, option A; CHG-R9CR-003). A new cart holds no lease, so its `expiresAt` is its own window: now plus `cartLeaseSeconds`, and its `maxExtensions` is `cartMaxExtensions`. Both are read with `tenancy#venueSettingsRecords`: the venue's row first, and where its value is null, the tenant's default, which is the tenant's own row of `platform.venue_settings` (the row with no venue that `setVenueSettingsDefaults` writes); where that is null too, the field's proposed default (900 seconds, 1 extension). `extensionsUsed` starts at 0.
 
 **The anonymous path, corrected** (ADAM CR-486, Chinmay, 3 November 2026: "#30682's anonymous path stands in shape, with three corrections: the venue check, the anonymous subjectId answer, and how the cart token is stored"; CHG-CR486-001). **Which grant writes the cart**: a signed-in guest's cart is written under its own subject; a staff or partner cart under the session's venue grant, as before. For a caller with no credential, after the venue check, the single insert of the `orders.cart` row runs under the routed tenant's root grant (ITenantRootGrant), and the request's read-only venue scope is back for every other statement: the same one-cart reach Identity's anonymous session gives that cart's later statements; then `identity#openAnonymousGuestSession` is called in the same transaction, as above. **The venue, for every caller**: `tenancy#activeVenues` is asked in process with `[body.venueId]`; absent (not this tenant's venue, or not active) is `404` and nothing is written. `tenancy#scopeRecords` is not used for this: it returns inactive venues too. **`body.subjectId`**: with no credential, any `subjectId` is `403`; a signed-in guest may omit it or send their own subject, anything else is `403`, and the cart takes the session's subject; a staff or partner caller may send one, looked up with `identity#subjectRecords`: unknown is `400 validation`, known is stored on `orders.cart.subject_id`. **`Cart.token`** is minted only for a cart created with no credential: 32 bytes from a cryptographic random generator, base64url without padding (43 characters); null on a signed-in guest's or a staff cart. It is stored field-encrypted with the tenant's key (never plain at rest and never hashed), because the server reads it back for `getCart`'s answer, `claimCart`'s comparison (constant-time) and the recovery link `cart.abandoned` carries. `createCart` and `getCart` answer it in clear to the cart's caller. `claimCart`'s rotation is `claimCart`'s.
+**The venue check for a caller with no credential** (ADAM CR-486, Chinmay, 3 November 2026, the correction posted on #30682; CHG-CR486-002): `tenancy#activeVenues` is asked as above, and for a caller with no credential it runs under the routed tenant's root grant; an inactive venue, or one that is not this tenant's, is absent and answers `404`, and nothing is written.
 
 |  |  |
 |---|---|
@@ -912,6 +935,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | lines[].id | string (uuid) | yes |  |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].productName | string |  | (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
@@ -933,11 +957,11 @@ Created against a guest subject where one is known, or an anonymous token where 
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
 | lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
-| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice | object |  | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. (nullable) |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal | object |  | quantity x unitPrice (ADAM CR-550); null when unitPrice is. (nullable) |
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -1043,6 +1067,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | lines[].id | string (uuid) | yes |  |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].productName | string |  | (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
@@ -1064,11 +1089,11 @@ Offered once, typically, and the interface should say it is the last extension r
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
 | lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
-| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice | object |  | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. (nullable) |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal | object |  | quantity x unitPrice (ADAM CR-550); null when unitPrice is. (nullable) |
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -1134,8 +1159,11 @@ Offered once, typically, and the interface should say it is the last extension r
 
 **A till's cart is the session's own** (decided 2 October 2026, CHG-SEED-013). On the till the cart belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller's own cart, and for a till that is the session's. A guest identified at the till is attached to the cart, never its owner, and there is no guest-scoped cart operation.
 **Staff since 1 October 2026**: the till reads its own cart (`cartId` from the workstation session) on POS-010; the declaration said guest and partner while P04 called it.
+**The conflicts and the consent questions** (ADAM CR-583, Chinmay, 3 November 2026; CHG-CR583-001). getCart ships to QA with pricing, availability, leases and totals as built, plus two conflict kinds; the consent part follows on its own ticket, and `checkoutCart` is not released before it. (1) getCart asks `catalogue#performanceRecords` in process for line times. (2) `overlappingTime`: for every pair of lines in the cart whose time ranges overlap (a line's time range is its performance's `startsAt` to `endsAt`, or its `bookedWindow`; a line with neither is skipped), one conflict with both `lineIds`, `isBlocking` false, and a `message` naming the two products and their times. Two lines on the same performance are not a conflict. (3) `requiresPrerequisite`: a line whose `parentLineId` names no line in the cart, or names a line whose `isAvailable` is false. One conflict per such line, `isBlocking` true. (4) `exceedsPartySize` and `sameSessionDifferentVenue` stay in the kind list but are never produced: nothing defines a party size or a session yet. (5) Until the consent ticket lands, getCart answers `consentQuestions: []` and produces no `consentBlocksBooking` conflict. **The consent part (its own ticket)**: (6) getCart also asks `catalogue#productRecords` in process for `Product.consentQuestionIds`, and Marketing's `marketing-crm#bookingConsentRecords`, `marketing.booking_consent_record` by `cartId` (service route, superseded rows excluded). The answers are booking consent records, not a guest's standing consents, so `marketing-crm#consentRecords` is not asked. Marketing serves this read alongside `consentQuestionRecords`, `consentQuestionVersionRecords` and WhiteLabel's `bookingFlowRecords`. (7) `consentQuestions` is computed exactly as `Cart.consentQuestions` describes: flow questions first, then each product's in line order, each question once. A question's `lineIds` are the lines whose product asks it. (8) `answered`: a `perBooking` question is answered when one current record exists for this cart and question at the shown version. A `perPerson` question is answered when every line in its `lineIds` has a current record for each `personIndex` from 0 to that line's quantity minus 1 (the cart has no eligibility declaration, so quantity is the person count). For a `perPerson` question the flow asks (empty `lineIds`), every line in the cart is counted. A record at an older version does not count. (9) `consentBlocksBooking`: for each current record with `blocksBooking` true, one blocking conflict on its `cartLineId`; for a `perBooking` answer, on every line that asks the question (every line in the cart if the flow asks it). (10) `checkoutCart`'s `consentRequired` and `consentAnswerBlocks` checks read these same computed fields and no other source.
 2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about the future and the future moves. Availability, promotions and lease expiry are all live.
 Returns the conflicts (2.9.5) and the leases with their remaining time, so the interface can say *"your seats are held for 6 minutes"* rather than discovering it at checkout.
+
+**The cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026: "one pricing rule for the cart"; CHG-CR550-001). One rule prices the cart, used by `getCart`, `addCartLine`, `updateCartLine`, `removeCartLine`, `applyCartPromoCode` and `checkoutCart`. (1) **Line unit price**: `catalogue#variantPriceRecords`, in process, for the line's variant at the cart's venue, on the cart's channel translated to the catalogue channel by the same map the price simulation uses (`guestWeb` to `web`, `guestApp` to `mobile`, `partner` to `b2b`, the rest by name; `api` and `backOffice` have none), at now. Exceptions: a transport line keeps `transport.quoteTransportFare`; a pass seat is zero; a table deposit line takes the booking's deposit amount; a staff line with `overridePrice` uses it. `lineTotal` = quantity x unit price. Only the selected rate is used: no member or dynamic adjustment and no fee rules in the cart, as the order exchange quotes price. (2) **Tax**: for each line amount, the tax step of Catalogue's one price calculation component is called (the code `simulatePriceBreakdownCalculation` uses: the matching tax rule first, else the price's tax code, rates through `finance#taxCodeRecords`, its rounding), in process, never copied; no calculation profile is needed for this step. If Orders cannot call it yet, that is said on the simulation ticket, never written again in Orders. (3) **Totals** in the venue's currency and scale (`tenancy#venueSettingsRecords`): `subtotal` = the sum of `lineTotal`; `taxTotal` = the sum of tax; `total` = `subtotal` + exclusive tax; `discountTotal` 0 and `appliedPromotionIds` empty until promotions evaluation (#28136) is built. No promotion, coupon campaign or coupon code record is read meanwhile. (4) **No price** (`variantPriceRecords` answers a null amount): `addCartLine` refuses `409 notSellableOnChannel` and holds nothing; `getCart` marks the line `isAvailable` false with `unitPrice` and `lineTotal` null and leaves it out of the totals; `checkoutCart` refuses such a line, as it refuses a line whose units are gone, and keeps the cart. (5) **Storage**: the changing operations write `unit_price` and `line_total` on each `orders.cart_line` and `net_amount`, `discount_total`, `tax_total` and `gross_amount` on `orders.cart`. `getCart` computes and answers without writing. `checkoutCart` prices afresh by this rule and writes the order from that pricing; with no promotions applied, `droppedPromotions` is empty.
 
 |  |  |
 |---|---|
@@ -1148,7 +1176,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Read routing | primary |
 | Reads | `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
 | Writes | - |
-| Called by | GST-007, GST-009, GST-032, GST-041, GST-048, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011, WEB-022 |
+| Called by | GST-007, GST-008, GST-009, GST-032, GST-041, GST-048, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011, WEB-012, WEB-022 |
 
 **Parameters**
 
@@ -1174,6 +1202,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | lines[].id | string (uuid) | yes |  |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].productName | string |  | (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
@@ -1195,11 +1224,11 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
 | lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
-| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice | object |  | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. (nullable) |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal | object |  | quantity x unitPrice (ADAM CR-550); null when unitPrice is. (nullable) |
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -1264,6 +1293,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 **`DELETE /carts/{cartId}/lines/{lineId}`**: Take something out
 
 Releases its lease immediately.
+**The cart is re-priced by the cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the rule is on `getCart`): the call writes `unit_price` and `line_total` on each line left and `net_amount`, `discount_total`, `tax_total` and `gross_amount` on the cart.
 
 |  |  |
 |---|---|
@@ -1302,6 +1332,7 @@ Releases its lease immediately.
 | lines[].id | string (uuid) | yes |  |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].productName | string |  | (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
@@ -1323,11 +1354,11 @@ Releases its lease immediately.
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
 | lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
-| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice | object |  | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. (nullable) |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal | object |  | quantity x unitPrice (ADAM CR-550); null when unitPrice is. (nullable) |
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -1392,6 +1423,7 @@ Releases its lease immediately.
 
 Increasing extends the lease and may fail on capacity; decreasing releases part of it. **Releasing immediately matters** — a guest reducing from six to two should return four seats to sale now, not in twenty minutes.
 **A quantity of 0 removes the line**, exactly as `removeCartLine` does: its lease is released and the line is gone from the returned cart (decided 28 September, audit R123 (1)).
+**The cart is re-priced by the cart pricing rule** (ADAM CR-550, Chinmay, 3 November 2026; CHG-CR550-001; the rule is on `getCart`): the call writes `unit_price` and `line_total` on each line and `net_amount`, `discount_total`, `tax_total` and `gross_amount` on the cart.
 
 |  |  |
 |---|---|
@@ -1437,6 +1469,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | lines[].id | string (uuid) | yes |  |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].productName | string |  | (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
 | lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
@@ -1458,11 +1491,11 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | lines[].overridePrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
 | lines[].feeKind | enum (booking, transaction, service, delivery, convenience, cancellation) |  | A fee is a line, not an adjustment. (nullable) |
-| lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice | object |  | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. (nullable) |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal | object |  | quantity x unitPrice (ADAM CR-550); null when unitPrice is. (nullable) |
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -1949,6 +1982,8 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| order.termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| order.termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | order.droppedPromotions[].promotionId | string (uuid) | yes |  |
 | order.droppedPromotions[].name | string |  |  |
@@ -1958,6 +1993,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.lines | array of OrderLine | yes |  |
+| order.lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | order.lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -1981,6 +2017,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| order.lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
 | order.payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
@@ -2127,6 +2164,8 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -2136,6 +2175,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -2188,6 +2228,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | lines[].discounts[].id | string (uuid) | yes |  |
 | lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
@@ -2293,7 +2334,8 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | ticketIds | array of string (uuid) | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
 | fromSubjectId | string (uuid) |  |  |
 | toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
-| recipientAddressMasked | string |  |  |
+| recipientAddressMasked | string |  | The recipient's address as the server masks it. |
+| recipientChannel | enum (email, sms, whatsapp) |  | The channel the transfer was sent by (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): transferOrderTickets stores its recipient.channel in orders.ticket_transfer.recipient_channel (text, email… (read-only; nullable) |
 | status | enum (offered, claimed, expired, cancelled) | yes |  |
 | claimUrl | string |  | The link the recipient is sent (R8 blocker fix, ORDERS-MONEY-C12). (nullable) |
 | claimToken | string (password) |  | What claimTicketTransfer checks the presented claimToken against. |
@@ -2356,6 +2398,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | guestLinkId | string |  | Present where the guest is linked across cells. (nullable) |
 | catalogueBundleVersion | string |  | The bundle the client priced from. |
 | lines | array of CreateOrderLine | yes | (min items 1) |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -2424,6 +2467,8 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -2433,6 +2478,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -2485,6 +2531,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | lines[].discounts[].id | string (uuid) | yes |  |
 | lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
@@ -2593,6 +2640,7 @@ The replacement is held before the original is released, never the other way rou
 | id | string (uuid) | yes | Client-generated UUIDv7 of this exchange, and its idempotency key — it must equal the Idempotency-Key header. |
 | outgoingLineIds | array of string (uuid) | yes | (min items 1) |
 | incomingLines | array of CreateOrderLine | yes | (min items 1) |
+| incomingLines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | incomingLines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | incomingLines[].variantId | string (uuid) | yes |  |
 | incomingLines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -2724,10 +2772,13 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 **`GET /orders/{orderId}`**: Read an order
 
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they placed; another guest's order is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+**Each line names its product** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): `OrderLine.productId`, stored on `orders.order_line` and copied from the cart line by `checkoutCart`, as on every read of an order's lines. Orders made before this change get it filled in from their variant's product. WEB-012 reads it from an order link for its summary panel and its booking-flow read.
 **Or with the order's access token and no session** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025): the device that checked out, or a payer with no session, sends `X-Order-Access-Token` (`Order.orderAccessToken`, from `checkoutCart`) and reads this one order for 24 hours. With neither a session nor a valid token for this order the answer is `404`. For a signed-in guest a `404` is also what WEB-013 and WEB-012 show as their no-access state: the guest's own order lookup found nothing they may see (IDENTITY-C28); no permission is involved.
 **A guest's own order, in the database** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004). `orders.sales_order` is read by staff by its scope path as before (the per-statement predicate of our repository's migration 225) and by a guest by its own subject (`subject_id` = the session's `ticvai.subject_id`; `x-ticvai-rls: guest-reads-own`), so a guest session needs no grant on the venue and another guest's order is simply not visible. `orders.order_line` is read by a guest through its order; `orders.payment`, `orders.order_line_discount` and `orders.order_line_eligibility` keep following their parent. A guest writes none of them through this rule.
 **The staff branch admits only a session with no guest subject** (ADAM CR-295, option A, decided 29 October 2026; CHG-R11GST-001). The venue scope a guest request carries (CR-198) matched the scope branch for every order at the venue; now `orders.sales_order` and `orders.order_line`, the order's lifecycle log and every table that reads through them show a guest its own rows by subject alone. Until the forward migration that carries this is applied, a guest's order reads also filter by `subject_id` in the query, so no database with the old policy shows a guest another guest's order.
 **The order access token, checked** (CR-191, option A). Its claims, signing key and minting are on `Order.orderAccessToken`. getOrder verifies the signature, that `exp` is in the future, that `oid` is the path's `orderId` and `tid` the routed tenant, and that `did` equals `X-Device-Id`; any failure is `404`. A verified token reads that one order (its lines, payments, discounts and eligibility rows) under the routed tenant's root grant, as the payment webhook does (ITenantRootGrant), and nothing else in the same transaction.
+
+**Or from the order access cookie** (ADAM CR-575, Chinmay, 3 November 2026; CHG-CR575-001). getOrder accepts the token from the `ticvai_order_access` cookie `checkoutCart` sets on a guest web checkout, as it accepts `X-Order-Access-Token`, with the same checks (signature, `exp`, `oid` the path's order, `tid` the routed tenant). A token that arrives in the cookie needs no `X-Device-Id`: only the browser that checked out holds the cookie, and no script can read it. A token sent in the header still needs `X-Device-Id`. If both are present, the header is used. Any failure is `404`. This is how the guest web reads the order back after the card round trip (3-D Secure or a hosted page), when the anonymous session is gone.
 
 |  |  |
 |---|---|
@@ -2750,6 +2801,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 | X-Order-Access-Token | header |  | string | Order.orderAccessToken from checkoutCart's answer, in place of a session (IDENTITY-C52, CHG-R8SPN-025). |
 | X-Device-Id | header |  | string (uuid) | The device a guest app or browser is (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004): the client UUIDv7 the app mints once per installation and keeps, the same value it sends as create… |
+| ticvai_order_access | cookie |  | string | The order access token the API set as a cookie on the guest web's checkout (ADAM CR-575; checkoutCart's Set-Cookie). |
 
 **Response**: `Order`
 
@@ -2789,6 +2841,8 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -2798,6 +2852,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -2850,6 +2905,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | lines[].discounts[].id | string (uuid) | yes |  |
 | lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
@@ -3148,6 +3204,8 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -3157,6 +3215,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -3209,6 +3268,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | lines[].discounts[].id | string (uuid) | yes |  |
 | lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
@@ -3355,6 +3415,8 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 
 **Admitted by subject, as `orders.cart` and `orders.sales_order` are** (ADAM CR-502, Chinmay, 3 November 2026: "orders.ticket_transfer admits a guest's own transfers by subject, as orders.cart and orders.sales_order already do. No wider grant, and no subject filter in code as the only safeguard"; CHG-CR502-001). It runs under the caller's own guest session. Rows: `from_subject_id` = the caller's subject (sent) or `to_subject_id` = the caller's subject (received; `to_subject_id` is set only on claim), a condition kept in the query as well as in the table's policy. `direction` `sent` narrows to `from_subject_id`, `received` to `to_subject_id`; `status` is an exact match; the cursor is (`expires_at`, `id`). Another guest's transfers are never shown.
 
+**Each transfer carries the channel it was sent by** (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): `recipientChannel` (email, sms or whatsapp; null on rows written before the change), read from `recipient_channel`. Nothing else about the read changes: guest-scoped, filtered by `direction`, `claimUrl` still null on the sender's rows. The page has no total: WEB-030 (`direction=sent`, every page until `hasMore` is false) counts its own 'N sent this year'.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -3366,7 +3428,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Read routing | replica |
 | Reads | `orders.ticket_transfer` |
 | Writes | - |
-| Called by | GST-012, GST-013, GST-045, WEB-018 |
+| Called by | GST-012, GST-013, GST-045, WEB-018, WEB-030 |
 
 **Parameters**
 
@@ -3387,7 +3449,8 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | items[].ticketIds | array of string (uuid) | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
 | items[].fromSubjectId | string (uuid) |  |  |
 | items[].toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
-| items[].recipientAddressMasked | string |  |  |
+| items[].recipientAddressMasked | string |  | The recipient's address as the server masks it. |
+| items[].recipientChannel | enum (email, sms, whatsapp) |  | The channel the transfer was sent by (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): transferOrderTickets stores its recipient.channel in orders.ticket_transfer.recipient_channel (text, email… (read-only; nullable) |
 | items[].status | enum (offered, claimed, expired, cancelled) | yes |  |
 | items[].claimUrl | string |  | The link the recipient is sent (R8 blocker fix, ORDERS-MONEY-C12). (nullable) |
 | items[].claimToken | string (password) |  | What claimTicketTransfer checks the presented claimToken against. |
@@ -3443,6 +3506,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 |---|---|---|---|
 | id | string (uuid) | yes | Client-generated UUIDv7 of this modification, not of the order — the order is the path's orderId. |
 | addLines | array of CreateOrderLine |  |  |
+| addLines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | addLines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | addLines[].variantId | string (uuid) | yes |  |
 | addLines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -3514,6 +3578,8 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| order.termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| order.termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | order.droppedPromotions[].promotionId | string (uuid) | yes |  |
 | order.droppedPromotions[].name | string |  |  |
@@ -3523,6 +3589,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.lines | array of OrderLine | yes |  |
+| order.lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | order.lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -3546,6 +3613,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| order.lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
 | order.payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
@@ -3622,6 +3690,8 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 
 **Who records what, and how a resend travels** (ADAM CR-506, Chinmay, 3 November 2026: "reprintOrder records a guest's resend as one order event, sends remote deliveries through Access as an event, and returns wallet passes in its answer"; CHG-CR506-001). **Staff and device printing**: `ORDER_REPRINT` for staff, the device credential for a kiosk. Delivery `print` increments `orders.order_line.reprint_count` for each line named (or all lines) and appends one `order_event` row; the answer carries `reprintCount`, `lines` and `reissuedTicketIds` (the lines' entitlement ids). Only `print` increments `reprint_count`. **Who else may call**: a guest whose subject is the order's subject, or a caller with a valid `X-Order-Access-Token` for this order, checked as `getOrder` checks it; any other order is `404`. A guest's delivery `print` is `400`: no guest screen sends it. **Email, SMS and WhatsApp** (any caller): in the same transaction, one `order_event` row with `event_type` `ticketsResent` is appended and `order.ticketsResent` is written to the outbox (`orderId`, `entitlementIds`, `channel`, `destination`, optional, null meaning the recipient already on each credential, `scopePath`, `tenantId`, `at`). Orders sends nothing itself: Access consumes the event and delivers each credential as `deliverCredential` does, one pending credential delivery row per entitlement (`sms` is `smsLink`), idempotent on the event id plus the entitlement id. **Wallet**: each ticket's pass is issued through `issueWalletPass`'s own step (same module) and answered in `walletPasses`, which WEB-013's Add to wallet expects; `walletPlatform` (`apple` or `google`) is required with `wallet`, and `400` otherwise; the `ticketsResent` row is appended as well. **Grants**: a signed-in guest writes the `ticketsResent` row under its own session, through `orders.order_event`'s insert-only branch for that event type on an order whose subject it is (`order_line`'s policy is unchanged); an order-access-token caller writes that one row under the routed tenant's root grant, the one-order reach the verified token gives; staff and devices write under their venue grant.
 
+**Settled on 3 November 2026** (ADAM CR-554, Chinmay: "#30679 builds reprintOrder as decided on 3 November, with these points settled"; CHG-CR554-001). **Wallet**: this operation does not sign passes. It calls `issueWalletPass`'s own step in the orders module, which #28045 builds on the planned wallet pass adapter (Apple signing with the store account's certificate, Google Wallet). Until that step exists, delivery `wallet` with a valid `walletPlatform` answers the declared `400` with detail 'wallet passes are not available yet' and writes nothing; once it lands, that branch calls the step, appends the `ticketsResent` `order_event` row and answers `walletPasses`. **The event** carries `subjectId` too (the order's `orders.sales_order.subject_id`, null when none), beside the fields above; Access's consumer (`x-ticvai-jobs` `orderTicketsResent` in access.yaml) writes the delivery rows and picks the destination as `events/order-ticketsResent.yaml` states. **`reprintCount`** is the sum of `lines[].reprintCount` over the lines this call answers: the lines named in `lineIds`, or every line. Only `print` increments the counts; for `email`, `sms`, `whatsapp` and `wallet` the counts are read and returned unchanged. **A signed-in guest's email, SMS or WhatsApp resend** needs `orders.order_event`'s insert-only guest branch for `ticketsResent`, which the planned row-security migration task for the orders module (Hrushikant Patkar) builds; it is built and tested against that branch locally until the migration is applied. Callers with an order-access token, staff and devices do not wait on it.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_REPRINT` |
@@ -3658,8 +3728,8 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| reprintCount | integer |  | The order's total, the sum of lines[].reprintCount. |
-| lines | array of object |  | The count per reprinted line, as recorded on OrderLine.reprintCount. |
+| reprintCount | integer |  | The sum of lines[].reprintCount over the lines this call answers, the lines named in lineIds or every line (ADAM CR-554). |
+| lines | array of object |  | The count per line answered (the lines named in lineIds, or every line), as recorded on OrderLine.reprintCount; read and returned unchanged for email, sms, whatsapp and wallet (ADAM CR-554). |
 | lines[].lineId | string (uuid) | yes |  |
 | lines[].reprintCount | integer | yes |  |
 | reissuedTicketIds | array of string (uuid) |  | The entitlements reprinted. |
@@ -3832,6 +3902,8 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| order.termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| order.termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | order.droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | order.droppedPromotions[].promotionId | string (uuid) | yes |  |
 | order.droppedPromotions[].name | string |  |  |
@@ -3841,6 +3913,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.lines | array of OrderLine | yes |  |
+| order.lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | order.lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -3864,6 +3937,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| order.lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
 | order.payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
@@ -3992,6 +4066,8 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 
 **Written under the caller's own session** (ADAM CR-502, Chinmay, 3 November 2026; CHG-CR502-001): the transfer row is inserted with `from_subject_id` = the caller's subject, admitted by `orders.ticket_transfer`'s write branch for the guest who is the sender and the order's subject; no wider grant.
 
+**The channel is stored** (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): the row's `recipient_channel` is the body's `recipient.channel` (email, sms or whatsapp), returned as `TicketTransfer.recipientChannel` here and on every answer that returns a transfer.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -4018,7 +4094,7 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 |---|---|---|---|
 | ticketIds | array of string (uuid) | yes | The entitlements to hand over. (min items 1) |
 | recipient | object | yes |  |
-| recipient.channel | enum (email, sms, whatsapp) | yes |  |
+| recipient.channel | enum (email, sms, whatsapp) | yes | Stored on the transfer as recipient_channel and returned as TicketTransfer.recipientChannel (ADAM CR-593). |
 | recipient.address | string | yes |  |
 | message | string |  | (max length 500) |
 
@@ -4031,7 +4107,8 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 | ticketIds | array of string (uuid) | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
 | fromSubjectId | string (uuid) |  |  |
 | toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
-| recipientAddressMasked | string |  |  |
+| recipientAddressMasked | string |  | The recipient's address as the server masks it. |
+| recipientChannel | enum (email, sms, whatsapp) |  | The channel the transfer was sent by (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): transferOrderTickets stores its recipient.channel in orders.ticket_transfer.recipient_channel (text, email… (read-only; nullable) |
 | status | enum (offered, claimed, expired, cancelled) | yes |  |
 | claimUrl | string |  | The link the recipient is sent (R8 blocker fix, ORDERS-MONEY-C12). (nullable) |
 | claimToken | string (password) |  | What claimTicketTransfer checks the presented claimToken against. |
@@ -4057,7 +4134,9 @@ Only before settlement and only within the same shift. After that it is a refund
 **The reason comes from the void reason list** (`VoidReason`; decided 28 September, audit R125 (4)), the one list every void takes, F&B included. `other` requires a `note` (audit R222); the notes are reviewed quarterly to add real reasons.
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass). **The void's `reason` and `note` are kept on that row**, as `OrderEvent.reasonCode` and `OrderEvent.note` (r8 walk fix, CHG-R8WFC-002): the quarterly review of `other` notes reads them there.
 
-**The supervisor's approval, and its reject path** (r8 walk fix, CHG-R8WFC-005; POS-014's approved "AUTHORISATION REQUIRED" modal). A caller who holds `ORDER_VOID` acts alone and sends no step-up. A cashier who does not is not simply refused at the till: the modal asks a supervisor to approve, and the call carries `supervisorStepUp` (common.yaml `SupervisorStepUp`, verified by Identity in process: the supervisor holds `ORDER_VOID` at the till's venue and is not the caller); the act is recorded with that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is the modal's reject path and sends nothing**: the order stays as it was and the till shows the reason the supervisor picked; no record is written for a request that was declined. A step-up needs the server, so offline only a caller who holds `ORDER_VOID` can do this.
+**The supervisor's approval, and its reject path** (r8 walk fix, CHG-R8WFC-005; POS-014's approved "AUTHORISATION REQUIRED" modal). A caller who holds `ORDER_VOID` acts alone and sends no step-up. A cashier who does not is not simply refused at the till: the modal asks a supervisor to approve, and the call carries `supervisorStepUp` (common.yaml `SupervisorStepUp`, verified by Identity in process: the supervisor holds `ORDER_VOID` at the till's venue and is not the caller); the act is recorded with that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is the modal's reject path and sends nothing**: the order stays as it was and the till shows the reason the supervisor picked; no record is written for a request that was declined.
+
+**Offline, the supervisor signs against the till's offline verifier** (decided 3 November 2026, Chinmay, on system review finding F-01: "Offline verifier" (the till keeps a verifier, re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001; this replaces r13's "offline only a caller who holds `ORDER_VOID` can do this"). The prompt's picker comes from the till's offline step-up package (identity `getOfflineStepUpPackage`), the PIN is checked on the till, and the void is queued with `supervisorStepUp.offline`. **At sync** Identity re-checks the step-up as at `recordedAt` (`verifySupervisorStepUp`): the void is recorded either way, because it happened at the till, and the `200` carries `X-Ticvai-Step-Up-Verdict` (`confirmed` or `refusedAtSync`); a `refusedAtSync` void keeps the supervisor as `approvedByPrincipalId` as sent, and Identity's `identity.offlineStepUpRefused` raises the alert to the venue's managers. A cashier who holds `ORDER_VOID` voids offline alone, as online.
 
 |  |  |
 |---|---|
@@ -4088,6 +4167,11 @@ Only before settlement and only within the same shift. After that it is a refund
 | reason | VoidReason: enum (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other) | yes | The void reason list (decided 28 September, audit R125 (4)): the one list voidOrder takes, and the list fnb.amendFnbOrder and fnb.cancelFnbOrder point to. |
 | note | string |  | Required when reason is other (audit R222); optional otherwise. (min length 3; max length 500; nullable) |
 | supervisorStepUp | object |  | The supervisor approving for a cashier without ORDER_VOID (r8 walk fix, CHG-R8WFC-005). |
+| supervisorStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| supervisorStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| supervisorStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| supervisorStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| supervisorStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -4131,6 +4215,8 @@ Only before settlement and only within the same shift. After that it is a refund
 | chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -4140,6 +4226,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -4192,6 +4279,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | lines[].discounts[].id | string (uuid) | yes |  |
 | lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
@@ -4606,6 +4694,7 @@ BL-028. **`orders.group_booking` had ten columns and nothing read it** — a tab
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The group. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPaymentLink
@@ -4615,6 +4704,8 @@ BL-028. **`orders.group_booking` had ten columns and nothing read it** — a tab
 BL-072. **The operation the link needed and did not have.** `createPaymentLink` was contracted and nothing could open one.
 **The caller is anonymous.** No session, no account, and quite possibly no intention of creating one — a guest who booked by phone is the case where they have not registered. **The token is the credential**, scoped to one order.
 Returns the lines, the total and the deadline. **Never the guest's other orders**, never their profile, and never enough to identify them beyond what they already know.
+
+**What the guest is paying for** (ADAM CR-578, Chinmay, 3 November 2026: "getPaymentLink answers what the guest is paying for, in the 200 and in the expired and already-paid 410s, so the page stays one anonymous read"; CHG-CR578-001). The 200 carries `orderNumber` (`Order.orderNumber` of the link's order), and its `lines` are `PaymentLinkLine`: the order line plus `displayName` (the product name and the variant name joined by a middle dot, from the catalogue in the request's `Accept-Language`, falling back to the venue's default language) and `visitStartsAt` (date-time with the venue's offset: the performance's `startsAt` where `performanceId` is set, else `bookedWindow.startsAt`, else null). The `410` for `linkExpired` and `linkPaid` also carries `orderNumber`, `venueName` and `lines` (`PaymentLinkLine`), and `linkPaid` also `amount`, what the link charged; `linkSuperseded` and `linkCancelled` are unchanged. Nothing else is added: no holder name, contact, payment card or other orders. The answer stays within what the guest already knows.
 
 |  |  |
 |---|---|
@@ -4644,7 +4735,9 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | link.status | enum (issued, viewed, paid, expired, cancelled, superseded) | yes |  |
 | link.expiresAt | string (date-time) | yes |  |
 | link.releaseHoldOnExpiry | boolean |  |  |
-| lines | array of OrderLine |  |  |
+| orderNumber | string |  | Order.orderNumber of the link's order, the reference the guest reads (ADAM CR-578). |
+| lines | array of PaymentLinkLine |  | The order's lines, each with what it is and when the visit is (ADAM CR-578). |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -4697,12 +4790,15 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | lines[].discounts[].id | string (uuid) | yes |  |
 | lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
 | lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
+| lines[].displayName | string | yes | The product name and the variant name joined by a middle dot, from the catalogue in the request's Accept-Language, falling back to the venue's default language (catalogue#productRecords, catalogue#va… (read-only) |
+| lines[].visitStartsAt | string (date-time) |  | With the venue's offset. (read-only; nullable) |
 | amountDue | Money |  | On the wire this is three fields; in the database it is one column. |
 | amountDue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amountDue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -5002,6 +5098,8 @@ Lines run oldest first by `occurredAt`. `total` = the order's `gross_amount` les
 | items[].chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| items[].termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| items[].termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | items[].droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | items[].droppedPromotions[].promotionId | string (uuid) | yes |  |
 | items[].droppedPromotions[].name | string |  |  |
@@ -5011,6 +5109,7 @@ Lines run oldest first by `occurredAt`. `total` = the order's `gross_amount` les
 | items[].totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].lines | array of OrderLine | yes |  |
+| items[].lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | items[].lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | items[].lines[].variantId | string (uuid) | yes |  |
 | items[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -5034,6 +5133,7 @@ Lines run oldest first by `occurredAt`. `total` = the order's `gross_amount` les
 | items[].lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | items[].lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | items[].lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| items[].lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | items[].lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | items[].payments | array of Payment |  |  |
 | items[].payments[].tipAmount | object |  | The tip recorded against this payment (addTip; r8 walk fix, CHG-R8WFC-002). (read-only; nullable) |
@@ -5286,7 +5386,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `payments.provider` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `payments.provider` |
 | Writes | `access.entitlement`, `cache:idempotency`, `orders.payment`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `payments.payment_attempt`, `platform.outbox` |
 | Called by | GST-009, WEB-014 |
 
@@ -5729,6 +5829,7 @@ Governed by `EntitlementTemplate.canShareMedia`, which already exists and had no
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Shared. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Not shareable, and the reason says which: the entitlement's template does not allow sharing (sharingNotAllowed, EntitlementTemplate.canShareMedia false), the caller holds it only through a share and… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -6059,6 +6160,10 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 
 **No cash on a handheld; cash goes to a till** (decided 2 October 2026, Chinmay, batch 6 #200, EMP-009: "No cash on handhelds; cash goes to a till"; DEC-200; CHG-CSP-039; DI-805). A server taking payment at the table on a staff handheld (EMP-059) offers card, wallet, gift card and voucher only; a `cash` tender from a session with no till (the staff app, a handheld, a browser) is refused `409 cashNotOnHandheld`, and the guest pays cash at a till, where a drawer and a person reconcile it. So a server's End shift (EMP-009) has no cash count; the till holder's shift does.
 **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
+**A partner does this from the partner portal, with no workstation** (the lead, 3 November 2026, "Approve all 28 as recommended", on PTR-012; CHG-R14BO-005; `x-ticvai-partner-callable`): the partner variant, as the guest variant above is a guest's. A partner user signs in no workstation (CHG-DOOR-001), so the call runs under the session's venue grant, the venue of the order, as a partner's cart and order are written (ADAM CR-184), and only on an order of the partner's own channel (`Order.channelProfileId` the session's); any other order is answered as one that does not exist. `ORDER_CREATE` is what the partner user must hold.
+**Or with the order's access token** (ADAM CR-575, Chinmay, 3 November 2026; CHG-CR575-001). A guest web visitor who lost the anonymous session on the card round trip pays again after a decline with the order access token: from the `ticvai_order_access` cookie `checkoutCart` set, or from `X-Order-Access-Token` with `X-Device-Id`, checked as `getOrder` checks it (with the header used when both are sent). It reaches a payment on that order only, under the routed tenant's root grant, as `getOrder`'s token read reaches that one order; any other order is `404`.
+
+**The quote is re-taken after the rate lock lapses** (ADAM CR-577, Chinmay, 3 November 2026: "after the rate lock lapses, createPayment re-quotes before charging, and the guest sees and confirms any new amount"; CHG-CR577-001). For a card or wallet payment on an order whose `chargeCurrency` is set and differs from its `currency`, when now is past `chargeRateLockedUntil`, the call first takes the region's tender rate in force, as `checkoutCart` does, and recomputes `chargeTotal`. It writes `chargeFxRate`, `chargeFxRateId`, `chargeTotal` and `chargeRateLockedUntil` (now plus `cartLeaseSeconds`, read as `checkoutCart` reads it) to the order. If the new `chargeTotal` equals the old one, the payment carries on as normal. Otherwise the answer is `409 quoteExpired` with a `quote` (`chargeCurrency`, `chargeTotal`, `chargeFxRate`, `chargeRateLockedUntil`): no provider call is made and no `orders.payment` or `payments.payment_attempt` row is written, but the re-lock is kept. The guest's confirmed attempt is a new call with a new `Idempotency-Key` (a replay of the old key returns the same `409`), paid at the newly locked quote under the existing rules, including re-acquiring a lapsed inventory hold.
 
 |  |  |
 |---|---|
@@ -6070,7 +6175,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Conflict policy | append |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `catalogue.inventory_reservation`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
-| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
+| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `orders.sales_order`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
 
@@ -6079,6 +6184,9 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Order-Access-Token | header |  | string | Order.orderAccessToken, in place of a session, for a payment on that order only (ADAM CR-575), checked as getOrder checks it; with X-Device-Id. |
+| X-Device-Id | header |  | string (uuid) | The device a guest app or browser is (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004): the client UUIDv7 the app mints once per installation and keeps, the same value it sends as create… |
+| ticvai_order_access | cookie |  | string | The order access token from the cookie checkoutCart sets on a guest web checkout (ADAM CR-575), accepted as getOrder accepts it, with no X-Device-Id; the header is used when both are sent. |
 
 **Request body**: `CreatePaymentRequest`
 
@@ -6154,6 +6262,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 201 |  | Recorded |
 | 402 |  | Declined by the provider (providerDeclined). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Tender unavailable offline (tenderUnavailableOffline), amount exceeds the balance due (exceedsBalanceDue), or a guest channel sent a tender other than card or wallet (tenderNotAllowedOnChannel, audit… |
 
 ### inquirePaymentStatus
@@ -6164,6 +6273,8 @@ The recovery path (12 Aug §12). A terminal charged the card and the response ne
 This queries the provider directly and reconciles. A background reconciler runs the same operation for payments left unconfirmed past a threshold, so recovery does not depend on an operator noticing.
 **The reconciler threshold is the provider's own recommended status-poll interval** (Stripe and Network International each publish one), held per provider in the adapter configuration and never shorter than that interval. Proposed, client to correct (decided 28 September, audit R065). **For Network International this poll is how a payment is confirmed** (ADAM CR-165, 18 October 2026; CHG-CRA-004): the provider never redelivers its webhook, so the scheduled job polls every Network International payment still `pendingConfirmation`, and the webhook is only the faster path.
 **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
+**A partner does this from the partner portal, with no workstation** (the lead, 3 November 2026, "Approve all 28 as recommended", on PTR-012; CHG-R14BO-005; `x-ticvai-partner-callable`): the partner variant, as the guest variant above is a guest's. A partner user signs in no workstation (CHG-DOOR-001), so the call runs under the session's venue grant, the venue of the order, as a partner's cart and order are written (ADAM CR-184), and only on an order of the partner's own channel (`Order.channelProfileId` the session's); any other order is answered as one that does not exist. `ORDER_CREATE` is what the partner user must hold.
+**Or with the order's access token** (ADAM CR-575, Chinmay, 3 November 2026; CHG-CR575-001). The guest web, back from the card round trip (3-D Secure or a hosted page) without its anonymous session, asks with the order access token: from the `ticvai_order_access` cookie `checkoutCart` set, or from `X-Order-Access-Token` with `X-Device-Id`, checked as `getOrder` checks it (with the header used when both are sent). It reaches a payment of that order only, under the routed tenant's root grant, as `getOrder`'s token read reaches that one order; any other order or payment is `404`.
 
 |  |  |
 |---|---|
@@ -6185,6 +6296,9 @@ This queries the provider directly and reconciles. A background reconciler runs 
 |---|---|---|---|---|
 | paymentId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Order-Access-Token | header |  | string | Order.orderAccessToken, in place of a session, for a payment of that order only (ADAM CR-575), checked as getOrder checks it; with X-Device-Id. |
+| X-Device-Id | header |  | string (uuid) | The device a guest app or browser is (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004): the client UUIDv7 the app mints once per installation and keeps, the same value it sends as create… |
+| ticvai_order_access | cookie |  | string | The order access token from the cookie checkoutCart sets on a guest web checkout (ADAM CR-575), accepted as getOrder accepts it, with no X-Device-Id; the header is used when both are sent. |
 
 **Response**: `Payment`
 
@@ -6245,7 +6359,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 ### createPaymentProviderConnection
 
-**`POST /payment-providers`**: Connect a provider
+**`POST /payment-provider-connections`**: Connect a provider
 
 **Credentials are written and never read back.** The response carries a fingerprint so somebody can confirm which key is in use without the key being retrievable from a screen.
 
@@ -6963,6 +7077,8 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | chargeTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | chargeTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | chargeRateLockedUntil | string (date-time) |  | The quote holds until then (the cart lease). (read-only; nullable) |
+| termsVersion | string |  | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. (max length 40; read-only; nullable) |
+| termsAcceptedAt | string (date-time) |  | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). (read-only; nullable) |
 | droppedPromotions | array of object |  | Promotions left off this order at checkout because their budget cap would have been exceeded (decided 28 September, audit R101 (8)). (read-only) |
 | droppedPromotions[].promotionId | string (uuid) | yes |  |
 | droppedPromotions[].name | string |  |  |
@@ -6972,6 +7088,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -7024,6 +7141,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].productId | string (uuid) |  | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… (read-only) |
 | lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | lines[].discounts[].id | string (uuid) | yes |  |
 | lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
@@ -7122,6 +7240,7 @@ A reservation is not an order. It holds capacity, expires, creates no entitlemen
 | venueId | string (uuid) | yes |  |
 | subjectId | string (uuid) |  | The guest the reservation is held for. |
 | lines | array of CreateOrderLine | yes | (min items 1) |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -7161,6 +7280,7 @@ A reservation is not an order. It holds capacity, expires, creates no entitlemen
 | subjectId | string (uuid) |  | The guest it is held for, from CreateReservationRequest.subjectId. (nullable) |
 | status | enum (held, converted, expired, cancelled) | yes |  |
 | lines | array of CreateOrderLine |  |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -7237,6 +7357,7 @@ Bounded by the venue's maximum, so a reservation cannot be renewed indefinitely 
 | subjectId | string (uuid) |  | The guest it is held for, from CreateReservationRequest.subjectId. (nullable) |
 | status | enum (held, converted, expired, cancelled) | yes |  |
 | lines | array of CreateOrderLine |  |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -7312,6 +7433,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | subjectId | string (uuid) |  | The guest it is held for, from CreateReservationRequest.subjectId. (nullable) |
 | status | enum (held, converted, expired, cancelled) | yes |  |
 | lines | array of CreateOrderLine |  |  |
+| lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -7393,6 +7515,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | items[].subjectId | string (uuid) |  | The guest it is held for, from CreateReservationRequest.subjectId. (nullable) |
 | items[].status | enum (held, converted, expired, cancelled) | yes |  |
 | items[].lines | array of CreateOrderLine |  |  |
+| items[].lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | items[].lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | items[].lines[].variantId | string (uuid) | yes |  |
 | items[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -7459,6 +7582,11 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 |---|---|---|---|
 | reason | string | yes | Retained for audit. (min length 3; max length 500) |
 | supervisorStepUp | object |  | The supervisor accepting, signing on this device (CHG-RUL-019). |
+| supervisorStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| supervisorStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| supervisorStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| supervisorStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| supervisorStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -7727,6 +7855,11 @@ A float that does not match the venue's expected amount holds the shift in `pend
 |---|---|---|---|
 | reason | string | yes | (min length 3; max length 300) |
 | supervisorStepUp | object |  | The supervisor approving, signing on this device (ADAM CR-200). |
+| supervisorStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| supervisorStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| supervisorStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| supervisorStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| supervisorStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -7873,6 +8006,11 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | releaseHeldLeases | boolean |  | Accepted and does nothing (ADAM CR-517, Chinmay, 3 November 2026; CHG-CR517-001): a till holds no standing lease (one inventory hold per sale, converted when the order is paid), so the close has noth… (default True) |
 | recordedAt | string (date-time) | yes |  |
 | supervisorStepUp | object |  | The supervisor closing the shift, signing on this device (CHG-RUL-019). |
+| supervisorStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| supervisorStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| supervisorStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| supervisorStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| supervisorStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -8724,7 +8862,8 @@ Fails if another shift is already open on this workstation. Where the venue is c
 
 Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 **Recorded because it is the classic cover for theft.** A drawer that opens forty times in a shift with four sales is a conversation, and it is only a conversation if someone can see the count. A reason is required for the same reason it is required on a manual discount — attributable, not forbidden.
-**The supervisor's approval, and its reject path** (r8 walk fix, CHG-R8WFC-005; POS-014's approved "AUTHORISATION REQUIRED" modal). A caller who holds `CASH_NO_SALE` acts alone and sends no step-up. A cashier who does not is not simply refused at the till: the modal asks a supervisor to approve, and the call carries `supervisorStepUp` (common.yaml `SupervisorStepUp`, verified by Identity in process: the supervisor holds `CASH_NO_SALE` at the till's venue and is not the caller); the act is recorded with that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is the modal's reject path and sends nothing**: the drawer stays shut and the till shows the reason the supervisor picked; no record is written for a request that was declined. A step-up needs the server, so offline only a caller who holds `CASH_NO_SALE` can do this.
+**The supervisor's approval, and its reject path** (r8 walk fix, CHG-R8WFC-005; POS-014's approved "AUTHORISATION REQUIRED" modal). A caller who holds `CASH_NO_SALE` acts alone and sends no step-up. A cashier who does not is not simply refused at the till: the modal asks a supervisor to approve, and the call carries `supervisorStepUp` (common.yaml `SupervisorStepUp`, verified by Identity in process: the supervisor holds `CASH_NO_SALE` at the till's venue and is not the caller); the act is recorded with that supervisor as `approvedByPrincipalId`. Without the permission and without a verified step-up the call is `403` (`supervisor-step-up-refused`) and nothing is written. **The supervisor declining is the modal's reject path and sends nothing**: the drawer stays shut and the till shows the reason the supervisor picked; no record is written for a request that was declined.
+**Offline, the supervisor signs against the till's offline verifier** (decided 3 November 2026, Chinmay, on system review finding F-01: "Offline verifier" (the till keeps a verifier, re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001; this replaces r13's "offline only a caller who holds `CASH_NO_SALE` can do this"). The prompt's picker comes from the till's offline step-up package (identity `getOfflineStepUpPackage`), the PIN is checked on the till, the drawer opens and the no-sale is queued with `supervisorStepUp.offline`. **At sync** Identity re-checks the step-up as at `recordedAt` (`verifySupervisorStepUp`): the no-sale is recorded either way, because the drawer did open, and the `201` carries `X-Ticvai-Step-Up-Verdict` (`confirmed` or `refusedAtSync`); a `refusedAtSync` no-sale keeps the supervisor as `approvedByPrincipalId` as sent, and Identity's `identity.offlineStepUpRefused` raises the alert to the venue's managers. A cashier who holds `CASH_NO_SALE` acts offline alone, as online.
 
 |  |  |
 |---|---|
@@ -8755,6 +8894,11 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 | note | string |  | (max length 300) |
 | recordedAt | string (date-time) | yes |  |
 | supervisorStepUp | object |  | The supervisor approving for a cashier without CASH_NO_SALE (r8 walk fix, CHG-R8WFC-005). |
+| supervisorStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| supervisorStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| supervisorStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| supervisorStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| supervisorStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -8778,7 +8922,7 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Recorded |
-| 403 |  | The caller lacks CASH_NO_SALE and no supervisor step-up was sent, or it was refused (r8 walk fix, CHG-R8WFC-005) |
+| 403 |  | The caller lacks CASH_NO_SALE and no supervisor step-up was sent, or it was refused (r8 walk fix, CHG-R8WFC-005). |
 | 409 |  | Shift is not open (problem type shift-not-open) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -8816,6 +8960,11 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 |---|---|---|---|
 | reason | string | yes | Why a recount is needed, shown to the cashier. (min length 3; max length 500) |
 | supervisorStepUp | object |  | The supervisor sending the shift back, signing on this device (CHG-RUL-014, as reopenShift). |
+| supervisorStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| supervisorStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| supervisorStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| supervisorStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| supervisorStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -8935,6 +9084,11 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 |---|---|---|---|
 | reason | string | yes | (min length 3; max length 500) |
 | supervisorStepUp | object | yes | The supervisor signing the reopen on this device (audit R144). |
+| supervisorStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| supervisorStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| supervisorStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| supervisorStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| supervisorStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -9459,6 +9613,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 **Recorded as one `CashMovement` of kind `lift`** (F32 step 4: a safe drop "is recorded as a movement so the settlement adds up"; 26 September, pull audit R099/R104). The row carries this box's `depositBoxId` and `shiftId`, the caller as `authorisedByPrincipalId`, the witness, `withdrawalReason` from `reason`, and `note` as its `reason` text. It is the box-level form of the same lift `createCashMovement` records — **one withdrawal is one movement**, so the expected close figure falls once, and `withdrawnTotal` is the sum of the box's lifts.
 **`recordedAt` is the device's time** (offline-and-sync: offline data keeps both `recorded_at` and `synced_at`), and `id` is the client UUIDv7 that doubles as the idempotency key.
 **The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on `reopenShift` and `rejectShiftVariance`: `witnessStepUp` carries the principal and PIN of the cashier the cash came from (`witnessPrincipalId`), who countersigns, entered on the device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`). The step-up's principal must be `witnessPrincipalId`; it is the witness's PIN, not a supervisor's, so the field is named for the witness.
+**Offline, the witness signs against the till's offline verifier** (decided 3 November 2026, Chinmay, on system review finding F-01: "Offline verifier" (the till keeps a verifier, re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001). r13 queued the witness's PIN unchecked ("captured offline, it is verified when the withdrawal syncs"), so the cash left the box on a PIN nothing had checked. Now the prompt offers the signers of the till's offline step-up package (identity `getOfflineStepUpPackage`) marked `witness` (a shift open at the venue), the PIN is checked on the till before the box opens, and the withdrawal is queued with `witnessStepUp.offline`. **At sync** Identity re-checks the step-up as at `recordedAt` (`verifySupervisorStepUp`): the withdrawal is recorded either way, because the cash has left the box, so the expected close figure falls as it did at the till, and the `201` carries `X-Ticvai-Step-Up-Verdict` (`confirmed` or `refusedAtSync`); a `refusedAtSync` withdrawal keeps the witness as sent, and Identity's `identity.offlineStepUpRefused` raises the alert to the venue's managers.
 
 |  |  |
 |---|---|
@@ -9495,6 +9650,11 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | note | string |  | (max length 300) |
 | recordedAt | string (date-time) | yes |  |
 | witnessStepUp | object |  | The witnessing cashier's countersignature on this device (CHG-RUL-019): principalId is witnessPrincipalId, credential their PIN. |
+| witnessStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| witnessStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| witnessStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| witnessStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| witnessStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | witnessStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | witnessStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | witnessStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -9676,6 +9836,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | orders[].guestLinkId | string |  | Present where the guest is linked across cells. (nullable) |
 | orders[].catalogueBundleVersion | string |  | The bundle the client priced from. |
 | orders[].lines | array of CreateOrderLine | yes | (min items 1) |
+| orders[].lines[].holderSubjectId | string (uuid) |  | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. (nullable) |
 | orders[].lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | orders[].lines[].variantId | string (uuid) | yes |  |
 | orders[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
@@ -9776,6 +9937,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | variant_id | uuid | yes |  |
 | product_name | text | no |  |
+| product_id | uuid | no | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by getCart; a client never s… |
 | quantity | integer | yes |  |
 | performance_id | uuid | no |  |
 | booked_window | jsonb | no |  |
@@ -9788,8 +9950,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | override_price | numeric(18,4) | no |  |
 | override_reason | text | no | BL-085. |
 | fee_kind | text | no | A fee is a line, not an adjustment. |
-| unit_price | numeric(18,4) | no |  |
-| line_total | numeric(18,4) | no |  |
+| unit_price | numeric(18,4) | no | By the cart pricing rule (getCart; ADAM CR-550): catalogue#variantPriceRecords for the variant at the cart's venue on its channel at now, or the rule's exceptions. |
+| line_total | numeric(18,4) | no | quantity x unitPrice (ADAM CR-550); null when unitPrice is. |
 | inventory_reservation_id | text | no | The capacity held for this line — a catalogue.InventoryHold.id, typed as that id is. |
 | lease_expires_at | timestamptz | no | Shown to the guest. |
 | is_available | boolean | no | Re-checked on every read. |
@@ -9963,12 +10125,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | group_participant_list_id | uuid | yes | The parent row. |
+| subject_id | uuid | no | The participant, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): fullName, email, phone, dateOfBirth are kept in pii.* for this subject, never on this row, and erasure removes them… |
 | id | uuid | yes |  |
-| full_name | text | yes |  |
 | role | text | no |  |
-| email | text | no |  |
-| phone | text | no |  |
-| date_of_birth | date | no |  |
 
 ### `orders.group_visit_plan`
 
@@ -10077,6 +10236,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | sales_order_id | uuid | yes | The parent row. |
+| holder_subject_id | uuid | no | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. |
 | id | uuid | yes | Client-generated UUIDv7 of the line. |
 | variant_id | uuid | yes |  |
 | recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
@@ -10088,7 +10248,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | attributes | jsonb | no |  |
 | quantity | integer | yes |  |
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
-| holder_name | text | no |  |
 | data_mask_values | jsonb | no | Deliberately open. |
 | server_unit_price | numeric(18,4) | yes | What the server computed on ingest. |
 | price_variance | numeric(18,4) | no | Server minus quoted. |
@@ -10099,6 +10258,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cross_region_right_ids | text[] | no | Redemption rights propagated to other cells for this line. |
 | reprint_count | integer | no | How many times this line's tickets were reprinted or resent. |
 | venue_id | uuid | no | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. |
+| product_id | uuid | no | The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on orders.order_line: copied from the cart line by checkoutCart, as recommendationId is, and… |
 
 ### `orders.order_line_discount`
 
@@ -10334,6 +10494,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | reservation_id | uuid | yes | The parent row. |
+| holder_subject_id | uuid | no | The named holder of the line, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): holderName is kept in pii.* for this subject, never on this row, and erasure removes them there. |
 | id | uuid | yes | Client-generated UUIDv7 of the line. |
 | variant_id | uuid | yes |  |
 | recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
@@ -10345,7 +10506,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | attributes | jsonb | no |  |
 | quantity | integer | yes |  |
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
-| holder_name | text | no |  |
 | data_mask_values | jsonb | no | Deliberately open. |
 
 ### `orders.sales_order`
@@ -10368,6 +10528,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | charge_fx_rate_id | uuid | no | The finance.FxRate row the rate was taken from, for audit. |
 | charge_total | numeric(18,4) | no | grossAmount converted at chargeFxRate and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). |
 | charge_rate_locked_until | timestamptz | no | The quote holds until then (the cart lease). |
+| terms_version | text | no | The terms the guest accepted (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the termsAndConditions version checkoutCart took in termsAccepted, checked against the policy in force. |
+| terms_accepted_at | timestamptz | no | When the guest accepted termsVersion, the time checkoutCart wrote the order (ADAM CR-576). |
 | total_price_variance | numeric(18,4) | no | Sum across lines. |
 | principal_id | uuid | no |  |
 | workstation_id | uuid | no |  |
@@ -10412,7 +10574,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | ticket_ids | text[] | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
 | from_subject_id | uuid | no |  |
 | to_subject_id | uuid | no | Set only on claim. |
-| recipient_address_masked | text | no |  |
+| recipient_address_masked | text | no | The recipient's address as the server masks it. |
+| recipient_channel | text | no | The channel the transfer was sent by (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): transferOrderTickets stores its recipient.channel in orders.ticket_transfer.recipient_channel (text, email… |
 | status | text | yes |  |
 | claim_url | text | no | The link the recipient is sent (R8 blocker fix, ORDERS-MONEY-C12). |
 | claim_token | text | no | What claimTicketTransfer checks the presented claimToken against. |

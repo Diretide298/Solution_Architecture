@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Screens | 1663 |
-| Operations | 1899 |
+| Operations | 1903 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
 | Operations with no screen | 208 |
-| Waves | wave1 150 · wave2 55 · wave3 1458 |
+| Waves | wave1 170 · wave2 53 · wave3 1440 |
 
 ## Gaps
 
@@ -62,7 +62,7 @@
 | `listProductApprovalWorkflows` | catalogue | GET | The product approval workflows `approveWorkflow` saved |
 | … | | | 168 more |
 
-### 14 modules split across waves
+### 13 modules split across waves
 
 **A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
 
@@ -78,7 +78,6 @@
 - **Rentals** — waves 1, 3
 - **Sell** — waves 1, 2, 3
 - **Stock & Supply** — waves 1, 2
-- **Transport** — waves 1, 2
 - **Venue Operations** — waves 1, 2, 3
 
 ## Modules
@@ -101,7 +100,7 @@
 | Food & Beverage | 8 | 1, 2 |
 | Partners | 8 | 3 |
 | Operations | 7 | 3 |
-| Transport | 7 | 1, 2 |
+| Transport | 7 | 1 |
 | Guests & Marketing | 4 | 1, 2 |
 | Setup | 1 | 1 |
 
@@ -141,7 +140,7 @@
 | `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | Commercial | 3 | 3 | yes |
 | `ADM-069` | Tax Profile & Jurisdiction Configuration | Commercial | 1 | 7 | yes |
 | `ADM-070` | Tax Rule & Treatment Builder | Commercial | 3 | 1 | yes |
-| `ADM-071` | Fee & Surcharge Library | Commercial | 3 | 2 | yes |
+| `ADM-071` | Fee & Surcharge Library | Commercial | 1 | 2 | yes |
 | `ADM-072` | Fee Applicability & Charging Rule Builder | Commercial | 3 | 1 | yes |
 | `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | Commercial | 3 | 1 | yes |
 | `ADM-074` | Price Calculation Sequence & Formula Engine | Commercial | 3 | 2 | yes |
@@ -158,7 +157,7 @@
 | `ADM-085` | Pricing Distribution, Synchronization & Publication Monitor | Commercial | 3 | 1 | yes |
 | `ADM-086` | Pricing Rollback & Emergency Control Center | Commercial | 3 | 3 | yes |
 | `ADM-087` | Pricing History, Audit & Compliance Explorer | Commercial | 3 | 1 | yes |
-| `ADM-088` | Dynamic Pricing Strategy Command Center | Commercial | 3 | 2 | yes |
+| `ADM-088` | Dynamic Pricing Strategy Command Center | Commercial | 1 | 2 | yes |
 | `ADM-089` | Dynamic Pricing Strategy Builder | Commercial | 3 | 3 | yes |
 | `ADM-090` | Demand, Occupancy & Availability Rule Builder | Commercial | 3 | 2 | yes |
 | `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | Commercial | 3 | 2 | yes |
@@ -178,7 +177,7 @@
 | `ADM-105` | Price Elasticity & Revenue Response Intelligence | Commercial | 3 | 1 | yes |
 | `ADM-106` | AI Pricing Recommendation & Explainability Center | Commercial | 3 | 2 | yes |
 | `ADM-107` | AI Signal Registry, Data Quality & Model Governance | Commercial | 3 | 2 | yes |
-| `ADM-108` | Revenue Optimization Command Center | Commercial | 3 | 1 | yes |
+| `ADM-108` | Revenue Optimization Command Center | Commercial | 1 | 1 | yes |
 | `ADM-109` | Pricing Simulation Studio | Commercial | 3 | 1 | yes |
 | `ADM-110` | Scenario Modeling & What-If Analysis | Commercial | 3 | 1 | yes |
 | `ADM-111` | A/B Pricing Experiment Studio | Commercial | 3 | 1 | yes |
@@ -329,17 +328,17 @@
 | `ADM-256` | Process Optimization & Automation Opportunity Center | Platform | 3 | 1 | yes |
 | `ADM-257` | AI Workflow Intelligence & Autonomous Governance Center | Platform | 3 | 1 | yes |
 | `ADM-258` | Sales Channel Command Center | Commercial | 3 | 1 | yes |
-| `ADM-259` | Channel Creation & Profile Configuration | Commercial | 3 | 1 | yes |
-| `ADM-260` | Product & Catalogue Assignment | Commercial | 3 | 1 | yes |
-| `ADM-261` | Channel Pricing & Commercial Profile Assignment | Commercial | 3 | 1 | yes |
+| `ADM-259` | Channel Creation & Profile Configuration | Commercial | 1 | 2 | yes |
+| `ADM-260` | Product & Catalogue Assignment | Commercial | 1 | 2 | yes |
+| `ADM-261` | Channel Pricing & Commercial Profile Assignment | Commercial | 1 | 2 | yes |
 | `ADM-262` | Inventory, Capacity & Channel Allocation | Commercial | 3 | 1 | yes |
-| `ADM-263` | Channel Sales Schedule & Availability Windows | Commercial | 3 | 2 | yes |
+| `ADM-263` | Channel Sales Schedule & Availability Windows | Commercial | 1 | 2 | yes |
 | `ADM-264` | Customer & Eligibility Rules by Channel | Commercial | 3 | 2 | yes |
 | `ADM-265` | Channel Sales Rules, Limits & Restrictions | Commercial | 3 | 2 | yes |
-| `ADM-266` | Channel Fees, Payment & Fulfillment Configuration | Commercial | 3 | 1 | yes |
-| `ADM-267` | Channel Publication, Readiness & AI Validation | Commercial | 3 | 1 | yes |
-| `ADM-268` | Channel Operations Command Center | Commercial | 3 | 1 | yes |
-| `ADM-269` | Channel Connection & Integration Manager | Commercial | 3 | 3 | yes |
+| `ADM-266` | Channel Fees, Payment & Fulfillment Configuration | Commercial | 1 | 2 | yes |
+| `ADM-267` | Channel Publication, Readiness & AI Validation | Commercial | 1 | 2 | yes |
+| `ADM-268` | Channel Operations Command Center | Commercial | 1 | 1 | yes |
+| `ADM-269` | Channel Connection & Integration Manager | Commercial | 1 | 3 | yes |
 | `ADM-270` | Product, Price & Availability Synchronization | Commercial | 3 | 2 | yes |
 | `ADM-271` | Real-Time Channel Availability & Inventory Monitor | Commercial | 3 | 2 | yes |
 | `ADM-272` | Channel Allocation & Rebalancing Operations | Commercial | 3 | 2 | yes |
@@ -399,18 +398,18 @@
 | `ADM-328` | Workflow Versioning & Change History | Platform | 3 | 1 | yes |
 | `ADM-329` | Approval Matrix Command Center | Platform | 3 | 1 | yes |
 | `ADM-330` | Approval Authority Matrix | Platform | 3 | 1 | yes |
-| `ADM-331` | Organizational Hierarchy Routing | Platform | 3 | 1 | yes |
+| `ADM-331` | Organizational Hierarchy Routing | Platform | 3 | 2 | yes |
 | `ADM-332` | Department-Based Approval Matrix | Platform | 3 | 1 | yes |
-| `ADM-333` | Venue & Tenant Approval Matrix | Platform | 3 | 1 | yes |
-| `ADM-334` | Value & Threshold Routing | Platform | 3 | 1 | yes |
-| `ADM-335` | Risk-Based & Conditional Routing | Platform | 3 | 1 | yes |
+| `ADM-333` | Venue & Tenant Approval Matrix | Platform | 3 | 2 | yes |
+| `ADM-334` | Value & Threshold Routing | Platform | 3 | 2 | yes |
+| `ADM-335` | Risk-Based & Conditional Routing | Platform | 3 | 2 | yes |
 | `ADM-336` | Approver Group & Decision Policy | Platform | 3 | 1 | yes |
 | `ADM-337` | Routing Simulator & Conflict Detection | Platform | 3 | 2 | yes |
 | `ADM-338` | AI Routing Advisor & Matrix Optimization | Platform | 3 | 1 | yes |
 | `ADM-339` | Governance & Compliance Command Center | Platform | 3 | 2 | yes |
 | `ADM-340` | Segregation of Duties Policy Manager | Platform | 1 | 2 | yes |
 | `ADM-341` | Four-Eyes & Dual-Control Policy | Platform | 3 | 2 | yes |
-| `ADM-342` | Authentication & MFA Policy Manager | Platform | 1 | 7 | yes |
+| `ADM-342` | Authentication & MFA Policy Manager | Platform | 1 | 6 | yes |
 | `ADM-343` | Sensitive Action Confirmation | Platform | 3 | 2 | yes |
 | `ADM-344` | Digital Signature Management | Platform | 3 | 0 | yes |
 | `ADM-345` | Immutable Approval Record & Tamper Detection | Platform | 3 | 1 | yes |
@@ -484,7 +483,7 @@
 | `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | Commercial | 1 | 5 | yes |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | Commercial | 3 | 2 | yes |
 | `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | Commercial | 3 | 2 | yes |
-| `ADM-606` | Partial Payment, Failure & Recovery Manager | Commercial | 3 | 5 | yes |
+| `ADM-606` | Partial Payment, Failure & Recovery Manager | Commercial | 1 | 6 | yes |
 | `ADM-607` | Mixed Tender Transaction Trace & Allocation Audit | Commercial | 3 | 1 | yes |
 | `ADM-608` | Mixed Tender Simulator, Credit Exposure & AI Advisor | Commercial | 3 | 2 | yes |
 | `ADM-609` | Refund & Payment Adjustment Command Center | Commercial | 3 | 1 | yes |
@@ -662,7 +661,7 @@
 | `BO-084` | Approval Inbox | People & Access Rights | 1 | 4 | yes |
 | `BO-085` | Approval Request | People & Access Rights | 1 | 5 | yes |
 | `BO-086` | Approval Matrix | People & Access Rights | 2 | 2 | yes |
-| `BO-087` | Approval Delegations | People & Access Rights | 2 | 5 | yes |
+| `BO-087` | Approval Delegations | People & Access Rights | 1 | 5 | yes |
 | `BO-088` | Approval Analytics | People & Access Rights | 3 | 1 | yes |
 | `BO-089` | Journal Entries | Orders & Money | 1 | 6 | yes |
 | `BO-090` | Period Close | Orders & Money | 1 | 7 | yes |
@@ -695,7 +694,7 @@
 | `BO-1015` | Buffer Seat Rules | Access & Venue | 3 | 2 | yes |
 | `BO-1016` | Companion Seat Rules | Access & Venue | 3 | 2 | yes |
 | `BO-1017` | Wheelchair Companion Rules | Access & Venue | 3 | 2 | yes |
-| `BO-1018` | Accessible Seating Master | Access & Venue | 3 | 2 | yes |
+| `BO-1018` | Accessible Seating Master | Access & Venue | 1 | 2 | yes |
 | `BO-1019` | Accessible Route Mapping | Access & Venue | 3 | 2 | yes |
 | `BO-102` | Sell | Sell | 1 | 3 | yes |
 | `BO-1020` | Accessible Filters & Eligibility | Access & Venue | 3 | 2 | yes |
@@ -713,7 +712,7 @@
 | `BO-1031` | Contracts & Approval Workflow | Access & Venue | 3 | 1 | yes |
 | `BO-1032` | Group Reporting & Audit | Access & Venue | 3 | 1 | yes |
 | `BO-1033` | Recommendation Command Center | Access & Venue | 3 | 1 | yes |
-| `BO-1034` | Best Seat Recommendations | Access & Venue | 3 | 2 | yes |
+| `BO-1034` | Best Seat Recommendations | Access & Venue | 1 | 2 | yes |
 | `BO-1035` | Best Value Recommendations | Access & Venue | 3 | 2 | yes |
 | `BO-1036` | Closest-to-Stage Recommendations | Access & Venue | 3 | 2 | yes |
 | `BO-1037` | Family Seating Recommendations | Access & Venue | 3 | 2 | yes |
@@ -729,7 +728,7 @@
 | `BO-1046` | Inventory Forecasting | Access & Venue | 3 | 1 | yes |
 | `BO-1047` | Section Revenue Forecast | Access & Venue | 3 | 1 | yes |
 | `BO-1048` | Seat Upsell Recommendations | Access & Venue | 3 | 1 | yes |
-| `BO-1049` | Scenario & What-If Planning | Access & Venue | 3 | 1 | yes |
+| `BO-1049` | Scenario & What-If Planning | Access & Venue | 3 | 4 | yes |
 | `BO-105` | Stock & Supply | Stock & Supply | 1 | 2 | yes |
 | `BO-1050` | Revenue Analytics & Audit | Access & Venue | 3 | 1 | yes |
 | `BO-1051` | Seat Analytics Command Center | Access & Venue | 3 | 1 | yes |
@@ -872,7 +871,7 @@
 | `BO-1176` | Wallet Events, Webhooks & Notification Orchestration | Orders & Money | 3 | 3 | yes |
 | `BO-1177` | API Security, Access & Integration Permissions | Orders & Money | 3 | 4 | yes |
 | `BO-1178` | Synchronization, Retry & Resilience Configuration | Orders & Money | 3 | 1 | yes |
-| `BO-1179` | Integration Monitoring & Exception Workbench | Orders & Money | 3 | 8 | yes |
+| `BO-1179` | Integration Monitoring & Exception Workbench | Orders & Money | 1 | 9 | yes |
 | `BO-118` | Campaign & Audience Management | Sell | 2 | 5 | yes |
 | `BO-1180` | Wallet Configuration Governance & Version Control | Orders & Money | 3 | 2 | yes |
 | `BO-1181` | Approval, Publication & Change Management | Orders & Money | 3 | 4 | yes |
@@ -881,7 +880,7 @@
 | `BO-1184` | Transport Routes & Stops | Transport | 1 | 6 | yes |
 | `BO-1185` | Transport Fares & Passenger Types | Transport | 1 | 4 | yes |
 | `BO-1186` | Transport Timetables | Transport | 1 | 6 | yes |
-| `BO-1187` | Transport Departure Board | Transport | 2 | 4 | yes |
+| `BO-1187` | Transport Departure Board | Transport | 1 | 4 | yes |
 | `BO-1188` | Transport Pass Types | Transport | 1 | 4 | yes |
 | `BO-1189` | Transport Network Import | Transport | 1 | 5 | yes |
 | `BO-119` | Cross-Sell, Upsell & Recommendation Rules | Sell | 2 | 4 | yes |
@@ -1058,7 +1057,7 @@
 | `BO-288` | Membership Entitlement & Admission Benefit Builder | Sell | 1 | 8 | yes |
 | `BO-289` | Membership Usage, Visit & Consumption Rules | Sell | 3 | 4 | yes |
 | `BO-290` | Family, Household & Dependent Membership Configuration | Sell | 3 | 1 | yes |
-| `BO-291` | Membership Commercial, Pricing & Channel Association | Sell | 3 | 7 | yes |
+| `BO-291` | Membership Commercial, Pricing & Channel Association | Sell | 1 | 7 | yes |
 | `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | Sell | 3 | 1 | yes |
 | `BO-293` | Membership Product Validation, Approval, Publication & Versioning | Sell | 3 | 4 | yes |
 | `BO-294` | Member Operations Command Center | Sell | 3 | 1 | yes |
@@ -1110,7 +1109,7 @@
 | `BO-341` | Media Activation, Priority & Fallback Rules | Access & Venue | 3 | 1 | yes |
 | `BO-342` | Media Replacement, Revocation & Rebinding Rules | Access & Venue | 3 | 2 | yes |
 | `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | Access & Venue | 3 | 1 | yes |
-| `BO-344` | Media Design Studio Command Center | Access & Venue | 3 | 8 | yes |
+| `BO-344` | Media Design Studio Command Center | Access & Venue | 1 | 8 | yes |
 | `BO-345` | Digital QR & Barcode Ticket Designer | Access & Venue | 3 | 1 | yes |
 | `BO-346` | PDF, Printable & POS Ticket Designer | Access & Venue | 1 | 2 | yes |
 | `BO-347` | Apple Wallet Pass Designer | Access & Venue | 3 | 1 | yes |
@@ -1253,7 +1252,7 @@
 | `BO-485` | Self-Service Kiosk Profile & Channel Configuration | Games & Rides | 1 | 7 | yes |
 | `BO-486` | Customer Card / Wallet Identification | Games & Rides | 3 | 1 | yes |
 | `BO-487` | Customer Wallet & Balance Summary | Games & Rides | 3 | 3 | yes |
-| `BO-488` | Self-Service Wallet Top-Up | Games & Rides | 3 | 2 | yes |
+| `BO-488` | Self-Service Wallet Top-Up | Games & Rides | 3 | 1 | yes |
 | `BO-489` | Bonus, Free Game & Benefit View | Games & Rides | 3 | 1 | yes |
 | `BO-490` | Game & Ride Eligibility / “What Can I Play?” | Games & Rides | 3 | 1 | yes |
 | `BO-491` | Redemption Balance & Prize Discovery | Games & Rides | 3 | 1 | yes |
@@ -1404,7 +1403,7 @@
 | `BO-636` | Application Review Workspace | Access & Venue | 3 | 5 | yes |
 | `BO-637` | Approval Workflow Builder | Access & Venue | 3 | 1 | yes |
 | `BO-638` | Approval Rules & Conditions | Access & Venue | 3 | 1 | yes |
-| `BO-639` | Reviewer Assignment & Delegation | Access & Venue | 3 | 1 | yes |
+| `BO-639` | Reviewer Assignment & Delegation | Access & Venue | 3 | 2 | yes |
 | `BO-640` | Rejection & Resubmission Management | Access & Venue | 3 | 5 | yes |
 | `BO-641` | Escalation & Exception Management | Access & Venue | 3 | 1 | yes |
 | `BO-642` | Approval Decision History | Access & Venue | 3 | 1 | yes |
@@ -1718,7 +1717,7 @@
 | `BO-951` | Resource Integration & System Health Center | Rentals | 3 | 1 | yes |
 | `BO-952` | Executive Resource Intelligence & AI Improvement Center | Rentals | 3 | 1 | yes |
 | `BO-953` | Seat Map Command Center | Access & Venue | 3 | 2 | yes |
-| `BO-954` | Venue Canvas | Access & Venue | 3 | 3 | yes |
+| `BO-954` | Venue Canvas | Access & Venue | 1 | 3 | yes |
 | `BO-955` | Sections & Zones | Access & Venue | 3 | 5 | yes |
 | `BO-956` | Rows & Seats | Access & Venue | 3 | 3 | yes |
 | `BO-957` | Standing Zones | Access & Venue | 3 | 2 | yes |

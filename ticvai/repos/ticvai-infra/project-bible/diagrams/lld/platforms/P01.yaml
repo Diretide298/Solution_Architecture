@@ -43,9 +43,9 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 66
+  operationCalls: 68
 - service: MarketingService
-  operationCalls: 58
+  operationCalls: 59
 - service: CatalogueService
   operationCalls: 54
 - service: VenueOpsService
@@ -515,10 +515,12 @@ screens:
   operations:
   - checkoutCart
   - createPayment
+  - getCart
   - getOrder
   - getPublishedBookingFlow
   - inquirePaymentStatus
   - listPublishedPolicies
+  - recordConsentAnswers
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1119,6 +1121,7 @@ screens:
   - createResaleListing
   - listMyOrders
   - listOwnResaleListings
+  - listTicketTransfers
   - transferOrderTickets
   states:
   - emptyFirstRun

@@ -113,6 +113,21 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "ticvai_order_access",
+    "in": "cookie",
+    "required": false
    }
   ],
   "requestBody": "CreatePaymentRequest",
@@ -180,6 +195,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "ticvai_order_access",
+    "in": "cookie",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -278,6 +298,21 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": "X-Order-Access-Token",
+    "in": "header",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "ticvai_order_access",
+    "in": "cookie",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -372,6 +407,25 @@
    }
   ],
   "requestBody": null,
+  "responds": null
+ },
+ "recordConsentAnswers": {
+  "method": "POST",
+  "path": "/consent-answers",
+  "contract": "marketing-crm",
+  "summary": "Answer the consent questions a booking asks",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentAnswersRequest",
   "responds": null
  },
  "registerGuest": {

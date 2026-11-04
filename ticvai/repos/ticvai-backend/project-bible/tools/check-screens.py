@@ -1131,6 +1131,10 @@ def check_reachability(files) -> None:
         for t in (nav.get("entryFrom") or []):
             if t in scr:
                 out.setdefault(t, set()).add(sid)
+        # a redirect is reached when the screen its route goes to is (CHG-R14J-030, the r13 system review F-14)
+        to = (s.get("implementation") or {}).get("redirect")
+        if to in scr:
+            out.setdefault(to, set()).add(sid)
 
     # **Two screens on one platform with the same name.** Not an error — `F&B Order Management`
     # is BO-020 and BO-047 and has been since before the packs arrived, and which of the two

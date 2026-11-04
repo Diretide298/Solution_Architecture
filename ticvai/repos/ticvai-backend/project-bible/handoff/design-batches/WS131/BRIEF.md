@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-716` | Event Lifecycle & Change Command Center | A | 6 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-717` | Lifecycle Transition Configuration | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-718` | Event Change Request Configuration | B | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-718` | Event Change Request Configuration | B | 11 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 | `BO-719` | Event Cancellation Workflow Configuration | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-720` | Ticket, Reservation & Customer Treatment Configuration | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 

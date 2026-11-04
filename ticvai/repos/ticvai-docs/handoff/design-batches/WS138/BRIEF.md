@@ -191,7 +191,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-768` | Multichannel Composer | D | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-769` | Schedule & Trigger Rules | D | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-770` | Campaign Approval Workflow | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-771` | Budget, Goals & Forecast | B | 0 | 20 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-771` | Budget, Goals & Forecast | B | 11 | 20 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `BO-772` | A/B & AI Optimization | A | 48 | 21 | 6 | 31 | 0 | 0 | — | notStarted (—) |
 | `BO-773` | Attribution & Audit | D | 0 | 20 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 

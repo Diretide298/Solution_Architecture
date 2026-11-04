@@ -61,7 +61,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added 18 August** — the guest app's payment screen did not declare the operation that takes a payment, and F11 routed food payment through the AI concierge instead. **Card or wallet** (TenderKind `card`, `wallet`, as `createPayment` and flow F11 step 4 say; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September.** **W1:** a guest who proved the contact with the code arrives here with it; only the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.\n\n**F&B is paid on its own (decided by Chinmay, 2 October 2026; DEC-052, DEC-071).** When this step pays a guest F&B order (F11 step 4, after `createGuestFnbOrder`), it pays that order alone, with its own receipt; F&B lines never join the ticket cart's one receipt (DI-293 does not apply to F&B) (CHG-SGU-001).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added 18 August** — the guest app's payment screen did not declare the operation that takes a payment, and F11 routed food payment through the AI concierge instead. **Card or wallet** (TenderKind `card`, `wallet`, as `createPayment` and flow F11 step 4 say; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency**; a foreign card is converted by the guest's own issuer at their rate, which is not ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September.** **W1:** a guest who proved the contact with the code arrives here with it; only the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.\n\n**F&B is paid on its own (decided by Chinmay, 2 October 2026; DEC-052, DEC-071).** When this step pays a guest F&B order (F11 step 4, after `createGuestFnbOrder`), it pays that order alone, with its own receipt; F&B lines never join the ticket cart's one receipt (DI-293 does not apply to F&B) (CHG-SGU-001).\n\n**Unanswered consent at Pay** (ADAM CR-556 with CR-576, CHG-R14INT-001): Pay's `checkoutCart` refusing `422 consentRequired` or `consentAnswerBlocks` opens the same consent pop-up (overlay `consentQuestions`, as GST-008 asks them) for the unanswered questions, then `recordConsentAnswers`, the cart read again and `checkoutCart` once more. It sat on GST-041 until CR-576 moved `checkoutCart` here.",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getCart` reads one record and nothing reads a population — the screen is about that one thing",
@@ -122,7 +122,7 @@
        "kind": "consentBlock",
        "label": "Terms and conditions",
        "operation": "checkoutCart",
-       "notes": "**After the code the guest goes straight to the T&Cs tick and completes** (W1): no second name, email or phone form. The profile is created by `checkoutCart` and completed later.",
+       "notes": "**After the code the guest goes straight to the T&Cs tick and completes** (W1): no second name, email or phone form. The profile is created by `checkoutCart` and completed later. Pay sends `termsAccepted` (`kind` termsAndConditions, `version` the one the Read the terms panel shows) on `checkoutCart`; on `422 termsVersionNotCurrent` the app reloads `listPublishedPolicies`, clears the tick and leaves Pay disabled until the guest ticks the current version: the consent block's existing behaviour (ADAM CR-576, CHG-CR576-001).",
        "provenance": "decided 29 September 2026, W1"
       },
       {
@@ -175,7 +175,7 @@
        "kind": "primaryButton",
        "label": "Pay",
        "operation": "createPayment",
-       "notes": "One Pay: checks the cart out (`checkoutCart`, with the T&Cs tick and the opt-in), which creates the order, and takes the payment (`createPayment`). The provider token comes from the gateway, never a form.",
+       "notes": "One Pay: checks the cart out (`checkoutCart`, with the T&Cs tick as `termsAccepted` and the opt-in), which creates the order, and takes the payment (`createPayment`). The provider token comes from the gateway, never a form. **On `409 quoteExpired`** (ADAM CR-577, CHG-CR577-001) the You pay in line is replaced with the answer's `quote` in its existing format (charge amount, base amount, rate, held until) and the guest is asked to confirm; Pay then sends `createPayment` again with a new `Idempotency-Key`, so nothing is charged that the guest has not seen.",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
@@ -213,6 +213,16 @@
     "contract": "orders",
     "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsentAnswers",
+    "contract": "marketing-crm",
+    "purpose": "Record the answers to the questions Pay's checkoutCart refused for (422 consentRequired or consentAnswerBlocks), once, after the last question (ADAM CR-556, moved from GST-041 with checkoutCart)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getCart"
+    ],
+    "provenance": "ADAM CR-556, 3 November 2026; ADAM CR-576 (CHG-R14INT-001)"
    },
    {
     "operationId": "getPaymentLink",
@@ -253,7 +263,9 @@
     },
     {
      "name": "paymentId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Only on a link back to a payment already started; from the basket (GST-041) there is none, since Pay makes the order and its payment here (ADAM CR-576)."
     },
     {
      "name": "token",
@@ -309,6 +321,26 @@
     "removed": true,
     "why": "The hold was taken when the lines were added on the booking steps; nothing is added on the payment step.",
     "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "consentQuestions",
+    "component": "modal",
+    "trigger": "Pay's checkoutCart refuses 422 consentRequired or consentAnswerBlocks",
+    "body": "**The same consent pop-up component as GST-007, for the unanswered questions** (ADAM CR-556, 3 November 2026; as accepted under CR-493): one question at a time, Yes / No, the second tap on a blocking answer, and a close (x) that discards the answers and records nothing. A per-booking question is asked once. A per-person question is asked once for each person on each line in its `lineIds`: a line of quantity n has persons 0 to n-1, named by ticket type and number (*Adult 1*, *Child 2*), or *Person n* as the eligibility drawer labels them when the line has a declaration. A question whose `answered` is true is not asked again. After the last question one `recordConsentAnswers` is sent, per-person answers with `cartLineId`, `personIndex` and `personName` (the label shown); then the cart is read again and Pay sends `checkoutCart` once more.",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Yes / No",
+     "operation": "recordConsentAnswers"
+    },
+    "dismiss": {
+     "label": "Close (x)",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "ADAM CR-556 (3 November 2026), moved here from GST-041 with checkoutCart (ADAM CR-576; CHG-R14INT-001); the pop-up as accepted under CR-493"
    }
   ],
   "_platform": {
@@ -667,23 +699,23 @@
      "provenance": "derived — GST-001 declares entryState.params  and GST-041 holds none of them. The edge carries nothing: GST-041 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
     },
     {
-     "to": "GST-059",
-     "trigger": "They follow it through the day",
-     "provenance": "flow F49 step 5→6"
-    },
-    {
      "to": "GST-009",
      "trigger": "Checkout",
-     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+     "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction); no payment id since Checkout makes no order here (ADAM CR-576)",
      "carries": [
       "orderId",
-      "paymentId",
       "token"
      ]
+    },
+    {
+     "to": "GST-059",
+     "trigger": "They follow it through the day",
+     "provenance": "flow F49 step 5→6",
+     "operation": "getCart"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Promo code added 28 September** (decided 28 September, audit R073 (e)) — the web cart WEB-010 has the field, and the two shells are one product.\n\n**Rev 3 (decided 29 September).** **Sign-in (REV3-3):** with `signInAt` `afterAddOns` (default) the sign-in or guest-code choice is asked when the guest leaves the tickets and add-ons step (GST-008 → GST-042); with `atPayment` it is asked here, on the way to payment. The basket is kept either way; guest checkout and matching are unchanged (DG-1). Visit date per line (23SEP-9). **On mobile the basket stays a bottom bar with the running total**; the floating icon and the cart side apply to the website (REV3-10). A spot held on the venue map counts down from its `ResourceHold.expiresAt` (REV3-15). `checkoutCart` `422 consentRequired` or `consentAnswerBlocks` sends the guest back to the consent questions (REV3-26).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September.** **W1:** after the guest code, or when signed in, the basket goes straight to payment (GST-009) with no details form. *Book this plan* (GST-053) and *Buy meal combo* (GST-004 → GST-056) land here.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Promo code added 28 September** (decided 28 September, audit R073 (e)) — the web cart WEB-010 has the field, and the two shells are one product.\n\n**Rev 3 (decided 29 September).** **Sign-in (REV3-3):** with `signInAt` `afterAddOns` (default) the sign-in or guest-code choice is asked when the guest leaves the tickets and add-ons step (GST-008 → GST-042); with `atPayment` it is asked here, on the way to payment. The basket is kept either way; guest checkout and matching are unchanged (DG-1). Visit date per line (23SEP-9). **On mobile the basket stays a bottom bar with the running total**; the floating icon and the cart side apply to the website (REV3-10). A spot held on the venue map counts down from its `ResourceHold.expiresAt` (REV3-15). Checkout makes no order here (ADAM CR-576), so the consent pop-up CR-556 placed here for a `checkoutCart` refusal moved with `checkoutCart` to GST-009 (CHG-R14INT-001); unanswered questions are asked there.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September.** **W1:** after the guest code, or when signed in, the basket goes straight to payment (GST-009) with no details form. *Book this plan* (GST-053) and *Buy meal combo* (GST-004 → GST-056) land here.",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getCart` reads one record and nothing reads a population — the screen is about that one thing",
@@ -795,8 +827,7 @@
       {
        "kind": "primaryButton",
        "label": "Checkout",
-       "operation": "checkoutCart",
-       "notes": "Checks the cart out (`checkoutCart`) and moves on to Review & Payment.",
+       "notes": "Moves on to Review & Payment without calling `checkoutCart`: the order is made at Pay on GST-009, so the T&Cs tick reaches the call that creates the order (ADAM CR-576, CHG-CR576-001). The button looks and reads the same.",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
@@ -826,12 +857,6 @@
     "contract": "orders",
     "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "checkoutCart",
-    "contract": "orders",
-    "purpose": "Turn the cart into an order",
-    "trigger": "onAction"
    },
    {
     "operationId": "abandonCart",

@@ -521,6 +521,12 @@
        "kind": "secondaryButton",
        "label": "Connection profile",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Activate terminal",
+       "operation": "enrolDevice",
+       "provenance": "contract tenancy.yaml POST /devices/{deviceId}/enrolment; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       }
      ]
     }
@@ -566,6 +572,30 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formEnrolDevice",
+    "component": "modal",
+    "trigger": "Activate terminal",
+    "body": "**Collects what `enrolDevice` sends before it is called.** Required: `state`. Optional: `configurationProfileId`, `reason`, `enrolmentCode`, `testResult`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DeviceEnrolment",
+    "confirm": {
+     "label": "Activate terminal",
+     "operation": "enrolDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "state",
+      "configurationProfileId",
+      "reason",
+      "enrolmentCode",
+      "testResult"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /devices/{deviceId}/enrolment; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

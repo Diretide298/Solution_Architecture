@@ -4,9 +4,9 @@ generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**Money, and it is append-only.** 72 operations over 27 tables that are never updated and never
-  deleted — a different discipline from everything around it, and one that should not share a deploy
-  with anything that does mutate.'
+why: '**Money, and it is append-only.** Its postings are never updated and never deleted — a different
+  discipline from everything around it, and one that should not share a deploy with anything that does
+  mutate.'
 scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
 ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable; one
   that is briefly wrong is not.'

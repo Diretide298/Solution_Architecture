@@ -338,6 +338,8 @@ operations:
   - guest
   offline: true
   reads:
+  - catalogue.product
+  - catalogue.variant
   - promotions.bundle
   - promotions.bundle_choice_group
   - promotions.bundle_choice_option

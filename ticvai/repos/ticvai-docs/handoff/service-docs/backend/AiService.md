@@ -682,6 +682,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| subjectId | string (uuid) |  | The guest whose conversation the message is in, so erasure finds it (r13 system review C-11; the lead, 3 November 2026: "ai.conversation and the AI messages get a subject id erasure can find"; CHG-R1… (read-only; nullable) |
 | id | string (uuid) | yes |  |
 | conversationId | string (uuid) | yes |  |
 | role | enum (user, assistant, system) | yes |  |
@@ -5355,6 +5356,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| subject_id | uuid | no | The guest whose conversation the message is in, so erasure finds it (r13 system review C-11; the lead, 3 November 2026: "ai.conversation and the AI messages get a subject id erasure can find"; CHG-R1… |
 | id | uuid | yes |  |
 | conversation_id | uuid | yes |  |
 | role | text | yes |  |

@@ -54,8 +54,9 @@ WARNINGS: list[str] = []
 
 def main() -> int:
     if not BACKLOG.exists():
-        print("no backlog — nothing to check")
-        return 0
+        # A missing input is a failure, not "nothing to check" (r14, review E-07, CHG-R14I-007).
+        print(f"FAIL - {BACKLOG.relative_to(BACKLOG.parents[1]).as_posix()} is missing: the backlog is not judged")
+        return 1
 
     doc = json.loads(BACKLOG.read_text(encoding="utf-8"))
     entries = doc.get("entries") or []

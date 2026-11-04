@@ -909,7 +909,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/reminder-breach-notification-rules-bo-389",
-   "component": "src/routes/venue-operations/ReminderBreachNotificationRules.tsx",
+   "redirect": "BO-388",
    "status": "notStarted"
   },
   "navigation": {
@@ -994,7 +994,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/escalation-policy-builder-bo-390",
-   "component": "src/routes/venue-operations/EscalationPolicyBuilder.tsx",
+   "redirect": "BO-388",
    "status": "notStarted"
   },
   "navigation": {

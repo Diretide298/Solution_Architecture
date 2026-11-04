@@ -1,6 +1,6 @@
 # WS195 — Wallet Configuration Backend Structure v1.0 board 10
 
-**10 screens · 22 operations · 22 schemas · 8 permissions**
+**10 screens · 23 operations · 22 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -130,15 +130,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1173` | Wallet Integration Command Center | B | 5 | 12 | 6 | 1 | 0 | 6 | — | notStarted (—) |
+| `BO-1173` | Wallet Integration Command Center | B | 8 | 12 | 6 | 1 | 0 | 6 | — | notStarted (—) |
 | `BO-1174` | Wallet API Catalogue & Endpoint Configuration | B | 30 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1175` | Integration Profile & System Mapping | C | 32 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1176` | Wallet Events, Webhooks & Notification Orchestration | B | 11 | 9 | 6 | 12 | 0 | 6 | — | notStarted (—) |
 | `BO-1177` | API Security, Access & Integration Permissions | B | 15 | 17 | 6 | 1 | 2 | 5 | — | notStarted (—) |
 | `BO-1178` | Synchronization, Retry & Resilience Configuration | C | 12 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1179` | Integration Monitoring & Exception Workbench | A | 25 | 26 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-1179` | Integration Monitoring & Exception Workbench | A | 31 | 26 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-1180` | Wallet Configuration Governance & Version Control | C | 2 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1181` | Approval, Publication & Change Management | C | 9 | 30 | 6 | 12 | 0 | 3 | — | notStarted (—) |
+| `BO-1181` | Approval, Publication & Change Management | C | 20 | 30 | 6 | 12 | 0 | 3 | — | notStarted (—) |
 | `BO-1182` | Wallet Platform Health, Audit & Administration Center | C | 0 | 2 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 
 ## Design inputs from the client meetings

@@ -3,6 +3,11 @@
 **Written 17 August.** Four things the screen definitions already imply and nothing has stated.
 None needs new data — all of it derives from `handoff/screen-index.json` and the app manifests.
 
+> **Historical figures.** Every count on this page (apps, screens, waves, routes) is as of 17 August 2026, when the
+> package had ten app manifests and 364 screens; the arguments still hold and the numbers do not (r13 system review
+> F-13, CHG-R14J-041). Today's counts per app and wave are each manifest's `byWave` in `frontend/*.yaml`, and the
+> package totals are in [OVERVIEW.md](../../OVERVIEW.md).
+
 ---
 
 ## Bundles split by wave

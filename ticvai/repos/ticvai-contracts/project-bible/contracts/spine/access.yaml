@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 248
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
@@ -52,7 +53,7 @@ info:
     \ the front gate and\n  scanned twenty metres later must not be refused by a lagging replica.\n- Scans\
     \ recorded offline are appended, never conflicting, deduplicated on the\n  client-generated UUIDv7.\n\
     - Deny is always explained. A gate operator facing a queue needs a reason, not a\n  boolean.\n\nCross-cell\
-    \ (ADR-0014, ADR-0010): entitlements cross cells. A ticket issued in one cell is validated in another\
+    \ (ADR-0038, which supersedes ADR-0014; ADR-0010): entitlements cross cells. A ticket issued in one cell is validated in another\
     \ as a REDEMPTION RIGHT — a narrow projection carrying only what a gate needs, with no personal data.\
     \ Redemption is authoritative in the consuming cell and reconciled back to the issuer, exactly as\
     \ offline scans are authoritative on the device and reconciled to the server. The gate must work when\
@@ -310,7 +311,9 @@ x-ticvai-jobs:
     - access.credential_exception
     - access.credential_issuance
     - access.entitlement
-    for: Access credential issuance, delivery and binding pipeline.
+    for: 'Access credential issuance, delivery and binding pipeline. A pending credential_delivery row with no destination
+      (the order.ticketsResent consumer found no recipient) moves to failed with failure_reason ''no recipient on
+      file'' (ADAM CR-554, CHG-CR554-001).'
     source:
     - states/access-credential-binding.yaml:27
     - states/access-credential-delivery.yaml:29
@@ -457,11 +460,27 @@ x-ticvai-jobs:
     reads: [access.entitlement, access.credential_delivery]
     writes: [access.credential_delivery]
     for: 'This module''s consumer of order.ticketsResent (ADAM CR-506, CHG-CR506-001): one pending credential delivery per
-      entitlement, as deliverCredential writes it (sms is smsLink), idempotent on the event id plus the entitlement id.'
+      entitlement, as deliverCredential writes it (sms is smsLink), idempotent on the event id plus the entitlement id.
+      Its rules are settled on ADAM CR-554 (CHG-CR554-001) and stated on the event''s consumer: cancelled, expired and
+      surrendered entitlements skipped, recipient_role purchaser, attempt counted per entitlement and channel, and the
+      destination from the event, else the latest earlier row, else the order subject''s primary contact through
+      identity#subjectContactRecords; with none, the row is written pending with no destination and the dispatch job
+      fails it with ''no recipient on file''.'
     source: ['events/order-ticketsResent.yaml']
+  subjectDataPart:
+    module: access
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [access.biometric_audit_event, access.configuration_change, access.device_binding, access.entitlement,
+      access.face_reenrolment_attempt, access.identity_lock, access.parking_entitlement, access.security_alert]
+    writes: []
+    for: 'access''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /access/validate:
     post:
+      x-ticvai-personal-data: gated
       operationId: validateAccess
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
@@ -623,6 +642,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/entitlements:
     get:
+      x-ticvai-personal-data: gated
       operationId: listMyEntitlements
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
@@ -733,6 +753,7 @@ paths:
         type: string
         format: uuid
     get:
+      x-ticvai-personal-data: gated
       operationId: getEntitlement
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
@@ -766,6 +787,7 @@ paths:
       - access
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, share, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -816,6 +838,12 @@ paths:
         because it is the sensitive half** — a list of a guest''s tickets is a convenience, and the credential
         admits somebody.
 
+        **Whose credential a guest may read** (r13 system review C-03, CHG-R14H-003; the lead, 3 November 2026: "All
+        four, one release"): as `getEntitlement`, the guest''s own entitlement, one shared with them
+        (`shareEntitlement`, not revoked) and one a guest has delegated to them with `ORDER_VIEW`
+        (`x-ticvai-object-owner`), and nothing else. Any other entitlement id is the shared `404`, exactly as one that
+        does not exist, so another guest''s rotation seed is never returned and an id reveals nothing.
+
         **Rotates without reissuing.** A guest whose phone was stolen gets a new payload against the same
         entitlement, and the old one stops scanning.
 
@@ -840,6 +868,7 @@ paths:
       - access
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, share, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -921,6 +950,8 @@ paths:
                         format: date-time
                         description: The seed stops verifying after this. The app fetches a fresh one
                           whenever it is online before then.
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/history:
@@ -954,6 +985,7 @@ paths:
       - access
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject, delegation]
       x-ticvai-audience:
       - staff
       - guest
@@ -997,6 +1029,8 @@ paths:
                     byPrincipalName:
                       type: string
                       nullable: true
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-tag/enrolments:
@@ -2267,6 +2301,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/override:
     post:
+      x-ticvai-personal-data: gated
       operationId: overrideAccess
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
@@ -2351,6 +2386,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/lookup:
     get:
+      x-ticvai-personal-data: gated
       operationId: lookupTicket
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
@@ -3566,6 +3602,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/group-validate:
     post:
+      x-ticvai-personal-data: gated
       operationId: validateGroupAccess
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
@@ -11660,6 +11697,7 @@ paths:
       x-ticvai-bounded: a venue's podiums, defined by hand
   /ticket-credential-investigation:
     get:
+      x-ticvai-personal-data: gated
       operationId: listTicketCredentialInvestigation
       x-ticvai-consumed-by:
         - "P08 BO-226 Ticket & Credential Investigation Console"
@@ -26513,6 +26551,13 @@ components:
       - validTo
       - changeVersion
       properties:
+        holderSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: guest
+          x-ticvai-references: pii.subject
+          description: '**The named holder, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes it there. Set by the server when it is first written: a known person''s subject where the caller names one, else a new pii.subject of kind guest; null while none is given.'
         id:
           type: string
           format: uuid
@@ -26799,6 +26844,8 @@ components:
           type: boolean
           default: false
         holderName:
+          x-ticvai-pii: {store: subject.displayName, subject: holderSubjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         sharedWithSubjectIds:
@@ -27917,6 +27964,7 @@ components:
         productName:
           type: string
         holderName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: 'Present only where the entitlement is name-bound. Identity and entitlement are
@@ -37817,6 +37865,7 @@ components:
           type: string
           description: Payment method
         guestName:
+          x-ticvai-data-class: personal
           type: string
           description: Guest
         visitDate:

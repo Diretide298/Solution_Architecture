@@ -247,7 +247,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - orderId<-navigation
   goesTo:
   - KSK-001
   - KSK-002

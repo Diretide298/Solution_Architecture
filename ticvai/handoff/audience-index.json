@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-03",
+ "generated": "2026-11-04",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2864,
+  "operations": 2873,
   "screens": 2453,
   "flows": 291
  },
@@ -197,6 +197,7 @@
     "identity.guest_credential",
     "identity.guest_session",
     "identity.mfa_method",
+    "identity.offline_pin_verifier",
     "identity.otp_challenge",
     "identity.password_policy",
     "identity.principal",
@@ -257,7 +258,7 @@
     "screens": 0,
     "flows": 14,
     "contracts": 7,
-    "tables": 74
+    "tables": 75
    }
   },
   "device": {
@@ -267,6 +268,7 @@
     "captureStoredValue",
     "endKioskAssist",
     "getCart",
+    "getOfflineStepUpPackage",
     "getPublishedKioskConfig",
     "getPublishedTenantConfig",
     "getSignageQueueBoard",
@@ -304,6 +306,7 @@
    ],
    "contracts": [
     "games",
+    "identity",
     "marketing-crm",
     "orders",
     "queue",
@@ -323,6 +326,9 @@
     "games.play",
     "games.reader",
     "games.reader_sync_status",
+    "identity.offline_pin_verifier",
+    "identity.open_shift_marker",
+    "identity.principal_credential",
     "marketing.consent_question",
     "marketing.consent_question_version",
     "marketing.form_definition",
@@ -376,11 +382,11 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 22,
+    "operations": 23,
     "screens": 0,
     "flows": 13,
-    "contracts": 6,
-    "tables": 63
+    "contracts": 7,
+    "tables": 66
    }
   },
   "guest": {
@@ -1568,6 +1574,7 @@
     "identity.mfa_method",
     "identity.mfa_recovery_code",
     "identity.module_access",
+    "identity.offline_pin_verifier",
     "identity.password_policy",
     "identity.principal",
     "identity.principal_credential",
@@ -1653,7 +1660,7 @@
     "screens": 51,
     "flows": 10,
     "contracts": 11,
-    "tables": 150
+    "tables": 151
    }
   },
   "prospect": {
@@ -1686,6 +1693,9 @@
     "cache:idempotency",
     "control.billing_entity",
     "control.capacity_pack",
+    "control.cell",
+    "control.cell_endpoint",
+    "control.cell_tenant",
     "control.contract",
     "control.licence_add_on",
     "control.licence_add_on_limit",
@@ -1698,8 +1708,10 @@
     "control.plan",
     "control.plan_limit",
     "control.plan_module",
+    "control.tenant",
     "control.tier_allowance",
     "control.tier_module",
+    "control.usage_record",
     "control.venue_type_template",
     "control.vsi_assessment",
     "ledger.fx_rate",
@@ -1713,7 +1725,7 @@
     "screens": 0,
     "flows": 2,
     "contracts": 3,
-    "tables": 25
+    "tables": 30
    }
   },
   "public": {
@@ -1805,6 +1817,7 @@
     "getDsarRequest",
     "getGuestLink",
     "getGuestLoyalty",
+    "getModuleEnablement",
     "getTenantRequestLimits",
     "getWalletPreCloseChecks",
     "holdWalletFunds",
@@ -1834,6 +1847,7 @@
     "recordQueueRedemptionUse",
     "recordSaleOwnerAnswers",
     "recordSubjectDataExportPart",
+    "recordSubjectDetails",
     "recordSyncRejection",
     "recordSyncRejectionResolution",
     "recordTouchPoint",
@@ -1856,6 +1870,7 @@
     "setTenantDomainMapping",
     "settleDeposit",
     "simulateRecommendationDecision",
+    "submitSubjectDataPart",
     "transmitEInvoices",
     "updateGuestSubjectDetails",
     "verifySupervisorStepUp",
@@ -1863,6 +1878,7 @@
    ],
    "screens": [],
    "flows": [
+    "F102",
     "F17",
     "F32",
     "F34",
@@ -1895,17 +1911,22 @@
     "access.parking_facility",
     "access.scan_event",
     "ai.activity",
+    "ai.answer_feedback",
     "ai.approval_request_score",
     "ai.capability",
     "ai.chunk_embedding",
+    "ai.conversation",
     "ai.decision_record",
     "ai.entity_risk",
     "ai.governance_policy_version",
     "ai.guided_choice_suggestion",
     "ai.index_entry",
+    "ai.message",
     "ai.policy",
     "ai.policy_exception",
     "ai.rec_decision",
+    "ai.rec_decline",
+    "ai.rec_event",
     "ai.risk_alert",
     "ai.risk_assessment",
     "ai.risk_strategy",
@@ -1915,6 +1936,7 @@
     "cache:governance-policy",
     "cache:idempotency",
     "cache:rec-candidates",
+    "cache:resolution",
     "cache:risk-features",
     "catalogue.channel_capacity",
     "catalogue.channel_envelope",
@@ -1925,6 +1947,7 @@
     "control.api_client_secret",
     "control.api_licence",
     "control.contract",
+    "control.licence_add_on",
     "control.plan",
     "control.tenant",
     "control.tenant_domain",
@@ -1932,11 +1955,14 @@
     "identity.benefit_usage",
     "identity.delegated_access",
     "identity.guest_session",
+    "identity.offline_pin_verifier",
+    "identity.offline_step_up",
     "identity.password_policy",
     "identity.principal",
     "identity.principal_credential",
     "identity.role_permission",
     "identity.subject_data_export_part",
+    "identity.subject_erasure_part",
     "ledger.account",
     "ledger.account_mapping",
     "ledger.credit_memo",
@@ -1954,30 +1980,54 @@
     "ledger.tax_invoice",
     "ledger.tax_invoice_line",
     "ledger.tax_invoice_template",
+    "marketing.attribution_touch",
+    "marketing.booking_consent_record",
     "marketing.campaign",
+    "marketing.case",
+    "marketing.case_service_action",
+    "marketing.challenge_progress",
     "marketing.communication_policy_decision",
     "marketing.communication_provider",
     "marketing.consent_record",
     "marketing.consent_record_channel",
+    "marketing.conversation",
     "marketing.cookie_scan_finding",
     "marketing.cookie_scan_policy",
     "marketing.cookie_scan_run",
     "marketing.customer_badge",
+    "marketing.device_consent",
     "marketing.form_submission",
     "marketing.form_submission_sale_link",
     "marketing.guest_device",
     "marketing.guest_document",
+    "marketing.guest_document_upload",
     "marketing.guest_match_policy",
+    "marketing.guest_note",
+    "marketing.guest_preference",
     "marketing.guest_profile",
+    "marketing.guest_relationship",
+    "marketing.invitation",
     "marketing.journey",
+    "marketing.journey_enrollment",
+    "marketing.lost_item",
     "marketing.loyalty_position",
     "marketing.loyalty_programme",
     "marketing.message_dispatch",
     "marketing.message_dispatch_attempt",
     "marketing.message_template",
+    "marketing.privacy_action",
+    "marketing.privacy_audit_event",
+    "marketing.privacy_exception",
+    "marketing.privacy_request",
+    "marketing.referral",
+    "marketing.review",
+    "marketing.subscription",
     "marketing.suppression",
     "marketing.touch_point",
     "marketing.tracking_technology",
+    "marketing.waiver_requirement",
+    "marketing.waiver_signature",
+    "marketing.wishlist_item",
     "orders.chargeback",
     "orders.chargeback_evidence",
     "orders.chargeback_investigation_log",
@@ -1999,6 +2049,9 @@
     "pii.consent_identifier",
     "pii.subject",
     "pii.subject_biometric",
+    "pii.subject_contact",
+    "pii.subject_document",
+    "pii.subject_network_identifier",
     "platform.audit_record",
     "platform.dead_letter",
     "platform.idempotency_record",
@@ -2031,14 +2084,15 @@
     "wallet.wallet_transaction",
     "whitelabel.guided_choice",
     "whitelabel.guided_choice_answer",
-    "whitelabel.guided_choice_question"
+    "whitelabel.guided_choice_question",
+    "whitelabel.module_enablement"
    ],
    "counts": {
-    "operations": 72,
+    "operations": 75,
     "screens": 0,
-    "flows": 5,
+    "flows": 6,
     "contracts": 18,
-    "tables": 142
+    "tables": 180
    }
   },
   "staff": {
@@ -2566,6 +2620,10 @@
     "getChallenge",
     "getChannelAllocations",
     "getChannelAvailability",
+    "getChannelFeePayment",
+    "getChannelPricingCommercial",
+    "getChannelProfile",
+    "getChannelReadinessValidation",
     "getChargebackAnalytics",
     "getCommandCentre",
     "getCommercialMetrics",
@@ -2717,6 +2775,7 @@
     "getProduct",
     "getProductAffinity",
     "getProductAttributes",
+    "getProductCatalogue",
     "getProductChannelTexts",
     "getProductDashboard",
     "getProductEligibilityRule",
@@ -2839,6 +2898,7 @@
     "getWalletBalance",
     "getWalletExitBalance",
     "getWalletFundingRules",
+    "getWalletIntegrationMapping",
     "getWalletLiability",
     "getWalletMovementSummary",
     "getWalletPreCloseChecks",
@@ -7502,6 +7562,7 @@
     "fnb.table_reservation",
     "fnb.table_session",
     "fnb.table_visit",
+    "fnb.table_visit_server",
     "fnb.temperature_checkpoint",
     "fnb.temperature_log",
     "fnb.waitlist_entry",
@@ -7547,6 +7608,7 @@
     "identity.mfa_recovery_code",
     "identity.module",
     "identity.module_access",
+    "identity.offline_pin_verifier",
     "identity.password_policy",
     "identity.permission",
     "identity.platform_staff_grant",
@@ -8188,11 +8250,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2649,
+    "operations": 2655,
     "screens": 2164,
     "flows": 138,
     "contracts": 33,
-    "tables": 1140
+    "tables": 1142
    }
   }
  }

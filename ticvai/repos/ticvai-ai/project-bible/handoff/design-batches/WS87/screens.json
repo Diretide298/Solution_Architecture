@@ -969,13 +969,6 @@
   },
   "apis": [
    {
-    "operationId": "topUpWallet",
-    "contract": "wallet",
-    "purpose": "Self-service top-up",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "getWallet",
     "contract": "wallet",
     "purpose": "Read a guest wallet",

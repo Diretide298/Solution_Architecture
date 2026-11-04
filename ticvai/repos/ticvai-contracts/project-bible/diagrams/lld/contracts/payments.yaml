@@ -59,7 +59,7 @@ operations:
   - payments.method
 - operation: createPaymentProviderConnection
   verb: POST
-  path: /payment-providers
+  path: /payment-provider-connections
   scope: tenant
   permission: PAYMENT_PROVIDER_MANAGE
   audience:
@@ -254,7 +254,7 @@ operations:
   writes: []
 - operation: listPaymentProviderConnections
   verb: GET
-  path: /payment-providers
+  path: /payment-provider-connections
   scope: tenant
   permission: PAYMENT_VIEW
   audience:
@@ -666,7 +666,7 @@ operations:
   - payments.chargeback_evidence
 - operation: testPaymentProviderConnection
   verb: POST
-  path: /payment-providers/{connectionId}/test
+  path: /payment-provider-connections/{connectionId}/test
   scope: tenant
   permission: PAYMENT_PROVIDER_MANAGE
   audience:

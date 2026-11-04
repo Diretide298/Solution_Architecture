@@ -1079,6 +1079,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Provider response | text | not in the schema: `Provider response` |
 | Expected completion | text | not in the schema: `Expected completion` |
 
+**Actions and what each produces**
+
+| Action | Calls | Sends | On success returns | Errors to show | Notes |
+|---|---|---|---|---|---|
+| Check status (primary button) | `inquirePaymentStatus` POST `/payments/{paymentId}/inquiry` | — | Payment | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The payment is not `pendingConfirmation`; its outcome is already known and there is nothing to ask the provider. | — |
+
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **Ask the provider**: Reconciles the refund state. *(source: contracts/spine/orders.yaml#inquirePaymentStatus)*
@@ -1149,7 +1155,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-615?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
+- [ ] Every action is wired with its success and its failure: Check status.
 - [ ] Every transition is wired: `ADM-609`.
 - [ ] Every gated control is gated: `ORDER_CREATE`.
 - [ ] The module and platform inputs below are applied.
@@ -1684,7 +1690,7 @@ Method, path, parameters, request and response for every operation these screens
 "approveRefund": {"method":"POST","path":"/refunds/{refundId}/approve","contract":"orders","summary":"Approve a refund held for approval","permission":"ORDER_REFUND_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Refund"},
 "createRefund": {"method":"POST","path":"/orders/{orderId}/refunds","contract":"orders","summary":"Refund an order, wholly or in part","permission":"ORDER_REFUND","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateRefundRequest","responds":null},
 "getRefundPolicy": {"method":"GET","path":"/venues/{venueId}/refund-policy","contract":"orders","summary":"Read a venue's refund policy","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"RefundPolicy"},
-"inquirePaymentStatus": {"method":"POST","path":"/payments/{paymentId}/inquiry","contract":"orders","summary":"Ask the provider what actually happened","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Payment"},
+"inquirePaymentStatus": {"method":"POST","path":"/payments/{paymentId}/inquiry","contract":"orders","summary":"Ask the provider what actually happened","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null},{"name":"X-Order-Access-Token","in":"header","required":false},{"name":null,"in":null,"required":null},{"name":"ticvai_order_access","in":"cookie","required":false}],"requestBody":null,"responds":"Payment"},
 "listFraudRules": {"method":"GET","path":"/fraud-rules","contract":"orders","summary":"The rules evaluated before a charge","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listOrderPaymentDetail": {"method":"GET","path":"/order-payment-detail","contract":"orders","summary":"Order Payment Detail & Transaction Ledger","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"OrderPaymentDetailTransactionLedgerView"},
 "listOrderRefunds": {"method":"GET","path":"/orders/{orderId}/refunds","contract":"orders","summary":"List refunds against an order","permission":"ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},

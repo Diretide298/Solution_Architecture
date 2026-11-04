@@ -13,7 +13,7 @@
 
 ## Why this is a service
 
-**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.
+**The biggest contract in the package, and probably two services eventually** (285 operations and 134 tables on 3 November 2026, the most of any contract and of any schema). CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
 **Kept as one for now** because splitting a service before it has a load profile is guessing.
 
@@ -46,7 +46,7 @@
 | consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, CMS-023, GST-039, GST-065, GST-066 … |
 | consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 1 | BO-008, CMS-018, CMS-103 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, GST-066, POS-027, WEB-020 … |
-| consent | [`recordConsentAnswers`](#recordconsentanswers) | POST | `/consent-answers` | core | 1 | GST-007, WEB-006, WEB-011 |
+| consent | [`recordConsentAnswers`](#recordconsentanswers) | POST | `/consent-answers` | core | 1 | GST-007, GST-008, GST-009, WEB-006, WEB-011, WEB-012 |
 | consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 1 | CMS-018, CMS-023 |
 | consent | [`setCookieBannerDesign`](#setcookiebannerdesign) | PUT | `/cookie-banner-preference/{bannerDesignId}` | setup | 1 | CMS-026 |
 | consent | [`setDynamicFieldQuestion`](#setdynamicfieldquestion) | PUT | `/dynamic-field-question/{formId}/{key}` | setup | 1 |  |
@@ -1279,7 +1279,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 **`POST /consent-answers`**: Answer the consent questions a booking asks
 
 **Each answer is a consent record: the question and its version, the answer, the person or the booking it covers, who answered and when** (decided 29 September, rev 3 REV3-26). Answered at booking, against the cart, for the questions `orders.Cart.consentQuestions` lists; `checkoutCart` binds them to the order. **Append-only**: changing an answer is a new record that supersedes the old one, so the history survives.
-**A `perPerson` question is answered per declared person** (`cartLineId` and `personIndex`, the person's row in the line's `eligibilityDeclaration`); a `perBooking` one once, and it covers everyone on the booking. For a `swim` question the answer fills `orders.CreateOrderLine.eligibilityDeclaration.confidentSwimmer`, which is now derived from it.
+**A `perPerson` question is answered per person on each line it asks** (`cartLineId` and `personIndex`); a `perBooking` one once, and it covers everyone on the booking. **`personIndex` counts the line's units from 0 to quantity minus 1; on a line with an `eligibilityDeclaration` it is that row** (ADAM CR-556, Chinmay, 3 November 2026; CHG-CR556-001). A per-person answer with no `cartLineId`, or a `personIndex` at or above the line's quantity (the line of the cart already read, `orders#cartRecords`), is `422 personRequired`. The cart's `consentQuestions[].answered` is true when every one of those persons on every line in `lineIds` has an answer. `personName` is the label the guest was shown (*Adult 1*, *Child 2*, or *Person n* on a line with a declaration). For a `swim` question the answer fills `orders.CreateOrderLine.eligibilityDeclaration.confidentSwimmer`, which is now derived from it.
 **An answer the venue set to block the booking is recorded, not refused**: the cart then shows a blocking `consentBlocksBooking` conflict on the lines it covers, and `checkoutCart` refuses until the lines are removed or the answer changes. A guest answers only on their own cart; staff at a till answer on a guest's behalf with `ORDER_CREATE`, and the record names them.
 
 |  |  |
@@ -1293,7 +1293,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.booking_consent_record` |
 | Writes | `cache:idempotency`, `marketing.booking_consent_record` |
-| Called by | GST-007, WEB-006, WEB-011 |
+| Called by | GST-007, GST-008, GST-009, WEB-006, WEB-011, WEB-012 |
 
 **Parameters**
 
@@ -1311,8 +1311,8 @@ Every record captures the notice version, the channel, the purpose, the source a
 | answers[].questionVersion | integer | yes | The version the guest was shown, from Cart.consentQuestions. (min 1) |
 | answers[].answer | enum (yes, no) | yes |  |
 | answers[].cartLineId | string (uuid) |  | For a perPerson question, the line the person is on. (nullable) |
-| answers[].personIndex | integer |  | For a perPerson question, the person's row in that line's eligibilityDeclaration, counting from 0. (min 0; nullable) |
-| answers[].personName | string |  | (max length 120; nullable) |
+| answers[].personIndex | integer |  | For a perPerson question, the person on that line: the line's units counted from 0 to quantity minus 1; on a line with an eligibilityDeclaration, that row (ADAM CR-556). (min 0; nullable) |
+| answers[].personName | string |  | The label the guest was shown for the person: ticket type and number (*Adult 1*, *Child 2*), or *Person n* on a line with a declaration (ADAM CR-556). (max length 120; nullable) |
 | answers[].personSubjectId | string (uuid) |  | Where the person is a known guest, such as the booker or a family member. (nullable) |
 | source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) | yes | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | answeredAt | string (date-time) | yes |  |
@@ -1349,7 +1349,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 |---|---|---|
 | 201 |  | Recorded |
 | 409 |  | The question has changed since the cart was read (questionVersionSuperseded); the client re-reads the cart and asks the current version. |
-| 422 |  | A perPerson question answered without a person (personRequired), a question this cart does not ask (questionNotAsked), or a retired one (questionRetired). |
+| 422 |  | A perPerson question answered without a person: no cartLineId, or a personIndex at or above the line's quantity (personRequired, ADAM CR-556), a question this cart does not ask (questionNotAsked), or… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setConsentPurposes
@@ -1771,6 +1771,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 **What it writes.** For `requestType` `access` only (an erasure writes no part): every row of the guest (`subjectId`) in marketing.consent_record, marketing.guest_profile, marketing.form_submission and marketing.guest_document, the tables of Marketing's that `handoff/subject-data-register.json` lists, in the export's `format`, as one object in the tenant's private storage (never a public or CDN path; encrypted at rest under the tenant's keys, ADR-0063). **Another guest's rows are left out even where they share a form or a document**, as `exportSubjectData` says. Then it publishes `marketing.subjectDataPartWritten` with the object's key, in the same transaction as its inbox record. A guest with no Marketing rows still gets a part, with `rowCount` 0, so the export job never waits for a part that will not come.
 
+**Every Marketing table, and the erasure too** (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). The part covers every Marketing table `handoff/subject-data-register.json` lists under `owners` (the reads below), not only the four above; a table the tenant database does not have yet (its migration in a later block) is left out of the part until it lands, and those reads are marked `feedsSetup: false`, so they pull no writer and no migration forward. For `requestType` `deletion` it erases what Marketing keeps of the guest outside pii.*: the profile's `preferredChannel` and `guestLinkId` are cleared, and each suppression of the guest's keeps its row and `addressHash` with `address` replaced by `erased`; then it records the erasure with identity `submitSubjectDataPart` (`deletion`, `rowCount` the rows changed), so Identity's erasure job holds the erasure done only with Marketing's answer. The names, contacts and IP addresses Marketing's rows used to hold are in pii.* now (x-ticvai-pii) and go with the subject.
+
 **When.** On the event, which `exportSubjectData` raises with the request: the part is the guest's Marketing data as of the request. It is not delivered until the export is approved; the export job deletes it with the export (7 days after `readyAt`, or when the request is rejected, withdrawn or expired).
 
 **Idempotent on `approvalRequestId`**: a redelivered event finds the part already written and returns it. Invoked by the event relay, never by a screen.
@@ -1783,8 +1785,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile` |
-| Writes | `cache:idempotency`, `platform.outbox` |
+| Reads | `cache:idempotency`, `marketing.attribution_touch`, `marketing.booking_consent_record`, `marketing.case`, `marketing.case_service_action`, `marketing.challenge_progress`, `marketing.communication_policy_decision`, `marketing.consent_record`, `marketing.conversation`, `marketing.device_consent`, `marketing.form_submission`, `marketing.guest_device`, `marketing.guest_document`, `marketing.guest_document_upload`, `marketing.guest_note`, `marketing.guest_preference`, `marketing.guest_profile`, `marketing.guest_relationship`, `marketing.invitation`, `marketing.journey_enrollment`, `marketing.lost_item`, `marketing.loyalty_position`, `marketing.message_dispatch`, `marketing.privacy_action`, `marketing.privacy_audit_event`, `marketing.privacy_exception`, `marketing.privacy_request`, `marketing.referral`, `marketing.review`, `marketing.subscription`, `marketing.suppression`, `marketing.touch_point`, `marketing.waiver_requirement`, `marketing.waiver_signature`, `marketing.wishlist_item` |
+| Writes | `cache:idempotency`, `marketing.guest_profile`, `marketing.suppression`, `platform.outbox` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -3904,6 +3906,7 @@ Read from the primary, because a reply the guest has just sent must be in the th
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Status |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### handoverToAgent
@@ -3991,6 +3994,7 @@ Triggered by the guest asking, by the assistant refusing or failing, by sentimen
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Queued for an agent, with a position and a wait estimate |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | No agent available. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4432,6 +4436,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Added — the case with its guest-visible thread |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### respondToInvitation
@@ -4481,7 +4486,7 @@ written by OrderService (`access.entitlement` with `invitationId`, CHG-FXC-007).
 | campaignId | string (uuid) | yes |  |
 | subjectId | string (uuid) |  | (nullable) |
 | recipientEmail | string (email) |  | (nullable) |
-| token | string | yes | Single-use and unguessable. |
+| token | string | yes | Single-use and unguessable: at least 128 bits from a cryptographic random source (22 or more base64url characters), never logged (x-ticvai-secret: bearer on the path; r13 system review C-13, CHG-R14H… |
 | plusOnes | integer |  | (default 0) |
 | status | enum (issued, viewed, accepted, declined, expired, revoked) | yes |  |
 | entitlementIds | array of string (uuid) |  |  |
@@ -4553,6 +4558,7 @@ written by OrderService (`access.entitlement` with `invitationId`, CHG-FXC-007).
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Sent |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### sendGuestConversationMessage
@@ -4956,6 +4962,7 @@ Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateMyProfile
@@ -5466,7 +5473,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | order_id | uuid | no | Set by orders.checkoutCart when the cart becomes an order. |
 | order_line_id | uuid | no |  |
 | person_index | integer | no |  |
-| person_name | text | no |  |
 | person_subject_id | uuid | no |  |
 | answered_by_subject_id | uuid | no | The guest who answered, from the session. |
 | answered_by_principal_id | uuid | no | The staff member who answered on the guest's behalf. |
@@ -5574,6 +5580,28 @@ Every table this service owns that the slice reads or writes, with its columns a
 | synced_at | timestamptz | no | Server time the message arrived. |
 | case_id | uuid | yes | The case this message belongs to, from the path of addCaseMessage (the opening one, createCase). |
 
+### `marketing.case_service_action`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Client-generated UUIDv7; equals the Idempotency-Key header. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| mode | text | yes |  |
+| case_id | uuid | no | Required with execute; the action is recorded on this case. |
+| order_id | uuid | yes |  |
+| line_ids | text[] | no | Omit for the whole order. |
+| action | text | no | Required with execute. |
+| target_performance_id | uuid | no | For reschedule and exchange, the option chosen from the evaluation. |
+| target_product_id | uuid | no | For exchange and upgrade. |
+| recipient_subject_id | uuid | no | For transfer and changeName, the new ticket holder. |
+| delivery_channel | text | no | For resendTicket. |
+| reason | text | no |  |
+| status | text | no |  |
+| downstream_operation | text | no | The operation that performed it, e.g. |
+| downstream_reference | text | no |  |
+| performed_by_principal_id | uuid | no |  |
+| updated_at | timestamptz | no |  |
+
 ### `marketing.challenge`
 
 | Column | Type | Required | Notes |
@@ -5606,6 +5634,29 @@ Every table this service owns that the slice reads or writes, with its columns a
 | streak_count | integer | no |  |
 | completed_at | timestamptz | no |  |
 | reward_issued_at | timestamptz | no |  |
+
+### `marketing.communication_policy_decision`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| communication_id | text | yes | marketing.message_dispatch id. |
+| subject_id | uuid | yes |  |
+| message_class | text | yes |  |
+| channel | text | yes |  |
+| marketing_consent | text | no |  |
+| prefers_email | boolean | no |  |
+| prefers_sms | boolean | no |  |
+| prefers_whatsapp | boolean | no |  |
+| prefers_push | boolean | no |  |
+| language | text | no | Preferred language (BCP 47) used to pick the template language. |
+| is_contact_restricted | boolean | no | A contact restriction (e.g. |
+| jurisdiction | text | no | Country whose policy was applied. |
+| suppression_reason | text | no |  |
+| decision | text | yes |  |
+| reasons | text[] | no | Why the decision was reached; empty when allowed with nothing notable. |
+| rerouted_to_channel | text | no |  |
+| evaluated_at | timestamptz | yes |  |
 
 ### `marketing.consent_propagation`
 
@@ -5872,7 +5923,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | synced_at | timestamptz | no | Server time the submission arrived. |
 | expires_at | timestamptz | no | From validForMonths. |
 | captured_at_channel | text | no |  |
-| ip_address | text | no |  |
 
 ### `marketing.form_submission_sale_link`
 
@@ -5936,6 +5986,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expires_at | timestamptz | yes | When the signed upload URL stops working (15 minutes after issue). |
 | status | text | yes |  |
 
+### `marketing.guest_note`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| subject_id | uuid | yes |  |
+| kind | text | yes |  |
+| text | text | yes |  |
+| is_allergy | boolean | no |  |
+| is_visible_to_server | boolean | no |  |
+| author_principal_id | uuid | no |  |
+| recorded_at | timestamptz | yes |  |
+| synced_at | timestamptz | no |  |
+
 ### `marketing.guest_preference`
 
 | Column | Type | Required | Notes |
@@ -5954,10 +6018,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes | Added 20 August. |
 | subject_id | uuid | yes | Opaque reference. |
-| display_name | text | no |  |
-| email | text | no |  |
-| phone | text | no |  |
-| preferred_language | text | no |  |
 | preferred_channel | text | no | Left out where the guest has no preferred channel: a guest who chose none in updateMyProfile is stored as null and answered without this field (ADAM CR-291, option B; CHG-R11GST-002). |
 | guest_link_id | uuid | no | Present where the guest is linked across cells. |
 | tags | text[] | no |  |
@@ -5976,6 +6036,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | notes | text | no |  |
 | segment_id | uuid | yes | Points at marketing.segment. |
 
+### `marketing.guest_relationship`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| related_subject_id | uuid | no |  |
+| organisation_id | uuid | no |  |
+| kind | text | yes |  |
+| authorities | text[] | no | Four different permissions, not one relationship. |
+| effective_from | date | no |  |
+| effective_to | date | no |  |
+| has_shared_benefits | boolean | no |  |
+| verified_at | timestamptz | no |  |
+| scope_path | text | no |  |
+
 ### `marketing.invitation`
 
 | Column | Type | Required | Notes |
@@ -5983,8 +6058,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | campaign_id | uuid | yes |  |
 | subject_id | uuid | no |  |
-| recipient_email | text | no |  |
-| token | text | yes | Single-use and unguessable. |
+| token | text | yes | Single-use and unguessable: at least 128 bits from a cryptographic random source (22 or more base64url characters), never logged (x-ticvai-secret: bearer on the path; r13 system review C-13, CHG-R14H… |
 | plus_ones | integer | no |  |
 | status | text | yes |  |
 | entitlement_ids | text[] | no |  |
@@ -6005,6 +6079,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | accepted_count | integer | no |  |
 | respond_by_at | timestamptz | no |  |
 | status | text | yes |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `marketing.journey_enrollment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| journey_id | uuid | yes |  |
+| subject_id | uuid | yes | The guest. |
+| step_id | uuid | yes | Where they are now. |
+| status | text | no | suppressed is distinct from exited. |
+| entered_at | timestamptz | no |  |
+| step_entered_at | timestamptz | no | When this step started, which is what a delay step counts from. |
+| next_action_at | timestamptz | no | The queue. |
+| exited_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ### `marketing.lost_item`
@@ -6165,6 +6254,50 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_to | timestamptz | no |  |
 | is_active | boolean | yes |  |
 
+### `marketing.privacy_action`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| action_id | uuid | no |  |
+| request_id | uuid | no | The privacy request it fulfils; null when a retention run raised it. |
+| retention_run_id | uuid | no |  |
+| subject_id | uuid | yes |  |
+| action_type | text | yes | pseudonymise only where the tenant has configured it. |
+| other_action_label | text | no |  |
+| requires_approval | boolean | no |  |
+| decision | jsonb | no | Sent to record an approval step or cancel. |
+| status | text | no |  |
+| system_results | jsonb | no | The execution monitor, per system. |
+| dsar_request_id | text | no |  |
+| evidence_asset_id | uuid | no | Completion evidence, as runDataRetention produces. |
+| created_at | timestamptz | no |  |
+| completed_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `marketing.privacy_audit_event`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| event_id | uuid | yes |  |
+| subject_id | uuid | no |  |
+| action | text | yes |  |
+| actor_type | text | no |  |
+| actor_principal_id | uuid | no |  |
+| actor_role | text | no | The role the actor held at the time. |
+| source | text | no |  |
+| channel | text | no | A ConsentSource value or the staff surface it came through. |
+| occurred_at | timestamptz | yes |  |
+| before | jsonb | no | The changed fields before, masked where the field is sensitive. |
+| after | jsonb | no |  |
+| reason | text | no |  |
+| approval_reference | text | no | The approval that authorised it (privacy action approval, hold approval, package approval). |
+| related_request_id | uuid | no |  |
+| related_case_id | uuid | no |  |
+| evidence_reference | text | no | e.g. |
+| id | uuid | yes | Synthesised key. |
+
 ### `marketing.privacy_change_set`
 
 | Column | Type | Required | Notes |
@@ -6175,6 +6308,70 @@ Every table this service owns that the slice reads or writes, with its columns a
 | approval_request_id | text | no | The approvals-engine request, once submitted. |
 | publish_at | timestamptz | no |  |
 | published_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
+
+### `marketing.privacy_exception`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Absent to raise; present to update. |
+| category | text | yes |  |
+| severity | text | yes |  |
+| summary | text | yes |  |
+| subject_id | uuid | no |  |
+| system | text | no |  |
+| brand_id | uuid | no |  |
+| country | text | no |  |
+| owner_principal_id | uuid | no |  |
+| status | text | no |  |
+| related_evidence_ids | text[] | no | Consent evidence ids and audit event ids. |
+| policy_reference | text | no | The configuration or policy version involved. |
+| root_cause | text | no |  |
+| corrective_action | text | no |  |
+| notes | text | no |  |
+| attachment_asset_ids | text[] | no |  |
+| escalated_to | text | no |  |
+| privacy_incident_id | uuid | no | The recordPrivacyIncident record, when the exception is also a breach. |
+| detected_at | timestamptz | yes |  |
+| detected_by | text | no |  |
+| sla_due_at | timestamptz | no | From the SLA policy for the severity (setSlaPolicy). |
+| closed_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+
+### `marketing.privacy_request`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| request_id | uuid | no |  |
+| subject_id | uuid | yes | The person the request is about. |
+| request_type | text | yes | A configured request type code (setPrivacyRequestTypes), e.g. |
+| source | text | yes |  |
+| requester_role | text | yes |  |
+| requester_subject_id | uuid | no | The guardian or representative, when not self; verified like the subject. |
+| jurisdiction | text | yes | Selects the response period configured for this request type. |
+| submitted_at | timestamptz | no |  |
+| due_at | timestamptz | no | submittedAt plus the jurisdiction's configured response period; null when none is configured. |
+| is_deadline_configured | boolean | no |  |
+| days_remaining | integer | no | Negative once overdue; null without a deadline. |
+| is_at_risk | boolean | no | Inside the request type's configured warning window before dueAt. |
+| sla_state | text | no |  |
+| priority | text | no |  |
+| owner_principal_id | uuid | no |  |
+| verification_method | text | no | One of the methods the request type allows. |
+| verification_status | text | no |  |
+| status | text | no | MoM 20 Aug lifecycle. |
+| stage | text | no | The configured workflow step within inProgress (a stage code of the request type). |
+| outcome | text | no | Required to complete. |
+| outcome_reason | text | no |  |
+| is_escalated | boolean | no |  |
+| dsar_request_id | text | no | The cross-region DsarRequest.requestId, when fulfilment fanned out. |
+| approval_request_id | uuid | no | The request a guest's export or erasure was raised as (identity.privacyRequestRaised approvalRequestId), so the case and the request are one (the lead, 25 October 2026, r10 round 3, ADAM CR-101; CHG-… |
+| case_id | uuid | no | The customer-service case it came in through, if any. |
+| notes | text | no |  |
+| completed_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 | updated_at | timestamptz | no |  |
 | id | uuid | yes | Synthesised key. |
@@ -6307,6 +6504,32 @@ Every table this service owns that the slice reads or writes, with its columns a
 | unsubscribe_token | text | no | Unsubscribe must work without a login. |
 | updated_at | timestamptz | no |  |
 
+### `marketing.suppression`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Added 20 August. |
+| channel | text | yes |  |
+| address | text | yes |  |
+| address_hash | text | no | The address as the deterministic hash a subject contact's value hash uses (ADR-0023: a suppression list is checked without holding the address it suppresses; as amended 3 November 2026, CHG-R14M-001). |
+| reason | text | yes |  |
+| suppressed_at | timestamptz | yes |  |
+| suppressed_by_principal_id | uuid | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `marketing.touch_point`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| subject_id | uuid | yes |  |
+| campaign_id | uuid | no |  |
+| journey_id | uuid | no |  |
+| channel | text | yes |  |
+| kind | text | no |  |
+| occurred_at | timestamptz | yes |  |
+| order_id | uuid | no | Set on the conversion touch. |
+
 ### `marketing.tracking_technology`
 
 | Column | Type | Required | Notes |
@@ -6394,6 +6617,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | reason | text | no |  |
 | occurred_at | timestamptz | yes |  |
 | scope_path | text | no | The partition key (ADR-0005), the requirement's. |
+
+### `marketing.waiver_signature`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| guardian_subject_id | uuid | no | The guardian, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): guardianName is kept in pii.* for this subject, never on this row, and erasure removes it there. |
+| signer_subject_id | uuid | no | The person who signed, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): signedName, ipAddress are kept in pii.* for this subject, never on this row, and erasure removes them there. |
+| participant_subject_id | uuid | no | The person the waiver covers, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): subjectName is kept in pii.* for this subject, never on this row, and erasure removes it there. |
+| id | uuid | yes |  |
+| form_definition_id | uuid | yes | The waiver form signed (FormDefinition.id, the form); with formVersion, the exact version row (ADAM CR-359). |
+| form_version | integer | yes | The exact version signed (ADAM CR-359, decided 30 October 2026), which the row could not record before: with templateId, the key of the FormDefinition version row the signature binds to. |
+| customer_id | uuid | no |  |
+| signer_type | text | yes |  |
+| source_type | text | no |  |
+| source_reference_id | uuid | no |  |
+| data_reference | text | no |  |
+| document_hash | text | yes |  |
+| device_info | text | no |  |
+| status | text | yes |  |
+| signed_at | timestamptz | yes |  |
 
 ### `marketing.waiver_version_control`
 

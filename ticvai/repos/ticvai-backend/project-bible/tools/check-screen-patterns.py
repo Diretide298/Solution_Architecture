@@ -36,6 +36,13 @@ from) and from the plan this tree derives (`tasks.csv`; CHG-R12GT-001: the bundl
 screen the plan brings in is judged before it becomes a ticket); when both are absent it says so and the rule does
 not run.
 
+**Every finding is its own `FAIL` line** (r14, review E-01, CHG-R14I-002): `  FAIL <rule> <screen> <detail>`, and a
+ratchet over its ceiling is `  FAIL NP-CEILING <count> > <ceiling>` (READ-CEILING, EF-CEILING alike), so the count is
+in the line and growth is a new line. Until r13 only the summary carried FAIL, the release gate's allowlist pinned
+that summary (`^28 finding\(s\): NP 1, P8 20, READ 7$`), and NP grew from 191 to 312 as "NP 1". A missing input
+the rules need (op-release.json, block-a-schedule.json) is a finding too (`FAIL INPUT`, review E-07), never a rule
+that quietly does not run.
+
     python tools/check-screen-patterns.py            # fail on any finding
     python tools/check-screen-patterns.py --list     # every finding, not the first 40
     python tools/check-screen-patterns.py --only P5  # one rule
@@ -72,10 +79,6 @@ EXEMPT = {
     ("P3", "WEB-013", "GUEST_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C09: a guest holds no permission), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
     ("P3", "GST-010", "GUEST_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C09: a guest holds no permission), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
     ("P3", "POS-003", "ORDER_CREATE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C11: getAvailability asks PRODUCT_VIEW), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
-    ("P3", "DEV-001", "DEVELOPER_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (DEV-001-followup: the reads are public), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
-    ("P3", "BO-293", "PLATFORM_CELL_MANAGE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
-    ("P3", "BO-293", "MEMBERSHIP_VIEW"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
-    ("P3", "BO-293", "MEMBERSHIP_MANAGE"): ("the operations' permission changed in r8 and the no-access text is visible on a client-approved screen: the new wording waits for the client in audit lane-screens-pending-ui.json (GPS-C33: MEMBERSHIP_VIEW and MEMBERSHIP_MANAGE), and the check names it until it is applied (r8 integration, CHG-R8INT-017)"),
 }
 
 # NP: Sprint 1-2 screens the package cannot define, handed to the plan to move out of Sprints 1-2
@@ -253,6 +256,9 @@ def decided(S) -> list:
     return out
 
 
+found_missing: list = []
+
+
 def run(only=None):
     pk = sp.Package()
     S = pk.screens
@@ -260,6 +266,10 @@ def run(only=None):
     owners = sp.component_owners(S)
     block_a = sp.block_a_screens()
     sprints = sp.planned_sprints() if only in (None, "NP") else {}
+    if sprints is None:
+        found_missing.append(("INPUT", "-", "handoff/service-docs/op-release.json or block-a-schedule.json is absent: "
+                                            "NP is not judged (derive them first)"))
+        sprints = {}
     found = decided(S) if only in (None, "DEC") else []
     for sid, s in S.items():
         if only in (None, "P1"):
@@ -316,8 +326,10 @@ def main() -> int:
     args = sys.argv[1:]
     only = args[args.index("--only") + 1] if "--only" in args else None
     found, block_a = run(only)
-    if block_a is None:
-        print("  P8 not run: handoff/service-docs/op-release.json is absent (derive it first)")
+    found += found_missing
+    if block_a is None and only in (None, "P8", "READ"):
+        found.append(("INPUT", "-", "handoff/service-docs/op-release.json and the derived plan are absent: P8 and "
+                                    "READ are not judged (derive them first)"))
     used, bad = [], []
     outside = [f for f in found if f[0] == "READ" and block_a is not None and f[1] not in block_a]
     found = [f for f in found if not (f[0] == "READ" and block_a is not None and f[1] not in block_a)]
@@ -328,8 +340,8 @@ def main() -> int:
             for _, sid, detail in outside:
                 print(f"    READ {sid:<9} {detail}")
         if len(outside) > READ_OUTSIDE_A_CEILING:
-            found += [("READ", "-", f"{len(outside)} READ findings outside Block A, above the ceiling of "
-                                    f"{READ_OUTSIDE_A_CEILING}: a new screen shows or edits data with no read")]
+            found += [("READ-CEILING", f"{len(outside)} > {READ_OUTSIDE_A_CEILING}",
+                       f"READ findings outside Block A above the ceiling: a new screen shows or edits data with no read")]
     later = [f for f in found if f[0] == "NP" and not f[2].endswith(("(Sprint 1)", "(Sprint 2)"))]
     found = [f for f in found if f not in later]
     if later:
@@ -339,8 +351,9 @@ def main() -> int:
             for _, sid, detail in later:
                 print(f"    NP {sid:<9} {detail}")
         if len(later) > NP_LATER_CEILING:
-            found += [("NP", "-", f"{len(later)} NP findings in Sprints 3 and later, above the ceiling of "
-                                  f"{NP_LATER_CEILING}: a screen planned later needs a person or binds nothing")]
+            found += [("NP-CEILING", f"{len(later)} > {NP_LATER_CEILING}",
+                       "NP findings in Sprints 3 and later above the ceiling: a screen planned later needs a person "
+                       "or binds nothing (--list-np lists them)")]
     ef = [f for f in found if f[0] == "EF"]
     found = [f for f in found if f[0] != "EF"]
     if ef:
@@ -350,7 +363,7 @@ def main() -> int:
             for _, sid, detail in ef:
                 print(f"    EF {sid:<9} {detail}")
         if len(ef) > EF_CEILING:
-            found += [("EF", "-", f"{len(ef)} EF findings, above the ceiling of {EF_CEILING}: a screen's "
+            found += [("EF-CEILING", f"{len(ef)} > {EF_CEILING}", "EF findings above the ceiling: a screen's "
                                   "emptyNoResults names a filter no operation it binds takes")]
     for rule, sid, detail in found:
         why = next((w for (r, s, phrase), w in EXEMPT.items()
@@ -361,11 +374,12 @@ def main() -> int:
     by = Counter(r for r, _, _, _ in bad)
     show = bad if "--list" in args else bad[:40]
     for rule, sid, detail, _ in show:
-        print(f"  {rule:<4} {sid:<9} {detail}")
+        print(f"  FAIL {rule:<4} {sid:<9} {detail}")
     if len(show) < len(bad):
         print(f"  … and {len(bad) - len(show)} more (--list shows all)")
     if bad:
-        print(f"FAIL {len(bad)} finding(s): " + ", ".join(f"{k} {v}" for k, v in sorted(by.items())))
+        # the closing verdict, `FAIL - ...` like every checker's, so no allowlist can take it for a finding (r14)
+        print(f"FAIL - {len(bad)} finding(s): " + ", ".join(f"{k} {v}" for k, v in sorted(by.items())))
         return 1
     print(f"ok: no screen asks for a readOnly field, dumps a schema, names the wrong permission, "
           f"needs a parameter nothing carries, wears another screen's route, says a Block A screen "

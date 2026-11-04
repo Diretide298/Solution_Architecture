@@ -176,7 +176,7 @@
   "name": "Venue Canvas",
   "module": "Access & Venue",
   "requiresModule": "seating",
-  "wave": 3,
+  "wave": 1,
   "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",

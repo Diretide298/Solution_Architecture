@@ -305,8 +305,9 @@ Actions 1–5 stand. Action 4's KERNEL-RELAY takes the drain loop and the batch 
 7. [ ] Package: retire the name `IEventPublisher` where it still stands (ADR-0033 and ADR-0057 were
    changed with this amendment): the comment in the four `deploy/*.yml`, the PLATFORM-OUTBOX task
    text (`docs/active/block-a-extra-tasks.json`, which feeds `handoff/service-docs/tasks.csv`), and
-   `repos/ticvai-backend/src/Ticvai.Shared.Kernel/Abstractions/IIntegrationEvent.cs` (that older
-   scaffold does not build today: 22 analyzer errors). Re-derive, mirrors, check.
+   the package's old ticvai-backend scaffold's IIntegrationEvent.cs (that scaffold did not build: 22 analyzer
+   errors; it was retired with the code trees on 3 November 2026, CHG-R14J-002, so only the starter's name remains).
+   Re-derive, mirrors, check.
 8. [ ] Burst environment: `Relay__BatchSize=1000` on the `workers` host in the burst environment's
    configuration (Terraform or Helm values; `deploy/c-flash-sale.yml` has no `workers` service yet).
 

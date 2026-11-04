@@ -151,6 +151,7 @@
     "nullable": true
    },
    "guestName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "readOnly": true,
@@ -549,6 +550,7 @@
     "nullable": true
    },
    "customerName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Resolved from `pii.subject`; null unless the caller holds `GUEST_VIEW_PII`."

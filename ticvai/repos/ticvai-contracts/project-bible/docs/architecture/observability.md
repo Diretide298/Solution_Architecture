@@ -22,6 +22,27 @@ Without it, *"the tenant is slow"* is unactionable — and with cells, *"which c
 
 Central aggregation is a control-plane function. Metrics and traces are operational telemetry, not personal data — but see compliance/data-residency: logs must be PII-free **by construction**, not by filtering, if they leave the jurisdiction.
 
+## Credentials in requests
+
+**Decided 3 November 2026, Chinmay** ("All four, one release", on the r13 system review's finding C-13; CHG-R14H-005).
+Some credentials travel in the request itself: a payment link's and an invitation's token and a gift or game card's
+code in the path (`/payment-links/{token}`, `/gift-cards/{cardCode}`), an order access token, a consent key, an
+admission token and the till's supervisor PIN in a header (`X-Order-Access-Token`, `X-Consent-Key`,
+`X-Admission-Token`, `X-Supervisor-Pin`). Standard ingress, WAF and tracing record full paths and often headers, so
+"never PII" is not enough: these are credentials. Each such parameter is marked `x-ticvai-secret: bearer` in its
+contract (`tools/check-contract-shapes.py` C-SECRET-PARAM fails one that is not), and:
+
+| Where | Rule |
+|---|---|
+| Application logs and traces | Record the route template (`http.route` = `/payment-links/{token}`), never the raw path: `url.path`, `url.full` and `http.target` are dropped or rewritten to the template for every operation with a `bearer` path parameter. No request header is logged unless it is on an allow-list; `Authorization`, `X-Api-Key` and every `bearer` header are never on it |
+| The edge (Front Door, WAF, ingress) | Access logs for a route with a `bearer` path parameter record the route template, or are scrubbed of the path; request headers are not logged. A WAF match on such a route logs the rule, never the matched value |
+| Errors and problem bodies | A `bearer` value is never echoed in `detail`, `instance` or a validation message |
+| Retention | Anything that slipped through is a security incident, not a log line: purge it and record it |
+
+**Long enough not to be guessed** means at least 128 bits from a cryptographic random source (22 or more base64url
+characters) for a payment link's and an invitation's token. Gift and game card codes are printed and typed, so their
+strength is the rate limit and lockout on the reads that take them, not their length.
+
 ## Per-venue attribution
 
 A hot venue degrades within its tenant and is invisible to every other tenant. Diagnosing that requires venue-level attribution on every signal — otherwise the only visible symptom is aggregate latency.

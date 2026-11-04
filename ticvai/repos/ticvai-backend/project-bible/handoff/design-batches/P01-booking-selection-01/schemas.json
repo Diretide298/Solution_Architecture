@@ -398,11 +398,17 @@
     "nullable": true
    },
    "personName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "personSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "maxLength": 120,
     "nullable": true
    },
    "personSubjectId": {
+    "x-ticvai-subject-kind": "guest",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -646,174 +652,6 @@
    "multiLocation"
   ]
  },
- "BundleChoiceGroup": {
-  "type": "object",
-  "x-ticvai-persistence": "promotions.bundle_choice_group + promotions.bundle_choice_option",
-  "description": "**Pick n from a set** (3.5.10). The shape a dynamic bundle needs and `BundleComponent` could not express — it names specific variants, which describes a fixed bundle with swaps.\nThe bundle price does not move with the choice (ADR-0019). **The allocation does.**\n",
-  "required": [
-   "label",
-   "choose",
-   "options"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "label": {
-    "type": "string",
-    "description": "What the guest is asked. \"Choose 3 attractions\"."
-   },
-   "choose": {
-    "type": "integer",
-    "minimum": 1,
-    "description": "How many options the guest picks."
-   },
-   "allowDuplicates": {
-    "type": "boolean",
-    "default": false,
-    "description": "Whether the same option may be picked twice. False for attractions, sometimes true for F&B.\n"
-   },
-   "options": {
-    "type": "array",
-    "minItems": 2,
-    "description": "The rows of `promotions.bundle_choice_option`, one per option, each keyed to its group. A required array with nowhere to be stored was a group whose choices were lost on write.\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "variantId"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid",
-       "readOnly": true
-      },
-      "variantId": {
-       "x-ticvai-references": "catalogue.variant",
-       "type": "string",
-       "format": "uuid"
-      },
-      "quantity": {
-       "type": "integer",
-       "default": 1
-      },
-      "isDefault": {
-       "type": "boolean",
-       "default": false
-      }
-     }
-    }
-   },
-   "unavailableBehaviour": {
-    "type": "string",
-    "enum": [
-     "hideOption",
-     "hideBundle"
-    ],
-    "default": "hideOption",
-    "description": "An option that has sold out for the chosen date is **not offered**. Where the group can no longer be satisfied at all, the bundle itself becomes unavailable — **it is never sold with a component that cannot be delivered**, because a substitution the guest did not choose is a complaint at the gate.\n"
-   }
-  }
- },
- "BundleComponent": {
-  "x-ticvai-persistence": "promotions.bundle_component",
-  "type": "object",
-  "required": [
-   "variantId",
-   "quantity"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "variantId": {
-    "x-ticvai-references": "catalogue.variant",
-    "type": "string",
-    "format": "uuid"
-   },
-   "componentKind": {
-    "$ref": "#/components/schemas/BundleComponentKind"
-   },
-   "menuItemId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The F&B menu item a `fnbMenuItem` component entitles the guest to** (decided 29 September, MOB-4): the meal of a *meal combo with admission*. `variantId` is still the catalogue variant the menu item sells (fnb `MenuItem.variantId`), which prices and taxes it; this names what the outlet redeems. Required when `componentKind` is `fnbMenuItem`, else ignored; a menu item that does not sell `variantId` is a `422` on `createBundle`.\n"
-   },
-   "redeemAtOutletIds": {
-    "type": "array",
-    "maxItems": 20,
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "Outlets that redeem an `fnbMenuItem` component; empty means any outlet of the component's venue that has the menu item on a live menu (MOB-4)."
-   },
-   "quantity": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "isOptional": {
-    "type": "boolean",
-    "default": false
-   },
-   "substituteVariantIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "For dynamic bundles — guest chooses among these."
-   },
-   "substitutionTriggers": {
-    "type": "array",
-    "nullable": true,
-    "items": {
-     "type": "string",
-     "enum": [
-      "soldOut",
-      "capacityExhausted",
-      "productSuspended",
-      "venueClosed",
-      "externalApiUnavailable",
-      "inventoryBelowThreshold"
-     ]
-    },
-    "description": "When a substitute from `substituteVariantIds` may replace this component (Dynamic Component Substitution Engine). Empty: never substituted. (DM5, 29 September: data model for the agreed operations)"
-   },
-   "substitutionPriceEffect": {
-    "type": "string",
-    "enum": [
-     "samePrice",
-     "surcharge",
-     "reducedPrice"
-    ],
-    "default": "samePrice",
-    "description": "What a substitution does to the bundle price. (DM5, 29 September: data model for the agreed operations)"
-   },
-   "substitutionApproval": {
-    "type": "string",
-    "enum": [
-     "none",
-     "customer",
-     "operator"
-    ],
-    "default": "customer",
-    "description": "Who must accept a substitution before it stands. Customer by default, because a substitution the guest did not choose is a complaint at the gate. (DM5, 29 September: data model for the agreed operations)"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Where this component is redeemed. Differs from the selling venue for multi-venue passes, which is why the allocation split exists.\n"
-   }
-  }
- },
  "BundleKind": {
   "type": "string",
   "enum": [
@@ -901,7 +739,7 @@
     "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
-    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
+    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered. **Answered from booking consent records** (ADAM CR-583; CHG-CR583-001): `answered` and the `consentBlocksBooking` conflicts are worked out from Marketing's current booking consent records (`marketing-crm#bookingConsentRecords`) of this cart at the shown version, as `getCart` states; until the consent ticket lands this list is empty.\n",
     "items": {
      "allOf": [
       {
@@ -920,7 +758,7 @@
         },
         "answered": {
          "type": "boolean",
-         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."
+         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer. For `perPerson`, true when every one of the persons on every line in `lineIds` has an answer: a line of quantity n has persons 0 to n-1 (`personIndex`), on a line with an `eligibilityDeclaration` its rows (ADAM CR-556, 3 November 2026; CHG-CR556-001)."
         }
        }
       }
@@ -988,7 +826,7 @@
  "CartConflict": {
   "type": "object",
   "x-ticvai-persistence": "none — computed on read",
-  "description": "2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n",
+  "description": "2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n**Which kinds are produced** (ADAM CR-583, Chinmay, 3 November 2026; CHG-CR583-001; the rules are on `getCart`): `overlappingTime` (two lines whose time ranges overlap, not on the same performance; not blocking), `requiresPrerequisite` (a line whose parent line is missing or unavailable; blocking) and, with the consent ticket, `consentBlocksBooking` (blocking). `exceedsPartySize` and `sameSessionDifferentVenue` stay in the list but are never produced: nothing defines a party size or a session yet.\n",
   "properties": {
    "kind": {
     "type": "string",
@@ -1036,6 +874,13 @@
    "productName": {
     "type": "string",
     "readOnly": true
+   },
+   "productId": {
+    "x-ticvai-references": "catalogue.product",
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001): set by the server from the variant when the line is added and returned by `getCart`; a client never sends it. `checkoutCart` copies it to the order line."
    },
    "quantity": {
     "type": "integer",
@@ -1115,10 +960,22 @@
     "description": "**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"
    },
    "unitPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "By the cart pricing rule (`getCart`; ADAM CR-550): `catalogue#variantPriceRecords` for the variant at the cart's venue on its channel at now, or the rule's exceptions. Null, with `isAvailable` false, when no price list prices the variant there."
    },
    "lineTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "quantity x `unitPrice` (ADAM CR-550); null when `unitPrice` is."
    },
    "inventoryHoldId": {
     "x-ticvai-column": "inventory_reservation_id",
@@ -1136,7 +993,7 @@
    "isAvailable": {
     "type": "boolean",
     "readOnly": true,
-    "description": "Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"
+    "description": "Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here. So does a line that has no price any more (ADAM CR-550): its `unitPrice` and `lineTotal` are null and it is left out of the cart's totals.\n"
    }
   }
  },
@@ -1488,6 +1345,7 @@
   "additionalProperties": false,
   "required": [
    "id",
+   "variantId",
    "name",
    "price"
   ],
@@ -1495,6 +1353,12 @@
    "id": {
     "type": "string",
     "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "catalogue.variant",
+    "description": "**The bundle's own sellable variant**, `promotions.bundle.variant_id` (ADAM CR-597, option A, Chinmay, 3 November 2026; CHG-CR597-001). Every bundle a guest can see has one, because an unpublished bundle answers 404. Add to basket sends it as `addCartLine`'s `variantId`, with `attributes.bundle` = `{bundleId: id, choices: [{choiceGroupId, optionId}, one per pick]}`; a component's or an option's `variantId` is never the line's."
    },
    "name": {
     "type": "string"
@@ -1518,14 +1382,16 @@
    },
    "components": {
     "type": "array",
+    "description": "The bundle's components in the guest's shape (ADAM CR-597), named from the catalogue.",
     "items": {
-     "$ref": "#/components/schemas/BundleComponent"
+     "$ref": "#/components/schemas/GuestBundleComponent"
     }
    },
    "choiceGroups": {
     "type": "array",
+    "description": "The bundle's choice groups in the guest's shape (ADAM CR-597). An option that is not offered (`unavailableBehaviour` `hideOption`) is left out; a group that can no longer be met makes the bundle 404.",
     "items": {
-     "$ref": "#/components/schemas/BundleChoiceGroup"
+     "$ref": "#/components/schemas/GuestBundleChoiceGroup"
     }
    },
    "validFrom": {
@@ -1537,6 +1403,83 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "GuestBundleChoiceGroup": {
+  "x-ticvai-persistence": "none — guest projection of promotions.bundle_choice_group",
+  "type": "object",
+  "description": "**A bundle choice group as a guest sees it** (ADAM CR-597; CHG-CR597-001): its label and the options still offered, each named. `BundleChoiceGroup` stays the staff and stored shape and is unchanged. `additionalProperties: false` is the point.",
+  "additionalProperties": false,
+  "required": [
+   "id",
+   "label",
+   "choose",
+   "options"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "label": {
+    "type": "string"
+   },
+   "choose": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "allowDuplicates": {
+    "type": "boolean"
+   },
+   "options": {
+    "type": "array",
+    "description": "The options offered; one not offered (`unavailableBehaviour` `hideOption`) is left out.",
+    "items": {
+     "$ref": "#/components/schemas/GuestBundleChoiceOption"
+    }
+   }
+  }
+ },
+ "GuestBundleComponent": {
+  "x-ticvai-persistence": "none — guest projection of promotions.bundle_component, named from catalogue.product and catalogue.variant",
+  "type": "object",
+  "description": "**A bundle component as a guest sees it** (ADAM CR-597, option A with guest-only shapes, Chinmay, 3 November 2026; CHG-CR597-001). `BundleComponent` stays the staff and stored shape and is unchanged; this one carries the component's public name and never its menu item, redemption outlets or substitution fields. `additionalProperties: false` is the point.",
+  "additionalProperties": false,
+  "required": [
+   "id",
+   "variantId",
+   "name",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "catalogue.variant"
+   },
+   "name": {
+    "type": "string",
+    "description": "The catalogue's public text for the component's variant: the product name, plus the variant name when the product has more than one variant."
+   },
+   "description": {
+    "type": "string",
+    "nullable": true,
+    "description": "The catalogue's public description of the component's product."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "componentKind": {
+    "$ref": "#/components/schemas/BundleComponentKind"
+   },
+   "isOptional": {
+    "type": "boolean"
    }
   }
  },
@@ -2158,6 +2101,12 @@
     "type": "string",
     "format": "date-time"
    },
+   "admissionStartsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**When admission opens for the performance** (ADAM CR-411, Chinmay, 3 November 2026, answering #35240; CHG-CR411-002): stored as `catalogue.performance.admission_starts_at`, nullable. A sales window anchored on `admissionStart` (`eventRelativeWindows.anchor`) uses it, and falls back to `startsAt` while it is null."
+   },
    "approvalRequestId": {
     "type": "string",
     "format": "uuid",
@@ -2429,6 +2378,13 @@
  },
  "Product": {
   "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
+  "x-ticvai-index": [
+   [
+    "venueId",
+    "displayOrder",
+    "id"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -2465,6 +2421,28 @@
    "description": {
     "type": "string"
    },
+   "bookingEntry": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "dateFirst",
+     "productFirst",
+     "venueMap",
+     "timeWindow",
+     "bundle"
+    ],
+    "description": "**Which booking screen Book opens** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). Worked out on read and never stored; set on every guest or visitor read that answers a product (`listProducts`, `getProduct`) and on every `searchCatalogue` result, null on staff reads, and null when the product has no Book (info-only). In this order: (a) kind `bundle` gives `bundle` while `bundleId` is set; with no such bundle it is null and the card opens Item Detail as now. (b) `requiresTimeWindow` true gives `timeWindow`. (c) Otherwise the product's published booking flow by `getPublishedBookingFlow`'s rule (the product's flow, then its category's, then the venue's enabled default for its kind, with the same tie rule), from `white-label#publishedBookingFlowSteps`: its first enabled step, skipping `location` and `helpMeChoose`; `resourceMap` gives `venueMap`; `date`, `time` or `performance` gives `dateFirst`; any other step gives `productFirst`. If no flow resolves, the same test is applied to the default order of the flow type the kind rule picks. Book opens: `dateFirst` GST-007, `productFirst` GST-008, `venueMap` GST-074, `timeWindow` GST-075, each with `productId`; `bundle` GST-056 with `bundleId`."
+   },
+   "bundleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Set only when `bookingEntry` is `bundle` (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose `variant_id` is this product's variant, while `getGuestBundle` would return it (published, active, in its window). Never taken from a search result's `id`: for a bundle that is the bundle's catalogue product, not the bundle."
+   },
    "fromPrice": {
     "oneOf": [
      {
@@ -2475,6 +2453,12 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "nullable": true,
+    "default": 100,
+    "description": "Where this product sorts among the venue's products in listProducts, lower first. Not alphabetical: the order the venue wants guests to see. (ADAM CR-581, Chinmay, 3 November 2026; CHG-CR581-001.) Stored on `catalogue.product` as `display_order`, nullable with default 100 like `catalogue.product_category.display_order`; existing rows take 100. Set by `createProduct` (100 when not sent) and `updateProduct` (changed only when the body carries it; null stores null), and returned by every operation that answers `Product`, `getProduct` and the till's catalogue bundle included. No back-office product screen shows or edits it."
    },
    "isFeatured": {
     "type": "boolean",
@@ -3033,11 +3017,13 @@
   "minProperties": 1,
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "maxLength": 32,
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "maxLength": 254,
@@ -3347,12 +3333,14 @@
        "type": "integer",
        "minimum": 0,
        "nullable": true,
-       "description": "For a `perPerson` question, the person's row in that line's `eligibilityDeclaration`, counting from 0."
+       "description": "For a `perPerson` question, the person on that line: the line's units counted from 0 to quantity minus 1; on a line with an `eligibilityDeclaration`, that row (ADAM CR-556). At or above the line's quantity is `422 personRequired`."
       },
       "personName": {
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "maxLength": 120,
-       "nullable": true
+       "nullable": true,
+       "description": "The label the guest was shown for the person: ticket type and number (*Adult 1*, *Child 2*), or *Person n* on a line with a declaration (ADAM CR-556)."
       },
       "personSubjectId": {
        "type": "string",
@@ -4477,11 +4465,17 @@
     "nullable": true
    },
    "subjectId": {
+    "x-ticvai-subject-kind": "guest",
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
    "contactPoint": {
+    "x-ticvai-pii": {
+     "store": "contact.point",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "**Where the offer goes.** An entry with no way to reach the guest is an entry that can never be honoured, so this is required even for an anonymous guest.\n"
    },

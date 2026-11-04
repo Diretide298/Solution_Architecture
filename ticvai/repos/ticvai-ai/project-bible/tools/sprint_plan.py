@@ -136,6 +136,41 @@ def due_of(extra_tasks) -> dict:
     return out
 
 
+# **Sprints re-cut from the build order** (r14 plan pass, CHG-R14PL-022; the lead's Sprint 1 message of 3 November 2026,
+# "work in build order", taken as yes, and his instruction of 4 November 2026, "take the recommended decision unless its
+# very very important"). Until r14 the scheduler placed every task from Monday 5 October as if nothing had happened
+# since, so at r13 850 tasks nobody had started still sat in Sprints 1 and 2, which had ended (the release push sets
+# a New ticket's sprint from the schedule). From REPLAN_FROM a task nobody has started starts no earlier than that day,
+# in build order on its owner; a started task keeps its place (and OpenProject keeps a started ticket's sprint). A task
+# has started when it or any of its sub-tasks is off New, On hold and Rejected in handoff/service-docs/adam-links.json
+# (the statuses read at the last release), mapped to plan keys through pms-map.json, as build-service-docs.py
+# started_plan_keys reads them. Move REPLAN_FROM forward at each release that re-cuts the sprints again.
+REPLAN_FROM = dt.date(2026, 11, 4)
+_NOT_STARTED = ("New", "On hold", "Rejected")
+_STARTED: set | None = None
+
+
+def started_task_keys() -> set:
+    """Plan task keys whose ticket, or one of its sub-tasks, has started (cached; empty without the two files)."""
+    global _STARTED
+    if _STARTED is None:
+        sd = ROOT / "handoff" / "service-docs"
+        try:
+            links = json.loads((sd / "adam-links.json").read_text(encoding="utf-8")).get("links") or []
+            mp = json.loads((sd / "pms-map.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            links, mp = [], {}
+        on = {str(x.get("key")) for x in links if x.get("status") and x.get("status") not in _NOT_STARTED
+              and x.get("type") not in ("Epic", "Feature")}
+        _STARTED = {k.split("#", 1)[0] for k, v in mp.items() if isinstance(v, int) and str(v) in on}
+    return _STARTED
+
+
+def replan_floor(key: str) -> float:
+    """The first day a task may start under the re-cut: REPLAN_FROM's day index, or 0 for a started task."""
+    return 0.0 if key.split("#", 1)[0] in started_task_keys() else float(index_of(REPLAN_FROM))
+
+
 # ---------------------------------------------------------------------------------------------- modules
 MODULE_OF_CONTRACT = {
     "identity": "Identity, Roles & Security", "tenancy": "Tenancy, Venues & Devices",
@@ -779,6 +814,14 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
         if len(hard) < len(deps) and it["track"] != "Frontend":
             ready = max(ready, INTERFACES_DAY)
         ready = max(ready, float(it.get("notBefore") or 0.0))
+        if not it.get("client") and REPLAN_FROM:
+            # sprints re-cut from the build order (REPLAN_FROM, r14): an unstarted task starts no earlier than that day;
+            # a started one is already under way, so it keeps its place before it and waits on nothing re-cut after it
+            if replan_floor(k):
+                ready = max(ready, replan_floor(k))
+            else:
+                hard, deps = [], []
+                ready = float(it.get("notBefore") or 0.0)
         if it.get("due") is not None and it.get("who"):
             # **a task due on a date** (`due`, a day index: due_of; CHG-R8INT-032) sits at that date, whatever its build
             # order and waits, and lands in that date's sprint. A chore of under a day done between tickets, it holds no

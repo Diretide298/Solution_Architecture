@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 105 operations, 48 tables
+title: IdentityService — 108 operations, 52 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -10,26 +10,26 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 105
+  operations: 108
   inAFlow: 21
-  percent: 20%
+  percent: 19%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 42
+  tables: 45
   stores:
   - postgres
   - redis
   largestTable: identity.delegated_access
 - schema: pii
-  tables: 6
+  tables: 7
   stores:
   - postgres
   largestTable: pii.subject_biometric
 operationsByContract:
 - contract: identity
-  count: 105
+  count: 108
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -38,7 +38,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 5
-    writes: 5
+    writes: 6
   - operation: completeSsoAuthorization
     verb: POST
     path: /auth/sso/{providerId}/callback
@@ -238,6 +238,14 @@ operationsByContract:
     permission: null
     offline: false
     reads: 1
+    writes: 0
+  - operation: getOfflineStepUpPackage
+    verb: GET
+    path: /auth/offline-step-up-package
+    scope: workstation
+    permission: null
+    offline: false
+    reads: 3
     writes: 0
   - operation: getPasswordPolicy
     verb: GET
@@ -566,7 +574,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 8
-    writes: 5
+    writes: 6
   - operation: logout
     verb: POST
     path: /auth/logout
@@ -607,6 +615,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: recordSubjectDetails
+    verb: POST
+    path: /internal/subjects/details
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 5
   - operation: refreshToken
     verb: POST
     path: /auth/refresh
@@ -783,6 +799,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 3
+  - operation: submitSubjectDataPart
+    verb: POST
+    path: /internal/subject-data-parts
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 3
   - operation: suggestRoleAssignment
     verb: GET
     path: /role-suggestions
@@ -870,7 +894,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 6
-    writes: 2
+    writes: 5
 tables:
 - store: cache:idempotency
   kind: cache
@@ -915,6 +939,7 @@ tables:
   - recordBenefitUsage
   - recordConsentIdentifier
   - recordSubjectDataExportPart
+  - recordSubjectDetails
   - refreshToken
   - registerGuest
   - removeMfaMethod
@@ -936,6 +961,7 @@ tables:
   - simulateAuthorisationPolicy
   - startProspectSignup
   - submitGuestIdentityDocument
+  - submitSubjectDataPart
   - updateAuthorisationPolicy
   - updateGuestSubjectDetails
   - updatePrincipal
@@ -978,6 +1004,7 @@ tables:
   - recordBenefitUsage
   - recordConsentIdentifier
   - recordSubjectDataExportPart
+  - recordSubjectDetails
   - refreshToken
   - registerGuest
   - removeMfaMethod
@@ -999,6 +1026,7 @@ tables:
   - simulateAuthorisationPolicy
   - startProspectSignup
   - submitGuestIdentityDocument
+  - submitSubjectDataPart
   - updateAuthorisationPolicy
   - updateGuestSubjectDetails
   - updatePrincipal
@@ -1296,6 +1324,20 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.offline_pin_verifier
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.offline_step_up
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
 - table: identity.open_shift_marker
   columns: 6
   store: postgres
@@ -1394,7 +1436,7 @@ tables:
 - table: identity.session
   columns: 17
   store: postgres
-  parent: null
+  parent: pii.subject
   writtenBy:
   - identity
   foreignWriters: null
@@ -1426,6 +1468,13 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.subject_erasure_part
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
 - table: identity.subject_holding
   columns: 12
   store: postgres
@@ -1433,7 +1482,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: pii.consent_identifier
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1479,12 +1528,19 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: pii.subject_network_identifier
+  columns: 6
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - identity
+  foreignWriters: null
 readsFrom:
 - service: TenancyService
   operations: 7
 writesOutside:
 - service: TenancyService
-  operations: 18
+  operations: 19
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -1545,6 +1601,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: verifyMfaChallenge
+    tables:
+    - platform.outbox
+  - operation: verifySupervisorStepUp
     tables:
     - platform.outbox
 screens:

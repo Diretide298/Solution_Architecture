@@ -96,6 +96,7 @@ def main() -> int:
     ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}
     cols = {t: v for t, v in (ref.get("cols") or {}).items()}
     store = ref.get("store") or {}
+    kept = {t: {r.get("field") for r in rows} for t, rows in (ref.get("personal") or {}).items()}
     by, _ = g.schemas()
     for oid, o in sorted(g.operations().items()):
         op = o["op"]
@@ -136,6 +137,11 @@ def main() -> int:
             else:
                 reaches = any(col in names[t] or any(str(x or "").startswith(col + "_") for x in names[t])
                               or leaf in sources[t] for t in writes)
+                # **A person's field reaches pii.*** (ADR-0023 as amended 3 November 2026, CHG-R14M-001): a written
+                # table whose contract keeps this field in pii.* for its subject (schema-reference `personal`, from
+                # `x-ticvai-pii`) stores it there, through identity recordSubjectDetails, not as one of its columns
+                reaches = reaches or spec.get("x-ticvai-pii") or any(
+                    leaf in kept.get(t, ()) for t in writes)
             desc = str(spec.get("description") or "")
             owner_desc = str(owner.get("description") or "")
             claimed = bool(stored_as) or (STORED.search(desc) and not NOT_STORED.search(desc)) or (

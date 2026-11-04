@@ -213,9 +213,8 @@
       {
        "kind": "primaryButton",
        "label": "Checkout",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "operation": "checkoutCart",
-       "notes": "Checks the cart out (`checkoutCart`) and moves on to the guest details."
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); ADAM CR-576 (3 November 2026)",
+       "notes": "Moves on to the guest details (or straight to payment) without calling `checkoutCart`: the order is made at Pay now on WEB-012, so the T&Cs tick reaches the call that creates the order (ADAM CR-576, CHG-CR576-001). The button looks and reads the same."
       }
      ]
     }
@@ -287,7 +286,7 @@
    {
     "operationId": "checkoutCart",
     "contract": "orders",
-    "purpose": "Turn the cart into an order",
+    "purpose": "Turn the cart into an order: only on the transfer journey (F55); the Checkout button moves on without it, and the order is made at Pay now on WEB-012 (ADAM CR-576)",
     "trigger": "onAction"
    },
    {
@@ -469,12 +468,18 @@
     {
      "to": "WEB-012",
      "trigger": "Pays",
-     "provenance": "flow F01 step 6→7, F02 step 4→5"
+     "provenance": "flow F01 step 6→7, F02 step 4→5",
+     "carries": [
+      "orderId"
+     ]
     },
     {
      "to": "WEB-012",
      "trigger": "Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)",
-     "provenance": "decided 29 September 2026, W1"
+     "provenance": "decided 29 September 2026, W1",
+     "carries": [
+      "orderId"
+     ]
     },
     {
      "to": "WEB-010",
@@ -816,7 +821,7 @@
     }
    ]
   },
-  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowLevelSettings.signInAt` `atPayment` the sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September.** W1: a guest who proved the contact with the code arrives here from the cart (WEB-011 skipped) and only ticks the T&Cs. M18-15: unticked marketing opt-in.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **On this screen:** the total shows in the selected currency with the base amount and the rate beneath (\"USD 81.72 · AED 300.00 at 3.6710, held until 14:25\"); when the hold lapses the amount is re-quoted and the guest confirms the new figure before paying. The earlier rule above (\"both in base currency, so tender currency equals base currency\") is superseded for card and wallet.\n\n**createOrder left 4 October 2026: the order is made from the cart by checkoutCart (the cart's lines, holder names and opt-ins), then paid with createPayment; F01 step 7 and F02 step 5 say the same** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).\n\nBuild note (r8 second round, IDENTITY-C28, from the core lane): the no-access state is the 404 of the guest's own order lookup (an order that is not theirs answers as one that does not exist); the visible text is unchanged.",
+  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowLevelSettings.signInAt` `atPayment` the sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig` `bookingFlow`.\n\n**29 September.** W1: a guest who proved the contact with the code arrives here from the cart (WEB-011 skipped) and only ticks the T&Cs. M18-15: unticked marketing opt-in.\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it. **On this screen:** the total shows in the selected currency with the base amount and the rate beneath (\"USD 81.72 · AED 300.00 at 3.6710, held until 14:25\"); when the hold lapses the amount is re-quoted and the guest confirms the new figure before paying. The earlier rule above (\"both in base currency, so tender currency equals base currency\") is superseded for card and wallet.\n\n**createOrder left 4 October 2026: the order is made from the cart by checkoutCart (the cart's lines, holder names and opt-ins), then paid with createPayment; F01 step 7 and F02 step 5 say the same** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).\n\nBuild note (r8 second round, IDENTITY-C28, from the core lane): the no-access state is the 404 of the guest's own order lookup (an order that is not theirs answers as one that does not exist); the visible text is unchanged.\n\n**Unanswered consent at Pay now** (ADAM CR-556 with CR-576, CHG-R14INT-001): WEB-011 is skipped when the cart needs no forms, so Pay now's `checkoutCart` can still refuse `422 consentRequired` or `consentAnswerBlocks`; it then opens the same consent pop-up (overlay `consentQuestions`, as WEB-006 asks them) for the unanswered questions, then `recordConsentAnswers` and `checkoutCart` once more.",
   "openQuestions": [
    "Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot be tested without them."
   ],
@@ -850,8 +855,10 @@
       },
       {
        "kind": "cartPanel",
-       "notes": "Order summary stays visible throughout. Never collapsed behind a link",
-       "provenance": "carried from the previous definition"
+       "bindsTo": "Cart",
+       "operation": "getCart",
+       "notes": "Order summary stays visible throughout. Never collapsed behind a link. **Filled from the cart it is about to pay for** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), as GST-009 already does: on load `getCart` with the session's `cartId` (the same guest session or anonymous cart session as WEB-010). Until Pay now the panel shows the cart's lines (product name, quantity, line total, add-ons under their parent line) and its subtotal, discount, tax and total. It stays open on every state. Opened with an `orderId` from a link, the screen calls `getOrder` instead of `getCart` and fills the same panel from the order's lines and totals; after Pay now has made the order, it keeps showing the order. Loading reads `getCart`, or `getOrder` when an `orderId` came with the link; if the cart has no lines and there is no order, the guest is sent back to the cart (WEB-010). Nothing visible changes.",
+       "provenance": "carried from the previous definition; data from ADAM CR-590 (3 November 2026)"
       },
       {
        "kind": "progressIndicator",
@@ -861,13 +868,13 @@
         "BookingFlow.steps"
        ],
        "operation": "getPublishedBookingFlow",
-       "notes": "The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022). **Which product** (ADAM CR-590). `productId` is taken from the cart's lines by the rule WEB-010 and WEB-011 use, the first line with no parent line in cart order (on an order-link arrival, from the order's lines by the same rule). The indicator is drawn from the answer and `signInAt` is read from it, so with `atPayment` a guest who is not signed in gets the sign-in or guest-code step (to WEB-016, keeping the cart) before Pay now. On a 404 the flow type's default order is used, as the other booking screens do. The flow read is never called with no id.",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
        "kind": "consentBlock",
        "label": "Terms and conditions",
-       "notes": "Pay now is enabled only when ticked; the version shown is the one in force (listPublishedPolicies).",
+       "notes": "Pay now is enabled only when ticked; the version shown is the one in force (listPublishedPolicies). Pay now sends `termsAccepted` (`kind` termsAndConditions, `version` the one the Read the terms panel shows) on `checkoutCart`. On `422 termsVersionNotCurrent` the screen reloads `listPublishedPolicies`, clears the tick and leaves Pay now disabled until the guest ticks the current version: the consent block's existing behaviour, nothing new on screen (ADAM CR-576, CHG-CR576-001).",
        "provenance": "defined 4 October 2026 (CHG-FXS-003)"
       },
       {
@@ -894,7 +901,7 @@
        "kind": "banner",
        "label": "Checking your payment",
        "operation": "inquirePaymentStatus",
-       "notes": "Only in the unknown-outcome state: the screen asks the provider by itself (`inquirePaymentStatus`) and never offers to pay again.",
+       "notes": "Only in the unknown-outcome state: the screen asks the provider by itself (`inquirePaymentStatus`) and never offers to pay again. **Back from the card round trip** (3-D Secure or a hosted page; ADAM CR-575, CHG-CR575-001): the page opens on `returnUrl`, this screen's route with `?orderId=<the order id>`, never a token; it calls `getOrder` with credentials included (the API's `ticvai_order_access` cookie), finds the `pendingConfirmation` payment among the order's payments, shows this banner and calls `inquirePaymentStatus`; it never offers to pay again while the payment is pending. The page never reads, copies or stores the cookie.",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
@@ -908,7 +915,7 @@
        "label": "Pay now",
        "provenance": "defined 4 October 2026 (CHG-FXS-003)",
        "operation": "createPayment",
-       "notes": "checkoutCart (once; its idempotency key is the cart's), then createPayment against the order it returns; an unknown payment outcome has the order to attach to."
+       "notes": "checkoutCart (once; its idempotency key is the cart's), with `termsAccepted` from the T&Cs tick (ADAM CR-576), then createPayment against the order it returns; an unknown payment outcome has the order to attach to. A card payment sends `returnUrl` = this screen's route with `?orderId=<the order id>`, never a token (ADAM CR-575). After a decline, Pay now calls `createPayment` again with a new `Idempotency-Key`. **On `409 quoteExpired`** (ADAM CR-577, CHG-CR577-001) the total line is replaced with the answer's `quote` in the screen's existing format (charge amount, base amount, rate, held until) and the guest is asked to confirm; Pay now then sends `createPayment` again with a new key. Nothing is charged that the guest has not seen. The states and text are unchanged."
       }
      ]
     }
@@ -935,6 +942,13 @@
     "trigger": "onLoad"
    },
    {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart this screen is about to pay for, on load with the session's `cartId`: the summary panel's lines and totals, and the first line with no parent line for `getPublishedBookingFlow`'s `productId`; not called when an `orderId` came with the link, which reads `getOrder` instead (ADAM CR-590). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
+    "trigger": "onLoad",
+    "provenance": "ADAM CR-590, decided by Chinmay on 3 November 2026"
+   },
+   {
     "operationId": "inquirePaymentStatus",
     "contract": "orders",
     "purpose": "Ask what happened to a payment that did not answer",
@@ -943,7 +957,7 @@
    {
     "operationId": "getPublishedBookingFlow",
     "contract": "white-label",
-    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12); `productId` from the cart's (or the order's) first line with no parent line, never called with no id (ADAM CR-590)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
    },
@@ -960,6 +974,13 @@
     "purpose": "Pay now, first step: turn the session's cart into the order pending payment, with the holder names (attendees) and opt-ins (marketingConsents) from WEB-011 when it ran",
     "trigger": "onAction",
     "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "recordConsentAnswers",
+    "contract": "marketing-crm",
+    "purpose": "Record the answers to the questions Pay now's checkoutCart refused for (422 consentRequired or consentAnswerBlocks), once, after the last question (ADAM CR-556 with CR-576)",
+    "trigger": "onAction",
+    "provenance": "ADAM CR-556, 3 November 2026; ADAM CR-576 (CHG-R14INT-001)"
    }
   ],
   "entryState": {
@@ -972,7 +993,7 @@
      "name": "orderId",
      "from": "deepLink",
      "optional": true,
-     "notes": "A link to an order already pending payment opens it; otherwise checkoutCart makes the order from the cart."
+     "notes": "A link to an order already pending payment opens it; otherwise checkoutCart makes the order from the cart. Also the card round trip's return: `returnUrl` is this route with `?orderId=`, and the order is read back with the order access cookie (ADAM CR-575)."
     },
     {
      "name": "paymentId",
@@ -1018,6 +1039,26 @@
     "removed": true,
     "why": "Transfers happen after purchase from the tickets (WEB-030); on the payment screen it offered to give away tickets not yet paid for (F55 step 4).",
     "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "consentQuestions",
+    "component": "modal",
+    "trigger": "Pay now's checkoutCart refuses 422 consentRequired or consentAnswerBlocks",
+    "body": "**The same consent pop-up as WEB-006, for the questions still unanswered** (ADAM CR-556 with CR-576, CHG-R14INT-001; then Pay now sends `checkoutCart` once more). **The venue's consent questions for this booking**, e.g. *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*: one or several, in the order `Cart.consentQuestions` gives (the booking flow's `BookingFlowLevelSettings.consentQuestionIds` and every cart product's `consentQuestionIds`, each question once). A question asked **per person** is asked for each member of the party; one asked **per booking** once. Themed as the prototype's pop-up (Yes / No, Next). Next sends the answers to `recordConsentAnswers`, which stores each as a consent record (question version, answer, who answered, when). **A blocking answer** (e.g. *No* to the swim question) marks the lines it blocks and says so; the guest removes them or answers again. There is no tenant on/off toggle: a question is attached to a product or a flow by the venue (decided 29 September, rev 3 REV3-26).",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Next",
+     "operation": "recordConsentAnswers"
+    },
+    "dismiss": {
+     "label": "Back",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "the pop-up as WEB-006 has it (client-verified), opened on this screen for checkoutCart's 422 (ADAM CR-556 with CR-576, 3 November 2026; CHG-R14INT-001)"
    }
   ],
   "_platform": {
@@ -1436,7 +1477,7 @@
       {
        "kind": "detailPanel",
        "bindsTo": "PaymentLinkView",
-       "notes": "Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked by phone may not recognise a reference number.",
+       "notes": "Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked by phone may not recognise a reference number. **As the frame shows** (ADAM CR-578, CHG-CR578-001): each line is drawn by `PaymentLinkLine.displayName`, the visit from the earliest `visitStartsAt` and the reference from `orderNumber`, in the main view and in the expired and already-paid views (the `410` `linkExpired` and `linkPaid` carry `orderNumber`, `venueName`, `lines` and, paid, `amount`). Guest count and subtotal come from the lines' quantities and amounts. Until the backend ships, these fields are stubbed.",
        "provenance": "carried from the previous definition"
       },
       {

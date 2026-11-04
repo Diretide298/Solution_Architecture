@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
-  version: 0.1.0
+  version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 130
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
@@ -255,6 +256,33 @@ x-ticvai-jobs:
     - states/restaurant-waitlist.yaml:32
     - states/table-reservation.yaml:26
     - states/table.yaml:52
+  subjectDataPart:
+    module: fnb
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [fnb.location_session, fnb.table_reservation, fnb.table_session, fnb.table_visit, fnb.waitlist_entry]
+    writes: []
+    for: 'fnb''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
+  menuSchedule:
+    # **A scheduled menu goes live at its outlet's local midnight, and something has to make it live** (r13 system
+    # review B-09; the lead, 3 November 2026, "All four, one release"; CHG-R14J-010). publishMenu with an effectiveAt
+    # and scheduleMenuPublish write a scheduled MenuVersion; nothing declared made it live or published
+    # fnb.menuPublished, the event that carries allergen changes to two critical consumers (the AI index and the answer
+    # cache). This timer does both, per outlet zone (RegionSettings.timeZone).
+    module: fnb
+    host: workers
+    trigger: {kind: timer}
+    reads: [fnb.menu_schedule, fnb.menu_version, fnb.menu]
+    writes: [fnb.menu_schedule, fnb.menu_version, fnb.menu]
+    emits: [fnb.menuPublished]
+    reliesOn: [publishMenu, scheduleMenuPublish]
+    for: 'F&B''s scheduled menu publish: at the outlet''s local midnight the scheduled MenuVersion becomes live, the
+      previous live one superseded, and fnb.menuPublished is written to the outbox in the same transaction.'
+    source:
+    - contracts/satellite/fnb.yaml
+    - events/fnb-menuPublished.yaml
 paths:
   /reservation-policy:
     get:
@@ -1352,6 +1380,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: printOrderLabel
       x-ticvai-consumed-by:
         - "P15 KIT-006 Expeditor & Order Assembly"
@@ -2226,6 +2255,16 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-024 Outlet Setup"
         - "P06 EMP-053 Table & Seating Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet in the path (platform.outlet by id) and its venue (venue_id), whose venue path the row''s
+          scope_path carries; outlets have no scope node of their own (ADAM CR-561; XDR-004)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the outlet''s venue scope node (platform.scope), written as fnb.table_combination.scope_path on every
+          write, the same path the venue''s own rows carry; an outlet whose venue has no scope node refuses the write
+          (ADAM CR-561)'
       summary: Which tables can be pushed together, and to what capacity
       description: 'Board 4. **A party of nine at a restaurant of four-tops is the everyday case**, and
         the package had no way to say that tables 6 and 7 make a nine.
@@ -2234,6 +2273,12 @@ paths:
         a service run. **A host knows which pairs work and a floor plan does not.**
 
         Without it, `getTableMap` reports a full room while the venue turns away a booking it could seat.
+
+
+        **Each row carries the path of the outlet''s venue** (ADAM CR-561, Chinmay, 3 November 2026; CHG-CR561-001):
+        `fnb.table_combination.scope_path` is written as the path of the outlet''s venue scope node in `platform.scope`,
+        as `setCourseRules` states, set by the server on every write and never taken from the request; outlets have no
+        scope node of their own. If the outlet''s venue has no scope node, the write is refused.
 
         '
       tags:
@@ -2447,6 +2492,19 @@ paths:
         route: in-process
         for: 'the target visit''s outlet (409 target-visit-not-open) (CHG-MOD-003)'
       x-ticvai-names-for-context: [orders.order_line]
+      x-ticvai-reads:
+      - table: fnb.table_visit
+        for: 'both visits: the source, and the target''s state and outlet (409 target-visit-not-open)'
+      - table: fnb.service_order
+        for: 'each line''s service order: sales_order_id, payment_timing and sent_to_kitchen_at for paid (ADAM CR-594)'
+      - table: fnb.service_order_line
+        for: 'the lines asked for: their visit, status (voided) and comped_at (comped) (ADAM CR-594)'
+      - table: fnb.sub_bill
+        for: 'the visit''s paid sub-bills, whose line_ids make a line paid (ADAM CR-594)'
+      - table: fnb.kitchen_ticket
+        for: 'the kitchen tickets the moved lines stay on: never re-fired'
+      - table: fnb.kitchen_ticket_line
+        for: 'the kitchen ticket lines of the moved lines: never re-fired'
       summary: Move items to another table's bill
       description: 'Board 4. **A guest moves from the bar to a table and their drinks should follow.**
         `transferTableVisit` hands a whole visit to another server; this moves lines between bills.
@@ -2466,6 +2524,23 @@ paths:
         (`422 line-not-transferable`, naming the lines); `toVisitId` equal to `visitId`, or a target visit
         that is `settled`, `merged` or `cancelled`, or in another outlet (`409 target-visit-not-open`).
         **Replayed offline** (`serverWins`): a line already on the target is skipped, so a replay is a no-op.
+
+
+        **What paid, voided and comped are** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001). The line''s
+        `status` stays the kitchen lifecycle (`FnbOrderStatus`); paid, voided and comped are read as follows, not
+        added to it. The request is refused `422 line-not-transferable`, the problem''s detail listing every refused
+        line id and its cause, for any line that: is not on a service order of `visitId` (cause `notOnVisit`); has
+        status `cancelled` or `refunded` (`voided`); belongs to a service order with `sales_order_id` set, or with
+        `payment_timing` `payFirst` and `sent_to_kitchen_at` set (`paid`: a round charged before the kitchen); is
+        listed in `line_ids` of a `fnb.sub_bill` of `visitId` with status `paid` (`paid`); or has `comped_at` set
+        (`comped`). One refused line refuses the whole request, and nothing moves. All of this is F&B''s own data, so
+        it needs no read of Orders and the declared reads stay as they are. Everything else as above: each line is
+        re-parented to an open service order on `toVisitId`, one opened there if the visit has none with the source
+        order''s outlet, `serviceMode` `tableService` and payment timing; `gross_amount` is recomputed on both service
+        orders and `running_total` on both visits; the kitchen is not re-fired and `orders` is not changed; `409
+        target-visit-not-open` as written; on an offline replay a line already on the target is skipped; `200` with
+        the target visit. Until `compItem` writes `comped_at`, no line reads as comped: that is correct, not a fault
+        in this operation.
 
         '
       tags:
@@ -2519,8 +2594,9 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
-          description: A line is not on the source visit, or is already paid, voided or comped (named in the
-            problem's detail).
+          description: 'A line is not on the source visit, or is already paid, voided or comped: the problem''s
+            detail lists every refused line id with its cause (`notOnVisit`, `voided`, `paid` or `comped`; ADAM
+            CR-594). One refused line refuses the whole request, and nothing moves.'
           x-ticvai-problem-types: [line-not-transferable]
           content:
             application/problem+json:
@@ -3424,12 +3500,36 @@ paths:
       operationId: setCourseRules
       x-ticvai-consumed-by:
         - "P08 BO-136 F&B Global Settings & Controls"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet in the path (platform.outlet by id) and its venue (venue_id); not found or not visible to the caller is 404, whose venue path the row''s
+          scope_path carries; outlets have no scope node of their own (ADAM CR-561; XDR-004)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the outlet''s venue scope node (platform.scope), written as fnb.course_rule.scope_path on every
+          write, the same path the venue''s own rows carry; an outlet whose venue has no scope node refuses the write
+          (ADAM CR-561)'
       summary: How this outlet courses by default
       description: 'Board 3. **Coursing was a per-ticket field with no default**, so every table was coursed
         by hand or not at all.
 
         **A fine-dining room and a food court do not course the same way**, and neither should have to
         be told twice a night.
+
+
+        **An outlet''s settings rows carry the path of the outlet''s venue** (ADAM CR-561, Chinmay, 3 November 2026;
+        CHG-CR561-001). Outlets have no scope node of their own, and none is planned. (1) The outlet in the path is
+        looked up (`platform.outlet` by id, `tenancy#outletRecords`); it is `404` if it does not exist or is not visible
+        to the caller. `fnb.course_rule.scope_path` is written as the path of that outlet''s venue scope node in
+        `platform.scope`, the same path the venue''s own rows carry, on every write, insert or replace, and never taken
+        from the request body; `scopePath` stays read-only in the response and returns that venue path. (2)
+        `outlet_id` stays the key the outlet''s course rules are found by, one row per outlet: reads and the replace on
+        PUT select by `outlet_id`, not by path. Row-level security on `scope_path` then lets anyone granted at the
+        venue, its region or the tenant read and write the row, as it does for dining tables. (3) If the outlet''s venue
+        has no scope node, the write is refused; an empty or made-up path is never written (`scope_path` is NOT NULL).
+        (4) Nothing changes in Tenancy: no `platform.scope` row of level outlet, no new column on `platform.outlet`, no
+        backfill and no migration.
 
         '
       tags:
@@ -3453,6 +3553,8 @@ paths:
       responses:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '200':
           headers:
             X-Consistency-Token:
@@ -3583,14 +3685,50 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: identity#principalRecords
-        route: service
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'the server named by serverPrincipalId (identity.principal by id): id, is_active, valid_from and valid_to
+          and nothing else, read in process under the caller''s row security, for the 400 on an unknown, inactive or
+          out-of-validity server (ADAM CR-595, option A; XDR-195; CHG-CR595-001)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the visit''s outlet (platform.outlet by fnb.table_visit.outlet_id) and its venue (venue_id), whose path
+          each fnb.table_visit_server row carries (ADAM CR-595)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the outlet''s venue scope node (platform.scope), written as fnb.table_visit_server.scope_path,
+          the venue scope the visit is written at (ADAM CR-595)'
+      x-ticvai-reads:
+      - table: fnb.table_visit
+        for: 'the visit: its status (409 table-visit-closed), opened_at and server_principal_id (ADAM CR-595)'
+      - table: fnb.table_visit_server
+        for: 'the visit''s server history: whether it has rows yet, and the row with the latest from_at (ADAM CR-595)'
+      x-ticvai-writes:
+      - table: fnb.table_visit_server
+        for: 'one row per hand-over, and first the opening server''s row when the visit has none (ADAM CR-595)'
+      - table: fnb.table_visit
+        for: 'server_principal_id, the server on the history row with the latest from_at (ADAM CR-595)'
       summary: Hand a table to another server
       description: 'Board 4. **A shift change mid-service is the ordinary case**, and the package had
         no way to say who a table belongs to now.
 
         **The gratuity split follows the assignment**, which is why this is recorded rather than edited
         — a table reassigned at 8pm and closed at 10pm has two servers with a claim on it.
+
+
+        **A reassignment is recorded, not edited** (ADAM CR-595, option A, Chinmay, 3 November 2026; CHG-CR595-001).
+        Inside one transaction: (1) the server is read in process, `identity#principalRecords` by `serverPrincipalId`
+        (id, `is_active`, `valid_from` and `valid_to` and nothing else; XDR-195). Unknown, `is_active` false, or
+        `recordedAt` outside `valid_from` to `valid_to` answers `400 validation` on `serverPrincipalId`. (2) A visit
+        that is `settled`, `merged` or `cancelled` answers `409 table-visit-closed`, as `compItem` does. (3) If the
+        visit has no `fnb.table_visit_server` rows yet and `server_principal_id` is set, a row for that server is
+        written first, with `from_at` = `opened_at` and `is_split_gratuity` true. (4) Then the new row: `from_at` =
+        `recordedAt`, `is_split_gratuity` = `splitGratuity` (default true), `recorded_by_principal_id` = the caller,
+        `scope_path` the path of the visit''s outlet''s venue (`tenancy#outletRecords`, `tenancy#scopeRecords`), the
+        venue scope the visit is written at. (5) `table_visit.server_principal_id` is set to the server on the row
+        with the latest `from_at`, so an offline replay arriving late never overwrites a newer hand-over. A replay
+        with the same `Idempotency-Key` writes nothing twice. The answer is `200` with the visit. **No split is
+        computed here**: the rows (who held the table, from when, and whether they share) are what `closeTableVisit`
+        will use once the client has given the rule.
 
         '
       tags:
@@ -3620,9 +3758,15 @@ paths:
                 serverPrincipalId:
                   type: string
                   format: uuid
+                  x-ticvai-stored-as: fnb.table_visit_server.server_principal_id
+                  description: The server taking the table, an active principal valid at `recordedAt` (else `400`;
+                    ADAM CR-595).
                 splitGratuity:
                   type: boolean
                   default: true
+                  x-ticvai-stored-as: fnb.table_visit_server.is_split_gratuity
+                  description: Whether this server shares the visit's gratuity, recorded on the hand-over's row (ADAM
+                    CR-595). Nothing divides it here.
       responses:
         '200':
           headers:
@@ -3633,6 +3777,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableVisit'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'The visit is `settled`, `merged` or `cancelled`; a table is handed over only while the visit is
+            `open` or `billRequested`. Nothing changes (ADAM CR-595).'
+          x-ticvai-problem-types: [table-visit-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits/{visitId}/comp:
@@ -3657,6 +3811,9 @@ paths:
       x-ticvai-write-via:
       - table: orders.order_line
         operation: applyManualDiscount
+      x-ticvai-writes:
+      - table: fnb.service_order_line
+        for: 'the comp marker on the F&B line: comped_at, comp_reason and comped_by_principal_id (ADAM CR-594)'
       summary: Take a line off the bill, with a reason and a name
       description: 'Board 4. **A comp is not a discount.** A discount is a price decision; a comp is a
         service recovery, it comes out of a different budget, and **a venue that cannot tell them apart
@@ -3671,6 +3828,12 @@ paths:
         default, proposed AED 100.00, client to correct under audit R094) needs `ORDER_DISCOUNT`; at or
         below it, `ORDER_MODIFY` is enough. Above it without `ORDER_DISCOUNT` is a `403`
         (`comp-escalation-required`).
+
+
+        **The F&B line records the comp** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001): beside its write
+        to Orders, `compItem` sets `comped_at` (now), `comp_reason` (the body''s `reason`) and
+        `comped_by_principal_id` (the caller) on the `fnb.service_order_line` named by `orderLineId`, so
+        `transferOrderItems` refuses a comped line. Built in its own ticket.
 
         '
       tags:
@@ -4526,6 +4689,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-reservations:
     get:
+      x-ticvai-personal-data: gated
       operationId: listTableReservations
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
@@ -4765,6 +4929,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: seatTableReservation
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
@@ -6712,6 +6877,11 @@ paths:
         Offline behaviour depends on the items: an order containing only untracked items queues normally,
         while one containing a recipe-linked item is refused offline because stock depletes in real time.
 
+
+        **Each new line is written `ordered`** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001):
+        `fnb.service_order_line.status` holds `FnbOrderStatus`''s values (a check, nullable), and a null status reads
+        as `ordered`.
+
         '
       tags:
       - order
@@ -7027,6 +7197,10 @@ paths:
         **The reasons a void may carry are the void reason list** (decided 28 September, audit R125 (4)),
         the same list every void takes, ending in `other` with a required note (audit R222). No second list
         is kept for F&B. The refusal names `voidOrder` in `suggestedOperation`.
+
+
+        **Each new line is written `ordered`** (ADAM CR-594, Chinmay, 3 November 2026; CHG-CR594-001), as
+        `createFnbOrder` writes them; a null status reads as `ordered`.
 
         '
       tags:
@@ -8744,6 +8918,7 @@ paths:
       - fnb
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -9049,6 +9224,11 @@ paths:
       - query: tenancy#outletRecords
         route: in-process
         for: 'the outlet the stations serve (422 unknown-station) (CHG-MOD-003)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the path of the outlet''s venue scope node (platform.scope), written as fnb.kitchen_routing_rule.scope_path on every
+          write, the same path the venue''s own rows carry; an outlet whose venue has no scope node refuses the write
+          (ADAM CR-561)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q189 and Q190 (BO-135, DI-323); shape follows setCourseRules'
@@ -9066,6 +9246,13 @@ paths:
         If the station a line routes to is inactive or every display assigned to it is down, its ticket goes to
         `fallbackStationId` instead (DI-323: the fallback display). Every station named must belong to this
         outlet, or to the producing outlet that serves it (`KitchenStation.servesOutletIds`); otherwise `422`.
+
+
+        **The row carries the path of the outlet''s venue** (ADAM CR-561, Chinmay, 3 November 2026; CHG-CR561-001):
+        `fnb.kitchen_routing_rule.scope_path` is written as the path of the outlet''s venue scope node in
+        `platform.scope`, as `setCourseRules` states, set by the server on every write and never taken from the
+        request; outlets have no scope node of their own. If the outlet''s venue has no scope node, the write is
+        refused.
 
         '
       tags:
@@ -9263,6 +9450,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: createTableReservationForGuest
       x-ticvai-consumed-by:
         - "P04 POS-028 Table Service"
@@ -11162,12 +11350,17 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-subject-kind: guest
           type: string
           format: uuid
           nullable: true
         guestName:
+          x-ticvai-pii: {store: subject.displayName, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
         contactPoint:
+          x-ticvai-pii: {store: contact.point, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
         partySize:
           type: integer
@@ -11264,8 +11457,10 @@ components:
           format: uuid
           nullable: true
         guestName:
+          x-ticvai-data-class: personal
           type: string
         contactPoint:
+          x-ticvai-data-class: personal
           type: string
         partySize:
           type: integer
@@ -12522,6 +12717,15 @@ components:
           $ref: '#/components/schemas/FnbOrderStatus'
         lines:
           type: array
+          # **The line's status carries its values onto fnb.service_order_line** (ADAM CR-594, Chinmay, 3 November
+          # 2026; CHG-CR594-001): a check on the column allowing exactly FnbOrderStatus, nullable (tools/derive-ddl.py
+          # reads x-ticvai-item-checks).
+          x-ticvai-item-checks: [status]
+          description: '**A line''s `status` is its kitchen lifecycle** (ADAM CR-594, Chinmay, 3 November 2026;
+            CHG-CR594-001): `FnbOrderStatus`''s nine values, held by a check on `fnb.service_order_line.status`,
+            nullable. `createFnbOrder` and `amendFnbOrder` write `ordered` on each new line, and a null status reads
+            as `ordered`. Paid, voided and comped are not statuses: voided is `cancelled` or `refunded`, paid is read
+            from the service order and the sub-bills, and comped from `compedAt` (`transferOrderItems`).'
           items:
             allOf:
             - $ref: '#/components/schemas/CreateFnbOrderLine'
@@ -12533,6 +12737,27 @@ components:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 lineTotal:
                   $ref: ../shared/common.yaml#/components/schemas/Money
+                compedAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  readOnly: true
+                  description: '**When the line was comped** (ADAM CR-594; CHG-CR594-001): set by `compItem` with
+                    `compReason` and `compedByPrincipalId`; null on a line never comped. A line with `compedAt` set
+                    is comped and is not transferable.'
+                compReason:
+                  type: string
+                  nullable: true
+                  readOnly: true
+                  description: 'The reason `compItem` took, one of its reasons (qualityIssue, wait, wrongItem,
+                    allergyIncident, goodwill, staffMeal, wastage, other), stored as text (ADAM CR-594); null on a line
+                    never comped. The note an `other` reason requires stays on the comp''s write to Orders.'
+                compedByPrincipalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  readOnly: true
+                  description: Who comped the line, the caller of `compItem` (ADAM CR-594); null on a line never comped.
         salesOrderId:
           type: string
           format: uuid
@@ -12742,6 +12967,57 @@ components:
         recordedAt:
           type: string
           format: date-time
+    TableVisitServer:
+      type: object
+      x-ticvai-persistence: fnb.table_visit_server
+      x-ticvai-index: [[tableVisitId, fromAt]]
+      description: '**Who held a table, from when, and whether they share its gratuity** (ADAM CR-595, option A,
+        Chinmay, 3 November 2026; CHG-CR595-001). One row per hand-over, written by `reassignServer`, which first writes
+        the opening server''s row (`from_at` = the visit''s `opened_at`) when the visit has none. A row is recorded, never
+        edited. `closeTableVisit` will divide the gratuity from these rows once the client has given the rule; nothing
+        divides it now. Storage only: no operation answers it.'
+      required:
+      - id
+      - tableVisitId
+      - serverPrincipalId
+      - fromAt
+      - splitGratuity
+      - recordedByPrincipalId
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tableVisitId:
+          type: string
+          format: uuid
+          x-ticvai-references: fnb.table_visit
+          description: The visit handed over.
+        serverPrincipalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+          description: The server who holds the table from `fromAt`.
+        fromAt:
+          type: string
+          format: date-time
+          description: From when, the hand-over's `recordedAt` (or the visit's `opened_at` for the opening server).
+        splitGratuity:
+          type: boolean
+          default: true
+          description: Whether this server shares the visit's gratuity. Its column is `is_split_gratuity`, the
+            naming standard's name for a boolean (CR-595's `split_gratuity`).
+        recordedByPrincipalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+          description: Who recorded the hand-over, the caller of `reassignServer`.
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the visit''s outlet''s venue, the venue scope the visit is
+            written at, set by the server and never taken from the request. Row-level security reads it.'
     TableVisit:
       x-ticvai-persistence: fnb.table_visit
       type: object
@@ -13263,7 +13539,10 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope, which means: the
+            server writes the scope path of the venue the outlet belongs to (its venue''s `platform.scope` node), on
+            every write and never from a request, as `DiningTable.scopePath` does; outlets have no scope node of their
+            own (ADAM CR-561, Chinmay, 3 November 2026).'
     WasteApprovalPolicy:
       type: object
       x-ticvai-persistence: fnb.waste_approval_policy
@@ -13660,7 +13939,10 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope, which means: the
+            server writes the scope path of the venue the outlet belongs to (its venue''s `platform.scope` node), on
+            every write and never from a request, as `DiningTable.scopePath` does; outlets have no scope node of their
+            own (ADAM CR-561, Chinmay, 3 November 2026).'
     TableCombination:
       type: object
       x-ticvai-persistence: fnb.table_combination
@@ -13697,7 +13979,10 @@ components:
         scopePath:
           type: string
           readOnly: true
-          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope.'
+          description: '**The partition key** (ADR-0005). Operations write it at `outlet` scope, which means: the
+            server writes the scope path of the venue the outlet belongs to (its venue''s `platform.scope` node), on
+            every write and never from a request, as `DiningTable.scopePath` does; outlets have no scope node of their
+            own (ADAM CR-561, Chinmay, 3 November 2026).'
     SectionLayout:
       type: object
       description: An outlet's floor divided into sections, each with its server (`setSectionLayout`).
@@ -13835,6 +14120,7 @@ components:
         orderNumber:
           type: string
         guestName:
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         serviceMode:

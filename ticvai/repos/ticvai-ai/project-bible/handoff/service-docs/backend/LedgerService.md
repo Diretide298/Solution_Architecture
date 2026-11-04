@@ -13,7 +13,7 @@
 
 ## Why this is a service
 
-**Money, and it is append-only.** 54 operations over 18 tables that are never updated and never deleted — a different discipline from everything around it, and one that should not share a deploy with anything that does mutate.
+**Money, and it is append-only.** Its postings are never updated and never deleted — a different discipline from everything around it, and one that should not share a deploy with anything that does mutate.
 
 ## Depends on
 

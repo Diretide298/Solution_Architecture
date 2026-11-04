@@ -3,7 +3,7 @@ info:
   title: TICVAI Catalogue & Entitlement
   version: 1.0.0
   x-ticvai-hosts: [cell]
-  x-ticvai-screen-count: 240
+  x-ticvai-screen-count: 245
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -3402,6 +3402,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-004 Attraction Details"
         - "P02 GST-004 Item Detail"
+        - "P02 GST-007 Select Date & Time"
         - "P08 BO-161 Guest, Companion & Eligibility Rules"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -9210,6 +9211,8 @@ paths:
   /channel-profile:
     get:
       operationId: getChannelProfile
+      x-ticvai-consumed-by:
+        - "P08 ADM-259 Channel Creation & Profile Configuration"
       x-ticvai-audience:
         - staff
       summary: A sales channel's profile, as saved
@@ -9319,6 +9322,8 @@ paths:
   /product-catalogue:
     get:
       operationId: getProductCatalogue
+      x-ticvai-consumed-by:
+        - "P08 ADM-260 Product & Catalogue Assignment"
       x-ticvai-audience:
         - staff
       summary: A sales channel's product assignment, as saved
@@ -9405,6 +9410,8 @@ paths:
   /channel-pricing-commercial:
     get:
       operationId: getChannelPricingCommercial
+      x-ticvai-consumed-by:
+        - "P08 ADM-261 Channel Pricing & Commercial Profile Assignment"
       x-ticvai-audience:
         - staff
       summary: A sales channel's pricing and commercial profile, as saved
@@ -9845,6 +9852,8 @@ paths:
   /channel-fee-payment:
     get:
       operationId: getChannelFeePayment
+      x-ticvai-consumed-by:
+        - "P08 ADM-266 Channel Fees, Payment & Fulfillment Configuration"
       x-ticvai-audience:
         - staff
       summary: A sales channel's fees, payment and fulfilment configuration, as saved
@@ -9956,6 +9965,8 @@ paths:
   /channel-readiness-validation:
     get:
       operationId: getChannelReadinessValidation
+      x-ticvai-consumed-by:
+        - "P08 ADM-267 Channel Publication, Readiness & AI Validation"
       x-ticvai-audience:
         - staff
       summary: A sales channel's readiness and publication state, as last validated

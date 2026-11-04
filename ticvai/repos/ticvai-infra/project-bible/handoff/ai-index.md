@@ -9,11 +9,11 @@
 | **Operations** | 148 |
 | **Schemas** | 125 |
 | **States** | 43 |
-| **Events** | 53 |
+| **Events** | 54 |
 | **Tables** | 139 |
 | **Screens** | 183 |
 | **Flows** | 11 |
-| **Documents** | 68 |
+| **Documents** | 69 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -56,7 +56,7 @@
 | **The vector store is reached by one contract** — 1 collection, 9 operations, all in `ai`. No screen, service or other contract reaches it directly. | yes | tools/check-package.py — no non-AI contract writes an AI table |
 | **Writes stay inside the domain** — AI reads the transactional core and writes only its own stores and caches. `generateVenueLayout` wrote into `seating.import_job` on 17 August and now stops at a draft. | yes | tools/check-package.py, with two stated exceptions (ADR-0020) |
 | **Conversation logs sit off the transactional primary** — Prompt and response volume does not compete with a sale. 5 tables on the analytical store. | yes | ADR-0020, checked against the store map |
-| **Every model call leaves an audit record** — 17 operations write an `ai.interaction` (8.3.55). | yes | tools/check-package.py — a model-calling operation with no interaction fails |
+| **Every model call leaves an audit record** — 18 operations write an `ai.interaction` (8.3.55). | yes | tools/check-package.py — a model-calling operation with no interaction fails |
 | **Only governed operations outside the domain may write to it** — 2 operations in other contracts write an `ai.*` table: ['askReportingQuestion', 'saveNaturalLanguageQuery']. Each is a governance record, not a bypass. | yes | tools/check-package.py allowlist, stated in ADR-0020 |
 
 **Storage tiers** — `postgres` 124 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 9
@@ -300,6 +300,7 @@
 | `fnb.menuPublished` | consumes | fnb | yes |
 | `identity.credentialResetRequested` | consumes | identity | no |
 | `identity.loginRecorded` | consumes | identity | no |
+| `identity.privacyRequestRaised` | consumes | identity | yes |
 | `ledger.periodClosed` | consumes | ledger | yes |
 | `maintenance.templatePublished` | consumes | maintenance | yes |
 | `marketing.caseClosed` | consumes | marketing | yes |
@@ -625,7 +626,8 @@
 | [ADR-0009: AI Data Residency](..\docs\adr\0009-ai-data-residency.md) | Accepted · section 2 amended by [ADR-0049](0049-vectors-live | 1 |
 | [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Accepted · 30 September 2026 · Chinmay Parab — amended by [A | 20 |
 | [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](..\docs\adr\0021-qdrant-partitioning.md) | Accepted in part · amended by [ADR-0049](0049-vectors-live-i | 4 |
-| [ADR-0023 — Personal data lives apart from the append-only ledger](..\docs\adr\0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 2 |
+| [ADR-0023 — Personal data lives apart from the append-only ledger](..\docs\adr\0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 6 |
+| [ADR-0026: Public API versioning, scopes and deprecation](..\docs\adr\0026-public-api-versioning.md) | Accepted | 1 |
 | [ADR-0028: Seventeen modules, and the data boundary decides where they split](..\docs\adr\0028-service-decomposition.md) | Accepted · amended by [ADR-0055](0055-a-modular-monolith-dep | 1 |
 | [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](..\docs\adr\0033-outbox-and-dead-letters.md) | Accepted · amended by [ADR-0058](0058-one-relay-per-region-a | 3 |
 | [ADR-0034: The cheapest AI call is the one that never reaches a provider](..\docs\adr\0034-ai-retrieval-and-cost.md) | Accepted | 6 |

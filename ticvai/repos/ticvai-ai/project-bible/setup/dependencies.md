@@ -2,7 +2,7 @@
 
 > **Purpose:** Adding a package is a decision  
 > **Owner:** Chinmay  
-> **Status:** Stub
+> **Status:** **Draft: proposed, client to approve (audit R038)**
 
 
 ## Before adding
@@ -23,4 +23,57 @@
 
 ## Approved by runtime
 
-To be filled as the stack settles. Current baseline is in each repo's project files.
+**Proposed, client to approve (audit R038, decided 28 September).** Drafted from what the starters already ship. Anything not on this list needs sign-off from **one named approver on the client side: [client to name]** (client IT / architecture), recorded in the PR that adds it. Until that person is named, Chinmay approves provisionally and the addition is listed for the client at the next review.
+
+Versions are the starters' baseline; Renovate raises bumps within a major version, and a major bump is a new approval.
+
+### Backend (.NET 10, `ticvai-backend`)
+
+| Package | Purpose | Starter baseline |
+|---|---|---|
+| `Microsoft.AspNetCore.OpenApi`, `Microsoft.OpenApi` | OpenAPI document from the API | 10.0.x, 2.x |
+| `Microsoft.Extensions.*` (DependencyInjection, Configuration, Options, Diagnostics.HealthChecks) | Hosting, configuration, `/health` | 10.0.x (framework) |
+| `Serilog.AspNetCore`, `Serilog.Sinks.Console` | Structured logging | 10.0.x, 6.x |
+| `OpenTelemetry.Extensions.Hosting`, `OpenTelemetry.Instrumentation.AspNetCore`, `OpenTelemetry.Instrumentation.Http` | Traces | 1.17.x |
+| `OpenTelemetry.Exporter.OpenTelemetryProtocol` | Export to the OTLP endpoint (not yet in the starter; approved for SETUP-OBS) | 1.17.x |
+| `FluentValidation`, `FluentValidation.DependencyInjectionExtensions` | Request validation | 12.x |
+| `Microsoft.EntityFrameworkCore`, `Microsoft.EntityFrameworkCore.Design`, `Npgsql.EntityFrameworkCore.PostgreSQL` | Persistence on PostgreSQL | 10.0.x |
+| `Microsoft.CodeAnalysis.BannedApiAnalyzers` | Compile-time banned symbols (`BannedSymbols.txt`) | 3.3.x |
+| `xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `coverlet.collector` | Tests and coverage (test projects only) | 2.9.x, 3.1.x, 17.x, 6.x |
+
+### Frontend (Nx + pnpm, `ticvai-frontend`)
+
+| Package | Purpose | Starter baseline |
+|---|---|---|
+| `nx`, `@nx/js`, `@nx/react`, `@nx/react-native`, `@nx/vite`, `@nx/eslint`, `@nx/eslint-plugin` | Monorepo build, module boundaries | 20.x |
+| `typescript` | Language | 5.6+ |
+| `vitest` | Tests | 2.x |
+| `eslint`, `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin` | Lint, including `enforce-module-boundaries` | 8.x |
+| pnpm | Package manager (`packageManager: pnpm@9`) | 9.x |
+
+**Banned in apps by the lint rule:** `expo-sqlite`, `react-native-sqlite-storage`, `@op-engineering/op-sqlite`. Local storage goes through `offline-core` only.
+
+### Infrastructure and CI (`ticvai-infra`)
+
+No infra starter ships yet, so this list follows the platform decision (audit R057: Azure in a UAE region; CI is GitLab CI since 20 October 2026, ADR-0007 amendment, r8 cause FOUNDATION-AI-C37).
+
+| Item | Purpose |
+|---|---|
+| Terraform with the `hashicorp/azurerm` provider | Cells, databases, key vaults |
+| Terraform with the `hashicorp/helm` and `hashicorp/kubernetes` providers | The cluster bootstrap stage after the cell module: the Qdrant chart, ingress and cert-manager (the lead, 20 October 2026, r8 cause FOUNDATION-AI-C22, option A) |
+| The official Qdrant Helm chart (`qdrant/qdrant`), pinned to a chart version that installs Qdrant 1.16 or later | Self-hosted Qdrant, three nodes (ADR-0049) |
+| cert-manager (`jetstack/cert-manager`), issuing from Let's Encrypt | TLS on the Qdrant service and the cluster ingress (ADR-0049) |
+| GitLab CI (`.gitlab-ci.yml`, the group's shared runners), official images only (`node`, `python`, `mcr.microsoft.com/dotnet/sdk`, `hashicorp/terraform`, `alpine`), pinned to a version | CI for every repository (ADR-0007 amendment, 20 October 2026) |
+| The ticvai-frontend group's GitLab npm registry | Where `@ticvai/api-client` is published; each frontend repository pins it by exact version |
+| Azure Key Vault | Per-cell secrets (see config-and-secrets) |
+
+A third-party CI image or template is a dependency like any other and needs the named approver.
+
+**The cluster bootstrap** (FOUNDATION-AI-C22, option A): a second Terraform stage in ticvai-infra, run after the
+cell module against its AKS cluster with the helm and kubernetes providers. It installs cert-manager, the ingress,
+and the Qdrant chart on the `qdrant` node pool with TLS from cert-manager and JWT RBAC on (the API key from the
+cell's Key Vault). It is owned by SETUP-ENV's author and built in SETUP-QDRANT.
+
+### AI (`ticvai-ai`, Python)
+
+No code starter ships yet: ADAM setup's `ai` role (`setup.cmd -Role ai`, 20 October 2026, r8 cause FOUNDATION-AI-C29) clones `ticvai-ai` and adds only ADAM's CLAUDE.md and commands. FastAPI is the stated framework (quickstart); every other package waits for the named approver.

@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Accreditation
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 48
   x-ticvai-tier: satellite
   x-ticvai-module: 12 — Accreditation & Credential Management
@@ -44,7 +45,10 @@ info:
 
     '
 servers:
-- url: https://api.ticvai.com/v1
+- url: https://{cellHost}/api/v1
+  variables:
+    cellHost:
+      default: cell.ticvai.local
 security:
 - bearerAuth: []
 x-ticvai-queries:
@@ -163,6 +167,15 @@ x-ticvai-jobs:
     for: 'The daily renewal run: an active holder whose validTo is renewalWindowDays away gets accreditation.renewalDue, once
       per holder per validity period.'
     source: ['events/accreditation-renewalDue.yaml']
+  subjectDataPart:
+    module: accreditation
+    host: workers
+    trigger: {kind: event}
+    consumes: [identity.privacyRequestRaised]
+    reads: [accreditation.holder]
+    writes: []
+    for: 'accreditation''s part of a guest''s privacy request (r13 system review B-01; the lead, 3 November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). On identity.privacyRequestRaised: for `requestType` access it writes every row of the subject (by its subject columns) in the tables it reads, in the export''s format, with the fields kept in pii.* answered through identity#subjectDetails, as one object in the tenant''s private storage (encrypted at rest, ADR-0063), leaving out another guest''s rows; for `deletion` it has nothing to erase, since every personal field it holds is kept in pii.* for the subject (x-ticvai-pii) and its rows keep only the subject''s id. Either way it then records its part with identity `submitSubjectDataPart` (rowCount 0 where it holds nothing for the subject), so the export and erasure jobs never wait on it. Idempotent on approvalRequestId.'
+    source: ['events/identity-privacyRequestRaised.yaml']
 paths:
   /accreditation-programmes:
     get:
@@ -483,6 +496,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-holders:
     get:
+      x-ticvai-personal-data: gated
       operationId: listAccreditationHolders
       x-ticvai-consumed-by:
         - "P08 BO-615 Accreditation Command Center"
@@ -545,6 +559,7 @@ paths:
         type: string
         format: uuid
     get:
+      x-ticvai-personal-data: gated
       operationId: getAccreditationHolder
       x-ticvai-consumed-by:
         - "P08 BO-626 Accreditation Holder Profile"
@@ -569,6 +584,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
+      x-ticvai-personal-data: gated
       operationId: updateAccreditationHolder
       x-ticvai-consumed-by:
         - "P08 BO-627 Identity Details & Verification"
@@ -833,6 +849,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-credentials:
     get:
+      x-ticvai-personal-data: gated
       operationId: listAccreditationCredentials
       x-ticvai-consumed-by:
         - "P08 BO-615 Accreditation Command Center"
@@ -875,6 +892,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
+      x-ticvai-personal-data: gated
       operationId: issueAccreditationCredential
       x-ticvai-consumed-by:
         - "P08 BO-645 Credential Generation Workspace"
@@ -929,6 +947,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: replaceAccreditationCredential
       x-ticvai-consumed-by:
         - "P08 BO-650 NFC & RFID Credential Encoding"
@@ -1305,6 +1324,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: setAccreditationStatus
       x-ticvai-consumed-by:
         - "P08 BO-662 Access Revocation & Suspension"
@@ -1563,6 +1583,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-access-activity:
     get:
+      x-ticvai-personal-data: gated
       operationId: listAccreditationAccessActivity
       x-ticvai-consumed-by:
         - "P08 BO-686 Accreditation Utilization Analytics"
@@ -2004,6 +2025,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2033,6 +2055,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [accreditation-application-not-editable]
           description: The application is not draft or informationRequested
@@ -2080,6 +2104,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2096,6 +2121,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [accreditation-application-not-draft, accreditation-window-closed]
           description: Not a draft, or the programme's application window is closed
@@ -2152,6 +2179,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2203,6 +2231,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [accreditation-application-not-resubmittable, accreditation-window-closed]
           description: Not informationRequested or rejected, or the programme's window is closed
@@ -2253,6 +2283,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2287,6 +2318,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [accreditation-application-already-closed]
           description: The application is already decided, withdrawn or expired
@@ -2353,6 +2386,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/accreditation-credentials:
     get:
+      x-ticvai-personal-data: self
       operationId: listMyAccreditationCredentials
       x-ticvai-consumed-by:
         - "P11 ACC-005 Accreditation Badge"
@@ -2432,7 +2466,8 @@ paths:
 
 
         Issued under the same wallet issuer accounts as `orders.issueWalletPass`. Only the caller''s own
-        credential (`403`), and only one that is `issued` or `active` (`409`). Recorded as an
+        credential (another holder''s is the shared `404`, as one that does not exist: `x-ticvai-object-owner`, r13
+        system review C-03, CHG-R14H-003), and only one that is `issued` or `active` (`409`). Recorded as an
         `AccreditationCredentialDelivery` with channel `appleWallet` or `googleWallet`.
 
         '
@@ -2440,6 +2475,7 @@ paths:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - guest
       x-ticvai-scope-level: venue
@@ -2476,6 +2512,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [credential-not-mobile-or-qr, credential-not-issued-or-active]
           description: The credential is not a mobile or QR credential, or is not issued or active
@@ -2569,6 +2607,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-credentials/verify:
     get:
+      x-ticvai-personal-data: gated
       operationId: verifyAccreditationCredential
       x-ticvai-consumed-by:
         - "P07 SCN-003 Ready to scan"
@@ -2669,13 +2708,16 @@ paths:
 
         Only inside the renewal window (`renewalWindowDays` before `validTo`, or during a grace period) and
         only for an `active` or `expired` holder (`409`); a `revoked` holder applies afresh. A guest may renew
-        only their own accreditation (`403`).
+        only their own accreditation: another holder''s is the shared `404`, exactly as one that does not exist
+        (`x-ticvai-object-owner`; r13 system review C-03, CHG-R14H-003; it said `403`, which told the caller the
+        holder exists).
 
         '
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2715,6 +2757,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [outside-renewal-window, holder-not-renewable, renewal-already-open]
           description: Outside the renewal window, the holder is revoked, suspended or archived, or a renewal
@@ -3015,6 +3059,7 @@ components:
         accreditationNumber:
           type: string
         fullName:
+          x-ticvai-data-class: personal
           type: string
         photoAssetId:
           type: string
@@ -3556,30 +3601,41 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-subject-kind: applicant
           type: string
           format: uuid
           nullable: true
         accreditationNumber:
           type: string
         fullName:
+          x-ticvai-pii: {store: subject.displayName, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
         photoAssetId:
           type: string
           format: uuid
           nullable: true
         dateOfBirth:
+          x-ticvai-pii: {store: subject.dateOfBirth, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           format: date
           nullable: true
         nationality:
+          x-ticvai-pii: {store: subject.nationality, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         email:
+          x-ticvai-pii: {store: contact.email, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           format: email
           nullable: true
           description: 12.1.16. The holder's own address — where a mobile credential and renewal notices go
         phone:
+          x-ticvai-pii: {store: contact.phone, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
           description: 12.1.16. E.164
@@ -3839,6 +3895,7 @@ components:
         scopePath:
           type: string
         holderName:
+          x-ticvai-data-class: personal
           type: string
           readOnly: true
           x-ticvai-persisted: false
@@ -4247,6 +4304,7 @@ components:
           type: string
           format: uuid
         holderName:
+          x-ticvai-data-class: personal
           type: string
         zoneId:
           type: string

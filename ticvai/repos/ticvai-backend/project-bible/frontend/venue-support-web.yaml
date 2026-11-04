@@ -36,7 +36,7 @@ contracts:
 - orders
 - reporting
 - white-label
-deployment:
+deployment: &id001
   target: browser, desktop
   distribution: served from the cell
   bundleUpdate: immediate on deploy
@@ -45,6 +45,12 @@ deployment:
   deviceOwnership: agent workstation
   networkAssumption: corporate network
   releaseCadence: weekly
+platformProfiles:
+- platform: P12
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment: *id001
 screenCount: 28
 byWave:
   wave1: 4

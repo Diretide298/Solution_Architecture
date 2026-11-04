@@ -1,6 +1,6 @@
 # WS57 — Sales Channel Management board 1
 
-**10 screens · 11 operations · 21 schemas · 2 permissions**
+**10 screens · 16 operations · 21 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -345,9 +345,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #29749 (VM-ADM-259) |
-| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -355,8 +355,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/commercial/channel-creation-profile-configuration-adm-259` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of a channel profile (createChannelProfile has no get or list).
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Create and define a sales channel before products and rules are assigned: name, code, type (web, app, POS, mobile POS, kiosk, call centre, B2B portal, reseller, OTA, API, partner portal).
 
@@ -385,6 +383,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Owner | select field | — | — | — | — | — | — |
 | Responsible Department | select field | — | — | — | — | — | — |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Channel | picker: choose a channel | — | — | `getChannelProfile` ?channelId |
+
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **channelCode**: Upper-case letters, digits and hyphen, 2 to 20. *(source: contracts/spine/catalogue.yaml#createChannelProfile)*
@@ -396,6 +400,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create (primary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getChannelProfile` (onLoad, The channel profile as saved, when the screen opens on a …)
 
 **Where the user goes next**
 
@@ -426,6 +432,7 @@ channel:
 
 #### Permissions
 
+- `getChannelProfile` → `PRODUCT_VIEW` (read) · staff
 - `createChannelProfile` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -458,12 +465,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (13), with its required mark, default, format and its error state (400, 409).
+- [ ] Every input above is drawn (13), with its required mark, default, format and its error state (400, 404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-259?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create.
 - [ ] Every transition is wired: `ADM-258`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -476,9 +483,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #29752 (VM-ADM-260) |
-| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
@@ -487,7 +494,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Assign Products, Remove Products, Disable, Copy Assignment, Import Assignment. Each needs an operation, or … Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of product-to-channel catalogue assignments.
+**Known gaps.** **The pack names 6 actions on this screen and the screen declares 2 operations** (setProductCatalogue and its read getProductCatalogue). Unserved: Assign Products, Remove Products, Disable, Copy …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which products each channel may sell: by product, family, category, event, attraction, venue catalogue, collection or the whole approved catalogue, with exclusions.
 
@@ -497,6 +504,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Pack actions with no operation: Assign Products, Remove Products, Disable, Copy Assignment, Import Assignment. (CHG-MOV-008)
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Channel | picker: choose a channel | — | — | `getProductCatalogue` ?channelId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -523,7 +536,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Effective from | 1 Oct 2026 | Effective From |
 | Effective to | 1 Oct 2026 | Effective To; empty for open-ended |
 
-**The selected product catalogue** (detail panel): The pack groups this record's detail under its own headings: “Administrators can assign”, “Global Channel Catalogue”, “Venue Catalogue”, “For example”, “Important Architecture”, “This screen only determines”.
+**The selected product catalogue** (detail panel, from `getProductCatalogue`): The pack groups this record's detail under its own headings: “Administrators can assign”, “Global Channel Catalogue”, “Venue Catalogue”, “For example”, “Important Architecture”, “This screen only determines”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -548,6 +561,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Set Effective Dates (secondary button) | navigation or local | — | — | — | — |
 | Copy Assignment (secondary button) | navigation or local | — | — | — | — |
 | Import Assignment (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getProductCatalogue` (onLoad, The channel's product assignment as saved)
 
 **Where the user goes next**
 
@@ -585,6 +600,7 @@ assignment:
 
 #### Permissions
 
+- `getProductCatalogue` → `PRODUCT_VIEW` (read) · staff
 - `setProductCatalogue` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -614,12 +630,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-260?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Assign Products, Remove Products, Disable, Set Effective Dates, Copy Assignment, Import Assignment.
 - [ ] Every transition is wired: `ADM-258`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -632,9 +648,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #29753 (VM-ADM-261) |
-| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -643,7 +659,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel pricing and commercial profile assignments.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which pricing a channel consumes: price profile, effective dates, venue, event, product, segment, priority.
 
@@ -653,6 +669,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - No read operation: the screen declares only setChannelPricingCommercial and nothing that returns the current configuration. (CHG-WIR-027)
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Channel | picker: choose a channel | — | — | `getChannelPricingCommercial` ?channelId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -664,6 +686,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getChannelPricingCommercial` (onLoad, The channel's pricing and commercial profile as saved)
 
 **Where the user goes next**
 
@@ -697,6 +721,7 @@ assignment:
 
 #### Permissions
 
+- `getChannelPricingCommercial` → `PRODUCT_VIEW` (read) · staff
 - `setChannelPricingCommercial` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -729,12 +754,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-261?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes, Cancel.
 - [ ] Every transition is wired: `ADM-258`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -894,7 +919,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #29775 (VM-ADM-263) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -1613,9 +1638,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #29773 (VM-ADM-266) |
-| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -1623,8 +1648,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/commercial/channel-fees-payment-fulfillment-configuration-adm-266` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel fee, payment and fulfilment configuration.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** What each channel charges and how it pays and fulfils: fees, payment methods (card, cash, digital wallet, payment link, account credit, B2B credit), fulfilment (email, WhatsApp, SMS, print, wallet pass).
 
@@ -1651,6 +1674,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Collection | select field | — | — | — | — | — | — |
 | Ticket credential | segmented control | optional | — | Platform signed QR · Static QR · RFID card | — | Platform signed QR (the default), Static signed QR, RFID card. **A partner's or reseller's channel can issue its tickets without dynamic QR** (MoM 2 Sep 2026 §4.7, MOM-0330): ticket issuing … | `ChannelFeesPaymentFulfillmentConfigurationInput.ticketCredentialFormat` |
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Channel | picker: choose a channel | — | — | `getChannelFeePayment` ?channelId |
+
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **paymentMethods**: Checkboxes with Apple Pay / Google Pay labelled as the digital wallet tender, distinct from the TICVAI wallet. *(source: contracts/spine/catalogue.yaml#setChannelFeePayment / contracts/spine/orders.yaml#/components/schemas/TenderKind)*
@@ -1662,6 +1691,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save changes (primary button) | navigation or local | — | — | — | — |
+
+**Data it reads**: `getChannelFeePayment` (onLoad, The channel's fees, payment and fulfilment as saved)
 
 **Where the user goes next**
 
@@ -1696,6 +1727,7 @@ channel:
 
 #### Permissions
 
+- `getChannelFeePayment` → `PRODUCT_VIEW` (read) · staff
 - `setChannelFeePayment` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -1725,12 +1757,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-266?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
 - [ ] Every transition is wired: `ADM-258`.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1743,9 +1775,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #29774 (VM-ADM-267) |
-| Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
+| Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration works) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -1753,8 +1785,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Route | `/commercial/channel-publication-readiness-ai-validation-adm-267` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
-
-**Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel readiness and validation results.
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** The final check before a channel or channel-product configuration goes live: validate, preview, submit for approval, schedule, activate, return, suspend.
 
@@ -1769,6 +1799,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
 | 4.1.1 Channel Publication, Readiness & AI | text field | — | — | — | — | — | — |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Channel | picker: choose a channel | — | — | `getChannelReadinessValidation` ?channelId |
 
 **Sent by *What publishing changes*** (`publishChannelReadinessValidation`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1798,6 +1834,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - **Activate**: Only after validation passes; warnings may be overridden with a reason, errors not. *(source: contracts/spine/catalogue.yaml#publishChannelReadinessValidation)*
 
+**Data it reads**: `getChannelReadinessValidation` (onLoad, The channel's readiness checklist and status)
+
 #### States
 
 | State | What it shows |
@@ -1822,6 +1860,7 @@ readiness:
 
 #### Permissions
 
+- `getChannelReadinessValidation` → `PRODUCT_VIEW` (read) · staff
 - `publishChannelReadinessValidation` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -1851,12 +1890,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (403, 409, 422).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (403, 404, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-267?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Publish, What publishing changes.
 - [ ] No transition is declared; back returns where the user came from.
-- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`.
+- [ ] Every gated control is gated: `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1955,6 +1994,11 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "createChannelProfile": {"method":"POST","path":"/channel-profile","contract":"catalogue","summary":"Channel Creation & Profile Configuration","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ChannelCreationProfileConfigurationInput","responds":"ChannelCreationProfileConfigurationView"},
+"getChannelFeePayment": {"method":"GET","path":"/channel-fee-payment","contract":"catalogue","summary":"A sales channel's fees, payment and fulfilment configuration, as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channelId","in":"query","required":true}],"requestBody":null,"responds":"ChannelFeesPaymentFulfillmentConfigurationView"},
+"getChannelPricingCommercial": {"method":"GET","path":"/channel-pricing-commercial","contract":"catalogue","summary":"A sales channel's pricing and commercial profile, as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channelId","in":"query","required":true}],"requestBody":null,"responds":"ChannelPricingCommercialProfileAssignmentView"},
+"getChannelProfile": {"method":"GET","path":"/channel-profile","contract":"catalogue","summary":"A sales channel's profile, as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channelId","in":"query","required":true}],"requestBody":null,"responds":"ChannelCreationProfileConfigurationView"},
+"getChannelReadinessValidation": {"method":"GET","path":"/channel-readiness-validation","contract":"catalogue","summary":"A sales channel's readiness and publication state, as last validated","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channelId","in":"query","required":true}],"requestBody":null,"responds":"ChannelPublicationReadinessAiValidationView"},
+"getProductCatalogue": {"method":"GET","path":"/product-catalogue","contract":"catalogue","summary":"A sales channel's product assignment, as saved","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channelId","in":"query","required":true}],"requestBody":null,"responds":"ProductCatalogueAssignmentView"},
 "listChannelSaleRule": {"method":"GET","path":"/channel-sale-rule","contract":"catalogue","summary":"Channel Sales Rules, Limits & Restrictions","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"ruleLevel","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listChannelSaleSchedule": {"method":"GET","path":"/channel-sale-schedule","contract":"catalogue","summary":"Channel Sales Schedule & Availability Windows","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listCustomerEligibilityRule": {"method":"GET","path":"/customer-eligibility-rule","contract":"catalogue","summary":"Customer & Eligibility Rules by Channel","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":false},{"name":"product","in":"query","required":false},{"name":"dimension","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1985,7 +2029,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ChannelSalesRule": {"type":"object","x-ticvai-persistence":"catalogue.channel_sales_rule","description":"**When, how much and to whom a channel may sell** (29 September, data model DM3). Merges the channel sales schedule (ADM-261), sales limits and restrictions (ADM-265) and customer eligibility by channel (ADM-262): each is a rule on a channel, optionally for one product, with an effective window. `ruleKind` says which group of fields applies; the others are null. A product-level rule is overridden only where `overridesProductRule`.","required":["id","scopePath","salesChannelId","ruleKind","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"salesChannelId":{"x-ticvai-references":"catalogue.sales_channel","type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","nullable":true},"ruleKind":{"type":"string","enum":["salesWindow","salesLimit","eligibility"]},"name":{"type":"string","maxLength":200,"nullable":true},"ruleLevel":{"type":"string","enum":["platform","product","channel","contractPartner"],"default":"channel"},"overridesProductRule":{"type":"boolean","default":false},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean","default":true},"salesStartDate":{"type":"string","format":"date","nullable":true},"salesStartTime":{"type":"string","format":"time","nullable":true},"salesEndDate":{"type":"string","format":"date","nullable":true},"salesEndTime":{"type":"string","format":"time","nullable":true},"timeZone":{"type":"string","maxLength":64,"nullable":true},"daysOfWeek":{"type":"array","items":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]}},"hoursOfOperation":{"type":"object","additionalProperties":true,"nullable":true,"description":"`[{opensAt, closesAt}]`."},"blackoutDates":{"type":"array","items":{"type":"string"},"description":"ISO dates."},"eventRelativeWindow":{"type":"object","additionalProperties":true,"nullable":true,"description":"`{anchor, opensMinutesBefore, closesMinutesBefore}`."},"minimumLeadDays":{"type":"integer","nullable":true,"minimum":0},"minimumQuantity":{"type":"integer","nullable":true,"minimum":0},"maximumQuantity":{"type":"integer","nullable":true,"minimum":1},"maximumPerTransaction":{"type":"integer","nullable":true,"minimum":1},"maximumPerCustomer":{"type":"integer","nullable":true,"minimum":1},"maximumPerDay":{"type":"integer","nullable":true,"minimum":1},"maximumPerEvent":{"type":"integer","nullable":true,"minimum":1},"maximumPerProduct":{"type":"integer","nullable":true,"minimum":1},"isReservationPermitted":{"type":"boolean","nullable":true},"isHoldPermitted":{"type":"boolean","nullable":true},"isPaymentLinkPermitted":{"type":"boolean","nullable":true},"isPartialPaymentPermitted":{"type":"boolean","nullable":true},"isSplitPaymentPermitted":{"type":"boolean","nullable":true},"isDiscountPermitted":{"type":"boolean","nullable":true},"isPromoCodePermitted":{"type":"boolean","nullable":true},"isExchangePermitted":{"type":"boolean","nullable":true},"isReschedulePermitted":{"type":"boolean","nullable":true},"isUpgradePermitted":{"type":"boolean","nullable":true},"restrictions":{"type":"array","items":{"type":"string","enum":["noRefunds","noCashPayment","noComplimentary","noManualDiscount","noSameDaySales","noSeatChanges"]}},"eligibilityDimension":{"type":"string","enum":["customerType","membership","loyaltyTier","country","residency","age","corporateAccount","partner","customerSegment","promoEligibility","authenticationStatus","purchaseHistory","salesTerritory",null],"nullable":true},"eligibilityOperator":{"type":"string","enum":["equals","notEquals","in","notIn","greaterThanOrEqual","lessThanOrEqual","between",null],"nullable":true},"eligibilityValues":{"type":"array","items":{"type":"string"}},"eligibilityEffect":{"type":"string","enum":["allow","deny",null],"nullable":true},"isGuestAllowed":{"type":"boolean","nullable":true},"isLoginRequired":{"type":"boolean","nullable":true},"isMembershipRequired":{"type":"boolean","nullable":true},"isCorporateAccountRequired":{"type":"boolean","nullable":true},"isIdentityVerificationRequired":{"type":"boolean","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "ChannelSalesRulesLimitsRestrictionsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Channel Sales Rules, Limits & Restrictions displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"minimumQuantity":{"type":"integer","description":"Minimum Quantity per transaction","minimum":1,"nullable":true},"maximumQuantity":{"type":"integer","description":"Maximum Quantity; empty for no limit","minimum":1,"nullable":true},"maximumPerTransaction":{"type":"integer","description":"Maximum Per Transaction; empty for no limit","minimum":1,"nullable":true},"maximumPerCustomer":{"type":"integer","description":"Maximum Per Customer; empty for no limit","minimum":1,"nullable":true},"maximumPerDay":{"type":"integer","description":"Maximum Per Day; empty for no limit","minimum":1,"nullable":true},"maximumPerEvent":{"type":"integer","description":"Maximum Per Event; empty for no limit","minimum":1,"nullable":true},"maximumPerProduct":{"type":"integer","description":"Maximum Per Product; empty for no limit","minimum":1,"nullable":true},"reservationPermitted":{"type":"boolean","description":"Reservation permitted"},"holdPermitted":{"type":"boolean","description":"Hold permitted"},"paymentLinkPermitted":{"type":"boolean","description":"Payment link permitted"},"partialPaymentPermitted":{"type":"boolean","description":"Partial payment permitted"},"discountPermitted":{"type":"boolean","description":"Discount permitted"},"promoCodePermitted":{"type":"boolean","description":"Promo code permitted"},"exchangePermitted":{"type":"boolean","description":"Exchange permitted"},"reschedulePermitted":{"type":"boolean","description":"Reschedule permitted"},"ruleId":{"type":"string","description":"Rule ID"},"channelId":{"type":"string","description":"Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"},"product":{"type":"string","description":"Product ID; empty for every product on the channel","nullable":true},"ruleLevel":{"type":"string","enum":["platform","product","channel","contractPartner"],"description":"Rule Priority level (pack p.14)"},"overridesProductRule":{"type":"boolean","description":"Channel Overrides: this channel rule overrides a general product rule"},"splitPaymentPermitted":{"type":"boolean","description":"Split payment permitted"},"upgradePermitted":{"type":"boolean","description":"Upgrade permitted"},"restrictions":{"type":"array","items":{"type":"string","enum":["noRefunds","noCashPayment","noComplimentary","noManualDiscount","noSameDaySales","noSeatChanges"]},"description":"Channel Restrictions (pack p.14 examples as a closed list) (decided 29 September, readiness close-out)"},"effectiveFrom":{"type":"string","format":"date-time","nullable":true,"description":"Effective From: the instant as stored and as setChannelSalesRule takes it; null means in effect from when the rule was saved. The screen shows the day in the venue's time zone (ADAM CR-414)."},"effectiveTo":{"type":"string","format":"date-time","description":"Effective To: the instant as stored and as setChannelSalesRule takes it; null means open-ended. The screen shows the day in the venue's time zone (ADAM CR-414).","nullable":true}}},
 "ChannelSalesScheduleAvailabilityWindowsSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Channel Sales Schedule & Availability Windows.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.\n\n**What each figure counts** (ADAM CR-411, decided 31 October 2026, Chinmay). The summary covers every row the filters return, not just the page: the active `salesWindow` rules whose effective period overlaps `from` to `to` (`from` defaults to today; `to` is open-ended when not sent). Dates and times are local to the row's `timeZone`, else its channel's `time_zone`. A **covered performance** is a performance, not cancelled, of the event of the row's product; for a row with no product, a performance of any product its channel sells (an enabled, not excluded `catalogue.product_channel_assignment` for that sales channel); under the `event` filter, only that event's performances count.","properties":{"activeSellingPeriods":{"type":"integer","description":"Active selling periods: rows selling today: today is within salesStartDate to salesEndDate (an empty end is open), today is in daysOfWeek (empty means every day), and today is not one of its blackoutDates. An event-relative row counts when now is inside its window for a covered performance (ADAM CR-411)."},"scheduledOpenings":{"type":"integer","description":"Scheduled openings: rows whose salesStartDate falls in the range, plus, for each event-relative row, each covered performance whose opening (the anchor minus opensMinutesBefore) falls in it (ADAM CR-411)."},"scheduledClosures":{"type":"integer","description":"Scheduled closures: rows whose salesEndDate falls in the range, plus, for each event-relative row, each covered performance whose closing (the anchor minus closesMinutesBefore) falls in it (ADAM CR-411)."},"blackouts":{"type":"integer","description":"Blackouts: distinct (channel, date) pairs from the blackoutDates of the rows within the range; there is no separate blackout row (ADAM CR-411)."},"conflicts":{"type":"integer","description":"Conflicts: rows whose dates and days overlap another counted row on the same channel for the same product; a row with no product overlaps every product of its channel, unless the product row has overridesProductRule (ADAM CR-411)."},"eventDates":{"type":"integer","description":"Event dates: the distinct dates in the range on which a covered performance starts (ADAM CR-411)."}}},
-"ChannelSalesScheduleAvailabilityWindowsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Channel Sales Schedule & Availability Windows displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"salesStartDate":{"type":"string","format":"date","description":"Sales Start Date","nullable":true},"salesStartTime":{"type":"string","description":"Sales Start Time, HH:MM local to timeZone","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","nullable":true},"salesEndDate":{"type":"string","format":"date","description":"Sales End Date","nullable":true},"salesEndTime":{"type":"string","description":"Sales End Time, HH:MM local to timeZone","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","nullable":true},"timeZone":{"type":"string","description":"Time Zone: IANA name"},"daysOfWeek":{"type":"array","items":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"description":"Days of Week the channel sells; empty means every day"},"hoursOfOperation":{"type":"array","items":{"type":"object","properties":{"opensAt":{"type":"string"},"closesAt":{"type":"string"}}},"description":"Hours of Operation: HH:MM ranges within each selling day"},"blackoutDates":{"type":"array","items":{"type":"string","format":"date"},"description":"Blackout Dates"},"eventRelativeWindows":{"type":"object","nullable":true,"description":"Event-relative windows (pack p.11: B2C opens 90 days before, OTA closes 4 hours before, kiosk opens 2 hours before admission; MoM: onsite closes 15 min before a timed show). Offsets in minutes before the anchor; negative means after","properties":{"anchor":{"type":"string","enum":["eventStart","admissionStart","eventEnd"]},"opensMinutesBefore":{"type":"integer","nullable":true},"closesMinutesBefore":{"type":"integer","nullable":true}}},"channelId":{"type":"string","description":"Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"},"product":{"type":"string","description":"Product ID the window applies to; empty for every product on the channel","nullable":true},"minimumLeadDays":{"type":"integer","description":"Minimum days between purchase and visit: 0 allows same-day, 1 is the MoM's next-day minimum for online sales (MoM 31 Aug §4.11)","minimum":0,"default":0},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Unusual schedule configurations AI detects (pack p.12, e.g. OTA closing after admission has ended). Advisory only: nothing is changed until a user acts. Always an empty list until an insight source is declared (ADAM CR-411; docs/active/left-out.yaml LO-CR411-001)."}}},
+"ChannelSalesScheduleAvailabilityWindowsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Channel Sales Schedule & Availability Windows displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"salesStartDate":{"type":"string","format":"date","description":"Sales Start Date","nullable":true},"salesStartTime":{"type":"string","description":"Sales Start Time, HH:MM local to timeZone","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","nullable":true},"salesEndDate":{"type":"string","format":"date","description":"Sales End Date","nullable":true},"salesEndTime":{"type":"string","description":"Sales End Time, HH:MM local to timeZone","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","nullable":true},"timeZone":{"type":"string","description":"Time Zone: IANA name"},"daysOfWeek":{"type":"array","items":{"type":"string","enum":["mon","tue","wed","thu","fri","sat","sun"]},"description":"Days of Week the channel sells; empty means every day"},"hoursOfOperation":{"type":"array","items":{"type":"object","properties":{"opensAt":{"type":"string"},"closesAt":{"type":"string"}}},"description":"Hours of Operation: HH:MM ranges within each selling day"},"blackoutDates":{"type":"array","items":{"type":"string","format":"date"},"description":"Blackout Dates"},"eventRelativeWindows":{"type":"object","nullable":true,"description":"Event-relative windows (pack p.11: B2C opens 90 days before, OTA closes 4 hours before, kiosk opens 2 hours before admission; MoM: onsite closes 15 min before a timed show). Offsets in minutes before the anchor; negative means after. Anchor `admissionStart` is the performance's `admissionStartsAt`, or its `startsAt` while that is null (ADAM CR-411, 3 November 2026)","properties":{"anchor":{"type":"string","enum":["eventStart","admissionStart","eventEnd"]},"opensMinutesBefore":{"type":"integer","nullable":true},"closesMinutesBefore":{"type":"integer","nullable":true}}},"channelId":{"type":"string","description":"Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"},"product":{"type":"string","description":"Product ID the window applies to; empty for every product on the channel","nullable":true},"minimumLeadDays":{"type":"integer","description":"Minimum days between purchase and visit: 0 allows same-day, 1 is the MoM's next-day minimum for online sales (MoM 31 Aug §4.11)","minimum":0,"default":0},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Unusual schedule configurations AI detects (pack p.12, e.g. OTA closing after admission has ended). Advisory only: nothing is changed until a user acts. Always an empty list until an insight source is declared (ADAM CR-411; docs/active/left-out.yaml LO-CR411-001)."}}},
 "CustomerEligibilityRulesByChannelView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Customer & Eligibility Rules by Channel displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"guestAllowed":{"type":"boolean","description":"Guest allowed"},"loginRequired":{"type":"boolean","description":"Login required"},"membershipRequired":{"type":"boolean","description":"Membership required"},"corporateAccountRequired":{"type":"boolean","description":"Corporate account required"},"identityVerificationRequired":{"type":"boolean","description":"Identity verification required"},"ruleId":{"type":"string","description":"Rule ID"},"ruleName":{"type":"string","description":"Rule name, e.g. UAE Resident Offer"},"channelId":{"type":"string","description":"Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"},"product":{"type":"string","description":"Product ID; empty for every product on the channel","nullable":true},"dimension":{"type":"string","enum":["customerType","membership","loyaltyTier","country","residency","age","corporateAccount","partner","customerSegment","promoEligibility","authenticationStatus","purchaseHistory","salesTerritory"],"description":"Eligibility Dimension (pack p.12)"},"operator":{"type":"string","enum":["equals","notEquals","in","notIn","greaterThanOrEqual","lessThanOrEqual","between"],"description":"How values are compared (decided 29 September, readiness close-out)"},"values":{"type":"array","items":{"type":"string"},"description":"Values the dimension is compared with (e.g. residency = AE, customer account type = approvedTravelAgent)"},"effect":{"type":"string","enum":["allow","deny"],"description":"Whether a match allows or denies purchase on the channel"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Contradictory channel/customer rules AI detects (pack p.13). Advisory only: nothing is changed until a user acts."}}},
 "InventoryCapacityChannelAllocationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Inventory, Capacity & Channel Allocation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"productEvent":{"type":"string","description":"Product/Event: the product or event ID the pool belongs to"},"capacityPool":{"type":"string","description":"Capacity Pool ID"},"channel":{"type":"string","description":"Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"},"allocation":{"type":"number","description":"Allocation: allocationPercent (envelope_percent) for percentage, allocated_units for dedicated and dynamic (a dynamic envelope's current size); empty for sharedPool (ADAM CR-412)","minimum":0,"nullable":true},"minimum":{"type":"integer","description":"Minimum units the channel keeps (not released below this)","minimum":0,"nullable":true},"maximum":{"type":"integer","description":"Maximum units the channel may reach, including dynamic growth","minimum":0,"nullable":true},"replenishmentRule":{"type":"object","nullable":true,"description":"Replenishment Rule: automatic migration from another channel (MoM 31 Aug §4.11, e.g. when B2C sells out pull 20% from B2B)","properties":{"sourceChannelId":{"type":"string"},"trigger":{"type":"string","enum":["soldOut","belowThreshold"]},"thresholdUnits":{"type":"integer","nullable":true},"sharePercent":{"type":"number","nullable":true},"units":{"type":"integer","nullable":true}}},"oversellAllowance":{"type":"integer","description":"Oversell allowance in units; 0 means no oversell","minimum":0,"default":0},"waitlistBehavior":{"type":"string","enum":["none","joinWaitlist","notifyOnRelease"],"description":"Waitlist behavior where applicable (decided 29 September, readiness close-out)"},"allocated":{"type":"integer","description":"Allocated"},"sold":{"type":"integer","description":"Sold"},"held":{"type":"integer","description":"Held"},"remaining":{"type":"integer","description":"Remaining"},"utilization":{"type":"number","description":"Utilization %: sold plus held over allocated, 0-100","minimum":0,"maximum":100},"released":{"type":"integer","description":"Released: units given back to the shared pool by the allocation release job (channel_envelope.released_units; ADAM CR-412)"},"returned":{"type":"integer","description":"Returned: units returned manually by relinquishChannelAllocation (channel_envelope.returned_units; ADAM CR-412)"},"allocationType":{"type":"string","enum":["sharedPool","dedicated","percentage","dynamic"],"description":"Allocation Type (pack p.10)"},"releaseThreshold":{"type":"integer","description":"Release Threshold: unsold units above which the excess returns to the shared pool (pack p.10, e.g. 300)","nullable":true},"releaseHoursBeforeEvent":{"type":"integer","description":"Release point relative to the event, in hours before start (pack p.10, e.g. 48)","nullable":true},"releaseDate":{"type":"string","format":"date-time","description":"Release Date: fixed release point, used instead of the event-relative one","nullable":true},"aiInsights":{"type":"array","items":{"type":"string"},"description":"AI reallocation suggestions (pack p.11). Advisory only: nothing is changed until a user acts. An empty list until an insight source is declared (ADAM CR-412; docs/active/left-out.yaml LO-CR412-001)."}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

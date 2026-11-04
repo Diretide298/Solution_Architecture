@@ -21,6 +21,14 @@
    "quotedUnitPrice"
   ],
   "properties": {
+   "holderSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "guest",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The named holder of the line, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind guest; null while none is given."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -121,6 +129,11 @@
     "description": "What the client charged, from its local bundle."
    },
    "holderName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "holderSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -398,7 +411,21 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001): `createPayment` re-locks the quote on the order and, when `chargeTotal` changed, answers `409 quoteExpired` with the new quote before charging anything (ADAM CR-577)."
+   },
+   "termsVersion": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the `termsAndConditions` version `checkoutCart` took in `termsAccepted`, checked against the policy in force. Null when the checkout sent none; never filled in from the policy in force."
+   },
+   "termsAcceptedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the guest accepted `termsVersion`, the time `checkoutCart` wrote the order (ADAM CR-576). Null with `termsVersion`."
    },
    "droppedPromotions": {
     "type": "array",
@@ -641,6 +668,13 @@
       "format": "uuid",
       "readOnly": true,
       "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "productId": {
+      "x-ticvai-references": "catalogue.product",
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on `orders.order_line`: copied from the cart line by `checkoutCart`, as `recommendationId` is, and returned on every read of an order's lines (`getOrder` included). Orders made before this change get it filled in from their variant's product. A client never sends it."
      },
      "discounts": {
       "type": "array",

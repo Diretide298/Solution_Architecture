@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 43 of 105 |
+| Operations in the slice | 43 of 108 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -63,7 +63,7 @@
 | identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-010, GST-042, GST-073, WEB-013, WEB-016, WEB-020 |
 | mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053 … |
 | mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
-| mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 1 | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
+| mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 1 | ADM-699, EMP-042, GST-073, WEB-024 |
 | mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053 … |
 | mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 | session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | BO-053, POS-000 |
@@ -830,7 +830,7 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
 | mfaMethods[].isActive | boolean | yes |  |
-| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].isPrimary | boolean |  | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | mfaMethods[].enrolledAt | string (date-time) | yes |  |
 | mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
@@ -934,7 +934,7 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
 | mfaMethods[].isActive | boolean | yes |  |
-| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].isPrimary | boolean |  | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | mfaMethods[].enrolledAt | string (date-time) | yes |  |
 | mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
@@ -1011,7 +1011,7 @@ Where the provider's verified email matches an existing account, the identities 
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
 | mfaMethods[].isActive | boolean | yes |  |
-| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].isPrimary | boolean |  | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | mfaMethods[].enrolledAt | string (date-time) | yes |  |
 | mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
@@ -1094,7 +1094,7 @@ Government onboarding has lead time and should be started before it becomes the 
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
 | mfaMethods[].isActive | boolean | yes |  |
-| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].isPrimary | boolean |  | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | mfaMethods[].enrolledAt | string (date-time) | yes |  |
 | mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
@@ -1225,7 +1225,7 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
 | mfaMethods[].isActive | boolean | yes |  |
-| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].isPrimary | boolean |  | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | mfaMethods[].enrolledAt | string (date-time) | yes |  |
 | mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
@@ -1354,7 +1354,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
 | mfaMethods[].isActive | boolean | yes |  |
-| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].isPrimary | boolean |  | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | mfaMethods[].enrolledAt | string (date-time) | yes |  |
 | mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
@@ -1386,6 +1386,8 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 Held to `setPasswordPolicy` (length, breach check); a PIN is held to the tenant's PIN settings only (`PasswordPolicy.pinLength` digits, `pinReusePrevention`; CHG-CRD-002), because it is valid only on a registered workstation (see `LoginRequest.method`). **Every other session of the principal is ended** on success, since a credential changed because it leaked is not fixed while the leaked one is still signed in. **What ending them writes** (accepted 26 October 2026, Chinmay, ADAM CR-242 option A): each other live `identity.session` row of the principal takes `status` `terminated`, `endedAt` now, `endedByPrincipalId` the principal itself and `endReason` `credential-changed`; the session that made the change stays signed in. The three columns are V0108's (CHG-R8MIG-015) and the CHECK that `endedAt` is null exactly while `active` is the next forward migration's: until the migration is applied to a database, the change that writes them carries the columns behind it.
 **What it writes** (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal's `identity.principal_credential` row for `method` takes the new PHC hash (ADR-0071), `setAt` now, `failedAttempts` 0 and `lockedUntil` null; the replaced hash goes to `identity.principal_credential_history`, which the reuse check reads; and a successful change **clears `Principal.mustChangeCredential`**, so the session that signed in with a temporary credential becomes usable. **A wrong `currentCredential` is 422 `current-credential-wrong`, not 401**: the session is valid and stays signed in; the wrong attempt counts towards the lockout like a wrong sign-in, and at the threshold the method locks (429 `credential-locked`). A principal provisioned by single sign-on (`Principal.ssoProviderId`) has no local password to change: `method: password` is 409 `credential-managed-by-sso` (a PIN issued to them by `resetPrincipalCredential` is changed here like anyone's).
 
+**A new PIN mints the principal's offline step-up verifiers** (ADR-0013 amendment of 3 November 2026, CHG-R14V-001): with `method: pin`, the same transaction replaces the principal's `identity.offline_pin_verifier` rows from the new PIN, for the venue of the session's workstation and each venue where the principal holds a permission an offline step-up operation asks for. The verifiers of the old PIN stop counting at once, because their `credentialSetAt` no longer matches the `pin` row.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1395,7 +1397,7 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the tenant'
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.principal_credential_history` |
-| Writes | `cache:idempotency`, `identity.principal`, `identity.principal_credential`, `identity.principal_credential_history`, `identity.session` |
+| Writes | `cache:idempotency`, `identity.offline_pin_verifier`, `identity.principal`, `identity.principal_credential`, `identity.principal_credential_history`, `identity.session` |
 | Called by | ADM-001, ADM-699, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
@@ -1506,7 +1508,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 **`POST /auth/sessions/{sessionId}/force-logout`**: Supervisor termination of an abandoned session
 
 Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displaces a second login — an operator who went home still logged in would otherwise be locked out until token expiry.
-**Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`), and carries the supervisor's own principal and PIN (`supervisorStepUp` in the body). The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only a session at a workstation of that venue. Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
+**Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this as its device (`deviceAuth`, r14 review C-04, CHG-R14H-001; it was `{}`, no token at all), and carries the supervisor's own principal and PIN (`supervisorStepUp` in the body). The till is the workstation its device is bound to: a body `workstationId` that is not it is 403 `workstation-mismatch`, and a call with neither a session nor `deviceAuth` is 401 `device-unauthenticated`, answered before the PIN is checked, so it spends no attempt and moves no lockout. The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only a session at a workstation of that venue. Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
 **What it writes** (R8 blocker IDENTITY-C46, CHG-R8MIG-015): the session's `status` `terminated`, `endedAt`, `endedByPrincipalId` (the caller, or the supervisor of the step-up) and `endReason` (the body's `reason`), and one `identity.authz_audit` row for the decision.
 
@@ -1536,8 +1538,13 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | reason | string |  | Why the session is ended. (min length 3; max length 500; default supervisor-takeover) |
-| workstationId | string (uuid) |  | The till making the call. (nullable) |
+| workstationId | string (uuid) |  | The till making the call (the POS-000 door; CHG-RUL-015). (nullable) |
 | supervisorStepUp | object |  | The supervisor ending the session, signing on this device. |
+| supervisorStepUp.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| supervisorStepUp.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| supervisorStepUp.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| supervisorStepUp.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| supervisorStepUp.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
 | supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -1547,7 +1554,8 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Session terminated and audited |
-| 403 |  | The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed or the session is not at the till's venue (supervisor-step-up-refused; CHG-RUL-015). |
+| 401 |  | Neither a staff session nor an authenticated device (device-unauthenticated; r14 review C-04, CHG-R14H-001): a call with no session must come from a registered device by deviceAuth. |
+| 403 |  | The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed or the session is not at the till's venue (supervisor-step-up-refused; CHG-RUL-015), or the bod… |
 | 409 |  | The session has already ended (signedOut, terminated or expired). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1604,7 +1612,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
 | workstation.currencyScale | integer |  | (min 0; max 4) |
 | workstation.timezone | string |  |  |
-| workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
+| workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes AD… |
 | workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | availableRoles | array of RoleSummary |  | The roles the principal may choose, one per grant (IDENTITY-C45, CHG-R8SPN-032), resolved on read as LoginResponse.availableRoles is, so EMP-002 can list them on a cold open or after a relaunch (getC… (read-only) |
@@ -1766,6 +1774,7 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 |---|---|---|
 | 201 |  | Granted |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A cycle, or a minor granting authority over an adult. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1865,17 +1874,21 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 |---|---|---|
 | 200 |  | Grants held and grants over |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### login
 
 **`POST /auth/login`**: Authenticate and open a session
 
-One sign-in for every staff and partner door. **A browser door sends no `workstationId`** (the TICVAI Console ADM-001, Venue Management SUP-001, the partner portal PTR-001): a desk browser is not a registered device, and requiring one locked every web door out (CHG-DOOR-001, Chinmay, 2 October 2026: fix the Block A blockers now). **A device door sends it** (the till POS-000, the staff handheld EMP-001, the scanner SCN-001), and a device-bound `method` (`pin`, `card`, `rfid`) without it is refused 400 (problem type `workstation-required`), because the device is what bounds a PIN. Nothing else about the sign-in changes: the second factor is asked by permission (audit R135), five wrong codes lock step-up (R126), a second sign-in is refused 409 (R184), and several roles mean a role prompt (ADR-0003). Where the tenant has SSO, the same doors offer `startSsoAuthorization` / `completeSsoAuthorization`, which return the same `LoginResponse`.
+One sign-in for every staff and partner door. **A browser door sends no `workstationId`** (the TICVAI Console ADM-001, Venue Management SUP-001, the partner portal PTR-001): a desk browser is not a registered device, and requiring one locked every web door out (CHG-DOOR-001, Chinmay, 2 October 2026: fix the Block A blockers now). **A device door sends it** (the till POS-000, the staff handheld EMP-001, the scanner SCN-001), and a device-bound `method` (`pin`, `card`, `rfid`) without it, or without `deviceAuth`, is refused 400 (problem type `workstation-required`), because the device is what bounds a PIN. Nothing else about the sign-in changes: the second factor is asked by permission (audit R135), five wrong codes lock step-up (R126), a second sign-in is refused 409 (R184), and several roles mean a role prompt (ADR-0003). Where the tenant has SSO, the same doors offer `startSsoAuthorization` / `completeSsoAuthorization`, which return the same `LoginResponse`.
+**The device is authenticated, and the workstation is the device's** (r14 review C-04, CHG-R14H-001; the lead, 3 November 2026: "All four, one release"). A device door calls with `deviceAuth`, the credential `enrolDevice` issued to the device the door runs on (`common.yaml` `deviceAuth`), and the workstation is the one that device is bound to, never one the body names: a `workstationId` that is not that workstation is 403 `workstation-mismatch`, and a `workstationId` sent without `deviceAuth` is 401 `device-unauthenticated`. Both are answered before any credential is checked, so neither spends an attempt or moves a lockout.
 **The credential is checked against `identity.principal_credential`** (`PrincipalCredential`, 14 October 2026, CHG-CRD-001, ADAM CR-078): the row for the principal and `method`, its PHC hash (ADR-0071), and its lockout. A wrong password or PIN adds to `failedAttempts`; at `PasswordPolicy.lockoutAfterAttempts` (password) or `pinLockoutAfterAttempts` (PIN) the method is locked until `lockedUntil`, and a locked method is refused 429 `credential-locked` without the credential being checked. A PIN must be `PasswordPolicy.pinLength` digits. **A principal provisioned by single sign-on** (`Principal.ssoProviderId`) has no local password: a `password` sign-in, or a `pin` sign-in before `resetPrincipalCredential` has issued a PIN, is refused 401 `sso-sign-in-required`, and the door offers `startSsoAuthorization`. A temporary credential (`Principal.mustChangeCredential`) signs in with `LoginResponse.mustChangeCredential` true.
 **A device sign-in is recorded on the device** (ADAM CR-232, the lead's answer to r10 question 23, 25 October 2026; CHG-R10TEN-018). A successful sign-in that names a `workstationId` asks Tenancy's in-process API `tenancy#recordDeviceSignIn` in the same transaction as the session, so each device bound to that workstation gets a `tenancy.device_audit` row of kind `access`, action `signIn`, which `listDeviceAuditRecords` returns.
 
 **The session stores the grant it was opened through** (ADAM CR-513, Chinmay, 3 November 2026; CHG-CR513-001). When the call opens a usable session directly because the principal holds one grant, it writes that grant's id into `identity.session.grant_id` (`SessionGrant`) and the session registry entry carries it beside the resolved scope and permissions; `venue_id` and `working_venue_id` are written as now. Permissions stay resolved once, here or at `selectRole`.
+
+**A correct `pin` sign-in mints the principal's offline step-up verifiers** (decided 3 November 2026, Chinmay, system review finding F-01: "Offline verifier"; ADR-0013 amendment of 3 November 2026; CHG-R14V-001). In the same transaction, one `identity.offline_pin_verifier` row (`OfflinePinVerifier`, replacing the previous one) for the venue of the `workstationId` and for each venue where the principal holds a permission an offline step-up operation asks for, so tills there can check the PIN with no connection. Nothing in the response changes; a wrong PIN mints nothing.
 
 |  |  |
 |---|---|
@@ -1887,7 +1900,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | Conflict policy | serverWins |
 | Offline note | Signing in needs the network on every staff device in r8 (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C01; CHG-R8SPN-027). |
 | Reads | `cache:idempotency`, `identity.delegated_access`, `identity.mfa_method`, `identity.password_policy`, `identity.principal`, `identity.principal_credential`, `identity.role`, `identity.role_permission` |
-| Writes | `cache:idempotency`, `identity.principal_credential`, `identity.refresh_token`, `identity.session`, `platform.outbox` |
+| Writes | `cache:idempotency`, `identity.offline_pin_verifier`, `identity.principal_credential`, `identity.refresh_token`, `identity.session`, `platform.outbox` |
 | Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
@@ -1928,7 +1941,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | mfaMethods[].label | string |  | (nullable) |
 | mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
 | mfaMethods[].isActive | boolean | yes |  |
-| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].isPrimary | boolean |  | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | mfaMethods[].enrolledAt | string (date-time) | yes |  |
 | mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | availableRoles | array of RoleSummary |  |  |
@@ -1969,7 +1982,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | session.workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
 | session.workstation.currencyScale | integer |  | (min 0; max 4) |
 | session.workstation.timezone | string |  |  |
-| session.workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
+| session.workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes AD… |
 | session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | session.workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | session.availableRoles | array of RoleSummary |  | The roles the principal may choose, one per grant (IDENTITY-C45, CHG-R8SPN-032), resolved on read as LoginResponse.availableRoles is, so EMP-002 can list them on a cold open or after a relaunch (getC… (read-only) |
@@ -1989,6 +2002,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | 200 |  | Authenticated. |
 | 400 | BadRequest | Validation failed |
 | 401 |  | The username and credential do not match (unauthenticated; one answer for an unknown username and a wrong credential), or the principal signs in only through the tenant's single sign-on (sso-sign-in-… |
+| 403 |  | The body names a workstationId that is not the workstation the authenticated device is bound to (workstation-mismatch; r14 review C-04, CHG-R14H-001). |
 | 409 |  | An active session already exists for this principal on another device. |
 | 429 |  | The request budget is exceeded (rate-limited), or this principal's password or PIN is locked after too many wrong attempts (credential-locked, 14 October 2026, CHG-CRD-001; an unknown username is loc… |
 
@@ -2169,7 +2183,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
 | workstation.currencyScale | integer |  | (min 0; max 4) |
 | workstation.timezone | string |  |  |
-| workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
+| workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes AD… |
 | workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | availableRoles | array of RoleSummary |  | The roles the principal may choose, one per grant (IDENTITY-C45, CHG-R8SPN-032), resolved on read as LoginResponse.availableRoles is, so EMP-002 can list them on a cold open or after a relaunch (getC… (read-only) |
@@ -2464,6 +2478,8 @@ A session that authenticated hours ago is not the same as a person present at th
 
 **An `emailOtp` code, and how it reaches the person** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001). For a sign-in or step-up challenge on `emailOtp`, for staff, partners and guests: 6 random digits, valid 10 minutes (`mfa_challenge.expires_at`), stored as its PHC hash; five wrong codes void it, as now. The call writes `identity.mfaCodeIssued` v1 to the outbox in the same transaction as the `mfa_challenge` row (`challengeId`, `principalId` or `subjectId`, `action`, `locale`, `expiresAt`, and `destination` and `code` field-encrypted through `IFieldEncryption`, never in clear). Marketing sends it through the tenant's email provider; until that consumer is on dev, Identity's delivery seam records only that a code was issued, never the code. A `totp` challenge sends nothing (`enrolMfaMethod` states the authenticator values).
 
+**Which method, when the body has no `methodId`** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). The call uses the principal's usable methods: the active ones, leaving out `emailOtp` when the caller is a guest who signed in with an email code. Among those it takes the one marked primary (`MfaMethod.isPrimary`; a row with `is_primary` null counts as false); if none is marked primary, the newest (highest `id`; ids are UUIDv7). If the principal has active methods but every one is left out, the call answers the existing `409 email-otp-not-second-factor`. If there are no active methods at all, it answers the existing `422 mfa-method-not-usable`. With a `methodId`, nothing changes. The method chosen is written to `identity.mfa_challenge.method_id`, never left null.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -2487,7 +2503,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | action | string | yes | What the step-up is for. |
-| methodId | string (uuid) |  |  |
+| methodId | string (uuid) |  | The method to challenge. |
 | venueId | string (uuid) |  | For a guest, the venue whose VenueSettings.identity.guestTwoStep applies (sign-in venue, or the venue of the booking being acted on). (nullable) |
 
 **Response**: `object`
@@ -2504,7 +2520,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | 200 |  | Challenge issued |
 | 403 |  | A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue). |
 | 409 |  | A guest who signed in with an email code asks for emailOtp as the second factor, because the same inbox twice is one factor (R8 blocker fix, IDENTITY-C18). |
-| 422 |  | The methodId names a method that is pending or inactive, or the principal has no active method to challenge. |
+| 422 |  | The methodId names a method that is pending or inactive, or the principal has no active method to challenge (with no methodId, no active method at all; ADAM CR-549, Chinmay, 3 November 2026; CHG-CR54… |
 | 429 |  | Step-up is locked (audit R126 (6)): five wrong codes voided a challenge, and no new one is issued to this principal until voidedAt plus PasswordPolicy.lockoutMinutes. |
 
 ### enrolMfaMethod
@@ -2515,7 +2531,11 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 **Staff enrol an authenticator app (`totp`), with email (`emailOtp`) as the fallback** (decided 28 September, audit R126 (5)). A staff or partner principal asking for `smsOtp`, `biometric` or `hardwareToken` is refused `422`.
 **A guest may enrol only where at least one venue of the tenant enabled guest two-step verification** (`VenueSettings.identity.guestTwoStep.enabled`, decided 29 September, rev 3 GAP-B1, per venue): the same kinds as staff, `totp` with `emailOtp` as the fallback. The enrolment belongs to the guest account and is tenant-wide; it is used only in venues that have the setting on. Any other kind is refused `422`; enrolling while no venue has the setting on is refused `403` `guest-two-step-disabled`.
 
-**The MFA values** (ADAM CR-522, Chinmay, 3 November 2026: the MFA values follow the authenticator standard, and a code the server sends goes by an outbox event like the guest's; CHG-CR522-001). (1) Authenticator codes (`totp`), RFC 6238: HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose step is not later than the last step accepted for that method is refused (that step is kept in the distributed cache for two minutes), so each code works once. The secret is 20 random bytes, base32 without padding, returned once in `MfaEnrolment.secret` and stored field-encrypted in `mfa_method.secret`; `qrCodeUri` is `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`, where `issuer` is the tenant's display name and `account` the principal's username or the guest's email, each URL-encoded. (2) Recovery codes: ten, each 10 characters of Crockford base32, shown as five characters, a hyphen, five characters. Every `enrolMfaMethod` of any kind issues a new set and replaces the earlier one, as `MfaRecoveryCode` says; they are stored as PHC hashes. (3) A pending enrolment lapses 10 minutes after this call; `pendingExpiresAt` and `MfaEnrolment.expiresAt` are that time. (4) An `emailOtp` code (this enrol challenge, or a sign-in or step-up challenge, for staff, partners and guests) is 6 random digits, valid 10 minutes (`mfa_challenge.expires_at`), stored as its PHC hash; five wrong codes void it, as now. (5) The carrier: for `emailOtp` this call writes `identity.mfaCodeIssued` v1 to the outbox in the same transaction as the `mfa_challenge` row, with `destination` and `code` field-encrypted through `IFieldEncryption`, never in clear. Marketing sends it through the tenant's email provider; until that consumer is on dev, Identity's delivery seam records only that a code was issued, never the code.
+**The authenticator issuer and an `emailOtp` destination** (ADAM CR-587, option A, Chinmay, 3 November 2026; CHG-CR587-001). (1) **The issuer.** When this call enrols kind `totp`, it reads the tenant's name from the tenant database, never the control database: it asks Tenancy's `scopeRecords` in process, with where `{level: 'tenant'}`, on the caller's connection and transaction and under its row-level security, and takes the name of the one row it returns (the tenant's root scope node, `platform.scope.name`), whether the node is active or not. That name is the issuer, URL-encoded in both places of `qrCodeUri`: `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`. The account stays the principal's username or the guest's email, URL-encoded. If no tenant-level row is visible (a broken tenant set-up), the answer is 500, nothing is written and it is logged; a name is never made up. Other kinds do not make this read. (2) **`emailOtp` and `target`.** If `target` is sent and not blank, it must be an email address; otherwise `400 validation` with field `target`. It becomes the method's destination. If `target` is missing or blank, the account's own email is used: `identity.principal.email` for staff and partners, or the guest account's email (the one already used as the authenticator account). If the account has no email, `400 validation` with field `target`, and nothing is written. The address chosen is stored in `mfa_method.destination`, field-encrypted as now, `masked_target` is built from it exactly as when `target` is sent, and the `identity.mfaCodeIssued` event carries it as `destination`. A `target` sent with `totp` is ignored. (3) Nothing else changes: no migration, no new column, no copy of the control plane's tenant name in the tenant database. The 201, 403 and 422 answers stay as they are. Screens do not change: the issuer shows only in the person's authenticator app, and a screen that sends `target` keeps working.
+
+**The MFA values** (ADAM CR-522, Chinmay, 3 November 2026: the MFA values follow the authenticator standard, and a code the server sends goes by an outbox event like the guest's; CHG-CR522-001). (1) Authenticator codes (`totp`), RFC 6238: HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose step is not later than the last step accepted for that method is refused (that step is kept in the distributed cache for two minutes), so each code works once. The secret is 20 random bytes, base32 without padding, returned once in `MfaEnrolment.secret` and stored field-encrypted in `mfa_method.secret`; `qrCodeUri` is `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`, where `issuer` is the tenant's name, its root scope node's (ADAM CR-587, below), and `account` the principal's username or the guest's email, each URL-encoded. (2) Recovery codes: ten, each 10 characters of Crockford base32, shown as five characters, a hyphen, five characters. Every `enrolMfaMethod` of any kind issues a new set and replaces the earlier one, as `MfaRecoveryCode` says; they are stored as PHC hashes. (3) A pending enrolment lapses 10 minutes after this call; `pendingExpiresAt` and `MfaEnrolment.expiresAt` are that time. (4) An `emailOtp` code (this enrol challenge, or a sign-in or step-up challenge, for staff, partners and guests) is 6 random digits, valid 10 minutes (`mfa_challenge.expires_at`), stored as its PHC hash; five wrong codes void it, as now. (5) The carrier: for `emailOtp` this call writes `identity.mfaCodeIssued` v1 to the outbox in the same transaction as the `mfa_challenge` row, with `destination` and `code` field-encrypted through `IFieldEncryption`, never in clear. Marketing sends it through the tenant's email provider; until that consumer is on dev, Identity's delivery seam records only that a code was issued, never the code.
+
+**The pending method is not primary** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001): this call writes `is_primary` false on it; `verifyMfaEnrolment` decides whether it becomes the primary one.
 
 |  |  |
 |---|---|
@@ -2559,6 +2579,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Enrolment started, pending verification |
+| 400 | BadRequest | Validation failed |
 | 403 |  | A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue). |
 | 422 |  | A kind the caller may not enrol. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -2567,7 +2588,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 
 **`GET /auth/mfa/methods`**: Enrolled MFA methods
 
-**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004) `isPrimary` is false for a row whose `is_primary` is null, never null (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
 
 |  |  |
 |---|---|
@@ -2580,7 +2601,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Read routing | replica |
 | Reads | `identity.mfa_method` |
 | Writes | - |
-| Called by | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
+| Called by | ADM-699, EMP-042, GST-073, WEB-024 |
 
 **Responses**
 
@@ -2594,9 +2615,11 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 
 **`POST /auth/mfa/challenge/{challengeId}/verify`**: Complete a sign-in or step-up challenge
 
-For a `signIn` challenge (decided 28 September, audit R135) a correct code completes the sign-in: the pending session becomes usable and is returned in `session`, or, where `login` also answered `requiresRoleSelection`, the client goes on to `selectRole`. For any other action it returns a short-lived, single-purpose `stepUpToken`.
+For a `signIn` challenge (decided 28 September, audit R135) a correct code completes the sign-in: the pending session becomes usable and is returned in `session`, or, where `login` also answered `requiresRoleSelection`, the client goes on to `selectRole`. For any other action the step-up is recorded on the caller's session until `expiresAt`; `stepUpToken` is always null and stays in the response only so clients built at r1 still read it (ADAM CR-588).
 
-**How an MFA step-up reaches the operation that demands it: the session** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-020). A successful step-up is also recorded against the caller's own session, bound to the challenge's `action` and to that session, for the token's short life. Every operation that declares `x-ticvai-step-up: mfa` declares `x-ticvai-step-up-carrier: session` and reads the step-up from the session that calls it: the client sends no token field and no header, and a step-up made on another session or for another action does not count. It is single-use: the operation that consumes it clears it. Without a fresh step-up the operation is refused 403, and the client runs `createMfaChallenge` and this operation, then retries. A call with no session (`{}`) cannot carry an MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`, CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1.
+**No step-up token: the proof is the challenge row** (ADAM CR-588, option A, Chinmay, 3 November 2026; CHG-CR588-001). (1) This operation returns `stepUpToken: null` for every challenge, `signIn` and step-up alike. No token is generated, signed, stored or logged, and `identity.mfa_challenge` gets no column for one. The response shape stays as it is (`stepUpToken` nullable, `expiresAt`, `session`). (2) For a step-up, the proof is the `identity.mfa_challenge` row itself: status `verified` and `verified_at` set, bound to the challenge's `action` and the caller's session. The `expiresAt` returned is `verified_at` plus 5 minutes. `consumeMfaStepUp` remains the only check: it finds that row on the caller's session and sets `consumed_at`, and answers `403 step-up-token-missing` or `step-up-token-expired` as now; those problem types keep their names. (3) For whoever builds an operation that demands a step-up: a tenant operation never reads a `stepUpToken` from the body or a header; it decides only through `consumeMfaStepUp`. `revokeAllSessions` is built that way on its own ticket, #33749: it declares an MFA step-up carried on the session, with action `revokeAllSessions`, and `stepUpToken` is no longer required in its body (an old client may still send it; it is ignored). Screens do not change: the authentication-code dialog looks and works as now, and a screen that passed the token on now passes null or nothing. The platform caller's step-up on the Control Plane token is a different path and does not change.
+
+**How an MFA step-up reaches the operation that demands it: the session** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-020). A successful step-up is also recorded against the caller's own session, bound to the challenge's `action` and to that session, for the step-up's short life (until `expiresAt`). Every operation that declares `x-ticvai-step-up: mfa` declares `x-ticvai-step-up-carrier: session` and reads the step-up from the session that calls it: the client sends no token field and no header, and a step-up made on another session or for another action does not count. It is single-use: the operation that consumes it clears it. Without a fresh step-up the operation is refused 403, and the client runs `createMfaChallenge` and this operation, then retries. A call with no session (`{}`) cannot carry an MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`, CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1, always null (ADAM CR-588).
 
 **The action, the lifetime and the refusals, for every operation that declares `x-ticvai-step-up: mfa`** (ADAM CR-375, Chinmay, 31 October 2026; CHG-CR375-001). The step-up action is the operation's `operationId`: the client calls `createMfaChallenge` with that `action`, then this operation. A verified step-up counts for 5 minutes from `verifiedAt`, which is the `expiresAt` this operation returns. The operation looks on the caller's own session for an `identity.mfa_challenge` row with that action, status `verified` and no `consumedAt`, and sets `consumedAt` in its own transaction. With no such row it answers `403 step-up-token-missing`; when the newest one is older than 5 minutes it answers `403 step-up-token-expired`; nothing is written in either case. **The look-up and the consume are Identity's in-process step-up check, `consumeMfaStepUp`** (ADAM CR-509, Chinmay, 3 November 2026; CHG-CR509-001): every operation that demands an MFA step-up on a tenant session uses the same check, called before any other write in its own transaction, so a later refusal rolls the consume back. A platform caller's step-up is still read from the Control Plane token, never from a tenant MFA challenge row (ADR-0072 point 4; CHG-R13ID-001).
 
@@ -2631,7 +2654,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| stepUpToken | string |  | Null for a signIn challenge. (nullable) |
+| stepUpToken | string |  | Always null, for every challenge, signIn and step-up alike (ADAM CR-588); kept only so clients built at r1 still read it. (nullable) |
 | expiresAt | string (date-time) |  | For a step-up, verifiedAt plus 5 minutes, after which the step-up no longer counts and the operation answers 403 step-up-token-expired (ADAM CR-375). |
 | session | object |  | Only for a signIn challenge, and only where no role selection is still owed. (nullable) |
 | session.sessionId | string (uuid) | yes |  |
@@ -2659,7 +2682,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | session.workstation.currency | string |  | (pattern ^[A-Z]{3}$) |
 | session.workstation.currencyScale | integer |  | (min 0; max 4) |
 | session.workstation.timezone | string |  |  |
-| session.workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it from its own… |
+| session.workstation.cellName | string |  | The cell this workstation's region is served from, which is the cell the commerce host answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes AD… |
 | session.workstation.deploymentProfile | enum (terminalLocal, venueEdge, thin) |  | Whether this surface reads catalogue locally (ADR-0013). |
 | session.workstation.pinLength | enum (4, 6, 8) |  | The tenant's PasswordPolicy.pinLength, carried to the device (14 October 2026, CHG-CRD-002, ADAM CR-078). (read-only) |
 | session.availableRoles | array of RoleSummary |  | The roles the principal may choose, one per grant (IDENTITY-C45, CHG-R8SPN-032), resolved on read as LoginResponse.availableRoles is, so EMP-002 can list them on a cold open or after a relaunch (getC… (read-only) |
@@ -2689,6 +2712,8 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 **`POST /auth/mfa/methods/{methodId}`**: Complete enrolment
 
 **Authenticator codes (`totp`) follow RFC 6238** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001): HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose step is not later than the last step accepted for that method is refused (that step is kept in the distributed cache for two minutes), so each code works once. An `emailOtp` enrolment code is 6 digits, valid 10 minutes. The pending enrolment lapses 10 minutes after `enrolMfaMethod` (`pendingExpiresAt`); a code after that completes nothing.
+
+**The first active method becomes primary** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001): when the method becomes active and the principal has no other active method marked primary, its `is_primary` is set to true; otherwise it is set to false, in the same transaction. A principal has at most one primary among its active methods.
 
 |  |  |
 |---|---|
@@ -2729,7 +2754,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | label | string |  | (nullable) |
 | maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
 | isActive | boolean | yes |  |
-| isPrimary | boolean |  |  |
+| isPrimary | boolean |  | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | enrolledAt | string (date-time) | yes |  |
 | lastUsedAt | string (date-time) |  | (nullable) |
 
@@ -2750,7 +2775,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 **`GET /auth/sessions`**: List active sessions
 
 Who is logged in, on which workstation, since when. There was previously no way to see this — only to terminate a session someone already knew about.
-**Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`), and carries the supervisor's own principal and PIN (the `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only the sessions at that one till (`workstationId` is required then). Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
+**Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this as its device (`deviceAuth`, r14 review C-04, CHG-R14H-001; it was `{}`, no token at all), names itself (`workstationId`), and carries the supervisor's own principal and PIN (the `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The `workstationId` must be the workstation the calling device is bound to (403 `workstation-mismatch`), and a call with neither a session nor `deviceAuth` is 401 `device-unauthenticated`, answered before the PIN is checked, so it spends no attempt and moves no lockout. The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only the sessions at that one till (`workstationId` is required then). Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
 **Ordered by `startedAt` descending, `sessionId` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the session that began last is first, which on a till is the one somebody is asking about. **Only `active` sessions unless `status` asks for another** (CHG-R8MIG-015).
 
@@ -2787,6 +2812,7 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of ActiveSession | yes |  |
+| items[].subjectId | string (uuid) |  | The signed-in person (their principal's subject), as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): ipAddress is kept in pii.* for this subject, never on this row, and erasure removes… (nullable) |
 | items[].status | object | yes | A registry that only holds live sessions cannot answer why one ended. |
 | items[].sessionId | string | yes | The session's identity.session.id, written as text, and the key forceLogout takes in its path (R8 blocker fix, IDENTITY-C02). |
 | items[].principalId | string (uuid) | yes |  |
@@ -2813,7 +2839,8 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Sessions |
-| 403 |  | The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed, or workstationId is missing (supervisor-step-up-refused; CHG-RUL-015). |
+| 401 |  | Neither a staff session nor an authenticated device (device-unauthenticated; r14 review C-04, CHG-R14H-001): a call with no session must come from a registered device by deviceAuth. |
+| 403 |  | The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed, or workstationId is missing (supervisor-step-up-refused; CHG-RUL-015), or it is not the callin… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -2981,7 +3008,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | The challengeId the client verifies. |
 | principal_id | uuid | no | The staff or partner principal challenged; null for a guest. |
 | subject_id | uuid | no | The guest challenged (pii.subject); null for a principal. |
-| method_id | uuid | no | The identity.mfa_method asked; null means the principal's primary method. |
+| method_id | uuid | no | The identity.mfa_method challenged. |
 | action | text | yes | What the step-up is for (signIn at sign-in). |
 | session_id | uuid | no | The session the challenge, and the step-up it proves, are bound to (CHG-RUL-020). |
 | code_hash | text | no | The PHC hash (ADR-0071) of a code the server sent (smsOtp, emailOtp, and the code of an enrol challenge); null for an authenticator (totp), whose code is computed from the method's stored MfaMethod.s… |
@@ -3006,7 +3033,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | label | text | no |  |
 | masked_target | text | no | Partially masked destination, so a person can tell two methods apart. |
 | is_active | boolean | yes |  |
-| is_primary | boolean | no |  |
+| is_primary | boolean | no | At most one primary among a principal's active methods (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). |
 | enrolled_at | timestamptz | yes |  |
 | last_used_at | timestamptz | no |  |
 
@@ -3033,6 +3060,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | granted_by_principal_id | uuid | no |  |
 | granted_at | timestamptz | no |  |
 | id | uuid | yes | Synthesised key. |
+
+### `identity.offline_pin_verifier`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | The verifier id the package and the offline evidence carry. |
+| principal_id | uuid | yes |  |
+| venue_id | uuid | yes | The venue (platform.venue.id, Tenancy's); not a foreign key, since Identity reads nothing above it (ADR-0028). |
+| verifier_hash | text | yes | The Argon2id PHC string over the PIN with its own 16-byte salt and ADR-0071's parameters, with no pepper (the device must compute it), stored encrypted with the tenant's field key (ADR-0063) so a cop… |
+| credential_set_at | timestamptz | yes | The setAt of the pin credential it was minted from. |
+| issued_at | timestamptz | yes |  |
+| expires_at | timestamptz | yes | 30 days after issuedAt. |
+| revoked_at | timestamptz | no | Set when the principal is deactivated or loses every offline step-up permission at the venue, so the verifier leaves every later package. |
+| scope_path | text | no | The partition key (ADR-0005), the venue's path. |
 
 ### `identity.otp_challenge`
 
@@ -3103,7 +3144,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_login_at | timestamptz | no |  |
 | must_change_credential | boolean | no | The principal must replace their credential before the session is usable (14 October 2026, CHG-CRD-001, ADAM CR-078; createPrincipal took it and nothing stored it). |
 | sso_provider_id | uuid | no | Set when single sign-on provisioned this principal (completeSsoAuthorization, from the tenant's identity.sso_provider; 14 October 2026, CHG-CRD-001). |
-| email | text | no | The principal's email, once verified; null until then. |
+| subject_id | uuid | no | The principal, as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): email is kept in pii.* for this subject, never on this row, and erasure removes them there. |
 | home_scope_id | uuid | no | Points at platform.org_unit. |
 
 ### `identity.principal_credential`
@@ -3195,6 +3236,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| subject_id | uuid | no | The signed-in person (their principal's subject), as a subject (ADR-0023 as amended 3 November 2026; CHG-R14M-001): ipAddress is kept in pii.* for this subject, never on this row, and erasure removes… |
 | status | text | yes | A registry that only holds live sessions cannot answer why one ended. |
 | session_id | text | yes | The session's identity.session.id, written as text, and the key forceLogout takes in its path (R8 blocker fix, IDENTITY-C02). |
 | principal_id | uuid | yes |  |
@@ -3204,7 +3246,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | role_id | uuid | no |  |
 | workstation_id | uuid | no |  |
 | venue_id | uuid | no |  |
-| ip_address | text | no |  |
 | device_info | text | no |  |
 | is_mfa_satisfied | boolean | no |  |
 | started_at | timestamptz | yes |  |
@@ -3354,13 +3395,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-62 operations, added to this service in later releases without changing any of the above.
+65 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
 | guestAuth | `getMyIdentityVerification`, `submitGuestIdentityDocument` |
-| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `listSubjectBiometricRecords`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
+| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getOfflineStepUpPackage`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `listSubjectBiometricRecords`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `recordSubjectDetails`, `setGuestVerificationPolicy`, `setSessionVenue`, `submitSubjectDataPart`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
 | mfa | `removeMfaMethod` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |

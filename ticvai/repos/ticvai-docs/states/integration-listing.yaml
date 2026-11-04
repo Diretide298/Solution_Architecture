@@ -20,9 +20,23 @@ transitions:
   guard: Sent for review
 - from: submitted
   to: inReview
+  trigger: system
+  guard: '**Only a listing already stored as inReview** (CHG-R14INT-006): CR-572 has certifyIntegration accept a
+    listing in inReview and never write it, and since r14 nothing moves a listing there (CHG-CR572-002). A listing
+    the earlier build left inReview is still certified or rejected from it. The lead decides whether inReview leaves
+    the enum once no stored listing holds it.'
+- from: submitted
+  to: certified
   operation: certifyIntegration
   trigger: operation
-  guard: Being assessed
+  guard: '**Approved, with an expiry**, straight from submitted (ADAM CR-572, CHG-CR572-001: certify is accepted from
+    submitted or inReview, and certifyIntegration never writes inReview, so it has no submitted -> inReview
+    transition, CHG-CR572-002)'
+- from: submitted
+  to: rejected
+  operation: certifyIntegration
+  trigger: operation
+  guard: Not approved, with reasons the developer can act on, straight from submitted (ADAM CR-572, CHG-CR572-001)
 - from: inReview
   to: certified
   operation: certifyIntegration

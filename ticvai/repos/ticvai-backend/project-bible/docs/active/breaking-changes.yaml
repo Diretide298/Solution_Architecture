@@ -2072,3 +2072,163 @@ changes:
     tag: r13
     producer-tickets: ['30970']
     consumer-tickets: [none-linked]
+  - id: BC-800
+    contract: identity
+    operation: login
+    operations: [login, completeSsoAuthorization, forceLogout, listActiveSessions]
+    change: "security changed"
+    reason: 'r13 system review C-04 (CHG-R14H-001): the device doors trusted a workstationId the caller typed, and the
+      till''s session-less supervisor step-up admitted a call with no credential ({}), so any internet caller who
+      learned a workstation id could try PINs, list and end sessions and lock every supervisor. A device door now
+      authenticates its device (deviceAuth) and the workstation is the device''s. login and completeSsoAuthorization
+      keep {} for the browser doors and add deviceAuth; forceLogout and listActiveSessions replace {} with deviceAuth.
+      Removing the unauthenticated door cannot be made additive.'
+    approved-by: 'Chinmay, 3 November 2026 ("All four, one release", on the triage of the r13 system review: device, guest and token access go into r14)'
+    tag: r14
+    producer-tickets: ['30674', '30729', '30721', '30746']
+    consumer-tickets: ['27758', '27761', '27767', '27772', '27783', '27785', '29045', '30732', '30733', '30734', '30735',
+      '30736', '30737', '30747', '30748', '30749', '30753', '30754', '30755', '30787', '30788', '30789', '30790', '30791',
+      '30792', '33754', '33755', '33756']
+  - id: BC-801
+    contract: orders
+    operation: captureStoredValue
+    operations: [captureStoredValue, relinquishStoredValue]
+    change: "security changed"
+    reason: 'r13 system review C-04 (CHG-R14H-001): a device took and released stored value under any device key
+      (apiKeyAuth), a signage display''s included. A device that moves stored value now authenticates as itself
+      (deviceAuth) and is one of the operation''s x-ticvai-device-kinds (the readers on a machine). A scheme removed
+      from security cannot be made additive.'
+    approved-by: 'Chinmay, 3 November 2026 ("All four, one release", on the triage of the r13 system review: device, guest and token access go into r14)'
+    tag: r14
+    producer-tickets: ['32272', '32268']
+    consumer-tickets: ['28642', '32915', '32916', '32917']
+  - id: BC-802
+    contract: games
+    operation: recordGamePlay
+    operations: [recordGamePlay, syncGamePlays]
+    change: "security changed"
+    reason: 'r13 system review C-04 (CHG-R14H-001): a machine''s reader deducts credits under any device key
+      (apiKeyAuth). It now authenticates as itself (deviceAuth), a cardReader, rfidReader or nfcReader
+      (x-ticvai-device-kinds). A scheme removed from security cannot be made additive.'
+    approved-by: 'Chinmay, 3 November 2026 ("All four, one release", on the triage of the r13 system review: device, guest and token access go into r14)'
+    tag: r14
+    producer-tickets: ['32996', '32997']
+    consumer-tickets: [none-linked]
+  - id: BC-803
+    contract: tenancy
+    operation: listWorkstations
+    operations: [listWorkstations, getWorkstation, configureWorkstation, listDevices, registerDevice, getDevice,
+      enrolDevice, approveDevice]
+    change: "gained enum value(s) ['workstationTerminal']"
+    reason: 'r13 system review C-04 (CHG-R14H-001): a till or kiosk computer had no device kind, so it could hold no
+      deviceAuth credential and the device doors could not authenticate it. DeviceKind gains workstationTerminal (the
+      computer a device door runs on, bound to its workstation). A value added to a response enum is breaking by the
+      compat rule: a client that switches on kind shows the new value as unknown until it is built.'
+    approved-by: 'Chinmay, 3 November 2026 ("All four, one release", on the triage of the r13 system review: device, guest and token access go into r14)'
+    tag: r14
+    producer-tickets: ['32814', '32812', '30794', '30798', '32815', '33989']
+    consumer-tickets: ['27793', '28753', '29006', '29103', '29110', '29113', '29114', '29116', '29117', '29118', '29119',
+      '29171', '29666', '30807', '30808', '30809', '33131', '33132', '33133', '33722', '33723', '33724', '33871', '33872',
+      '33873', '33886', '33887', '33888', '33895', '33896', '33897', '33898', '33899', '33900', '33904', '33905', '33906',
+      '33907', '33908', '33909', '33910', '33911', '33912', '33913', '33914', '33915', '34030', '34031', '34032', '35089',
+      '35090', '35091', '36340', '36341', '36342', '37014', '37040', '37041', '37042']
+  - id: BC-740
+    contract: subscription
+    operation: addCapacityPack
+    change: "`unit`"
+    reason: 'ADAM CR-560 (CHG-CR560-001): CapacityPack.unit, a free string, becomes the UsageMetric enum (venues,
+      workstations, activeUsers, devices, brandedApps, aiTokens, apiCalls, storageGb, transactions, guestProfiles), and
+      addCapacityPack refuses any other unit 400 validation naming unit. A narrowed request field, and a response field
+      typed anew, are breaking.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-560 posted on #30841: "Capacity packs: CapacityPack.unit takes the
+      UsageMetric values ... addCapacityPack refuses any other unit with 400 validation naming the unit field"), the
+      lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['29312']
+    consumer-tickets: [none-linked]
+  - id: BC-741
+    contract: subscription
+    operation: previewSubscriptionChange
+    change: "`modulesGained`"
+    reason: 'ADAM CR-568 (CHG-CR568-001): SubscriptionPreview.modulesGained, a list of free strings, becomes a list of
+      ModuleKey values, always present (an empty list rather than the field left out). A response field typed anew is
+      breaking by the compat rule.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-568 posted on #31281: "modulesGained / modulesLost: ModuleKeys in the
+      licence position after but not before, and before but not after ... Sort ascending; return [] rather than leaving
+      the field out"), the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['31281']
+    consumer-tickets: [none-linked]
+  - id: BC-742
+    contract: subscription
+    operation: previewSubscriptionChange
+    change: "`modulesLost`"
+    reason: 'ADAM CR-568 (CHG-CR568-001): SubscriptionPreview.modulesLost, a list of free strings, becomes a list of
+      ModuleKey values, always present. A response field typed anew is breaking by the compat rule.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-568 posted on #31281: "modulesGained / modulesLost: ModuleKeys in the
+      licence position after but not before, and before but not after ... Sort ascending; return [] rather than leaving
+      the field out"), the lead''s "Dont hold r13. approve them and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['31281']
+    consumer-tickets: [none-linked]
+  - id: BC-750
+    contract: subscription
+    operation: listCells
+    change: "`query:region`"
+    reason: 'ADAM CR-563 (CHG-CR563-001): the region query parameter, which said no cell field it matched, is replaced by
+      regionId (a uuid matched exactly against control.cell.region_id), as listCellClusters filters. A removed parameter
+      is breaking; ADM-003 sends neither.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-563 posted on #31366: "listCells filters by regionId, the same way listCellClusters
+      does ... Replace the query parameter region with regionId (string, uuid, optional) ... status is optional and takes
+      the CellStatus values ... Any other value is 400 validation naming status"), the lead''s "Dont hold r13. approve them
+      and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['31366']
+    consumer-tickets: [none-linked]
+  - id: BC-751
+    contract: subscription
+    operation: listCells
+    change: "`query:status`"
+    reason: 'ADAM CR-563 (CHG-CR563-001): status, a free string, takes the CellStatus values and matches control.cell.status
+      exactly; any other value is 400 validation. A parameter typed anew is breaking by the compat rule; ADM-003 sends
+      neither.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-563 posted on #31366: "listCells filters by regionId, the same way listCellClusters
+      does ... Replace the query parameter region with regionId (string, uuid, optional) ... status is optional and takes
+      the CellStatus values ... Any other value is 400 validation naming status"), the lead''s "Dont hold r13. approve them
+      and rever tto the devs" of 3 November 2026'
+    tag: r14
+    producer-tickets: ['31366']
+    consumer-tickets: [none-linked]
+  - id: BC-823
+    contract: payments
+    contracts: [payments, wallet, rental, resources, venue-map, accreditation, public-api, workforce, approvals]
+    operation: listPaymentProviderConnections
+    operations: all
+    change: "base path moved from"
+    reason: 'The r13 system review B-12 (CHG-R14J-020): every contract is now served from its host''s one definition
+      (contracts/shared/common.yaml x-ticvai-servers, ADR-0026 amended 3 November 2026). payments, wallet, rental,
+      resources, venue-map and accreditation were served from https://api.ticvai.com/v1, a global host that cannot know
+      the tenant''s cell, and are now https://{cellHost}/api/v1; workforce and approvals carried their module name in the
+      base (https://api.{region}.ticvai.com/workforce/v1, /approvals/v1) and are now https://{cellHost}/api/v1;
+      public-api (the Control Plane''s developer accounts and keys) moved from https://api.ticvai.com/v1 to
+      https://{controlPlaneHost}/api/v1. Every operation''s path key is unchanged; the route a client calls is not, and a
+      base path cannot change additively. ai moved host only (https://{cellHost}/ai/v1), with the same base.'
+    approved-by: 'Chinmay, 3 November 2026 (the r13 system review''s fixes, finding B-12: "All four, one release"; ADR-0026 amended 3 November 2026)'
+    tag: r14
+    producer-tickets: ['27699', '27816', '27950', '28416', '30848', '30854', '30855', '30856', '30857', '30858', '30859', '30860', '30898', '31185', '31239', '31294', '31296', '31358', '31384', '31385', '31390', '31391', '31392', '32338', '32339', '32340', '33473', '33474', '36225', '36316', '37011', '37036', '37102', '37103', '37104']
+    consumer-tickets: ['31749', '31751', '31855', '31857', '31893', '31895', '32100', '32102', '32125', '33038', '33271']
+  - id: BC-824
+    contract: payments
+    operation: listPaymentProviderConnections
+    operations: [listPaymentProviderConnections, createPaymentProviderConnection, testPaymentProviderConnection]
+    change: "/payment-provider-connections"
+    reason: 'The r13 system review B-12 (CHG-R14J-020): on the cell host payments shares /api/v1 with orders, and both
+      declared GET /payment-providers (orders listPaymentProviders, the gateways configured for a scope; payments
+      listPaymentProviderConnections, the provider connections and their capabilities), one route for two operations
+      (check-package rule 47). The payments collection of provider connections is now /payment-provider-connections
+      (list, create, and /{connectionId}/test), named for what it holds; orders keeps /payment-providers. None of the
+      three is started; a path cannot change additively.'
+    approved-by: 'Chinmay, 3 November 2026 (the r13 system review''s fixes, finding B-12: "All four, one release"; ADR-0026 amended 3 November 2026)'
+    tag: r14
+    producer-tickets: [none-started]
+    consumer-tickets: [none-started]

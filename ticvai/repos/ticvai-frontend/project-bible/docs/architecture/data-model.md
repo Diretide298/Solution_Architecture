@@ -45,7 +45,7 @@ Adding an attribute value auto-creates sellable variants (07 Aug §12).
 | Identity ≠ Entitlement | 05 Aug 2026 |
 | Ticket ID ≠ Media Code | 07 Aug 2026 |
 | Ledger is append-only; corrections are entries | 12 Aug 2026 |
-| PII lives in a separate erasable store, referenced by opaque subject ID | Derived — reconciles append-only with erasure |
+| PII lives in a separate erasable store, referenced by opaque subject ID: a module row holds the subject id, never a name, contact, birth date, ID number or IP address (`x-ticvai-pii`) | Derived — reconciles append-only with erasure; module tables included 3 November 2026 (ADR-0023 amendment, CHG-R14M-001) |
 | Order ≠ Reservation ≠ Ticket | Glossary |
 
 ## Conventions

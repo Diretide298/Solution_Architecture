@@ -1530,7 +1530,7 @@
    "eventRelativeWindows": {
     "type": "object",
     "nullable": true,
-    "description": "Event-relative windows (pack p.11: B2C opens 90 days before, OTA closes 4 hours before, kiosk opens 2 hours before admission; MoM: onsite closes 15 min before a timed show). Offsets in minutes before the anchor; negative means after",
+    "description": "Event-relative windows (pack p.11: B2C opens 90 days before, OTA closes 4 hours before, kiosk opens 2 hours before admission; MoM: onsite closes 15 min before a timed show). Offsets in minutes before the anchor; negative means after. Anchor `admissionStart` is the performance's `admissionStartsAt`, or its `startsAt` while that is null (ADAM CR-411, 3 November 2026)",
     "properties": {
      "anchor": {
       "type": "string",

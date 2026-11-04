@@ -284,7 +284,7 @@ components:
   - kind: supervisorPinPrompt
     description: >
       The step-up a till or handheld asks before an act that needs a supervisor: who approves, then their PIN.
-    states: [picking, entering, verifying, refused]
+    states: [picking, entering, verifying, refused, offline]
     notes: >
       **Added 20 October 2026 (r8 cause GPS-C31).** Two parts. **The picker** lists the supervisors who may
       approve this act here: `identity.listStepUpSupervisors` with the act's operation (so its permission and the
@@ -293,6 +293,22 @@ components:
       masked, and sends them with the picked principal as the operation's `SupervisorStepUp`. A refusal
       (`403 supervisor-step-up-refused`) says only that the approval was refused and keeps the picked supervisor,
       never whether the person or the PIN was wrong.
+
+      **The `offline` state** (decided 3 November 2026, Chinmay, on system review finding F-01: "Offline verifier"
+      (the till keeps a verifier, re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001), for an
+      act whose operation declares `x-ticvai-offline-step-up: verifier` while the device has no connection. **The
+      picker** lists the signers of the device's offline step-up package (identity `getOfflineStepUpPackage`) whose
+      `permissions` hold the act's permission (or who are marked `witness`, for a witness's countersignature), by
+      display name, the signed-in person left out, under the line "Offline: checked on this till, confirmed when it
+      syncs". **The keypad** is the same; the PIN is checked on the device against the signer's verifier and the
+      act goes ahead at once, queued with the step-up and its `offline` evidence. **A wrong PIN** says only that the
+      approval was refused, as online. **At the package's `attemptLimit` wrong PINs** that signer shows as "Locked on
+      this till until it reconnects" and cannot be picked. **With no package, or after its `expiresAt`**, the
+      picker is empty and says "Supervisor approval needs a connection", as the till marks what is "Unavailable
+      offline". **After sync**, an act whose response carries `X-Ticvai-Step-Up-Verdict: refusedAtSync` is shown
+      once on the till as the warn toast "Supervisor approval for <the act> was not confirmed when the till synced.
+      The venue manager has been told." (the act stays recorded); the venue's managers see the alert on Shift
+      Exceptions & Alerts (POS-020) and Offline Alerts, Limits & Audit (BO-133).
   - kind: progressIndicator
     states: [determinate, indeterminate, complete, failed]
 

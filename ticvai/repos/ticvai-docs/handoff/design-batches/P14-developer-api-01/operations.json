@@ -98,7 +98,7 @@
   "method": "POST",
   "path": "/api-versions/{version}/deprecate",
   "contract": "public-api",
-  "summary": "Announce a sunset date and notify subscribers",
+  "summary": "Announce a sunset date; the notice job notifies subscribers",
   "permission": "DEVELOPER_ADMIN",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",

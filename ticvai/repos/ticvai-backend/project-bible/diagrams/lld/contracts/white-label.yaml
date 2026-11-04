@@ -154,7 +154,6 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - whitelabel.tenant_config
   writes:
   - cache:idempotency
   - platform.outbox
@@ -438,6 +437,7 @@ operations:
   permission: TENANT_CONFIGURE
   audience:
   - staff
+  - service
   offline: false
   reads:
   - cache:resolution

@@ -4,14 +4,15 @@ generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals
-  are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting
-  them means three services doing the same joins.
+why: '**`platform.scope` is the tenancy spine**: 903 of the 111 tables in the schema reference''s lineage
+  name it as an anchor (3 November 2026; it was named platform.org_unit until the scope rename). Workforce
+  and approvals are folded in because each is small, both read `platform.scope` constantly and write
+  it rarely, and splitting them means three services doing the same joins.
 
 
   **`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning
   was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service
-  with no data belongs where its data is**, and a shift''s data is entirely in `orders`: `orders.shift`,
+  with no data belongs where its data is**, and a shift''s data is entirely in `orders`: `orders.pos_shift`,
   `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
 
 
@@ -46,7 +47,7 @@ schemas:
   tables: 16
   stores:
   - postgres
-  largestTable: accreditation.holder
+  largestTable: accreditation.application
 - schema: tenancy
   tables: 8
   stores:
@@ -107,7 +108,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 7
+    reads: 8
     writes: 4
   - operation: cancelApprovalRequest
     verb: POST
@@ -2240,7 +2241,7 @@ tables:
   - accreditation
   foreignWriters: null
 - table: accreditation.holder
-  columns: 21
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2427,7 +2428,7 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.request
-  columns: 36
+  columns: 38
   store: postgres
   parent: null
   writtenBy:
@@ -2662,6 +2663,7 @@ tables:
   - promotions
   - queue
   - reporting
+  - retail
   - seating
   - shift
   - subscription
@@ -2684,6 +2686,7 @@ tables:
   - promotions
   - queue
   - reporting
+  - retail
   - seating
   - shift
   - subscription
@@ -2871,7 +2874,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: workforce.employee
-  columns: 15
+  columns: 11
   store: postgres
   parent: null
   writtenBy:

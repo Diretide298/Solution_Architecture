@@ -134,7 +134,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #29778 (VM-ADM-268) |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -327,7 +327,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
 | Block | Block A · ticket #29779 (VM-ADM-269) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -405,7 +405,7 @@ Errors to draw in the form: 409 Refused, and nothing is stored. `connection-id-m
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Tests `tests` | multi-select chips | optional | — | Connectivity · Authentication · Product sync · Availability · Pricing · Order creation · Cancellation · Webhook | — | The tests to run; all that apply to the connection type when omitted. | `testChannelConnection` body |
+| Tests `tests` | multi-select chips | optional | — | Connectivity · Authentication · Product sync · Availability · Pricing · Order creation · Cancellation · Webhook | — | The tests to run; all that apply to the connection type when omitted. Which tests to run, not stored as sent; each test's result is stored in the connection's `lastTests` (r14 … | `testChannelConnection` body |
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `connectionDisabled`.; 422 `orderTestInProduction`: `orderCreation` or `cancellation` is named, applies to the connection, and its `environment` is `production` (ADAM CR-540).
 

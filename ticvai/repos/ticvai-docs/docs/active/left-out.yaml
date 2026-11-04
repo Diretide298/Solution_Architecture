@@ -445,3 +445,121 @@ items:
   owner: Chinmay
   added: '2026-11-03'
   change: CHG-CR534-001
+- id: LO-CR551-001
+  kind: deferred
+  platform: P02
+  screens: [GST-008, GST-046]
+  what: 'Tickets & Add-ons (GST-008) sends the guest to the waiting room (GST-046) when its Continue''s addCartLine is
+    refused 403 admission-required, with performanceId and waitingEntryId, and on admission brings them back to GST-008
+    with the chosen quantities kept, sending the admission token on addCartLine. GST-008''s record has no such edge yet;
+    GST-007''s edge to GST-046 stays for flows that add lines there.'
+  source: 'ADAM CR-551 (#31784 GST-007), decided by Chinmay on 3 November 2026: "The move from a refused addCartLine to
+    the waiting room happens on the tickets screen''s Continue; that is a separate ticket, so build nothing for it here";
+    CHG-CR551-001'
+  reason: 'the decision moves the waiting-room edge to a ticket of its own under GST-008 (#28159), and #31775 (GST-008''s
+    build) is Ready for QA, so its text stays as it is'
+  target: 'the new [FE] ticket under #28159 (a plan task the integration pass files)'
+  owner: Chinmay
+  added: '2026-11-03'
+  change: CHG-CR551-001
+- id: LO-CR552-001
+  kind: deferred
+  platform: P02
+  screens: [GST-007]
+  what: 'GST-007''s wireframe (wireframes/incoming/P02-mobile-v4/gst-007.html, the prototype capture) and page info
+    redrawn to the build in 614c7ee, which ADAM CR-552 accepted as the screen''s design: the Who''s coming? drawer as
+    folding person cards with the merged height bands, the equal black and white pills in the drawer and the waitlist
+    pop-up, and the waitlist confirmation card. The screen record says it now (notes, overlays eligibilityDeclaration
+    and joinWaitlist, the You''re on the waitlist! card, prototype.differences).'
+  source: 'ADAM CR-552 (#31784 GST-007), decided by Chinmay on 3 November 2026: "the package''s wireframe, screen record
+    and page info will be brought into line with it"; CHG-CR552-001'
+  reason: the frame is a capture of the client-verified prototype view; a redraw to the build is a design batch's work
+  target: 'the next design batch rebuild after r14'
+  owner: Chinmay
+  added: '2026-11-03'
+  change: CHG-CR552-001
+- id: LO-R14J-001
+  kind: deferred
+  platform: all (the backend and the event contracts; no screen)
+  what: 'The two emitter declarations agreeing everywhere: 111 (event, operation) pairs on 105 operations name the
+    operation in the event''s emittedBy while the operation declares no x-ticvai-emits (and postOrderRevenue declares
+    ledger.journalPosted, whose event does not name it). Lineage already unions the two, so every one of these
+    operations writes platform.outbox in its lineage; what is missing is the operation''s own x-ticvai-emits line, which
+    ADAM and the screen design specs show. The five events r14 gave emitters (review B-09) are declared in emittedBy
+    and job emits only, for the same reason.'
+  source: 'r13 system review of 3 November 2026, finding B-09 (the 111 pairs); CHG-R14J-010'
+  reason: 'deriving x-ticvai-emits into the contracts would be a derive step writing authored files, which review
+    finding E-03 (lane i) removes; adding the line by hand is 105 contract edits reaching 36 started tickets, and
+    check-contract-compat counts each added x-ticvai-emits as a breaking change needing its own approval. A check that
+    the two agree would fail on all 111 until then and cannot be baselined.'
+  target: 'the next contract sweep after r14 (not scheduled): add x-ticvai-emits to the 105 operations, then a
+    check-jobs rule that emittedBy and x-ticvai-emits agree'
+  owner: Chinmay
+  added: '2026-11-03'
+  change: CHG-R14J-010
+# ---------------------------------------------------------------- r14: decisions waiting on the client (review A-12)
+- id: LO-R14J-002
+  kind: deferred
+  platform: all (the backend and the infrastructure; no screen)
+  what: 'The cloud event broker, ADR-0057 (Proposed): RabbitMQ or Kafka in the cloud. Everything else in the ADR is
+    decided (the kernel interfaces, the envelope, per-aggregate ordering, the dead-letter drain, the inbox) and local
+    development runs RabbitMQ; the relay and the HA and throughput figures of ADR-0058 and ADR-0060 assume one of the
+    two. The ADR asked for the answer before sprint 1 week 2 (Monday 12 October 2026), and it has not come.'
+  source: 'docs/adr/0057-events-travel-on-rabbitmq-or-kafka.md (Status: Proposed); docs/active/development-plan.md
+    "broker: client"; r13 system review of 3 November 2026, finding A-12; CHG-R14J-040'
+  reason: 'the client chooses the cloud broker (ADR-0057); the package does not choose it for them, and its 12 October
+    deadline has passed with no answer'
+  target: 'the release after the client answers (not scheduled): the lead escalates the overdue answer to the client;
+    until then the relay is built against RabbitMQ behind IBrokerPublisher, as the ADR says'
+  owner: Chinmay, to the client
+  added: '2026-11-03'
+  change: CHG-R14J-040
+- id: LO-R14J-003
+  kind: deferred
+  platform: all (the backend and the infrastructure; no screen)
+  what: 'The availability targets and how they are met, ADR-0060 (Proposed): which services the 99.99% agreed on
+    31 July covers, whether the client accepts an SLO per tier (99.99% venue operations locally, 99.95% cloud
+    commerce) and the cost of zone-redundant HA, the one production HA mode for PostgreSQL, and UAE Central access
+    for the DR module. Until then ADR-0061''s Stage 1 runs one replica per deployable and a node or zone loss is an
+    outage.'
+  source: 'docs/adr/0060-availability-targets-high-availability-and-disaster-recovery.md (Status: Proposed, "What is
+    open, and who answers"); r13 system review of 3 November 2026, finding A-12; CHG-R14J-040'
+  reason: 'the coverage of the 99.99%, the per-tier SLO and the HA cost are the client''s answers; the HA mode and the
+    DR region access follow them'
+  target: 'the release after the client answers (not scheduled): the lead escalates; ADR-0060 moves to Accepted then'
+  owner: Chinmay, to the client (Dinesh for the UAE Central access)
+  added: '2026-11-03'
+  change: CHG-R14J-040
+- id: LO-R14PL-001
+  kind: deferred
+  platform: database
+  what: '78 array item columns (child tables derived from an array whose item property names an enum, for example
+    fnb.kitchen_ticket_line.status and control.invoice_line.kind) carry no CHECK holding the contract''s enum.
+    tools/derive-ddl.py carries an item property''s enum onto its child table only where the array names it in
+    x-ticvai-item-checks (opt-in, r14 lane l: fnb.service_order_line.status, CHG-CR594-001); the other 78 are
+    untouched, so the database accepts a value the contract does not.'
+  source: 'r14 lane l (ADAM CR-594, CHG-CR594-001 notes: "78 other array item columns ... still carry no contract enum
+    check: x-ticvai-item-checks is opt-in, so they are untouched; the class is in the lane report for the lead")'
+  reason: 'a CHECK added to a column of a live table needs its rows checked first (NOT VALID, then VALIDATE, each
+    column''s values read), and seventy-eight at once is a release''s worth of migration work that r14 did not plan'
+  target: r15
+  owner: Chinmay (the class), Hrushikant Patkar (the migration)
+  added: '2026-11-04'
+  change: CHG-R14PL-023
+- id: LO-R14PL-002
+  kind: deferred
+  platform: P10
+  screens: [PTR-002, PTR-008, PTR-015, PTR-012]
+  what: 'Ten partner-portal bindings to staff-only operations, which a partner user (no workstation) cannot call as
+    the contracts stand: createOrder, holdOrder and resumeOrder on PTR-002, PTR-008 and PTR-015, and capturePayment on
+    PTR-012. They stay known findings of check-screen-wiring (S-WORKSTATION-OP) on no started ticket. The partner
+    variant CHG-R14BO-005 defined (x-ticvai-partner-callable) took createPayment and inquirePaymentStatus on PTR-012
+    only, the two the lead decided.'
+  source: 'r14 lane s (CHG-R14BO-005 notes: "The other ten P10 keeps ... stay known findings, on no started ticket:
+    the lead decided PTR-012''s two")'
+  reason: 'each operation needs its own decision on whether a partner may call it and under what grant, before the
+    marker is applied (a partner order, hold or capture is money on another channel)'
+  target: r15
+  owner: Chinmay
+  added: '2026-11-04'
+  change: CHG-R14PL-023

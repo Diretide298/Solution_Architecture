@@ -316,6 +316,7 @@
     "nullable": true
    },
    "guestName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "readOnly": true,
@@ -1422,6 +1423,7 @@
     "description": "The guest's `subjectId`."
    },
    "customerName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Null unless the caller holds GUEST_VIEW_PII."
@@ -1464,10 +1466,12 @@
     "description": "Masked (e.g. `j***@example.com`, `+971 ** *** 4821`) unless the caller holds GUEST_VIEW_PII.",
     "properties": {
      "email": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "nullable": true
      },
      "phone": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "nullable": true
      }

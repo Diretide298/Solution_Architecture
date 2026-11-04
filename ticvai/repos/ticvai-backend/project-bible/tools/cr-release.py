@@ -954,7 +954,7 @@ def last_full_run_seconds():
         for d in sorted(runs.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
             tsv = d / "phases.tsv"
             if tsv.is_file():
-                rows = dict(line.split("\t")[:2] for line in tsv.read_text().splitlines()[1:] if "\t" in line)
+                rows = dict(line.split("\t")[:2] for line in tsv.read_text(encoding="utf-8").splitlines()[1:] if "\t" in line)
                 if rows.get("total", "").isdigit():
                     return int(rows["total"]), d.name
     except OSError:

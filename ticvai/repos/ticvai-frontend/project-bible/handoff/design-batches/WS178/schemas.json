@@ -115,6 +115,7 @@
     "format": "uuid"
    },
    "documentNumber": {
+    "x-ticvai-data-class": "business",
     "type": "string"
    },
    "legalEntityId": {

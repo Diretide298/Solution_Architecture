@@ -1524,6 +1524,7 @@
     "description": "Payment method"
    },
    "guestName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "description": "Guest"
    },
@@ -1572,6 +1573,7 @@
     "type": "string"
    },
    "holderName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "description": "Present only where the entitlement is name-bound. Identity and entitlement are separate concerns; most entitlements carry no holder.\n"

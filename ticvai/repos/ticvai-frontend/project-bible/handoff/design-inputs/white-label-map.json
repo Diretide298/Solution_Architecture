@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/build-white-label-map.py",
- "generated": "2026-11-03",
+ "generated": "2026-11-04",
  "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
  "elements": [
   {
@@ -7991,7 +7991,7 @@
    "mask": "English and Arabic (Arabic right to left)",
    "required": true,
    "default": "—",
-   "allowed": "- URL schemes: https, mailto and tel for href; https only for src.",
+   "allowed": "- URL schemes: https, mailto and tel for href, and a relative internal link, a path starting with a single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923 …",
    "help": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).",
    "effect": "",
    "configuredOn": [
@@ -8155,7 +8155,7 @@
    "mask": "English and Arabic (Arabic right to left)",
    "required": true,
    "default": "—",
-   "allowed": "- URL schemes: https, mailto and tel for href; https only for src.",
+   "allowed": "- URL schemes: https, mailto and tel for href, and a relative internal link, a path starting with a single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923 …",
    "help": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).",
    "effect": "",
    "configuredOn": [
@@ -8383,7 +8383,7 @@
    "mask": "English and Arabic (Arabic right to left)",
    "required": true,
    "default": "—",
-   "allowed": "- URL schemes: https, mailto and tel for href; https only for src.",
+   "allowed": "- URL schemes: https, mailto and tel for href, and a relative internal link, a path starting with a single `/` (never `//`), which is kept (ADAM CR-401, Chinmay, 3 November 2026, answering #30923 …",
    "help": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).",
    "effect": "",
    "configuredOn": [],
@@ -9832,9 +9832,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, WEB-001",
+   "reachesText": "GST-001, GST-007, WEB-001",
    "specific": [
     "GST-001",
+    "GST-007",
     "WEB-001"
    ],
    "channel": "",
@@ -13282,7 +13283,8 @@
     "bookingFlows.settings.seatEventDateMode",
     "bookingFlows.settings.extrasStep",
     "bookingFlows.settings.quickTour",
-    "bookingFlows.settings.consentQuestionIds"
+    "bookingFlows.settings.consentQuestionIds",
+    "cookieBanner.position"
    ]
   },
   "GST-008": {

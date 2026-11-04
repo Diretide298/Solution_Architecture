@@ -91,6 +91,7 @@
     "nullable": true
    },
    "guestName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true,
     "readOnly": true,

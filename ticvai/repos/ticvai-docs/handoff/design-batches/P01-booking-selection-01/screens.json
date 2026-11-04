@@ -1204,18 +1204,20 @@
      "trigger": "Ticket Type Selection",
      "carries": [
       "cartId",
-      "performanceId"
+      "performanceId",
+      "productId"
      ],
-     "provenance": "derived — WEB-005 declares entryState.params cartId, performanceId, productId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-005 declares entryState.params cartId, performanceId, productId and WEB-008 holds cartId, performanceId, productId, so an edge into it carries them"
     },
     {
      "to": "WEB-006",
      "trigger": "Date & Performance Selection",
      "carries": [
       "cartId",
-      "performanceId"
+      "performanceId",
+      "productId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-008 holds cartId, performanceId, productId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
@@ -1325,7 +1327,7 @@
    {
     "operationId": "getGuestBundle",
     "contract": "promotions",
-    "purpose": "A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009)",
+    "purpose": "A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009). The add-ons page uses the same read as the app's Bundle Package (GST-056). Draw the component rows from `components[].name`, and each choice group as its `label` followed by its options' names, as the approved frame shows; preselect the `isDefault` option; the look does not change. Add to basket calls `addCartLine` with `variantId` = `GuestBundle.variantId`, `quantity` = the chosen number, `attributes.bundle` = {`bundleId`: `GuestBundle.id`, `choices`: [{`choiceGroupId`: group `id`, `optionId`: option `id`}, one entry per pick]}; never a component's or an option's `variantId` as the line's. Until the backend serves this shape, build against it with mocked data; never guess ids or show bare ids (ADAM CR-597, Chinmay, 3 November 2026; CHG-CR597-001).",
     "trigger": "onAction"
    },
    {

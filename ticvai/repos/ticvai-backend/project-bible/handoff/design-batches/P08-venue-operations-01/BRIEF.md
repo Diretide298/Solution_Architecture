@@ -183,7 +183,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-058` | Reporting Home | D | 91 | 26 | 6 | 100 | 2 | 0 | — | notStarted (generated) |
 | `BO-060` | Attendance & Footfall | D | 111 | 38 | 6 | 153 | 1 | 0 | — | notStarted (generated) |
 | `BO-064` | Zones & Areas | A | 32 | 27 | 6 | 27 | 0 | 0 | — | notStarted (generated) |
-| `BO-067` | Integrations | B | 5 | 42 | 6 | 27 | 1 | 0 | — | notStarted (generated) |
+| `BO-067` | Integrations | B | 5 | 42 | 6 | 26 | 1 | 0 | — | notStarted (generated) |
 | `BO-070` | Work Orders | D | 61 | 31 | 6 | 17 | 6 | 2 | — | notStarted (generated) |
 | `BO-100` | Venue Home | A | 4 | 43 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
 | `BO-108` | Venue Operations | A | 6 | 32 | 6 | 17 | 0 | 0 | — | notStarted (generated) |

@@ -543,7 +543,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/stock-supply/production-execution-batch-management",
-   "component": "src/routes/ops/ProductionExecutionBatchManagementList.tsx",
+   "redirect": "BO-112",
    "status": "notStarted"
   },
   "navigation": {

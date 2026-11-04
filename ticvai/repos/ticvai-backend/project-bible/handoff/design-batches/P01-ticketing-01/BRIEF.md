@@ -1,6 +1,6 @@
 # P01-ticketing-01 — P01 · Ticketing
 
-**3 screens · 17 operations · 34 schemas · 6 permissions**
+**3 screens · 18 operations · 35 schemas · 6 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

@@ -4809,6 +4809,7 @@ screens:
       trigger: Packages & Bundles
       provenance: flow F77 step 1→2
       carries:
+      - bundleId
       - productId
       - version
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -7343,9 +7344,10 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-022
-        holds variantId, so an edge into it carries them
+        holds productId, variantId, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -7906,9 +7908,10 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-023
-        holds variantId, so an edge into it carries them
+        holds productId, variantId, so an edge into it carries them
     entryFrom:
     - BO-015
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -8872,10 +8875,11 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       - version
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-026
-        holds variantId, version, so an edge into it carries them
+        holds productId, variantId, version, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 31 August**
@@ -9471,9 +9475,10 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-027
-        holds variantId, so an edge into it carries them
+        holds productId, variantId, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **8 assets operations
@@ -10312,7 +10317,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /venue-operations/asset-register-bo-031
-    component: src/routes/venue-operations/AssetRegisterBO031Detail.tsx
+    redirect: BO-069
     status: notStarted
   navigation:
     inferred: true
@@ -14480,9 +14485,10 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-047
-        holds variantId, so an edge into it carries them
+        holds productId, variantId, so an edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -24664,6 +24670,8 @@ screens:
   patternReason: '`listApprovalMatrices` reads a population and nothing reads one of them; the detail
     is the row until a `get` exists'
   purpose: What needs approval here, and who grants it.
+  division: 'Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-333, ADM-334, ADM-335,
+    BO-639; this screen is Approval Matrix: what needs approval here, and who grants it.'
   layout:
     template: split
     regions:
@@ -24775,7 +24783,7 @@ screens:
   name: Approval Delegations
   module: People & Access Rights
   requiresModule: core
-  wave: 2
+  wave: 1
   permission: APPROVAL_VIEW
   capability: C00
   implementation:
@@ -30995,7 +31003,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /sell/recipe-bom-management
-    component: src/routes/sell/RecipeBomManagementList.tsx
+    redirect: BO-111
     status: notStarted
   navigation:
     entryFrom:
@@ -31645,7 +31653,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /sell/central-kitchen-commissary-management
-    component: src/routes/sell/CentralKitchenCommissaryManagementList.tsx
+    redirect: BO-112
     status: notStarted
   navigation:
     entryFrom:
@@ -35646,7 +35654,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /food-beverage/order-routing-kds-printer-rules
-    component: src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx
+    redirect: BO-134
     status: notStarted
   navigation:
     entryFrom:
@@ -36155,7 +36163,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /stock-supply/production-execution-batch-management
-    component: src/routes/ops/ProductionExecutionBatchManagementList.tsx
+    redirect: BO-112
     status: notStarted
   navigation:
     entryFrom:
@@ -37038,6 +37046,22 @@ screens:
       slot: record
       components:
       - kind: searchField
+        label: Find dropped goods
+        operation: lookupShopAndDrop
+        notes: By entitlement, drop reference or receipt, as the till finds them.
+        provenance: contract retail.yaml GET /shop-and-drop/lookup; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
+      - kind: detailPanel
+        label: The dropped goods found
+        operation: lookupShopAndDrop
+        bindsTo: ShopAndDrop
+        columns:
+        - ShopAndDrop.dropReference
+        - ShopAndDrop.status
+        - ShopAndDrop.collectionPointName
+        provenance: contract retail.yaml GET /shop-and-drop/lookup; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
+      - kind: searchField
         label: Search retail global settings
         provenance: carried from the previous definition
       - kind: detailPanel
@@ -37054,6 +37078,11 @@ screens:
         operation: setReturnPolicy
         provenance: contract retail.yaml PUT /outlets/{outletId}/return-policy; wiring fix, 2 October
           2026
+      - kind: secondaryButton
+        label: Dispose of dropped goods
+        operation: disposeShopAndDrop
+        provenance: contract retail.yaml POST /shop-and-drop/{dropId}/dispose; design change approved
+          by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The retail global settings, read by `getReturnPolicy`.
     error: Could not load. Names which read failed and leaves the retail global settings untouched.
@@ -37125,6 +37154,21 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract retail.yaml PUT /outlets/{outletId}/return-policy; wiring fix, 2 October 2026
+  - id: formDisposeShopAndDrop
+    component: modal
+    trigger: Dispose of dropped goods
+    body: '**Collects what `disposeShopAndDrop` sends before it is called.** Required: `method`. Optional:
+      `note`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Dispose of dropped goods
+      operation: disposeShopAndDrop
+    dismiss:
+      label: Cancel
+      discards:
+      - method
+      - note
+    provenance: contract retail.yaml POST /shop-and-drop/{dropId}/dispose; design change approved by the
+      lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   gaps:
   - operation: getVenueSettings
     removed: true
@@ -50022,6 +50066,11 @@ screens:
         label: ROLLBACK TO V3.4
         operation: rollbackAccessPolicy
         provenance: pack Access Control Module_Reference.pdf, page 146 §Allow
+      - kind: secondaryButton
+        label: Submit for approval
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   overlays:
   - id: confirmRollbackToV
     component: confirmDialog
@@ -50032,6 +50081,32 @@ screens:
     provenance: pack Access Control Module_Reference.pdf, page 146 §Allow
     confirm:
       operation: rollbackAccessPolicy
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Submit for approval
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Submit for approval
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The policy approval audit list.
     error: Could not load. Names which read failed and leaves the policy approval audit untouched.
@@ -56585,7 +56660,7 @@ screens:
   name: Membership Commercial, Pricing & Channel Association
   module: Sell
   requiresModule: membership
-  wave: 3
+  wave: 1
   permission: MEMBERSHIP_VIEW
   source:
     pack: Membership___Annual_Pass_Management_Reference.pdf
@@ -57045,9 +57120,10 @@ screens:
     loading: The version's checks and impact load first.
     error: Could not load. Names the read that failed; no action is offered until it loads.
     emptyFirstRun: 'Not used: the screen opens on one product version.'
-    emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_MANAGE`, which `approveMembershipProductValidation`
-      requires to show this screen, and names that permission. **Never an empty table** — that reads as
-      *there is no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `MEMBERSHIP_VIEW`, which `getMembershipProductValidation`
+      requires to show this screen, or `MEMBERSHIP_MANAGE`, which `approveMembershipProductValidation`
+      requires to approve it, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: approveMembershipProductValidation
     contract: subscription
@@ -58250,6 +58326,11 @@ screens:
         label: Replacement Credential
         operation: createMemberException
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 32 §Support
+      - kind: secondaryButton
+        label: Request approval
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
     - name: contentBody
       components: []
   states:
@@ -58308,6 +58389,33 @@ screens:
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract
     change: `createMemberException`.'
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Request approval
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Request approval
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-302
   name: Member Lifecycle History, Audit & Case Timeline
   module: Sell
@@ -63941,7 +64049,7 @@ screens:
   name: Media Design Studio Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   permission: SCOPE_VIEW
   source:
     pack: Ticket_Media___Credential_Management_Reference.pdf
@@ -67213,7 +67321,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /venue-operations/my-approval-inbox-bo-365
-    component: src/routes/venue-operations/MyApprovalInbox.tsx
+    redirect: BO-084
     status: notStarted
   navigation:
     exitTo:
@@ -69725,7 +69833,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /venue-operations/reminder-breach-notification-rules-bo-389
-    component: src/routes/venue-operations/ReminderBreachNotificationRules.tsx
+    redirect: BO-388
     status: notStarted
   navigation:
     entryFrom:
@@ -69781,7 +69889,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /venue-operations/escalation-policy-builder-bo-390
-    component: src/routes/venue-operations/EscalationPolicyBuilder.tsx
+    redirect: BO-388
     status: notStarted
   navigation:
     entryFrom:
@@ -80832,11 +80940,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: topUpWallet
-    contract: wallet
-    purpose: Self-service top-up
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getWallet
     contract: wallet
     purpose: Read a guest wallet
@@ -85133,7 +85236,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /rentals/dynamic-pricing-ai-recommendation-bo-528
-    component: src/routes/rentals/DynamicPricingAiRecommendation.tsx
+    redirect: ADM-088
     status: notStarted
   navigation:
     entryFrom:
@@ -97090,6 +97193,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Manage reviewers and approval responsibilities.
+  division: 'Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-333, ADM-334, ADM-335,
+    BO-086; this screen is Reviewer Assignment & Delegation (pack ACCREDITATION.pdf, board 3.5, page 23):
+    manage reviewers and approval responsibilities.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -97106,11 +97212,24 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: dataTable
+        label: Approval matrices, the one being changed among them
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix
+        columns:
+        - ApprovalMatrix.kind
+        - ApprovalMatrix.scopeLevel
+        - ApprovalMatrix.isActive
+        provenance: contract approvals.yaml GET /approval-matrices; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: primaryButton
         derived: true
         impliedBy: setApprovalMatrix
         label: Save approval matrix
         notes: The act the screen exists for.
+        operation: setApprovalMatrix
+        provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved
+          by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -97131,6 +97250,12 @@ screens:
     purpose: Reviewer assignment
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: The matrices, the one being changed among them
+    trigger: onLoad
+    provenance: design change approved by the lead ("Approve all 28 as recommended", 3 November 2026;
+      CHG-R14BO-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-639
@@ -97144,6 +97269,25 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
+  overlays:
+  - id: formSetApprovalMatrix
+    component: modal
+    trigger: Save approval matrix
+    body: '**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`,
+      `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ApprovalMatrix
+    confirm:
+      label: Save approval matrix
+      operation: setApprovalMatrix
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - scopeLevel
+      - rules
+      - isActive
+    provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the
+      lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-640
   name: Rejection & Resubmission Management
   module: Access & Venue
@@ -100114,7 +100258,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /access-venue/temporary-seasonal-accreditation-bo-669
-    component: src/routes/access-venue/TemporarySeasonalAccreditation.tsx
+    redirect: BO-666
     status: notStarted
   navigation:
     entryFrom:
@@ -100950,7 +101094,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /access-venue/communication-template-library-bo-677
-    component: src/routes/access-venue/CommunicationTemplateLibrary.tsx
+    redirect: BO-785
     status: notStarted
   navigation:
     entryFrom:
@@ -105271,6 +105415,9 @@ screens:
         impliedBy: createApprovalRequest
         label: Create approval request
         notes: The act the screen exists for.
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -105299,6 +105446,33 @@ screens:
     page 83. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Create approval request
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Create approval request
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-719
   name: Event Cancellation Workflow Configuration
   module: Sell
@@ -106300,7 +106474,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /operations/outlet-management-bo-728
-    component: src/routes/operations/OutletManagement.tsx
+    redirect: BO-044
     status: notStarted
   navigation:
     entryFrom:
@@ -106355,7 +106529,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /operations/create-edit-outlet-bo-729
-    component: src/routes/operations/CreateEditOutlet.tsx
+    redirect: BO-044
     status: notStarted
   navigation:
     entryFrom:
@@ -111471,6 +111645,9 @@ screens:
         impliedBy: createApprovalRequest
         label: Create approval request
         notes: The act the screen exists for.
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: detailPanel
         derived: true
         impliedBy: getCampaign
@@ -111513,6 +111690,33 @@ screens:
     params:
     - name: campaignId
       from: navigation
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Create approval request
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Create approval request
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-772
   name: A/B & AI Optimization
   module: Engagement & Support
@@ -119898,6 +120102,9 @@ screens:
         impliedBy: setSeoMetadata
         label: Save SEO metadata
         notes: The act the screen exists for.
+        operation: setSeoMetadata
+        provenance: contract marketing-crm.yaml PUT /seo-metadata; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -119930,6 +120137,36 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSetSeoMetadata
+    component: modal
+    trigger: Save SEO metadata
+    body: '**Collects what `setSeoMetadata` sends before it is called.** Required: `entityKind`, `entityId`.
+      Optional: `locale`, `title`, `metaDescription`, `keywords`, `canonicalUrl`, `slug`, `hreflang`,
+      `schemaOrgType`, `openGraph`, `isAutoGenerated`, `noIndex`. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    bindsTo: SeoMetadata
+    confirm:
+      label: Save SEO metadata
+      operation: setSeoMetadata
+    dismiss:
+      label: Cancel
+      discards:
+      - entityKind
+      - entityId
+      - locale
+      - title
+      - metaDescription
+      - keywords
+      - canonicalUrl
+      - slug
+      - hreflang
+      - schemaOrgType
+      - openGraph
+      - isAutoGenerated
+      - noIndex
+    provenance: contract marketing-crm.yaml PUT /seo-metadata; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-843
   name: Publishing, Analytics & Audit
   module: Engagement & Support
@@ -122485,12 +122722,21 @@ screens:
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require
       - kind: secondaryButton
         label: Manager approval
+        operation: setApprovalMatrix
+        notes: Routes resource changes to this approver group, as the VM close-out of 29 September mapped
+          it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require
       - kind: secondaryButton
         label: Finance approval
+        operation: setApprovalMatrix
+        notes: Routes resource changes to this approver group, as the VM close-out of 29 September mapped
+          it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require
       - kind: secondaryButton
         label: Operations approval
+        operation: setApprovalMatrix
+        notes: Routes resource changes to this approver group, as the VM close-out of 29 September mapped
+          it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 16 §Actions may require
       - kind: secondaryButton
         label: Create
@@ -130518,6 +130764,9 @@ screens:
         impliedBy: createApprovalRequest
         label: Create approval request
         notes: The act the screen exists for.
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -130555,6 +130804,33 @@ screens:
     params:
     - name: eventId
       from: navigation
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Create approval request
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Create approval request
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-923
   name: AI Resource Intelligence Command Center
   module: Rentals
@@ -134269,7 +134545,7 @@ screens:
   name: Venue Canvas
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
@@ -141056,6 +141332,9 @@ screens:
         impliedBy: createApprovalRequest
         label: Create approval request
         notes: The act the screen exists for.
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: dataTable
         derived: true
         impliedBy: listSeatHoldPools
@@ -141095,6 +141374,33 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Create approval request
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Create approval request
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-1011
   name: Priority & Conflict Resolution
   module: Access & Venue
@@ -141908,7 +142214,7 @@ screens:
   name: Accessible Seating Master
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   permission: CAPACITY_CONFIGURE
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
@@ -143431,6 +143737,9 @@ screens:
         impliedBy: createApprovalRequest
         label: Create approval request
         notes: The act the screen exists for.
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -143459,6 +143768,33 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Create approval request
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Create approval request
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-1032
   name: Group Reporting & Audit
   module: Access & Venue
@@ -143727,7 +144063,7 @@ screens:
   name: Best Seat Recommendations
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   permission: CAPACITY_CONFIGURE
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
@@ -145472,6 +145808,10 @@ screens:
         derived: true
         impliedBy: simulatePriceBreakdownCalculation
         notes: The act the screen exists for.
+        label: Run simulation
+        operation: simulatePriceBreakdownCalculation
+        provenance: contract catalogue.yaml PUT /price-breakdown-calculation; design change approved by
+          the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -145492,6 +145832,24 @@ screens:
     purpose: What-if on price
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listEvents
+    contract: catalogue
+    purpose: The events, to pick the simulated event in Run simulation
+    trigger: onLoad
+    provenance: design change approved by the lead ("Approve all 28 as recommended", 3 November 2026;
+      CHG-R14BO-004)
+  - operationId: listProducts
+    contract: catalogue
+    purpose: The products, to pick the simulated product in Run simulation
+    trigger: onLoad
+    provenance: design change approved by the lead ("Approve all 28 as recommended", 3 November 2026;
+      CHG-R14BO-004)
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: The picked product's variants, to pick the simulated variant in Run simulation
+    trigger: onAction
+    provenance: design change approved by the lead ("Approve all 28 as recommended", 3 November 2026;
+      CHG-R14BO-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1049
@@ -145500,6 +145858,48 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formSimulatePriceBreakdownCalculation
+    component: modal
+    reads:
+    - listEvents
+    - listProducts
+    - listProductVariants
+    trigger: Run simulation
+    body: '**Collects what `simulatePriceBreakdownCalculation` sends before it is called.** Required:
+      nothing. Optional: `customerId`, `productId`, `productVariantId`, `quantity`, `venueId`, `eventId`,
+      `channel`, `date`, `timeslotId`, `membershipId`, `promotionCode`, `paymentMethod`, `deliveryMethod`,
+      `currency`, `compareChannels`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: PriceBreakdownCalculationSimulationExplainabilityInput
+    confirm:
+      label: Run simulation
+      operation: simulatePriceBreakdownCalculation
+    dismiss:
+      label: Cancel
+      discards:
+      - customerId
+      - productId
+      - productVariantId
+      - quantity
+      - venueId
+      - eventId
+      - channel
+      - date
+      - timeslotId
+      - membershipId
+      - promotionCode
+      - paymentMethod
+      - deliveryMethod
+      - currency
+      - compareChannels
+    provenance: contract catalogue.yaml PUT /price-breakdown-calculation; design change approved by the
+      lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
+  entryState:
+    params:
+    - name: productId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listProducts`.'
 - id: BO-1050
   name: Revenue Analytics & Audit
   module: Access & Venue
@@ -149093,6 +149493,9 @@ screens:
         impliedBy: createApprovalRequest
         label: Create approval request
         notes: The act the screen exists for.
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -149121,6 +149524,33 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 32 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Create approval request
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Create approval request
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-1081
   name: Finance Dashboard
   module: Orders & Money
@@ -154805,15 +155235,31 @@ screens:
       components:
       - kind: primaryButton
         label: Post-spend review
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29
+          September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support
       - kind: secondaryButton
         label: Single approval
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29
+          September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support
       - kind: secondaryButton
         label: Multi-level approval
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29
+          September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support
       - kind: secondaryButton
         label: Exception approval
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Sets how the selected matrix approves corporate wallet spend, as the VM close-out of 29
+          September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 44 §Support
   states:
     loading: The corporate budget policy configuration as saved.
@@ -158967,6 +159413,10 @@ screens:
       components:
       - kind: primaryButton
         label: Multi-level approval
+        collectedBy: What requires approval here
+        operation: setApprovalMatrix
+        notes: Requires multi-level approval of balance adjustments on the selected matrix, as the VM
+          close-out of 29 September mapped it (`setApprovalMatrix`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 81 §Support
   states:
     loading: The administrative balance adjustment configuration as saved.
@@ -162535,6 +162985,9 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions
       - kind: secondaryButton
         label: Retry Failed Event
+        operation: replayEvents
+        notes: Re-delivers the selected subscription's failed events, as the VM close-out of 29 September
+          mapped it (`replayEvents`) (r14 gate, CHG-R14BO-003).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Quick Actions
       - kind: secondaryButton
         label: Open Error Log
@@ -163313,7 +163766,7 @@ screens:
   name: Integration Monitoring & Exception Workbench
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: WALLET_VIEW
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
@@ -163394,17 +163847,24 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Exception Categories”,
           “Workflow”.'
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display
+        operation: getWalletIntegrationMapping
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
         label: Retry
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions
+        provenance: contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design
+          change approved by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
+        operation: replayEvents
       - kind: secondaryButton
         label: Replay
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions
+        provenance: contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design
+          change approved by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
+        operation: replayEvents
       - kind: secondaryButton
         label: Correct mapping
+        reads:
+        - getWalletIntegrationMapping
         operation: setWalletIntegrationMapping
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions
       - kind: secondaryButton
@@ -163438,6 +163898,38 @@ screens:
     provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions
     confirm:
       operation: setApiClientStatus
+  - id: formReplayEvents
+    component: modal
+    trigger: Replay
+    body: '**Collects what `replayEvents` sends before it is called.** Required: `from`. Optional: `to`,
+      `eventTypes`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Replay
+      operation: replayEvents
+    dismiss:
+      label: Cancel
+      discards:
+      - from
+      - to
+      - eventTypes
+    provenance: contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design change
+      approved by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
+  - id: formRetryReplayEvents
+    component: modal
+    trigger: Retry
+    body: '**Collects what `replayEvents` sends before it is called.** Required: `from`. Optional: `to`,
+      `eventTypes`. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Retry
+      operation: replayEvents
+    dismiss:
+      label: Cancel
+      discards:
+      - from
+      - to
+      - eventTypes
+    provenance: contract public-api.yaml POST /webhook-subscriptions/{subscriptionId}/replay; design change
+      approved by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The integration monitoring exception list.
     error: Could not load. Names which read failed and leaves the integration monitoring exception untouched.
@@ -163448,6 +163940,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getWalletIntegrationMapping
+    contract: wallet
+    purpose: The mapping Correct mapping opens on
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: listWalletDisputes
     contract: wallet
     purpose: Integration exceptions
@@ -163698,6 +164195,14 @@ screens:
         label: Requests awaiting a decision, or already decided
         operation: listApprovalRequests
         provenance: contract approvals.yaml GET /approval-requests; wiring fix, 2 October 2026
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Send for approval
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The approval publication change configuration as saved.
     error: Could not load. Names which read failed and leaves the approval publication change untouched.
@@ -163740,6 +164245,33 @@ screens:
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
   entryState: {}
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Send for approval
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Send for approval
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: BO-1182
   name: Wallet Platform Health, Audit & Administration Center
   module: Orders & Money
@@ -164691,7 +165223,7 @@ screens:
   name: Transport Departure Board
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   permission: TRANSPORT_VIEW
   implementation:
     app: venue-management-web
@@ -169069,7 +169601,7 @@ screens:
   name: Fee & Surcharge Library
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
@@ -171611,7 +172143,7 @@ screens:
   name: Dynamic Pricing Strategy Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
@@ -173134,7 +173666,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /commercial/rule-priority-conflict-resolution-dynamic-pricing-test-c-adm-097
-    component: src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx
+    redirect: BO-441
     status: notStarted
   navigation:
     entryFrom:
@@ -174767,7 +175299,7 @@ screens:
   name: Revenue Optimization Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
@@ -191965,7 +192497,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /platform/approval-matrix-multi-level-approval-configuration-adm-242
-    component: src/routes/platform/ApprovalMatrixMultiLevelApprovalConfiguration.tsx
+    redirect: BO-086
     status: notStarted
   navigation:
     entryFrom:
@@ -192153,6 +192685,10 @@ screens:
           by
       - kind: selectField
         label: Role
+        operation: setApprovalMatrix
+        bindsTo: ApprovalMatrix.rules
+        notes: The approver role of the selected matrix's rule (`ApprovalRule.approverRoleIds`), saved
+          with `setApprovalMatrix` on the matrix picked in the table above (r14 gate, CHG-R14BO-003).
         provenance: pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Define
           by
       - kind: selectField
@@ -193017,7 +193553,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /platform/unified-approval-inbox-decision-workspace-adm-249
-    component: src/routes/platform/UnifiedApprovalInboxDecisionWorkspace.tsx
+    redirect: BO-084
     status: notStarted
   navigation:
     entryFrom:
@@ -193529,7 +194065,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /platform/sla-escalation-bottleneck-monitor-adm-252
-    component: src/routes/platform/SlaEscalationBottleneckMonitor.tsx
+    redirect: BO-391
     status: notStarted
   navigation:
     entryFrom:
@@ -194532,7 +195068,7 @@ screens:
   name: Channel Creation & Profile Configuration
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -194618,6 +195154,8 @@ screens:
       components:
       - kind: primaryButton
         label: Create
+        reads:
+        - getChannelProfile
         provenance: contract operation createChannelProfile
   states:
     loading: The channel creation profile configuration as saved.
@@ -194627,6 +195165,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getChannelProfile
+    contract: catalogue
+    purpose: The channel profile as saved, when the screen opens on a channel
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: createChannelProfile
     contract: catalogue
     purpose: Channel Creation & Profile Configuration
@@ -194640,16 +195183,12 @@ screens:
     bound to a contract property; 14 of 42 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of a channel profile (createChannelProfile
-      has no get or list).'
-    source: contracts/spine/catalogue.yaml#createChannelProfile | screens/P08-venue-back-office.yaml#ADM-259
+  gaps: []
 - id: ADM-260
   name: Product & Catalogue Assignment
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -194686,15 +195225,11 @@ screens:
   purpose: Control exactly which products are available through each sales channel.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Assign
-      Products, Remove Products, Disable, Copy Assignment, Import Assignment. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 2 operations** (setProductCatalogue
+      and its read getProductCatalogue). Unserved: Assign Products, Remove Products, Disable, Copy Assignment,
+      Import Assignment. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 7 §Support
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of product-to-channel catalogue
-      assignments.'
-    source: contracts/spine/catalogue.yaml#setProductCatalogue | screens/P08-venue-back-office.yaml#ADM-260
   layout:
     template: split
     regions:
@@ -194703,6 +195238,8 @@ screens:
       components:
       - kind: dataTable
         label: Every product catalogue
+        reads:
+        - getProductCatalogue
         columns:
         - ProductCatalogueAssignmentView.product
         - ProductCatalogueAssignmentView.productType
@@ -194738,6 +195275,7 @@ screens:
           “Global Channel Catalogue”, “Venue Catalogue”, “For example”, “Important Architecture”, “This
           screen only determines”.'
         provenance: pack Sales_Channel_Management_Reference.pdf, page 7 §Display
+        operation: getProductCatalogue
     - name: actionBar
       slot: rowActions
       components:
@@ -194784,6 +195322,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getProductCatalogue
+    contract: catalogue
+    purpose: The channel's product assignment as saved
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setProductCatalogue
     contract: catalogue
     purpose: Product & Catalogue Assignment
@@ -194809,7 +195352,7 @@ screens:
   name: Channel Pricing & Commercial Profile Assignment
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -194855,10 +195398,6 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Sales_Channel_Management_Reference.pdf, page 8
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel pricing and commercial
-      profile assignments.'
-    source: contracts/spine/catalogue.yaml#setChannelPricingCommercial | screens/P08-venue-back-office.yaml#ADM-261
   layout:
     template: split
     regions:
@@ -194867,6 +195406,8 @@ screens:
       components:
       - kind: primaryButton
         label: Save changes
+        reads:
+        - getChannelPricingCommercial
         provenance: contract operation setChannelPricingCommercial
     - name: contentBody
       components:
@@ -194885,6 +195426,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getChannelPricingCommercial
+    contract: catalogue
+    purpose: The channel's pricing and commercial profile as saved
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setChannelPricingCommercial
     contract: catalogue
     purpose: Channel Pricing & Commercial Profile Assignment
@@ -195007,7 +195553,7 @@ screens:
   name: Channel Sales Schedule & Availability Windows
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195510,7 +196056,7 @@ screens:
   name: Channel Fees, Payment & Fulfillment Configuration
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195600,6 +196146,8 @@ screens:
       components:
       - kind: primaryButton
         label: Save changes
+        reads:
+        - getChannelFeePayment
         provenance: contract operation setChannelFeePayment
   states:
     loading: The channel fees payment configuration as saved.
@@ -195609,6 +196157,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getChannelFeePayment
+    contract: catalogue
+    purpose: The channel's fees, payment and fulfilment as saved
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setChannelFeePayment
     contract: catalogue
     purpose: Channel Fees, Payment & Fulfillment Configuration
@@ -195622,16 +196175,12 @@ screens:
     bound to a contract property; 11 of 42 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel fee, payment and fulfilment
-      configuration.'
-    source: contracts/spine/catalogue.yaml#setChannelFeePayment | screens/P08-venue-back-office.yaml#ADM-266
+  gaps: []
 - id: ADM-267
   name: Channel Publication, Readiness & AI Validation
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_CONFIGURE
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195688,6 +196237,8 @@ screens:
         provenance: pack Sales_Channel_Management_Reference.pdf, page 16 §Authorized users can
       - kind: publishGate
         label: What publishing changes
+        reads:
+        - getChannelReadinessValidation
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
           one somebody presses meaning to save.'
         provenance: authored — required by check-screens for publishChannelReadinessValidation
@@ -195700,6 +196251,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getChannelReadinessValidation
+    contract: catalogue
+    purpose: The channel's readiness checklist and status
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: publishChannelReadinessValidation
     contract: catalogue
     purpose: Channel Publication, Readiness & AI Validation
@@ -195713,16 +196269,12 @@ screens:
     bound to a contract property; 8 of 88 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of channel readiness and validation
-      results.'
-    source: contracts/spine/catalogue.yaml#publishChannelReadinessValidation | screens/P08-venue-back-office.yaml#ADM-267
+  gaps: []
 - id: ADM-268
   name: Channel Operations Command Center
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -195938,7 +196490,7 @@ screens:
   name: Channel Connection & Integration Manager
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   permission: PRODUCT_VIEW
   source:
     pack: Sales_Channel_Management_Reference.pdf
@@ -203680,6 +204232,11 @@ screens:
       - kind: secondaryButton
         label: Scheduled expiry
         provenance: pack Payment_Payment_Orchestration.pdf, page 13 §Support
+      - kind: secondaryButton
+        label: Send for approval
+        operation: createApprovalRequest
+        provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The payment policy governance configuration as saved.
     error: Could not load. Names which read failed and leaves the payment policy governance untouched.
@@ -203716,6 +204273,33 @@ screens:
     bound to a contract property; 9 of 29 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  overlays:
+  - id: formCreateApprovalRequest
+    component: modal
+    trigger: Send for approval
+    body: '**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`,
+      `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`,
+      `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: CreateApprovalRequest
+    confirm:
+      label: Send for approval
+      operation: createApprovalRequest
+    dismiss:
+      label: Cancel
+      discards:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      - amount
+      - attributes
+      - justification
+      - isDraft
+    provenance: contract approvals.yaml POST /approval-requests; design change approved by the lead ("Approve
+      all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: ADM-568
   name: Payment Configuration Simulator & Validation Center
   module: Commercial
@@ -205361,6 +205945,11 @@ screens:
       - kind: secondaryButton
         label: Connection profile
         provenance: pack Payment_Payment_Orchestration.pdf, page 50 §Support
+      - kind: secondaryButton
+        label: Activate terminal
+        operation: enrolDevice
+        provenance: contract tenancy.yaml POST /devices/{deviceId}/enrolment; design change approved by
+          the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The terminal provisioning device configuration as saved.
     error: Could not load. Names which read failed and leaves the terminal provisioning device untouched.
@@ -205395,6 +205984,26 @@ screens:
     params:
     - name: deviceId
       from: session
+  overlays:
+  - id: formEnrolDevice
+    component: modal
+    trigger: Activate terminal
+    body: '**Collects what `enrolDevice` sends before it is called.** Required: `state`. Optional: `configurationProfileId`,
+      `reason`, `enrolmentCode`, `testResult`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: DeviceEnrolment
+    confirm:
+      label: Activate terminal
+      operation: enrolDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - state
+      - configurationProfileId
+      - reason
+      - enrolmentCode
+      - testResult
+    provenance: contract tenancy.yaml POST /devices/{deviceId}/enrolment; design change approved by the
+      lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: ADM-582
   name: POS, Kiosk & Terminal Assignment Manager
   module: Commercial
@@ -207183,6 +207792,11 @@ screens:
           Check Status, Cancel Session, Regenerate Link, View Provider Events, View Decision Trace. Each
           needs attaching to the control it gates, or the screen needs the control.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 75 §Depending on permissions
+      - kind: primaryButton
+        label: Check status
+        operation: inquirePaymentStatus
+        provenance: contract orders.yaml POST /payments/{paymentId}/inquiry; design change approved by
+          the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The digital payment session list.
     error: Could not load. Names which read failed and leaves the digital payment session untouched.
@@ -207426,6 +208040,14 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Exception Types”, “Timed
           Out”, “Depending on condition”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 78 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Check status
+        operation: inquirePaymentStatus
+        provenance: contract orders.yaml POST /payments/{paymentId}/inquiry; design change approved by
+          the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The digital payment exception list.
     error: Could not load. Names which read failed and leaves the digital payment exception untouched.
@@ -208476,7 +209098,7 @@ screens:
   name: Partial Payment, Failure & Recovery Manager
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: PAYMENT_CONFIGURE
   source:
     pack: Payment_Payment_Orchestration.pdf
@@ -208536,6 +209158,12 @@ screens:
           “Partial Payment States”, “Timeout”, “Partially Paid”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card
         operation: getDunningPolicy
+      - kind: detailPanel
+        label: Which tenders may be combined, and in what order
+        bindsTo: MixedTenderRules
+        operation: getMixedTenderRules
+        provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules
+          on ADM-606)'
   states:
     loading: The partial payment failure list.
     error: Could not load. Names which read failed and leaves the partial payment failure untouched.
@@ -208546,6 +209174,12 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getMixedTenderRules
+    contract: payments
+    purpose: The tender rules this screen edits, as saved
+    trigger: onLoad
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules
+      on ADM-606)'
   - operationId: setMixedTenderRules
     contract: payments
     purpose: Partial payment and recovery
@@ -209138,7 +209772,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /commercial/refund-policy-rule-configuration-t118-adm-611
-    component: src/routes/commercial/RefundPolicyRuleConfigurationT118.tsx
+    redirect: BO-1146
     status: notStarted
   navigation:
     entryFrom:
@@ -209664,6 +210298,14 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Refund Processing States”,
           “Verify Provider Status”, “Recovery Actions”.'
         provenance: pack Payment_Payment_Orchestration.pdf, page 121 §Show
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Check status
+        operation: inquirePaymentStatus
+        provenance: contract orders.yaml POST /payments/{paymentId}/inquiry; design change approved by
+          the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
   states:
     loading: The refund processing provider list.
     error: Could not load. Names which read failed and leaves the refund processing provider untouched.
@@ -221690,9 +222332,15 @@ screens:
       components:
       - kind: metricTile
         label: Active Approval Matrices
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix.isActive
+        notes: The matrices in force (`isActive`), counted from `listApprovalMatrices` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards
       - kind: metricTile
         label: Approval Rules
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix.rules
+        notes: The rules across the matrices listed, counted from `listApprovalMatrices` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards
       - kind: metricTile
         label: Tenants Covered
@@ -221788,6 +222436,9 @@ screens:
       components:
       - kind: selectField
         label: Role
+        operation: setApprovalMatrix
+        bindsTo: ApprovalMatrix.rules
+        notes: The rule's `approverRoleIds`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
       - kind: selectField
         label: User
@@ -221806,12 +222457,18 @@ screens:
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
       - kind: selectField
         label: Transaction value
+        operation: setApprovalMatrix
+        bindsTo: ApprovalMatrix.rules
+        notes: The rule's `minAmount` and `maxAmount`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
       - kind: selectField
         label: Percentage
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
       - kind: selectField
         label: Risk level
+        operation: setApprovalMatrix
+        bindsTo: ApprovalMatrix.rules
+        notes: The rule's `riskScoreAbove`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).
         provenance: pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions
   states:
     loading: The approval authority configuration as saved.
@@ -221880,6 +222537,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Configure approval routing based on the client's organizational hierarchy.
+  division: 'Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-333, ADM-334, ADM-335, BO-086,
+    BO-639; this screen is Organizational Hierarchy Routing (pack Approval_Workflows_and_Governance_Reference.pdf,
+    board 3.3, page 23): configure approval routing based on the client''s organizational hierarchy.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -221896,11 +222556,24 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: dataTable
+        label: Approval matrices, the one being changed among them
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix
+        columns:
+        - ApprovalMatrix.kind
+        - ApprovalMatrix.scopeLevel
+        - ApprovalMatrix.isActive
+        provenance: contract approvals.yaml GET /approval-matrices; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: primaryButton
         derived: true
         impliedBy: setApprovalMatrix
         label: Save approval matrix
         notes: The act the screen exists for.
+        operation: setApprovalMatrix
+        provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved
+          by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -221922,6 +222595,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id039
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: The matrices, the one being changed among them
+    trigger: onLoad
+    provenance: design change approved by the lead ("Approve all 28 as recommended", 3 November 2026;
+      CHG-R14BO-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-331
@@ -221936,6 +222615,25 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
+  overlays:
+  - id: formSetApprovalMatrix
+    component: modal
+    trigger: Save approval matrix
+    body: '**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`,
+      `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ApprovalMatrix
+    confirm:
+      label: Save approval matrix
+      operation: setApprovalMatrix
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - scopeLevel
+      - rules
+      - isActive
+    provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the
+      lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: ADM-332
   name: Department-Based Approval Matrix
   module: Platform
@@ -222060,6 +222758,10 @@ screens:
     rather than passed off as a decision'
   purpose: Allow approval policies to differ between TICVAI clients and between venues belonging to the
     same client.
+  division: 'Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-334, ADM-335, BO-086,
+    BO-639; this screen is Venue & Tenant Approval Matrix (pack Approval_Workflows_and_Governance_Reference.pdf,
+    board 3.5, page 24): allow approval policies to differ between TICVAI clients and between venues belonging
+    to the same client.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -222076,11 +222778,24 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: dataTable
+        label: Approval matrices, the one being changed among them
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix
+        columns:
+        - ApprovalMatrix.kind
+        - ApprovalMatrix.scopeLevel
+        - ApprovalMatrix.isActive
+        provenance: contract approvals.yaml GET /approval-matrices; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: primaryButton
         derived: true
         impliedBy: setApprovalMatrix
         label: Save approval matrix
         notes: The act the screen exists for.
+        operation: setApprovalMatrix
+        provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved
+          by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -222102,6 +222817,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id039
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: The matrices, the one being changed among them
+    trigger: onLoad
+    provenance: design change approved by the lead ("Approve all 28 as recommended", 3 November 2026;
+      CHG-R14BO-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-333
@@ -222116,6 +222837,25 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
+  overlays:
+  - id: formSetApprovalMatrix
+    component: modal
+    trigger: Save approval matrix
+    body: '**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`,
+      `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ApprovalMatrix
+    confirm:
+      label: Save approval matrix
+      operation: setApprovalMatrix
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - scopeLevel
+      - rules
+      - isActive
+    provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the
+      lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: ADM-334
   name: Value & Threshold Routing
   module: Platform
@@ -222155,6 +222895,10 @@ screens:
     rather than passed off as a decision'
   purpose: Configure approval authority according to transaction value or percentage thresholds. Example
     — Refund
+  division: 'Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-333, ADM-335, BO-086,
+    BO-639; this screen is Value & Threshold Routing (pack Approval_Workflows_and_Governance_Reference.pdf,
+    board 3.6, page 25): configure approval authority according to transaction value or percentage thresholds.
+    Example — Refund.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -222171,11 +222915,24 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: dataTable
+        label: Approval matrices, the one being changed among them
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix
+        columns:
+        - ApprovalMatrix.kind
+        - ApprovalMatrix.scopeLevel
+        - ApprovalMatrix.isActive
+        provenance: contract approvals.yaml GET /approval-matrices; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: primaryButton
         derived: true
         impliedBy: setApprovalMatrix
         label: Save approval matrix
         notes: The act the screen exists for.
+        operation: setApprovalMatrix
+        provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved
+          by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -222197,6 +222954,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id039
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: The matrices, the one being changed among them
+    trigger: onLoad
+    provenance: design change approved by the lead ("Approve all 28 as recommended", 3 November 2026;
+      CHG-R14BO-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-334
@@ -222211,6 +222974,25 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
+  overlays:
+  - id: formSetApprovalMatrix
+    component: modal
+    trigger: Save approval matrix
+    body: '**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`,
+      `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ApprovalMatrix
+    confirm:
+      label: Save approval matrix
+      operation: setApprovalMatrix
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - scopeLevel
+      - rules
+      - isActive
+    provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the
+      lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: ADM-335
   name: Risk-Based & Conditional Routing
   module: Platform
@@ -222249,6 +223031,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Dynamically modify approval routing based on the risk or context of the request.
+  division: 'Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-333, ADM-334, BO-086,
+    BO-639; this screen is Risk-Based & Conditional Routing (pack Approval_Workflows_and_Governance_Reference.pdf,
+    board 3.7, page 26): dynamically modify approval routing based on the risk or context of the request.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -222265,11 +223050,24 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: dataTable
+        label: Approval matrices, the one being changed among them
+        operation: listApprovalMatrices
+        bindsTo: ApprovalMatrix
+        columns:
+        - ApprovalMatrix.kind
+        - ApprovalMatrix.scopeLevel
+        - ApprovalMatrix.isActive
+        provenance: contract approvals.yaml GET /approval-matrices; design change approved by the lead
+          ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: primaryButton
         derived: true
         impliedBy: setApprovalMatrix
         label: Save approval matrix
         notes: The act the screen exists for.
+        operation: setApprovalMatrix
+        provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved
+          by the lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -222291,6 +223089,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id039
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: The matrices, the one being changed among them
+    trigger: onLoad
+    provenance: design change approved by the lead ("Approve all 28 as recommended", 3 November 2026;
+      CHG-R14BO-004)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-335
@@ -222305,6 +223109,25 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
+  overlays:
+  - id: formSetApprovalMatrix
+    component: modal
+    trigger: Save approval matrix
+    body: '**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`,
+      `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ApprovalMatrix
+    confirm:
+      label: Save approval matrix
+      operation: setApprovalMatrix
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - scopeLevel
+      - rules
+      - isActive
+    provenance: contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the
+      lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
 - id: ADM-336
   name: Approver Group & Decision Policy
   module: Platform
@@ -222975,7 +223798,13 @@ screens:
 
 
     **Stale gaps removed 4 October 2026: the content is defined and getPasswordPolicy is bound, so setPasswordPolicy
-    saves what was read. The step-up table is bound to StepUpPolicy** (CHG-FXS-005)'
+    saves what was read. The step-up table is bound to StepUpPolicy** (CHG-FXS-005)
+
+
+    **listMfaMethods is not read here** (r14 gate, CHG-R14BO-003): it answers only the signed-in caller''s
+    own enrolled methods (x-ticvai-self-scoped: principal), so it could not say which methods approvers
+    hold, and no element showed it. Each person''s methods are on their own security screen (ADM-699,
+    EMP-042).'
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -223107,11 +223936,6 @@ screens:
       drop (decided 28 September, audit R135); and the tenant's PIN settings, chosen from drop-downs (`pinLength`,
       `pinReusePrevention`, `pinLockoutAfterAttempts`; CHG-CRD-002)
     trigger: onAction
-  - operationId: listMfaMethods
-    contract: identity
-    purpose: Which methods approvers have enrolled, because a policy demanding a factor nobody holds locks
-      the action
-    trigger: onLoad
   - operationId: getGuestVerificationPolicy
     contract: identity
     purpose: The tenant's guest identity-verification workflow
@@ -224214,7 +225038,7 @@ screens:
   implementation:
     app: venue-management-web
     route: /platform/webhook-configuration-subscription-manager-adm-353
-    component: src/routes/platform/WebhookConfigurationSubscriptionManager.tsx
+    redirect: BO-1074
     status: notStarted
   navigation:
     entryFrom:

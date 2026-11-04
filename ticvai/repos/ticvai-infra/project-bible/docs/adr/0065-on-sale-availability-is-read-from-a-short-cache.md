@@ -14,7 +14,7 @@
 cached"* (`flows/F01-guest-online-purchase.yaml:56`, `F07-guest-buys-at-a-kiosk.yaml:52`) for the
 browse read, keeping the hold as the only correctness check? It is not a client question. Everything
 else below is consistent with what is decided; this ADR is Proposed only because it overturns a rule
-the package states.
+the package states. **Answered 1 October 2026: yes** (Chinmay; the Status line), and F01 and F07 say so.
 
 ---
 
@@ -37,7 +37,7 @@ wrong hold costs an oversell.
 
 ## Decision
 
-**Proposed: browse availability comes from a shared cache that is at most about one second old. The
+**Accepted 1 October 2026 (the Status line; it was written as the proposal): browse availability comes from a shared cache that is at most about one second old. The
 hold stays the only correctness check.**
 
 - **Key:** tenant, performance, channel (and section, for seat maps). **Value:** capacity minus sold minus active holds, computed from the primary.

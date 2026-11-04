@@ -4809,6 +4809,7 @@ screens:
       trigger: Packages & Bundles
       provenance: flow F77 step 1→2
       carries:
+      - bundleId
       - productId
       - version
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -7343,9 +7344,10 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-022
-        holds variantId, so an edge into it carries them
+        holds productId, variantId, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -7906,9 +7908,10 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-023
-        holds variantId, so an edge into it carries them
+        holds productId, variantId, so an edge into it carries them
     entryFrom:
     - BO-015
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -8872,10 +8875,11 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       - version
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-026
-        holds variantId, version, so an edge into it carries them
+        holds productId, variantId, version, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 31 August**
@@ -9471,9 +9475,10 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-027
-        holds variantId, so an edge into it carries them
+        holds productId, variantId, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **8 assets operations
@@ -14480,9 +14485,10 @@ screens:
     - to: BO-008
       trigger: Product Detail & Variants
       carries:
+      - productId
       - variantId
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-047
-        holds variantId, so an edge into it carries them
+        holds productId, variantId, so an edge into it carries them
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -57114,10 +57120,10 @@ screens:
     loading: The version's checks and impact load first.
     error: Could not load. Names the read that failed; no action is offered until it loads.
     emptyFirstRun: 'Not used: the screen opens on one product version.'
-    emptyNoAccess: Shown when the caller lacks `MEMBERSHIP_VIEW`, which `getMembershipProductValidation` requires
-      to show this screen, or `MEMBERSHIP_MANAGE`, which `approveMembershipProductValidation` requires to approve
-      it, and names that permission. **Never an empty table** — that reads as
-      *there is no data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Shown when the caller lacks `MEMBERSHIP_VIEW`, which `getMembershipProductValidation`
+      requires to show this screen, or `MEMBERSHIP_MANAGE`, which `approveMembershipProductValidation`
+      requires to approve it, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: approveMembershipProductValidation
     contract: subscription
@@ -145888,6 +145894,12 @@ screens:
       - compareChannels
     provenance: contract catalogue.yaml PUT /price-breakdown-calculation; design change approved by the
       lead ("Approve all 28 as recommended", 3 November 2026; CHG-R14BO-004)
+  entryState:
+    params:
+    - name: productId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listProducts`.'
 - id: BO-1050
   name: Revenue Analytics & Audit
   module: Access & Venue
@@ -163835,6 +163847,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Exception Categories”,
           “Workflow”.'
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Display
+        operation: getWalletIntegrationMapping
     - name: actionBar
       slot: rowActions
       components:
@@ -195212,10 +195225,10 @@ screens:
   purpose: Control exactly which products are available through each sales channel.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 2 operations** (setProductCatalogue and its read getProductCatalogue). Unserved: Assign
-      Products, Remove Products, Disable, Copy Assignment, Import Assignment. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 6 actions on this screen and the screen declares 2 operations** (setProductCatalogue
+      and its read getProductCatalogue). Unserved: Assign Products, Remove Products, Disable, Copy Assignment,
+      Import Assignment. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Sales_Channel_Management_Reference.pdf, page 7 §Support
   layout:
     template: split
@@ -195262,6 +195275,7 @@ screens:
           “Global Channel Catalogue”, “Venue Catalogue”, “For example”, “Important Architecture”, “This
           screen only determines”.'
         provenance: pack Sales_Channel_Management_Reference.pdf, page 7 §Display
+        operation: getProductCatalogue
     - name: actionBar
       slot: rowActions
       components:
@@ -195310,7 +195324,7 @@ screens:
   apis:
   - operationId: getProductCatalogue
     contract: catalogue
-    purpose: 'The channel''s product assignment as saved'
+    purpose: The channel's product assignment as saved
     trigger: onLoad
     provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setProductCatalogue
@@ -195414,7 +195428,7 @@ screens:
   apis:
   - operationId: getChannelPricingCommercial
     contract: catalogue
-    purpose: 'The channel''s pricing and commercial profile as saved'
+    purpose: The channel's pricing and commercial profile as saved
     trigger: onLoad
     provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setChannelPricingCommercial
@@ -196145,7 +196159,7 @@ screens:
   apis:
   - operationId: getChannelFeePayment
     contract: catalogue
-    purpose: 'The channel''s fees, payment and fulfilment as saved'
+    purpose: The channel's fees, payment and fulfilment as saved
     trigger: onLoad
     provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: setChannelFeePayment
@@ -196239,7 +196253,7 @@ screens:
   apis:
   - operationId: getChannelReadinessValidation
     contract: catalogue
-    purpose: 'The channel''s readiness checklist and status'
+    purpose: The channel's readiness checklist and status
     trigger: onLoad
     provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: Add the six reads)'
   - operationId: publishChannelReadinessValidation
@@ -209148,7 +209162,8 @@ screens:
         label: Which tenders may be combined, and in what order
         bindsTo: MixedTenderRules
         operation: getMixedTenderRules
-        provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules on ADM-606)'
+        provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules
+          on ADM-606)'
   states:
     loading: The partial payment failure list.
     error: Could not load. Names which read failed and leaves the partial payment failure untouched.
@@ -209163,7 +209178,8 @@ screens:
     contract: payments
     purpose: The tender rules this screen edits, as saved
     trigger: onLoad
-    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules on ADM-606)'
+    provenance: 'r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules
+      on ADM-606)'
   - operationId: setMixedTenderRules
     contract: payments
     purpose: Partial payment and recovery

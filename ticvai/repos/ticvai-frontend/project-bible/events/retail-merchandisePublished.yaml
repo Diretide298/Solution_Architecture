@@ -6,7 +6,11 @@ version: 1
 publisher: retail
 description: Merchandise is on sale.
 aggregate: merchandise
-emittedWhen: Merchandise published or withdrawn
+emittedWhen: Merchandise published or withdrawn - createMerchandise (a new item on sale) or updateMerchandise
+  (its description changes, or isActive turns it on or off; false is the withdrawal)
+emittedBy:
+- retail.createMerchandise
+- retail.updateMerchandise
 payload:
 - field: merchandiseId
   type: uuid

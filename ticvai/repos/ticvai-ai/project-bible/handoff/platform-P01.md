@@ -77,7 +77,7 @@
 | `WEB-009` | Wishlist | Booking & Selection | 1 | 3 | yes |
 | `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 14 | yes |
 | `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 7 | yes |
-| `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 6 | yes |
+| `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 8 | yes |
 | `WEB-013` | Booking Confirmation | Cart & Checkout | 1 | 5 | yes |
 | `WEB-014` | Pay for a Booking | Cart & Checkout | 1 | 2 | yes |
 | `WEB-015` | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 | yes |
@@ -95,7 +95,7 @@
 | `WEB-027` | Newsletter Subscription | Engagement & Support | 1 | 5 | yes |
 | `WEB-028` | Contact & Venue Information | Engagement & Support | 1 | 1 | yes |
 | `WEB-029` | Error / Sold Out / Maintenance | System States | 1 | 2 | yes |
-| `WEB-030` | Ticket Transfer | Ticketing | 1 | 4 | yes |
+| `WEB-030` | Ticket Transfer | Ticketing | 1 | 5 | yes |
 | `WEB-031` | My Reservations | Ticketing | 1 | 11 | yes |
 | `WEB-032` | Offers & Promotions | Promotions | 1 | 2 | yes |
 | `WEB-033` | Shop | Retail | 1 | 5 | yes |

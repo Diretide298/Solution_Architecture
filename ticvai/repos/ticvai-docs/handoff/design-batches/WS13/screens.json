@@ -300,7 +300,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/my-approval-inbox-bo-365",
-   "component": "src/routes/venue-operations/MyApprovalInbox.tsx",
+   "redirect": "BO-084",
    "status": "notStarted"
   },
   "navigation": {

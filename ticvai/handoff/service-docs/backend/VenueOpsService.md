@@ -13,7 +13,7 @@
 
 ## Why this is a service
 
-**Six small domains, 102 operations, one team.** Queue, maintenance, bookable resources, venue mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys none of them should not be running six idle services.
+**Eight small domains, one team.** Queue, maintenance, bookable resources, venue mapping, media assets and arcade, joined by rental (venue floor operations — check-out, condition, return — beside resources, maintenance and games; the working assumption derive-lineage records in NEW_CONTRACT_SERVICE) and transport (below). None is large enough to deploy alone, all are venue-scoped, none is on the critical sale path, and **each is licensed as an optional module** — a venue that buys none of them should not be running eight idle services.
 
 ## Depends on
 
@@ -1873,7 +1873,7 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 | Config scope | tenant |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `maintenance.inspection_template`, `maintenance.inspection_template_item` |
-| Writes | `cache:idempotency`, `maintenance.inspection_template`, `maintenance.inspection_template_item` |
+| Writes | `cache:idempotency`, `maintenance.inspection_template`, `maintenance.inspection_template_item`, `platform.outbox` |
 | Called by | BO-911 |
 
 **Parameters**
@@ -3025,6 +3025,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Extended |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Already expired or converted, or the extension limit is reached. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -3712,6 +3713,8 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 A stock photograph licensed for one season and still on a website two years later is a legal problem. Expired assets in active use sort first.
 **"In use" means referenced by live content** (decided 28 September, audit R106 (10)): an asset counts as in use only while a published page, block, menu or other content that is live references it. A reference from a draft, an archived item or a collection does not count, so an expired asset only a draft uses sorts with the unused ones.
 
+**The readings, with their edges** (ADAM CR-573, Chinmay, 3 November 2026: the readings as built stand; CHG-CR573-001). **Which assets:** an asset is listed when its rights have a `validTo` and either the licence has ended (`validTo` earlier than today) or it ends within the window (`validTo` from today up to and including today plus `withinDays`). Today is the current date in UTC. A licence is valid through its `validTo` day, so an asset whose `validTo` is today is expiring, not expired. An asset with no rights or no `validTo` is never listed. Expired assets are listed however long ago they expired. Every status is listed (processing, ready, quarantined, failed, archived), as `searchMedia` returns every status. **`withinDays`:** a whole number, 0 or more, default 60, no upper bound; 0 lists the expired assets and those ending today. A negative or non-whole value is refused with the service's usual `400` for a bad query parameter. A value whose end date would pass the last date the calendar can hold lists every dated asset instead of failing. **Fields:** `isExpired` is true exactly when `validTo` is earlier than today in UTC, worked out from `validTo` on every read (not taken from a stored flag), so it always agrees with the date shown. `daysRemaining` is `validTo` minus today in whole days (0 on the last day) and is left out for an expired asset. `liveUsageCount` is the number of `assets.media_usage` rows for the asset with `is_live` true, always sent, 0 when there are none; `isInUse` is `liveUsageCount` above zero. References from drafts, archived items and collections do not count. `thumbnailUrl` and `licensor` are null when the asset has none. **Order, total:** expired and in use; expired and not in use; expiring and in use; expiring and not in use. Within each group, `validTo` earliest first, then `assetId`. **The answer is a plain array with no paging:** every matching asset in this order, never a first 50. **Dependency:** nothing writes `assets.media_usage` yet, so until something does every asset reads as not in use (`liveUsageCount` 0, `isInUse` false) and the list falls to expired, then expiring. That is correct behaviour, not a defect. The Media Library, DAM Governance & Rights Command Center, Rights Expiry, Renewal & Usage Impact and Governance Risk screens show these fields unchanged.
+
 |  |  |
 |---|---|
 | Permission | `ASSET_LIBRARY_VIEW` |
@@ -3729,12 +3732,13 @@ A stock photograph licensed for one season and still on a website two years late
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| withinDays | query |  | integer |  |
+| withinDays | query |  | integer | Days ahead from today (UTC), a whole number, 0 or more, no upper bound; 0 lists the expired assets and those ending today. |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | BadRequest | Validation failed |
 | 200 |  | Expiring assets |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 

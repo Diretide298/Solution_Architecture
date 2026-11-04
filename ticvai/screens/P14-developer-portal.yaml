@@ -202,10 +202,10 @@ screens:
       called `createRefund`.
 
       '
-    emptyNoAccess: '**There is no permission to name — `listApiVersions` and `listApiScopes` are open to
-      anyone.** No access here means the portal itself could not be reached (a gateway refusal or an unknown
-      tenant), and the screen says so. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.'
+    emptyNoAccess: '**There is no permission to name — `listApiVersions` and `listApiScopes` are open
+      to anyone.** No access here means the portal itself could not be reached (a gateway refusal or an
+      unknown tenant), and the screen says so. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question.'
   apis:
   - operationId: listApiVersions
     contract: public-api

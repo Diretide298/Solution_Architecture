@@ -45,9 +45,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 77
 - service: MarketingService
-  operationCalls: 62
+  operationCalls: 64
 - service: CatalogueService
-  operationCalls: 59
+  operationCalls: 60
 - service: VenueOpsService
   operationCalls: 55
 - service: IdentityService
@@ -340,6 +340,7 @@ screens:
   - checkBookingEligibility
   - getAvailability
   - getCart
+  - getProductEligibilityRule
   - getPublishedBookingFlow
   - joinWaitlist
   - leaveWaitlist
@@ -381,11 +382,13 @@ screens:
   operations:
   - addCartLine
   - createCart
+  - getCart
   - getPublishedBookingFlow
   - getPublishedGuidedChoice
   - listProductCategories
   - listProductVariants
   - listProducts
+  - recordConsentAnswers
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -423,6 +426,7 @@ screens:
   - inquirePaymentStatus
   - listPublishedPolicies
   - payByLink
+  - recordConsentAnswers
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1402,7 +1406,6 @@ screens:
   operations:
   - abandonCart
   - applyCartPromoCode
-  - checkoutCart
   - claimCart
   - createCart
   - extendCart

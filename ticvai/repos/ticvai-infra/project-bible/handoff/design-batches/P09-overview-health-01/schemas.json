@@ -457,7 +457,8 @@
   ]
  },
  "CellHealth": {
-  "x-ticvai-persistence": "none — polled, not stored",
+  "x-ticvai-persistence": "none — a value stored whole in control.cell.health (jsonb), not a table of its own",
+  "description": "**A cell's last health reading, as stored** (ADAM CR-562, Chinmay, 3 November 2026; CHG-CR562-001). The reading is kept in `control.cell.health`; `getCell` returns it as `CellDetail.health` (left out while the column is null) and `getCellHealth` answers it, with `cellId` the cell row's `id`. A stored value missing `isHealthy`, `schemaVersion` or `checkedAt` is no reading. The writer of `control.cell.health` (`cellHealthWriter`) is separate work on its own task.",
   "type": "object",
   "required": [
    "cellId",
@@ -1088,10 +1089,12 @@
     "type": "integer"
    },
    "startedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid"
    },
    "approvedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1389,6 +1392,7 @@
     "nullable": true
    },
    "terminationRequestedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1473,6 +1477,7 @@
     "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
    },
    "accountManagerPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true

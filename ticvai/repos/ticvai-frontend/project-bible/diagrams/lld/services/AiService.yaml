@@ -262,7 +262,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 1
-    writes: 3
+    writes: 10
   - operation: evaluateAiGovernance
     verb: POST
     path: /governance/evaluate
@@ -1894,9 +1894,9 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.message
-  columns: 15
+  columns: 16
   store: postgres-analytical
-  parent: null
+  parent: pii.subject
   writtenBy:
   - ai
   foreignWriters: null

@@ -658,7 +658,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/webhook-configuration-subscription-manager-adm-353",
-   "component": "src/routes/platform/WebhookConfigurationSubscriptionManager.tsx",
+   "redirect": "BO-1074",
    "status": "notStarted"
   },
   "navigation": {

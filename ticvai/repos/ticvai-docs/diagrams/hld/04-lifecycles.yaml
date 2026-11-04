@@ -7,7 +7,7 @@ sourceFiles:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 210 state models and 113 events
+title: 210 state models and 114 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -1577,7 +1577,7 @@ stateModels:
   owner: public-api
   service: PlatformService
   states: null
-  transitions: 8
+  transitions: 10
   initial:
   - draft
   terminal:
@@ -1585,7 +1585,7 @@ stateModels:
   operations:
   - certifyIntegration
   - submitIntegrationListing
-  guarded: 8
+  guarded: 10
   ref: diagrams/lld/lifecycles/integration-listing.yaml
 - entity: Inter-entity obligation
   contract: finance
@@ -3564,6 +3564,10 @@ events:
 - event: identity-mfaCodeIssued
   description: An emailOtp code was issued for a sign-in, step-up or enrolment challenge, for Marketing
     to send to the person by email (ADAM CR-522, Chinmay, 3 November 2026).
+- event: identity-offlineStepUpRefused
+  description: A supervisor or witness step-up a till checked offline against its offline verifier was
+    not confirmed when the server re-checked it at sync. The act it signed is recorded all the same,
+    because it happened at the till.
 - event: identity-privacyRequestRaised
   description: A guest's privacy request (a data export or an erasure) was raised, as an Approvals request.
 - event: inventory-purchaseOrderReceived

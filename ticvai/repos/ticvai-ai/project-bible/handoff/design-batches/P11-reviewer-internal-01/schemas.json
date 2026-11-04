@@ -12,6 +12,7 @@
     "format": "uuid"
    },
    "holderName": {
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "zoneId": {
@@ -276,6 +277,7 @@
     "type": "string"
    },
    "holderName": {
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "readOnly": true,
     "x-ticvai-persisted": false,

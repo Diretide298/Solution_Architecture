@@ -123,7 +123,7 @@
   "states": {
    "loading": "Checking the credential. The form stays visible and disabled.",
    "emptyFirstRun": "**Nobody signed in** - the normal state of a door. A scanner between shifts shows the keypad and a badge prompt.",
-   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed.",
+   "error": "Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps what was typed. **On `401 device-unauthenticated` or `403 workstation-mismatch` it says \"This device is not registered\"** rather than that the password is wrong: the device's own credential was refused before any password was checked, so no attempt is spent (ADR-0071 amendment of 3 November 2026, CHG-R14H-001; CHG-R14INT-002).",
    "denied": "The credential does not match, or the account is locked. One message for both, with the attempts left before the lock; a locked account says when to try again.",
    "emptyNoAccess": "Signed in, and the person holds no role in this app. Says who at the tenant grants access; distinct from a wrong password. A door has no permission of its own to name, because the person is not signed in until it succeeds.",
    "sessionHeld": "`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004). Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory (BO-053), and signing in never ends it by itself.",

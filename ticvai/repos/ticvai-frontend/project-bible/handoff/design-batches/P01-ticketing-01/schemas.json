@@ -21,6 +21,14 @@
    "quotedUnitPrice"
   ],
   "properties": {
+   "holderSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-subject-kind": "guest",
+    "x-ticvai-references": "pii.subject",
+    "description": "**The named holder of the line, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `holderName` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind guest; null while none is given."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -121,6 +129,11 @@
     "description": "What the client charged, from its local bundle."
    },
    "holderName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "holderSubjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string",
     "nullable": true
    },
@@ -811,7 +824,21 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."
+    "description": "The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001): `createPayment` re-locks the quote on the order and, when `chargeTotal` changed, answers `409 quoteExpired` with the new quote before charging anything (ADAM CR-577)."
+   },
+   "termsVersion": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The terms the guest accepted** (ADAM CR-576, Chinmay, 3 November 2026; CHG-CR576-001): the `termsAndConditions` version `checkoutCart` took in `termsAccepted`, checked against the policy in force. Null when the checkout sent none; never filled in from the policy in force."
+   },
+   "termsAcceptedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the guest accepted `termsVersion`, the time `checkoutCart` wrote the order (ADAM CR-576). Null with `termsVersion`."
    },
    "droppedPromotions": {
     "type": "array",
@@ -995,6 +1022,13 @@
       "format": "uuid",
       "readOnly": true,
       "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "productId": {
+      "x-ticvai-references": "catalogue.product",
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The catalogue product of the line's variant (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), stored on `orders.order_line`: copied from the cart line by `checkoutCart`, as `recommendationId` is, and returned on every read of an order's lines (`getOrder` included). Orders made before this change get it filled in from their variant's product. A client never sends it."
      },
      "discounts": {
       "type": "array",
@@ -1236,6 +1270,13 @@
  },
  "Product": {
   "x-ticvai-persistence": "catalogue.product + catalogue.product_media",
+  "x-ticvai-index": [
+   [
+    "venueId",
+    "displayOrder",
+    "id"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1272,6 +1313,28 @@
    "description": {
     "type": "string"
    },
+   "bookingEntry": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "dateFirst",
+     "productFirst",
+     "venueMap",
+     "timeWindow",
+     "bundle"
+    ],
+    "description": "**Which booking screen Book opens** (ADAM CR-591, Chinmay, 3 November 2026; CHG-CR591-001). Worked out on read and never stored; set on every guest or visitor read that answers a product (`listProducts`, `getProduct`) and on every `searchCatalogue` result, null on staff reads, and null when the product has no Book (info-only). In this order: (a) kind `bundle` gives `bundle` while `bundleId` is set; with no such bundle it is null and the card opens Item Detail as now. (b) `requiresTimeWindow` true gives `timeWindow`. (c) Otherwise the product's published booking flow by `getPublishedBookingFlow`'s rule (the product's flow, then its category's, then the venue's enabled default for its kind, with the same tie rule), from `white-label#publishedBookingFlowSteps`: its first enabled step, skipping `location` and `helpMeChoose`; `resourceMap` gives `venueMap`; `date`, `time` or `performance` gives `dateFirst`; any other step gives `productFirst`. If no flow resolves, the same test is applied to the default order of the flow type the kind rule picks. Book opens: `dateFirst` GST-007, `productFirst` GST-008, `venueMap` GST-074, `timeWindow` GST-075, each with `productId`; `bundle` GST-056 with `bundleId`."
+   },
+   "bundleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Set only when `bookingEntry` is `bundle` (ADAM CR-591; CHG-CR591-001): the id of the promotions bundle whose `variant_id` is this product's variant, while `getGuestBundle` would return it (published, active, in its window). Never taken from a search result's `id`: for a bundle that is the bundle's catalogue product, not the bundle."
+   },
    "fromPrice": {
     "oneOf": [
      {
@@ -1282,6 +1345,12 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "nullable": true,
+    "default": 100,
+    "description": "Where this product sorts among the venue's products in listProducts, lower first. Not alphabetical: the order the venue wants guests to see. (ADAM CR-581, Chinmay, 3 November 2026; CHG-CR581-001.) Stored on `catalogue.product` as `display_order`, nullable with default 100 like `catalogue.product_category.display_order`; existing rows take 100. Set by `createProduct` (100 when not sent) and `updateProduct` (changed only when the body carries it; null stores null), and returned by every operation that answers `Product`, `getProduct` and the till's catalogue bundle included. No back-office product screen shows or edits it."
    },
    "isFeatured": {
     "type": "boolean",
@@ -1734,11 +1803,13 @@
   "minProperties": 1,
   "properties": {
    "phone": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "maxLength": 32,
     "nullable": true
    },
    "email": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "format": "email",
     "maxLength": 254,
@@ -2072,14 +2143,25 @@
     "format": "uuid"
    },
    "subjectId": {
+    "x-ticvai-subject-kind": "guest",
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
    "guestName": {
+    "x-ticvai-pii": {
+     "store": "subject.displayName",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "contactPoint": {
+    "x-ticvai-pii": {
+     "store": "contact.point",
+     "subject": "subjectId"
+    },
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "partySize": {
@@ -2226,6 +2308,103 @@
    "noShow"
   ]
  },
+ "TicketTransfer": {
+  "x-ticvai-persistence": "orders.ticket_transfer",
+  "type": "object",
+  "x-ticvai-rls": "guest-reads-own",
+  "x-ticvai-guest-subject": [
+   "fromSubjectId",
+   "toSubjectId"
+  ],
+  "x-ticvai-guest-writer": "fromSubjectId",
+  "required": [
+   "id",
+   "orderId",
+   "ticketIds",
+   "status",
+   "offeredAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ticketIds": {
+    "type": "array",
+    "description": "The entitlements offered — `Entitlement.id` values, since a ticket is an entitlement. Each points at `access.entitlement`.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "fromSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set only on claim. Ownership moves then, not at offer."
+   },
+   "recipientAddressMasked": {
+    "type": "string",
+    "description": "The recipient's address as the server masks it. A screen shows it as sent and never unmasked (ADAM CR-593)."
+   },
+   "recipientChannel": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp"
+    ],
+    "description": "**The channel the transfer was sent by** (ADAM CR-593, Chinmay, 3 November 2026; CHG-CR593-001): `transferOrderTickets` stores its `recipient.channel` in `orders.ticket_transfer.recipient_channel` (text, email, sms or whatsapp, nullable), and every answer that returns a transfer returns it. Null on rows written before this change. WEB-030 draws a sent row's channel part from it: email is 'Sent to ' plus `recipientAddressMasked`, sms is 'Sent by SMS', whatsapp is 'Sent by WhatsApp'."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "offered",
+     "claimed",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "claimUrl": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The link the recipient is sent** (R8 blocker fix, ORDERS-MONEY-C12). Built from the tenant's deep-link table (`white-label.DeepLinkScheme`), pattern `transferClaim`: the tenant's `baseUrl` plus `/t/{transferId}?token={claimToken}`. It opens the app on `/general/ticket-transfer` (GST-014) where the app is installed, and the storefront claim page otherwise. Once released the pattern never changes, so a link already sent keeps working. **Never returned to the sender** in `listTicketTransfers` (null on the rows the caller sent; IDENTITY-C26, CHG-R8SPN-025)."
+   },
+   "claimToken": {
+    "x-ticvai-secret": "blind-index",
+    "x-ticvai-blind-index-of": "none",
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**What `claimTicketTransfer` checks the presented `claimToken` against.** Carried to the recipient inside `claimUrl` and never returned — the sender reading their transfer must not be able to claim it on the recipient's behalf.\n"
+   },
+   "offeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "An unclaimed transfer expires and the tickets return. A transfer to a mistyped address must not strand a ticket somewhere nobody can reach.\n"
+   }
+  }
+ },
  "UpdateTableReservationRequest": {
   "type": "object",
   "x-ticvai-persistence": "none — request only; a partial update of fnb.table_reservation",
@@ -2242,9 +2421,11 @@
     "nullable": true
    },
    "guestName": {
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "contactPoint": {
+    "x-ticvai-data-class": "personal",
     "type": "string"
    },
    "partySize": {

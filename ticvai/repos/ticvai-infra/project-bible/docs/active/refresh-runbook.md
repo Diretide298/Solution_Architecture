@@ -7,8 +7,11 @@
 > The release steps around it are in `docs/active/release-runbook.md`.
 
 `bash tools/refresh-safe.sh` is the only way a refresh reaches the main tree. It copies the package into a
-throwaway worktree, runs the 65 derive steps of `tools/refresh.sh`, runs the 68 checkers, judges them against
-`tools/refresh-safe-baseline.json` and merges the derived output only on PASS. Everything below is about
+throwaway worktree, runs the derive steps of `tools/refresh.sh`, runs every checker through `tools/run-checks.py`
+(whose verdict is the gate's: it applies the dated allowlist `tools/refresh-safe-baseline.json` itself through
+`tools/gate_allowlist.py`, r14, CHG-R14I-001) and merges the derived output only on PASS. A pass over an allowlisted
+failure prints `PASS with N allowlisted failure(s)`; the release commit and the release notes quote that line as it is,
+never "gate PASS" over an allowlist (the r13 system review, E-02). Everything below is about
 making a failure cheap and the gate trustworthy. None of it changes what a step or a checker produces.
 
 ## 1. Policy

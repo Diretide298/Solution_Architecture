@@ -443,11 +443,13 @@
        "maxLength": 120
       },
       "email": {
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "format": "email",
        "nullable": true
       },
       "phone": {
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "maxLength": 30,
        "nullable": true
@@ -469,6 +471,7 @@
       "nullable": true
      },
      "address": {
+      "x-ticvai-data-class": "business",
       "type": "string",
       "maxLength": 500,
       "nullable": true
@@ -516,6 +519,7 @@
     "description": "City"
    },
    "address": {
+    "x-ticvai-data-class": "business",
     "type": "string",
     "description": "Address"
    },
@@ -649,6 +653,14 @@
       "name"
      ],
      "properties": {
+      "contactSubjectId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "x-ticvai-subject-kind": "contact",
+       "x-ticvai-references": "pii.subject",
+       "description": "**The organisation's contact, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `name`, `email`, `phone` are kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person's subject where the caller names one, else a new pii.subject of kind contact; null while none is given."
+      },
       "role": {
        "type": "string",
        "enum": [
@@ -660,15 +672,30 @@
        ]
       },
       "name": {
+       "x-ticvai-pii": {
+        "store": "subject.displayName",
+        "subject": "contactSubjectId"
+       },
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "maxLength": 120
       },
       "email": {
+       "x-ticvai-pii": {
+        "store": "contact.email",
+        "subject": "contactSubjectId"
+       },
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "format": "email",
        "nullable": true
       },
       "phone": {
+       "x-ticvai-pii": {
+        "store": "contact.phone",
+        "subject": "contactSubjectId"
+       },
+       "x-ticvai-data-class": "personal",
        "type": "string",
        "maxLength": 30,
        "nullable": true
@@ -690,6 +717,7 @@
       "nullable": true
      },
      "address": {
+      "x-ticvai-data-class": "business",
       "type": "string",
       "maxLength": 500,
       "nullable": true
@@ -932,11 +960,13 @@
       "maxLength": 120
      },
      "email": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "format": "email",
       "nullable": true
      },
      "phone": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "maxLength": 30,
       "nullable": true
@@ -1181,11 +1211,13 @@
       "maxLength": 120
      },
      "email": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "format": "email",
       "nullable": true
      },
      "phone": {
+      "x-ticvai-data-class": "personal",
       "type": "string",
       "maxLength": 30,
       "nullable": true

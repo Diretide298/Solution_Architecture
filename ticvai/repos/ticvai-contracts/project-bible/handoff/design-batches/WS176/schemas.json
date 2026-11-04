@@ -1468,7 +1468,7 @@
    "cellName": {
     "type": "string",
     "readOnly": true,
-    "description": "The cell serving this region. One cell per tenant per region (ADR-0014).\n"
+    "description": "The cell serving this region. A region is one cell, and the cell holds many tenants (ADR-0038, which supersedes ADR-0014).\n"
    }
   }
  },

@@ -1,6 +1,6 @@
 # P02-booking-selection-01 — P02 · Booking & Selection
 
-**10 screens · 36 operations · 71 schemas · 8 permissions**
+**10 screens · 37 operations · 72 schemas · 8 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -144,10 +144,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-007` | Select Date & Time | A | 31 | 31 | 6 | 22 | 28 | 0 | guest | notStarted (client-verified) |
-| `GST-008` | Tickets & Add-ons | A | 27 | 66 | 6 | 30 | 25 | 0 | guest | notStarted (client-verified) |
+| `GST-007` | Select Date & Time | A | 31 | 33 | 6 | 22 | 28 | 0 | guest | notStarted (client-verified) |
+| `GST-008` | Tickets & Add-ons | A | 38 | 66 | 6 | 32 | 25 | 0 | guest | notStarted (client-verified) |
 | `GST-048` | Upsell / Cross-Sell | A | 27 | 10 | 5 | 57 | 9 | 0 | guest | approved (client-verified) |
-| `GST-049` | Interactive Seat Selection | A | 8 | 39 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
+| `GST-049` | Interactive Seat Selection | A | 8 | 40 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
 | `GST-050` | Resource Booking – Cabana | A | 27 | 18 | 6 | 34 | 4 | 6 | guest | approved (client-verified) |
 | `GST-056` | Bundle Package | A | 27 | 4 | 6 | 4 | 4 | 0 | guest | approved (client-verified) |
 | `GST-058` | Resource Availability (Cabana) | A | 3 | 20 | 6 | 0 | 4 | 0 | guest | approved (client-verified) |

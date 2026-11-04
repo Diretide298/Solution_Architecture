@@ -121,11 +121,17 @@
       {
        "kind": "metricTile",
        "label": "Active Approval Matrices",
+       "operation": "listApprovalMatrices",
+       "bindsTo": "ApprovalMatrix.isActive",
+       "notes": "The matrices in force (`isActive`), counted from `listApprovalMatrices` (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Approval Rules",
+       "operation": "listApprovalMatrices",
+       "bindsTo": "ApprovalMatrix.rules",
+       "notes": "The rules across the matrices listed, counted from `listApprovalMatrices` (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
       },
       {
@@ -267,6 +273,9 @@
       {
        "kind": "selectField",
        "label": "Role",
+       "operation": "setApprovalMatrix",
+       "bindsTo": "ApprovalMatrix.rules",
+       "notes": "The rule's `approverRoleIds`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
       },
       {
@@ -297,6 +306,9 @@
       {
        "kind": "selectField",
        "label": "Transaction value",
+       "operation": "setApprovalMatrix",
+       "bindsTo": "ApprovalMatrix.rules",
+       "notes": "The rule's `minAmount` and `maxAmount`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
       },
       {
@@ -307,6 +319,9 @@
       {
        "kind": "selectField",
        "label": "Risk level",
+       "operation": "setApprovalMatrix",
+       "bindsTo": "ApprovalMatrix.rules",
+       "notes": "The rule's `riskScoreAbove`, saved with `setApprovalMatrix` (r14 gate, CHG-R14BO-003).",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
       }
      ]
@@ -410,6 +425,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure approval routing based on the client's organizational hierarchy.",
+  "division": "Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-333, ADM-334, ADM-335, BO-086, BO-639; this screen is Organizational Hierarchy Routing (pack Approval_Workflows_and_Governance_Reference.pdf, board 3.3, page 23): configure approval routing based on the client's organizational hierarchy.",
   "gaps": [
    {
     "operation": null,
@@ -429,11 +445,25 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Approval matrices, the one being changed among them",
+       "operation": "listApprovalMatrices",
+       "bindsTo": "ApprovalMatrix",
+       "columns": [
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.isActive"
+       ],
+       "provenance": "contract approvals.yaml GET /approval-matrices; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "setApprovalMatrix",
        "label": "Save approval matrix",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setApprovalMatrix",
+       "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       },
       {
        "kind": "secondaryButton",
@@ -463,6 +493,13 @@
     "invalidates": [
      "listApprovalMatrices"
     ]
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "The matrices, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "wireframe": {
@@ -481,6 +518,29 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -671,6 +731,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow approval policies to differ between TICVAI clients and between venues belonging to the same client.",
+  "division": "Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-334, ADM-335, BO-086, BO-639; this screen is Venue & Tenant Approval Matrix (pack Approval_Workflows_and_Governance_Reference.pdf, board 3.5, page 24): allow approval policies to differ between TICVAI clients and between venues belonging to the same client.",
   "gaps": [
    {
     "operation": null,
@@ -690,11 +751,25 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Approval matrices, the one being changed among them",
+       "operation": "listApprovalMatrices",
+       "bindsTo": "ApprovalMatrix",
+       "columns": [
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.isActive"
+       ],
+       "provenance": "contract approvals.yaml GET /approval-matrices; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "setApprovalMatrix",
        "label": "Save approval matrix",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setApprovalMatrix",
+       "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       },
       {
        "kind": "secondaryButton",
@@ -724,6 +799,13 @@
     "invalidates": [
      "listApprovalMatrices"
     ]
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "The matrices, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "wireframe": {
@@ -742,6 +824,29 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -805,6 +910,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure approval authority according to transaction value or percentage thresholds. Example — Refund",
+  "division": "Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-333, ADM-335, BO-086, BO-639; this screen is Value & Threshold Routing (pack Approval_Workflows_and_Governance_Reference.pdf, board 3.6, page 25): configure approval authority according to transaction value or percentage thresholds. Example — Refund.",
   "gaps": [
    {
     "operation": null,
@@ -824,11 +930,25 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Approval matrices, the one being changed among them",
+       "operation": "listApprovalMatrices",
+       "bindsTo": "ApprovalMatrix",
+       "columns": [
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.isActive"
+       ],
+       "provenance": "contract approvals.yaml GET /approval-matrices; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "setApprovalMatrix",
        "label": "Save approval matrix",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setApprovalMatrix",
+       "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       },
       {
        "kind": "secondaryButton",
@@ -858,6 +978,13 @@
     "invalidates": [
      "listApprovalMatrices"
     ]
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "The matrices, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "wireframe": {
@@ -876,6 +1003,29 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -939,6 +1089,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Dynamically modify approval routing based on the risk or context of the request.",
+  "division": "Shares `listApprovalMatrices`, `setApprovalMatrix` with ADM-331, ADM-333, ADM-334, BO-086, BO-639; this screen is Risk-Based & Conditional Routing (pack Approval_Workflows_and_Governance_Reference.pdf, board 3.7, page 26): dynamically modify approval routing based on the risk or context of the request.",
   "gaps": [
    {
     "operation": null,
@@ -958,11 +1109,25 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "dataTable",
+       "label": "Approval matrices, the one being changed among them",
+       "operation": "listApprovalMatrices",
+       "bindsTo": "ApprovalMatrix",
+       "columns": [
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.isActive"
+       ],
+       "provenance": "contract approvals.yaml GET /approval-matrices; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+      },
+      {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "setApprovalMatrix",
        "label": "Save approval matrix",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setApprovalMatrix",
+       "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
       },
       {
        "kind": "secondaryButton",
@@ -992,6 +1157,13 @@
     "invalidates": [
      "listApprovalMatrices"
     ]
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "The matrices, the one being changed among them",
+    "trigger": "onLoad",
+    "provenance": "design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
    }
   ],
   "wireframe": {
@@ -1010,6 +1182,29 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApprovalMatrix",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "scopeLevel",
+      "rules",
+      "isActive"
+     ]
+    },
+    "provenance": "contract approvals.yaml PUT /approval-matrices/{matrixId}; design change approved by the lead (\"Approve all 28 as recommended\", 3 November 2026; CHG-R14BO-004)"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

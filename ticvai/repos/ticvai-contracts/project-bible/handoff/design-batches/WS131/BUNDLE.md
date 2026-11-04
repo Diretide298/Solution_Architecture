@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-716` | Event Lifecycle & Change Command Center | A | 6 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-717` | Lifecycle Transition Configuration | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-718` | Event Change Request Configuration | B | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-718` | Event Change Request Configuration | B | 11 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 | `BO-719` | Event Cancellation Workflow Configuration | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-720` | Ticket, Reservation & Customer Treatment Configuration | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
@@ -460,7 +460,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Create approval request** (modal, opened by *Create approval request*; *Create approval request* calls `createApprovalRequest`, *Cancel* sends nothing)
+
+**Collects what `createApprovalRequest` sends before it is called.** Required: `id`, `kind`, `subjectContract`, `subjectType`, `subjectId`, `scopePath`, `summary`. Optional: `amount`, `attributes`, `justification`, `isDraft`. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createApprovalRequest` body |
+| Kind `kind` | select | required | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | — | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. | `createApprovalRequest` body |
+| Subject contract `subjectContract` | text field | required | — | — | — | Which contract owns the thing being approved. | `createApprovalRequest` body |
+| Subject type `subjectType` | text field | required | — | — | — | — | `createApprovalRequest` body |
+| Subject `subjectId` | text field | required | — | — | — | A reference, never a copy. A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists. | `createApprovalRequest` body |
+| Scope path `scopePath` | text field | required | — | — | — | — | `createApprovalRequest` body |
+| Summary `summary` | text area | required | — | max length 300 | — | What the approver sees in their queue before opening it. | `createApprovalRequest` body |
+| Amount `amount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createApprovalRequest` body |
+| Attributes `attributes` | key and value settings | optional | — | — | — | — | `createApprovalRequest` body |
+| Justification `justification` | text area | optional | — | max length 1000 | — | — | `createApprovalRequest` body |
+| Is draft `isDraft` | toggle | optional | off | — | — | True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129). | `createApprovalRequest` body |
+
+Errors to draw in the form: 409 An open request already exists for this subject. Two approvals for one subject is how the same money goes out twice. (ApprovalStateProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): the request is not a draft and no active rule matches its kind and subject type at its `scopePath` (for …
 
 #### Outputs: what the screen shows and produces
 
@@ -468,7 +486,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create approval request (primary button) | navigation or local | — | — | — | — |
+| Create approval request (primary button) | `createApprovalRequest` POST `/approval-requests` | CreateApprovalRequest | ApprovalRequest | 409 An open request already exists for this subject. Two approvals for one subject is how the same money goes out twice. (ApprovalStateProblem); 422 No approval route (`no-approval-route`; CHG-R8SPN-015): the request is … | opens modal first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
@@ -542,7 +560,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-718?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create approval request, Cancel.

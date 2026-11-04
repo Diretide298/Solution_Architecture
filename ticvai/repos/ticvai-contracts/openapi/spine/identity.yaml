@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
+  x-ticvai-hosts: [cell]
   x-ticvai-screen-count: 81
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
@@ -51,7 +52,6 @@ servers:
   variables:
     cellHost:
       default: cell.ticvai.local
-      description: Resolved per tenant from the Control Plane. Never hardcoded.
 security:
 - bearerAuth: []
 # **The rule questions Identity answers for other modules** (14 October 2026, the cross-module query pattern of the
@@ -66,15 +66,32 @@ x-ticvai-queries:
       permission: Permission, the asking operation's x-ticvai-permission (contracts/shared/permissions.yaml)
       scopePath: ltree, the scope the asking operation acts at (its venue or workstation)
       reversedPrincipalId: uuid or null, whose act is being reversed, where the asking operation forbids self-approval
+      offline: OfflineStepUpEvidence or null, SupervisorStepUp.offline, sent only by a call queued offline (CHG-R14V-001)
+      askingOperation: string, the asking operation's operationId (kept on the offline step-up's record)
+      actId: uuid, the id of the act the step-up signs (the asking request's `id`, its idempotency key)
+      callerPrincipalId: uuid, the principal whose session made the asking call
+      workstationId: uuid, the workstation the call came from (the session's, or the device's under deviceAuth)
+      recordedAt: date-time, the act's device time (the asking request's `recordedAt`)
     returns:
       verified: boolean
-      refusal: one of credentialWrong, credentialLocked, noPin, permissionNotHeld, notActiveHere, selfApproval; null when verified
+      refusal: one of credentialWrong, credentialLocked, noPin, permissionNotHeld, notActiveHere, selfApproval, verifierInvalid; null when verified
       lockedUntil: date-time or null, when refusal is credentialLocked
+      offlineVerdict: confirmed, refusedAtSync or null; set only when `offline` was sent
     rule: 'common.yaml SupervisorStepUp: the PIN matches the principal''s current `pin` row in identity.principal_credential
       (PHC hash with the tenant''s Key Vault pepper, ADR-0071) and the row is not locked; the principal is active, holds
       `permission` at `scopePath` through a live grant, and is not `reversedPrincipalId`. A wrong PIN counts towards
       PasswordPolicy.pinLockoutAfterAttempts exactly as at sign-in. Any refusal is the asking operation''s 403
-      `supervisor-step-up-refused` and nothing is written by it.'
+      `supervisor-step-up-refused` and nothing is written by it. **With `offline` (a call queued offline, ADR-0013
+      amendment of 3 November 2026, CHG-R14V-001)** the same checks are made as at `recordedAt`: the PIN against the
+      `pin` credential in force then (the current row, or the identity.principal_credential_history row it replaced
+      after `recordedAt`), the lock ignored and no attempt counted (the attempt was made on the device); the
+      principal active and holding `permission` at `scopePath` then, and not `reversedPrincipalId`; and the verifier
+      `offline.verifierId` was in package `offline.packageId`, which was issued to `workstationId`, and was neither
+      expired nor revoked at `recordedAt` (else `verifierInvalid`). The answer is `offlineVerdict` confirmed or
+      refusedAtSync with its refusal, and it is written, in the asking operation''s transaction, as one
+      identity.offline_step_up row (idempotent on operationId and actId); a refusedAtSync also publishes
+      identity.offlineStepUpRefused. **A refusedAtSync is never a 403**: the asking operation records its act as
+      sent and answers its success with `X-Ticvai-Step-Up-Verdict: refusedAtSync` (common.yaml StepUpVerdict).'
     served: [in-process, service]
     operation: verifySupervisorStepUp
   # **The MFA step-up, checked and consumed for the operation that demands it** (ADAM CR-509, decided 3 November 2026;
@@ -378,6 +395,29 @@ x-ticvai-queries:
       It is asked in process by the access host for listDeviceBindingSession's holder name, display_name and no
       other column (ADAM CR-302, option A, 29 October 2026; XDR-010; CHG-CR302-001).
     served: [in-process, service]
+  subjectDetails:
+    module: identity
+    table: pii.subject
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The pii.subject ids asked for: the subject columns of the asker''s rows (`subjectId`, `holderSubjectId`, ...).'}
+      fields: {type: array, items: {type: string}, description: 'The x-ticvai-pii stores the asker answers with (`subject.displayName`, `contact.email`, `document.number`, `identifier.ipAddress`, ...); only those come back.'}
+      record: {type: object, additionalProperties: true, description: 'For `identifier.ipAddress`: the asker''s table and row ids (`recordTable`, `recordIds`) whose network identifiers are asked for.'}
+    returns:
+      type: array
+      description: 'One entry per subject found, with the asked fields; an erased subject (is_erased) answers its id, `erased: true` and no field.'
+      items: {$ref: '#/components/schemas/SubjectDetails'}
+    rule: >-
+      **The owner's read of the personal fields the modules keep in pii.*** (r13 system review B-01; the lead, 3 November
+      2026, "Move the columns"; ADR-0023 as amended 3 November 2026; CHG-R14M-001). A module whose contract marks a field
+      `x-ticvai-pii: {store, subject}` holds only the subject's id on its row; it answers the field by asking this, in
+      process within commerce through the C# query interface Identity implements, and from another deployable through
+      Identity's service route (serviceAuth; POST /queries/subject-details, the rule for every served service query,
+      ADAM CR-438). Identity answers the fields from pii.subject, pii.subject_contact (the primary contact of each kind,
+      `contact.point` the primary email or mobile), pii.subject_document (the number decrypted through KERNEL-FIELD-ENC,
+      ADR-0063 section 5) and pii.subject_network_identifier, as the caller's scope lets it see them. It decides nothing:
+      **whether the caller may see a personal field is the asking operation's rule** (`x-ticvai-personal-data`, or its
+      PII permission), and a field the asker will not answer is not asked for.
+    served: [in-process, service]
   subjectBiometricRecords:
     module: identity
     table: pii.subject_biometric
@@ -515,10 +555,21 @@ x-ticvai-jobs:
     module: identity
     host: workers
     trigger: {kind: timer, every: P1D}
-    reads: [identity.subject_data_export, pii.subject]
-    writes: [pii.subject, identity.subject_data_export]
-    reliesOn: [deleteGuestAccount, eraseSubject]
-    for: Identity's guest erasure job and its daily sweep.
+    reads: [identity.subject_data_export, identity.subject_erasure_part, pii.consent_identifier, pii.subject]
+    writes: [pii.subject, pii.consent_identifier, pii.subject_biometric, pii.subject_contact, pii.subject_document,
+      pii.subject_identity, pii.subject_network_identifier, identity.subject_data_export]
+    reliesOn: [deleteGuestAccount, eraseSubject, submitSubjectDataPart]
+    for: 'Identity''s guest erasure job and its daily sweep. **It empties the subject and waits for every owner**
+      (r13 system review B-01 and C-11; the lead, 3 November 2026, "Move the columns": erasure reaches every module;
+      ADR-0023 as amended 3 November 2026; CHG-R14M-001). With the tombstone (is_erased, erased_at, erasure_request_id)
+      it deletes the subject''s rows in pii.subject_contact, pii.subject_document, pii.subject_biometric,
+      pii.subject_identity, pii.subject_network_identifier and pii.consent_identifier (by its subject_id) and clears pii.subject''s name, birth date, nationality
+      and language, so every field a module keeps in pii.* (x-ticvai-pii) is gone at once and the modules'' rows keep
+      only the subject''s id. Then it waits: the erasure is done only when every contract in
+      handoff/subject-data-register.json `owners` has recorded its part (identity.subject_erasure_part, through
+      submitSubjectDataPart; Marketing''s through its own consumer) and ai.eraseSubject answered nothing left. The daily
+      sweep names, in its log and alert, every tombstoned subject with an owner that has not answered 72 hours after the
+      tombstone; partiallyFailed is not a synonym for completed (ADR-0023).'
     source:
     - contracts/satellite/ai.yaml
     - contracts/spine/identity.yaml
@@ -595,13 +646,19 @@ x-ticvai-jobs:
     module: identity
     host: workers
     trigger: {kind: queue}
-    reads: [identity.subject_data_export, identity.subject_data_export_part, identity.subject_holding, pii.subject]
+    reads: [identity.subject_data_export, identity.subject_data_export_part, identity.subject_holding, pii.subject,
+      identity.delegated_access, identity.guest_credential, identity.guest_identity_verification, identity.guest_session,
+      identity.guest_upload_ref, identity.mfa_challenge, identity.mfa_method, identity.mfa_recovery_code,
+      identity.otp_challenge, identity.principal, identity.refresh_token, identity.session, identity.subject_erasure_part,
+      pii.consent_identifier, pii.subject_biometric, pii.subject_contact, pii.subject_document, pii.subject_identity,
+      pii.subject_network_identifier]
     writes: [identity.subject_data_export]
-    reliesOn: [exportSubjectData, recordSubjectDataExportPart, writeSubjectDataExportPart]
+    reliesOn: [exportSubjectData, recordSubjectDataExportPart, writeSubjectDataExportPart, submitSubjectDataPart]
     for: 'Identity''s subject-data export job: assemble the parts, write the file, delete it after 7 days. **Its rules,
       on a ticket of its own** (ADAM CR-512, Chinmay, 3 November 2026; CHG-CR512-001). It starts on approval.granted
       for subjectDataExport, or at once for a row exportSubjectData wrote running. It waits for a part from every
-      module that writes one on identity.privacyRequestRaised (today Marketing alone); if a part is not recorded 72
+      contract in handoff/subject-data-register.json `owners` (each writes one from its job on identity.privacyRequestRaised
+      and records it through submitSubjectDataPart, Marketing through its event; r13 review B-01, CHG-R14M-001); if a part is not recorded 72
       hours after the start, it ends the row failed and names the missing owner in failureReason. It reads Identity''s
       own subject tables and identity.subject_holding as they stand. Layouts: json is one object keyed by table, each
       an array of rows; csv is a zip of one file per table with a header row; pdf is one section per table, each row
@@ -644,6 +701,13 @@ paths:
   /internal/step-up/verify:
     post:
       operationId: verifySupervisorStepUp
+      x-ticvai-writes:
+      - table: identity.offline_pin_verifier
+        for: 'a correct online PIN mints the supervisor''s offline verifiers (ADR-0013 amendment of 3 November 2026, CHG-R14V-001)'
+      - table: identity.offline_step_up
+        for: 'an offline step-up re-checked at sync, one row with its verdict (CHG-R14V-001)'
+      x-ticvai-emits:
+      - identity.offlineStepUpRefused
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -660,7 +724,14 @@ paths:
         **Answers, never decides.** It returns whether the step-up holds and, when it does not, why; the asking
         operation answers its own caller 403 `supervisor-step-up-refused` and writes nothing. A wrong PIN is counted
         against the supervisor''s `pin` credential (`PrincipalCredential.failedAttempts`, `pinLockoutAfterAttempts`),
-        which is the only thing this operation writes. The PIN is never logged, stored or echoed.
+        and a correct one mints the supervisor''s offline verifiers (`OfflinePinVerifier`). The PIN is never logged,
+        stored or echoed.
+
+
+        **An offline step-up re-checked at sync** (`stepUp.offline`; ADR-0013 amendment of 3 November 2026,
+        CHG-R14V-001) is checked as at the act''s `recordedAt` by the query''s rule, counts no attempt, and is written
+        as one `identity.offline_step_up` row with its `offlineVerdict`; a `refusedAtSync` publishes
+        `identity.offlineStepUpRefused`. The asking operation records its act either way.
 
         '
       tags:
@@ -890,6 +961,212 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/subjects/details:
+    post:
+      operationId: recordSubjectDetails
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Keep a person's personal fields in pii.* for a module's row
+      description: '**The owner''s write of the personal fields the modules keep in pii.*** (r13 system review B-01;
+        the lead, 3 November 2026, "Move the columns"; ADR-0023 as amended 3 November 2026; CHG-R14M-001; ADR-0055 rule
+        4). A module whose contract marks a field `x-ticvai-pii: {store, subject}` never stores the field on its own row:
+        in the same request that writes its row, it calls this with the subject its row names (or none) and the fields,
+        in process within commerce through the C# interface Identity implements, and over Identity''s service route from
+        another deployable (serviceAuth, cell-internal over mTLS), with the `Idempotency-Key` it was called with.
+
+
+        **The subject.** With `subjectId`, the fields are written to that subject; an erased subject (`is_erased`)
+        answers `410 subject-erased` and nothing is written. Without one, a new `pii.subject` of the given `kind`
+        (guest, employee, contact or applicant: the subject property''s `x-ticvai-subject-kind`) is created with a new
+        UUIDv7, and its id is answered, for the module to store in the subject column it named. A field sent null
+        clears it; a field not sent is left as it is.
+
+
+        **Where each field goes** (tools/personal_data.py, the stores): `subject.*` on `pii.subject` (`displayName`,
+        `givenName`, `familyName`, `dateOfBirth`, `nationality`, `preferredLanguage`); `contact.email`,
+        `contact.phone`, `contact.mobile` and `contact.point` (an email where the value holds `@`, else a mobile) as the
+        subject''s primary `pii.subject_contact` of that kind, normalised and hashed as registerGuest does, unverified;
+        `document.number` as a `pii.subject_document` (kind from `documentKind`, `other` when not sent), encrypted
+        into `number_ciphertext` through KERNEL-FIELD-ENC (ADR-0063 section 5) with `number_last4`;
+        `identifier.ipAddress` as a `pii.subject_network_identifier` naming the module''s `recordTable` and `recordId`.
+        Writes no event: an event would copy the fields into the outbox (CHG-XDW-005''s rule).'
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: lastWriterWins
+      x-ticvai-writes:
+      - table: pii.subject
+        for: 'the subject, created when none is named, and its `subject.*` fields (CHG-R14M-001)'
+      - table: pii.subject_contact
+        for: 'the subject''s primary contact of each kind sent (CHG-R14M-001)'
+      - table: pii.subject_document
+        for: 'the document number, encrypted (CHG-R14M-001)'
+      - table: pii.subject_network_identifier
+        for: 'the IP address a module''s row was made from (CHG-R14M-001)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectDetailsWrite'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Written; the subject the fields are kept for.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [subjectId]
+                properties:
+                  subjectId:
+                    type: string
+                    format: uuid
+                    description: The subject named, or the one created; the module stores it in its subject column.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '410':
+          description: The subject named is erased (`subject-erased`); nothing is written.
+          x-ticvai-problem-types:
+          - subject-erased
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/subject-data-parts:
+    post:
+      operationId: submitSubjectDataPart
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Record a module's part of a guest's export or erasure
+      description: '**Every module''s answer to a privacy request** (r13 system review B-01 and C-11; the lead, 3
+        November 2026, "Move the columns": erasure and export reach every module; CHG-R14M-001). Each contract that
+        holds a subject''s data (`handoff/subject-data-register.json` `owners`) consumes `identity.privacyRequestRaised`
+        in a job of its own (`subjectDataPart`), and calls this over Identity''s service route (serviceAuth), or in
+        process within commerce, when its part is done. The calling module is the part''s `owner`, from its service
+        identity, never sent. Marketing keeps its event (`marketing.subjectDataPartWritten`, recorded by
+        `recordSubjectDataExportPart`, CHG-R11FXC-005).
+
+
+        **For `requestType` access**: `fileRef` names the object the module wrote to the tenant''s private storage
+        (every row of the subject in its tables, in the export''s format); recorded as a `SubjectDataExportPart` of the
+        export, as Marketing''s is, and the export job (`subjectExport`) assembles the file once every owner has one.
+        **For `deletion`**: no file; `rowsErased` counts the rows whose personal fields the module erased (the fields
+        it keeps outside pii.*, by its contracts'' marks); recorded as a `SubjectErasurePart`, and the erasure job
+        (`guestErasure`) holds the erasure done only when every owner has one. A module with nothing for the subject
+        still answers, with 0, so neither job waits for a part that will not come.
+
+
+        **Idempotent on the request and the owner**: a repeat finds the part recorded and returns it.'
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-writes:
+      - table: identity.subject_data_export_part
+        for: 'an owner''s part of an export, requestType access (CHG-R14M-001)'
+      - table: identity.subject_erasure_part
+        for: 'an owner''s erasure, requestType deletion (CHG-R14M-001)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              x-ticvai-persistence: none — request only; recorded as identity.subject_data_export_part or identity.subject_erasure_part
+              required:
+              - approvalRequestId
+              - subjectId
+              - requestType
+              - rowCount
+              properties:
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: The request the part answers (`identity.privacyRequestRaised` `approvalRequestId`).
+                subjectId:
+                  type: string
+                  format: uuid
+                  description: The guest the request is about.
+                requestType:
+                  type: string
+                  enum: [access, deletion]
+                  x-ticvai-persisted: false
+                  description: Which part this is; chooses the table it is recorded in.
+                fileRef:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: The part's object key, for access; null for deletion. Server only.
+                tables:
+                  type: array
+                  items: {type: string}
+                  description: The module's tables the part covers.
+                rowCount:
+                  type: integer
+                  minimum: 0
+                  description: Rows exported (access) or rows erased (deletion).
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The part, recorded now or already recorded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [approvalRequestId, owner, recordedAt]
+                properties:
+                  approvalRequestId:
+                    type: string
+                    format: uuid
+                  owner:
+                    type: string
+                    description: The module the part is recorded for.
+                  recordedAt:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /internal/guest-sessions/end-for-device:
     post:
       operationId: endGuestDeviceSessions
@@ -998,12 +1275,19 @@ paths:
         PTR-001): a desk browser is not a registered device, and requiring one locked every web door
         out (CHG-DOOR-001, Chinmay, 2 October 2026: fix the Block A blockers now). **A device door
         sends it** (the till POS-000, the staff handheld EMP-001, the scanner SCN-001), and a
-        device-bound `method` (`pin`, `card`, `rfid`) without it is refused 400 (problem type
-        `workstation-required`), because the device is what bounds a PIN. Nothing else about the
+        device-bound `method` (`pin`, `card`, `rfid`) without it, or without `deviceAuth`, is refused 400 (problem
+        type `workstation-required`), because the device is what bounds a PIN. Nothing else about the
         sign-in changes: the second factor is asked by permission (audit R135), five wrong codes lock
         step-up (R126), a second sign-in is refused 409 (R184), and several roles mean a role prompt
         (ADR-0003). Where the tenant has SSO, the same doors offer `startSsoAuthorization` /
         `completeSsoAuthorization`, which return the same `LoginResponse`.
+
+        **The device is authenticated, and the workstation is the device''s** (r14 review C-04, CHG-R14H-001;
+        the lead, 3 November 2026: "All four, one release"). A device door calls with `deviceAuth`, the credential
+        `enrolDevice` issued to the device the door runs on (`common.yaml` `deviceAuth`), and the workstation is the one
+        that device is bound to, never one the body names: a `workstationId` that is not that workstation is 403
+        `workstation-mismatch`, and a `workstationId` sent without `deviceAuth` is 401 `device-unauthenticated`. Both
+        are answered before any credential is checked, so neither spends an attempt or moves a lockout.
 
         **The credential is checked against `identity.principal_credential`** (`PrincipalCredential`, 14 October 2026,
         CHG-CRD-001, ADAM CR-078): the row for the principal and `method`, its PHC hash (ADR-0071), and its lockout.
@@ -1027,11 +1311,27 @@ paths:
         scope and permissions; `venue_id` and `working_venue_id` are written as now. Permissions stay resolved once,
         here or at `selectRole`.
 
+
+        **A correct `pin` sign-in mints the principal''s offline step-up verifiers** (decided 3 November 2026, Chinmay,
+        system review finding F-01: "Offline verifier"; ADR-0013 amendment of 3 November 2026; CHG-R14V-001). In the
+        same transaction, one `identity.offline_pin_verifier` row (`OfflinePinVerifier`, replacing the previous one)
+        for the venue of the `workstationId` and for each venue where the principal holds a permission an offline
+        step-up operation asks for, so tills there can check the PIN with no connection. Nothing in the response
+        changes; a wrong PIN mints nothing.
+
         '
       x-ticvai-writes:
       - table: identity.session
         for: 'grant_id, the one grant a direct sign-in opens the session through (ADAM CR-513)'
-      security: []
+      - table: identity.offline_pin_verifier
+        for: 'a correct `pin` sign-in at a device door mints the principal''s offline step-up verifiers (ADR-0013 amendment of 3 November 2026, CHG-R14V-001)'
+      # A browser door has no credential before signing in (`{}`); a device door authenticates the device it runs on
+      # (`deviceAuth`), which is what bounds a PIN (r14 review C-04, CHG-R14H-001).
+      security:
+      - {}
+      - deviceAuth: []
+      x-ticvai-workstation-from: device
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       requestBody:
         required: true
         content:
@@ -1070,14 +1370,27 @@ paths:
             submitted username whether or not a principal has it, and per sign-in method** (password, PIN, card,
             RFID), so an unknown username has its own counter and its own lock for each method, as a known one
             does, and nothing in the answer reveals which usernames exist. `sso-sign-in-required` checks no
-            credential, spends no attempt and does not carry `attemptsRemaining`.'
+            credential, spends no attempt and does not carry `attemptsRemaining`. **`device-unauthenticated`** (r14
+            review C-04, CHG-R14H-001): the body names a `workstationId` and the call carries no valid `deviceAuth`;
+            no credential is checked, no attempt is spent, and it does not carry `attemptsRemaining`.'
           x-ticvai-problem-types:
           - unauthenticated
           - sso-sign-in-required
+          - device-unauthenticated
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/LoginDeniedProblem'
+        '403':
+          description: 'The body names a `workstationId` that is not the workstation the authenticated device is bound
+            to (`workstation-mismatch`; r14 review C-04, CHG-R14H-001). Answered before the credential is checked: no
+            attempt is spent and nothing is written.'
+          x-ticvai-problem-types:
+          - workstation-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           x-ticvai-problem-types: [session-active-elsewhere, workstation-in-use]
           description: 'An active session already exists for this principal on another device. Per §3.1.3
@@ -1921,6 +2234,7 @@ paths:
       - identity.privacyRequestRaised
       x-ticvai-permission: GUEST_VIEW_PII
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2142,6 +2456,7 @@ paths:
       - identity
       x-ticvai-permission: GUEST_VIEW_PII
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2225,6 +2540,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: GUEST_VIEW
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2255,6 +2571,8 @@ paths:
                               $ref: '#/components/schemas/DelegatedAccess'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -2350,6 +2668,7 @@ paths:
       - identity
       x-ticvai-permission: GUEST_MANAGE
       x-ticvai-guest-callable: true
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -2409,6 +2728,8 @@ paths:
                 $ref: '#/components/schemas/DelegatedAccess'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [delegation-cycle, minor-grants-adult-authority]
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
@@ -2664,6 +2985,72 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Unauthorized
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /auth/offline-step-up-package:
+    get:
+      operationId: getOfflineStepUpPackage
+      x-ticvai-reads:
+      - table: identity.offline_pin_verifier
+        for: 'the venue''s verifiers that still count (OfflinePinVerifier), decrypted into the package (CHG-R14V-001)'
+      - table: identity.principal_credential
+        for: 'that each signer''s `pin` row is the one the verifier was minted from and is not locked (CHG-R14V-001)'
+      - table: identity.open_shift_marker
+        for: 'which signers have a shift open at the venue, so may witness (CHG-R14V-001)'
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the venue of the workstation the asking device is bound to (CHG-R14V-001)'
+      security:
+      - deviceAuth: []
+      # The doors whose supervisor step-up runs offline: the till and the shared handheld (POS-014, POS-018, POS-006,
+      # EMP-034), the kinds login's device door takes (CHG-R14H-001; CHG-R14INT-006 at the merge of lanes v and h).
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
+      x-ticvai-audience: [device]
+      x-ticvai-read-routing: primary
+      x-ticvai-bounded: the signers of one venue (at most 500)
+      summary: The till's offline step-up package
+      description: '**What a till or handheld needs to check a supervisor''s PIN with no connection** (decided 3
+        November 2026, Chinmay, on system review finding F-01: "Offline verifier" (the till keeps a verifier,
+        re-checked at sync); ADR-0013 amendment of 3 November 2026; CHG-R14V-001). Called by the device, never by a
+        person: under `deviceAuth` the caller is the registered device, and the package is for the workstation it
+        is bound to and that workstation''s venue. **The device fetches it whenever it is online**: after each sync
+        drains its outbox and at least hourly, and replaces the package it holds whole (so a verifier left out is
+        gone from the device at its next sync).
+
+
+        **Who is in it.** Every active principal with a verifier for the venue that still counts (`OfflinePinVerifier`:
+        not expired or revoked, minted from the current `pin` row, which is not locked), with the offline step-up
+        permissions they hold at the venue now through a live grant, after deny resolution, as the step-up check
+        resolves them: today `ORDER_VOID` (`voidOrder`) and `CASH_NO_SALE` (`recordNoSale`), the permissions of the
+        operations that declare `x-ticvai-offline-step-up: verifier`; and `witness` where they have a shift open at
+        the venue (`withdrawFromDepositBox`''s witness, the cashier the cash came from). A principal with neither is
+        left out. By `displayName`, then `principalId`.
+
+
+        **What the device does with it** (`SupervisorStepUp` in contracts/shared/common.yaml; the `supervisorPinPrompt`
+        component''s `offline` state): offline, the prompt offers the signers whose `permissions` hold the act''s
+        permission (or `witness`, for a witness step-up), leaving out the signed-in caller; it computes the Argon2id
+        of the typed PIN with the verifier''s own salt and parameters and compares; a wrong PIN counts for that signer,
+        and at `attemptLimit` the signer is locked on this device until its next sync; after `expiresAt` no PIN is
+        checked offline. The package is kept in the device''s encrypted local store only, never logged, and deleted
+        when the device is retired.'
+      tags:
+      - identity
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-self-scoped: principal
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The package
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfflineStepUpPackage'
+        '401':
+          $ref: ../shared/common.yaml#/components/responses/Unauthorized
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/credential:
     post:
       operationId: changeOwnCredential
@@ -2719,7 +3106,17 @@ paths:
         has no local password to change: `method: password` is 409 `credential-managed-by-sso` (a PIN issued to them by
         `resetPrincipalCredential` is changed here like anyone''s).
 
+
+        **A new PIN mints the principal''s offline step-up verifiers** (ADR-0013 amendment of 3 November 2026,
+        CHG-R14V-001): with `method: pin`, the same transaction replaces the principal''s `identity.offline_pin_verifier`
+        rows from the new PIN, for the venue of the session''s workstation and each venue where the principal holds a
+        permission an offline step-up operation asks for. The verifiers of the old PIN stop counting at once, because
+        their `credentialSetAt` no longer matches the `pin` row.
+
         '
+      x-ticvai-writes:
+      - table: identity.offline_pin_verifier
+        for: 'a new PIN replaces the principal''s offline step-up verifiers (CHG-R14V-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2754,11 +3151,16 @@ paths:
             the session is valid and stays signed in; the attempt counts towards the lockout);
             `policy-not-met`, the new credential fails the policy (a password: `minLength`, the breach check, by the
             rule on `PasswordPolicy.requireBreachCheck`, ADAM CR-514; a PIN: not exactly `PasswordPolicy.pinLength`
-            digits), with `errors[]` naming the rule (`requireBreachCheck` for a breached password);
+            digits), answered as `CredentialPolicyNotMetProblem`: `rule` names the first rule that failed
+            (`minLength`, then `requireBreachCheck`; for a PIN `pinLength`), `detail` says it in words, and there is
+            no `errors[]`, which stays on the `400` validation answers only (ADAM CR-548, Chinmay, 3 November 2026;
+            CHG-CR548-001);
             `credential-reused`, it matches the current one or one the policy keeps (a password: the previous
             `PasswordPolicy.reusePreventionCount`, 5 unless the tenant sets another, audit R132; a PIN:
             `PasswordPolicy.pinReusePrevention`). The server keeps a hash of each replaced credential in
             `identity.principal_credential_history` for that purpose and never the credential itself.
+            `current-credential-wrong` and `credential-reused` keep the plain `Problem` body. Nothing is written when
+            the 422 answers.
 
             '
           x-ticvai-problem-types:
@@ -2768,7 +3170,9 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                oneOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Problem
+                - $ref: '#/components/schemas/CredentialPolicyNotMetProblem'
         '429':
           description: The request budget is exceeded (`rate-limited`), or wrong current credentials reached the
             lockout threshold and the method is locked until `PrincipalCredential.lockedUntil` (`credential-locked`,
@@ -2863,10 +3267,13 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
-      # No session on the POS-000 door (CHG-RUL-015): `{}` admits the call without a token, under the step-up.
+      # No session on the POS-000 door (CHG-RUL-015): the till calls as its device (`deviceAuth`), under the step-up;
+      # an unauthenticated caller is never admitted (r14 review C-04, CHG-R14H-001).
       security:
       - bearerAuth: []
-      - {}
+      - deviceAuth: []
+      x-ticvai-workstation-from: device
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       summary: Supervisor termination of an abandoned session
       description: 'Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displaces
         a second login — an operator who went home still logged in would otherwise be locked out until
@@ -2875,8 +3282,11 @@ paths:
         **Callable on the POS-000 door with no session, under a supervisor''s PIN step-up** (Chinmay, 3 October
         2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which
         reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a
-        session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`),
-        and carries the supervisor''s own principal and PIN (`supervisorStepUp` in the body). The PIN is verified against the
+        session: the till calls this as its device (`deviceAuth`, r14 review C-04, CHG-R14H-001; it was `{}`, no
+        token at all), and carries the supervisor''s own principal and PIN (`supervisorStepUp` in the body).
+        The till is the workstation its device is bound to: a body `workstationId` that is not it is 403
+        `workstation-mismatch`, and a call with neither a session nor `deviceAuth` is 401 `device-unauthenticated`,
+        answered before the PIN is checked, so it spends no attempt and moves no lockout. The PIN is verified against the
         principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT`
         at the till''s venue, and the call reaches only a session at a workstation of that venue. Anything else is `403
         supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up:
@@ -2917,7 +3327,9 @@ paths:
                   type: string
                   format: uuid
                   nullable: true
-                  description: The till making the call. Required with no session (the POS-000 door; CHG-RUL-015).
+                  description: 'The till making the call (the POS-000 door; CHG-RUL-015). With no session the till
+                    is the workstation the calling device is bound to (`deviceAuth`; r14 review C-04, CHG-R14H-001):
+                    it may be left out, and when sent must be that workstation (403 `workstation-mismatch`).'
                 supervisorStepUp:
                   allOf:
                   - $ref: ../shared/common.yaml#/components/schemas/SupervisorStepUp
@@ -2929,12 +3341,24 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Session terminated and audited
+        '401':
+          description: 'Neither a staff session nor an authenticated device (`device-unauthenticated`; r14 review C-04,
+            CHG-R14H-001): a call with no session must come from a registered device by `deviceAuth`. Nothing is read
+            or written and no PIN attempt is spent.'
+          x-ticvai-problem-types:
+          - device-unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           description: The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is
             missing or failed or the session is not at the till's venue (`supervisor-step-up-refused`;
-            CHG-RUL-015).
+            CHG-RUL-015), or the body's `workstationId` is not the calling device's workstation (`workstation-mismatch`;
+            r14 review C-04, CHG-R14H-001).
           x-ticvai-problem-types:
           - supervisor-step-up-refused
+          - workstation-mismatch
           content:
             application/problem+json:
               schema:
@@ -3152,8 +3576,10 @@ paths:
         **`initialCredential` is held to `setPasswordPolicy`, the breach check included** (ADAM CR-514, Chinmay, 3
         November 2026; CHG-CR514-001): the same check as `changeOwnCredential`, by the rule on
         `PasswordPolicy.requireBreachCheck` (after the length check, only for a password, only when the tenant''s
-        `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` with
-        `errors[]` naming the rule, and nothing is written.
+        `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` as
+        `CredentialPolicyNotMetProblem`, `rule` naming the first rule that failed (`minLength`, then
+        `requireBreachCheck`) and no `errors[]` (ADAM CR-548, Chinmay, 3 November 2026; CHG-CR548-001), and nothing is
+        written.
 
         '
       x-ticvai-reads:
@@ -3200,13 +3626,15 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`initialCredential` fails the tenant''s password policy (`policy-not-met`): shorter than
-            `minLength`, or found in the breached-password corpus (`errors[]` names `requireBreachCheck`; ADAM CR-514).
-            Nothing is written.'
+            `minLength`, or found in the breached-password corpus (ADAM CR-514). The answer is
+            `CredentialPolicyNotMetProblem`: `rule` is the first rule that failed, `minLength` then `requireBreachCheck`,
+            `detail` says it in words, and there is no `errors[]` (ADAM CR-548, Chinmay, 3 November 2026;
+            CHG-CR548-001). Nothing is written.'
           x-ticvai-problem-types: [policy-not-met]
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CredentialPolicyNotMetProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}/credential-reset:
@@ -3273,8 +3701,10 @@ paths:
         **A `password` reset is held to `setPasswordPolicy`, the breach check included** (ADAM CR-514, Chinmay, 3
         November 2026; CHG-CR514-001): `temporaryCredential` with method `password` gets the same check as
         `changeOwnCredential`, by the rule on `PasswordPolicy.requireBreachCheck` (after the length check, only when the
-        tenant''s `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` with
-        `errors[]` naming the rule, and nothing is written.
+        tenant''s `requireBreachCheck` is true). A breached or too-short password is refused `422 policy-not-met` as
+        `CredentialPolicyNotMetProblem`, `rule` naming the first rule that failed (`minLength`, then
+        `requireBreachCheck`) and no `errors[]` (ADAM CR-548, Chinmay, 3 November 2026; CHG-CR548-001), and nothing is
+        written.
 
         **Publishes `identity.credentialResetRequested`** (kind `staffReset`) in the same transaction
         (29 September, build pass, group G2; ADR-0033): a reset is the step an account takeover takes before
@@ -3317,13 +3747,15 @@ paths:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
         '422':
           description: 'A `password` `temporaryCredential` fails the tenant''s password policy (`policy-not-met`):
-            shorter than `minLength`, or found in the breached-password corpus (`errors[]` names `requireBreachCheck`;
-            ADAM CR-514). Nothing is written.'
+            shorter than `minLength`, or found in the breached-password corpus (ADAM CR-514). The answer is
+            `CredentialPolicyNotMetProblem`: `rule` is the first rule that failed, `minLength` then `requireBreachCheck`,
+            `detail` says it in words, and there is no `errors[]` (ADAM CR-548, Chinmay, 3 November 2026;
+            CHG-CR548-001). Nothing is written.'
           x-ticvai-problem-types: [policy-not-met]
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/CredentialPolicyNotMetProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /principals/{principalId}:
@@ -5313,7 +5745,13 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      security: []
+      # A browser door has no credential before signing in (`{}`); a device door authenticates its device
+      # (`deviceAuth`), and the workstation is that device's (r14 review C-04, CHG-R14H-001).
+      security:
+      - {}
+      - deviceAuth: []
+      x-ticvai-workstation-from: device
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       requestBody:
         required: true
         content:
@@ -5331,6 +5769,9 @@ paths:
                 workstationId:
                   type: string
                   format: uuid
+                  description: 'Sent by a device door, as on `login`: the workstation the calling device is bound to
+                    (`deviceAuth`), never believed from the body alone (r14 review C-04, CHG-R14H-001). Sent without
+                    `deviceAuth` it is 401 `device-unauthenticated`; another workstation is 403 `workstation-mismatch`.'
       responses:
         '200':
           headers:
@@ -5342,10 +5783,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
-          x-ticvai-problem-types: [sso-state-invalid]
+          x-ticvai-problem-types: [sso-state-invalid, device-unauthenticated]
           description: 'The `state` is unknown, already used or expired (`sso-state-invalid`; R8 blocker IDENTITY-C58,
             CHG-R8MIG-015; r8 integration, CHG-R8INT-024): the sign-in page says the link has expired and starts
-            again. Not `unauthenticated`: this door takes no session.
+            again. Not `unauthenticated`: this door takes no session. Or the body names a `workstationId` and the
+            call carries no valid `deviceAuth` (`device-unauthenticated`; r14 review C-04, CHG-R14H-001).
 
             '
           content:
@@ -5353,8 +5795,10 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          x-ticvai-problem-types: [sso-group-not-mapped, sso-principal-not-provisioned, forbidden]
-          description: 'Authenticated, but no group maps to a role in this tenant (`sso-group-not-mapped`). The
+          x-ticvai-problem-types: [sso-group-not-mapped, sso-principal-not-provisioned, forbidden, workstation-mismatch]
+          description: 'The body''s `workstationId` is not the calling device''s workstation (`workstation-mismatch`;
+            r14 review C-04, CHG-R14H-001), answered before anything else. Or authenticated, but no group maps to a
+            role in this tenant (`sso-group-not-mapped`). The
             provider proved who they are; it did not grant them anything. Or no principal is linked to the
             provider''s subject and the provider is not set to provision one (`sso-principal-not-provisioned`; R8
             blocker IDENTITY-C57, CHG-R8MIG-015, CHG-R8INT-024). A linked principal that is inactive is
@@ -5463,7 +5907,6 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
-        - "P08 ADM-342 Authentication & MFA Policy Manager"
         - "P09 ADM-699 My Account & Security"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
@@ -5492,6 +5935,7 @@ paths:
       summary: Enrolled MFA methods
       description: >-
         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
+        `isPrimary` is false for a row whose `is_primary` is null, never null (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
       tags:
       - mfa
       x-ticvai-permission: null
@@ -5532,6 +5976,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the tenant''s root scope node, whose name is the authenticator issuer in qrCodeUri (ADAM CR-587; totp only)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5567,6 +6014,28 @@ paths:
         `guest-two-step-disabled`.
 
 
+        **The authenticator issuer and an `emailOtp` destination** (ADAM CR-587, option A, Chinmay, 3 November 2026;
+        CHG-CR587-001). (1) **The issuer.** When this call enrols kind `totp`, it reads the tenant''s name from the
+        tenant database, never the control database: it asks Tenancy''s `scopeRecords` in process, with where
+        `{level: ''tenant''}`, on the caller''s connection and transaction and under its row-level security, and takes
+        the name of the one row it returns (the tenant''s root scope node, `platform.scope.name`), whether the node is
+        active or not. That name is the issuer, URL-encoded in both places of `qrCodeUri`:
+        `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`. The
+        account stays the principal''s username or the guest''s email, URL-encoded. If no tenant-level row is visible
+        (a broken tenant set-up), the answer is 500, nothing is written and it is logged; a name is never made up.
+        Other kinds do not make this read. (2) **`emailOtp` and `target`.** If `target` is sent and not blank, it
+        must be an email address; otherwise `400 validation` with field `target`. It becomes the method''s
+        destination. If `target` is missing or blank, the account''s own email is used: `identity.principal.email`
+        for staff and partners, or the guest account''s email (the one already used as the authenticator account).
+        If the account has no email, `400 validation` with field `target`, and nothing is written. The address chosen
+        is stored in `mfa_method.destination`, field-encrypted as now, `masked_target` is built from it exactly as
+        when `target` is sent, and the `identity.mfaCodeIssued` event carries it as `destination`. A `target` sent
+        with `totp` is ignored. (3) Nothing else changes: no migration, no new column, no copy of
+        the control plane''s tenant name in the tenant database. The 201, 403 and 422 answers stay as they are. Screens do not
+        change: the issuer shows only in the person''s authenticator app, and a screen that sends `target` keeps
+        working.
+
+
         **The MFA values** (ADAM CR-522, Chinmay, 3 November 2026: the MFA values follow the authenticator standard,
         and a code the server sends goes by an outbox event like the guest''s; CHG-CR522-001). (1) Authenticator codes (`totp`), RFC 6238:
         HMAC-SHA1, a 30-second time step, 6 digits. The current step and one either side are accepted. A code whose
@@ -5575,7 +6044,7 @@ paths:
         secret is 20 random bytes, base32 without padding, returned once in `MfaEnrolment.secret` and stored
         field-encrypted in `mfa_method.secret`; `qrCodeUri` is
         `otpauth://totp/{issuer}:{account}?secret={secret}&issuer={issuer}&algorithm=SHA1&digits=6&period=30`, where
-        `issuer` is the tenant''s display name and `account` the principal''s username or the guest''s email, each
+        `issuer` is the tenant''s name, its root scope node''s (ADAM CR-587, below), and `account` the principal''s username or the guest''s email, each
         URL-encoded. (2) Recovery codes: ten, each 10 characters of Crockford base32, shown as five characters, a
         hyphen, five characters. Every `enrolMfaMethod` of any kind issues a new set and replaces the earlier one, as
         `MfaRecoveryCode` says; they are stored as PHC hashes. (3) A pending enrolment lapses 10 minutes after this
@@ -5586,6 +6055,10 @@ paths:
         the `mfa_challenge` row, with `destination` and `code` field-encrypted through `IFieldEncryption`, never in
         clear. Marketing sends it through the tenant''s email provider; until that consumer is on dev, Identity''s
         delivery seam records only that a code was issued, never the code.
+
+
+        **The pending method is not primary** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001): this call writes `is_primary` false on it;
+        `verifyMfaEnrolment` decides whether it becomes the primary one.
 
         '
       x-ticvai-emits:
@@ -5612,7 +6085,9 @@ paths:
                   $ref: '#/components/schemas/MfaKind'
                 target:
                   type: string
-                  description: Phone or email for OTP methods.
+                  description: Phone or email for OTP methods. For `emailOtp`, an email address when sent and not
+                    blank (else `400 validation`, field `target`); missing or blank, the account's own email is used
+                    (ADAM CR-587). Ignored with `totp`.
       responses:
         '201':
           headers:
@@ -5623,6 +6098,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MfaEnrolment'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           description: A guest caller while no venue of the tenant has guest two-step verification on
             (rev 3 GAP-B1, per venue).
@@ -5690,6 +6167,11 @@ paths:
         cache for two minutes), so each code works once. An `emailOtp` enrolment code is 6 digits, valid 10 minutes. The
         pending enrolment lapses 10 minutes after `enrolMfaMethod` (`pendingExpiresAt`); a code after that completes
         nothing.
+
+
+        **The first active method becomes primary** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001): when the method becomes active and the
+        principal has no other active method marked primary, its `is_primary` is set to true; otherwise it is set to
+        false, in the same transaction. A principal has at most one primary among its active methods.
 
         '
       tags:
@@ -5774,6 +6256,11 @@ paths:
         decided 28 September, audit R135). Removing the last factor from an account that must have one is
         not a choice the account holder gets to make. **The `409` keeps its declared type,
         `last-required-mfa-method`** (ADAM CR-522, Chinmay, 3 November 2026; CHG-CR522-001).
+
+
+        **Removing the primary method moves the mark** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001): when the removed method was the
+        primary one, the newest remaining active method (highest `id`) is marked primary in the same transaction, if
+        there is one.
 
         '
       tags:
@@ -5892,6 +6379,15 @@ paths:
         that consumer is on dev, Identity''s delivery seam records only that a code was issued, never the code. A
         `totp` challenge sends nothing (`enrolMfaMethod` states the authenticator values).
 
+
+        **Which method, when the body has no `methodId`** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001). The call uses the principal''s
+        usable methods: the active ones, leaving out `emailOtp` when the caller is a guest who signed in with an email
+        code. Among those it takes the one marked primary (`MfaMethod.isPrimary`; a row with `is_primary` null counts
+        as false); if none is marked primary, the newest (highest `id`; ids are UUIDv7). If the principal has active
+        methods but every one is left out, the call answers the existing `409 email-otp-not-second-factor`. If there
+        are no active methods at all, it answers the existing `422 mfa-method-not-usable`. With a `methodId`, nothing
+        changes. The method chosen is written to `identity.mfa_challenge.method_id`, never left null.
+
         '
       x-ticvai-emits:
       - identity.mfaCodeIssued
@@ -5923,6 +6419,8 @@ paths:
                 methodId:
                   type: string
                   format: uuid
+                  description: 'The method to challenge. Absent, the server takes the principal''s primary usable
+                    method, else the newest usable one, as the description says (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).'
                 venueId:
                   type: string
                   format: uuid
@@ -5957,7 +6455,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: A guest who signed in with an email code asks for `emailOtp` as the second factor, because the same inbox
-            twice is one factor (R8 blocker fix, IDENTITY-C18).
+            twice is one factor (R8 blocker fix, IDENTITY-C18). With no `methodId`, also when the principal has active
+            methods and every one is left out that way (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
           x-ticvai-problem-types:
           - email-otp-not-second-factor
           content:
@@ -5966,7 +6465,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: The `methodId` names a method that is pending or inactive, or the principal has no active method
-            to challenge.
+            to challenge (with no `methodId`, no active method at all; ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
           x-ticvai-problem-types:
           - mfa-method-not-usable
           content:
@@ -6043,19 +6542,37 @@ paths:
       description: 'For a `signIn` challenge (decided 28 September, audit R135) a correct code completes the
         sign-in: the pending session becomes usable and is returned in `session`, or, where `login`
         also answered `requiresRoleSelection`, the client goes on to `selectRole`. For any other action
-        it returns a short-lived, single-purpose `stepUpToken`.
+        the step-up is recorded on the caller''s session until `expiresAt`; `stepUpToken` is always null and stays in
+        the response only so clients built at r1 still read it (ADAM CR-588).
+
+
+        **No step-up token: the proof is the challenge row** (ADAM CR-588, option A, Chinmay, 3 November 2026;
+        CHG-CR588-001). (1) This operation returns `stepUpToken: null` for every challenge, `signIn` and step-up
+        alike. No token is generated, signed, stored or logged, and `identity.mfa_challenge` gets no column for one.
+        The response shape stays as it is (`stepUpToken` nullable, `expiresAt`, `session`). (2) For a step-up, the
+        proof is the `identity.mfa_challenge` row itself: status `verified` and `verified_at` set, bound to the
+        challenge''s `action` and the caller''s session. The `expiresAt` returned is `verified_at` plus 5 minutes.
+        `consumeMfaStepUp` remains the only check: it finds that row on the caller''s session and sets `consumed_at`,
+        and answers `403 step-up-token-missing` or `step-up-token-expired` as now; those problem types keep their
+        names. (3) For whoever builds an operation that demands a step-up: a tenant operation never reads a
+        `stepUpToken` from the body or a header; it decides only through `consumeMfaStepUp`. `revokeAllSessions` is
+        built that way on its own ticket, #33749: it declares an MFA step-up carried on the session, with action
+        `revokeAllSessions`, and `stepUpToken` is no longer required in its body (an old client may still send it;
+        it is ignored). Screens do not change: the authentication-code dialog looks and works as now, and a screen
+        that passed the token on now passes null or nothing. The platform caller''s step-up on the Control Plane
+        token is a different path and does not change.
 
 
         **How an MFA step-up reaches the operation that demands it: the session** (Chinmay, 3 October 2026,
         defaults taken; CHG-RUL-020). A successful step-up is also recorded against the caller''s own session,
-        bound to the challenge''s `action` and to that session, for the token''s short life. Every operation
+        bound to the challenge''s `action` and to that session, for the step-up''s short life (until `expiresAt`). Every operation
         that declares `x-ticvai-step-up: mfa` declares `x-ticvai-step-up-carrier: session` and reads the
         step-up from the session that calls it: the client sends no token field and no header, and a step-up
         made on another session or for another action does not count. It is single-use: the operation that
         consumes it clears it. Without a fresh step-up the operation is refused 403, and the client runs
         `createMfaChallenge` and this operation, then retries. A call with no session (`{}`) cannot carry an
         MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`,
-        CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1.
+        CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1, always null (ADAM CR-588).
 
 
         **The action, the lifetime and the refusals, for every operation that declares `x-ticvai-step-up: mfa`**
@@ -6107,8 +6624,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Verified. The step-up token is short-lived and single-purpose; a `signIn`
-            challenge returns the now usable `session` instead (audit R135)
+          description: Verified. For a step-up, the step-up counts on the caller's session until `expiresAt`; a
+            `signIn` challenge returns the now usable `session` instead (audit R135; ADAM CR-588)
           content:
             application/json:
               schema:
@@ -6117,7 +6634,8 @@ paths:
                   stepUpToken:
                     type: string
                     nullable: true
-                    description: Null for a `signIn` challenge.
+                    description: Always null, for every challenge, `signIn` and step-up alike (ADAM CR-588); kept
+                      only so clients built at r1 still read it. The step-up is recorded on the caller's session.
                   expiresAt:
                     type: string
                     format: date-time
@@ -6180,6 +6698,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
   /auth/sessions:
     get:
+      x-ticvai-personal-data: gated
       operationId: listActiveSessions
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
@@ -6195,8 +6714,12 @@ paths:
         **Callable on the POS-000 door with no session, under a supervisor''s PIN step-up** (Chinmay, 3 October
         2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which
         reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a
-        session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`),
-        and carries the supervisor''s own principal and PIN (the `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The PIN is verified against the
+        session: the till calls this as its device (`deviceAuth`, r14 review C-04, CHG-R14H-001; it was `{}`, no
+        token at all), names itself (`workstationId`), and carries the supervisor''s own principal and PIN (the
+        `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The `workstationId` must
+        be the workstation the calling device is bound to (403 `workstation-mismatch`), and a call with neither a
+        session nor `deviceAuth` is 401 `device-unauthenticated`, answered before the PIN is checked, so it spends no
+        attempt and moves no lockout. The PIN is verified against the
         principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT`
         at the till''s venue, and the call reaches only the sessions at that one till (`workstationId` is required then). Anything else is `403
         supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up:
@@ -6226,10 +6749,13 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
-      # No session on the POS-000 door (CHG-RUL-015): `{}` admits the call without a token, under the step-up.
+      # No session on the POS-000 door (CHG-RUL-015): the till calls as its device (`deviceAuth`), under the step-up;
+      # an unauthenticated caller is never admitted (r14 review C-04, CHG-R14H-001).
       security:
       - bearerAuth: []
-      - {}
+      - deviceAuth: []
+      x-ticvai-workstation-from: device
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       parameters:
       - name: X-Supervisor-Principal-Id
         in: header
@@ -6249,6 +6775,7 @@ paths:
           maxLength: 200
       - name: X-Supervisor-Pin
         in: header
+        x-ticvai-secret: bearer
         required: false
         description: With no session (POS-000), the supervisor's staff PIN, as `SupervisorStepUp.credential`
           (CHG-RUL-015). Never logged, stored or echoed. Ignored with a session.
@@ -6301,11 +6828,23 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ActiveSession'
+        '401':
+          description: 'Neither a staff session nor an authenticated device (`device-unauthenticated`; r14 review C-04,
+            CHG-R14H-001): a call with no session must come from a registered device by `deviceAuth`. Nothing is read
+            and no PIN attempt is spent.'
+          x-ticvai-problem-types:
+          - device-unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           description: The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is
-            missing or failed, or `workstationId` is missing (`supervisor-step-up-refused`; CHG-RUL-015).
+            missing or failed, or `workstationId` is missing (`supervisor-step-up-refused`; CHG-RUL-015), or it is
+            not the calling device's workstation (`workstation-mismatch`; r14 review C-04, CHG-R14H-001).
           x-ticvai-problem-types:
           - supervisor-step-up-refused
+          - workstation-mismatch
           content:
             application/problem+json:
               schema:
@@ -6314,6 +6853,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /auth/sessions/mine:
     get:
+      x-ticvai-personal-data: gated
       operationId: listOwnSessions
       x-ticvai-consumed-by:
         - "P09 ADM-699 My Account & Security"
@@ -6366,6 +6906,7 @@ paths:
         type: string
         format: uuid
     post:
+      x-ticvai-personal-data: gated
       operationId: endOwnSession
       x-ticvai-consumed-by:
         - "P09 ADM-699 My Account & Security"
@@ -6433,6 +6974,11 @@ paths:
       description: 'Incident response. Requires step-up authentication and a reason, and is recorded against
         the acting principal.
 
+        **The step-up is an MFA step-up carried on the session** (ADAM CR-588, Chinmay, 3 November 2026;
+        CHG-CR588-001; built on its own ticket, #33749): the action is `revokeAllSessions`, and the operation decides
+        only through Identity''s `consumeMfaStepUp`, never from a token in the body or a header. `stepUpToken` is no
+        longer required in the body; an old client may still send it, and it is ignored.
+
         **Open shifts are not left unseen, and Identity does not report them** (decided 14 October 2026,
         Chinmay, CHG-R6G-006; ADR-0028 tiers, ADR-0055 rule 2). Revoking a cashier mid-shift leaves cash
         unreconciled, and whoever pulls this needs to know that before they do, but Identity is the
@@ -6445,6 +6991,9 @@ paths:
       tags:
       - session
       x-ticvai-permission: SESSION_FORCE_LOGOUT
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020; ADAM CR-588)
+      x-ticvai-step-up-reason: Signs everyone in scope out at once; the second factor proves it is the account holder acting.
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6458,7 +7007,6 @@ paths:
               type: object
               required:
               - reason
-              - stepUpToken
               properties:
                 reason:
                   type: string
@@ -6466,6 +7014,9 @@ paths:
                   maxLength: 500
                 stepUpToken:
                   type: string
+                  deprecated: true
+                  description: Ignored (ADAM CR-588); the MFA step-up is read from the caller's session. An old
+                    client may still send it.
                 venueId:
                   type: string
                   format: uuid
@@ -7573,6 +8124,7 @@ paths:
       tags:
       - identity
       x-ticvai-permission: GUEST_VIEW
+      x-ticvai-object-owner: [subject]
       x-ticvai-audience:
       - staff
       - guest
@@ -7599,6 +8151,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IdentityCustomerMembership'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /memberships/{membershipId}:
@@ -9196,6 +9750,7 @@ components:
             `marketing.device_consent.scope_path`; Identity may not read that table across deployables and so takes it
             from the caller, refusing a path outside the caller''s scope.'
         ipAddress:
+          x-ticvai-data-class: personal
           type: string
           maxLength: 45
           nullable: true
@@ -9261,6 +9816,7 @@ components:
       - email
       properties:
         email:
+          x-ticvai-data-class: personal
           type: string
           format: email
           maxLength: 256
@@ -9715,6 +10271,7 @@ components:
           - other
           description: The vocabulary of `pii.subject_document.kind`.
         documentNumber:
+          x-ticvai-data-class: personal
           type: string
           format: password
           writeOnly: true
@@ -10640,7 +11197,9 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: The `identity.mfa_method` asked; null means the principal's primary method.
+          description: 'The `identity.mfa_method` challenged. With no `methodId` in the body, the method
+            `createMfaChallenge` chose (the primary usable one, else the newest usable one); it is always written,
+            never left null (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).'
         action:
           type: string
           maxLength: 100
@@ -10789,11 +11348,39 @@ components:
           format: uuid
           nullable: true
           description: Whose act is being reversed, where the asking operation forbids the same person signing it.
+        askingOperation:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The asking operation's operationId. Required when `stepUp.offline` is sent (CHG-R14V-001).
+        actId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The id of the act the step-up signs (the asking request's `id`). Required with `stepUp.offline`.
+        callerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The principal whose session made the asking call. Required with `stepUp.offline`.
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The workstation the asking call came from. Required with `stepUp.offline`.
+        recordedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The act's device time (the asking request's `recordedAt`). Required with `stepUp.offline`; the
+            step-up is checked as at this time.
     SupervisorStepUpVerdict:
       type: object
       x-ticvai-persistence: none — computed
       description: '`verifySupervisorStepUp`''s answer (14 October 2026, CHG-CRD-004). The asking operation maps any
-        refusal to its own 403 `supervisor-step-up-refused`.'
+        refusal to its own 403 `supervisor-step-up-refused`, **except an offline step-up re-checked at sync**
+        (CHG-R14V-001): then `offlineVerdict` is set, the act is recorded as sent and the success response carries
+        it as `X-Ticvai-Step-Up-Verdict`.'
       required: [verified]
       properties:
         verified:
@@ -10801,13 +11388,226 @@ components:
         refusal:
           type: string
           nullable: true
-          enum: [credentialWrong, credentialLocked, noPin, permissionNotHeld, notActiveHere, selfApproval]
-          description: Why it does not hold; null when `verified`.
+          enum: [credentialWrong, credentialLocked, noPin, permissionNotHeld, notActiveHere, selfApproval, verifierInvalid]
+          description: Why it does not hold; null when `verified`. `verifierInvalid` (offline only) is a verifier that
+            was not for the workstation's venue, or was expired or revoked at the act's `recordedAt`.
         lockedUntil:
           type: string
           format: date-time
           nullable: true
           description: When the supervisor's PIN unlocks, where `refusal` is `credentialLocked`.
+        offlineVerdict:
+          type: string
+          nullable: true
+          enum: [confirmed, refusedAtSync]
+          description: Set only when the question carried `stepUp.offline` (CHG-R14V-001).
+    OfflineStepUpPackage:
+      type: object
+      x-ticvai-persistence: none — computed for the asking device from identity.offline_pin_verifier
+      description: '**What a till or handheld holds to check a supervisor''s PIN with no connection** (decided 3
+        November 2026, Chinmay, system review finding F-01: "Offline verifier"; ADR-0013 amendment of 3 November
+        2026; CHG-R14V-001). `getOfflineStepUpPackage` answers it. **The device replaces its package whole** each
+        time it fetches one, so a verifier left out of the new package is gone from the device at its next sync.'
+      required: [packageId, workstationId, venueId, issuedAt, expiresAt, pinLength, attemptLimit, signers]
+      properties:
+        packageId:
+          type: string
+          format: uuid
+          description: A fresh UUIDv7 per answer; the device sends it back in `OfflineStepUpEvidence.packageId`.
+        workstationId:
+          type: string
+          format: uuid
+          description: The workstation the asking device is bound to.
+        venueId:
+          type: string
+          format: uuid
+          description: That workstation's venue; every verifier in the package is for it.
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: '`issuedAt` plus 24 hours. After it the device checks no PIN offline and the prompt says the
+            step-up needs a connection.'
+        pinLength:
+          type: integer
+          enum: [4, 6, 8]
+          description: The tenant's `PasswordPolicy.pinLength`.
+        attemptLimit:
+          type: integer
+          enum: [3, 5, 10]
+          description: The tenant's `PasswordPolicy.pinLockoutAfterAttempts`. At this many wrong PINs for one signer
+            the device locks that signer until its next sync.
+        signers:
+          type: array
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/OfflineStepUpSigner'
+    OfflineStepUpSigner:
+      type: object
+      x-ticvai-persistence: none — computed from identity.offline_pin_verifier, identity.principal and the grants
+      description: One person who may sign an offline step-up at the package's venue, and how the device checks them
+        (CHG-R14V-001).
+      required: [principalId, displayName, permissions, witness, verifierId, verifier, expiresAt]
+      properties:
+        principalId:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+          description: What the offline picker shows, as `listStepUpSupervisors` does.
+        permissions:
+          type: array
+          items:
+            $ref: ../shared/permissions.yaml#/components/schemas/Permission
+          description: 'The offline step-up permissions this signer holds at the venue now (of those the operations
+            declaring `x-ticvai-offline-step-up: verifier` ask for). The picker offers the signer for an act whose
+            permission is in this list.'
+        witness:
+          type: boolean
+          description: True where the signer has a shift open at the venue (identity.open_shift_marker), so may
+            countersign as the cashier the cash came from (`withdrawFromDepositBox`'s `witnessStepUp`).
+        verifierId:
+          type: string
+          format: uuid
+        verifier:
+          type: string
+          maxLength: 300
+          description: '**An Argon2id PHC string over the signer''s PIN with its own salt** (ADR-0071 as amended 3
+            November 2026), never the PIN and never the server''s peppered credential hash. The device keeps it in
+            its encrypted local store only.'
+        expiresAt:
+          type: string
+          format: date-time
+          description: The earlier of the package's `expiresAt` and the verifier's own.
+    OfflinePinVerifier:
+      x-ticvai-persistence: identity.offline_pin_verifier
+      x-ticvai-unique-together: [[principalId, venueId]]
+      type: object
+      description: '**A signer''s offline verifier for one venue, as Identity keeps it** (decided 3 November 2026,
+        Chinmay, system review finding F-01: "Offline verifier"; ADR-0013 and ADR-0071 as amended 3 November 2026;
+        CHG-R14V-001). **Never returned as stored**; `getOfflineStepUpPackage` decrypts `verifierHash` into a
+        package. **Minted only where Identity has just checked the PIN itself**, since it never holds a PIN: a
+        correct `pin` sign-in (`login`), a correct online supervisor step-up (`verifySupervisorStepUp`) and a new PIN
+        set by `changeOwnCredential`. Each mints, in the same transaction, one row (replacing the old one) for the
+        venue of the workstation the PIN was used at and for every venue where the principal holds a permission an
+        offline step-up operation asks for. **It stops counting** when it expires (30 days after it was minted), when
+        `revokedAt` is set, when the principal''s `pin` row is no longer the one it was minted from (`setAt` differs:
+        a change or a reset), while that row is locked, or when the principal is not active.'
+      required: [id, principalId, venueId, verifierHash, credentialSetAt, issuedAt, expiresAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The verifier id the package and the offline evidence carry.
+        principalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+        venueId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The venue (`platform.venue.id`, Tenancy's); not a foreign key, since Identity reads nothing
+            above it (ADR-0028).
+        verifierHash:
+          x-ticvai-secret: field-encrypted
+          type: string
+          writeOnly: true
+          description: The Argon2id PHC string over the PIN with its own 16-byte salt and ADR-0071's parameters, with
+            no pepper (the device must compute it), stored encrypted with the tenant's field key (ADR-0063) so a copy
+            of the table yields nothing.
+        credentialSetAt:
+          type: string
+          format: date-time
+          description: The `setAt` of the `pin` credential it was minted from.
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: 30 days after `issuedAt`.
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Set when the principal is deactivated or loses every offline step-up permission at the venue,
+            so the verifier leaves every later package.
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), the venue's path.
+    OfflineStepUp:
+      x-ticvai-persistence: identity.offline_step_up
+      x-ticvai-unique-together: [[operationId, actId]]
+      type: object
+      description: '**Every offline step-up, as the server found it at sync** (decided 3 November 2026, Chinmay,
+        system review finding F-01: "Offline verifier"; CHG-R14V-001). Written by the `verifySupervisorStepUp`
+        query, in the asking operation''s transaction, once per act (idempotent on `operationId` and `actId`, so a
+        replay writes nothing). **Never returned by any operation**; a `refusedAtSync` row publishes
+        `identity.offlineStepUpRefused`, and that event''s alert is how a person sees it.'
+      required: [id, operationId, actId, workstationId, callerPrincipalId, signerPrincipalId, packageId, verifierId,
+        verifiedAt, recordedAt, syncedAt, failedAttemptsBefore, verdict]
+      properties:
+        id:
+          type: string
+          format: uuid
+        operationId:
+          type: string
+          maxLength: 100
+        actId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The act's id in its own module (an order void's, a no-sale's, a cash movement's).
+        workstationId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The till (`platform.workstation.id`); not a foreign key (ADR-0028).
+        callerPrincipalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+        signerPrincipalId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.principal
+        packageId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+        verifierId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The verifier the device checked against; not a foreign key, since a replaced verifier's row
+            is gone.
+        verifiedAt:
+          type: string
+          format: date-time
+        recordedAt:
+          type: string
+          format: date-time
+        syncedAt:
+          type: string
+          format: date-time
+        failedAttemptsBefore:
+          type: integer
+          minimum: 0
+        verdict:
+          type: string
+          enum: [confirmed, refusedAtSync]
+        refusal:
+          type: string
+          nullable: true
+          enum: [credentialWrong, noPin, permissionNotHeld, notActiveHere, selfApproval, verifierInvalid]
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005), the workstation's path.
     OpenShiftMarker:
       x-ticvai-persistence: identity.open_shift_marker
       # Keyed on the shift; read by principal and workstation (storage-core request 2 at the merge, CHG-R8MIG-014).
@@ -11718,7 +12518,8 @@ components:
             `CheckPasswordBreachedAsync(prefix)` opens `{Identity:BreachCorpusPath}/{prefix}.txt` and returns its
             (suffix, count) pairs; nothing else reads the files, and nothing leaves the host. (3) The check: take the
             SHA-1 of the UTF-8 password as upper-case hex and split it into prefix and suffix; if the suffix is
-            present with any count, refuse `422 policy-not-met` with `errors[]` naming `requireBreachCheck`. It runs
+            present with any count, refuse `422 policy-not-met` as `CredentialPolicyNotMetProblem` with `rule`
+            `requireBreachCheck` and no `errors[]` (ADAM CR-548; CHG-CR548-001). It runs
             only for a password, only when this is true (the default), after the length check. The password, its hash
             and the prefix are never logged. (4) Startup: when `Identity:BreachCorpusPath` is unset, or the directory
             does not hold `00000.txt` and `FFFFF.txt`, Identity''s host fails its readiness check and does not start;
@@ -12421,6 +13222,148 @@ components:
         linkedAt:
           type: string
           format: date-time
+    SubjectNetworkIdentifier:
+      type: object
+      x-ticvai-persistence: pii.subject_network_identifier
+      x-ticvai-index: [[recordTable, recordId]]
+      description: '**The IP address a person''s row was made from, kept apart from the row** (r13 system review B-01;
+        the lead, 3 November 2026, "Move the columns"; ADR-0023 as amended 3 November 2026; CHG-R14M-001). A form
+        submission, a waiver signature, a rental agreement signature or a staff session no longer holds its IP address:
+        `recordSubjectDetails` writes it here against the subject and the module''s row, `subjectDetails` reads it back,
+        and erasure deletes it with the subject''s other pii.* rows. Storage only, never returned by itself.'
+      required: [id, subjectId, recordTable, recordId, ipAddress, capturedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+          description: The person whose address it is.
+        recordTable:
+          type: string
+          maxLength: 63
+          description: The module's table the row is in (`marketing.form_submission`, `rental.agreement_signature`, ...).
+        recordId:
+          type: string
+          format: uuid
+          description: The id of that row.
+        ipAddress:
+          x-ticvai-data-class: personal
+          type: string
+          maxLength: 45
+          description: IPv4 or IPv6, as the request carried it.
+        capturedAt:
+          type: string
+          format: date-time
+    SubjectErasurePart:
+      type: object
+      x-ticvai-persistence: identity.subject_erasure_part
+      x-ticvai-unique-together:
+      - [requestId, owner]
+      description: '**One module''s answer to a guest''s erasure** (r13 system review B-01 and C-11; the lead, 3 November
+        2026, "Move the columns": erasure reaches every module; CHG-R14M-001). Recorded by `submitSubjectDataPart` for
+        `requestType` deletion. The erasure job (`guestErasure`) holds an erasure done only when every owner in
+        `handoff/subject-data-register.json` has a row here and `ai.eraseSubject` answered nothing left; until then the
+        tombstone on pii.subject is the record that it is owed.'
+      required: [requestId, subjectId, owner, rowsErased, erasedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        requestId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: 'The erasure request (`pii.subject.erasure_request_id`, the event''s `approvalRequestId`): the
+            approvals.request id, or the request''s own id where no approval route matched, so it is no key of either.'
+        subjectId:
+          type: string
+          format: uuid
+          x-ticvai-references: pii.subject
+        owner:
+          type: string
+          maxLength: 40
+          description: The module (contract) that answered, from its service identity.
+        rowsErased:
+          type: integer
+          minimum: 0
+        erasedAt:
+          type: string
+          format: date-time
+    SubjectDetailsWrite:
+      type: object
+      x-ticvai-persistence: none — request only; lands on pii.subject, pii.subject_contact, pii.subject_document and pii.subject_network_identifier
+      description: The personal fields a module keeps in pii.* for one of its rows (`recordSubjectDetails`, CHG-R14M-001).
+      required: [kind]
+      properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The subject the module's row already names; absent or null to create one.
+        kind:
+          type: string
+          enum: [guest, employee, contact, applicant]
+          description: The kind of a subject created here (the subject property's `x-ticvai-subject-kind`).
+        displayName: {type: string, maxLength: 200, nullable: true, x-ticvai-data-class: personal}
+        givenName: {type: string, maxLength: 100, nullable: true, x-ticvai-data-class: personal}
+        familyName: {type: string, maxLength: 100, nullable: true, x-ticvai-data-class: personal}
+        dateOfBirth: {type: string, format: date, nullable: true, x-ticvai-data-class: personal}
+        nationality: {type: string, minLength: 2, maxLength: 2, nullable: true, x-ticvai-data-class: personal}
+        preferredLanguage: {type: string, minLength: 2, maxLength: 2, nullable: true, x-ticvai-data-class: personal}
+        contacts:
+          type: array
+          description: The contacts to keep, one per kind; each becomes the primary of its kind.
+          items:
+            type: object
+            required: [kind, value]
+            properties:
+              kind: {type: string, enum: [email, phone, mobile, point]}
+              value: {type: string, maxLength: 320, x-ticvai-data-class: personal}
+        document:
+          type: object
+          nullable: true
+          properties:
+            documentKind: {type: string, maxLength: 30}
+            number: {type: string, maxLength: 64, x-ticvai-data-class: personal}
+        networkIdentifier:
+          type: object
+          nullable: true
+          required: [ipAddress, recordTable, recordId]
+          properties:
+            ipAddress: {type: string, maxLength: 45, x-ticvai-data-class: personal}
+            recordTable: {type: string, maxLength: 63}
+            recordId: {type: string, format: uuid}
+    SubjectDetails:
+      type: object
+      x-ticvai-persistence: none — projection over pii.subject, pii.subject_contact, pii.subject_document and pii.subject_network_identifier
+      description: One subject's personal fields, as `subjectDetails` answers them (CHG-R14M-001).
+      required: [subjectId, erased]
+      properties:
+        subjectId: {type: string, format: uuid}
+        erased: {type: boolean}
+        displayName: {type: string, nullable: true, x-ticvai-data-class: personal}
+        givenName: {type: string, nullable: true, x-ticvai-data-class: personal}
+        familyName: {type: string, nullable: true, x-ticvai-data-class: personal}
+        dateOfBirth: {type: string, format: date, nullable: true, x-ticvai-data-class: personal}
+        nationality: {type: string, nullable: true, x-ticvai-data-class: personal}
+        preferredLanguage: {type: string, nullable: true, x-ticvai-data-class: personal}
+        email: {type: string, nullable: true, x-ticvai-data-class: personal}
+        phone: {type: string, nullable: true, x-ticvai-data-class: personal}
+        mobile: {type: string, nullable: true, x-ticvai-data-class: personal}
+        documentNumber: {type: string, nullable: true, x-ticvai-data-class: personal}
+        networkIdentifiers:
+          type: array
+          items:
+            type: object
+            properties:
+              recordTable: {type: string}
+              recordId: {type: string, format: uuid}
+              ipAddress: {type: string, x-ticvai-data-class: personal}
     PrincipalExternalIdentity:
       type: object
       x-ticvai-persistence: identity.principal_external_identity
@@ -12645,6 +13588,12 @@ components:
           type: boolean
         isPrimary:
           type: boolean
+          description: '**At most one primary among a principal''s active methods** (ADAM CR-549, Chinmay, 3 November 2026; CHG-CR549-001).
+            `enrolMfaMethod` writes false on the pending method; `verifyMfaEnrolment` sets it true when the method
+            becomes active and the principal has no other active method marked primary, else false;
+            `removeMfaMethod` moves the mark to the newest remaining active method when the primary one is removed.
+            A row with `is_primary` null counts as false: `listMfaMethods` and any `MfaMethod` answer return false
+            for null, never null. There is no operation to choose a primary.'
         enrolledAt:
           type: string
           format: date-time
@@ -12740,6 +13689,13 @@ components:
       - startedAt
       - lastSeenAt
       properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: employee
+          x-ticvai-references: pii.subject
+          description: '**The signed-in person (their principal''s subject), as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `ipAddress` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind employee; null while none is given.'
         status:
           allOf:
           - $ref: '#/components/schemas/SessionStatus'
@@ -12809,6 +13765,8 @@ components:
           format: uuid
           nullable: true
         ipAddress:
+          x-ticvai-pii: {store: identifier.ipAddress, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           nullable: true
         deviceInfo:
@@ -13429,6 +14387,12 @@ components:
             without it); absent on the TICVAI Console, Venue Management and partner portal sign-ins,
             which have no workstation.
 
+
+            **Believed only from the device** (r14 review C-04, CHG-R14H-001): the call authenticates the device
+            with `deviceAuth`, and this must be the workstation that device is bound to (403
+            `workstation-mismatch`). Sent without `deviceAuth` it is 401 `device-unauthenticated`, and a
+            device-bound method without `deviceAuth` is 400 `workstation-required`.
+
             '
         deviceFingerprint:
           type: string
@@ -13495,6 +14459,33 @@ components:
           attemptsRemaining:
             type: integer
             minimum: 0
+    CredentialPolicyNotMetProblem:
+      x-ticvai-persistence: none — error shape
+      description: '**The `422 policy-not-met` of `changeOwnCredential`, `createPrincipal` (`initialCredential`) and
+        `resetPrincipalCredential` (a `password` `temporaryCredential`)** (ADAM CR-548, Chinmay, 3 November 2026;
+        CHG-CR548-001): the shared `Problem` plus one member, `rule`, and no `errors[]`, which stays on the `400`
+        validation answers only (common.yaml; the rule set for `setApprovalMatrix` on 2 November, ADAM CR-481).
+        `type` is the existing `policy-not-met` URI, `status` 422. Nothing changes in the shared problem model or the
+        request kernel''s problem mapper. `detail` says it in words, for example "The password is shorter than 12
+        characters." or "This password appears in a list of breached passwords; choose another."; `detail` never
+        contains the password, its hash or the hash prefix, and none of them is logged. Nothing is written when the
+        422 answers. `current-credential-wrong` and `credential-reused` keep the plain `Problem` body.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - rule
+        properties:
+          rule:
+            type: string
+            enum:
+            - minLength
+            - pinLength
+            - requireBreachCheck
+            description: 'The first rule that failed, the rules checked one after another. For a password: `minLength` (shorter
+              than `PasswordPolicy.minLength`), then `requireBreachCheck` (found in the breached-password corpus;
+              this check runs only when the tenant''s `requireBreachCheck` is true, after the length check). For a
+              PIN: `pinLength` (not exactly `PasswordPolicy.pinLength` digits).'
     LoginResponse:
       x-ticvai-persistence: none — computed
       allOf:
@@ -13746,7 +14737,8 @@ components:
         cellName:
           type: string
           description: 'The cell this workstation''s region is served from, which is the cell the commerce host
-            answering this request is deployed in (one cell per tenant per region, ADR-0014): the host fills it
+            answering this request is deployed in (a cell is a region and serves many tenants: ADR-0038, which supersedes
+            ADR-0014): the host fills it
             from its own configuration and reads no table (ADAM CR-096, CHG-RTE-001). A client uses this only for
             diagnostics and telemetry tagging — never for routing, which the Control Plane resolves. **Filled from the
             host''s configuration key `Cell:Name` when it is set, and left out when it is not** (ADAM CR-513,
@@ -13782,7 +14774,16 @@ components:
         developer account whose active `control.developer_member` has that email, and with no match it has no
         developer account. **Never returned by any operation**.
       properties:
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-subject-kind: employee
+          x-ticvai-references: pii.subject
+          description: '**The principal, as a subject** (ADR-0023 as amended 3 November 2026; CHG-R14M-001): `email` is kept in pii.* for this subject, never on this row, and erasure removes them there. Set by the server when one of them is first written: a known person''s subject where the caller names one, else a new pii.subject of kind employee; null while none is given.'
         email:
+          x-ticvai-pii: {store: contact.email, subject: subjectId}
+          x-ticvai-data-class: personal
           type: string
           format: email
           maxLength: 320

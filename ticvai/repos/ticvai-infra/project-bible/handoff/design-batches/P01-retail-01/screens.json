@@ -149,7 +149,10 @@
     "operationId": "createPayment",
     "contract": "orders",
     "purpose": "Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236)",
-    "trigger": "onAction"
+    "trigger": "onAction",
+    "inputSources": {
+     "orderId": "checkoutCart.id"
+    }
    },
    {
     "operationId": "addCartLine",

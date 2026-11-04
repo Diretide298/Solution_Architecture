@@ -146,6 +146,7 @@
  },
  "DowngradeConflictProblem": {
   "x-ticvai-persistence": "none — error shape",
+  "description": "**Its type says which refusal it is** (ADAM CR-585, Chinmay, 3 November 2026; CHG-CR585-001): `https://api.ticvai.com/problems/downgrade-conflict` for `setSubscription`'s downgrade refusal and `previewSubscriptionChange`'s `conflicts` (title 'Downgrade conflicts with current usage'), `https://api.ticvai.com/problems/subscription-expired` for an expired subscription (no `modulesInUse` or `limitsExceeded`), and `module-in-use` for `removeLicenceAddOn`, unchanged. `type` takes no enum.",
   "allOf": [
    {
     "$ref": "../shared/common.yaml#/components/schemas/Problem"
@@ -450,7 +451,7 @@
    },
    "planVersion": {
     "type": "string",
-    "description": "Defaults to the current version, the plan's highest active version (ADAM CR-510)."
+    "description": "Defaults to the current version, the plan's highest active version (ADAM CR-510), through the same reader `getPlan` uses, `PlanReader.Current` (ADAM CR-567; CHG-CR567-001)."
    },
    "effectiveFrom": {
     "type": "string",
@@ -585,6 +586,7 @@
     "readOnly": true
    },
    "issuedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "readOnly": true
@@ -883,38 +885,60 @@
  "SubscriptionPreview": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
+  "description": "What `setSubscription` would do with the same body, by the same rules (ADAM CR-568, Chinmay, 3 November 2026; CHG-CR568-001); `previewSubscriptionChange` states each rule.",
   "required": [
    "canApply",
-   "priceChange"
+   "priceChange",
+   "modulesGained",
+   "modulesLost"
   ],
   "properties": {
    "canApply": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "False when `conflicts` has entries or `setSubscription` would refuse the body (`subscription-expired`, `plan-not-offered`); otherwise true (ADAM CR-568)."
    },
    "priceChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The target package price minus the current package price, in the contract's `currencyCode` (first plan: the target's). A package price is the version's `basePrice` plus, for each of its `plan_module` rows, that module's `control.module_listing` price unless `pricingBasis` is `metered`; a module with no listing adds nothing; add-ons are left out. Same plan and version: 0 (ADAM CR-568)."
    },
    "proratedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "For an upgrade only. `prorate` true (the default): `priceChange` x days from today to `renewsAt` / days from (`renewsAt` minus one `billingPeriod`) to `renewsAt`, rounded half away from zero to the currency's minor unit; `prorate` false: `priceChange` unscaled. Absent for a downgrade, a first plan or a contract with no `renewsAt` (ADAM CR-568)."
    },
    "modulesGained": {
     "type": "array",
+    "description": "The `ModuleKey`s in the licence position after the change but not before, sorted ascending; an empty list when there are none (ADAM CR-568).",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/subscription::ModuleKey"
     }
    },
    "modulesLost": {
     "type": "array",
+    "description": "The `ModuleKey`s in the licence position before the change but not after, sorted ascending; an empty list when there are none (ADAM CR-568).",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/subscription::ModuleKey"
     }
    },
    "conflicts": {
-    "$ref": "#/components/schemas/DowngradeConflictProblem"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/DowngradeConflictProblem"
+     }
+    ],
+    "description": "For a downgrade only, from `setSubscription`'s downgrade check itself; absent when there are none (ADAM CR-568)."
    },
    "cellTierChange": {
     "type": "object",
     "nullable": true,
+    "description": "The current version's `cellTier` to the target's; null when they are equal (ADAM CR-568).",
     "properties": {
      "from": {
       "$ref": "#/components/schemas/CellTier"
@@ -923,7 +947,8 @@
       "$ref": "#/components/schemas/CellTier"
      },
      "requiresMigration": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "True whenever `from` and `to` differ (ADAM CR-568)."
      }
     }
    }
@@ -1010,6 +1035,7 @@
     "nullable": true
    },
    "terminationRequestedByPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1094,6 +1120,7 @@
     "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
    },
    "accountManagerPrincipalId": {
+    "x-ticvai-references": "control.platform_operator",
     "type": "string",
     "format": "uuid",
     "nullable": true

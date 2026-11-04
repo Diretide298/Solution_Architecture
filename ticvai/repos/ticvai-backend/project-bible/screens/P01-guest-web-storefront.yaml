@@ -540,7 +540,12 @@ screens:
 
 
     **A product''s event is Product.eventId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011),
-    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)'
+    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)
+
+
+    **Book uses the same two fields as the app''s Buy Tickets** (ADAM CR-591, Chinmay, 3 November 2026;
+    CHG-CR591-001): each listed product''s `bookingEntry` and `bundleId` (`listProducts`, `searchCatalogue`)
+    say where Book goes; nothing visible changes.'
   density: compact
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -947,7 +952,12 @@ screens:
 
 
     **A product''s event is Product.eventId (added by the contracts agent, runs/fix-s12/LEDGER.md (CHG-FXC-011),
-    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)'
+    4 October 2026): the date filter and the product page read listPerformances for it** (CHG-FXS-003)
+
+
+    **Book uses the same two fields as the app''s Item Detail** (ADAM CR-591, Chinmay, 3 November 2026;
+    CHG-CR591-001): the product''s `bookingEntry` and `bundleId` (`getProduct`) say where Book goes; nothing
+    visible changes.'
   density: compact
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getProduct` reads one of them — list, select,
@@ -2299,16 +2309,18 @@ screens:
       carries:
       - cartId
       - performanceId
+      - productId
       provenance: derived — WEB-005 declares entryState.params cartId, performanceId, productId and WEB-008
-        holds cartId, performanceId, so an edge into it carries them
+        holds cartId, performanceId, productId, so an edge into it carries them
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
       - cartId
       - performanceId
+      - productId
       provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId,
-        productId, waitingEntryId and WEB-008 holds cartId, performanceId, so an edge into it carries
-        them
+        productId, waitingEntryId and WEB-008 holds cartId, performanceId, productId, so an edge into
+        it carries them
     - to: WEB-010
       trigger: Shopping Cart
       carries:
@@ -2425,7 +2437,15 @@ screens:
     trigger: onAction
   - operationId: getGuestBundle
     contract: promotions
-    purpose: A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009)
+    purpose: 'A bundle offered as an upsell, in the guest shape (r8, ORDERS-MONEY-C32, CHG-R8INT-009).
+      The add-ons page uses the same read as the app''s Bundle Package (GST-056). Draw the component rows
+      from `components[].name`, and each choice group as its `label` followed by its options'' names,
+      as the approved frame shows; preselect the `isDefault` option; the look does not change. Add to
+      basket calls `addCartLine` with `variantId` = `GuestBundle.variantId`, `quantity` = the chosen number,
+      `attributes.bundle` = {`bundleId`: `GuestBundle.id`, `choices`: [{`choiceGroupId`: group `id`, `optionId`:
+      option `id`}, one entry per pick]}; never a component''s or an option''s `variantId` as the line''s.
+      Until the backend serves this shape, build against it with mocked data; never guess ids or show
+      bare ids (ADAM CR-597, Chinmay, 3 November 2026; CHG-CR597-001).'
     trigger: onAction
   - operationId: decideRecommendations
     contract: ai
@@ -2832,9 +2852,11 @@ screens:
         provenance: contract orders.yaml DELETE /carts/{cartId}
       - kind: primaryButton
         label: Checkout
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        operation: checkoutCart
-        notes: Checks the cart out (`checkoutCart`) and moves on to the guest details.
+        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); ADAM CR-576
+          (3 November 2026)
+        notes: 'Moves on to the guest details (or straight to payment) without calling `checkoutCart`:
+          the order is made at Pay now on WEB-012, so the T&Cs tick reaches the call that creates the
+          order (ADAM CR-576, CHG-CR576-001). The button looks and reads the same.'
   overlays:
   - id: confirmRemoveCartLine
     component: confirmDialog
@@ -2890,7 +2912,8 @@ screens:
     trigger: onAction
   - operationId: checkoutCart
     contract: orders
-    purpose: Turn the cart into an order
+    purpose: 'Turn the cart into an order: only on the transfer journey (F55); the Checkout button moves
+      on without it, and the order is made at Pay now on WEB-012 (ADAM CR-576)'
     trigger: onAction
   - operationId: abandonCart
     contract: orders
@@ -3056,9 +3079,13 @@ screens:
     - to: WEB-012
       trigger: Pays
       provenance: flow F01 step 6→7, F02 step 4→5
+      carries:
+      - orderId
     - to: WEB-012
       trigger: 'Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)'
       provenance: decided 29 September 2026, W1
+      carries:
+      - orderId
     - to: WEB-010
       trigger: They check out
       provenance: flow F55 step 2→3
@@ -3400,7 +3427,13 @@ screens:
 
     Build note (r8 second round, IDENTITY-C28, from the core lane): the no-access state is the 404 of
     the guest''s own order lookup (an order that is not theirs answers as one that does not exist); the
-    visible text is unchanged.'
+    visible text is unchanged.
+
+
+    **Unanswered consent at Pay now** (ADAM CR-556 with CR-576, CHG-R14INT-001): WEB-011 is skipped when
+    the cart needs no forms, so Pay now''s `checkoutCart` can still refuse `422 consentRequired` or `consentAnswerBlocks`;
+    it then opens the same consent pop-up (overlay `consentQuestions`, as WEB-006 asks them) for the unanswered
+    questions, then `recordConsentAnswers` and `checkoutCart` once more.'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -3430,8 +3463,19 @@ screens:
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
       - kind: cartPanel
-        notes: Order summary stays visible throughout. Never collapsed behind a link
-        provenance: carried from the previous definition
+        bindsTo: Cart
+        operation: getCart
+        notes: 'Order summary stays visible throughout. Never collapsed behind a link. **Filled from the
+          cart it is about to pay for** (ADAM CR-590, Chinmay, 3 November 2026; CHG-CR590-001), as GST-009
+          already does: on load `getCart` with the session''s `cartId` (the same guest session or anonymous
+          cart session as WEB-010). Until Pay now the panel shows the cart''s lines (product name, quantity,
+          line total, add-ons under their parent line) and its subtotal, discount, tax and total. It stays
+          open on every state. Opened with an `orderId` from a link, the screen calls `getOrder` instead
+          of `getCart` and fills the same panel from the order''s lines and totals; after Pay now has
+          made the order, it keeps showing the order. Loading reads `getCart`, or `getOrder` when an `orderId`
+          came with the link; if the cart has no lines and there is no order, the guest is sent back to
+          the cart (WEB-010). Nothing visible changes.'
+        provenance: carried from the previous definition; data from ADAM CR-590 (3 November 2026)
       - kind: progressIndicator
         label: Booking steps
         bindsTo: BookingFlow
@@ -3441,11 +3485,21 @@ screens:
         notes: The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
           venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
-          the same published settings (CMS-016) (CHG-SGU-022).
+          the same published settings (CMS-016) (CHG-SGU-022). **Which product** (ADAM CR-590). `productId`
+          is taken from the cart's lines by the rule WEB-010 and WEB-011 use, the first line with no parent
+          line in cart order (on an order-link arrival, from the order's lines by the same rule). The
+          indicator is drawn from the answer and `signInAt` is read from it, so with `atPayment` a guest
+          who is not signed in gets the sign-in or guest-code step (to WEB-016, keeping the cart) before
+          Pay now. On a 404 the flow type's default order is used, as the other booking screens do. The
+          flow read is never called with no id.
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: consentBlock
         label: Terms and conditions
-        notes: Pay now is enabled only when ticked; the version shown is the one in force (listPublishedPolicies).
+        notes: 'Pay now is enabled only when ticked; the version shown is the one in force (listPublishedPolicies).
+          Pay now sends `termsAccepted` (`kind` termsAndConditions, `version` the one the Read the terms
+          panel shows) on `checkoutCart`. On `422 termsVersionNotCurrent` the screen reloads `listPublishedPolicies`,
+          clears the tick and leaves Pay now disabled until the guest ticks the current version: the consent
+          block''s existing behaviour, nothing new on screen (ADAM CR-576, CHG-CR576-001).'
         provenance: defined 4 October 2026 (CHG-FXS-003)
       - kind: detailPanel
         label: Read the terms
@@ -3468,7 +3522,12 @@ screens:
         label: Checking your payment
         operation: inquirePaymentStatus
         notes: 'Only in the unknown-outcome state: the screen asks the provider by itself (`inquirePaymentStatus`)
-          and never offers to pay again.'
+          and never offers to pay again. **Back from the card round trip** (3-D Secure or a hosted page;
+          ADAM CR-575, CHG-CR575-001): the page opens on `returnUrl`, this screen''s route with `?orderId=<the
+          order id>`, never a token; it calls `getOrder` with credentials included (the API''s `ticvai_order_access`
+          cookie), finds the `pendingConfirmation` payment among the order''s payments, shows this banner
+          and calls `inquirePaymentStatus`; it never offers to pay again while the payment is pending.
+          The page never reads, copies or stores the cookie.'
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
     - name: actionBar
       slot: rowActions
@@ -3477,8 +3536,15 @@ screens:
         label: Pay now
         provenance: defined 4 October 2026 (CHG-FXS-003)
         operation: createPayment
-        notes: checkoutCart (once; its idempotency key is the cart's), then createPayment against the
-          order it returns; an unknown payment outcome has the order to attach to.
+        notes: checkoutCart (once; its idempotency key is the cart's), with `termsAccepted` from the T&Cs
+          tick (ADAM CR-576), then createPayment against the order it returns; an unknown payment outcome
+          has the order to attach to. A card payment sends `returnUrl` = this screen's route with `?orderId=<the
+          order id>`, never a token (ADAM CR-575). After a decline, Pay now calls `createPayment` again
+          with a new `Idempotency-Key`. **On `409 quoteExpired`** (ADAM CR-577, CHG-CR577-001) the total
+          line is replaced with the answer's `quote` in the screen's existing format (charge amount, base
+          amount, rate, held until) and the guest is asked to confirm; Pay now then sends `createPayment`
+          again with a new key. Nothing is charged that the guest has not seen. The states and text are
+          unchanged.
   states:
     loading: The checkout payment, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the checkout payment untouched.
@@ -3500,13 +3566,24 @@ screens:
       cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix
       before Block A starts (GFIX-6)).'
     trigger: onLoad
+  - operationId: getCart
+    contract: orders
+    purpose: 'The cart this screen is about to pay for, on load with the session''s `cartId`: the summary
+      panel''s lines and totals, and the first line with no parent line for `getPublishedBookingFlow`''s
+      `productId`; not called when an `orderId` came with the link, which reads `getOrder` instead (ADAM
+      CR-590). With the guest session the device already holds: signed in, or the anonymous cart session
+      a visitor gets with the first line (ADR-0045)'
+    trigger: onLoad
+    provenance: ADAM CR-590, decided by Chinmay on 3 November 2026
   - operationId: inquirePaymentStatus
     contract: orders
     purpose: Ask what happened to a payment that did not answer
     trigger: onAction
   - operationId: getPublishedBookingFlow
     contract: white-label
-    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12);
+      `productId` from the cart''s (or the order''s) first line with no parent line, never called with
+      no id (ADAM CR-590)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
   - operationId: listPublishedPolicies
@@ -3521,6 +3598,12 @@ screens:
       names (attendees) and opt-ins (marketingConsents) from WEB-011 when it ran'
     trigger: onAction
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: recordConsentAnswers
+    contract: marketing-crm
+    purpose: Record the answers to the questions Pay now's checkoutCart refused for (422 consentRequired
+      or consentAnswerBlocks), once, after the last question (ADAM CR-556 with CR-576)
+    trigger: onAction
+    provenance: ADAM CR-556, 3 November 2026; ADAM CR-576 (CHG-R14INT-001)
   entryState:
     params:
     - name: cartId
@@ -3528,8 +3611,9 @@ screens:
     - name: orderId
       from: deepLink
       optional: true
-      notes: A link to an order already pending payment opens it; otherwise checkoutCart makes the order
-        from the cart.
+      notes: 'A link to an order already pending payment opens it; otherwise checkoutCart makes the order
+        from the cart. Also the card round trip''s return: `returnUrl` is this route with `?orderId=`,
+        and the order is read back with the order access cookie (ADAM CR-575).'
     - name: paymentId
       from: navigation
       optional: true
@@ -3577,6 +3661,31 @@ screens:
     why: Transfers happen after purchase from the tickets (WEB-030); on the payment screen it offered
       to give away tickets not yet paid for (F55 step 4).
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  overlays:
+  - id: consentQuestions
+    component: modal
+    trigger: Pay now's checkoutCart refuses 422 consentRequired or consentAnswerBlocks
+    body: '**The same consent pop-up as WEB-006, for the questions still unanswered** (ADAM CR-556 with
+      CR-576, CHG-R14INT-001; then Pay now sends `checkoutCart` once more). **The venue''s consent questions
+      for this booking**, e.g. *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept
+      the risk*: one or several, in the order `Cart.consentQuestions` gives (the booking flow''s `BookingFlowLevelSettings.consentQuestionIds`
+      and every cart product''s `consentQuestionIds`, each question once). A question asked **per person**
+      is asked for each member of the party; one asked **per booking** once. Themed as the prototype''s
+      pop-up (Yes / No, Next). Next sends the answers to `recordConsentAnswers`, which stores each as
+      a consent record (question version, answer, who answered, when). **A blocking answer** (e.g. *No*
+      to the swim question) marks the lines it blocks and says so; the guest removes them or answers again.
+      There is no tenant on/off toggle: a question is attached to a product or a flow by the venue (decided
+      29 September, rev 3 REV3-26).'
+    bindsTo: ConsentQuestion
+    confirm:
+      label: Next
+      operation: recordConsentAnswers
+    dismiss:
+      label: Back
+      discards:
+      - answers
+    provenance: the pop-up as WEB-006 has it (client-verified), opened on this screen for checkoutCart's
+      422 (ADAM CR-556 with CR-576, 3 November 2026; CHG-R14INT-001)
 - id: WEB-013
   name: Booking Confirmation
   module: Cart & Checkout
@@ -3896,8 +4005,13 @@ screens:
         provenance: contract orders.yaml GET /payment-links/{token}
       - kind: detailPanel
         bindsTo: PaymentLinkView
-        notes: Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked
-          by phone may not recognise a reference number.
+        notes: 'Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked
+          by phone may not recognise a reference number. **As the frame shows** (ADAM CR-578, CHG-CR578-001):
+          each line is drawn by `PaymentLinkLine.displayName`, the visit from the earliest `visitStartsAt`
+          and the reference from `orderNumber`, in the main view and in the expired and already-paid views
+          (the `410` `linkExpired` and `linkPaid` carry `orderNumber`, `venueName`, `lines` and, paid,
+          `amount`). Guest count and subtotal come from the lines'' quantities and amounts. Until the
+          backend ships, these fields are stubbed.'
         provenance: carried from the previous definition
       - kind: banner
         notes: The deadline, counted in time remaining rather than as a timestamp. **Expires in 46 minutes**
@@ -7873,10 +7987,10 @@ screens:
     transitions:
     - to: WEB-031
       trigger: My Reservations
-      provenance: 'derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId,
-        resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId,
-        resourceId only pre-select (optional); WEB-031 finds productId (listGroupPackages) itself, and
-        WEB-031 opens on its own'
+      carries:
+      - productId
+      provenance: derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId,
+        resourceId and WEB-030 holds productId, so an edge into it carries them
     - to: GST-014
       trigger: The friend claims it in the app
       provenance: flow F55 step 4→5
@@ -7947,12 +8061,34 @@ screens:
     trigger: onLoad
     shownBy: Listed for resale · AED 180
     provenance: r8 walk, 20 October 2026 (ORDERS-MONEY-C26, CHG-R8SPN-012)
+  - operationId: listTicketTransfers
+    contract: orders
+    purpose: 'The guest''s sent transfers, drawn as the approved frame''s sent rows in Transfer & resale,
+      above the resale rows; no component of its own and the layout does not change (ADAM CR-593, Chinmay,
+      3 November 2026; CHG-CR593-001). Called with `direction=sent` when the screen opens, every page
+      read until `hasMore` is false, and again after Transfer tickets succeeds. One row per transfer,
+      in the order returned (soonest to lapse first). Title: the line of the `listMyOrders` order whose
+      `id` is the transfer''s `orderId` and whose `entitlementIds` hold its `ticketIds`, written as the
+      order cards write that line (more order pages are read when the order is not loaded). Second line:
+      the channel part, '' · '', the state part. Channel part from `recipientChannel`: email is ''Sent
+      to '' plus `recipientAddressMasked` (always masked, as the server sends it), sms is ''Sent by SMS'',
+      whatsapp is ''Sent by WhatsApp''. State part: offered is ''waiting to be claimed'' (no date); claimed
+      is ''claimed'' plus the day and month of `claimedAt`; expired is ''expired, tickets returned'' plus
+      the day and month of `expiresAt`; cancelled is ''cancelled''. ''N sent this year'' at the top right
+      counts the sent transfers whose `offeredAt` falls in the current calendar year in the venue''s time
+      zone; the read has no total. The loading and empty states that speak of the ticket transfer list
+      mean this list: a guest with no sent transfers sees the first-run empty state. The rows'' Details
+      and Cancel transfer buttons are not part of this read (no operation exists for them).'
+    trigger: onLoad
+    shownBy: Sent by SMS · waiting to be claimed
+    provenance: ADAM CR-593, Chinmay, 3 November 2026 (CHG-CR593-001)
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
     invalidates:
     - listMyOrders
+    - listTicketTransfers
   - operationId: listMyOrders
     contract: orders
     purpose: The orders this guest placed
@@ -8711,6 +8847,8 @@ screens:
     purpose: Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit
       R236)
     trigger: onAction
+    inputSources:
+      orderId: checkoutCart.id
   - operationId: addCartLine
     contract: orders
     purpose: Add the chosen item to the cart, for collection on the way out
@@ -8990,7 +9128,7 @@ screens:
       trigger: Ticket Transfer
       provenance: 'derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds
         none of them. The edge carries nothing: transferId only pre-selects (optional); WEB-030 finds
-        orderId (listMyOrders) itself, and WEB-030 opens on its own'
+        orderId (listTicketTransfers) itself, and WEB-030 opens on its own'
     - to: WEB-031
       trigger: My Reservations
       carries:

@@ -1276,7 +1276,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | Logo (`cookieBanner.logoAssetId`) | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001, WEB-001 | — |
 | Cookie banner title (`cookieBanner.title`) | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. |
 | Body (`cookieBanner.body`) | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. |
-| Position (`cookieBanner.position`) | Top · Bottom · Popup · Modal | — | GST-001, WEB-001 | — |
+| Position (`cookieBanner.position`) | Top · Bottom · Popup · Modal | — | GST-001, GST-007, WEB-001 | — |
 | Theme (`cookieBanner.themeId`) | — | — | GST-001, WEB-001 | The white-label theme it takes colours and fonts from. |
 | Buttons (`cookieBanner.buttons`) | — | — | GST-001, WEB-001 | — |
 | Buttons: action (`cookieBanner.buttons[].action`) | Accept all · Reject non essential · Manage preferences · Save preferences · Do not sell or share | — | GST-001, WEB-001, WEB-016 | — |

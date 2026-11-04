@@ -56,6 +56,25 @@
   "requestBody": "WebhookSubscription",
   "responds": "WebhookSubscription"
  },
+ "getWalletIntegrationMapping": {
+  "method": "GET",
+  "path": "/wallet-integration-mappings",
+  "contract": "wallet",
+  "summary": "How one integration's fields, currencies, statuses and credit types map, as saved",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "apiClientId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletIntegrationMapping"
+ },
  "getWalletLiability": {
   "method": "GET",
   "path": "/wallet-liability",

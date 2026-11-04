@@ -1260,7 +1260,7 @@
   "name": "Partial Payment, Failure & Recovery Manager",
   "module": "Commercial",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
@@ -1332,6 +1332,13 @@
        "notes": "The pack groups this record's detail under its own headings: “AED 200 successfully consumed”, “Partial Payment States”, “Timeout”, “Partially Paid”.",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card",
        "operation": "getDunningPolicy"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Which tenders may be combined, and in what order",
+       "bindsTo": "MixedTenderRules",
+       "operation": "getMixedTenderRules",
+       "provenance": "r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules on ADM-606)"
       }
      ]
     }
@@ -1345,6 +1352,13 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getMixedTenderRules",
+    "contract": "payments",
+    "purpose": "The tender rules this screen edits, as saved",
+    "trigger": "onLoad",
+    "provenance": "r14 review lane i (CHG-R14I-013; the lead, 3 November 2026: bind getMixedTenderRules on ADM-606)"
+   },
    {
     "operationId": "setMixedTenderRules",
     "contract": "payments",

@@ -13,7 +13,7 @@
 
 ## Why this is a service
 
-Merchandise, wallets and gift cards. Modest at 35 operations, and separate because **it is licensed separately** — a venue can run ticketing with no shop.
+Merchandise, returns and gift cards; the wallet runtime left for WalletService on 19 September. Modest (25 operations on 3 November 2026), and separate because **it is licensed separately** — a venue can run ticketing with no shop.
 
 ## Depends on
 
@@ -403,6 +403,8 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 
 Links a sellable catalogue variant to an inventory item. That link is what makes a sale deplete stock — merchandise without it sells but never runs out, which is how a shop discovers its stock figures are fiction.
 
+**The price is copied from the catalogue variant, never typed in** (ADAM CR-559 and CR-574, Chinmay, 3 November 2026; CHG-CR559-001). The approved Retail Products screen has no price field, and a till sale charges the price Orders took from the catalogue. (1) **Venue:** the item's outlet is read with `tenancy#outletRecords`, in process (ids [outletId]). An outlet that is not found, or belongs to a venue other than the caller's, is `400 validation` on `outletId`. That outlet's `venueId` is the venue in (2) and the 201. (2) **Price:** `catalogue#variantPriceRecords` is asked in process (the operations host already reads Catalogue's price tables for the wishlist, so no new grant) with `variantId`, that `venueId`, channel `pos`, `at` now and no `customerSegment`. The amount is stored as `list_price`. A null amount is `409` with `refusedReason` `variantNotPriced`, and nothing is written. `price` is answered as Money in the venue's currency and scale from `tenancy#venueSettingsRecords`. (3) **Stock:** `on_hand` is written 0. The request takes no stock figure; stock arrives through Inventory's movements. (4) **SKU in use:** before inserting, another item at the same `outletId` whose lower(`sku`) equals the lowercased requested `sku` is looked for; if one exists the answer is `409` `refusedReason` `skuInUse` with `conflictingMerchandiseId` set to that item. A unique violation on `merchandise_outlet_id_sku_uniq` (a race) is the same `409`, and one on `merchandise_outlet_id_barcode_uniq` is `barcodeInUse`, never a `500`. (5) BO-048 and BO-007 do not change: the forms send what they send today, and a `409` shows in the form's existing error message, worded by its `refusedReason`.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -412,7 +414,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.merchandise` |
-| Writes | `cache:idempotency`, `retail.merchandise` |
+| Writes | `cache:idempotency`, `platform.outbox`, `retail.merchandise` |
 | Called by | BO-007, BO-048 |
 
 **Parameters**
@@ -457,7 +459,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 | price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| onHand | number | yes |  |
+| onHand | number | yes | 0 at create; the request takes no stock figure, and stock arrives through Inventory's movements (ADAM CR-559). |
 | isReturnable | boolean |  | (default True) |
 | returnWindowDays | integer |  | (nullable) |
 | requiresSerialNumber | boolean |  | (default False) |
@@ -472,7 +474,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 |---|---|---|
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
-| 409 |  | Barcode already in use by another item with the same outletId (ADAM CR-104). |
+| 409 |  | Barcode already in use by another item with the same outletId (ADAM CR-104), refusedReason barcodeInUse; the SKU already used by another item at the same outletId, compared lowercased, skuInUse; or t… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMerchandise
@@ -484,6 +486,8 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 **A guest gets the guest projection, not the stock record.** A staff caller receives `MerchandiseItem`. A guest caller receives `GuestMerchandiseItem`, which leaves out the inventory link, the catalogue variant, the stock count and the serial-number flag, and says only whether the item can be bought. The server chooses by the caller's audience; the client does not ask for one.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 **Order.** Sorted by `name` ascending, then by `id`.
+
+**The venue, through the outlets** (ADAM CR-574, Chinmay, 3 November 2026; CHG-CR574-001): a merchandise item reaches its venue only through its outlet, so Tenancy's outlets are read in process (`tenancy#outletRecords`, inside the operation's own transaction), the same rule F&B's menus follow. The venue is `X-Venue-Id` for a guest or visitor, and the session's venue for staff. `outletRecords` is asked with where {venueId}, and only `retail.merchandise` rows whose `outlet_id` is one of those outlets are listed. An `outletId` that is not one of them answers an empty page, never another venue's items. Every row is priced in that venue's currency, with one `venueSettingsRecords` read per page. All other filters, the order and the guest view stay as they are. `retail.merchandise` gets no venue column.
 
 |  |  |
 |---|---|
@@ -533,6 +537,8 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 
 **`PATCH /merchandise/{merchandiseId}`**: Amend a merchandise item
 
+**The price follows the catalogue** (ADAM CR-559 and CR-574, Chinmay, 3 November 2026; CHG-CR559-001). The item's stored outlet is read with `tenancy#outletRecords` in process (ids [the stored `outlet_id`]); its venue prices the 200. Every successful update asks `catalogue#variantPriceRecords` again, in process, for the item's variant and that venue (channel `pos`, `at` now, no `customerSegment`), and stores the amount as `list_price` when there is one. A null amount keeps the stored `list_price` and refuses nothing. The body has no price field. `sku` cannot change here, so `skuInUse` is create only; a unique violation on `merchandise_outlet_id_barcode_uniq` is the `409` `barcodeInUse`, never a `500`. BO-048 does not change.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -542,7 +548,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.merchandise` |
-| Writes | `cache:idempotency`, `retail.merchandise` |
+| Writes | `cache:idempotency`, `platform.outbox`, `retail.merchandise` |
 | Called by | BO-048, BO-116 |
 
 **Parameters**
@@ -585,7 +591,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| onHand | number | yes |  |
+| onHand | number | yes | 0 at create; the request takes no stock figure, and stock arrives through Inventory's movements (ADAM CR-559). |
 | isReturnable | boolean |  | (default True) |
 | returnWindowDays | integer |  | (nullable) |
 | requiresSerialNumber | boolean |  | (default False) |
@@ -652,6 +658,11 @@ Goods returned damaged or opened are written off rather than restocked, and that
 | reason | ReturnReason: enum (changedMind, wrongSize, wrongItem, faulty, damagedInTransit, duplicatePurchase, giftReturn, other) | yes |  |
 | refundTender | string |  | Defaults to the original tender. |
 | secondaryAuthorisation | object |  | Required above the outlet's self-authorise limit. |
+| secondaryAuthorisation.offline | object |  | Sent only by a call queued offline whose step-up was checked on the device against its offline verifier (CHG-R14V-001). |
+| secondaryAuthorisation.offline.packageId | string (uuid) | yes | The offline step-up package (identity OfflineStepUpPackage.packageId) the device checked against. |
+| secondaryAuthorisation.offline.verifierId | string (uuid) | yes | The signer's verifier in that package (OfflineStepUpSigner.verifierId). |
+| secondaryAuthorisation.offline.verifiedAt | string (date-time) | yes | Device time the typed PIN matched the verifier. |
+| secondaryAuthorisation.offline.failedAttemptsBefore | integer | yes | Wrong PINs the device counted for this signer since its package was applied, before this one matched. (min 0) |
 | secondaryAuthorisation.principalId | string (uuid) |  | The supervisor signing. |
 | secondaryAuthorisation.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
 | secondaryAuthorisation.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
@@ -1280,7 +1291,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | variant_id | uuid | yes | The catalogue variant sold. |
 | inventory_item_id | uuid | no | The stock item depleted on sale. |
 | list_price | numeric(18,4) | yes |  |
-| on_hand | numeric | yes |  |
+| on_hand | numeric | yes | 0 at create; the request takes no stock figure, and stock arrives through Inventory's movements (ADAM CR-559). |
 | is_returnable | boolean | no |  |
 | return_window_days | integer | no |  |
 | requires_serial_number | boolean | no |  |

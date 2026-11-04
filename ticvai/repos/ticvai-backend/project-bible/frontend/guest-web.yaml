@@ -47,7 +47,7 @@ contracts:
 - venue-map
 - wallet
 - white-label
-deployment:
+deployment: &id001
   target: browser
   distribution: CDN + edge
   bundleUpdate: immediate on deploy
@@ -56,6 +56,12 @@ deployment:
   deviceOwnership: guest device
   networkAssumption: public internet, unmanaged
   releaseCadence: continuous
+platformProfiles:
+- platform: P01
+  formFactor: web
+  runtime: reactWeb
+  offlineCapable: false
+  deployment: *id001
 screenCount: 50
 byWave:
   wave1: 50

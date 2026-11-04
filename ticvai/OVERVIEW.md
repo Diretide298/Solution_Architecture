@@ -4,7 +4,7 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**2864 operations · 33 contracts · 1173 tables · 2453 screens · 210 state models · 98 authored flows · 72 ADRs**
+**2873 operations · 33 contracts · 1178 tables · 2453 screens · 210 state models · 98 authored flows · 72 ADRs**
 
 **Design 95% · Build 32%** (handoff/status.json).
 
@@ -12,8 +12,8 @@ journeys through them, and the reasoning behind every decision that was not obvi
 
 ## What this is for
 
-**A contract-first package that refuses to contradict itself.** 107 checks run on
-every refresh, 99 of them gating: a screen cannot call an operation that does not exist, an operation cannot
+**A contract-first package that refuses to contradict itself.** 117 checks run on
+every refresh, 111 of them gating: a screen cannot call an operation that does not exist, an operation cannot
 name a table stored nowhere, a state model cannot anchor on a schema with no values, a
 flow cannot step through a screen that was deleted.
 
@@ -32,14 +32,14 @@ package has been bitten by that three times.
 
 | | | |
 |---|---:|---|
-| Requirements contracted | **3,153** of 3,184 | **100% of what is in scope** |
-| Operations reaching a screen | 2577 of 2864 | 90% |
-| Screens reachable from an entry point | 2451 of 2453 | 100% |
+| Requirements contracted | **3,154** of 3,184 | **100% of what is in scope** |
+| Operations reaching a screen | 2583 of 2873 | 90% |
+| Screens reachable from an entry point | 2453 of 2453 | 100% |
 | Screens drawn on a board | 2453 of 2453 | 100% |
 | Screens in an authored journey | 265 of 2453 | 11% |
 | Screens on any flow, board-derived routes included | 2108 of 2453 | 86% |
 | Conflicts | 158 closed | 8 open, 0 blocking |
-| Tables in the DDL | 1,123 of 1,173 | 96% |
+| Tables in the DDL | 1,123 of 1,178 | 95% |
 
 ---
 
@@ -97,8 +97,8 @@ cd viewer && npm start        →  http://localhost:4173
 | `docs/adr/` | Decisions, with the alternatives and why they lost |
 | `docs/registers/` | Conflicts, traceability, the backlog |
 | `handoff/` | Derived artefacts — the schema reference, the lineage, the graph |
-| `tools/` | 107 checks (tools/run-checks.py) and 43 derivers. `bash tools/refresh.sh` runs everything |
-| `repos/` | Mirrors of this package for each build repository. Also generated |
+| `tools/` | 117 checks (tools/run-checks.py) and 43 derivers. `bash tools/refresh.sh` runs everything |
+| `repos/` | Each repository's project documents (its README, its CLAUDE.md from ADAM's starter) and `project-bible/`, a mirror of this package; no code. Also generated |
 
 ---
 
@@ -110,7 +110,7 @@ cd viewer && npm start        →  http://localhost:4173
 
 **98 authored journeys of a target 120**, beside 193 routes derived from the client boards. 3 of 33 contracts have no operation in an authored journey (`payments`, `rental`, `transport`). **Every journey written so far has found a defect**, which is the argument for writing more.
 
-**2 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
+**0 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
 
 **8 conflicts are open**, 0 of them blocking. Each is listed with who answers it:
 

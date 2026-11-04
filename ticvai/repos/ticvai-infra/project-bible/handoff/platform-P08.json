@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-11-03",
+ "generated": "2026-11-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1663,
-  "operations": 1899,
+  "operations": 1903,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
   "operationsWithNoScreen": 208
  },
  "waves": {
-  "wave1": 150,
-  "wave2": 55,
-  "wave3": 1458
+  "wave1": 170,
+  "wave2": 53,
+  "wave3": 1440
  },
  "modules": [
   {
@@ -156,8 +156,7 @@
    "module": "Transport",
    "screens": 7,
    "waves": [
-    1,
-    2
+    1
    ]
   },
   {
@@ -183,7 +182,7 @@
   },
   {
    "contract": "catalogue",
-   "operations": 232
+   "operations": 237
   },
   {
    "contract": "orders",
@@ -202,19 +201,19 @@
    "operations": 78
   },
   {
-   "contract": "finance",
-   "operations": 62
-  },
-  {
    "contract": "wallet",
    "operations": 62
   },
   {
-   "contract": "resources",
-   "operations": 56
+   "contract": "finance",
+   "operations": 62
   },
   {
    "contract": "ai",
+   "operations": 56
+  },
+  {
+   "contract": "resources",
    "operations": 56
   },
   {
@@ -246,15 +245,15 @@
    "operations": 44
   },
   {
-   "contract": "identity",
-   "operations": 42
-  },
-  {
    "contract": "workforce",
    "operations": 42
   },
   {
    "contract": "maintenance",
+   "operations": 41
+  },
+  {
+   "contract": "identity",
    "operations": 41
   },
   {
@@ -595,7 +594,7 @@
    "id": "ADM-071",
    "name": "Fee & Surcharge Library",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/fee-surcharge-library-adm-071",
    "operations": 2,
    "drawn": true
@@ -748,7 +747,7 @@
    "id": "ADM-088",
    "name": "Dynamic Pricing Strategy Command Center",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/dynamic-pricing-strategy-command-center-adm-088",
    "operations": 2,
    "drawn": true
@@ -928,7 +927,7 @@
    "id": "ADM-108",
    "name": "Revenue Optimization Command Center",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/revenue-optimization-command-center-adm-108",
    "operations": 1,
    "drawn": true
@@ -2287,27 +2286,27 @@
    "id": "ADM-259",
    "name": "Channel Creation & Profile Configuration",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/channel-creation-profile-configuration-adm-259",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
    "id": "ADM-260",
    "name": "Product & Catalogue Assignment",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/product-catalogue-assignment-adm-260",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
    "id": "ADM-261",
    "name": "Channel Pricing & Commercial Profile Assignment",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/channel-pricing-commercial-profile-assignment-adm-261",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2323,7 +2322,7 @@
    "id": "ADM-263",
    "name": "Channel Sales Schedule & Availability Windows",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/channel-sales-schedule-availability-windows-adm-263",
    "operations": 2,
    "drawn": true
@@ -2350,25 +2349,25 @@
    "id": "ADM-266",
    "name": "Channel Fees, Payment & Fulfillment Configuration",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/channel-fees-payment-fulfillment-configuration-adm-266",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
    "id": "ADM-267",
    "name": "Channel Publication, Readiness & AI Validation",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/channel-publication-readiness-ai-validation-adm-267",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
    "id": "ADM-268",
    "name": "Channel Operations Command Center",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/channel-operations-command-center-adm-268",
    "operations": 1,
    "drawn": true
@@ -2377,7 +2376,7 @@
    "id": "ADM-269",
    "name": "Channel Connection & Integration Manager",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/channel-connection-integration-manager-adm-269",
    "operations": 3,
    "drawn": true
@@ -2919,7 +2918,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/organizational-hierarchy-routing-adm-331",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2937,7 +2936,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/venue-tenant-approval-matrix-adm-333",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2946,7 +2945,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/value-threshold-routing-adm-334",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2955,7 +2954,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/risk-based-conditional-routing-adm-335",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3018,7 +3017,7 @@
    "module": "Platform",
    "wave": 1,
    "route": "/platform/authentication-mfa-policy-manager-adm-342",
-   "operations": 7,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -3682,9 +3681,9 @@
    "id": "ADM-606",
    "name": "Partial Payment, Failure & Recovery Manager",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/partial-payment-failure-recovery-manager-t100-adm-606",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -5284,7 +5283,7 @@
    "id": "BO-087",
    "name": "Approval Delegations",
    "module": "People & Access Rights",
-   "wave": 2,
+   "wave": 1,
    "route": "/approvals/approval-delegations",
    "operations": 5,
    "drawn": true
@@ -5581,7 +5580,7 @@
    "id": "BO-1018",
    "name": "Accessible Seating Master",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/accessible-seating-master-bo-1018",
    "operations": 2,
    "drawn": true
@@ -5743,7 +5742,7 @@
    "id": "BO-1034",
    "name": "Best Seat Recommendations",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/best-seat-recommendations-bo-1034",
    "operations": 2,
    "drawn": true
@@ -5889,7 +5888,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/scenario-what-if-planning-bo-1049",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -7174,9 +7173,9 @@
    "id": "BO-1179",
    "name": "Integration Monitoring & Exception Workbench",
    "module": "Orders & Money",
-   "wave": 3,
+   "wave": 1,
    "route": "/orders-money/integration-monitoring-exception-workbench-bo-1179",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -7255,7 +7254,7 @@
    "id": "BO-1187",
    "name": "Transport Departure Board",
    "module": "Transport",
-   "wave": 2,
+   "wave": 1,
    "route": "/transport/departures",
    "operations": 4,
    "drawn": true
@@ -8848,7 +8847,7 @@
    "id": "BO-291",
    "name": "Membership Commercial, Pricing & Channel Association",
    "module": "Sell",
-   "wave": 3,
+   "wave": 1,
    "route": "/sell/membership-commercial-pricing-channel-association-bo-291",
    "operations": 7,
    "drawn": true
@@ -9316,7 +9315,7 @@
    "id": "BO-344",
    "name": "Media Design Studio Command Center",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/media-design-studio-command-center-bo-344",
    "operations": 8,
    "drawn": true
@@ -10605,7 +10604,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/self-service-wallet-top-up-bo-488",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -11964,7 +11963,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/reviewer-assignment-delegation-bo-639",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -14788,7 +14787,7 @@
    "id": "BO-954",
    "name": "Venue Canvas",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/venue-canvas-bo-954",
    "operations": 3,
    "drawn": true
@@ -16606,13 +16605,6 @@
    },
    {
     "module": "Stock & Supply",
-    "waves": [
-     1,
-     2
-    ]
-   },
-   {
-    "module": "Transport",
     "waves": [
      1,
      2

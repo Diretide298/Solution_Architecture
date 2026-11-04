@@ -646,6 +646,8 @@ class Model:
                 continue
             if BACKFILL_UPDATE.match(s):
                 continue   # a declared backfill's one-time UPDATE (CHG-R10OPN-002): data, not schema
+            if DATA_STEP.match(s):
+                continue   # a hand-written data step, `$data$`, or its session helper (CHG-R14INT-004): not schema
             tf = TYPE_FIX.match(s)
             if tf:
                 # a column a frozen baseline typed with a type nothing creates, converted (CHG-R12DB-001)
@@ -855,9 +857,11 @@ def guard_drop_index(idx: str) -> str:
 PERFORM_BLOCK = re.compile(r"^DO \$\$ BEGIN IF (?P<guard>.*?) THEN (?P<body>PERFORM .*); END IF; END \$\$$", re.I | re.S)
 DROP_POLICY = re.compile(rf"^DROP POLICY IF EXISTS {NAME} ON ({QNAME})$", re.I)
 # derive-ddl's guarded grant of a read across deployables (ADAM CR-196, CHG-R9CR-005): role, table.
+# A read limited to named columns (`columns` on the entry, ADAM CR-595, CHG-CR595-001) is `GRANT SELECT (a, b) ON`; group 3
+# is that list, or None for the whole table.
 GRANT_READ = re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM pg_roles WHERE rolname = '(\w+)'\) AND "
-                        r"to_regclass\('([\w.]+)'\) IS NOT NULL THEN GRANT SELECT ON [\w.]+ TO \w+; END IF; END \$\$;?$",
-                        re.I)
+                        r"to_regclass\('([\w.]+)'\) IS NOT NULL THEN GRANT SELECT (?:(\([\w, ]+\)) )?ON [\w.]+ TO \w+; "
+                        r"END IF; END \$\$;?$", re.I)
 # derive-ddl's guarded USAGE on the schema of a read granted across deployables (ADAM CR-247, CHG-R10CRF-007): role,
 # schema. A SELECT on a table is refused without USAGE on its schema, which DB-ROLES gives a role on its own schemas only.
 GRANT_USAGE = re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM pg_roles WHERE rolname = '(\w+)'\) AND "
@@ -925,6 +929,15 @@ def guard_block(guard: str, stmts) -> str:
 
 # **A backfill a contract declares** (CHG-R10OPN-002): the UPDATE inside `backfill_block`, which a model does not fold.
 BACKFILL_UPDATE = re.compile(rf"^UPDATE (?:ONLY )?{QNAME} SET {NAME} = .+$", re.I | re.S)
+
+
+# **A hand-written data step is data, not schema** (r14 integration, 4 November 2026; CHG-R14INT-004). A forward
+# migration a person writes for a live database counts the rows a new rule would refuse and stops on them, fills a
+# column from the rows' own data, or copies values (personal data into pii.*), before the guarded schema block that
+# makes the change. Such a step is a `DO $data$ ... $data$` block, and its helpers are session functions
+# (`CREATE ... FUNCTION pg_temp.`): neither changes the schema, so the old side skips them, and only the schema
+# blocks beside them (SET NOT NULL, VALIDATE CONSTRAINT) are folded and leave the review list.
+DATA_STEP = re.compile(r"^(?:DO \$data\$|CREATE (?:OR REPLACE )?FUNCTION pg_temp\.)", re.I)
 
 
 def backfill_block(t: str, c: str, add: str, value: str) -> str:
@@ -2043,7 +2056,8 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             # guarded on the role and the table (docs/active/cross-deployable-writes.yaml `reads`). A GRANT touches no
             # row and runs twice, so it is written as it is.
             p.statements.append(stmt)
-            p.rollback.append(f"REVOKE SELECT ON {unq(g.group(2))} FROM {g.group(1)};")
+            p.rollback.append(f"REVOKE SELECT {g.group(3) + ' ' if g.group(3) else ''}ON {unq(g.group(2))} "
+                              f"FROM {g.group(1)};")
             p.counts["other"] += 1
             continue
         gu = GRANT_USAGE.match(s)

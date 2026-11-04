@@ -1,6 +1,6 @@
 # TICVAI
 
-**2864 operations · 1173 tables · 2453 screens · 210 state models · 113 events · 98 flows · 72 ADRs**
+**2873 operations · 1178 tables · 2453 screens · 210 state models · 114 events · 98 flows · 72 ADRs**
 
 **Conflicts:** every one and its state in `conflict-status.md`; the open ones, with who answers each, in [OVERVIEW.md](OVERVIEW.md). **Today's figures are in OVERVIEW.md**, derived on every refresh; the counts on this page are rewritten from `handoff/status.json` by `tools/sync-counts.py`, and it carries no other figure (r13 system review F-13).
 
@@ -18,7 +18,7 @@ provenance and what each one rules out — including the six that were wrong fir
 | **`wireframes/TICVAI Wireframe Boards.dc.html`** | 219 boards, 2453 screens. Open in a browser |
 | **`handoff/platforms-and-apps.md`** | The platforms and the apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
-| **`handoff/TICVAI_Schema_Reference.xlsx`** | The data model as a workbook: 1173 tables |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | The data model as a workbook: 1178 tables |
 | **`handoff/ai-index.md`** | Where every AI artefact lives |
 | **`docs/active/workshop-packs.md`** | The three blocked domains, prepared |
 
@@ -26,10 +26,10 @@ provenance and what each one rules out — including the six that were wrong fir
 
 | | |
 |---|---|
-| `contracts/` | **2864 operations** in 33 contracts, spine and satellite |
+| `contracts/` | **2873 operations** in 33 contracts, spine and satellite |
 | `screens/` | 2453 screens across 16 platforms |
 | `frontend/` | 13 frontends, one derived manifest each, with build readiness |
-| `states/` · `events/` | 210 state models · 113 events, cross-checked |
+| `states/` · `events/` | 210 state models · 114 events, cross-checked |
 | `flows/` | 98 flows written as journeys, beside the routes derived from the client boards |
 | `handoff/` | Registers, indexes and workbooks: the derived layer |
 | `docs/` | Architecture, 72 ADRs, the conflict register |
