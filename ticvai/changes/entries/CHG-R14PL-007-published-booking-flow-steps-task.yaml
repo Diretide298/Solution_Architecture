@@ -1,0 +1,38 @@
+id: CHG-R14PL-007
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR591-PUBLISHED-BOOKING-FLOW-STEPS (Hrushikant Patkar, after PLATFORM-KERNEL): white-label#publishedBookingFlowSteps,
+  the booking flow rule served on the service route; named under #27878.'
+decision:
+  what: 'ADAM CR-591, approved by Chinmay on 3 November 2026; lane f listed the task (CHG-CR591-001); the lead, 4 November
+    2026: "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the rule #31033 built is exposed as a new service query, which the operation formula does not build.'
+keys_touched:
+  tickets:
+  - CR591-PUBLISHED-BOOKING-FLOW-STEPS (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a service query a decision adds, which no formula builds
+tickets:
+  started:
+  - '31033 (getPublishedBookingFlow, Ready for QA, Hrushikant Patkar) and 27878 (its task, Ready for QA): not rewritten.'
+  unstarted:
+  - '31009 (listProducts), 31004 (searchCatalogue), 31727 (getProduct), all New: ask it for bookingEntry.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-591
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

@@ -1,0 +1,46 @@
+id: CHG-R14PL-011
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'R14C-DB-CONTROL-PUBLIC-API (Hrushikant Patkar, after MIG-CONTROL: api_version''s deprecation columns, integration_listing.review_notes,
+  the unique indexes, client_id filled then NOT NULL, each step counting the rows that break it and stopping) and R14C-DB-ANOMALY-RULE-TENANT
+  (after MIG-CONTROL, named under MIG-CONTROL-13 #28006: the tenant foreign key NOT VALID, then NOT NULL after a count). R14S-DB-INTEGRATION-LISTING-NOTES,
+  which round 1 filed, is dropped: CHG-R14INT-003 keeps one note, review_notes, and certification_notes is not added.'
+decision:
+  what: 'ADAM CR-566 and CR-569 to CR-572, decided by Chinmay on 3 November 2026; the overnight decision of 4 November (never
+    delete or rewrite a row that breaks a new rule: count and stop); CHG-R14INT-003; the lead, 4 November 2026: "take the
+    recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: lane c''s control changes sit on tables whose migrations #27647 and #28006 are Ready for QA.'
+keys_touched:
+  tickets:
+  - R14C-DB-CONTROL-PUBLIC-API (new)
+  - R14C-DB-ANOMALY-RULE-TENANT (new)
+  - R14S-DB-INTEGRATION-LISTING-NOTES (dropped)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change that adds columns to a table whose migration ticket has started, carried by no plan task
+tickets:
+  started:
+  - '27647 (MIG-CONTROL) and 28006 (MIG-CONTROL-13), Ready for QA, Hrushikant Patkar: not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-572
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'A change-only [DB] task (area database; its key does not end in -DB, so it does not count as creating its tables),
+  owner the migration owner (team.json migrations, Hrushikant Patkar). The release''s forward migration is written once by
+  the r14 integration; the task copies its statements. The message_dispatch policy change of lane s rides on #37169''s follow-up
+  comment.'

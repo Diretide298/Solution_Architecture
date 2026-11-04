@@ -1,0 +1,44 @@
+id: CHG-R14PL-001
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR551-GST008-WAITING-ROOM (Chitrangi Mestry, [FE], after APP-MOB-GST-008): GST-008 sends the guest to GST-046 on
+  a refused addCartLine and back with the quantities kept; named under #28159. build-service-docs places a hand-written [FE]
+  task with no screen key in the app-module of the first screen its builds name.'
+decision:
+  what: 'ADAM CR-551, decided by Chinmay on 3 November 2026 (posted on #31784: "that is a separate ticket, so build nothing
+    for it here"); lane d listed the task (CHG-CR551-001, LO-CR551-001); the lead, 4 November 2026: "take the recommended
+    decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: lane d (CHG-CR551-001) named a new [FE] task under #28159 that no plan task carried; and build-service-docs
+  stopped on a Block A [FE] task whose key is not a screen key (TypeError in the app-module pass).'
+keys_touched:
+  tickets:
+  - CR551-GST008-WAITING-ROOM (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+root_class: a settled change spanning a screen's ticket, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - '28159 ([FE] GST-008 Tickets & Add-ons, New): the move is this task''s, beside it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-551
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task, so the ticket the work belongs to is named in the text. #31775 (GST-008''s build)
+  is Ready for QA and not rewritten. LO-CR551-001 stays on the left-out list (check-business-rules BR-GST007-ELIGIBILITY-RULES
+  reads it) until the ticket exists.'

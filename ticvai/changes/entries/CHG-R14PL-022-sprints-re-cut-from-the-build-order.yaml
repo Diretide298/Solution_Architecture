@@ -1,0 +1,45 @@
+id: CHG-R14PL-022
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'The schedule re-cuts every unstarted task from 4 November 2026 in build order (tools/sprint_plan.py REPLAN_FROM,
+  replan_floor): in the r13 schedule 850 tasks nobody had started sat in Sprints 1 and 2, which had ended. A started task
+  keeps its place, and OpenProject keeps a started ticket''s sprint. On the tree with lanes b, c, m and l merged, 3,228 unstarted
+  tasks change sprint; Pranay Shinde''s cart task SVC-ORDER-CART-1 (addCartLine, checkoutCart) moves from Sprint 2 to Sprint
+  3, starting 12 November, past Thursday 5 November. Block B''s last work moves from Sprint 6 to Sprint 9 (the plan now starts
+  from today); Blocks A, A2, C and D keep their end sprints.'
+decision:
+  what: 'The lead''s Sprint 1 message of 3 November 2026 ("work in build order", taken as yes) and the coordinator''s plan
+    pass items "each developer''s sprints re-cut from the build order" and "addCartLine and checkoutCart run past Thursday
+    (Pranay): move them in the sprint plan"; the lead, 4 November 2026: "take the recommended decision unless its very very
+    important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the scheduler placed every task from Monday 5 October as if no time had passed, so the release push set past
+  sprints on New tickets.'
+keys_touched:
+  tickets:
+  - SVC-ORDER-CART-1 (27910)
+  - every unstarted plan task
+  files:
+  - tools/sprint_plan.py
+root_class: a schedule that ignores the day it is made
+tickets:
+  started: []
+  unstarted:
+  - '27910 (SVC-ORDER-CART-1: addCartLine #31127, checkoutCart #31129, On hold, Pranay Shinde): out of Sprint 2.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/sprint_plan.py::replan_floor
+status: open

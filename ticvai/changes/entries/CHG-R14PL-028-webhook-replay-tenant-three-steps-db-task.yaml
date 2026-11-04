@@ -1,0 +1,40 @@
+id: CHG-R14PL-028
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR434-DB-WEBHOOK-REPLAY-TENANT (Hrushikant Patkar, after MIG-CONTROL, named under MIG-CONTROL-21 #36203): control.webhook_replay.tenant_id
+  backfilled from the subscription''s client, stopped on any row left, then SET NOT NULL.'
+decision:
+  what: 'ADAM CR-434 as decided (CHG-CR434-001), the contract migration of #36203; the lead, 4 November 2026: "take the recommended
+    decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: #36203 is Ready for QA, so its three steps are a task beside it (and its follow-up comment).'
+keys_touched:
+  tickets:
+  - CR434-DB-WEBHOOK-REPLAY-TENANT (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change that adds columns to a table whose migration ticket has started, carried by no plan task
+tickets:
+  started:
+  - '36203 (MIG-CONTROL-21, Ready for QA, Hrushikant Patkar): not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-434
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: A change-only [DB] task (area database; its key does not end in -DB, so it does not count as creating its tables),
+  owner the migration owner (team.json migrations, Hrushikant Patkar). The release's forward migration is written once by
+  the r14 integration; the task copies its statements.

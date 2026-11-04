@@ -1,0 +1,41 @@
+id: CHG-R14PL-026
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR594-COMP-ITEM-FNB-LINE (Narayan Gaonkar, named under #32786: compItem marks the F&B line comped) and CR595-CLOSE-TABLE-VISIT-GRATUITY
+  (Narayan Gaonkar, named under #32677: closeTableVisit divides the gratuity among the visit''s servers, once the client gives
+  the rule).'
+decision:
+  what: 'ADAM CR-594 (decided 3 November 2026) and CR-595 (approved 4 November 2026); lane l named both tasks (CHG-CR594-001,
+    CHG-CR595-001); the lead, 4 November 2026: "take the recommended decision unless its very very important" (the r14 integration,
+    overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: both are additions to operations whose tickets are New, posted as tasks beside them.'
+keys_touched:
+  tickets:
+  - CR594-COMP-ITEM-FNB-LINE (new)
+  - CR595-CLOSE-TABLE-VISIT-GRATUITY (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change spanning an operation's ticket, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - 32786 (compItem) and 32677 (closeTableVisit), New, Narayan Gaonkar.
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-595
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The gratuity rule waits on the client: the task says so and is not started until the rule is posted on it.'

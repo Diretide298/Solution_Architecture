@@ -1,0 +1,42 @@
+id: CHG-R14PL-013
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'R14G-KERNEL-PORT (Pranay Shinde, after PLATFORM-KERNEL): the r14 backend starter''s kernel ported into ticvai-backend
+  (scoped permission check, tenant bound to the token, durable idempotency, Money with scale, module boundaries).'
+decision:
+  what: 'The lead, 3 November 2026: "All four, one release" (the r13 system review''s starter findings); the integration inputs
+    name the task beside #27692 (lane g); the lead, 4 November 2026: "take the recommended decision unless its very very important"
+    (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the starters changed under #27692''s built kernel (CHG-R14G-001, -003, -006, -007); the started ticket''s text
+  is not rewritten, so the port is a task of its own.'
+keys_touched:
+  tickets:
+  - R14G-KERNEL-PORT (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a starter change under a started kernel ticket, carried by no plan task
+tickets:
+  started:
+  - '27692 (request kernel, Ready for QA, Pranay Shinde): not rewritten; follow-up comment.'
+  unstarted:
+  - '32080 (resolvePermissions): build on the ResolvedAuthority seam.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 system review (audit/ticvai/review-2026-11-03), lane g'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Owner: Pranay Shinde, who built #27692 and owns the kernel tasks; the load moves his later tasks (the sprint re-cut,
+  CHG-R14PL-022).'

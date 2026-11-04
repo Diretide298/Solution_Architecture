@@ -1,0 +1,41 @@
+id: CHG-R14PL-006
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR590-DB-LINE-PRODUCT (Hrushikant Patkar, after MIG-ORDERS): orders.cart_line and orders.order_line product_id with
+  their foreign keys and indexes, and the old order lines filled from their variant''s product.'
+decision:
+  what: 'ADAM CR-590, approved by Chinmay on 3 November 2026 (posted on #31898); lane f listed the migration task (CHG-CR590-001);
+    the lead, 4 November 2026: "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: CR-590 adds a column to two orders tables with a backfill of the live order lines; MIG-ORDERS (#27675) is Ready
+  for QA.'
+keys_touched:
+  tickets:
+  - CR590-DB-LINE-PRODUCT (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change that adds columns to a table whose migration ticket has started, carried by no plan task
+tickets:
+  started:
+  - '27675 (MIG-ORDERS, Ready for QA): not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-590
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: A change-only [DB] task (area database; its key does not end in -DB, so it does not count as creating its tables),
+  owner the migration owner (team.json migrations, Hrushikant Patkar). The release's forward migration is written once by
+  the r14 integration; the task copies its statements.

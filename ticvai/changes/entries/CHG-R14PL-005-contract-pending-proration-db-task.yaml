@@ -1,0 +1,40 @@
+id: CHG-R14PL-005
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR584-DB-CONTRACT-PENDING-PRORATION (Hrushikant Patkar, after MIG-CONTROL): control.contract.pending_proration numeric(18,4),
+  nullable.'
+decision:
+  what: 'ADAM CR-584, approved by Chinmay on 3 November 2026; lane f listed the migration task (CHG-CR584-001); the lead,
+    4 November 2026: "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: CR-584 adds a column to control.contract, whose migration #27647 (MIG-CONTROL) is Ready for QA.'
+keys_touched:
+  tickets:
+  - CR584-DB-CONTRACT-PENDING-PRORATION (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change that adds columns to a table whose migration ticket has started, carried by no plan task
+tickets:
+  started:
+  - '27647 (MIG-CONTROL, Ready for QA): not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-584
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: A change-only [DB] task (area database; its key does not end in -DB, so it does not count as creating its tables),
+  owner the migration owner (team.json migrations, Hrushikant Patkar). The release's forward migration is written once by
+  the r14 integration; the task copies its statements.

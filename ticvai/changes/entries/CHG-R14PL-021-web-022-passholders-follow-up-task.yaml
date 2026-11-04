@@ -1,0 +1,38 @@
+id: CHG-R14PL-021
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR534-WEB022-PASSHOLDERS (Chitrangi Mestry, [FE] WEB, after APP-WEB-WEB-022): WEB-022''s Passholders section, the
+  follow-up ticket CR-534 promised under #31742.'
+decision:
+  what: 'ADAM CR-534, decided by Chinmay on 3 November 2026 ("It is client-approved and comes back on its own follow-up ticket
+    under this one"); LO-CR534-002 names it "a plan task the integration pass files"; the lead, 4 November 2026: "take the
+    recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: r13''s integration did not file it: no plan task named the Passholders section.'
+keys_touched:
+  tickets:
+  - CR534-WEB022-PASSHOLDERS (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a promised follow-up ticket no plan task carried
+tickets:
+  started:
+  - '31742 ([FE] WEB-022 build, Ready for QA, Chitrangi Mestry): not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-534
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

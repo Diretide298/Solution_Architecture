@@ -530,3 +530,36 @@ items:
   owner: Chinmay, to the client (Dinesh for the UAE Central access)
   added: '2026-11-03'
   change: CHG-R14J-040
+- id: LO-R14PL-001
+  kind: deferred
+  platform: database
+  what: '78 array item columns (child tables derived from an array whose item property names an enum, for example
+    fnb.kitchen_ticket_line.status and control.invoice_line.kind) carry no CHECK holding the contract''s enum.
+    tools/derive-ddl.py carries an item property''s enum onto its child table only where the array names it in
+    x-ticvai-item-checks (opt-in, r14 lane l: fnb.service_order_line.status, CHG-CR594-001); the other 78 are
+    untouched, so the database accepts a value the contract does not.'
+  source: 'r14 lane l (ADAM CR-594, CHG-CR594-001 notes: "78 other array item columns ... still carry no contract enum
+    check: x-ticvai-item-checks is opt-in, so they are untouched; the class is in the lane report for the lead")'
+  reason: 'a CHECK added to a column of a live table needs its rows checked first (NOT VALID, then VALIDATE, each
+    column''s values read), and seventy-eight at once is a release''s worth of migration work that r14 did not plan'
+  target: r15
+  owner: Chinmay (the class), Hrushikant Patkar (the migration)
+  added: '2026-11-04'
+  change: CHG-R14PL-023
+- id: LO-R14PL-002
+  kind: deferred
+  platform: P10
+  screens: [PTR-002, PTR-008, PTR-015, PTR-012]
+  what: 'Ten partner-portal bindings to staff-only operations, which a partner user (no workstation) cannot call as
+    the contracts stand: createOrder, holdOrder and resumeOrder on PTR-002, PTR-008 and PTR-015, and capturePayment on
+    PTR-012. They stay known findings of check-screen-wiring (S-WORKSTATION-OP) on no started ticket. The partner
+    variant CHG-R14BO-005 defined (x-ticvai-partner-callable) took createPayment and inquirePaymentStatus on PTR-012
+    only, the two the lead decided.'
+  source: 'r14 lane s (CHG-R14BO-005 notes: "The other ten P10 keeps ... stay known findings, on no started ticket:
+    the lead decided PTR-012''s two")'
+  reason: 'each operation needs its own decision on whether a partner may call it and under what grant, before the
+    marker is applied (a partner order, hold or capture is money on another channel)'
+  target: r15
+  owner: Chinmay
+  added: '2026-11-04'
+  change: CHG-R14PL-023

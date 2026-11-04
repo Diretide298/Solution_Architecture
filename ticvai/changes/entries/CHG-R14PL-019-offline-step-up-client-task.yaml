@@ -1,0 +1,37 @@
+id: CHG-R14PL-019
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'OFFLINE-STEP-UP-CLIENT (Pradnya Yeram, [FE] POS, after OFFLINE-JOURNAL): offline-core fetches and keeps the step-up
+  package, checks a supervisor''s PIN offline, counts attempts and shows refusedAtSync.'
+decision:
+  what: 'The lead, 3 November 2026: "Offline verifier" (r13 system review F-01); lane v named the [FE] task (CHG-R14V-001);
+    the lead, 4 November 2026: "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the offline verifier is offline-core work the screen tickets (POS-014, POS-018, POS-006, EMP-034) build on.'
+keys_touched:
+  tickets:
+  - OFFLINE-STEP-UP-CLIENT (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: client work a decision adds below the screens, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - 27705 (OFFLINE-JOURNAL, New, Pradnya Yeram); the four screens' FE tickets, New.
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 system review finding F-01, lane v of r14'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

@@ -1,0 +1,38 @@
+id: CHG-R14PL-016
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'R14H-EDGE-LOG-SCRUB (Hrushikant Patkar, devops, after SETUP-FRONT-DOOR): Front Door and WAF logs keep route templates
+  and drop the bearer secrets in paths and headers.'
+decision:
+  what: 'Lane h''s recommendation (CHG-R14H-005), taken by the coordinator under the lead, 4 November 2026: "take the recommended
+    decision unless its very very important" (the r14 integration, overnight): the six token-in-path routes stay in r14 and
+    the edge scrubs them.'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the edge logs full request URIs unless scrubbed, and the Terraform does not configure it (CHG-R14H-005).'
+keys_touched:
+  tickets:
+  - R14H-EDGE-LOG-SCRUB (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: infrastructure work a review names, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - '27691 (observability, New): the same rule in the application.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 system review, lane h of r14'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

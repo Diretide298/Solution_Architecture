@@ -1,0 +1,39 @@
+id: CHG-R14PL-018
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'R14V-OFFLINE-STEP-UP-DB (Hrushikant Patkar, after MIG-IDENTITY): creates identity.offline_pin_verifier and identity.offline_step_up.'
+decision:
+  what: 'The lead, 3 November 2026: "Offline verifier" (r13 system review F-01); lane v named the [DB] task (CHG-R14V-001);
+    the lead, 4 November 2026: "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: two new identity tables no migration task creates.'
+keys_touched:
+  tickets:
+  - R14V-OFFLINE-STEP-UP-DB (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a new table a decision adds, created by no migration task
+tickets:
+  started:
+  - '27657 (MIG-IDENTITY, Ready for QA): not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 system review finding F-01, lane v of r14'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The key ends -DB: the task creates its two tables, so no second migration is planned for them. getOfflineStepUpPackage
+  is the operation formula''s (SVC-IDENTITY-IDENTITY-21, Narayan Gaonkar) and the reporting consumer of identity.offlineStepUpRefused
+  is CONS-REPORTING-ALERT-RAISING''s: no hand-written task for either.'

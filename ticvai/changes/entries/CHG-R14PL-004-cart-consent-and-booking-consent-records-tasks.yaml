@@ -1,0 +1,41 @@
+id: CHG-R14PL-004
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR583-MARKETING-BOOKING-CONSENT-RECORDS (Pranay Shinde, named under #27866) serves marketing-crm#bookingConsentRecords;
+  CR583-CART-CONSENT (Pranay Shinde, after SVC-ORDER-CART-2 and it, named under #30684) adds getCart''s consent part.'
+decision:
+  what: 'ADAM CR-583, approved by Chinmay on 3 November 2026 ("Approve them"); lane f listed both tasks (CHG-CR583-001); the
+    lead, 4 November 2026: "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: CR-583 builds getCart in two steps and adds a Marketing service query; neither second step nor query is a formula
+  task.'
+keys_touched:
+  tickets:
+  - CR583-MARKETING-BOOKING-CONSENT-RECORDS (new)
+  - CR583-CART-CONSENT (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change spanning several operations' tickets, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - '30684 (getCart, On hold): the conflict kinds now, the consent part on CR583-CART-CONSENT.'
+  - 27866 (MarketingService consent operations, New).
+  - '31129 (checkoutCart, On hold): not released before the consent part.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-583
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

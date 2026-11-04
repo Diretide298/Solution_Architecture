@@ -1,0 +1,41 @@
+id: CHG-R14PL-024
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'CR555-560-CONTROL-PLANE-CELL-CALL (Pranay Shinde, after KERNEL-SERVICE-AUTH): CR-555''s service sign-in from the
+  Control Plane into a tenant''s cell and CR-560''s cross-cell service client, one ticket for the two ends of one call, named
+  under #37051 and #27687.'
+decision:
+  what: 'ADAM CR-555 and CR-560, decided by Chinmay on 3 November 2026; CR-560 point 2 as corrected on #30841 and #31281 (CHG-CR560-002);
+    lane b named both tasks and said "the plan pass may make them one ticket" (CHG-CR560-001); the lead, 4 November 2026:
+    "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the call''s two ends were posted as two kernel tasks on two started parents.'
+keys_touched:
+  tickets:
+  - CR555-560-CONTROL-PLANE-CELL-CALL (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change spanning several operations' tickets, carried by no plan task
+tickets:
+  started:
+  - '37051 (KERNEL-SERVICE-AUTH, Ready for QA, Pranay Shinde) and 30761 (getModuleEnablement, Ready for QA): not rewritten.'
+  unstarted:
+  - '30841 (setSubscription) and 31281 (previewSubscriptionChange), On hold: they call through it; no new task, their tickets
+    carry the correction (CHG-CR560-002).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-560
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
