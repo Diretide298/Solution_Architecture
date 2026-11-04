@@ -2650,7 +2650,8 @@ screens:
     contract: orders
     purpose: 'Read by the screen after its addCartLine calls succeed and before leaving the step, not a
       control: the cart''s consentQuestions, which open the consent questions pop-up when one is unanswered
-      (ADAM CR-556); with the guest session the device already holds (ADR-0045)'
+      (ADAM CR-556); with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with
+      the first line (ADR-0045)'
     trigger: background
     provenance: ADAM CR-556, 3 November 2026
   - operationId: recordConsentAnswers

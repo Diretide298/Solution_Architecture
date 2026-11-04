@@ -3,11 +3,12 @@ date: '2026-11-04'
 source: cr
 kind: contract
 summary: 'CR-565 and CR-569 point 2, as corrected: getDeveloperAccount, createApiClient and revokeApiCredential read a
-  tenant-session caller''s principal through identity#principalRecords in process (id, email and is_active only) to
-  match its verified email to an active control.developer_member. The operations role''s narrow grant XDR-195 (CR-595''s
-  id, is_active, valid_from, valid_to) gains email and these three operations, so the role holds one column list on
-  identity.principal; derive-ddl writes the column-limited GRANT and USAGE on schema identity into r14''s tenant
-  forward migration.'
+  tenant-session caller''s principal through identity#principalRecords in process under a narrow grant of its own,
+  XDR-196 (id, is_active and subject_id of identity.principal), and its verified email through identity#subjectDetails
+  over Identity''s service route, because lane m keeps the email in pii.subject_contact from r14 (CHG-R14M-001;
+  reconciled as CHG-R14INT-006). The operations role is granted nothing in pii. derive-ddl writes the column-limited
+  GRANT and USAGE on schema identity into r14''s tenant forward migration; CR-595''s XDR-195 stays reassignServer''s
+  alone.'
 decision:
   what: 'Decided overnight by the coordinator for lane c, under the lead''s instruction of 4 November 2026 ("take the
     recommended decision unless its very very important"), correction posted on #31389, #31295 and #31383 (mail off):
@@ -24,6 +25,7 @@ keys_touched:
   - contracts/satellite/public-api.yaml
   - docs/active/cross-deployable-writes.yaml
   - handoff/cross-deployable-writes.md
+  - backend/tenant/V0129__after_r1_20261104.sql
 root_class: a read across deployables with no grant, or a grant wider than the read
 tickets:
   started: []

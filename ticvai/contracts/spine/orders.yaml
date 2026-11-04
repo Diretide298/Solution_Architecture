@@ -7960,6 +7960,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - name: X-Order-Access-Token
         in: header
+        x-ticvai-secret: bearer
         required: false
         description: '`Order.orderAccessToken`, in place of a session, for a payment on that order only (ADAM CR-575),
           checked as getOrder checks it; with `X-Device-Id`. A token for another order, expired, forged or from
@@ -8093,6 +8094,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - name: X-Order-Access-Token
         in: header
+        x-ticvai-secret: bearer
         required: false
         description: '`Order.orderAccessToken`, in place of a session, for a payment of that order only (ADAM CR-575),
           checked as getOrder checks it; with `X-Device-Id`. A token for another order, expired, forged or from

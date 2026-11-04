@@ -7,7 +7,7 @@
 -- Every statement that needs a table is a guarded block (CHG-R9MIG-002): it does nothing where its table
 -- or a column it names is not there yet, so the file applies as one transaction, twice, on any database;
 -- the migration that creates such a table later copies the block. A table's policy change is one block.
--- 5 table(s), 36 column(s), 43 index(es), 46 other statement(s), 1 row-level security polic(ies) re-applied.
+-- 5 table(s), 36 column(s), 43 index(es), 47 other statement(s), 1 row-level security polic(ies) re-applied.
 
 DO $$ BEGIN IF to_regclass('access.entitlement') IS NOT NULL THEN
 ALTER TABLE access.entitlement ADD COLUMN IF NOT EXISTS holder_subject_id uuid;
@@ -566,10 +566,12 @@ DO $$ BEGIN IF to_regclass('pii.subject_network_identifier') IS NOT NULL AND EXI
 PERFORM platform.apply_subject_rls('pii.subject_network_identifier'::regclass);
 END IF; END $$;
 
-DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND to_regclass('identity.principal') IS NOT NULL THEN GRANT SELECT (id, is_active, valid_from, valid_to, email) ON identity.principal TO operations; END IF; END $$;
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND to_regclass('identity.principal') IS NOT NULL THEN GRANT SELECT (id, is_active, valid_from, valid_to) ON identity.principal TO operations; END IF; END $$;
+
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND to_regclass('identity.principal') IS NOT NULL THEN GRANT SELECT (id, is_active, subject_id) ON identity.principal TO operations; END IF; END $$;
 
 INSERT INTO platform.schema_version (version, description, checksum)
-VALUES ('V0129', 'after r1 (9cec72d): 5 table(s), 36 column(s), 43 index(es), 46 other statement(s), 1 row-level security polic(ies) re-applied', 'f19a7a6a48b93d3aeaab3e5ca7b0aca2ce7dfdc0b8a3a1863a98fc537403d822')
+VALUES ('V0129', 'after r1 (9cec72d): 5 table(s), 36 column(s), 43 index(es), 47 other statement(s), 1 row-level security polic(ies) re-applied', 'dcb9e9ebb4501e610a2701f35dffc1d32339e415cd8b03f175ab5e65fd05d9e6')
 ON CONFLICT (version) DO NOTHING;
 
 -- ============================================================================
@@ -577,7 +579,8 @@ ON CONFLICT (version) DO NOTHING;
 -- ============================================================================
 -- Commented out so that applying this file never runs it: the rollback is run by removing the
 -- leading `-- `, and is tested in CI against a restored snapshot (backend/MIGRATIONS.md).
--- REVOKE SELECT (id, is_active, valid_from, valid_to, email) ON identity.principal FROM operations;
+-- REVOKE SELECT (id, is_active, subject_id) ON identity.principal FROM operations;
+-- REVOKE SELECT (id, is_active, valid_from, valid_to) ON identity.principal FROM operations;
 -- SELECT platform.drop_rls_policies('marketing.message_dispatch'::regclass); SELECT platform.apply_subject_rls('marketing.message_dispatch'::regclass); SELECT platform.apply_grant_holder_subject_read_rls('marketing.message_dispatch'::regclass);
 -- DROP INDEX IF EXISTS fnb.table_visit_server_scope_path_idx;
 -- DROP INDEX IF EXISTS identity.offline_step_up_scope_path_idx;

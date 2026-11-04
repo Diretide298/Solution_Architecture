@@ -47747,7 +47747,12 @@
    {
     "query": "identity#principalRecords",
     "route": "in-process",
-    "for": "a tenant-session caller's principal (identity.principal by id): id, email and is_active only, its verified email matched to an active control.developer_member (ADAM CR-565 and CR-569 point 2 as corrected on #31389, #31295 and #31383, 4 November 2026; XDR-195; CHG-CR569-003)"
+    "for": "a tenant-session caller's principal (identity.principal by id): id, is_active and subject_id only (ADAM CR-565 and CR-569 point 2 as corrected on #31389, #31295 and #31383, 4 November 2026; XDR-196; CHG-CR569-003, CHG-R14INT-006)"
+   },
+   {
+    "query": "identity#subjectDetails",
+    "route": "service",
+    "for": "that principal's verified email (contact.email, kept in pii.* since r14, CHG-R14M-001), matched to an active control.developer_member; asked over Identity's service route, so the operations role holds no grant in pii (CHG-R14INT-006)"
    }
   ],
   "readsInProcess": [
@@ -47816,7 +47821,12 @@
    {
     "query": "identity#principalRecords",
     "route": "in-process",
-    "for": "a tenant-session caller's principal (identity.principal by id): id, email and is_active only, its verified email matched to an active control.developer_member (ADAM CR-565 and CR-569 point 2 as corrected on #31389, #31295 and #31383, 4 November 2026; XDR-195; CHG-CR569-003)"
+    "for": "a tenant-session caller's principal (identity.principal by id): id, is_active and subject_id only (ADAM CR-565 and CR-569 point 2 as corrected on #31389, #31295 and #31383, 4 November 2026; XDR-196; CHG-CR569-003, CHG-R14INT-006)"
+   },
+   {
+    "query": "identity#subjectDetails",
+    "route": "service",
+    "for": "that principal's verified email (contact.email, kept in pii.* since r14, CHG-R14M-001), matched to an active control.developer_member; asked over Identity's service route, so the operations role holds no grant in pii (CHG-R14INT-006)"
    }
   ],
   "readsInProcess": [
@@ -125253,7 +125263,12 @@
    {
     "query": "identity#principalRecords",
     "route": "in-process",
-    "for": "a tenant-session caller's principal (identity.principal by id): id, email and is_active only, its verified email matched to an active control.developer_member (ADAM CR-565 and CR-569 point 2 as corrected on #31389, #31295 and #31383, 4 November 2026; XDR-195; CHG-CR569-003)"
+    "for": "a tenant-session caller's principal (identity.principal by id): id, is_active and subject_id only (ADAM CR-565 and CR-569 point 2 as corrected on #31389, #31295 and #31383, 4 November 2026; XDR-196; CHG-CR569-003, CHG-R14INT-006)"
+   },
+   {
+    "query": "identity#subjectDetails",
+    "route": "service",
+    "for": "that principal's verified email (contact.email, kept in pii.* since r14, CHG-R14M-001), matched to an active control.developer_member; asked over Identity's service route, so the operations role holds no grant in pii (CHG-R14INT-006)"
    }
   ],
   "readsInProcess": [

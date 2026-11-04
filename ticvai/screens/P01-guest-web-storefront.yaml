@@ -3560,7 +3560,8 @@ screens:
     contract: orders
     purpose: 'The cart this screen is about to pay for, on load with the session''s `cartId`: the summary panel''s
       lines and totals, and the first line with no parent line for `getPublishedBookingFlow`''s `productId`; not
-      called when an `orderId` came with the link, which reads `getOrder` instead (ADAM CR-590)'
+      called when an `orderId` came with the link, which reads `getOrder` instead (ADAM CR-590). With the guest session the device already holds: signed in, or the
+      anonymous cart session a visitor gets with the first line (ADR-0045)'
     trigger: onLoad
     provenance: ADAM CR-590, decided by Chinmay on 3 November 2026
   - operationId: inquirePaymentStatus

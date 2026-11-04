@@ -3001,6 +3001,9 @@ paths:
         for: 'the venue of the workstation the asking device is bound to (CHG-R14V-001)'
       security:
       - deviceAuth: []
+      # The doors whose supervisor step-up runs offline: the till and the shared handheld (POS-014, POS-018, POS-006,
+      # EMP-034), the kinds login's device door takes (CHG-R14H-001; CHG-R14INT-006 at the merge of lanes v and h).
+      x-ticvai-device-kinds: [workstationTerminal, handheldScanner]
       x-ticvai-audience: [device]
       x-ticvai-read-routing: primary
       x-ticvai-bounded: the signers of one venue (at most 500)

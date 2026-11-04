@@ -813,12 +813,11 @@ reads:
 - id: XDR-195
   reader: operations
   tables: [identity.principal]
-  columns: [id, is_active, valid_from, valid_to, email]
+  columns: [id, is_active, valid_from, valid_to]
   privileges: [SELECT]
   queries: [identity#principalRecords]
-  operations: [reassignServer, getDeveloperAccount, createApiClient, revokeApiCredential]
-  # `narrow`, as XDR-010: this entry grants its query to these four operations only, and only these five columns: the
-  # operations role's one column list on identity.principal (CR-595's four, and email for CR-569; CHG-CR569-003).
+  operations: [reassignServer]
+  # `narrow`, as XDR-010: this entry grants its query to reassignServer only, and only these four columns.
   narrow: true
   added: '2026-11-04'
   decision_ref: 'ADAM CR-595, Chinmay, 3 November 2026 (posted on #32798: "The operations host reads Identity''s
@@ -830,9 +829,27 @@ reads:
     commerce, and no host composes Identity''s query classes (ADR-0055 as amended 2 November). The lead chose the narrow
     in-process read already chosen for Access (XDR-010, CR-302): the operations host asks identity#principalRecords by
     id through Identity''s own query class, in the caller''s transaction under the caller''s row-level security, and the
-    grant is SELECT on id, is_active, valid_from and valid_to only (`columns`). **And CR-569 point 2** (Chinmay, the
-    correction posted on #31389, #31295 and #31383, 4 November 2026, under the lead''s "take the recommended decision
-    unless its very very important"; CHG-CR569-003): getDeveloperAccount, createApiClient and revokeApiCredential match
-    a tenant-session caller''s verified email to an active control.developer_member, so the same narrow read gives
-    them id, email and is_active, as Access''s XDR-010; email joins the one column list. No other operations host
-    operation reads identity.principal in process under this entry.'
+    grant is SELECT on id, is_active, valid_from and valid_to only (`columns`). No other operations host operation reads
+    identity.principal in process under this entry.'
+- id: XDR-196
+  reader: operations
+  tables: [identity.principal]
+  columns: [id, is_active, subject_id]
+  privileges: [SELECT]
+  queries: [identity#principalRecords]
+  operations: [getDeveloperAccount, createApiClient, revokeApiCredential]
+  # `narrow`, as XDR-010 and XDR-195: this entry grants its query to these three operations only, and only these
+  # three columns. The email the operations match is not a column of identity.principal since r14 (CHG-R14M-001):
+  # it is read from pii through identity#subjectDetails over Identity's service route, which needs no grant.
+  narrow: true
+  added: '2026-11-04'
+  decision_ref: 'ADAM CR-565 and CR-569 point 2, Chinmay (the correction posted on #31389, #31295 and #31383, 4
+    November 2026: "the operations role gets SELECT on identity.principal (id, email, is_active) only, as Access''s
+    XDR-010"), under the lead''s "take the recommended decision unless its very very important"; with lane m''s move
+    of identity.principal.email into pii.* (CHG-R14M-001), reconciled as CHG-R14INT-006'
+  why: 'public-api getDeveloperAccount, createApiClient and revokeApiCredential (operations host; #31389, #31295,
+    #31383) match a tenant-session caller''s verified email to an active control.developer_member. The principal is
+    read in process through Identity''s own query class under the caller''s row-level security: id, is_active and
+    subject_id only (`columns`). Its email is kept in pii.subject_contact from r14 (ADR-0023 as amended), so it is
+    asked from identity#subjectDetails over the service route, and the operations role is granted nothing in pii. No
+    other operations host operation reads identity.principal in process under this entry.'

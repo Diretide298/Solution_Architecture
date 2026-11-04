@@ -1,0 +1,60 @@
+id: CHG-R14INT-006
+date: '2026-11-04'
+source: audit
+kind: contract
+summary: 'Where the lanes met, as the merged gate found it (run 20261104-043513-398700), fixed at the source. (1) The
+  operations role''s email read for CR-569 (lane c) named identity.principal.email, which lane m moved into
+  pii.subject_contact (check-cross-deployable-writes X-READ). The three operations now read the principal (id,
+  is_active, subject_id) under XDR-196 and the email through identity#subjectDetails over the service route. CR-595''s
+  XDR-195 stays reassignServer''s alone (BR-REASSIGN-SERVER-HISTORY). (2) Lane a''s X-Order-Access-Token header on
+  createPayment and inquirePaymentStatus is x-ticvai-secret: bearer, as lane h''s rule requires (C-SECRET-PARAM).
+  (3) Lane v''s getOfflineStepUpPackage lists the device kinds lane h made every device door list: workstationTerminal
+  and handheldScanner (D-DEVICE-KINDS). (4) inReview stays reachable only as a stored value (a system transition),
+  since CHG-CR572-002 removed the one transition into it (check-states). (5) GST-008''s and WEB-012''s cart reads say
+  they run with the guest session, signed in or the anonymous cart session (PS-UNDECLARED-SIGNIN). (6) The three
+  authored inputs whose slice moved were re-read and blessed: contract-backlog.json, traceability.json and
+  rag-index-sources.md. No open row or entry is answered by r14''s new operations, and the RAG page''s erasure rule
+  still holds.'
+decision:
+  what: 'The r14 integration brief (the lead, 4 November 2026: "take the recommended decision unless its very very
+    important"): fix every finding of the merged gate at its source, never baseline, acknowledge or exempt. Where two
+    lanes'' decisions meet, the later rule holds for both. Lane m''s rule that a natural person''s email is kept in
+    pii.* (the lead''s "Move the columns") holds for CR-569''s read, which reads it through Identity rather than by a
+    grant in pii.'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'The merged gate (refresh-safe on fix/r14-integration, 7df178722, run 20261104-043513-398700) failed eight
+  checkers. Each lane''s gate had passed alone (CHG-R14H-001, CHG-R14H-005, CHG-R14M-001, CHG-CR595-001 and the rest),
+  and the findings are where two lanes'' rules meet.'
+keys_touched:
+  operations: [getDeveloperAccount, createApiClient, revokeApiCredential, createPayment, inquirePaymentStatus,
+    getOfflineStepUpPackage, getCart]
+  screens: [GST-008, WEB-012]
+  tables: [identity.principal]
+  files:
+  - docs/active/cross-deployable-writes.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/identity.yaml
+  - states/integration-listing.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - handoff/.authored-inputs.json
+root_class: two decisions settled the same day on the same screen, each built in its own lane
+tickets:
+  started: []
+  unstarted:
+  - '31389, 31295, 31383 (Narayan Gaonkar, On hold): the email comes from identity#subjectDetails, not a column of
+    identity.principal; the principal read is id, is_active and subject_id.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-569
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-deployable-writes.py
+status: open
+notes: 'For the lead: the correction posted on #31389, #31295 and #31383 named an email column the operations role
+  would read. With lane m''s move, the email is read through Identity''s service route, which is not built yet
+  (#37051), so a follow-up comment on those three tickets says so. Recommendation: post it before they leave On hold.
+  Also for the lead: whether inReview leaves the IntegrationListing enum once no stored listing holds it (r15).'

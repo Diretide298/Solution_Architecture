@@ -219,7 +219,7 @@
   }
  },
  "handoff/contract-backlog.json": {
-  "blessed": "2026-11-03",
+  "blessed": "2026-11-04",
   "parts": {
    "ops:finance": [
     "abandonPeriodClose",
@@ -357,7 +357,7 @@
     "updateSupplier",
     "updateSupplierContract"
    ],
-   "shapes:inventory": "44f9ff132eb9c01eefafc5b69a26a84461f7709f33af939b2dd2b20746b78691",
+   "shapes:inventory": "439ca28c87883a11d61b6f82570bd2a42de360e60a6f5d048dc63452c621c4d3",
    "ops:tenancy": [
     "approveDevice",
     "configureWorkstation",
@@ -421,9 +421,9 @@
   }
  },
  "handoff/rag-index-sources.md": {
-  "blessed": "2026-11-03",
+  "blessed": "2026-11-04",
   "parts": {
-   "index-model": "51a7b45977d9cba9d240eba4d5c9fb50f0d39e1c7626cab82b25dd365bb8040f"
+   "index-model": "ea1ad9c50cb1ba2aac7d4d78975d4ca08c1f32ee75d9e7fffa69e7ff2d029fdd"
   }
  },
  "handoff/schema-viewer-notes.md": {
@@ -769,7 +769,7 @@
     "validateGroupAccess",
     "verifyIdentity"
    ],
-   "shapes:access": "989899b06d65ff796999c841c95e8c0ebff081313ce84d27fd8d37fddbdfa841",
+   "shapes:access": "e40cb41c0b99be8aff2b8bb01ed275b1659fa31d3e578d7f6262dccae105087f",
    "ops:ai": [
     "addRiskCaseEvidence",
     "answerConfigurationQuestion",
@@ -918,7 +918,7 @@
     "suggestGuidedChoice",
     "testAiProvider"
    ],
-   "shapes:ai": "5a77125df3477495bbfe50c4d126ed5ed7499fdcb7680f70242df9bb2f6a5083",
+   "shapes:ai": "fc868eb37b8cfb475ea5290a90104c61d2a771c1f6a91450903b7a2d80b44120",
    "ops:catalogue": [
     "acquireInventoryHold",
     "approvePricingWorkflowAuthority",
@@ -1195,7 +1195,7 @@
     "updateProduct",
     "updateProductVariant"
    ],
-   "shapes:catalogue": "2fe08530fe91fc0efccadef7c3b2a9aa557e4aab1cc7f7e10cb21e84b35b83f1",
+   "shapes:catalogue": "bec4a12b38de50c1f0ce6ac4552a66c61fee4258635c5c65692d365762d55cd4",
    "ops:finance": [
     "abandonPeriodClose",
     "approveJournalEntry",
@@ -1332,7 +1332,7 @@
     "updateSupplier",
     "updateSupplierContract"
    ],
-   "shapes:inventory": "44f9ff132eb9c01eefafc5b69a26a84461f7709f33af939b2dd2b20746b78691",
+   "shapes:inventory": "439ca28c87883a11d61b6f82570bd2a42de360e60a6f5d048dc63452c621c4d3",
    "ops:marketing-crm": [
     "accrueLoyaltyPoints",
     "actOnWaiverRequirements",
@@ -1620,7 +1620,7 @@
     "uploadGuestDocument",
     "writeSubjectDataExportPart"
    ],
-   "shapes:marketing-crm": "61fde91d964e1277cff77f04309adf097888dfc4e159635d8abb8e6d3ba34b5a",
+   "shapes:marketing-crm": "c0a903df5fee129aeb053d3bb3546d84347fd2cafdf5de0ca5d54f05ae3d084b",
    "ops:orders": [
     "abandonCart",
     "addCartLine",
@@ -1851,7 +1851,7 @@
     "voidOrder",
     "voidPayment"
    ],
-   "shapes:orders": "0d0c6177e139f91d2637dcec0ae8d79901bf36a935b65b896467869ee0b22c53",
+   "shapes:orders": "ff4fc2b4eb49562bb5e6dc24dc08c3414db48250b291f99667608cc91ae4bc30",
    "ops:promotions": [
     "analysePromotionConflicts",
     "approveCampaignWorkflow",
@@ -1999,7 +1999,7 @@
     "voidCouponCode",
     "voidVoucher"
    ],
-   "shapes:promotions": "0aa20271adc1ce980c0f62264392c57ecedd48127b3d8a2925168cb79e559613",
+   "shapes:promotions": "45decf3cdfa4daa040502d1cc5a52bc6ae22f192846795424dc6002a6aa079cf",
    "ops:public-api": [
     "certifyIntegration",
     "createApiClient",
@@ -2040,7 +2040,7 @@
     "testWebhookSubscription",
     "verifyDeveloper"
    ],
-   "shapes:public-api": "492469b5b18a881c677aef60c24b763e9da6683bf8f69ef4668ebbeb30782d07",
+   "shapes:public-api": "2528ce106534217ec328d7dc881fb2c7629bba7141e955128c2136669ef35053",
    "ops:resources": [
     "allocateResources",
     "bookResource",
