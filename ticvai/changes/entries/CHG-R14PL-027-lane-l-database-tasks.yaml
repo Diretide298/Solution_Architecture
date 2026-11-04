@@ -1,0 +1,47 @@
+id: CHG-R14PL-027
+date: '2026-11-04'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'Lane l''s [DB] tasks (Hrushikant Patkar): CR593-DB-TICKET-TRANSFER-CHANNEL (MIG-ORDERS), CR594-DB-FNB-SERVICE-ORDER-LINE
+  (MIG-FNB: the status CHECK and the comp columns), CR595-TABLE-VISIT-SERVER-DB (MIG-FNB, creates fnb.table_visit_server),
+  R14L-DB-OPERATIONS-PRINCIPAL-READ (beside MIG-IDENTITY: USAGE on identity and SELECT (id, is_active, valid_from, valid_to,
+  email) on identity.principal for the operations role) and CR411-DB-PERFORMANCE-ADMISSION-START (MIG-CATALOGUE).'
+decision:
+  what: 'ADAM CR-411 (answered 3 November 2026), CR-593 and CR-594 (decided 3 November), CR-595 (approved 4 November) and
+    CR-569 as corrected (CHG-CR569-003: one column list on identity.principal); lane l named the tasks; the lead, 4 November
+    2026: "take the recommended decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the columns, the check, the new table and the narrow grant sit on schemas whose migrations are Ready for QA.'
+keys_touched:
+  tickets:
+  - CR593-DB-TICKET-TRANSFER-CHANNEL (new)
+  - CR594-DB-FNB-SERVICE-ORDER-LINE (new)
+  - CR595-TABLE-VISIT-SERVER-DB (new)
+  - R14L-DB-OPERATIONS-PRINCIPAL-READ (new)
+  - CR411-DB-PERFORMANCE-ADMISSION-START (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change that adds columns to a table whose migration ticket has started, carried by no plan task
+tickets:
+  started:
+  - '27675 (MIG-ORDERS), 27678 (MIG-FNB), 27657 (MIG-IDENTITY), 27671 (MIG-CATALOGUE), Ready for QA: not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-595
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'A change-only [DB] task (area database; its key does not end in -DB, so it does not count as creating its tables),
+  owner the migration owner (team.json migrations, Hrushikant Patkar). The release''s forward migration is written once by
+  the r14 integration; the task copies its statements. CR595-TABLE-VISIT-SERVER-DB''s key ends -DB: it creates its table.'

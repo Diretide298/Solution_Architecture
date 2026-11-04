@@ -28,6 +28,12 @@ release_tag: pending
 decision_owner: Chinmay
 adam_cr: 'none: r13 system review finding C-04, lane h of r14'
 triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py

@@ -1,0 +1,43 @@
+id: CHG-R14PL-030
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: block-a-extra-tasks.json blockAOperations gains republishOutbox, getOutboxRepublish, listOutboxRepublishes and cancelOutboxRepublish,
+  which PLATFORM-REPUBLISH (#27700, Ready for QA) builds in Block A, so the migration that creates their table control.outbox_republish,
+  MIG-CONTROL-6 (#27991, Ready for QA), is planned in Block A again.
+decision:
+  what: 'The r14 plan pass on the merged tree (check-plan-closure C-TABLE); the lead, 4 November 2026: "take the recommended
+    decision unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: after lanes b and c, control.cell left MIG-CONTROL-6, so no Block A operation task pulled it any more and the
+  plan put it in Block B, behind a Block A task that writes its table. A wait from PLATFORM-REPUBLISH on the migration does
+  not pull it: only a later block''s waits pull back end forward, and a hand-written Block A task''s operations join the Block
+  A closure only through blockAOperations.'
+keys_touched:
+  tickets:
+  - PLATFORM-REPUBLISH (27700)
+  - MIG-CONTROL-6 (27991)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a hand-written task whose table's migration no Block A task pulls
+tickets:
+  started:
+  - '27700 (PLATFORM-REPUBLISH) and 27991 (MIG-CONTROL-6), Ready for QA, Hrushikant Patkar: text not rewritten; both keep
+    their sprint.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open

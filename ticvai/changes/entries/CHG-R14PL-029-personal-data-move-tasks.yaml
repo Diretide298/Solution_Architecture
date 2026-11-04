@@ -1,0 +1,49 @@
+id: CHG-R14PL-029
+date: '2026-11-04'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'Lane m''s tasks: R14M-PII-TABLES-DB (Hrushikant Patkar: creates pii.subject_network_identifier and identity.subject_erasure_part),
+  R14M-DB-PERSONAL-DATA-COPY (Hrushikant Patkar: the subject columns, each moved column copied into pii.* and the counts verified;
+  the old columns stay), R14M-DB-AI-MESSAGE-SUBJECT (Kalpita Mejari, the ai schema''s part) and R14M-PARTICIPANT-ID-NUMBER-JOB
+  (Hrushikant Patkar: the one-off encryption of rental.participant.id_number into pii.subject_document and, through Identity,
+  of the 18 moved contact fields into pii.subject_contact, after the r14 migration, which only counts those rows; the job
+  verifies its counts). The operation formula builds recordSubjectDetails and submitSubjectDataPart (SVC-IDENTITY-IDENTITY-21)
+  and the 26 CONS-<contract>-SUBJECT-DATA-PART consumers, the AI one to the AI engineers (CONS-AI-SUBJECT-DATA-PART, Kalpita
+  Mejari).'
+decision:
+  what: 'The lead, 3 November 2026: "Move the columns" (r13 system review B-01; CHG-R14M-001); the brief: retiring the old
+    columns waits for the lead (personal data on a live database); the lead, 4 November 2026: "take the recommended decision
+    unless its very very important" (the r14 integration, overnight).'
+  by: Chinmay
+  date: '2026-11-04'
+why: 'Finding: the move''s migration work and its one-off job are carried by no ticket; the formula makes the rest.'
+keys_touched:
+  tickets:
+  - R14M-PII-TABLES-DB (new)
+  - R14M-DB-PERSONAL-DATA-COPY (new)
+  - R14M-DB-AI-MESSAGE-SUBJECT (new)
+  - R14M-PARTICIPANT-ID-NUMBER-JOB (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: personal data a decision moves, with migration work no ticket carries
+tickets:
+  started:
+  - 'The schemas'' migration tickets (27657, 27664, 27671, 27673, 27675, 27676, 27677, 27678 and the rest, Ready for QA):
+    not rewritten; lane m''s follow-up comments (113 started tickets).'
+  unstarted:
+  - 36197 (AI-ENGINE-ERASE-SUBJECT, New, the AI engineers).
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 system review finding B-01, lane m of r14 (the lead''s "Move the columns")'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-04'
+    quote: waived by the coordinator under the lead's 4 November instruction ('take the recommended decision unless its very
+      very important'); the lead confirms before the tag
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
