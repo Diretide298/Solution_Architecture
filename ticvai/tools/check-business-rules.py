@@ -5875,7 +5875,7 @@ def lane_c_rules_r14(need, op):
          "states/integration-listing.yaml does not certify and reject from submitted (CR-572)")
     need("BR-LISTING-REVIEW-NOTES", ("submitted", "inReview") not in frm,
          "states/integration-listing.yaml has certifyIntegration write inReview, which it never does (CR-572, "
-         "CHG-CR572-003)")
+         "CHG-CR572-002)")
     need("BR-LISTING-REVIEW-NOTES", "certificationNotes" not in ((psch.get("IntegrationListing") or {}).get("properties")
                                                                   or {}),
          "IntegrationListing keeps the decision's note twice, certificationNotes beside reviewNotes (CHG-R14INT-003)")

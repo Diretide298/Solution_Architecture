@@ -13,7 +13,7 @@ decision:
     decision: they are the same field.'
   by: Chinmay
   date: '2026-11-04'
-why: 'The merge of lanes s and c conflicted on certifyIntegration''s notes and IntegrationListing: each lane added its own
+why: 'The merge of lanes s (CHG-R14BO-006) and c (CHG-CR572-001) conflicted on certifyIntegration''s notes and IntegrationListing: each lane added its own
   column for the same note.'
 keys_touched:
   operations: [certifyIntegration]
