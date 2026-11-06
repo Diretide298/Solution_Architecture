@@ -274,8 +274,13 @@ on this server."
 
    ```
    sudo install -m 600 -o ticvai -g ticvai /dev/null /etc/ticvai/cr-watch.env
-   sudo -u ticvai -H nano /etc/ticvai/cr-watch.env
+   sudo nano /etc/ticvai/cr-watch.env
+   sudo chown ticvai:ticvai /etc/ticvai/cr-watch.env && sudo chmod 600 /etc/ticvai/cr-watch.env
+   sudo -u ticvai test -r /etc/ticvai/cr-watch.env && echo "ticvai can read it"
    ```
+
+   As root: ticvai cannot write in `/etc/ticvai`, so its own editor cannot save
+   there ("Error writing ... Permission denied", the first server deploy).
 
    ```
    ANTHROPIC_API_KEY=...        # the key the drafting and ask-back turns spend
