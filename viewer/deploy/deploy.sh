@@ -571,12 +571,26 @@ else
     # link swapped in can redirect either.
     chown --no-dereference "$APP_USER:$APP_USER" "$WATCH_ENV"
     chmod 600 "$WATCH_ENV"
+    # Its folder is root's (/etc/ticvai holds secret.key, 0700 when the deploy
+    # made it), and a file the service account owns is still unreadable to it
+    # behind a folder it cannot enter: the first server run failed exactly so.
+    # Passing through (x) is all it gets: it cannot list the folder, and
+    # secret.key and drop.word keep their own root-only modes.
+    # Only ever /etc/ticvai: a WATCH_ENV pointed elsewhere must never re-mode
+    # a shared folder such as /etc.
+    WATCH_ENV_DIR="$(dirname "$WATCH_ENV")"
+    if [[ "$WATCH_ENV_DIR" == "/etc/ticvai" && ! -L "$WATCH_ENV_DIR" ]]; then
+      chown root:"$APP_USER" "$WATCH_ENV_DIR"
+      chmod 710 "$WATCH_ENV_DIR"
+    fi
     MISSING_KEYS=""
     for k in ANTHROPIC_API_KEY ADAM_EMAIL ADAM_PASSWORD TICVAI_OP_TOKEN; do
       grep -qE "^[[:space:]]*(export[[:space:]]+)?$k=[^[:space:]]" "$WATCH_ENV" || MISSING_KEYS="$MISSING_KEYS $k"
     done
     if [[ -n "$MISSING_KEYS" ]]; then
       note "$WATCH_ENV does not set$MISSING_KEYS — the watcher job is not started"
+    elif ! as_app test -r "$WATCH_ENV"; then
+      note "$APP_USER cannot read $WATCH_ENV (check the folder's mode) — the watcher job is not started"
     elif [[ -z "$CLAUDE_BIN" ]] || ! as_app test -x "$CLAUDE_BIN"; then
       note "Claude Code is not installed for $APP_USER (npm install -g @anthropic-ai/claude-code) — the watcher job is not started"
     elif [[ ! -f "$WATCH_DIR/out/state.json" ]]; then
