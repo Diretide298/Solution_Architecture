@@ -137,3 +137,10 @@ ticvai/_review-*/
 audit/
 # Reference documents the lead keeps beside the repository (r8 integration, CHG-R8INT-011): never committed
 ref-documents/
+
+# The phone app build (4 November 2026, the lead: keep it out of GitLab; it goes to GitHub as a release download, not in git)
+*.apk
+*.aab
+/adam-app/
+# The phone app source lives in its own GitHub-only repository (the lead, 4 November 2026), never here
+/viewer/mobile-app/

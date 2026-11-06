@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- resizes-content: a phone's keyboard shrinks the page instead of
+         covering it, so the field being typed in can always scroll into view. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
     <title>Adam — sign in</title>
     <script>
       // Night by default here, whatever the app is set to. Both auth pages are
@@ -25,6 +27,9 @@
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
     <link rel="stylesheet" href="/auth.css" />
+    <!-- The design system's tokens, for the phone sizes (DESIGN-SYSTEM.md).
+         Every name in it starts with `--ds-`, so the desktop page is untouched. -->
+    <link rel="stylesheet" href="/design-tokens.css" />
     <link rel="stylesheet" href="/login.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
@@ -66,30 +71,37 @@
             </p>
           </div>
 
+          <!-- A real form, so a phone's password manager offers to save the new
+               password against this address. Submitting it is the button below. -->
+          <form id="boot-form" class="signin-form-fields" novalidate>
           <div class="signin-fields">
             <div class="auth-field-row">
               <label class="auth-label" for="boot-email">Your email</label>
-              <input id="boot-email" class="auth-input" type="email" autocomplete="username"
+              <input id="boot-email" name="username" class="auth-input" type="email" autocomplete="username"
+                     inputmode="email" autocapitalize="none" spellcheck="false" enterkeyhint="next"
                      placeholder="you@softlabsgroup.com" />
             </div>
             <div class="auth-field-row">
               <label class="auth-label" for="boot-name">Your name</label>
-              <input id="boot-name" class="auth-input" type="text" autocomplete="name"
+              <input id="boot-name" name="name" class="auth-input" type="text" autocomplete="name"
+                     autocapitalize="words" enterkeyhint="next"
                      placeholder="How your verdicts will be signed" />
             </div>
             <div class="auth-field-row">
               <label class="auth-label" for="boot-password">Password</label>
-              <input id="boot-password" class="auth-input" type="password"
-                     autocomplete="new-password" placeholder="At least 12 characters" />
+              <input id="boot-password" name="new-password" class="auth-input" type="password"
+                     autocomplete="new-password" enterkeyhint="next" placeholder="At least 12 characters" />
             </div>
             <div class="auth-field-row">
               <label class="auth-label" for="boot-confirm">Password again</label>
-              <input id="boot-confirm" class="auth-input" type="password" autocomplete="new-password" />
+              <input id="boot-confirm" name="confirm-password" class="auth-input" type="password"
+                     autocomplete="new-password" enterkeyhint="done" />
             </div>
-            <p class="auth-error" id="boot-error" hidden></p>
+            <p class="auth-error" id="boot-error" role="alert" hidden></p>
           </div>
 
-          <button id="boot-submit" class="auth-button" type="button">Create the administrator</button>
+          <button id="boot-submit" class="auth-button" type="submit">Create the administrator</button>
+          </form>
           <p class="auth-note auth-fine">
             Nobody else sees this password, now or later — only a hash of it is
             kept. Long beats complicated: three or four unrelated words are easier
@@ -107,10 +119,14 @@
             </p>
           </div>
 
+          <!-- A real form with a username and a current password, which is what
+               a phone's password manager looks for to fill and to save. -->
+          <form id="signin-form" class="signin-form-fields" novalidate>
           <div class="signin-fields">
             <div class="auth-field-row">
               <label class="auth-label" for="email">Email</label>
-              <input id="email" class="auth-input" type="email" autocomplete="username"
+              <input id="email" name="username" class="auth-input" type="email" autocomplete="username"
+                     inputmode="email" autocapitalize="none" spellcheck="false" enterkeyhint="next"
                      placeholder="you@softlabsgroup.com" />
             </div>
 
@@ -124,8 +140,8 @@
                 <button id="forgot" class="signin-forgot" type="button"
                         aria-expanded="false" aria-controls="forgot-note">Forgot?</button>
               </div>
-              <input id="password" class="auth-input" type="password"
-                     autocomplete="current-password" placeholder="••••••••••••" />
+              <input id="password" name="password" class="auth-input" type="password"
+                     autocomplete="current-password" enterkeyhint="go" placeholder="••••••••••••" />
               <p class="signin-forgot-note" id="forgot-note" hidden>
                 There is no reset link to send — Adam keeps a hash of your
                 password and never the password. Ask whoever administers this
@@ -133,10 +149,11 @@
               </p>
             </div>
 
-            <p class="auth-error" id="error" hidden></p>
+            <p class="auth-error" id="error" role="alert" hidden></p>
           </div>
 
-          <button id="submit" class="auth-button" type="button">Sign in</button>
+          <button id="submit" class="auth-button" type="submit">Sign in</button>
+          </form>
           <p class="auth-note auth-fine">
             No account? Access is by invitation. Ask whoever runs the package to
             send you one — an invite works once and expires after seven days.
@@ -226,8 +243,21 @@
       // into a node still gets sent back to that node — `next` carries it — and
       // it is only the plain sign-in, with nowhere in particular to be, that
       // lands on the door.
-      const wanted = new URLSearchParams(location.search).get('next') || '/home.html';
-      const goOn = () => { location.href = wanted.startsWith('/') ? wanted : '/'; };
+      // `next` comes from the address bar, so anyone can write it: only a page
+      // on this site, and never this page, is a place to go (`//evil.example`
+      // and `/\evil.example` both start with '/' and leave the site).
+      const wanted = (() => {
+        try {
+          const url = new URL(new URLSearchParams(location.search).get('next') || '/home.html', location.origin);
+          if (url.origin === location.origin && !/^\/login(\.html)?$/.test(url.pathname)) {
+            return url.pathname + url.search + url.hash;
+          }
+        } catch { /* not a URL at all */ }
+        return '/home.html';
+      })();
+      // replace, not href: the sign-in page leaves history once it is done, so
+      // Back from where it went does not land here and bounce forward again.
+      const goOn = () => { location.replace(wanted); };
 
       async function decide() {
         show('checking');
@@ -287,20 +317,18 @@
         }
       };
 
-      $('submit').onclick = doSignIn;
-      $('boot-submit').onclick = doBootstrap;
+      // The forms submit on the button and on Enter in any field, once each;
+      // nothing is posted by the browser itself.
+      $('signin-form').onsubmit = (e) => { e.preventDefault(); if (!$('submit').disabled) doSignIn(); };
+      $('boot-form').onsubmit = (e) => { e.preventDefault(); if (!$('boot-submit').disabled) doBootstrap(); };
       $('retry').onclick = decide;
       $('forgot').onclick = () => {
         const note = $('forgot-note');
         note.hidden = !note.hidden;
         $('forgot').setAttribute('aria-expanded', String(!note.hidden));
       };
-      for (const id of ['email', 'password']) {
-        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') doSignIn(); });
-      }
-      for (const id of ['boot-email', 'boot-name', 'boot-password', 'boot-confirm']) {
-        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') doBootstrap(); });
-      }
+      // Enter in a field submits its form (above), so there are no key handlers.
+      
 
       decide();
     </script>

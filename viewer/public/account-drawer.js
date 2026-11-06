@@ -58,7 +58,16 @@ const BELL_HTML = `
 <div class="palette-backdrop" id="bell-panel" hidden>
   <div class="account-dialog bell-dialog" role="dialog" aria-modal="true"
        aria-labelledby="bell-title">
-    <h2 class="account-title" id="bell-title">Where you were named</h2>
+    <header class="bell-head">
+      <h2 class="account-title" id="bell-title">Where you were named</h2>
+      <!-- On a phone the bell is a full-screen sheet, which has no scrim left to
+           tap, so it needs a way out of its own. On a desk the scrim and Escape
+           are enough, and the button stays out of sight. -->
+      <button id="bell-close" class="icon-btn bell-close" type="button" aria-label="Close">
+        <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor"
+             stroke-width="1.6" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8" /></svg>
+      </button>
+    </header>
     <p class="auth-note auth-fine" id="bell-note"></p>
     <div id="bell-list" class="bell-list"></div>
     <button class="auth-button auth-button-quiet" id="bell-seen" type="button" hidden>
@@ -148,6 +157,10 @@ const DRAWER_HTML = `
           <a class="drawer-link" href="/board.html">My work</a>
           <a class="drawer-link" href="/tasks.html">Tasks</a>
           <a class="drawer-link" id="changes-link" href="/changes.html">Change requests</a>
+          <!-- The watcher's drafts, for the two people who decide them
+               (security.py DECIDERS). Hidden for everybody else, and refused
+               by the service for everybody else. -->
+          <a class="drawer-link" id="decide-link" data-link="decide" href="/decide" hidden>Decide change requests</a>
           <a class="drawer-link" id="mentions-link" href="/reviews.html">Reviews</a>
           <a class="drawer-link" href="/agents.html">Agent activity</a>
         </nav>
@@ -160,19 +173,19 @@ const DRAWER_HTML = `
           <a class="drawer-link" href="/updates.html">What is new in ADAM</a>
         </nav>
 
-        <nav class="drawer-group" id="account-admin" hidden aria-labelledby="drawer-admin">
+        <nav class="drawer-group" id="account-admin" data-group="admin" hidden aria-labelledby="drawer-admin">
           <h3 class="drawer-group-title" id="drawer-admin">Administration</h3>
           <a class="drawer-link" href="/admin.html">People and projects</a>
           <a class="drawer-link" href="/costing.html">Costing</a>
           <a class="drawer-link" href="/audit.html">Audit the package</a>
-          <a class="drawer-link" id="networks-link" href="/ips.html" hidden>Networks</a>
+          <a class="drawer-link" id="networks-link" data-link="networks" href="/ips.html" hidden>Networks</a>
         </nav>
 
         <!-- Its own group rather than a line in Administration, because it is
              not administration: it is the one screen that belongs to a single
              person. Hidden for everybody else, and refused by the service for
              everybody else, which are two different guarantees. -->
-        <nav class="drawer-group" id="account-architect" hidden aria-labelledby="drawer-architect">
+        <nav class="drawer-group" id="account-architect" data-group="architect" hidden aria-labelledby="drawer-architect">
           <h3 class="drawer-group-title" id="drawer-architect">System Architect</h3>
           <a class="drawer-link" href="/plan.html">The plan: modules on a chart</a>
         </nav>
@@ -223,17 +236,84 @@ let mentionCache = [];
 let alertCache = [];
 let onMentionTarget = null;
 
+// ── a sheet's history entry ─────────────────────────────────────────────────
+// On a phone the account panel and More (page-chrome.js) are screens over the
+// page, so Back closes them instead of leaving it. Opening one pushes an
+// entry; closing it by a button goes back off that entry; one opened from the
+// other takes the entry over rather than stacking a second; a link followed
+// from inside goes in the entry's place. Home's full-screen view (home.js
+// openExplorer) is the same pattern. A desk is left as it was: no entry.
+const SHEET_PHONE = matchMedia('(max-width: 719px)');
+let sheetClose = null;   // the open sheet's close, called by Back
+let sheetHeld = false;   // our entry is on top of the history
+let sheetBacking = false; // a history.back() of ours is on its way
+
+/** A sheet is open: hold one history entry for it, with `close` for Back. */
+export function holdSheet(close) {
+  if (!SHEET_PHONE.matches) return;
+  sheetClose = close;
+  if (sheetHeld || sheetBacking) return;
+  history.pushState({ ...(history.state ?? {}), sheet: true }, '', location.href);
+  sheetHeld = true;
+}
+
+/** A sheet closed. By Back, the entry is gone already; by a button, go back
+ *  off it; handed over to the next sheet, it is kept. */
+export function releaseSheet({ fromHistory = false, handOver = false } = {}) {
+  if (handOver) return;
+  sheetClose = null;
+  if (!sheetHeld) return;
+  sheetHeld = false;
+  if (!fromHistory) { sheetBacking = true; history.back(); }
+}
+
+/** Links inside a sheet replace its entry rather than leave it behind, where
+ *  it would come back as the page with nothing open and a Back that does nothing. */
+export function followFromSheet(root) {
+  root?.addEventListener('click', (e) => {
+    const link = e.target.closest?.('a[href]');
+    if (!sheetHeld || !link || e.defaultPrevented || e.button !== 0
+      || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || link.target) return;
+    e.preventDefault();
+    sheetHeld = false;
+    sheetClose = null;
+    location.replace(link.href);
+  });
+}
+
+/** `fn` once the history is back where the page was (now, or after our Back). */
+function afterSheet(fn) {
+  if (sheetBacking) addEventListener('popstate', fn, { once: true }); else fn();
+}
+
+addEventListener('popstate', () => {
+  if (sheetBacking) {
+    sheetBacking = false;
+    // Reopened while that Back was on its way: it needs an entry of its own.
+    if (sheetClose) holdSheet(sheetClose);
+    return;
+  }
+  if (!sheetHeld) return;
+  sheetHeld = false;
+  const close = sheetClose;
+  sheetClose = null;
+  close?.();
+});
+
 export function openAccountPanel() {
   accountOpener = document.activeElement;
   $('account-panel').hidden = false;
+  holdSheet(() => closeAccountPanel({ fromHistory: true }));
   renderAccountPanel();
   (auth.account() ? $('account-close') : $('signin-email'))?.focus();
 }
 
-export function closeAccountPanel() {
+/** Also an onclick (the event is then `opts`, and asks for nothing). */
+export function closeAccountPanel(opts) {
   const panel = $('account-panel');
   if (!panel || panel.hidden) return;
   panel.hidden = true;
+  releaseSheet({ fromHistory: opts?.fromHistory === true, handOver: opts?.handOver === true });
   if (accountOpener && document.contains(accountOpener)) accountOpener.focus();
   accountOpener = null;
 }
@@ -256,14 +336,31 @@ function renderAccountPanel() {
     $('account-email').textContent = who.name ? who.email : '';
     $('account-role').textContent = auth.roleLabel(who.role);
     $('account-role').dataset.role = who.role;
-    $('account-admin').hidden = !auth.isAdmin(who);
-    $('account-architect').hidden = !auth.isOwner(who);
-    $('networks-link').hidden = !auth.isOwner(who);
+    showLinksFor($('account-panel'), who);
     // Never reopen already armed. This panel is opened and closed all day, and
     // a confirm left standing from a change of mind ten minutes ago would sit
     // one click from ending every session on the account.
     disarmSignOutAll();
   }
+}
+
+/** Who may decide the watcher's drafts: the owner and the lead (security.py DECIDERS). */
+export const isDecider = (who) => who?.role === 'owner' || who?.role === 'lead';
+
+/**
+ * Shows the links this account may use and hides the rest, inside `root`.
+ *
+ * By id inside the root rather than by document id, because the phone menu
+ * holds a copy of these groups (page-chrome.js) and the copy has to answer the
+ * same way as the drawer: one rule, two places it is drawn.
+ */
+export function showLinksFor(root, who) {
+  if (!root) return;
+  const set = (sel, show) => { const node = root.querySelector(sel); if (node) node.hidden = !show; };
+  set('[data-group="admin"], #account-admin', auth.isAdmin(who));
+  set('[data-group="architect"], #account-architect', auth.isOwner(who));
+  set('[data-link="networks"], #networks-link', auth.isOwner(who));
+  set('[data-link="decide"], #decide-link', isDecider(who));
 }
 
 /** Puts "Sign out everywhere" back to its resting state — asking nothing. */
@@ -481,6 +578,10 @@ function openBellPanel() {
   renderBellPanel();
   $('bell-panel').hidden = false;
   $('bell-toggle').setAttribute('aria-expanded', 'true');
+  // Only where the close button is drawn (a phone): focus into the sheet, so a
+  // screen reader starts inside it rather than on the page underneath.
+  const close = $('bell-close');
+  if (close && close.offsetParent) close.focus();
 }
 
 export function closeBellPanel() {
@@ -611,6 +712,8 @@ export function mountAccountDrawer({ onTarget } = {}) {
   if (bell) {
     bell.onclick = () => ($('bell-panel').hidden ? openBellPanel() : closeBellPanel());
     $('bell-panel').onclick = (e) => { if (e.target === $('bell-panel')) closeBellPanel(); };
+    const bellClose = $('bell-close');
+    if (bellClose) bellClose.onclick = () => { closeBellPanel(); bell.focus(); };
     $('bell-seen').onclick = async () => {
       $('bell-seen').disabled = true;
       try {
@@ -624,12 +727,18 @@ export function mountAccountDrawer({ onTarget } = {}) {
     };
   }
 
-  $('account-toggle').onclick = () =>
-    ($('account-panel').hidden ? openAccountPanel() : closeAccountPanel());
+  // Home has no top bar, so no toggle: its drawer is opened from the phone's
+  // More sheet (page-chrome.js mountPhoneBar) and nowhere else.
+  const toggle = $('account-toggle');
+  if (toggle) {
+    toggle.onclick = () =>
+      ($('account-panel').hidden ? openAccountPanel() : closeAccountPanel());
+  }
   // Not awaited: the bar is drawn and usable whether or not this ever answers.
   markUpdates().catch(() => {});
   $('account-panel').onclick = (e) => { if (e.target === $('account-panel')) closeAccountPanel(); };
   $('account-close').onclick = closeAccountPanel;
+  followFromSheet($('account-panel'));
   // a verdict block asking for a sign-in
   document.addEventListener('ticvai:signin', openAccountPanel);
 
@@ -648,8 +757,9 @@ export function mountAccountDrawer({ onTarget } = {}) {
       closeAccountPanel();
       // A page drawn for a signed-out reader stays drawn for one. The viewer
       // redraws itself on the auth change; a standalone page has no such loop,
-      // so the honest move is to draw it again from the top.
-      if (document.body.classList.contains('admin-page')) location.reload();
+      // so the honest move is to draw it again from the top (off the panel's
+      // history entry first, or the reload would keep it).
+      if (document.body.classList.contains('admin-page')) afterSheet(() => location.reload());
     } catch (error) {
       signInError(error.message);
     } finally {

@@ -1,3 +1,8 @@
+/* The design system's tokens (--ds-*), for the phone frame at the end of this
+   file and for every page that moves onto them. Prefixed names only, so this
+   changes nothing that does not ask for them. See DESIGN-SYSTEM.md. */
+@import url("/design-tokens.css");
+
 /* Styles for the layer switch and the views the frontend and backend layers
    add. Loaded after styles.css, so the few overrides here win. */
 
@@ -3671,3 +3676,388 @@ textarea.rt-sendback-note {
   .set-flow-row { flex-wrap: wrap; gap: 12px; }
   .set-conn { display: none; }
 }
+
+/* ── the phone frame ─────────────────────────────────────────────────────────
+   page-chrome.js draws a compact app bar, a bottom bar and the More sheet on
+   every standalone page; this is where they show, under 720 px (the design
+   system's phone, DESIGN-SYSTEM.md). On a desk none of it is drawn, so nothing
+   above this block changes there. Values come from design-tokens.css (--ds-*),
+   the same system as /decide, so the two read as one product: the frame dark in
+   both themes, 44 px the floor for anything tappable, 48 px for the bars.
+
+   Also here, once for every rail-and-sheet page: the section rail as a strip of
+   44 px pills, forms at full width with 16 px text (no zoom on focus), and the
+   account drawer and the bell as full-screen sheets. */
+.phone-bar-start, .phone-tabbar, .bell-close { display: none; }
+
+@media (min-width: 720px) {
+  .phone-menu-backdrop { display: none !important; }
+}
+
+@media (max-width: 719px) {
+  /* ── the app bar ── */
+  .admin-bar[data-chrome="full"] {
+    height: auto;
+    min-height: calc(var(--ds-bar-top) + var(--ds-safe-top));
+    padding: var(--ds-safe-top) calc(var(--ds-space-1) + var(--ds-safe-right)) 0 calc(var(--ds-space-2) + var(--ds-safe-left));
+    gap: var(--ds-space-1);
+    background: var(--ds-frame);
+    border-bottom-color: var(--ds-frame-line);
+    z-index: var(--ds-z-bar);
+  }
+  .admin-bar[data-chrome="full"] > .brand { display: none; }
+  .phone-bar-start { display: flex; align-items: center; gap: var(--ds-space-1); flex: 1 1 auto; min-width: 0; }
+  .phone-mark {
+    flex: none; display: grid; place-items: center;
+    width: var(--ds-touch-min); height: var(--ds-touch-min); border-radius: var(--ds-radius-pill);
+  }
+  .phone-mark img { width: 28px; height: 28px; display: block; }
+  .phone-mark:focus-visible { outline: 3px solid var(--ds-frame-accent); outline-offset: -3px; }
+  .phone-title {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font: var(--ds-weight-bold) var(--ds-text-md)/var(--ds-leading-tight) var(--ds-font-sans);
+    color: var(--ds-frame-ink);
+  }
+  .admin-bar[data-chrome="full"] .admin-bar-right {
+    flex: none; margin-left: auto; gap: 0; overflow: visible;
+  }
+  /* Only the bell and you stay in the bar; the rest is in More. */
+  .admin-bar[data-chrome="full"] .admin-bar-right > * { display: none; }
+  .admin-bar[data-chrome="full"] .admin-bar-right > :is(#bell-toggle, #account-toggle) {
+    display: inline-grid; place-items: center;
+    width: var(--ds-touch-comfy); height: var(--ds-touch-comfy);
+    border: 0; border-radius: var(--ds-radius-pill);
+    background: transparent; color: var(--ds-frame-ink-2);
+  }
+  .admin-bar[data-chrome="full"] #bell-toggle .icon-bell { width: 22px; height: 22px; }
+  .admin-bar[data-chrome="full"] #bell-toggle.has-mentions { color: var(--ds-frame-accent); }
+  .admin-bar[data-chrome="full"] #bell-toggle .bell-count {
+    top: 6px; right: 5px; min-width: 18px; height: 18px; line-height: 18px; font-size: 11px;
+    background: var(--ds-frame-accent); color: var(--ds-frame); box-shadow: 0 0 0 2px var(--ds-frame);
+  }
+  .admin-bar[data-chrome="full"] #account-toggle .account-initials {
+    display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+    font-size: 12px; font-weight: var(--ds-weight-bold);
+    color: var(--ds-frame-ink); background: var(--ds-frame-raised); border: 1px solid var(--ds-frame-line);
+  }
+  .admin-bar[data-chrome="full"] #account-toggle.signed-in .account-initials {
+    color: var(--ds-frame); background: var(--ds-frame-accent); border-color: transparent;
+  }
+  .admin-bar[data-chrome="full"] #account-toggle.has-mentions::after { top: 7px; right: 7px; box-shadow: 0 0 0 2px var(--ds-frame); }
+  .admin-bar[data-chrome="full"] .admin-bar-right > :is(#bell-toggle, #account-toggle):active { background: var(--ds-frame-raised); }
+  .admin-bar[data-chrome="full"] .admin-bar-right > :focus-visible { outline: 3px solid var(--ds-frame-accent); outline-offset: -3px; }
+
+  /* ── the bottom bar ── */
+  .phone-tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--ds-z-bar);
+    display: flex;
+    height: calc(var(--ds-bar-bottom) + var(--ds-safe-bottom));
+    padding: 0 var(--ds-safe-right) var(--ds-safe-bottom) var(--ds-safe-left);
+    background: var(--ds-frame); border-top: 1px solid var(--ds-frame-line);
+    font-family: var(--ds-font-sans);
+  }
+  .phone-tab {
+    position: relative; flex: 1 1 0; min-width: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    min-height: var(--ds-touch-comfy); padding: 0; border: 0; background: transparent;
+    color: var(--ds-frame-ink-2); text-decoration: none; cursor: pointer;
+    font: var(--ds-weight-semibold) 12px/1.2 var(--ds-font-sans);
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  .phone-tab svg { width: 24px; height: 24px; transition: transform var(--ds-dur-fast) var(--ds-ease-out); }
+  .phone-tab::before {
+    content: ""; position: absolute; top: 6px; left: 50%; width: 56px; height: 32px; margin-left: -28px;
+    border-radius: var(--ds-radius-pill); background: transparent;
+    transition: background-color var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  .phone-tab > * { position: relative; }
+  .phone-tab-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 2px; }
+  .phone-tab[aria-current="page"], .phone-tab.is-here, .phone-tab[aria-expanded="true"] { color: var(--ds-frame-ink); }
+  .phone-tab[aria-current="page"]::before, .phone-tab.is-here::before, .phone-tab[aria-expanded="true"]::before { background: var(--ds-frame-raised); }
+  .phone-tab[aria-current="page"] svg, .phone-tab.is-here svg, .phone-tab[aria-expanded="true"] svg { color: var(--ds-frame-accent); }
+  .phone-tab:active svg { transform: scale(0.9); }
+  .phone-tab:focus-visible { outline: 3px solid var(--ds-frame-accent); outline-offset: -4px; border-radius: var(--ds-radius-sm); }
+  .phone-tab-dot {
+    position: absolute; top: 7px; left: calc(50% + 8px); width: 10px; height: 10px; border-radius: 50%;
+    background: var(--ds-frame-accent); border: 2px solid var(--ds-frame);
+  }
+  /* The waiting count on the Changes tab (page-chrome.js), where the dot sits. */
+  .phone-tab-count {
+    position: absolute; top: 4px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px;
+    box-sizing: border-box; border-radius: 9px; border: 2px solid var(--ds-frame);
+    background: var(--ds-frame-accent); color: var(--ds-frame);
+    font: var(--ds-weight-bold) 10px/14px var(--ds-font-sans); text-align: center; font-variant-numeric: tabular-nums;
+  }
+
+  /* Room for the bottom bar under the last thing on the page. The body is the
+     scroll container on these pages (`.admin-page` above).
+     A sticky element at the foot of a frame page (a compose box, an action
+     row) uses `bottom: 0`: a sticky box is measured inside this padding, so 0
+     already sits it on top of the bar, and adding the bar's height again
+     floats it a bar's height too high. */
+  body.has-phone-frame { padding-bottom: calc(var(--ds-bar-bottom) + var(--ds-safe-bottom)); box-sizing: border-box; }
+  /* While a text field has focus the keyboard is up: the bar steps aside so
+     the field sits on the keyboard rather than behind the bar (chat's dock
+     relied on this first; it is every page's now). */
+  body.has-phone-frame:has(:is(textarea, [contenteditable="true"],
+    input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="range"], [type="color"], [type="file"], [type="hidden"])):focus) {
+    padding-bottom: var(--ds-safe-bottom);
+  }
+  body.has-phone-frame:has(:is(textarea, [contenteditable="true"],
+    input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="range"], [type="color"], [type="file"], [type="hidden"])):focus) .phone-tabbar {
+    display: none;
+  }
+  body.has-phone-frame.phone-sheet-open { overflow: hidden; }
+
+  /* ── More: a full-screen sheet ── */
+  .phone-menu-backdrop {
+    position: fixed; inset: 0; z-index: 48;
+    display: flex; background: var(--ds-scrim);
+  }
+  .phone-menu {
+    flex: 1; display: flex; flex-direction: column; min-width: 0;
+    background: var(--ds-bg); color: var(--ds-ink); font-family: var(--ds-font-sans);
+    animation: phone-sheet-up var(--ds-dur-normal) var(--ds-ease-sheet);
+  }
+  @keyframes phone-sheet-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .phone-menu-head {
+    flex: none; display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-2);
+    min-height: calc(var(--ds-bar-top) + var(--ds-safe-top));
+    padding: var(--ds-safe-top) calc(var(--ds-space-1) + var(--ds-safe-right)) 0 calc(var(--ds-gutter) + var(--ds-safe-left));
+    background: var(--ds-frame); color: var(--ds-frame-ink); border-bottom: 1px solid var(--ds-frame-line);
+  }
+  .phone-menu-title { margin: 0; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-bold); }
+  .phone-menu-close {
+    display: grid; place-items: center; width: var(--ds-touch-comfy); height: var(--ds-touch-comfy);
+    border: 0; border-radius: var(--ds-radius-pill); background: transparent; color: var(--ds-frame-ink); cursor: pointer;
+  }
+  .phone-menu-close svg { width: 24px; height: 24px; }
+  .phone-menu-close:active { background: var(--ds-frame-raised); }
+  .phone-menu-close:focus-visible { outline: 3px solid var(--ds-frame-accent); outline-offset: -3px; }
+  .phone-menu-body {
+    flex: 1; overflow-y: auto; overscroll-behavior: contain;
+    padding: var(--ds-space-4) calc(var(--ds-gutter) + var(--ds-safe-right)) calc(var(--ds-space-8) + var(--ds-safe-bottom)) calc(var(--ds-gutter) + var(--ds-safe-left));
+  }
+  .phone-menu-me {
+    width: 100%; display: grid; grid-template-columns: 44px minmax(0, 1fr) 24px; gap: var(--ds-space-3); align-items: center;
+    padding: var(--ds-space-3) var(--ds-space-4); text-align: left; cursor: pointer;
+    background: var(--ds-surface); color: var(--ds-ink); font: inherit;
+    border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md);
+  }
+  .phone-menu-me:active { background: var(--ds-surface-press); }
+  .phone-menu-me:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
+  .phone-menu-me .account-avatar { width: 44px; height: 44px; }
+  .phone-menu-me b, .phone-menu-me small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .phone-menu-me b { font-size: var(--ds-text-md); }
+  .phone-menu-me small { margin-top: 2px; font-size: var(--ds-text-sm); color: var(--ds-ink-2); }
+  .phone-menu-me svg { width: 20px; height: 20px; color: var(--ds-ink-3); }
+  /* A tab that is not in this account's bar (page-chrome.js PHONE_TABS) heads
+     More, with the icon it would have had in the bar. */
+  .phone-menu-tabs .drawer-link { justify-content: flex-start; gap: var(--ds-space-3); }
+  .phone-menu-tabs .drawer-link > span { margin-right: auto; }
+  .phone-menu-tabs .drawer-link svg { width: 22px; height: 22px; flex: none; color: var(--ds-accent); }
+  .phone-menu-tabs .drawer-link:first-child { border-top-left-radius: var(--ds-radius-md); border-top-right-radius: var(--ds-radius-md); }
+
+  /* The drawer's link groups, in the drawer and in More: one surface per group,
+     rows with lines between them, 48 px each. */
+  :is(.phone-menu-body, .account-drawer-body) .drawer-group { margin-top: var(--ds-space-6); }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-group-title {
+    margin: 0 0 var(--ds-space-2); padding: 0 var(--ds-space-1);
+    font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--ds-ink-2);
+  }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-link {
+    margin: 0; min-height: var(--ds-touch-comfy); padding: 0 var(--ds-space-4);
+    font-size: var(--ds-text-md); color: var(--ds-ink);
+    background: var(--ds-surface); border: 1px solid var(--ds-line); border-radius: 0;
+  }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-link + .drawer-link { border-top: 0; }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-group-title + .drawer-link,
+  :is(.phone-menu-body, .account-drawer-body) .drawer-group-title + .drawer-link[hidden] + .drawer-link {
+    border-top-left-radius: var(--ds-radius-md); border-top-right-radius: var(--ds-radius-md);
+  }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-link:last-of-type,
+  :is(.phone-menu-body, .account-drawer-body) .drawer-link:has(+ .drawer-link[hidden]:last-child) {
+    border-bottom-left-radius: var(--ds-radius-md); border-bottom-right-radius: var(--ds-radius-md);
+  }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-link:active { background: var(--ds-surface-press); }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-link::after { font-size: 22px; color: var(--ds-ink-3); }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-link[aria-current='page'] {
+    background: var(--ds-accent-soft); box-shadow: inset 3px 0 0 var(--ds-accent-fill);
+  }
+  :is(.phone-menu-body, .account-drawer-body) .drawer-badge { background: var(--ds-accent-fill); color: var(--ds-accent-on); font-size: var(--ds-text-xs); }
+
+  .phone-seg {
+    display: grid; grid-template-columns: 1fr 1fr; padding: 4px; gap: 4px;
+    background: var(--ds-surface-2); border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md);
+  }
+  .phone-seg button {
+    min-height: var(--ds-touch-min); border: 0; border-radius: var(--ds-radius-sm); cursor: pointer;
+    background: transparent; color: var(--ds-ink-2); font: var(--ds-weight-semibold) var(--ds-text-md) var(--ds-font-sans);
+  }
+  .phone-seg button[aria-pressed="true"] { background: var(--ds-surface); color: var(--ds-ink); box-shadow: var(--ds-shadow-1); }
+  .phone-seg button:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: -3px; }
+
+  /* ── the account drawer, full screen ── */
+  .account-backdrop { z-index: 50; }
+  .account-drawer { width: 100vw; border-left: 0; padding-top: var(--ds-safe-top); background: var(--ds-bg); font-family: var(--ds-font-sans); }
+  .account-drawer-head {
+    min-height: var(--ds-bar-top); padding: 0 var(--ds-space-1) 0 var(--ds-gutter);
+    background: var(--ds-frame); border-bottom-color: var(--ds-frame-line);
+    margin-top: calc(-1 * var(--ds-safe-top)); padding-top: var(--ds-safe-top);
+  }
+  .account-drawer-head .account-title { color: var(--ds-frame-ink); font-size: var(--ds-text-lg); }
+  .account-close {
+    width: var(--ds-touch-comfy) !important; height: var(--ds-touch-comfy) !important;
+    border: 0 !important; border-radius: var(--ds-radius-pill) !important; color: var(--ds-frame-ink) !important;
+  }
+  .account-close svg { width: 20px; height: 20px; }
+  .account-drawer-body { padding: var(--ds-space-4) var(--ds-gutter) var(--ds-space-6); }
+  .account-who-name { font-size: var(--ds-text-md); }
+  .account-who-email { font-size: var(--ds-text-sm); }
+  .drawer-primary { min-height: 64px; border-radius: var(--ds-radius-md); }
+  .drawer-primary-text b { font-size: var(--ds-text-md); }
+  .drawer-primary-text small { font-size: var(--ds-text-sm); }
+  .account-drawer-foot { padding: var(--ds-space-3) var(--ds-gutter) calc(var(--ds-space-4) + var(--ds-safe-bottom)); }
+  .drawer-foot-btn { min-height: var(--ds-touch-comfy); font-size: var(--ds-text-md); border-radius: var(--ds-radius-sm); }
+  .account-drawer .auth-input { min-height: var(--ds-touch-comfy); font-size: var(--ds-text-md); }
+  .account-drawer .auth-button { min-height: var(--ds-touch-comfy); font-size: var(--ds-text-md); }
+
+  /* ── the bell, full screen ── */
+  #bell-panel.palette-backdrop { padding: 0; place-items: stretch; backdrop-filter: none; }
+  .bell-dialog {
+    width: 100vw; max-width: none; height: 100dvh; max-height: none;
+    display: flex; flex-direction: column;
+    border: 0; border-radius: 0; padding: 0 var(--ds-gutter) calc(var(--ds-space-4) + var(--ds-safe-bottom));
+    background: var(--ds-bg); font-family: var(--ds-font-sans);
+  }
+  .bell-head {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-2);
+    min-height: calc(var(--ds-bar-top) + var(--ds-safe-top));
+    margin: 0 calc(-1 * var(--ds-gutter)) var(--ds-space-3);
+    padding: var(--ds-safe-top) var(--ds-space-1) 0 var(--ds-gutter);
+    background: var(--ds-frame); border-bottom: 1px solid var(--ds-frame-line);
+  }
+  .bell-head .account-title { color: var(--ds-frame-ink); font-size: var(--ds-text-lg); }
+  .bell-close {
+    display: grid; place-items: center; width: var(--ds-touch-comfy); height: var(--ds-touch-comfy);
+    border: 0; border-radius: var(--ds-radius-pill); background: transparent; color: var(--ds-frame-ink);
+  }
+  .bell-close svg { width: 20px; height: 20px; }
+  .bell-list { flex: 1; max-height: none; }
+  .bell-dialog .auth-button { min-height: var(--ds-touch-comfy); font-size: var(--ds-text-md); display: grid; place-items: center; }
+  .bell-alert-chip, .bell-target { min-height: var(--ds-touch-min); }
+}
+
+/* The bell's title row on a desk: the same title, the close button out of sight. */
+.bell-head { display: flex; align-items: center; justify-content: space-between; }
+
+/* ── the rail-and-sheet pages on a phone ──────────────────────────────────── */
+@media (max-width: 719px) {
+  .set-layout { padding: var(--ds-space-3) calc(var(--ds-space-3) + var(--ds-safe-right)) var(--ds-space-6) calc(var(--ds-space-3) + var(--ds-safe-left)); gap: var(--ds-space-3); }
+  /* One section shows at a time, so the room left below the last one for a
+     deep link to scroll into is only empty screen here. */
+  .set-content { padding-bottom: 0; gap: var(--ds-space-3); }
+  .set-nav {
+    top: calc(var(--ds-bar-top) + var(--ds-safe-top));
+    margin: 0 calc(-1 * var(--ds-space-3)); padding: var(--ds-space-2) var(--ds-space-3);
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  .set-nav-list { gap: var(--ds-space-2); scroll-padding-inline: var(--ds-space-3); }
+  .set-nav a {
+    display: inline-flex; align-items: center; min-height: var(--ds-touch-min);
+    padding: 0 var(--ds-space-4); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium);
+    background: var(--bg-panel);
+  }
+  .set-nav a[aria-current='true'] { border-color: var(--accent); }
+  .admin-panel { padding: var(--ds-space-4); border-radius: var(--ds-radius-md); margin-bottom: var(--ds-space-3); }
+  .sh-sheet { padding: var(--ds-space-4); }
+
+  /* Reading sizes: nothing people read under 14 px, body text at 15. */
+  .admin-page :is(.sh-note, .sh-lede, .set-lede, .auth-note, .sh-empty, .sh-says, .sh-saying) { font-size: var(--ds-text-sm); }
+  .admin-page :is(.sh-pace) { font-size: 15px; }
+
+  /* Forms: full width, 44 px controls, 16 px text so a phone does not zoom in
+     when a field takes focus. */
+  .admin-page :is(.auth-input, .sh-input, .scope-select, textarea,
+    input:is([type="text"], [type="email"], [type="search"], [type="password"], [type="number"], [type="date"], [type="url"], [type="tel"]),
+    select) {
+    min-height: var(--ds-touch-min); font-size: var(--ds-text-md); max-width: 100%; box-sizing: border-box;
+  }
+  /* Room to write in the forms that ask for a paragraph; a one-line compose
+     box (chat) keeps its own height. */
+  .admin-page :is(.cr-form textarea, textarea.cr-note, textarea.rv-sendback-note, #bd-notes, #bd-evidence) { min-height: 120px; }
+  .admin-page .set-fields { max-width: none; }
+  .admin-page :is(.auth-button, button.chip, a.chip, .sh-switch button, .drawer-foot-btn) {
+    min-height: var(--ds-touch-min); font-size: var(--ds-text-sm);
+  }
+  .admin-page :is(button.chip, a.chip) { display: inline-flex; align-items: center; justify-content: center; padding: 0 var(--ds-space-4); }
+  .admin-page .set-actions .auth-button { flex: 1 1 140px; }
+  .admin-page :is(input[type="checkbox"], input[type="radio"]) { width: 20px; height: 20px; margin: 0; flex: none; }
+  .admin-page label:has(> :is(input[type="checkbox"], input[type="radio"])) { min-height: var(--ds-touch-min); display: inline-flex; align-items: center; gap: var(--ds-space-3); }
+}
+
+/* A touch screen at any width: nothing tappable under 44 px tall. */
+@media (pointer: coarse) {
+  .admin-page :is(.set-nav a, .sh-switch button) { min-height: var(--ds-touch-min); }
+}
+
+@media (max-width: 719px) and (prefers-reduced-motion: reduce) {
+  .phone-menu { animation: none; }
+  .phone-tab svg { transition: none; }
+}
+
+/* Settings on a phone: its tab row becomes the same strip of 44 px pills as
+   the other pages' section rails, held under the app bar; the role matrix
+   scrolls sideways with the capability column held, since a capability only
+   means something read across the roles. */
+@media (max-width: 719px) {
+  .set-tabs {
+    position: sticky; top: calc(var(--ds-bar-top) + var(--ds-safe-top)); z-index: 5;
+    flex-wrap: nowrap; gap: var(--ds-space-2); overflow-x: auto; scrollbar-width: none;
+    margin: 0 calc(-1 * var(--ds-space-3)) var(--ds-space-4); padding: var(--ds-space-2) var(--ds-space-3);
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  .set-tabs::-webkit-scrollbar { display: none; }
+  .set-tabs button {
+    flex: none; height: auto; min-height: var(--ds-touch-min); padding: 0 var(--ds-space-4);
+    font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium);
+    border: 1px solid var(--border); border-radius: var(--ds-radius-pill); background: var(--bg-panel);
+  }
+  .set-tabs button[aria-current='true'] { border-color: var(--accent); font-weight: var(--ds-weight-semibold); }
+  .set-head { margin-bottom: var(--ds-space-3); }
+  .set-more > summary { min-height: var(--ds-touch-min); }
+}
+/* The role matrix on a phone: one card per capability, the roles as a row of
+   labelled dots under it, so every role is on screen without scrolling. The
+   header row stays for a screen reader; each cell names its role (settings.js). */
+@media (max-width: 599px) {
+  .set-matrix, .set-matrix tbody { display: block; width: 100%; }
+  .set-matrix thead {
+    position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  .set-matrix tbody tr {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ds-space-2) var(--ds-space-1);
+    padding: var(--ds-space-3) 0; border-bottom: 1px solid var(--line);
+  }
+  .set-matrix tbody tr:last-child { border-bottom: 0; }
+  .set-matrix tbody th { grid-column: 1 / -1; padding: 0; border: 0; font-size: var(--ds-text-md); font-weight: var(--ds-weight-semibold); color: var(--text); }
+  .set-matrix tbody td {
+    display: grid; justify-items: center; gap: var(--ds-space-1); min-width: 0;
+    padding: var(--ds-space-2) 2px; border: 0; border-radius: var(--ds-radius-sm);
+  }
+  .set-matrix tbody td::after {
+    content: attr(data-label); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: var(--ds-text-xs); color: var(--text-dim);
+  }
+  .set-matrix tbody td[data-you]::after { color: var(--accent-text); font-weight: var(--ds-weight-semibold); }
+}
+@media (max-width: 719px) {
+  .set-more > summary { min-height: var(--ds-touch-min); font-size: var(--ds-text-sm); }
+}
+
+/* On a page with the phone frame, the strip styles.css draws behind the
+   status bar takes the frame's colour: the app bar under it is the frame, and
+   the ADAM app's status bar icons are light, so a day-coloured strip there
+   would hide them. */
+html:has(body.has-phone-frame)::before { background: var(--ds-frame); }

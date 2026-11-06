@@ -38,6 +38,22 @@ import { el, confirmStep } from '/sheet.js';
 
 const $ = (id) => document.getElementById(id);
 
+/**
+ * A phone: a touch screen with no hover. There Enter starts a new line, as it
+ * does in every messenger with an on-screen keyboard, and the Ask button sends;
+ * the box starts one line tall and grows with the question (chat.css docks it
+ * above the keyboard). A desktop keeps Enter to ask.
+ */
+const phone = matchMedia('(hover: none) and (pointer: coarse)');
+
+/** Grow the box to its text on a phone, up to 160px; then it scrolls. */
+function fitBox() {
+  const box = $('ch-question');
+  if (!phone.matches) { box.style.height = ''; return; }
+  box.style.height = 'auto';
+  box.style.height = `${Math.min(160, box.scrollHeight + 2)}px`;
+}
+
 const state = {
   providers: [],
   provider: null,
@@ -249,6 +265,7 @@ async function ask(question) {
   fail('');
   $('ch-send').disabled = true;
   $('ch-question').value = '';
+  fitBox();
   state.turns.push({ role: 'user', text: question });
   const mine = drawTurn({ role: 'user', text: question });
   $('ch-says').textContent = 'Reading the package…';
@@ -278,6 +295,7 @@ async function ask(question) {
     mine.remove();
     if (!state.turns.length) { $('ch-clear').hidden = true; $('ch-starters').hidden = false; }
     $('ch-question').value = question;
+    fitBox();
     fail(`That was not answered: ${error.message}`);
     if (error.status === 428) await loadProviders().catch(() => {});
   } finally {
@@ -296,7 +314,7 @@ async function drawStarters() {
   list.replaceChildren(...questions.map((q) => {
     const b = el('button', 'chat-starter', q);
     b.type = 'button';
-    b.onclick = () => { if (!state.busy && !$('ch-send').disabled) ask(q); else $('ch-question').value = q; };
+    b.onclick = () => { if (!state.busy && !$('ch-send').disabled) ask(q); else { $('ch-question').value = q; fitBox(); } };
     return b;
   }));
   $('ch-starters').hidden = !questions.length || state.turns.length > 0;
@@ -354,12 +372,29 @@ async function drawStarters() {
   // Enter sends, Shift+Enter is a newline. A textarea that only sends on a
   // button is a textarea people stop using. Ignored while a question is in
   // flight, which is the busy guard's other half.
+  // On a phone Enter is left alone: it starts a new line, and Ask sends.
   $('ch-question').onkeydown = (event) => {
+    if (phone.matches) return;
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       event.preventDefault();
       if (!state.busy) $('ch-ask').requestSubmit();
     }
   };
+
+  // What the box says about Enter, and how it is drawn, follow the device.
+  const fitToDevice = () => {
+    const box = $('ch-question');
+    box.rows = phone.matches ? 1 : 3;
+    box.enterKeyHint = phone.matches ? 'enter' : '';
+    box.placeholder = phone.matches ? 'Ask about the package' : '';
+    $('ch-ask-hint').textContent = phone.matches
+      ? 'Enter starts a new line; Ask sends the question.'
+      : 'Enter asks; Shift and Enter starts a new line.';
+    fitBox();
+  };
+  fitToDevice();
+  phone.addEventListener('change', fitToDevice);
+  $('ch-question').addEventListener('input', fitBox);
 
   // The conversation is not kept anywhere, so clearing it cannot be undone.
   $('ch-clear').onclick = async () => {

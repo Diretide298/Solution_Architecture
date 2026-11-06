@@ -350,3 +350,45 @@
   .signin-demo { display: none; }
   .signin-form { align-items: flex-start; padding: 40px 20px; }
 }
+
+/* The fields and the button are inside a <form> (so a password manager can
+   find them); the form keeps the state's own 24px rhythm between the two. */
+.signin-form-fields { display: flex; flex-direction: column; gap: 24px; margin: 0; }
+
+/* ── a phone ───────────────────────────────────────────────────────────
+   Below 720px (DESIGN-SYSTEM.md: a phone), on the design system's tokens.
+   One column for one thumb: the fields 52px tall with 16px text (no zoom on
+   focus), labels large enough to read at arm's length, Forgot? a full touch
+   target, and the button at the bottom of the form at 52px. The stage and the
+   card keep their look; only sizes change. */
+@media (max-width: 719px) {
+  .signin-form {
+    padding: calc(var(--ds-space-8) + var(--ds-safe-top)) var(--ds-gutter) calc(var(--ds-space-8) + var(--ds-safe-bottom));
+  }
+  .signin-stack { gap: var(--ds-space-6); }
+  .signin-page .auth-lockup { height: 48px; }
+  .signin-page .auth-title { font-size: var(--ds-text-2xl); text-wrap: balance; }
+  .signin-page .auth-note { font-size: var(--ds-text-md); }
+  .signin-page .auth-fine { font-size: var(--ds-text-sm); }
+  .signin-page .auth-label { font-size: var(--ds-text-xs); letter-spacing: 0.08em; }
+  .signin-page .auth-input {
+    min-height: 52px; font-size: var(--ds-text-md); padding: 0 var(--ds-space-4);
+    border-radius: var(--ds-radius-sm);
+  }
+  .signin-page .auth-button {
+    min-height: 52px; font-size: var(--ds-text-md); border-radius: var(--ds-radius-sm);
+    touch-action: manipulation;
+  }
+  .signin-page .auth-button:active:not(:disabled) { transform: scale(var(--ds-press-scale)); }
+  .signin-page .auth-error { font-size: var(--ds-text-sm); }
+  .signin-label-row { align-items: center; }
+  /* Forgot?: the word stays small, the place to tap does not. */
+  .signin-forgot {
+    min-height: var(--ds-touch-min); padding: 0 var(--ds-space-3);
+    margin: calc(-1 * var(--ds-space-3)) calc(-1 * var(--ds-space-3)) calc(-1 * var(--ds-space-3)) auto;
+    font-size: var(--ds-text-xs); touch-action: manipulation;
+  }
+  .signin-forgot-note { font-size: var(--ds-text-sm); }
+  .signin-page .auth-pre { font-size: var(--ds-text-xs); }
+  .signin-page .auth-by-label { font-size: 10px; }
+}

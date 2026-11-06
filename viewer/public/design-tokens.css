@@ -1,0 +1,234 @@
+/* ADAM design tokens: one system for the phone and the desktop.
+ *
+ * Load it before a page's own stylesheet. Every name starts with `--ds-`, so it
+ * sits beside styles.css (which owns the un-prefixed names) without changing a
+ * pixel of any page that does not use it. Pages move onto these names one at a
+ * time; DESIGN-SYSTEM.md says what each component does with them.
+ *
+ * Themes follow ADAM's own switch: day is the bare :root, night is
+ * :root[data-theme="dark"] (theme.js stamps it, night by default).
+ *
+ * The token families, and what each is for:
+ *
+ *   --ds-frame-*    The dark frame: app bar, bottom bar, menus over the page.
+ *                   Dark in BOTH themes, as ADAM's chrome has always been; the
+ *                   theme switch changes the page inside the frame.
+ *   --ds-bg, --ds-surface*, --ds-line*
+ *                   The page: the ground, the things that sit on it (rows,
+ *                   cards, sheets), and the lines between them. --ds-line is a
+ *                   divider; --ds-line-control is a control's edge (3:1).
+ *   --ds-ink*       Text on the page. ink is body and titles, ink-2 is
+ *                   secondary, ink-3 is the quietest text still at 4.5:1.
+ *   --ds-accent*    ADAM's teal: links, the primary action, focus, "needs you".
+ *                   -fill carries a filled control, -on is the text on it,
+ *                   -soft is a tinted surface whose text is --ds-accent.
+ *   --ds-danger*, --ds-warn*
+ *                   Signals, never decoration, always with words beside them.
+ *                   danger: blocking, reject, failed. warn: waiting on somebody
+ *                   else (the client), paused, near a cap.
+ *   --ds-font-*, --ds-text-*, --ds-leading-*, --ds-weight-*
+ *                   Type. One family (Plus Jakarta Sans) for everything people
+ *                   read; the mono only for code, file:line and hashes. The
+ *                   scale is a major third from a 16 px body, so phone body
+ *                   text never drops below 16 and meta never below 13.
+ *   --ds-space-*    A 4 px grid. Gaps inside a component use 1 to 4, gaps
+ *                   between components 4 to 6, sections 8 and up.
+ *   --ds-radius-*   Smallest on chips, larger on rows and cards, largest on
+ *                   sheets. Nested surfaces: outer = inner + padding.
+ *   --ds-shadow-*   Elevation, for things that float over the page (sheets,
+ *                   toasts, the bottom bar). Rows and cards use lines, not
+ *                   shadows.
+ *   --ds-dur-*, --ds-ease-*
+ *                   Motion. Durations by distance: tap feedback is fast, a
+ *                   sheet is normal, nothing on a phone is slow. Under
+ *                   prefers-reduced-motion every duration collapses and pages
+ *                   drop transforms (see the block at the end).
+ *   --ds-touch-*    Touch sizes. 44 px is the floor for anything tappable;
+ *                   48 px for the primary action and the bottom bar.
+ *   --ds-bar-*, --ds-safe-*, --ds-content-*
+ *                   Layout: the heights of the fixed bars, the phone's safe
+ *                   areas (notch, gesture bar), and reading widths.
+ *   --ds-z-*        Stacking order, so a toast is never under a sheet.
+ *
+ * Breakpoints cannot be custom properties inside a media query, so they are
+ * written here once and repeated as literals: phone below 720 px, tablet 720 to
+ * 1079 px, desktop 1080 px and up (two panes from 960 px where a page has a
+ * list and a detail).
+ */
+
+:root {
+  /* ── the frame (both themes) ─────────────────────────────────────── */
+  --ds-frame: #0b161c;
+  --ds-frame-raised: #12212a;
+  --ds-frame-line: #26404c;
+  --ds-frame-ink: #f2fafc;
+  --ds-frame-ink-2: #9fb6bf;
+  --ds-frame-accent: #22c3ea;
+
+  /* ── the page, day ───────────────────────────────────────────────── */
+  --ds-bg: #f2f6f8;
+  --ds-surface: #ffffff;
+  --ds-surface-2: #eaf1f4;
+  --ds-surface-press: #e1ebef;
+  --ds-line: #dbe5ea;
+  --ds-line-strong: #c3d2d9;
+  --ds-line-control: #7f959e;
+
+  --ds-ink: #14232a;
+  --ds-ink-2: #4f636c;
+  --ds-ink-3: #5d727b;
+
+  --ds-accent: #00708f;
+  --ds-accent-fill: #00708f;
+  --ds-accent-on: #ffffff;
+  --ds-accent-soft: #e1f3f9;
+  --ds-accent-line: #9cd9ec;
+
+  --ds-danger: #b03d36;
+  --ds-danger-fill: #b03d36;
+  --ds-danger-on: #ffffff;
+  --ds-danger-soft: #fbeceb;
+
+  --ds-warn: #84600f;
+  --ds-warn-fill: #c08a2e;
+  --ds-warn-soft: #faf1e0;
+
+  --ds-scrim: rgba(6, 14, 18, 0.5);
+  --ds-focus: #00708f;
+
+  /* ── type ────────────────────────────────────────────────────────── */
+  --ds-font-sans: 'Plus Jakarta Sans', ui-sans-serif, -apple-system, 'Segoe UI', Roboto, system-ui, sans-serif;
+  --ds-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  --ds-text-xs: 0.8125rem;   /* 13: chips, timestamps */
+  --ds-text-sm: 0.875rem;    /* 14: meta lines, captions */
+  --ds-text-md: 1rem;        /* 16: body, row titles */
+  --ds-text-lg: 1.25rem;     /* 20: section and sheet titles */
+  --ds-text-xl: 1.5625rem;   /* 25: a request's recommendation */
+  --ds-text-2xl: 1.9375rem;  /* 31: the page's one headline */
+
+  --ds-leading-tight: 1.2;
+  --ds-leading-snug: 1.35;
+  --ds-leading-body: 1.55;
+
+  --ds-weight-regular: 400;
+  --ds-weight-medium: 500;
+  --ds-weight-semibold: 600;
+  --ds-weight-bold: 700;
+  --ds-weight-heavy: 800;
+
+  --ds-tracking-tight: -0.02em;
+
+  /* ── space (4 px grid) ───────────────────────────────────────────── */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 20px;
+  --ds-space-6: 24px;
+  --ds-space-8: 32px;
+  --ds-space-10: 40px;
+  --ds-space-12: 48px;
+  --ds-gutter: 16px;          /* page edge on a phone; 24 from 720 px */
+
+  /* ── radius ──────────────────────────────────────────────────────── */
+  --ds-radius-xs: 6px;        /* chips, small tags */
+  --ds-radius-sm: 10px;       /* buttons, fields */
+  --ds-radius-md: 14px;       /* rows, cards */
+  --ds-radius-lg: 22px;       /* sheets, the toast */
+  --ds-radius-pill: 999px;
+
+  /* ── elevation ───────────────────────────────────────────────────── */
+  --ds-shadow-1: 0 1px 2px rgba(10, 26, 33, 0.06);
+  --ds-shadow-2: 0 8px 24px rgba(10, 26, 33, 0.12), 0 2px 6px rgba(10, 26, 33, 0.06);
+  --ds-shadow-3: 0 -12px 40px rgba(10, 26, 33, 0.18), 0 -2px 10px rgba(10, 26, 33, 0.06);
+
+  /* ── motion ──────────────────────────────────────────────────────── */
+  --ds-dur-instant: 80ms;     /* focus, a badge count */
+  --ds-dur-fast: 160ms;       /* press, chip, icon swap */
+  --ds-dur-normal: 280ms;     /* sheet, row leaving, toast */
+  --ds-dur-slow: 420ms;       /* a whole view changing; rare */
+  --ds-ease-out: cubic-bezier(0.22, 1, 0.36, 1);      /* arriving */
+  --ds-ease-in: cubic-bezier(0.4, 0, 1, 1);           /* leaving */
+  --ds-ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);    /* sheets and drawers */
+  --ds-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1); /* a swipe snapping home */
+  --ds-press-scale: 0.97;
+
+  /* ── touch ───────────────────────────────────────────────────────── */
+  --ds-touch-min: 44px;
+  --ds-touch-comfy: 48px;
+  --ds-touch-gap: 8px;
+
+  /* ── layout ──────────────────────────────────────────────────────── */
+  --ds-bar-top: 56px;
+  --ds-bar-bottom: 64px;
+  --ds-safe-top: env(safe-area-inset-top, 0px);
+  --ds-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ds-safe-left: env(safe-area-inset-left, 0px);
+  --ds-safe-right: env(safe-area-inset-right, 0px);
+  --ds-content-read: 68ch;    /* prose */
+  --ds-content-list: 560px;   /* a list pane on a wide screen */
+
+  /* ── stacking ────────────────────────────────────────────────────── */
+  --ds-z-bar: 20;
+  --ds-z-sheet: 40;
+  --ds-z-toast: 60;
+}
+
+:root[data-theme="dark"] {
+  --ds-frame: #03080b;
+  --ds-frame-raised: #0b151b;
+  --ds-frame-line: #1a2c35;
+  --ds-frame-ink: #eaf6fa;
+  --ds-frame-ink-2: #8ea5ae;
+  --ds-frame-accent: #2ec5ea;
+
+  --ds-bg: #050a0d;
+  --ds-surface: #0b161c;
+  --ds-surface-2: #10202a;
+  --ds-surface-press: #142833;
+  --ds-line: #172a33;
+  --ds-line-strong: #2a4552;
+  --ds-line-control: #4d6b78;
+
+  --ds-ink: #e8f3f6;
+  --ds-ink-2: #9ab0b8;
+  --ds-ink-3: #7d949d;
+
+  --ds-accent: #2ec5ea;
+  --ds-accent-fill: #00b4e0;
+  --ds-accent-on: #00161e;
+  --ds-accent-soft: #062a38;
+  --ds-accent-line: #0b6f8c;
+
+  --ds-danger: #f08a80;
+  --ds-danger-fill: #e0756b;
+  --ds-danger-on: #1a0605;
+  --ds-danger-soft: #2e1513;
+
+  --ds-warn: #e2b25c;
+  --ds-warn-fill: #d9a143;
+  --ds-warn-soft: #2b2418;
+
+  --ds-scrim: rgba(0, 4, 8, 0.66);
+  --ds-focus: #2ec5ea;
+
+  --ds-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --ds-shadow-2: 0 10px 28px rgba(0, 0, 0, 0.5);
+  --ds-shadow-3: 0 -14px 44px rgba(0, 0, 0, 0.6);
+}
+
+@media (min-width: 720px) {
+  :root { --ds-gutter: 24px; }
+}
+
+/* Reduced motion: durations collapse to a short fade. Pages also drop their
+   transforms under the same query; a token cannot turn a transform off. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ds-dur-fast: 1ms;
+    --ds-dur-normal: 120ms;
+    --ds-dur-slow: 120ms;
+    --ds-press-scale: 1;
+  }
+}

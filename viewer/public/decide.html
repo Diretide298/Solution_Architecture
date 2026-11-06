@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script>
+      // The saved day/night choice, before the stylesheets resolve. theme.js
+      // owns the key; this is here only because a module runs too late to beat
+      // the first paint.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied; day is a fine fallback */ }
+    </script>
+    <meta name="theme-color" content="#0b161c" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Adam: decide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/design-tokens.css" />
+    <link rel="stylesheet" href="/decide.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+    <link rel="apple-touch-icon" href="/brand/adam-mark.png" />
+  </head>
+  <body class="dc">
+    <a class="dc-skip" href="#dc-main">Skip to the requests</a>
+
+    <!-- The app bar: who is speaking (ADAM), what this is, and how fresh it is. -->
+    <header class="dc-appbar">
+      <!-- The way back to the rest of ADAM: in the app this page has no browser bar and no shared menu. -->
+      <a class="dc-home" href="/home.html" aria-label="ADAM home">
+        <svg class="dc-home-back" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+        <img class="dc-mark dc-mark-night" src="/brand/adam-mark-night.svg" alt="" aria-hidden="true" width="28" height="28" />
+      </a>
+      <div class="dc-appbar-text">
+        <h1 class="dc-appbar-title" id="dc-title">Decide</h1>
+        <p class="dc-appbar-sub" id="dc-fresh" aria-live="polite">Reading the watcher…</p>
+      </div>
+      <button class="dc-icon-btn" id="dc-refresh" type="button" aria-label="Check for new requests">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4.5h-4.5" /></svg>
+      </button>
+    </header>
+
+    <!-- One line across the top when something about the whole page is true:
+         offline, the demo, the watcher paused. -->
+    <div class="dc-banner" id="dc-banner" role="status" hidden></div>
+
+    <div class="dc-shell" id="dc-shell">
+      <main class="dc-main" id="dc-main" tabindex="-1">
+        <!-- Inbox -->
+        <section class="dc-view" id="view-inbox" data-view="inbox" aria-labelledby="dc-headline">
+          <div class="dc-lede" id="dc-lede">
+            <h2 class="dc-headline" id="dc-headline">
+              <span class="dc-skel dc-skel-headline" aria-hidden="true"></span>
+              <span class="dc-sr">Loading the requests</span>
+            </h2>
+            <p class="dc-lede-line" id="dc-lede-line"></p>
+          </div>
+          <div id="dc-groups" class="dc-groups" aria-busy="true">
+            <ul class="dc-list" aria-hidden="true">
+              <li class="dc-row dc-row-skel"><span></span><span></span><span></span></li>
+              <li class="dc-row dc-row-skel"><span></span><span></span><span></span></li>
+              <li class="dc-row dc-row-skel"><span></span><span></span><span></span></li>
+              <li class="dc-row dc-row-skel"><span></span><span></span><span></span></li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- The tray: what has been decided and not yet settled -->
+        <section class="dc-view" id="view-tray" data-view="tray" aria-labelledby="dc-tray-title" hidden>
+          <div class="dc-lede">
+            <h2 class="dc-headline" id="dc-tray-title">Decided</h2>
+            <p class="dc-lede-line" id="dc-tray-line"></p>
+          </div>
+          <div id="dc-tray"></div>
+        </section>
+
+        <!-- Health: is the watcher running, failing, or out of money -->
+        <section class="dc-view" id="view-health" data-view="health" aria-labelledby="dc-health-title" hidden>
+          <div class="dc-lede">
+            <h2 class="dc-headline" id="dc-health-title">Health</h2>
+            <p class="dc-lede-line" id="dc-health-line"></p>
+          </div>
+          <div id="dc-health"></div>
+        </section>
+      </main>
+
+      <!-- The request. A full-screen sheet on a phone, the right-hand pane on a
+           wide screen. -->
+      <section class="dc-request" id="dc-request" aria-labelledby="dc-req-title" hidden>
+        <header class="dc-req-bar">
+          <button class="dc-icon-btn dc-req-back" id="dc-req-back" type="button" aria-label="Back to the list">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+          </button>
+          <p class="dc-req-code" id="dc-req-code"></p>
+          <div class="dc-req-step">
+            <button class="dc-icon-btn" id="dc-req-prev" type="button" aria-label="Previous request">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
+            </button>
+            <button class="dc-icon-btn" id="dc-req-next" type="button" aria-label="Next request">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </button>
+          </div>
+        </header>
+        <div class="dc-req-body" id="dc-req-body" tabindex="-1"></div>
+        <footer class="dc-actions" id="dc-actions"></footer>
+      </section>
+      <div class="dc-pane-empty" id="dc-pane-empty" aria-hidden="true">
+        <p>Open a request to read its draft here.</p>
+        <p class="dc-pane-keys">On a keyboard: <kbd>j</kbd> and <kbd>k</kbd> move, <kbd>a</kbd> approves, <kbd>Enter</kbd> opens.</p>
+      </div>
+    </div>
+
+    <!-- The bottom bar on a phone, a rail on a wide screen. -->
+    <nav class="dc-tabbar" id="dc-tabbar" aria-label="Decide">
+      <button class="dc-tab" type="button" data-go="inbox" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13l2.5-7.5h11L20 13M4 13v5.5h16V13M4 13h4.5l1 2.5h5l1-2.5H20" /></svg>
+        <span class="dc-tab-label">Inbox</span>
+        <span class="dc-tab-count" id="dc-count-inbox" hidden></span>
+      </button>
+      <button class="dc-tab" type="button" data-go="tray">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" /></svg>
+        <span class="dc-tab-label">Decided</span>
+        <span class="dc-tab-count dc-tab-count-accent" id="dc-count-tray" hidden></span>
+      </button>
+      <button class="dc-tab" type="button" data-go="health">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2.5-6 5 12 2.5-6h4" /></svg>
+        <span class="dc-tab-label">Health</span>
+        <span class="dc-tab-dot" id="dc-health-dot" hidden></span>
+      </button>
+    </nav>
+
+    <!-- A bottom sheet for the short steps: reject's note, approve-all's list,
+         settle's dry run. -->
+    <div class="dc-scrim" id="dc-scrim" hidden></div>
+    <div class="dc-sheet" id="dc-sheet" role="dialog" aria-modal="true" aria-labelledby="dc-sheet-title" hidden>
+      <div class="dc-sheet-grip" aria-hidden="true"></div>
+      <div class="dc-sheet-inner" id="dc-sheet-inner"></div>
+    </div>
+
+    <div class="dc-toast" id="dc-toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+
+    <script type="module" src="/decide.js"></script>
+  </body>
+</html>

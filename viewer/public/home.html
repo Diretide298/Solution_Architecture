@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- `viewport-fit=cover` so the phone layout can read the safe areas (a
+         notch, the gesture bar); it changes nothing on a desktop. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
     <title>Adam — one reference graph</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,6 +25,14 @@
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
     <link rel="stylesheet" href="/styles.css" />
+    <!-- The design system's tokens, for the phone layout (DESIGN-SYSTEM.md).
+         Every name in it starts with `--ds-`, so the desktop door is untouched. -->
+    <link rel="stylesheet" href="/design-tokens.css" />
+    <!-- For the phone's bottom bar, More and the account drawer (page-chrome.js
+         mountPhoneBar), the same rules every other page uses. Everything in it
+         is scoped to classes this page does not use, so the desktop door is
+         unchanged; checked by screenshot against the page without it. -->
+    <link rel="stylesheet" href="/layers.css" />
     <link rel="stylesheet" href="/home.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <script>
@@ -52,12 +63,37 @@
       <p class="al-text">Counting what is in the package…</p>
     </div>
 
-    <!-- The scene. Everything else on this page sits over it. -->
-    <canvas
-      id="home-scene"
-      class="home-scene"
-      aria-label="The layers of the delivery package, drawn as a graph. The rail on the right does the same thing with the keyboard."
-    ></canvas>
+    <!-- The scene. Everything else on this page sits over it.
+         On a desktop the two wrappers are `display: contents` and the canvas is
+         the fixed full-window field it always was. On a phone they are the band
+         the scene lives in (the stage keeps its place in the column; the frame
+         inside it is what goes full screen) and carry the touch chrome: the
+         Explore button, the card for the focused layer, the hint, and the
+         full-screen view's own Close and Reset. -->
+    <div class="home-stage" id="home-stage">
+      <div class="home-stage-frame" id="home-stage-frame">
+        <div class="home-stage-view">
+          <canvas
+            id="home-scene"
+            class="home-scene"
+            aria-label="The layers of the delivery package, drawn as a graph. The rail on the right does the same thing with the keyboard."
+          ></canvas>
+        </div>
+        <button type="button" class="home-stage-btn home-explore" id="home-explore" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4.5h5v5M19.5 4.5l-6 6M9.5 19.5h-5v-5M4.5 19.5l6-6" /></svg>
+          <span>Explore</span>
+        </button>
+        <button type="button" class="home-stage-btn home-explore-close" id="home-explore-close" aria-label="Close the full-screen view" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+        <button type="button" class="home-stage-btn home-explore-reset" id="home-explore-reset" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4" /></svg>
+          <span>Reset view</span>
+        </button>
+        <p class="home-stage-hint" id="home-stage-hint" hidden></p>
+        <div class="home-card" id="home-card" hidden></div>
+      </div>
+    </div>
     <div class="home-scrim" aria-hidden="true"></div>
 
     <header class="home-hero">
@@ -84,15 +120,13 @@
          thing a visitor needs once and the thing a returning reader has to
          read past every day, which is an argument about placement rather than
          about whether to keep it. Same elements, same ids. -->
+    <!-- On a phone the header and this footer stop being boxes and their
+         children run as one column, in this order: the hero sentence, the two
+         figures, the layers, the other pages, the prose, the account. The
+         desktop draws the same children in its own order (home.css, the
+         colophon), so the source order is the phone's reading and tab order. -->
     <footer class="home-colophon">
       <h1>Every layer, one reference graph.</h1>
-      <p class="home-support">
-        Every screen, contract, state model, table, and decision in the delivery package —
-        indexed, cross-referenced, and checked against each other. Built for MCP and AI-agent
-        coding context, so agents can retrieve the right implementation context, trace
-        dependencies, and reason across the entire system without losing the thread. Pick a
-        layer to see what is in it.
-      </p>
       <div class="home-figures">
         <div class="home-figure">
           <b id="fig-artefacts">—</b>
@@ -103,6 +137,26 @@
           <span>operations</span>
         </div>
       </div>
+      <!-- Phone only: the scene's bodies as a list, each opening what a click
+           on the desktop rail opens. Filled by home.js. -->
+      <section class="home-layers" aria-labelledby="home-layers-title">
+        <h2 class="home-section-title" id="home-layers-title">Layers</h2>
+        <ul class="home-layer-list" id="home-layer-list"></ul>
+      </section>
+      <!-- Phone only: the way on to the rest of ADAM, since the door has no
+           top bar of its own. -->
+      <nav class="home-pages" aria-labelledby="home-pages-title">
+        <h2 class="home-section-title" id="home-pages-title">Go to</h2>
+        <ul class="home-pages-list" id="home-pages-list"></ul>
+      </nav>
+      <p class="home-support">
+        Every screen, contract, state model, table, and decision in the delivery package —
+        indexed, cross-referenced, and checked against each other. Built for MCP and AI-agent
+        coding context, so agents can retrieve the right implementation context, trace
+        dependencies, and reason across the entire system without losing the thread.
+        <!-- Not on a phone, where this prose comes after the layer list. -->
+        <span class="home-support-pick">Pick a layer to see what is in it.</span>
+      </p>
       <p class="home-account" id="home-account" hidden></p>
     </footer>
 

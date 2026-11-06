@@ -119,7 +119,7 @@ const API_META = API_PUBLIC
  * `session` was in here and is the reason /api/session was 404ing.
  */
 const API_ROUTES =
-  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|pms|changes|validation|verdicts|mentions|mentionable|alerts|scopes|ips|rates|budget|costing|test-batches|agent|chat|connector|diagram-versions|health)(\/|$)|docs|openapi\.json)/;
+  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|pms|changes|validation|verdicts|mentions|mentionable|alerts|scopes|ips|rates|budget|costing|test-batches|agent|chat|connector|diagram-versions|health|watcher|plan)(\/|$)|docs|openapi\.json)/;
 // `api/connector` above is the accounts service — which build each install
 // reported. `/connector/version` and `/connector/bundle`, with no `/api/`, are
 // this server's own and are answered before the gate. Two similar names for two
@@ -135,19 +135,71 @@ const API_ROUTES =
  * header directly because there can be more than one and the plain accessor
  * folds them into a single comma-joined string that no browser will parse.
  */
+// The watcher's routes take small bodies (a decision, a question): past this the stream is stopped and the answer is
+// 413, so nobody can make this process hold a large upload in memory (security review of 6 November 2026, M6). The
+// accounts service refuses the same size on its own (api/watcher.py BodyCap) for callers that reach it directly.
+const WATCHER_BODY_MAX = 64 * 1024;
+const WATCHER_DRAIN_MAX = 1024 * 1024;
+const TOO_BIG = Symbol('too big');
+
+// What is still coming is read and dropped, never kept, up to WATCHER_DRAIN_MAX, so the caller is not cut off before
+// it can read the 413; past that the connection is closed on it.
+function tooBig(req, res, limit) {
+  let drained = 0;
+  let answered = false;
+  const answer = () => {
+    if (answered) return;
+    answered = true;
+    res.writeHead(413, { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store', Connection: 'close' });
+    res.end(JSON.stringify({ detail: `That request is larger than the ${limit / 1024} KB these routes take.` }));
+  };
+  req.removeAllListeners('data');
+  req.removeAllListeners('end');
+  req.on('data', (c) => {
+    drained += c.length;
+    if (drained > WATCHER_DRAIN_MAX) {
+      answer();
+      req.destroy();
+    }
+  });
+  req.on('end', answer);
+  req.on('error', () => {});
+  if (req.readableEnded) answer();
+  else req.resume();
+}
+
 async function proxyToApi(req, res, url) {
+  const limit = url.pathname.startsWith('/api/watcher/') ? WATCHER_BODY_MAX : Infinity;
+  if (Number(req.headers['content-length'] ?? 0) > limit) return tooBig(req, res, limit);
   const body = ['GET', 'HEAD'].includes(req.method)
     ? undefined
     : await new Promise((resolve, reject) => {
       const parts = [];
-      req.on('data', (c) => parts.push(c));
+      let size = 0;
+      req.on('data', (c) => {
+        size += c.length;
+        if (size > limit) {
+          // Stop keeping it: what is still coming is never buffered (tooBig drops it).
+          req.removeAllListeners('data');
+          req.pause();
+          resolve(TOO_BIG);
+          return;
+        }
+        parts.push(c);
+      });
       req.on('end', () => resolve(Buffer.concat(parts)));
       req.on('error', reject);
     });
+  if (body === TOO_BIG) return tooBig(req, res, limit);
 
   const headers = {};
   for (const name of ['cookie', 'content-type', 'accept', 'user-agent']) {
     if (req.headers[name]) headers[name] = req.headers[name];
+  }
+  // The phone app's background check signs with a device token, not a cookie, and that token may read the watcher's
+  // summary and nothing else (api/watcher.py), so it is passed on for that one route only (PHONE-SPEC.md, Contracts).
+  if (url.pathname === '/api/watcher/summary' && req.headers.authorization) {
+    headers.authorization = req.headers.authorization;
   }
   headers['x-real-ip'] = callerIp(req);
 
@@ -1856,7 +1908,9 @@ const server = http.createServer(async (req, res) => {
     // the public allowlist, so a stranger on the landing page can be sent there
     // too. An alias rather than a second copy: 6.9 MB duplicated is 6.9 MB that
     // drifts, and whoever drops in the next export would update one of them.
+    // `/decide` is the phone decision page (PHONE-SPEC.md section 4); the app opens it by that name.
     const rel = url.pathname === '/' ? '/index.html'
+      : url.pathname === '/decide' ? '/decide.html'
       : (DROP_PATH !== null && url.pathname === DROP_PATH) ? '/offline.html'
       : url.pathname;
     const file = path.join(PUBLIC, rel);

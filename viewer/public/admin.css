@@ -123,3 +123,8 @@
   .ad-form .scope-select, .ad-form .sh-input, .ad-form .ad-date { width: 100%; }
   .ad-need { padding-left: 10px; font-size: 13.5px; }
 }
+
+/* A phone: the "go there" link under each thing that needs you is a 44 px target. */
+@media (max-width: 719px) {
+  .ad-need-go { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; }
+}

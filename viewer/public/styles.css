@@ -2047,9 +2047,16 @@ mark.search-hit-first {
     --safe-right: env(safe-area-inset-right, 0px);
   }
 
+  /* The chrome's row is as tall as the chrome. It was pinned to --topbar-h,
+     and the chrome's rows wrapped past it (the safe-area padding was added
+     to the chrome and to each of its rows, and the icon cluster took a line
+     of its own), so the chrome sat over the top of every view. Measured
+     instead: viewer-phone.js writes the real height to --viewer-chrome-h for
+     the drawers, which start under it. --topbar-h stays as the fallback. */
   .app {
+    height: 100dvh;
     grid-template-columns: 100%;
-    grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
     grid-template-areas:
       "top"
       "main";
@@ -2071,9 +2078,11 @@ mark.search-hit-first {
        top makes the failure visible instead of invisible. */
     align-content: flex-start;
     gap: 6px 8px;
-    padding: 4px calc(10px + var(--safe-right)) 4px calc(10px + var(--safe-left));
-    padding-top: calc(4px + var(--safe-top));
   }
+  /* The status bar's inset once, on the chrome, which paints under it; the
+     rows only keep clear of the sides. */
+  .chrome { padding-top: var(--safe-top); background: var(--chrome-1); }
+  .chrome-row { padding: 0 calc(8px + var(--safe-right)) 0 calc(8px + var(--safe-left)); }
 
   /* Only the rows wrap. `.chrome` itself is `flex-direction: column`, and
      `flex-wrap: wrap` on a column whose height is pinned to --topbar-h does
@@ -2199,7 +2208,7 @@ mark.search-hit-first {
   /* ── off-canvas rails ─────────────────────────────────────────── */
   .sidebar-left, .sidebar-right {
     position: fixed;
-    top: calc(var(--topbar-h) + var(--safe-top));
+    top: var(--viewer-chrome-h, calc(var(--topbar-h) + var(--safe-top)));
     bottom: 0;
     z-index: 41;
     display: flex;
@@ -2235,7 +2244,7 @@ mark.search-hit-first {
   .drawer-backdrop {
     display: block;
     position: fixed;
-    inset: calc(var(--topbar-h) + var(--safe-top)) 0 0 0;
+    inset: var(--viewer-chrome-h, calc(var(--topbar-h) + var(--safe-top))) 0 0 0;
     z-index: 40;
     background: var(--scrim);
     opacity: 0;
@@ -3172,3 +3181,23 @@ html[data-entry] .graph-legend {
 /* The bell itself, when one of them is high. The unread dot is already there
    for mentions; this changes its colour rather than adding a second mark. */
 .bell-toggle.has-alert .bell-count { background: var(--error); }
+
+/* ── the phone's system bars (the ADAM app draws edge to edge) ─────────
+   Android's status bar and button bar are transparent over the page, so a
+   page scrolled up showed under the clock and its last rows under the
+   buttons. A strip in the page's own colour sits behind each bar. Both are
+   0px tall wherever the device reports no system bars (every desktop).
+   The bottom strip stays off where a bottom menu already fills that space. */
+html::before,
+html::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  background: var(--ds-bg, var(--bg));
+}
+html::before { top: 0; height: env(safe-area-inset-top, 0px); }
+html::after { bottom: 0; height: env(safe-area-inset-bottom, 0px); }
+html:has(.phone-tabbar, .dc-tabbar)::after { content: none; }

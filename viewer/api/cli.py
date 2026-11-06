@@ -214,6 +214,9 @@ def passwd(args) -> None:
     dropped = db.one(
         "SELECT COUNT(*) AS n FROM session WHERE account_id = ?", (account["id"],))["n"]
     db.write("DELETE FROM session WHERE account_id = ?", (account["id"],))
+    # A phone's watcher token ends with the sessions (security review of 6 November 2026, M3).
+    from . import watcher
+    watcher.revoke_devices(account["id"], "password set on the machine")
     print(f"Set a new password for {account['email']} ({account['role']}).")
     if dropped:
         print(f"{dropped} session(s) signed out.")

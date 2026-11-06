@@ -466,7 +466,12 @@ function drawFlow(rows) {
 const SECTIONS = {
   decide: {
     rows: (c, x) => x.open,
-    empty: 'Nothing is waiting for a decision. Raise one from the rail if you found the package wrong.',
+    // Up to 820px the rail is a strip of sections above the page (layers.css).
+    get empty() {
+      return matchMedia('(max-width: 820px)').matches
+        ? 'Nothing is waiting for a decision. If you found the package wrong, raise one under "Raise one" in the sections above.'
+        : 'Nothing is waiting for a decision. Raise one from the rail if you found the package wrong.';
+    },
     note: () => `Open requests, most urgent first: blocking work, then those nobody has taken on for more than ${days(state.afterDays)}, then the oldest. Open one to read it and act on it.`,
   },
   untaken: {

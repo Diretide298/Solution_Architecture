@@ -715,6 +715,8 @@ def logout_all(
     else's* sessions is the separate route below.
     """
     dropped = db.change("DELETE FROM session WHERE account_id = ?", (account["id"],))
+    # A phone's watcher token ends with the sessions (security review of 6 November 2026, M3).
+    watcher.revoke_devices(account["id"], "signed out everywhere")
     # Including the caller's own. Signing out everywhere and staying signed in
     # here would mean the one device you are holding is the one you cannot
     # clear — and that is usually the point of pressing it.
@@ -735,6 +737,7 @@ def logout_account(account_id: int, admin: dict = Depends(require_admin)):
     if not db.one("SELECT id FROM account WHERE id = ?", (account_id,)):
         raise HTTPException(404, "No such account.")
     dropped = db.change("DELETE FROM session WHERE account_id = ?", (account_id,))
+    watcher.revoke_devices(account_id, "signed out everywhere by an admin", admin)
     return {"ok": True, "dropped": dropped}
 
 
@@ -805,6 +808,7 @@ def set_active(account_id: int, active: bool, admin: dict = Depends(require_admi
         # A disabled account must stop being signed in, not merely stop being
         # able to sign in again.
         db.write("DELETE FROM session WHERE account_id = ?", (account_id,))
+        watcher.revoke_devices(account_id, "account disabled", admin)
     return {"ok": True, "active": active}
 
 
@@ -1303,6 +1307,8 @@ def change_password(body: PasswordChange, account: dict = Depends(require_accoun
     keep = security.token_hash(ticvai_session) if ticvai_session else ""
     db.write("DELETE FROM session WHERE account_id = ? AND token_hash != ?",
              (account["id"], keep))
+    # And every phone's watcher token: the phone signs its background check with it, not with a session.
+    watcher.revoke_devices(account["id"], "password changed")
     return {"ok": True}
 
 
@@ -1591,6 +1597,7 @@ def use_reset(body: PasswordReset, response: Response, request: Request):
 
     # Every session, including any the old password left open somewhere else.
     dropped = db.change("DELETE FROM session WHERE account_id = ?", (row["account_id"],))
+    watcher.revoke_devices(row["account_id"], "password reset")
 
     token = security.new_token()
     db.write(
@@ -9433,3 +9440,13 @@ def health():
     "is this store empty", which is the field next door.
     """
     return {"ok": True}
+
+
+# The change-request watcher's decision API (watcher.py, PHONE-SPEC.md section 2).
+from . import watcher  # noqa: E402
+
+app.include_router(watcher.router)
+# The watcher's routes take small bodies only (watcher.BodyCap, 64 KB). Appended rather than add_middleware'd so it
+# sits innermost, inside the CORS layer: a browser on the other name can still read the 413.
+from starlette.middleware import Middleware  # noqa: E402
+app.user_middleware.append(Middleware(watcher.BodyCap))

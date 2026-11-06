@@ -25,6 +25,9 @@
          layers.css alongside the viewer's own, so a page that links only
          styles.css draws unstyled rows. -->
     <link rel="stylesheet" href="/layers.css" />
+    <!-- The design system's tokens, for the phone layout (DESIGN-SYSTEM.md).
+         Every name in it starts with `--ds-`, so the desktop page is untouched. -->
+    <link rel="stylesheet" href="/design-tokens.css" />
     <link rel="stylesheet" href="/ips.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
@@ -120,10 +123,14 @@
           <div class="set-actions" id="ip-arm-box">
             <label class="ip-confirm" id="ip-confirm-label">
               Type <b>arm</b> to switch it on
-              <input id="ip-confirm" type="text" autocomplete="off" spellcheck="false" />
+              <input id="ip-confirm" type="text" autocomplete="off" spellcheck="false"
+                     autocapitalize="off" enterkeyhint="done" />
             </label>
             <button id="ip-arm" class="chip" type="button">Switch on</button>
             <button id="ip-disarm" class="chip" type="button" hidden>Switch off</button>
+            <!-- Why Switch on is greyed out. The desktop says it in the
+                 button's tooltip; a phone has no hover, so it says it here. -->
+            <p class="ip-arm-why" id="ip-arm-why" hidden></p>
           </div>
         </section>
 
@@ -139,8 +146,10 @@
           </p>
           <form class="ip-add" id="ip-add">
             <input id="ip-cidr" type="text" placeholder="203.0.113.0/24"
+                   aria-label="Address or range" autocapitalize="off" enterkeyhint="next"
                    autocomplete="off" spellcheck="false" required />
-            <input id="ip-label" type="text" placeholder="The Bombay office" autocomplete="off" />
+            <input id="ip-label" type="text" placeholder="The Bombay office" autocomplete="off"
+                   aria-label="Label, for you" enterkeyhint="done" />
             <button class="chip" type="submit">Allow</button>
             <button class="chip" type="button" id="ip-use-mine">Allow where I am</button>
           </form>
@@ -174,7 +183,8 @@
           </p>
           <div class="set-actions">
             <input id="ip-seen-filter" class="ip-filter" type="search"
-                   placeholder="Filter by name, address or role" />
+                   aria-label="Filter where people sign in from" autocapitalize="off"
+                   enterkeyhint="search" placeholder="Filter by name, address or role" />
             <label class="ip-only"><input id="ip-seen-uncovered" type="checkbox" />
               Only addresses no rule covers</label>
           </div>

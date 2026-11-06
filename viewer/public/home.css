@@ -93,6 +93,16 @@
 .home-page .al-text { color: var(--support); }
 
 /* ── the scene ───────────────────────────────────────────────────── */
+/* The phone's band and its touch chrome (home.html). On a desktop the wrappers
+   are not boxes at all, so the canvas below is the fixed full-window field it
+   always was, and the chrome does not exist. */
+.home-stage,
+.home-stage-frame,
+.home-stage-view { display: contents; }
+.home-stage-btn,
+.home-stage-hint,
+.home-card { display: none; }
+
 .home-scene {
   position: fixed;
   inset: 0;
@@ -230,6 +240,17 @@
   pointer-events: none;
 }
 .home-colophon > * { pointer-events: auto; }
+/* The source order is the phone's (the figures straight under the sentence, the
+   prose near the end); this puts the desktop's back as it always was. Only top
+   margins in here, so a column lays them out exactly as block flow did. */
+.home-colophon { display: flex; flex-direction: column; }
+.home-colophon > h1 { order: 1; }
+.home-colophon > .home-support { order: 2; }
+.home-colophon > .home-figures { order: 3; }
+.home-colophon > .home-account { order: 4; }
+/* The phone's list of layers and of pages; the rail and the scene do this job
+   on a desktop. */
+.home-layers, .home-pages { display: none; }
 
 .home-colophon h1 {
   margin: 0;
@@ -587,4 +608,736 @@
 
 @media (prefers-reduced-motion: reduce) {
   .home-mascot { animation: none; }
+}
+
+/* ── the phone ───────────────────────────────────────────────────────
+ * Its own layout, below 600px or on a touch screen (PHONE-INVENTORY.md, batch
+ * G). The desktop door is a canvas steered with a pointer and a wheel; on a
+ * phone the page is one scrolling column on the design system's tokens
+ * (DESIGN-SYSTEM.md), and the scene is its hero:
+ *
+ *   the lockup; the projects, as a row of chips; the scene, live, in a tall
+ *   band edge to edge, with Explore (full screen) and a card for the layer a
+ *   tap picked; the sentence and the two figures; the layers as a list, each
+ *   row opening what a click on the rail opens on a desktop and focusing the
+ *   same body in the scene; the other pages; the prose; who is signed in.
+ *
+ * The scene is the desktop's, not a picture of it: same engine, same bodies,
+ * same colours, turned and zoomed by touch (galaxy.js) and paced for a battery
+ * (home.js draws only while something moves). The band leaves a vertical
+ * swipe to the page (`touch-action: pan-y`), so the scene never traps the
+ * scroll; full screen takes every gesture (`touch-action: none`).
+ *
+ * Nothing here applies above 600px with a mouse; the desktop stays as it was.
+ * The same query is in home.js (`PHONE`); keep the two in step.
+ */
+@media (max-width: 600px), (pointer: coarse) {
+  :root:has(body.home-page) { background: var(--ds-bg); }
+
+  .home-page {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    /* styles.css fixes html and body at the screen's height with overflow hidden (right for the viewer's shell);
+       on a phone the body is the scroll container, as on the other standalone pages (layers.css .admin-page). */
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    padding:
+      0
+      calc(var(--ds-gutter) + var(--ds-safe-right))
+      calc(var(--ds-safe-bottom) + var(--ds-space-8))
+      calc(var(--ds-gutter) + var(--ds-safe-left));
+    background: var(--ds-bg);
+    color: var(--ds-ink);
+    font-family: var(--ds-font-sans);
+    font-size: var(--ds-text-md);
+    line-height: var(--ds-leading-body);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* The status bar is drawn over the page (the app is edge to edge). What
+     scrolls under it is covered, so the clock never sits on a row's text. */
+  .home-page::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--ds-safe-top);
+    z-index: var(--ds-z-bar);
+    background: var(--ds-bg);
+    pointer-events: none;
+  }
+  .home-page :focus-visible {
+    outline: 3px solid var(--ds-focus);
+    outline-offset: 2px;
+    border-radius: var(--ds-radius-xs);
+  }
+  /* Full screen holds the page still behind it, and so does More. */
+  .home-page.is-exploring,
+  .home-page.phone-sheet-open { overflow: hidden; }
+
+  /* The two fixed boxes stop being boxes; their children join the column. */
+  .home-hero,
+  .home-colophon { display: contents; }
+  /* Source order here, not the desktop colophon's, and never squeezed: a
+     clipped list in a column would otherwise give up its height first. */
+  .home-page .home-colophon > *,
+  .home-page .home-hero > * { order: 0; flex-shrink: 0; }
+
+  /* The desktop's floating chrome. The scene's own touch chrome and the list
+     below do the rail's and the panel's work, and the hint described a mouse. */
+  .home-scrim,
+  .home-rail,
+  .home-panel,
+  .home-hint,
+  .home-back { display: none !important; }
+
+  /* The lockup and the projects come before the scene. */
+  .home-page .home-hero > .home-lockup-row,
+  .home-page .home-hero > .home-eyebrow,
+  .home-page .home-hero > .home-projects { order: -1; }
+
+  /* ── the lockup: the top of the page, where an app bar would be ── */
+  .home-lockup-row {
+    gap: var(--ds-space-3);
+    min-height: var(--ds-bar-top);
+    padding-top: var(--ds-safe-top);
+  }
+  .home-lockup {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--ds-touch-min);
+    margin-left: calc(-1 * var(--ds-space-1));
+    padding: 0 var(--ds-space-1);
+    border-radius: var(--ds-radius-sm);
+  }
+  .home-lockup img {
+    height: 28px;
+    filter: none;
+  }
+  /* Still on a phone: the page has one thing that moves by itself (the
+     scene's arrival), and a figure bobbing beside the wordmark is a second. */
+  .home-mascot {
+    height: 28px;
+    opacity: 1;
+    animation: none;
+  }
+
+  /* ── projects: a row of chips, the current one filled ──
+     The heading is for a screen reader (the nav is labelled already); a word
+     above two chips that name packages is an eyebrow. */
+  .home-eyebrow {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .home-page .home-projects {
+    flex-direction: row;
+    gap: var(--ds-space-2);
+    margin: var(--ds-space-1) calc(-1 * (var(--ds-gutter) + var(--ds-safe-right))) 0 calc(-1 * (var(--ds-gutter) + var(--ds-safe-left)));
+    padding: var(--ds-space-1) calc(var(--ds-gutter) + var(--ds-safe-right)) var(--ds-space-1) calc(var(--ds-gutter) + var(--ds-safe-left));
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .home-page .home-projects::-webkit-scrollbar { display: none; }
+  .home-page .home-project {
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    min-height: var(--ds-touch-min);
+    padding: 0 var(--ds-space-4);
+    border: 1px solid var(--ds-line-strong);
+    border-radius: var(--ds-radius-pill);
+    background: var(--ds-surface);
+    color: var(--ds-ink-2);
+    white-space: nowrap;
+    transition-property: background-color, border-color, transform;
+    transition-duration: var(--ds-dur-fast);
+    transition-timing-function: var(--ds-ease-out);
+  }
+  .home-page .home-project:hover { background: var(--ds-surface); color: var(--ds-ink-2); }
+  .home-page .home-project:active { transform: scale(var(--ds-press-scale)); background: var(--ds-surface-press); }
+  /* The filled chip is the current one; the desktop's dot is not needed. */
+  .home-page .home-project::before,
+  .home-page .home-project:not([aria-current="true"])::before { content: none; }
+  .home-page .home-project[aria-current="true"] {
+    border-color: var(--ds-accent-line);
+    background: var(--ds-accent-soft);
+    color: var(--ds-ink);
+  }
+  .home-project-name {
+    font-size: var(--ds-text-sm);
+    font-weight: var(--ds-weight-bold);
+    letter-spacing: normal;
+  }
+  .home-project-count {
+    font-family: var(--ds-font-sans);
+    font-size: var(--ds-text-xs);
+    color: var(--ds-ink-3);
+  }
+
+  /* ── the scene: the page's hero, edge to edge ── */
+  .home-stage {
+    display: block;
+    position: relative;
+    flex: none;
+    order: 0;
+    height: clamp(360px, 58svh, 560px);
+    margin:
+      var(--ds-space-2)
+      calc(-1 * (var(--ds-gutter) + var(--ds-safe-right)))
+      0
+      calc(-1 * (var(--ds-gutter) + var(--ds-safe-left)));
+  }
+  /* The box that goes full screen. In the band it fills the stage, so the
+     stage keeps its height in the column while the frame is fixed. */
+  .home-stage-frame {
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+  .home-stage-view {
+    display: block;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    /* Faded into the page top and bottom, so the band has no hard edge for
+       the eye to read as a box. On the view, not the canvas, so the canvas can
+       slide under it. */
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 9%, #000 86%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 9%, #000 86%, transparent 100%);
+  }
+  /* Wider than the band and offset (home.js CANVAS_SPAN, CAM_AT_X): the
+     engine's camera keeps its picture right of centre for the desktop's hero
+     copy, and 150% at -37% puts that centre mid-band. home.js slides it a
+     further 12% when a body is focused, over the camera's own flight time.
+     `pan-y`: a vertical swipe is the page's, everything else is the scene's.
+     That overrides layers.css's `touch-action: none` on galaxy fields. */
+  .home-page .home-scene {
+    position: absolute;
+    inset: auto;
+    top: 0;
+    left: -37%;
+    width: 150%;
+    height: 100%;
+    background: transparent;
+    touch-action: pan-y;
+    transition: transform 1.15s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  /* The controls over the scene. Floating things take the frame colour, so
+     they read the same over the scene in either theme. */
+  .home-stage-btn:not([hidden]) {
+    position: absolute;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ds-space-2);
+    min-width: var(--ds-touch-min);
+    min-height: var(--ds-touch-min);
+    padding: 0 var(--ds-space-4) 0 var(--ds-space-3);
+    border: 1px solid var(--ds-frame-line);
+    border-radius: var(--ds-radius-pill);
+    background: color-mix(in srgb, var(--ds-frame) 84%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: var(--ds-frame-ink);
+    font: var(--ds-weight-semibold) var(--ds-text-sm) / 1 var(--ds-font-sans);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition-property: transform, background-color;
+    transition-duration: var(--ds-dur-fast);
+    transition-timing-function: var(--ds-ease-out);
+  }
+  .home-stage-btn:active { transform: scale(var(--ds-press-scale)); }
+  .home-stage-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .home-explore {
+    top: var(--ds-space-3);
+    right: calc(var(--ds-gutter) + var(--ds-safe-right));
+  }
+  .home-stage-btn.home-explore-close {
+    top: calc(var(--ds-safe-top) + var(--ds-space-3));
+    left: calc(var(--ds-gutter) + var(--ds-safe-left));
+    width: var(--ds-touch-comfy);
+    height: var(--ds-touch-comfy);
+    padding: 0;
+  }
+  .home-explore-close svg { width: 22px; height: 22px; }
+  .home-explore-reset {
+    top: calc(var(--ds-safe-top) + var(--ds-space-3) + 2px);
+    right: calc(var(--ds-gutter) + var(--ds-safe-right));
+  }
+
+  /* What a finger can do, said once, under the scene. The card takes its
+     place once a layer is picked. */
+  .home-stage-hint:not([hidden]) {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    left: var(--ds-gutter);
+    right: var(--ds-gutter);
+    bottom: var(--ds-space-2);
+    margin: 0;
+    text-align: center;
+    font-size: var(--ds-text-xs);
+    font-weight: var(--ds-weight-medium);
+    color: var(--ds-ink-3);
+    pointer-events: none;
+    text-wrap: balance;
+  }
+
+  /* ── the card for the focused layer ──
+     22px outside, 12px padding, a 10px button: concentric. */
+  .home-card:not([hidden]) {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    left: calc(var(--ds-gutter) + var(--ds-safe-left));
+    right: calc(var(--ds-gutter) + var(--ds-safe-right));
+    bottom: var(--ds-space-3);
+    padding: var(--ds-space-3);
+    border: 1px solid var(--ds-frame-line);
+    border-radius: var(--ds-radius-lg);
+    background: color-mix(in srgb, var(--ds-frame-raised) 90%, transparent);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--ds-shadow-2);
+    color: var(--ds-frame-ink);
+    animation: home-card-in var(--ds-dur-normal) var(--ds-ease-out);
+  }
+  .home-card-head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--ds-space-3);
+    padding-left: var(--ds-space-2);
+  }
+  .home-card-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--ds-frame-accent);
+    box-shadow: 0 0 12px var(--ds-frame-accent);
+  }
+  .home-card[data-tier="core"] .home-card-dot {
+    background: var(--ds-warn-fill);
+    box-shadow: 0 0 12px var(--ds-warn-fill);
+  }
+  .home-card-words { min-width: 0; }
+  .home-card-name {
+    margin: 0;
+    font-size: var(--ds-text-lg);
+    font-weight: var(--ds-weight-heavy);
+    line-height: var(--ds-leading-tight);
+    letter-spacing: var(--ds-tracking-tight);
+  }
+  .home-card-count {
+    margin: 2px 0 0;
+    font-size: var(--ds-text-sm);
+    line-height: var(--ds-leading-snug);
+    color: var(--ds-frame-ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .home-card-count b { color: var(--ds-frame-ink); font-weight: var(--ds-weight-bold); }
+  .home-card-close {
+    display: grid;
+    place-items: center;
+    width: var(--ds-touch-min);
+    height: var(--ds-touch-min);
+    border: 0;
+    border-radius: var(--ds-radius-pill);
+    background: transparent;
+    color: var(--ds-frame-ink-2);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition-property: background-color, transform;
+    transition-duration: var(--ds-dur-fast);
+    transition-timing-function: var(--ds-ease-out);
+  }
+  .home-card-close:active { background: var(--ds-frame-line); transform: scale(var(--ds-press-scale)); }
+  .home-card-x {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  .home-card-open {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--ds-touch-comfy);
+    margin-top: var(--ds-space-3);
+    border-radius: var(--ds-radius-sm);
+    background: var(--ds-accent-fill);
+    color: var(--ds-accent-on);
+    font-weight: var(--ds-weight-bold);
+    text-decoration: none;
+    transition: transform var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  .home-card-open:active { transform: scale(var(--ds-press-scale)); }
+
+  /* ── full screen: the same frame, fixed over everything ── */
+  .home-stage-frame.is-full {
+    position: fixed;
+    inset: 0;
+    z-index: var(--ds-z-sheet);
+    background: var(--ds-bg);
+    animation: home-full-in var(--ds-dur-normal) var(--ds-ease-out);
+  }
+  .is-full .home-stage-view {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .home-page .is-full .home-scene { touch-action: none; }
+  .is-full .home-stage-hint:not([hidden]) {
+    bottom: calc(var(--ds-safe-bottom) + var(--ds-space-6));
+  }
+  .is-full .home-card:not([hidden]) {
+    bottom: calc(var(--ds-safe-bottom) + var(--ds-space-4));
+  }
+
+  /* ── the sentence and the figures: the caption to the scene ── */
+  .home-colophon h1 {
+    margin: var(--ds-space-4) 0 0;
+    padding: 0 var(--ds-space-1);
+    font-size: var(--ds-text-xl);
+    font-weight: var(--ds-weight-heavy);
+    line-height: var(--ds-leading-tight);
+    letter-spacing: var(--ds-tracking-tight);
+    color: var(--ds-ink);
+    text-wrap: balance;
+  }
+  .home-figures {
+    display: flex;
+    gap: 0;
+    margin: var(--ds-space-3) 0 0;
+    padding: 0 var(--ds-space-1);
+  }
+  .home-figure {
+    padding: 0 var(--ds-space-5) 0 0;
+  }
+  .home-figure + .home-figure {
+    padding-left: var(--ds-space-5);
+    border-left: 1px solid var(--ds-line-strong);
+  }
+  .home-figure b {
+    font-family: var(--ds-font-sans);
+    font-size: var(--ds-text-lg);
+    font-weight: var(--ds-weight-heavy);
+    line-height: var(--ds-leading-tight);
+    letter-spacing: var(--ds-tracking-tight);
+    color: var(--ds-ink);
+  }
+  .home-figure span {
+    margin-top: 2px;
+    font-size: var(--ds-text-sm);
+    font-weight: var(--ds-weight-medium);
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--ds-ink-2);
+  }
+  .home-figure span::first-letter { text-transform: uppercase; }
+
+  /* ── section titles: sentence case, no eyebrows ── */
+  .home-section-title {
+    margin: var(--ds-space-8) 0 var(--ds-space-2);
+    padding: 0 var(--ds-space-1);
+    font-size: var(--ds-text-md);
+    font-weight: var(--ds-weight-bold);
+    line-height: var(--ds-leading-snug);
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--ds-ink);
+  }
+
+  /* ── lists: one surface, lines between rows (as on Decide) ── */
+  .home-layer-list,
+  .home-pages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--ds-surface);
+    border: 1px solid var(--ds-line);
+    border-radius: var(--ds-radius-md);
+    overflow: hidden;
+  }
+  .home-layer-list > li + li,
+  .home-pages-list > li + li { border-top: 1px solid var(--ds-line); }
+
+  /* A row's ring sits inside it, or the list's rounded clip cuts it off. */
+  .home-project:focus-visible,
+  .home-layer-row:focus-visible,
+  .home-pages-list a:focus-visible {
+    outline-offset: -3px;
+    border-radius: var(--ds-radius-md);
+  }
+  .home-page .home-project:focus-visible { border-radius: var(--ds-radius-pill); }
+
+  /* ── the layers ── */
+  .home-layers,
+  .home-pages { display: block; }
+
+  .home-layer-row,
+  .home-pages-list a {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--ds-space-3);
+    width: 100%;
+    min-height: 52px;
+    padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-2) var(--ds-space-4);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ds-ink);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background-color var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  .home-layer-row:active,
+  .home-pages-list a:active { background: var(--ds-surface-press); }
+
+  /* The scene's colour for each body: Contracts is the amber one there, and
+     the only amber one here. */
+  .home-layer-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ds-accent);
+  }
+  .home-layer[data-tier="core"] .home-layer-dot { background: var(--ds-warn-fill); }
+  .home-layer-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: var(--ds-weight-semibold);
+  }
+  .home-layer-count {
+    flex: none;
+    font-size: var(--ds-text-sm);
+    color: var(--ds-ink-3);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .home-layer-count b {
+    font-weight: var(--ds-weight-bold);
+    color: var(--ds-ink-2);
+  }
+  .home-chevron {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: var(--ds-ink-3);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  /* The open row is the body lit in the scene: a stripe in its colour. */
+  .home-layer { --stripe: var(--ds-accent); }
+  .home-layer[data-tier="core"] { --stripe: var(--ds-warn-fill); }
+  .home-layer.is-open .home-chevron { transform: rotate(90deg); }
+  .home-layer.is-open .home-layer-row,
+  .home-layer.is-open .home-layer-detail {
+    background: var(--ds-surface-2);
+    box-shadow: inset 3px 0 0 var(--stripe);
+  }
+  .home-layer.is-open .home-layer-count b { color: var(--ds-ink); }
+
+  /* What the layer holds: a description at caption size, so an open row is a
+     note under its name and not a page of its own. */
+  .home-layer-detail {
+    padding: 0 var(--ds-space-4) var(--ds-space-4) calc(var(--ds-space-4) + 8px + var(--ds-space-3));
+  }
+  .home-layer-detail:not([hidden]) {
+    animation: home-detail-in var(--ds-dur-normal) var(--ds-ease-out);
+  }
+  .home-layer-blurb {
+    margin: 0;
+    max-width: 52ch;
+    font-size: var(--ds-text-sm);
+    line-height: var(--ds-leading-body);
+    color: var(--ds-ink-2);
+    text-wrap: pretty;
+  }
+  .home-layer-meta {
+    margin: var(--ds-space-2) 0 0;
+    font-size: var(--ds-text-xs);
+    color: var(--ds-ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .home-layer-open {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--ds-touch-comfy);
+    margin-top: var(--ds-space-4);
+    padding: 0 var(--ds-space-4);
+    border-radius: var(--ds-radius-sm);
+    background: var(--ds-accent-fill);
+    color: var(--ds-accent-on);
+    font-weight: var(--ds-weight-bold);
+    text-decoration: none;
+    transition: transform var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  .home-layer-open:active { transform: scale(var(--ds-press-scale)); }
+  .home-layer-views-title {
+    margin: var(--ds-space-4) 0 var(--ds-space-2);
+    font-size: var(--ds-text-xs);
+    font-weight: var(--ds-weight-medium);
+    color: var(--ds-ink-3);
+  }
+  .home-layer-views {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-space-2);
+  }
+  .home-layer-views a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--ds-touch-min);
+    padding: 0 var(--ds-space-3);
+    border: 1px solid var(--ds-line-strong);
+    border-radius: var(--ds-radius-pill);
+    background: var(--ds-surface);
+    color: var(--ds-ink);
+    font-size: var(--ds-text-xs);
+    font-weight: var(--ds-weight-semibold);
+    text-decoration: none;
+    transition: background-color var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  .home-layer-views a:active { background: var(--ds-surface-press); }
+
+  /* ── the other pages ── */
+  .home-pages-list a { font-weight: var(--ds-weight-semibold); }
+  .home-page-name { flex: 1 1 auto; min-width: 0; }
+  /* Decide's line icons: 24px grid, 1.8 stroke, drawn at 20px and muted, so
+     the label stays the thing read. */
+  .home-page-icon {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: var(--ds-ink-2);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── the prose, then the account ── */
+  .home-support {
+    max-width: var(--ds-content-read);
+    margin: var(--ds-space-8) 0 0;
+    padding: 0 var(--ds-space-1);
+    font-size: var(--ds-text-sm);
+    line-height: var(--ds-leading-body);
+    color: var(--ds-ink-2);
+    text-wrap: pretty;
+  }
+  /* It points at the layers, which on a phone are already above it. */
+  .home-support-pick { display: none; }
+  .home-account:not([hidden]) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ds-space-3);
+    margin: var(--ds-space-6) 0 0;
+    padding: var(--ds-space-4) var(--ds-space-1) 0;
+    border-top: 1px solid var(--ds-line);
+    font-size: var(--ds-text-sm);
+    color: var(--ds-ink-2);
+  }
+  .home-account-who { min-width: 0; overflow-wrap: anywhere; }
+  .home-account-who span { color: var(--ds-ink); font-weight: var(--ds-weight-semibold); }
+  .home-account-sep { display: none; }
+  .home-page .home-account button {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--ds-touch-min);
+    padding: 0 var(--ds-space-4);
+    border: 1px solid var(--ds-line-control);
+    border-radius: var(--ds-radius-sm);
+    background: var(--ds-surface);
+    color: var(--ds-ink);
+    font-weight: var(--ds-weight-semibold);
+    text-decoration: none;
+    transition: transform var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  .home-page .home-account button:hover { color: var(--ds-ink); }
+  .home-page .home-account button:active { transform: scale(var(--ds-press-scale)); }
+}
+
+/* The bottom bar (page-chrome.js mountPhoneBar, styled in layers.css), which
+   every page shows under 720 px. Here the last rows and Sign out stop above it;
+   the full-screen view (z-index sheet) covers it. */
+@media (max-width: 719px) and (max-width: 600px), (max-width: 719px) and (pointer: coarse) {
+  .home-page {
+    padding-bottom: calc(var(--ds-bar-bottom) + var(--ds-safe-bottom) + var(--ds-space-6));
+  }
+}
+/* Between 601 and 719 px with a mouse this page is still the desktop door (a
+   full-window scene with its own chrome), so it does not take the bar. */
+@media (min-width: 601px) and (pointer: fine) {
+  body.home-page > .phone-tabbar { display: none; }
+}
+
+/* A touch screen wide enough for more than one column (a tablet) gets the same
+   column, held to a readable width rather than stretched across it. */
+@media (pointer: coarse) and (min-width: 601px) {
+  .home-page { max-width: 640px; margin-inline: auto; }
+}
+
+@keyframes home-detail-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes home-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes home-full-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Reduced motion: no slide of the canvas (the camera jumps too, home.js), and
+   the card and rows arrive by a short fade rather than a movement. */
+@media (prefers-reduced-motion: reduce) {
+  .home-layer-detail:not([hidden]) { animation: none; }
+  .home-chevron { transition: none; }
+  .home-page .home-scene { transition: none; }
+  .home-card:not([hidden]) { animation: home-full-in var(--ds-dur-fast) linear; }
+  .home-page .home-project:active,
+  .home-stage-btn:active,
+  .home-card-close:active,
+  .home-card-open:active,
+  .home-layer-open:active { transform: none; }
 }

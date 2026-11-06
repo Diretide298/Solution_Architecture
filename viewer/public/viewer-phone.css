@@ -1,0 +1,556 @@
+/* ── the viewer on a phone ─────────────────────────────────────────────────────
+   index.html's views at phone width: the lead's phone is 420 x 933 CSS px, touch,
+   Android edge to edge (a 54 px status bar and a 48 px button bar, reported by
+   env(safe-area-inset-*)). Loaded after every other stylesheet the viewer uses,
+   so a rule here wins over a view's own sheet at equal specificity. Nothing in
+   this file applies above 760 px, so the desk is exactly as it was.
+
+   The shell itself (one column, off-canvas drawers) is styles.css's 760px
+   block; this is what sits on it: the chrome as a phone app bar with two
+   scrolling rails under it, 44 px targets, reading sizes, the bottom bar
+   (viewer-phone.js draws it in page-chrome.js's markup; layers.css styles it),
+   and each view's own fixes.
+
+   Big diagrams and canvases are view and zoom only on a phone (decided with the
+   lead, 4 November): pan, pinch, tap for details; editing stays on the desk,
+   and a one-line note says so where an edit control is hidden.
+
+   Sizes come from design-tokens.css (--ds-*): 44 px is the floor for anything
+   tappable, 14 px the floor for text, 16 px for reading. */
+
+/* The strip behind the status bar takes the chrome's colour on the viewer: the
+   chrome is what sits under it. 0 px tall wherever there is no status bar. */
+html:has(> body > #app.app)::before { background: var(--chrome-1); }
+
+@media (max-width: 760px) {
+  /* ── the chrome ──────────────────────────────────────────────────────────
+     Row one is the app bar: the tree, the mark, and four icon buttons. The layer
+     rail wraps under it on a line of its own, and the view rail is row two. */
+  .app > .chrome { gap: 0; }
+  .chrome-row-1 { min-height: 56px; gap: 0 2px; }
+  .chrome-row-1 > .chrome-spacer { min-width: 4px; }
+
+  .chrome .drawer-toggle,
+  .chrome .search-trigger,
+  .chrome .icon-btn {
+    width: var(--ds-touch-min); height: var(--ds-touch-min);
+    min-width: var(--ds-touch-min);
+    display: inline-grid; place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ds-radius-pill);
+    background: transparent;
+    color: var(--chrome-muted);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .chrome .drawer-toggle:active,
+  .chrome .search-trigger:active,
+  .chrome .icon-btn:active { background: var(--chrome-fill); }
+  .chrome .drawer-toggle[aria-expanded="true"] {
+    color: var(--ds-frame-accent);
+    background: var(--chrome-fill);
+  }
+  .chrome :is(.drawer-toggle, .search-trigger, .icon-btn, .brand, .layer-tray button, .mode):focus-visible {
+    outline: 3px solid var(--ds-frame-accent);
+    outline-offset: -3px;
+  }
+  /* The span icons are drawn at 15 px; a little larger reads better at arm's length. */
+  .chrome .icon-menu, .chrome .icon-menu::before, .chrome .icon-menu::after { width: 18px; }
+  .chrome .icon-search { transform: scale(1.2); }
+  .chrome .icon-links { transform: scale(1.2); }
+  .chrome .icon-btn svg { width: 20px; height: 20px; }
+
+  .chrome .brand {
+    min-height: var(--ds-touch-min);
+    padding: 0 6px;
+    border-radius: var(--ds-radius-sm);
+  }
+  .chrome .brand-lockup { height: 26px; }
+
+  .chrome-right { gap: 0; }
+
+  /* You, as on every other page's phone bar: initials in a 32 px disc. */
+  .chrome .account-toggle,
+  .chrome .account-toggle.signed-in { background: transparent; border: 0; }
+  .chrome .account-initials {
+    display: grid; place-items: center;
+    width: 32px; height: 32px; border-radius: 50%;
+    font: var(--ds-weight-bold) 14px/1 var(--ds-font-sans);
+    color: var(--ds-frame-ink);
+    background: var(--ds-frame-raised);
+    border: 1px solid var(--ds-frame-line);
+  }
+  .chrome .account-toggle.signed-in .account-initials {
+    color: var(--ds-frame); background: var(--ds-frame-accent); border-color: transparent;
+  }
+  .chrome .bell-toggle .bell-count {
+    top: 6px; right: 5px; min-width: 18px; height: 18px; line-height: 18px; font-size: 11px;
+    box-shadow: 0 0 0 2px var(--chrome-1);
+  }
+
+  /* The layer rail: a strip of 44 px pills, full bleed, scrolling sideways. */
+  .chrome .layer-tray {
+    order: 1;
+    flex: 1 0 100%;
+    gap: 4px;
+    margin: 0 calc(-8px - var(--safe-right)) 0 calc(-8px - var(--safe-left));
+    padding: 2px calc(8px + var(--safe-right)) 8px calc(8px + var(--safe-left));
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    scroll-padding-inline: 24px;
+  }
+  .chrome .layer-tray button {
+    min-height: var(--ds-touch-min);
+    padding: 0 14px;
+    gap: 6px;
+    border-radius: var(--ds-radius-pill);
+    font-size: 15px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .chrome .layer-tray button:not(.active) {
+    box-shadow: inset 0 0 0 1px var(--chrome-border);
+  }
+  .chrome .layer-count { font-size: 14px; font-family: var(--ds-font-sans); font-variant-numeric: tabular-nums; }
+
+  /* The view rail: tabs 48 px tall, underlined, scrolling sideways. The key
+     hints are for a keyboard, which a phone does not have. */
+  .chrome-row-2 {
+    height: auto;
+    padding: 0 var(--safe-right) 0 var(--safe-left);
+    background: var(--chrome-2);
+  }
+  .chrome-row-2 > :not(.view-tabs) { display: none; }
+  .chrome .view-tabs {
+    flex: 1 0 100%;
+    height: 48px;
+    padding: 0 4px;
+    border: 0;
+    scroll-padding-inline: 24px;
+  }
+  .chrome .mode {
+    min-height: 48px;
+    padding: 0 14px;
+    font-size: 15px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .chrome .mode .mode-key { display: none; }
+  .chrome .mode .audit-count { font-size: 14px; padding: 1px 7px; }
+
+  /* A rail with more past its edge fades there (viewer-phone.js marks which). */
+  .chrome :is(.layer-tray, .view-tabs)[data-more~="end"] {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+  }
+  .chrome :is(.layer-tray, .view-tabs)[data-more~="start"] {
+    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent);
+            mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent);
+  }
+  .chrome :is(.layer-tray, .view-tabs)[data-more~="start"][data-more~="end"] {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+            mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+  }
+
+  /* ── the drawers ─────────────────────────────────────────────────────────── */
+  .sidebar-left, .sidebar-right { width: min(340px, 88vw); }
+  .drawer-backdrop { -webkit-tap-highlight-color: transparent; }
+
+  /* ── the view toolbars ──────────────────────────────────────────────────────
+     One row that scrolls sideways (styles.css), its controls at 44 px. The
+     sheets under a toolbar start where it ends: viewer-phone.js writes the
+     toolbar's height to --toolbar-h on its view. */
+  .graph-toolbar {
+    align-items: center;
+    min-height: 56px;
+    padding: 6px calc(10px + var(--safe-right)) 6px calc(10px + var(--safe-left));
+  }
+  .sheet-body { top: var(--toolbar-h, 46px); }
+  /* A toolbar holding only the hint line (hidden at this width) has nothing to
+     offer a phone but an empty band. */
+  .graph-toolbar:not(:has(> :not(.spacer, .graph-hint, [hidden]))) { display: none; }
+  .graph-toolbar .seg { padding: 2px; }
+  .main :is(.seg button, .seg-btn, .ghost-btn, .scope-select, .struct-filter, .toggle, .chip, .uiux-toggle) {
+    min-height: var(--ds-touch-min);
+    font-size: 14px;
+  }
+  .main .seg button { padding: 0 14px; }
+  .main :is(.scope-select, .struct-filter, input[type="search"], input[type="text"]) { font-size: 16px; }
+  .main .toggle, .main .uiux-toggle { gap: 8px; padding: 0 4px; }
+  .main .ghost-btn { padding: 0 14px; }
+
+  /* ── reading size ───────────────────────────────────────────────────────
+     The views were set for a desk: body text 12.5 to 13 px, labels 10 to 12.
+     Rather than restate three hundred sizes one class at a time (and lose the
+     hierarchy between them), the reading panes are scaled as a whole, the way
+     a phone's own text size does it: everything inside lays out at the pane's
+     width divided by the scale and is drawn 1.3 times larger, so 13 px body
+     text reads at 17, an 11 px label at 14.3, and every proportion holds.
+     Children, not the pane itself: the pane keeps its geometry, its scrolling
+     and its place under the toolbar. Canvases are never inside these. */
+  :is(.sheet-body, .view.audit, .view.reader, .cicd-view, .build-view, .journey-body) > :not(canvas, .galaxy-field, iframe) {
+    zoom: var(--phone-read-zoom, 1.3);
+  }
+
+  /* The few sizes the scale alone leaves under 14 px: the 10 px labels, chips
+     and verdicts. 11 px under the scale is 14.3. */
+  :is(.sheet-body, .view.audit, .view.reader, .cicd-view, .build-view, .journey-body, .ux-scroll, .bd-detail)
+    :is(.artefact-kind, .journey-section-label, .deploy-label, .routing-seg, .audit-kind,
+        .supersede-verdict, .timeline-verdict, .adr-status, .adr-amended, .adr-constrains, .decision-link-head,
+        .decision-verdict, .screen-journeys-label, .screen-journey-step, .wave-cell, .bd-figure-label,
+        .service-fact-label, .service-schema-count, .reach-label, .nav-label, .lineage-service,
+        .step-duration, .step-platform, .journey-frame-platform, .branch-sev, .supersede-edge-label,
+        .method, .api-trigger, .bu-cont-flag, .bu-flag, .bu-svc-tier, .ci-chip, .ci-config-db-k, .ci-lang,
+        .ci-recipe-cmd-k, .ci-sev, .bld-tier, .bd-chip-more, .bd-tile-code, th) {
+    font-size: 11px;
+  }
+
+  /* Tappable things inside the scaled panes: 44 px on screen is 44 / 1.3 here. */
+  :is(.sheet-body, .view.audit, .view.reader, .cicd-view, .build-view, .journey-body, .ux-scroll, .bd-detail)
+    :is(.wave-cell, .routing-name, .service-pill, .jchip.link, .decision-link, .adr-title, .context-copy,
+        .context-path, .screen-journey, .journey-section-label, .supersede-link, .nav-pill, .lineage-table,
+        .service-table, .service-op, .service-edge-name, .service-schema-name, .md-adr, .burst-more,
+        .bu-rel-path, a.chip, button.chip, .board-open, .bld-open, .bld-btn, .journey-frame-name,
+        .api-row, .route-row, .audit-row, summary) {
+    min-height: calc(var(--ds-touch-min) / var(--phone-read-zoom, 1.3));
+  }
+  :is(.sheet-body, .view.reader, .journey-body) :is(.wave-cell, .routing-name, .service-pill, .jchip.link,
+      .decision-link, .context-copy, .context-path, .screen-journey, .supersede-link, .lineage-table,
+      .service-table, .service-edge-name, .service-schema-name, .md-adr, .burst-more, .bu-rel-path,
+      .journey-frame-name, .adr-title) {
+    display: inline-flex;
+    align-items: center;
+    min-width: calc(var(--ds-touch-min) / var(--phone-read-zoom, 1.3));
+  }
+  /* Card grids whose columns were sized for a desk (280 to 340 px wide) and
+     cannot fit the scaled column: one column. */
+  :is(.ci-repos, .ci-configs, .bu-contended, .app-grid, .wave-grid, .doc-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Screen: layers.css stacks the layout board into a column at 760px, and the
+     cards' `flex: 1 1 260px` then means 260px *tall*, so every region was cut
+     off at 260px with its fields hidden under overflow: hidden. */
+  .screen-board > .region-card { flex: 0 0 auto; }
+  /* Screen and Migrations: an operation row wraps instead of pushing its
+     contract past the edge. */
+  .api-row { flex-wrap: wrap; row-gap: 2px; }
+  .api-row .api-purpose { flex: 1 1 100%; order: 3; white-space: normal; }
+  .api-row .api-contract { margin-left: auto; }
+  .api-row .api-id { min-width: 0; overflow-wrap: anywhere; }
+  .struct-file { font-size: 14px; }
+
+  /* Build: the step controls are one row under the thumb that scrolls
+     sideways, not three rows covering a fifth of the screen. */
+  .build-view .bld-controls {
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+    padding-top: 6px; padding-bottom: 6px;
+  }
+  .build-view .bld-controls::-webkit-scrollbar { display: none; }
+  .build-view .bld-controls > * { flex: none; }
+  .build-view .bld-where { margin: 0 4px; }
+
+  /* Wide tables. The conflict register becomes a list of cards: the id and
+     the issue on top, owner, state and date under the issue. */
+  .register-table, .register-table tbody { display: block; width: 100%; }
+  .register-table thead {
+    position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  .register-table .register-row {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--line-soft, var(--border-soft));
+  }
+  .register-table .register-row td { padding: 0; border: 0; }
+  .register-table .register-row td:nth-child(n+3) { grid-column: 2; }
+  .register-table .register-issue { max-width: none; font-weight: 600; }
+  /* The other tables keep their columns and scroll sideways with the first
+     column held, so a row is never read without its name. */
+  :is(.md-table, .bu-table, .domain-table) :is(th, td):first-child {
+    position: sticky; left: 0; z-index: 1;
+    background: var(--bg-panel, var(--bg));
+    box-shadow: 1px 0 0 var(--border-soft);
+  }
+  .bu-table { display: block; overflow-x: auto; }
+
+  /* The disclosure headers are whole rows. */
+  .sheet-body .journey-section-label { display: flex; align-items: center; }
+
+  /* The design diagrams: one finger pans the frame, two zoom the drawing
+     (viewer-phone.js), so the browser keeps the pan and leaves the pinch. */
+  .dia-frame { touch-action: pan-x pan-y; overscroll-behavior-x: contain; }
+
+  /* What the view says about itself, at reading size. */
+  .graph-legend { font-size: 14px; }
+  /* Folded behind its button (viewer-phone.js) until asked for. */
+  .graph-legend:not(.is-open) > :not(.legend-key) { display: none !important; }
+  .graph-legend:not(.is-open) { padding: 0; border-color: transparent; background: transparent; box-shadow: none; }
+  .graph-legend.is-open { max-width: calc(100% - 16px); }
+  .graph-legend .legend-key {
+    display: inline-flex; align-items: center;
+    min-height: var(--ds-touch-min); padding: 0 16px; margin: 0 0 6px;
+    border: 1px solid var(--border); border-radius: var(--ds-radius-pill);
+    background: var(--bg-raised, var(--bg)); color: var(--text);
+    font: var(--ds-weight-semibold) 14px/1 var(--ds-font-sans);
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  .graph-legend:not(.is-open) .legend-key { margin: 0; }
+  .graph-legend .legend-key:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
+  .graph-legend :is(.legend-row, .legend-note) { font-size: 14px; }
+
+  /* The one line saying editing is for the desk (viewer-phone.js). It rides in
+     the view's own flow, under the toolbar, and never covers the drawing. */
+  .phone-desk-note {
+    position: absolute;
+    left: 0; right: 0;
+    top: var(--toolbar-h, 56px);
+    z-index: 2;
+    margin: 0;
+    padding: 6px calc(14px + var(--safe-right)) 6px calc(14px + var(--safe-left));
+    font: var(--ds-weight-medium) 14px/1.35 var(--ds-font-sans);
+    color: var(--text-dim);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    border-bottom: 1px solid var(--border-soft);
+    pointer-events: none;
+    text-wrap: pretty;
+  }
+}
+
+/* ── the UI/UX layer: one pane at a time ─────────────────────────────────── */
+.phone-panes { display: none; }
+@media (max-width: 760px) {
+  .has-phone-panes .phone-panes {
+    display: flex;
+    flex: none;
+    gap: 4px;
+    padding: 6px calc(10px + var(--safe-right)) 6px calc(10px + var(--safe-left));
+    border-bottom: 1px solid var(--border-soft);
+    background: var(--bg-panel, var(--bg));
+  }
+  .phone-pane-tab {
+    flex: 1 1 0;
+    min-height: var(--ds-touch-min);
+    border: 1px solid var(--border);
+    border-radius: var(--ds-radius-pill);
+    background: transparent;
+    color: var(--text-dim);
+    font: var(--ds-weight-semibold) 15px/1 var(--ds-font-sans);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .phone-pane-tab[aria-selected="true"] {
+    border-color: var(--accent-line, var(--accent));
+    background: var(--accent-soft);
+    color: var(--accent-text, var(--text));
+  }
+  .phone-pane-tab:disabled { opacity: 0.45; }
+  .phone-pane-tab:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
+
+  /* The panes stack into one column and only the picked one shows. */
+  .has-phone-panes :is(.canvas-main, .ux-shell),
+  .has-phone-panes :is(.canvas-main, .ux-shell).has-detail,
+  .has-phone-panes .canvas-main:has(.canvas-detail:not([hidden])) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .has-phone-panes .phone-pane:not(.is-phone-on) { display: none !important; }
+  .has-phone-panes .phone-pane.is-phone-on { display: flex; grid-column: 1; grid-row: 1; border: 0; }
+  .has-phone-panes .canvas-detail.phone-pane.is-phone-on { display: block; }
+  .has-phone-panes #bd-detail.phone-pane.is-phone-on { display: block; }
+
+  /* Screens & flows: the strip sits above the three-pane frame, which is
+     absolutely placed, so the frame starts under it. */
+  #view-uiux-screens { display: flex; flex-direction: column; }
+  #view-uiux-screens .canvas-main { position: relative; inset: auto; flex: 1; min-height: 0; }
+
+  /* Boards and Platforms: the page header wraps, the shell fills what is left. */
+  .uiux-view .ux-page { grid-template-rows: auto auto minmax(0, 1fr); }
+  .uiux-view .ux-head { flex-wrap: wrap; gap: 8px; padding: 8px calc(12px + var(--safe-right)) 8px calc(12px + var(--safe-left)); }
+  .uiux-view .ux-lead { white-space: normal; font-size: 14px; flex: 1 1 100%; }
+  .uiux-view .ux-head .scope-select { margin-left: 0; max-width: none; flex: 1 1 auto; }
+  .uiux-view .bd-claim { margin-left: 0; min-height: var(--ds-touch-min); padding: 0 16px; font-size: 14px; }
+
+  /* The rails at a finger's size. */
+  .uiux-view .ux-tabs button { min-height: var(--ds-touch-min); font-size: 14px; }
+  .uiux-view .ux-rail-find { padding: 8px 12px; }
+  .uiux-view .ux-input { min-height: var(--ds-touch-min); font-size: 16px; }
+  .uiux-view .ux-rail-count { font-size: 14px; }
+  .uiux-view .ux-row { min-height: var(--ds-touch-min); font-size: 15px; }
+  .uiux-view :is(.ux-row-count, .ux-row-code, .ux-group-count, .ux-group-caret) { font-size: 14px; }
+  .uiux-view .ux-tree { overflow-y: auto; overscroll-behavior: contain; }
+  .uiux-view .ux-callout { font-size: 14px; }
+
+  /* The middle's own bar scrolls sideways rather than wrapping. */
+  .uiux-view :is(.bd-bar, .canvas-bar) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 8px;
+    padding: 6px calc(10px + var(--safe-right)) 6px calc(10px + var(--safe-left));
+  }
+  .uiux-view :is(.bd-bar, .canvas-bar) > * { flex: none; }
+  .uiux-view :is(.bd-bar, .canvas-bar)::-webkit-scrollbar { display: none; }
+  .uiux-view .canvas-bar .scope-select { max-width: 260px; }
+  .uiux-view .bd-find { margin-left: 0; width: 240px; max-width: none; }
+  .uiux-view .bd-check { min-height: var(--ds-touch-min); font-size: 14px; gap: 8px; }
+  .uiux-view .canvas-spacer { display: none; }
+  .uiux-view .canvas-note { font-size: 14px; white-space: nowrap; }
+  .uiux-view .canvas-zoom .chip { min-width: var(--ds-touch-min); justify-content: center; }
+  .uiux-view .canvas-zoom #zoom-level { font-size: 14px; }
+  /* Putting moved cards back is part of arranging them, which is the desk's. */
+  .uiux-view #reset-layout { display: none; }
+
+  /* The reading panes at the same scale as the sheets. */
+  .uiux-view :is(.ux-scroll, .bd-detail, .canvas-detail) > * { zoom: var(--phone-read-zoom, 1.3); }
+  .uiux-view .canvas-detail { padding: 14px calc(14px + var(--safe-right)) 24px calc(14px + var(--safe-left)); }
+
+  .phone-desk-note.is-inline { position: static; flex: none; }
+  /* The same line, once it is saying what a tap picked. */
+  .phone-desk-note.is-hint {
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+}
+
+/* A finger owns the UI/UX canvas at any width: pan and pinch (canvas.js),
+   never the page's own zoom. A mouse never reads touch-action. */
+@media (pointer: coarse) {
+  .canvas-viewport { touch-action: none; }
+}
+
+/* ── framed pages (the shared cell, the flash-sale simulator) ─────────────── */
+.phone-frame-open { display: none; }
+@media (max-width: 760px) {
+  .phone-frame-open {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin: 0 0 12px; padding: 8px 8px 8px 14px;
+    border: 1px solid var(--border); border-radius: var(--ds-radius-md);
+    background: var(--bg-panel, var(--bg));
+    font: var(--ds-weight-medium) 14px/1.35 var(--ds-font-sans); color: var(--text-dim);
+    zoom: 1;
+  }
+  .phone-frame-open a {
+    flex: none; display: inline-flex; align-items: center;
+    min-height: var(--ds-touch-min); padding: 0 16px;
+    border-radius: var(--ds-radius-sm);
+    background: var(--accent-soft); color: var(--accent-text, var(--accent));
+    border: 1px solid var(--accent-line, var(--accent));
+    font-weight: var(--ds-weight-semibold); text-decoration: none;
+  }
+  .phone-frame-open a:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 2px; }
+  /* The frames themselves: never wider than the column. */
+  .cicd-view iframe { max-width: 100%; }
+}
+
+/* ── a galaxy's focus card ──────────────────────────────────────────────────
+   app.js raises it when a tap pins a body: the name, what it is, and the open
+   action a desk gets from a double click (galaxyFocus). A phone, or a screen
+   driven by a finger at any width; never a desk with a mouse. */
+.galaxy-focus { display: none; }
+@media (max-width: 760px), (hover: none) and (pointer: coarse) {
+  .galaxy-focus {
+    position: absolute;
+    left: calc(10px + var(--safe-left, 0px));
+    right: calc(10px + var(--safe-right, 0px));
+    bottom: 10px;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 14px 12px 16px;
+    border: 1px solid var(--ds-frame-line);
+    border-radius: var(--ds-radius-md);
+    background: var(--ds-frame);
+    color: var(--ds-frame-ink);
+    box-shadow: var(--ds-shadow-2, 0 10px 28px rgba(0, 0, 0, 0.5));
+    font-family: var(--ds-font-sans);
+    animation: galaxy-focus-in var(--ds-dur-normal, 280ms) var(--ds-ease-out, ease-out);
+  }
+  /* The key under a galaxy steps back while a card stands in front of it. */
+  .view:has(> .galaxy-focus) .graph-legend { visibility: hidden; }
+  .galaxy-focus-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .galaxy-focus-name {
+    font-size: var(--ds-text-md); font-weight: var(--ds-weight-bold, 700);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .galaxy-focus-says {
+    font-size: 14px; line-height: 1.45; color: var(--ds-frame-ink-2);
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    text-wrap: pretty;
+  }
+  .galaxy-focus-actions { display: flex; align-items: center; gap: 8px; }
+  .galaxy-focus-open {
+    flex: 1 1 auto;
+    min-height: var(--ds-touch-comfy);
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--ds-radius-sm);
+    background: var(--ds-frame-accent);
+    color: var(--ds-frame);
+    font: var(--ds-weight-semibold, 600) var(--ds-text-md)/1 var(--ds-font-sans);
+    cursor: pointer;
+    transition: transform var(--ds-dur-fast, 160ms) var(--ds-ease-out, ease-out);
+  }
+  .galaxy-focus-open:active { transform: scale(var(--ds-press-scale, 0.97)); }
+  .galaxy-focus-close {
+    flex: none; margin-left: auto;
+    display: grid; place-items: center;
+    width: var(--ds-touch-comfy); height: var(--ds-touch-comfy);
+    border: 1px solid var(--ds-frame-line);
+    border-radius: var(--ds-radius-sm);
+    background: transparent;
+    color: var(--ds-frame-ink-2);
+    cursor: pointer;
+  }
+  .galaxy-focus-close svg { width: 20px; height: 20px; }
+  .galaxy-focus :focus-visible { outline: 3px solid var(--ds-frame-accent); outline-offset: 2px; }
+  @keyframes galaxy-focus-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-focus { animation: none; }
+}
+
+/* The key's fold button is a phone's; a desk shows its keys open. */
+.legend-key { display: none; }
+
+/* Not drawn on a desk: the note exists only where the edit controls are gone. */
+.phone-desk-note { display: none; }
+@media (max-width: 760px) {
+  .phone-desk-note { display: block; }
+}
+
+@media (max-width: 760px) {
+  /* The palette: the keyboard's keys mean nothing to a thumb; the count stays.
+     A tap outside closes it, as on a desk. */
+  .palette-foot > span:has(kbd) { display: none; }
+  .palette-input { font-size: 16px; }
+  .palette-item { min-height: var(--ds-touch-min); }
+
+  /* A long press explains what it is on (tips.js), at reading size. */
+  .tip-panel { max-width: min(360px, calc(100vw - 24px)); font-size: 15px; padding: 12px 14px; }
+  .tip-title { font-size: 15px; }
+  .tip-body code, .tip-extra { font-size: 14px; }
+}
+
+/* ── under 720 px: the bottom bar is there ───────────────────────────────── */
+@media (max-width: 719px) {
+  /* The views stop above the bottom bar, which covers the button bar itself. */
+  .app {
+    padding-bottom: calc(var(--ds-bar-bottom) + var(--ds-safe-bottom));
+    box-sizing: border-box;
+  }
+  .sidebar-left, .sidebar-right, .drawer-backdrop {
+    bottom: calc(var(--ds-bar-bottom) + var(--ds-safe-bottom));
+  }
+  .tree { padding-bottom: 20px; }
+  .links-pane { padding-bottom: 24px; }
+  .graph-legend { bottom: 8px; }
+  .toast { bottom: calc(var(--ds-bar-bottom) + var(--ds-safe-bottom) + 12px); }
+
+  /* In More and the bottom bar instead: the desk chrome's home, map, theme,
+     live dot and release-notes chip. */
+  .chrome :is(#live-dot, #burst-link, #home-link, #theme-toggle, #updates-new) { display: none; }
+}

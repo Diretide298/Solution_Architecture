@@ -104,3 +104,8 @@
 @media (prefers-reduced-motion: reduce) {
   .au-mark { transition: none; }
 }
+
+/* A phone: a check's name opens it, so it is a 44 px target like every other control. */
+@media (max-width: 719px) {
+  .au-name { min-height: 44px; font-size: 13px; }
+}

@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- resizes-content: a phone's keyboard shrinks the page instead of
+         covering it, so the field being typed in can always scroll into view. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
     <title>Adam — accept your invite</title>
     <script>
       // Night by default here, whatever the app is set to. Both auth pages are
@@ -25,6 +27,9 @@
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
     <link rel="stylesheet" href="/auth.css" />
+    <!-- The design system's tokens, for the phone sizes (DESIGN-SYSTEM.md).
+         Every name in it starts with `--ds-`, so the desktop page is untouched. -->
+    <link rel="stylesheet" href="/design-tokens.css" />
     <link rel="stylesheet" href="/invite.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
@@ -79,26 +84,32 @@
           invited you and cannot be changed here.
         </p>
 
+        <!-- A real form, and the invited address in it as the username (fixed, so
+             hidden), which is what lets a phone's password manager save the new
+             password against the right account. -->
+        <form id="invite-form" class="invite-fields" novalidate>
+        <input id="invite-username" name="username" type="email" autocomplete="username" readonly hidden />
         <div class="auth-field-row">
           <label class="auth-label" for="name">Your name</label>
-          <input id="name" class="auth-input" type="text" autocomplete="name"
+          <input id="name" name="name" class="auth-input" type="text" autocomplete="name"
+                 autocapitalize="words" enterkeyhint="next"
                  placeholder="How your verdicts will be signed" />
         </div>
 
         <div class="auth-field-row">
           <label class="auth-label" for="password">Password</label>
-          <input id="password" class="auth-input" type="password"
-                 autocomplete="new-password" placeholder="At least 12 characters" />
+          <input id="password" name="new-password" class="auth-input" type="password"
+                 autocomplete="new-password" enterkeyhint="next" placeholder="At least 12 characters" />
         </div>
 
         <div class="auth-field-row">
           <label class="auth-label" for="confirm">Password again</label>
-          <input id="confirm" class="auth-input" type="password" autocomplete="new-password" />
+          <input id="confirm" name="confirm-password" class="auth-input" type="password"
+                 autocomplete="new-password" enterkeyhint="done" />
         </div>
-
-        <p class="auth-error" id="error" hidden></p>
-
-        <button id="submit" class="auth-button" type="button">Create my account</button>
+        <p class="auth-error" id="error" role="alert" hidden></p>
+        <button id="submit" class="auth-button" type="submit">Create my account</button>
+        </form>
         <p class="auth-note auth-fine">
           Long beats complicated. Three or four unrelated words are easier to
           remember and harder to guess than <code>Passw0rd!</code>
@@ -117,20 +128,22 @@
           signed in on.
         </p>
 
+        <form id="reset-form-fields" class="invite-fields" novalidate>
+        <input id="reset-username" name="username" type="email" autocomplete="username" readonly hidden />
         <div class="auth-field-row">
           <label class="auth-label" for="reset-password">New password</label>
-          <input id="reset-password" class="auth-input" type="password"
-                 autocomplete="new-password" placeholder="At least 12 characters" />
+          <input id="reset-password" name="new-password" class="auth-input" type="password"
+                 autocomplete="new-password" enterkeyhint="next" placeholder="At least 12 characters" />
         </div>
 
         <div class="auth-field-row">
           <label class="auth-label" for="reset-confirm">Password again</label>
-          <input id="reset-confirm" class="auth-input" type="password" autocomplete="new-password" />
+          <input id="reset-confirm" name="confirm-password" class="auth-input" type="password"
+                 autocomplete="new-password" enterkeyhint="done" />
         </div>
-
-        <p class="auth-error" id="reset-error" hidden></p>
-
-        <button id="reset-submit" class="auth-button" type="button">Set my password</button>
+        <p class="auth-error" id="reset-error" role="alert" hidden></p>
+        <button id="reset-submit" class="auth-button" type="submit">Set my password</button>
+        </form>
         <p class="auth-note auth-fine">
           Nobody else sees this, now or later — only a hash of it is kept, and
           whoever made you this link never learns what you chose. Long beats
@@ -191,6 +204,7 @@
         try {
           const who = await checkReset(token);
           $('reset-email').textContent = who.email;
+          $('reset-username').value = who.email;
           show('reset-form');
           $('reset-password').focus();
         } catch (error) {
@@ -201,6 +215,7 @@
         try {
           const invite = await checkInvite(token);
           $('invite-email').textContent = invite.email;
+          $('invite-username').value = invite.email;
           $('invite-role').textContent = invite.role;
           show('form');
           $('name').focus();
@@ -234,10 +249,9 @@
         }
       };
 
-      $('submit').onclick = submit;
-      for (const id of ['name', 'password', 'confirm']) {
-        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
-      }
+      // The button and Enter in any field submit the form, once each; nothing
+      // is posted by the browser itself.
+      $('invite-form').onsubmit = (e) => { e.preventDefault(); if (!$('submit').disabled) submit(); };
 
       const resetFail = (message) => {
         $('reset-error').textContent = message;
@@ -267,10 +281,14 @@
         }
       };
 
-      $('reset-submit').onclick = submitReset;
-      for (const id of ['reset-password', 'reset-confirm']) {
-        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') submitReset(); });
-      }
+      $('reset-form-fields').onsubmit = (e) => { e.preventDefault(); if (!$('reset-submit').disabled) submitReset(); };
+
+      // Into the workspace without leaving this page in history: its link is
+      // spent, so Back to it would only say so.
+      document.querySelector('#done .auth-button').onclick = (e) => {
+        e.preventDefault();
+        location.replace('/home.html');
+      };
     </script>
     <script type="module" src="/shortcuts.js"></script>
   </body>

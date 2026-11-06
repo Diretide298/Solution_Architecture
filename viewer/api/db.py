@@ -1005,6 +1005,75 @@ CREATE TABLE IF NOT EXISTS overview_held (
   asked_at    TEXT,
   PRIMARY KEY (project_id, pms_id)
 );
+
+-- The change-request watcher on the phone (viewer/api/watcher.py, PHONE-SPEC.md).
+--
+-- The watcher's own folder (CR_WATCH_OUT: state.json, drafts/, REVIEW.md) stays
+-- the record of what is waiting and how the lead marked it; these three are what
+-- ADAM adds beside it.
+--
+-- `watcher_event` is the audit trail: every decision the lead made from a page
+-- and every settle, with who, when, which request and the draft hash the
+-- decision was bound to. Appended, never updated. `who` is the email at the time,
+-- kept with the id so the row still reads after an account is gone.
+CREATE TABLE IF NOT EXISTS watcher_event (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id  INTEGER REFERENCES account(id) ON DELETE SET NULL,
+  who         TEXT    NOT NULL,
+  at          TEXT    NOT NULL,
+  -- decision | take-back (a mark taken back) | settle | settle-failed (a settle
+  -- that failed part way: what it was attempting) | device-token (a phone's
+  -- token made) | device-revoke (one revoked: by hand, replaced, expired, over
+  -- the limit, or with the account's sessions; the reason is in detail)
+  kind        TEXT    NOT NULL,
+  cr          TEXT    NOT NULL DEFAULT '',
+  -- approve | change | reject for a decision, the mark taken back for a take-back,
+  -- the request's new status for a settle
+  decision    TEXT    NOT NULL DEFAULT '',
+  draft_hash  TEXT    NOT NULL DEFAULT '',
+  detail      TEXT    NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS watcher_event_cr ON watcher_event(cr, id);
+
+-- The ask-back thread under a request: the lead's question, the read-only
+-- Claude turn's answer when it comes back, and what it cost. `state` is asking
+-- until the turn ends, then answered or failed. `proposal` is the resolution the
+-- answer proposed, as JSON, or empty. Asking never changes a decision.
+CREATE TABLE IF NOT EXISTS watcher_thread (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  cr          TEXT    NOT NULL,
+  account_id  INTEGER REFERENCES account(id) ON DELETE SET NULL,
+  asked_by    TEXT    NOT NULL,
+  asked_at    TEXT    NOT NULL,
+  question    TEXT    NOT NULL,
+  draft_hash  TEXT    NOT NULL DEFAULT '',
+  state       TEXT    NOT NULL DEFAULT 'asking',
+  answer      TEXT    NOT NULL DEFAULT '',
+  proposal    TEXT    NOT NULL DEFAULT '',
+  cost_usd    REAL    NOT NULL DEFAULT 0,
+  error       TEXT    NOT NULL DEFAULT '',
+  answered_at TEXT
+);
+CREATE INDEX IF NOT EXISTS watcher_thread_cr ON watcher_thread(cr, id);
+
+-- A phone's token for its background check. Only the hash is kept, the way a
+-- session's is; the token itself is shown once. It reads the watcher's summary
+-- (counts, no titles) and nothing else, and only while the account that made it
+-- is active and still a decider, for 90 days from made_at and 30 from its last
+-- use (watcher.py DEVICE_DAYS, DEVICE_IDLE_DAYS). One live token per account and
+-- device name, five per account: making a new one revokes the old. Ending an
+-- account's sessions (sign out everywhere, a password change or reset,
+-- deactivation) revokes all of them.
+CREATE TABLE IF NOT EXISTS watcher_device (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id   INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  device       TEXT    NOT NULL,
+  token_hash   TEXT    NOT NULL UNIQUE,
+  made_at      TEXT    NOT NULL,
+  last_used_at TEXT,
+  revoked_at   TEXT
+);
+CREATE INDEX IF NOT EXISTS watcher_device_account ON watcher_device(account_id, device);
 """
 
 # Indexes that cannot be created until the migration has run.

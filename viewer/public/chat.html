@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- resizes-content: an on-screen keyboard shrinks the page rather than
+         sliding over it, so the docked question box (chat.css) stays above it. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
     <script>
       try {
         if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
@@ -20,6 +22,9 @@
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
     <link rel="stylesheet" href="/sheet.css" />
+    <!-- The design system's tokens, for the phone layout (DESIGN-SYSTEM.md).
+         Every name in it starts with `--ds-`, so the desktop page is untouched. -->
+    <link rel="stylesheet" href="/design-tokens.css" />
     <link rel="stylesheet" href="/chat.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>

@@ -33,7 +33,7 @@ import { hideLoader } from '/loader.js';
 import { mountPanels } from '/panels.js';
 import {
   el, fmt, plural, ago, daysSince, param, setParams, personLink,
-  verdict, next, mountScope, legend, badge, stack, table,
+  verdict, next, mountScope, legend, badge, stack, table, cardRow,
 } from '/sheet.js';
 import {
   KINDS, MODULE_KIND, kindOf, kindLabel, artefactKey, viewerHref,
@@ -487,7 +487,7 @@ function paged(host, o) {
   }
   const shown = Math.min(list.length, state.pages[id] ?? page);
 
-  const wrap = el('div', 'sh-table-wrap');
+  const wrap = el('div', 'sh-table-wrap is-phone-cards');
   const t = el('table', `sh-table ${o.className ?? ''}`.trim());
   if (caption) t.append(el('caption', 'sh-sr', caption));
   const hr = el('tr');
@@ -532,6 +532,7 @@ function paged(host, o) {
       else cell.textContent = typeof v === 'number' ? fmt(v) : (v ?? '');
       tr.append(cell);
     });
+    cardRow(tr, columns.map((c) => c.label));
     tbody.append(tr);
   }
   const left = list.length - shown;

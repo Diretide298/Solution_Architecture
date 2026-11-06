@@ -19,6 +19,7 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/design-tokens.css" />
     <link rel="stylesheet" href="/plan.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
   </head>
@@ -72,6 +73,18 @@
           <em>Ship to OpenProject</em> and confirm &mdash; until then the
           arrangement is yours alone, and nobody else&rsquo;s board changes.
         </p>
+        <!-- A phone reads the plan and does not change it (decided with the lead,
+             4 November): the drag needs a pointer and room, and a moved bar sent
+             from a thumb is not a decision anybody should make by accident. -->
+        <p class="pl-phone-lede">
+          Every bar is a top-level ticket in OpenProject, spanning everything
+          underneath it. Slide the chart sideways to move through time, and tap a
+          bar for its dates.
+        </p>
+        <p class="pl-phone-note">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+          <span>Edit the plan on a larger screen</span>
+        </p>
       </section>
 
       <section class="pl-toolbar" id="pl-toolbar">
@@ -84,13 +97,23 @@
           <input type="checkbox" id="pl-hide-done" />
           <span>Hide finished modules</span>
         </label>
+        <button class="chip pl-refresh-phone" id="pl-refresh-phone" type="button">Refresh</button>
         <span class="pl-spacer"></span>
         <span class="pl-dirty" id="pl-dirty" hidden></span>
         <button class="chip" id="pl-discard" type="button" hidden>Discard the sketch</button>
         <button class="chip chip-go" id="pl-ship" type="button" hidden>Ship to OpenProject</button>
       </section>
 
-      <section class="admin-panel pl-chart-panel">
+      <!-- Loading, nothing to draw, or the plan could not be read: said in the
+           page rather than left as an empty chart. -->
+      <section class="admin-panel pl-state" id="pl-state" hidden>
+        <div class="pl-state-mark" id="pl-state-mark" aria-hidden="true"></div>
+        <h2 class="pl-state-title" id="pl-state-title"></h2>
+        <p class="pl-state-text" id="pl-state-text"></p>
+        <button class="pl-btn pl-btn-line" id="pl-state-retry" type="button" hidden>Try again</button>
+      </section>
+
+      <section class="admin-panel pl-chart-panel" id="pl-chart-panel">
         <div class="pl-chart" id="pl-chart">
           <!-- The names do not scroll sideways with the bars: a chart three
                months wide is one you read by scrolling, and a row whose label
@@ -133,6 +156,23 @@
         <div class="pl-dialog-actions">
           <button class="chip" id="pl-cancel" type="button">Cancel</button>
           <button class="chip chip-go" id="pl-confirm" type="button">Yes, send these</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- A bar's dates, on a phone: tapping a bar opens this instead of dragging it. -->
+    <div class="pl-scrim" id="pl-scrim" hidden></div>
+    <div class="pl-sheet" id="pl-sheet" role="dialog" aria-modal="true" aria-labelledby="pl-sheet-title" hidden>
+      <div class="pl-sheet-grip" id="pl-sheet-grip" aria-hidden="true"></div>
+      <div class="pl-sheet-inner">
+        <p class="pl-sheet-key" id="pl-sheet-key"></p>
+        <h2 class="pl-sheet-title" id="pl-sheet-title" tabindex="-1"></h2>
+        <div class="pl-sheet-span" id="pl-sheet-span" aria-hidden="true"><span></span></div>
+        <dl class="pl-sheet-facts" id="pl-sheet-facts"></dl>
+        <p class="pl-sheet-note" id="pl-sheet-note" hidden></p>
+        <div class="pl-sheet-actions">
+          <button class="pl-btn pl-btn-quiet" id="pl-sheet-close" type="button">Done</button>
+          <a class="pl-btn pl-btn-primary" id="pl-sheet-open" href="#" target="_blank" rel="noreferrer">Open in OpenProject</a>
         </div>
       </div>
     </div>

@@ -394,6 +394,15 @@ async function renderSimulator(host) {
   // first panel are there even if the message never comes.
   frame.style.height = '900px';
   sec.append(frame);
+  // On a phone the page in the frame is drawn for a desk and squeezed into a
+  // column. One tap opens it as a page of its own, full screen, in this window
+  // (Back returns here). Shown by viewer-phone.css only; a desk keeps the link
+  // under the frame.
+  const full = el('p', 'phone-frame-open');
+  const fullLink = el('a', null, 'Open full screen');
+  fullLink.href = auth.apiUrl(SIMULATOR);
+  full.append(el('span', null, 'Drawn for a desk.'), fullLink);
+  frame.before(full);
 
   const foot = el('p', 'bu-sim-foot');
   const open = el('a', null, 'Open it on its own');

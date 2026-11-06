@@ -1,0 +1,56 @@
+/* What is new in ADAM, on a phone. The page's desktop look is layers.css's
+   (.up-layout, .up-head, the Markdown block), and nothing here applies above
+   720px. Below it (DESIGN-SYSTEM.md: a phone), on the design system's tokens:
+   reading text at 16px, the column closer to the edges, the mascot kept as a
+   small mark beside the title rather than dropped, and each date a clear break
+   in a long page. */
+
+@media (max-width: 719px) {
+  .up-layout { padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-12); }
+  .up-layout .admin-panel { padding: var(--ds-space-5) var(--ds-space-4); border-radius: var(--ds-radius-md); }
+
+  .up-head { gap: var(--ds-space-3); }
+  /* layers.css hides the mascot below 640px; on a phone it is a 56px mark. */
+  .up-mascot { display: block; width: 56px; }
+  .up-title {
+    font-size: var(--ds-text-xl); line-height: var(--ds-leading-tight);
+    letter-spacing: var(--ds-tracking-tight); text-wrap: balance;
+  }
+
+  .up-fleet { font-size: var(--ds-text-sm); line-height: var(--ds-leading-body); text-wrap: pretty; }
+  .up-fleet code { font-size: var(--ds-text-xs); overflow-wrap: anywhere; }
+  .up-fleet .sh-badge { font-size: var(--ds-text-xs); }
+
+  /* The notes themselves. */
+  #up-body .md-p, #up-body .md-list li {
+    font-size: var(--ds-text-md); line-height: var(--ds-leading-body); text-wrap: pretty;
+  }
+  #up-body .md-list { padding-left: var(--ds-space-5); }
+  #up-body .md-head { text-wrap: balance; }
+  #up-body .md-h1 { font-size: var(--ds-text-lg); }
+  /* A date: the break between releases, so it reads as one. */
+  #up-body .md-h2 {
+    margin-top: var(--ds-space-10); padding-bottom: var(--ds-space-2);
+    font-size: var(--ds-text-lg); font-variant-numeric: tabular-nums;
+    border-bottom-color: var(--ds-line-strong);
+  }
+  #up-body .md-h2:first-child { margin-top: 0; }
+  #up-body .md-h3 { margin-top: var(--ds-space-6); font-size: var(--ds-text-md); line-height: var(--ds-leading-snug); }
+  #up-body code { font-size: 0.875em; overflow-wrap: anywhere; }
+  #up-body .md-code { font-size: var(--ds-text-sm); max-width: 100%; overflow-x: auto; }
+}
+
+@media (max-width: 719px) {
+  /* Signed out: the way to the sign-in page is a full-size button. */
+  #signed-out { margin: var(--ds-space-4) var(--ds-space-3); }
+  #signed-out .chip {
+    display: inline-flex; align-items: center; min-height: var(--ds-touch-comfy);
+    padding: 0 var(--ds-space-6); font-size: var(--ds-text-md); font-weight: var(--ds-weight-semibold);
+  }
+}
+
+@media (max-width: 719px) {
+  /* The links in the status line keep their place in the sentence and get a
+     taller place to tap. */
+  .up-fleet .sh-link { display: inline-block; padding: 13px 0; margin: -13px 0; }
+}

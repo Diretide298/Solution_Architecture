@@ -196,3 +196,58 @@
   .cr-dl { grid-template-columns: 96px minmax(0, 1fr); }
   .cr-row { scroll-margin-top: 150px; }
 }
+
+/* ── a phone ─────────────────────────────────────────────────────────
+   Each request is a card: its number and title (the whole card opens it),
+   how long it has waited and its state; the open one unfolds under it. The
+   people and the ticket are in the opened request, as they already were
+   below 820 px. The rail's count sits beside its name, centred. */
+@media (max-width: 719px) {
+  .cr-page .set-nav a { align-items: center; }
+}
+@media (max-width: 599px) {
+  .cr-table > thead {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
+  .cr-table, .cr-table > tbody { display: block; width: 100%; }
+  .cr-table > tbody { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--bg-panel); }
+  .cr-table > tbody > tr + tr { border-top: 1px solid var(--border); }
+  .cr-table > tbody > tr:hover { background: none; }
+  .cr-table tr.cr-row {
+    position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+    padding: 14px 44px 14px 16px;
+  }
+  .cr-table tr.cr-row > * { display: block; padding: 0; border: 0; text-align: left; }
+  .cr-table tr.cr-row > :is(.cr-c-side, .cr-c-raised, .cr-c-holder, .cr-c-ticket, .cr-c-next) { display: none; }
+  .cr-table tr.cr-row > .cr-c-req { flex: 1 1 100%; min-width: 0; }
+  .cr-table tr.cr-row > .cr-c-wait { order: 2; font-size: 14px; color: var(--text-dim); }
+  .cr-table tr.cr-row > .cr-c-wait:not(:empty)::before { content: 'Waiting '; }
+  .cr-table tr.cr-row > .cr-c-wait.is-late::before { content: '! Waiting '; color: var(--st-late); }
+  .cr-table tr.cr-row > .cr-c-state { order: 1; }
+  .cr-table .cr-toggle { min-height: 44px; font-size: 16px; gap: 4px; }
+  .cr-table .cr-toggle .sh-key { font-size: 13px; }
+  .cr-table .cr-title { font-size: 16px; line-height: 1.35; }
+  .cr-table .cr-toggle::after { content: ''; position: absolute; inset: 0; }
+  .cr-table tr.cr-row::after {
+    content: ''; position: absolute; right: 18px; top: 26px; width: 9px; height: 9px;
+    border-right: 2px solid var(--text-faint); border-bottom: 2px solid var(--text-faint);
+    transform: rotate(45deg); transition: transform var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  .cr-table tr.cr-row.is-chosen::after { transform: rotate(-135deg); top: 30px; }
+  .cr-table tr.cr-row:active { background: var(--bg-hover); }
+  .cr-table .cr-meta { position: relative; z-index: 1; }
+  .cr-table .cr-meta code { font-size: 12.5px; }
+  .cr-table tr.cr-detail-row, .cr-table tr.cr-detail-row > td { display: block; }
+  .cr-table tr.cr-detail-row { border-top: 0; }
+  .cr-table tr.cr-detail-row > td { padding: 0 0 16px; }
+  .cr-table td.sh-empty { display: block; padding: 16px; }
+  .cr-text, .cr-options { font-size: 15px; }
+  .cr-dl { font-size: 14px; }
+  .cr-buttons > :is(.auth-button, .chip) { flex: 1 1 auto; }
+  .cr-form-row > .cr-field { flex: 1 1 100%; }
+  .cr-narrow { width: 100% !important; }
+}
+@media (max-width: 599px) and (prefers-reduced-motion: reduce) {
+  .cr-table tr.cr-row::after { transition: none; }
+}

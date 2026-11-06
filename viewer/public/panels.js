@@ -38,6 +38,16 @@ export function mountPanels({ nav, fallback, onShow }) {
     for (const control of controls) {
       control.setAttribute('aria-current', nameOf(control) === pick ? 'true' : 'false');
     }
+    // On a phone the nav is a strip that scrolls sideways; bring the current
+    // section's pill into view, centred, so "you are here" is on screen. A nav
+    // that does not scroll (a desk) is left alone.
+    const current = controls[names.indexOf(pick)];
+    const strip = current?.parentElement;
+    if (strip && strip.scrollWidth > strip.clientWidth) {
+      const c = current.getBoundingClientRect();
+      const s = strip.getBoundingClientRect();
+      strip.scrollLeft += (c.left - s.left) - (s.width - c.width) / 2;
+    }
     for (const name of names) {
       const section = document.getElementById(name);
       if (section) section.hidden = name !== pick;
@@ -48,6 +58,9 @@ export function mountPanels({ nav, fallback, onShow }) {
     if (push) history.replaceState(null, '', `#${pick}`);
     // Back to the top of the section, not to wherever the last one was scrolled.
     window.scrollTo({ top: 0 });
+    // The standalone pages scroll the body, not the window (layers.css
+    // `.admin-page`), so the window's reset alone left them where they were.
+    document.body.scrollTop = 0;
     onShow?.(pick);
   };
 

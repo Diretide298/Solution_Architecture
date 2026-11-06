@@ -336,3 +336,13 @@ html:has(body.landing) { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   .lp-cta .lp-adam { animation: none; }
 }
+
+/* A phone (below 720px): every button and the home mark a full 44px touch
+   target. The desktop page is unchanged. */
+@media (max-width: 719px) {
+  .lp-lockup { min-height: 44px; }
+  .lp-btn, .landing a.lp-cta-fill, .landing a.lp-cta-ghost {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; box-sizing: border-box; touch-action: manipulation;
+  }
+}

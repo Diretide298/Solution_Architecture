@@ -16,6 +16,10 @@
 
 import * as auth from '/validation.js';
 
+// On a phone, the same frame as every other page (app bar, bottom bar, More).
+// Only there: this page has always kept its own plain bar on a desk.
+if (matchMedia('(max-width: 719px)').matches) import('/page-chrome.js');
+
 const $ = (id) => document.getElementById(id);
 
 function el(tag, cls, text) {
@@ -109,6 +113,10 @@ function drawStatus() {
       : !p.youAreCovered
         ? `No rule covers ${p.you || 'where you are'}, so this would refuse you first.`
         : '';
+  // The same reason as words under the button, for a phone, which has no hover
+  // to show a tooltip with (ips.css shows it below 720px only).
+  $('ip-arm-why').textContent = $('ip-arm').disabled ? $('ip-arm').title : '';
+  $('ip-arm-why').hidden = !$('ip-arm').title || !$('ip-arm').disabled;
 }
 
 // ── rules ────────────────────────────────────────────────────────────

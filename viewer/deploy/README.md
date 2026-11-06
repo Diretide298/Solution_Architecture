@@ -226,6 +226,123 @@ ticvai-backup                  # take one now
 ls -l /srv/ticvai/backups/
 ```
 
+## The change-request watcher
+
+ADAM on the phone (`viewer/PHONE-SPEC.md`). The watcher that drafted answers to
+developers' change requests on the lead's laptop runs here instead, as the PM2
+job `ticvai-cr-watch`: hourly, as `ticvai`, from its own clone. It drafts and
+lists; it never settles (the job runs `run` without `--auto`). The lead decides
+and settles from the decide page, which reads the watcher's folder through the
+accounts service (`api/watcher.py`).
+
+```
+/var/lib/ticvai/cr-watch-mirror.git   refreshed from this checkout by every deploy;
+                                      root's, read-only to ticvai
+/srv/ticvai/cr-watch/
+|-- repo/         the watcher's clone of the mirror, at what was deployed
+|-- release/      its worktree at the newest release tag (made by the watcher)
+`-- out/          state.json, drafts/, REVIEW.md, runs.log, spend.jsonl
+/etc/ticvai/cr-watch.env   its credentials: 0600, owned by ticvai, never in git
+```
+
+Every deploy refreshes the mirror and the clone. The mirror is root's and sits
+outside `/srv/ticvai` (which the deploy hands to `ticvai`): root runs git in it,
+so `ticvai` must not be able to write a hook or a config line there. Root's git
+also runs with hooks, the file-system monitor and automatic gc off. A mirror an
+earlier deploy left under `/srv/ticvai/cr-watch/` is removed, and one with
+anything in it that is not root's is made again. `ticvai`'s own git config names
+the mirror as safe to read. If git refuses to read this checkout as root (it
+belongs to whoever pulled it), the deploy stops with git's words rather than
+skipping the watcher. The job starts only when the env file, Claude Code and a
+seeded `out/` are all there. Until then the deploy
+says which one is missing and the decide page answers "The watcher is not set up
+on this server."
+
+### Once, by the lead
+
+1. **Deploy once**, so `/srv/ticvai/cr-watch/` exists.
+2. **Install Claude Code** for every account, then check `ticvai` can run it:
+
+   ```
+   sudo npm install -g @anthropic-ai/claude-code
+   sudo -u ticvai -H claude --version
+   ```
+
+   It signs in with the API key from the env file. Nothing logs in interactively.
+3. **Write the env file** in an editor. Do not `echo` the values: they would
+   stay in the shell history.
+
+   ```
+   sudo install -m 600 -o ticvai -g ticvai /dev/null /etc/ticvai/cr-watch.env
+   sudo -u ticvai -H nano /etc/ticvai/cr-watch.env
+   ```
+
+   ```
+   ANTHROPIC_API_KEY=...        # the key the drafting and ask-back turns spend
+   ADAM_EMAIL=...               # the ADAM account that reads the requests and settles them
+   ADAM_PASSWORD=...
+   TICVAI_OP_TOKEN=...          # that person's OpenProject API token, for the ticket comments
+   # optional
+   CR_WATCH_DAILY_USD=50        # the day's cap: at it drafting stops, and the summary says so
+   CR_WATCH_ASK_USD=2           # one question from the phone
+   ```
+
+   Each Claude turn is started with an allowlisted environment: PATH, HOME, the
+   locale, the temporary folder, `ANTHROPIC_API_KEY` and `CLAUDE_*`, nothing
+   else. It loads no settings file and can read nothing outside the release
+   worktree (`/etc/ticvai` and the out folder are denied by name). The deploy
+   fixes the file's owner and mode if they are wrong, refuses the file if it is
+   a symbolic link or a hard link (the watcher is then not started), checks that
+   the four names are set, and never prints a value. To change a value, edit the
+   file. Each run, settle and question reads it afresh, so nothing restarts.
+4. **Stop the laptop's schedule** first. Two watchers would draft every request
+   twice and both write REVIEW.md. Then **seed** the server's folder, in one of
+   two ways:
+
+   - carry the laptop's list over. On the server first, a folder only you can
+     read (not `/tmp`, which every account on the box can list and read):
+
+     ```
+     install -d -m 700 ~/cr-watch-seed
+     ```
+
+     From the checkout on the laptop:
+
+     ```
+     scp -r audit/ticvai/cr-watch/state.json audit/ticvai/cr-watch/REVIEW.md \
+       audit/ticvai/cr-watch/drafts <server>:cr-watch-seed/
+     ```
+
+     then on the server:
+
+     ```
+     sudo cp -r ~/cr-watch-seed/. /srv/ticvai/cr-watch/out/
+     sudo chown -R ticvai:ticvai /srv/ticvai/cr-watch/out
+     rm -r ~/cr-watch-seed
+     ```
+
+   - or start fresh after every request ADAM has now:
+
+     ```
+     sudo -u ticvai -H /srv/ticvai/.venv/bin/python \
+       /srv/ticvai/cr-watch/repo/ticvai/tools/cr-watch.py run --seed \
+       --env-file /etc/ticvai/cr-watch.env --out /srv/ticvai/cr-watch/out \
+       --release-dir /srv/ticvai/cr-watch/release
+     ```
+5. **Deploy again.** The deploy now says "the watcher job runs hourly". Check it:
+
+   ```
+   sudo -u ticvai -H pm2 status                      # ticvai-cr-watch is listed
+   sudo -u ticvai -H pm2 restart ticvai-cr-watch     # run it now rather than at :07
+   sudo -u ticvai -H pm2 logs ticvai-cr-watch --lines 30
+   ```
+
+   Then open the decide page signed in as the lead. Only the lead and the System
+   Architect can read or decide there.
+
+To stop the watcher, move the env file away and deploy. The job is removed, and
+the list in `out/` stays as it was.
+
 ## Inviting a client
 
 A client is somebody outside the company: they read everything except the

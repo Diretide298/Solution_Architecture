@@ -901,6 +901,10 @@ function wireCardDrag(card, n) {
 
   card.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
+    // A finger does not move cards: arranging the sheet is the desk's job, and
+    // on a phone the canvas is view and zoom only. The touch goes on to the
+    // viewport, which pans; a tap still opens the card.
+    if (e.pointerType === 'touch') return;
     e.stopPropagation();                 // the viewport must not also pan
     from = { px: e.clientX, py: e.clientY, x: n.x, y: n.y };
     moved = 0;
@@ -1029,15 +1033,54 @@ function wireViewport() {
   let last = null;
   let moved = 0;
 
+  // Two fingers pinch. Kept apart from the one-pointer pan above it: a mouse
+  // never has a second pointer, so nothing here runs for one.
+  const fingers = new Map();
+  let pinch = null;
+  const spread = () => {
+    const [a, b] = [...fingers.values()];
+    return { d: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  };
+  vp.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch') {
+      fingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (fingers.size >= 2) {
+        pinch = spread();
+        dragging = false;
+        moved += 7;                      // a pinch is never a tap
+        return;
+      }
+    }
+  }, true);
+  vp.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'touch' || !fingers.has(e.pointerId)) return;
+    fingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (fingers.size < 2 || !pinch) return;
+    const now = spread();
+    const box = vp.getBoundingClientRect();
+    zoomBy(now.d / pinch.d, now.x - box.left, now.y - box.top);
+    state.view.x += now.x - pinch.x;
+    state.view.y += now.y - pinch.y;
+    applyView();
+    pinch = now;
+  }, true);
+  const lift = (e) => {
+    if (!fingers.delete(e.pointerId)) return;
+    if (fingers.size < 2) pinch = null;
+  };
+  vp.addEventListener('pointerup', lift, true);
+  vp.addEventListener('pointercancel', lift, true);
+
   vp.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
+    if (fingers.size >= 2) return;
     dragging = true; moved = 0;
     last = { x: e.clientX, y: e.clientY };
     vp.setPointerCapture(e.pointerId);
     vp.classList.add('is-dragging');
   });
   vp.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
+    if (!dragging || pinch) return;
     const dx = e.clientX - last.x;
     const dy = e.clientY - last.y;
     moved += Math.abs(dx) + Math.abs(dy);

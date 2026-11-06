@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- The phone app's status bar and Android's own bar take the chrome's colour. -->
+    <meta name="theme-color" content="#0b161c" />
     <script>
       // The saved day/night choice, before the stylesheets resolve. `theme.js`
       // owns this key; this is only here because a module cannot run early
@@ -21,6 +23,7 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/design-tokens.css" />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
     <link rel="stylesheet" href="/diagram-versions.css" />
@@ -36,6 +39,9 @@
     <link rel="stylesheet" href="/burst-map.css" />
     <link rel="stylesheet" href="/cicd.css" />
     <link rel="stylesheet" href="/build.css" />
+    <!-- Last, so its phone rules win over every view's own sheet. Nothing in it
+         applies above 760px. -->
+    <link rel="stylesheet" href="/viewer-phone.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <script>
       // A new browser session starts at the door.
@@ -55,8 +61,15 @@
         var asked = location.search.length > 1 || location.hash.length > 1;
         // The landing page, not the project door: every new visit starts on
         // what Adam is, and "Open workspace" there goes on to the door.
+        //
+        // Except inside the ADAM phone app. Every launch of the app is a new
+        // session, and its reader is signed in and came to work, not to be told
+        // what Adam is: the app opens on its Home tab, the same place the bottom
+        // bar's Home goes. Capacitor puts its bridge on the window before the
+        // page's own scripts run; `AdamApp` is the app's shim (PHONE-SPEC.md).
+        var inApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) || !!window.AdamApp;
         if (!seen && !asked) {
-          location.replace('/landing.html');
+          location.replace(inApp ? '/home.html' : '/landing.html');
         }
       } catch { /* storage can be denied outright; then the viewer just opens */ }
 
@@ -1127,6 +1140,7 @@
     <div class="toast" id="toast" hidden></div>
 
     <script type="module" src="/app.js"></script>
+    <script type="module" src="/viewer-phone.js"></script>
     <!-- The mascot docks itself; it reads the same alerts the bell does. -->
     <script type="module" src="/mascot.js"></script>
   </body>

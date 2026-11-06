@@ -99,6 +99,12 @@
   margin: -1px; padding: 0; overflow: hidden;
   clip-path: inset(50%); white-space: nowrap; border: 0;
 }
+/* A <table> ignores `overflow` and will not shrink to 1px, so one carrying the
+   class itself kept its full width, and on a phone that widened the layout
+   viewport past the screen (changes' twin table: 811 px on a 360 px phone, so
+   every fixed sheet and bar was drawn 811 px wide). Off the left edge it adds
+   nothing to the page's width and is still read. */
+table.sh-sr { left: -10000px; }
 
 /* ── the verdict: what the page opens on ─────────────────────────── */
 .sh-hero {
@@ -257,4 +263,153 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .sh-sheet * { transition: none !important; animation: none !important; }
+}
+
+/* ── on a phone ─────────────────────────────────────────────────────
+   The filter folds behind one button and opens as a bottom sheet; a table
+   becomes one surface of cards, each row its first cell as a title and the
+   rest as label-and-value pairs (the labels are on the cells, sheet.js), or,
+   for a table whose rows only mean something side by side, scrolls with its
+   first column held. On a desk none of this is drawn: the filter's button,
+   head and scrim are hidden and its panel is `display: contents`. */
+.sh-scope-toggle, .sh-scope-head, .sh-scope-scrim { display: none; }
+.sh-scope-panel { display: contents; }
+
+@media (max-width: 719px) {
+  .sh-scope { flex-wrap: nowrap; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border-radius: 14px; }
+  .sh-scope-toggle {
+    flex: none; display: inline-flex; align-items: center; gap: 8px;
+    min-height: 44px; padding: 0 16px 0 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--bg); color: var(--text);
+    font: 600 15px var(--sans); touch-action: manipulation;
+  }
+  .sh-scope-toggle svg { width: 20px; height: 20px; }
+  .sh-scope-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .sh-scope-count {
+    min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
+    display: inline-grid; place-items: center; font-size: 12px; font-weight: 700;
+    background: var(--accent); color: var(--ink-on-accent); font-variant-numeric: tabular-nums;
+  }
+  .sh-scope > .sh-says { flex: 1 1 auto; min-width: 0; margin: 0; font-size: 14px; line-height: 1.4; color: var(--text-dim); }
+  .sh-scope-panel { display: none; }
+
+  .sh-scope.is-open .sh-scope-scrim {
+    display: block; position: fixed; inset: 0; z-index: 40;
+    background: var(--ds-scrim);
+  }
+  .sh-scope.is-open .sh-scope-panel {
+    display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 16px;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 41;
+    max-height: 88dvh; overflow-y: auto; overscroll-behavior: contain;
+    padding: 0 calc(16px + var(--ds-safe-right)) calc(20px + var(--ds-safe-bottom)) calc(16px + var(--ds-safe-left));
+    background: var(--bg-panel); color: var(--text);
+    border-radius: 22px 22px 0 0; box-shadow: var(--ds-shadow-3);
+    animation: sh-sheet-up var(--ds-dur-normal) var(--ds-ease-sheet);
+  }
+  @keyframes sh-sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+  .sh-scope.is-open .sh-scope-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 1; margin: 0 -16px; padding: 18px 16px 12px;
+    background: var(--bg-panel); border-bottom: 1px solid var(--border);
+  }
+  .sh-scope-title { margin: 0; font-size: 20px; font-weight: 700; color: var(--text); }
+  .sh-scope-done {
+    min-height: 44px; padding: 0 22px; border: 0; border-radius: 10px; cursor: pointer;
+    background: var(--accent); color: var(--ink-on-accent); font: 600 16px var(--sans);
+  }
+  .sh-scope-done:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .sh-scope-panel .sh-field { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: var(--text-dim); }
+  .sh-scope-panel .sh-field .scope-select,
+  .sh-scope-panel .sh-field .sh-input { width: 100%; min-width: 0; max-width: none; min-height: 48px; padding: 0 12px; font-size: 16px; border-radius: 10px; }
+  .sh-scope-panel .sh-switch { display: flex; width: 100%; border-radius: 10px; }
+  .sh-scope-panel .sh-switch button { flex: 1 1 0; min-height: 44px; font-size: 15px; }
+  .sh-scope-panel .sh-field-inline { min-height: 44px; font-size: 16px; color: var(--text); white-space: normal; }
+  .sh-scope-panel .sh-clear { justify-self: start; align-self: start; margin: 0; }
+
+  /* The verdict at the top of each sheet: a little smaller, still the boldest thing. */
+  .sh-headline { font-size: 26px; }
+  .sh-ledger { gap: 12px 22px; }
+  .sh-confirm { padding: 12px; font-size: 14px; }
+  .sh-confirm .chip { min-height: 44px; }
+}
+
+@media (max-width: 599px) {
+  /* ── cards ── */
+  .sh-table-wrap.is-phone-cards { overflow: visible; }
+  .is-phone-cards > .sh-table, .is-phone-cards > .sh-table > tbody { display: block; width: 100%; }
+  .is-phone-cards > .sh-table { font-size: 15px; }
+  .is-phone-cards > .sh-table > caption { display: block; padding-bottom: 8px; font-size: 13px; }
+
+  /* The header row becomes a strip of sort choices, or goes when nothing sorts. */
+  .is-phone-cards > .sh-table > thead { display: block; }
+  .is-phone-cards > .sh-table > thead:not(:has(.sh-sort)) { display: none; }
+  .is-phone-cards > .sh-table > thead > tr {
+    display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none;
+    padding: 0 0 10px;
+  }
+  .is-phone-cards > .sh-table > thead > tr::-webkit-scrollbar { display: none; }
+  .is-phone-cards > .sh-table > thead > tr::before { content: 'Sort'; flex: none; font-size: 13px; color: var(--text-dim); }
+  .is-phone-cards > .sh-table > thead th { display: none; padding: 0; border: 0; }
+  .is-phone-cards > .sh-table > thead th:has(.sh-sort) { display: block; flex: none; }
+  .is-phone-cards > .sh-table button.sh-sort {
+    min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 999px;
+    font-size: 13px; font-weight: 600; color: var(--text-dim); background: var(--bg-panel); white-space: nowrap;
+  }
+  .is-phone-cards > .sh-table th[aria-sort] button.sh-sort { color: var(--accent-text); border-color: var(--accent); background: var(--accent-soft); }
+  .is-phone-cards > .sh-table th[aria-sort="ascending"] button.sh-sort::after { content: ' \2191'; }
+  .is-phone-cards > .sh-table th[aria-sort="descending"] button.sh-sort::after { content: ' \2193'; }
+
+  /* One surface, rows with lines between them. */
+  .is-phone-cards > .sh-table > tbody {
+    border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--bg-panel);
+  }
+  .is-phone-cards > .sh-table > tbody > tr {
+    position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px 16px; padding: 14px 16px;
+  }
+  .is-phone-cards > .sh-table > tbody > tr + tr { border-top: 1px solid var(--border); }
+  .is-phone-cards > .sh-table > tbody > tr:hover { background: none; }
+  .is-phone-cards > .sh-table > tbody > tr.is-chosen { background: var(--accent-soft); }
+  .is-phone-cards > .sh-table > tbody > tr > :is(th, td) {
+    display: block; min-width: 0; padding: 0; border: 0; text-align: left; white-space: normal; overflow-wrap: anywhere;
+  }
+  .is-phone-cards > .sh-table > tbody > tr > th { grid-column: 1 / -1; font-size: 16px; font-weight: 650; line-height: 1.35; color: var(--text); }
+  .is-phone-cards > .sh-table > tbody > tr > td::before {
+    content: attr(data-label); display: block; margin-bottom: 2px;
+    font-size: 13px; font-weight: 500; line-height: 1.3; color: var(--text-dim);
+  }
+  .is-phone-cards > .sh-table > tbody > tr > td:is([data-label=""], :not([data-label]))::before { display: none; }
+  .is-phone-cards > .sh-table > tbody > tr > td:not([data-label]) { grid-column: 1 / -1; }
+  .is-phone-cards > .sh-table > tbody > tr > td:is(:empty, .sh-cell-blank) { display: none; }
+  .is-phone-cards > .sh-table > tbody > tr > td > * { text-align: left; justify-items: start; justify-content: flex-start; }
+  .is-phone-cards > .sh-table > tbody > tr > td.sh-cell-wide,
+  .is-phone-cards > .sh-table > tbody > tr > td.sh-empty { grid-column: 1 / -1; }
+  .is-phone-cards > .sh-table > tbody > tr > td.sh-empty::before { display: none; }
+  .is-phone-cards > .sh-table > tbody > tr > td.is-late::before { content: attr(data-label) ', late'; color: var(--st-late); }
+  .is-phone-cards > .sh-table > tbody > tr > td :is(select, .scope-select) { width: 100%; max-width: none; }
+
+  /* Links in a card reach 44 px tall without moving anything: the padding is
+     the finger's, the negative margin gives the line its height back. */
+  .is-phone-cards > .sh-table > tbody a[href] { display: inline-block; padding: 11px 0; margin: -11px 0; }
+
+  /* A row that is one link opens as a whole, with a chevron to say so. */
+  .is-phone-cards > .sh-table > tbody > tr.sh-row-link { padding-right: 40px; }
+  .is-phone-cards > .sh-table > tbody > tr.sh-row-link a[href]::after { content: ''; position: absolute; inset: 0; }
+  .is-phone-cards > .sh-table > tbody > tr.sh-row-link::after {
+    content: ''; position: absolute; right: 18px; top: 50%; width: 9px; height: 9px;
+    border-top: 2px solid var(--text-faint); border-right: 2px solid var(--text-faint);
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .is-phone-cards > .sh-table > tbody > tr.sh-row-link:active { background: var(--bg-hover); }
+
+  /* ── a matrix: scroll, first column held ── */
+  .is-phone-scroll { border: 1px solid var(--border); border-radius: 14px; background: var(--bg-panel); }
+  .is-phone-scroll > .sh-table { font-size: 14px; }
+  .is-phone-scroll > .sh-table :is(thead th:first-child, tbody th) {
+    position: sticky; left: 0; z-index: 1; background: var(--bg-panel);
+    box-shadow: 1px 0 0 var(--border);
+  }
+}
+@media (max-width: 719px) and (prefers-reduced-motion: reduce) {
+  .sh-scope.is-open .sh-scope-panel { animation: none; }
 }

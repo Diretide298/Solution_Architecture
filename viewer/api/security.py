@@ -137,6 +137,12 @@ SETTLERS = ("owner", "admin", "lead", "reviewer")
 # every ticket in the project is not what reviewing the package is.
 READERS = ("owner", "admin", "pm")
 
+# Who decides what the change-request watcher drafted (viewer/api/watcher.py, ADAM on the phone, 4 November 2026):
+# the lead, and the owner above them. Narrower than SETTLERS on purpose: the watcher's marks are the lead's own
+# REVIEW.md, written "the exact way we do here", and an admin or a reviewer deciding there would be deciding as the
+# lead. The device token a phone keeps for its background check is not a role and reads the summary only.
+DECIDERS = ("owner", "lead")
+
 # Who a platform can be handed to. A scope row for anybody else is meaningless
 # rather than harmful, and refusing it early is how it stays that way.
 SCOPED = ("lead", "dev")

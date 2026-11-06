@@ -169,9 +169,51 @@ export function mountScope({ root, fields, says, onChange }) {
   const clear = el('button', 'chip sh-clear', 'Show everything');
   clear.type = 'button';
 
+  // On a phone the fields fold behind one Filter button and open as a bottom
+  // sheet (sheet.css); the sentence saying what is shown stays in view. On a
+  // desk the button, the sheet's head and its scrim are not drawn and the panel
+  // is `display: contents`, so the bar lays out exactly as it did.
+  const toggle = el('button', 'sh-scope-toggle');
+  toggle.type = 'button';
+  toggle.setAttribute('aria-expanded', 'false');
+  const panel = el('div', 'sh-scope-panel');
+  panel.id = `sh-scope-${Math.random().toString(36).slice(2, 8)}`;
+  toggle.setAttribute('aria-controls', panel.id);
+  const head = el('div', 'sh-scope-head');
+  const done = el('button', 'sh-scope-done', 'Done');
+  done.type = 'button';
+  head.append(el('h2', 'sh-scope-title', 'Filter'), done);
+  const scrim = el('div', 'sh-scope-scrim');
+  const isOpen = () => root.classList.contains('is-open');
+  const setOpen = (open) => {
+    root.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    if (open) {
+      panel.setAttribute('role', 'dialog');
+      panel.setAttribute('aria-modal', 'true');
+      panel.setAttribute('aria-label', 'Filter');
+      panel.querySelector('select, input, .sh-switch button')?.focus();
+    } else {
+      for (const a of ['role', 'aria-modal', 'aria-label']) panel.removeAttribute(a);
+    }
+  };
+  toggle.onclick = () => setOpen(true);
+  done.onclick = () => { setOpen(false); toggle.focus(); };
+  scrim.onclick = () => setOpen(false);
+  root.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen()) { e.preventDefault(); setOpen(false); toggle.focus(); }
+  });
+  const paintToggle = () => {
+    const n = fields.filter((f) => !!state[f.key] && !f.sticky).length;
+    toggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4" /></svg><span>Filter</span>';
+    if (n) toggle.append(el('span', 'sh-scope-count', n));
+    toggle.setAttribute('aria-label', n ? `Filter, ${n} on` : 'Filter');
+  };
+
   const controls = new Map();
   const draw = () => {
-    root.replaceChildren();
+    root.replaceChildren(toggle, panel, scrim);
+    panel.replaceChildren(head);
     for (const f of fields) {
       const options = typeof f.options === 'function' ? f.options() : (f.options ?? []);
       if (f.kind === 'switch') {
@@ -190,7 +232,7 @@ export function mountScope({ root, fields, says, onChange }) {
           group.append(b);
         }
         wrap.append(label, group);
-        root.append(wrap);
+        panel.append(wrap);
         controls.set(f.key, group);
       } else if (f.kind === 'search') {
         const label = el('label', 'sh-field');
@@ -201,7 +243,7 @@ export function mountScope({ root, fields, says, onChange }) {
         let t;
         input.oninput = () => { clearTimeout(t); t = setTimeout(() => change(f.key, input.value.trim(), true), 180); };
         label.append(el('span', '', f.label), input);
-        root.append(label);
+        panel.append(label);
         controls.set(f.key, input);
       } else if (f.kind === 'check') {
         const label = el('label', 'sh-field-inline');
@@ -210,7 +252,7 @@ export function mountScope({ root, fields, says, onChange }) {
         input.checked = !!state[f.key];
         input.onchange = () => change(f.key, input.checked);
         label.append(input, f.label);
-        root.append(label);
+        panel.append(label);
         controls.set(f.key, input);
       } else {
         const label = el('label', 'sh-field');
@@ -221,14 +263,16 @@ export function mountScope({ root, fields, says, onChange }) {
         if (select.value !== state[f.key]) { state[f.key] = ''; select.value = ''; }
         select.onchange = () => change(f.key, select.value);
         label.append(el('span', '', f.label), select);
-        root.append(label);
+        panel.append(label);
         controls.set(f.key, select);
       }
     }
-    root.append(clear, saysLine);
+    panel.append(clear);
+    root.append(saysLine);
     const any = fields.some((f) => !!state[f.key] && !f.sticky);
     clear.hidden = !any;
     saysLine.textContent = says ? says(state) : '';
+    paintToggle();
   };
 
   const change = (key, value, keepFocus = false) => {
@@ -239,7 +283,15 @@ export function mountScope({ root, fields, says, onChange }) {
       const any = fields.some((f) => !!state[f.key] && !f.sticky);
       clear.hidden = !any;
       saysLine.textContent = says ? says(state) : '';
-    } else draw();
+      paintToggle();
+    } else {
+      draw();
+      // In the phone's sheet the redraw would drop focus to the page under it.
+      if (isOpen()) {
+        const c = controls.get(key);
+        (c?.matches?.('.sh-switch') ? c.querySelector('[aria-pressed="true"]') : c)?.focus();
+      }
+    }
     onChange?.(state);
   };
 
@@ -305,8 +357,11 @@ export function stack(parts, hero = false) {
  *
  * @returns {HTMLElement} the wrapper; `.redraw(rows)` replaces the rows.
  */
-export function table({ caption, columns, rows, empty = 'Nothing here.', srOnly = false, rowClass, sortBy }) {
+export function table({ caption, columns, rows, empty = 'Nothing here.', srOnly = false, rowClass, sortBy, phone = 'cards' }) {
   const wrap = el('div', srOnly ? 'sh-sr' : 'sh-table-wrap');
+  // On a phone a table is cards unless its rows only mean something side by
+  // side (a matrix): then it scrolls with its first column held (`phone: 'scroll'`).
+  if (!srOnly) wrap.classList.add(phone === 'scroll' ? 'is-phone-scroll' : 'is-phone-cards');
   const t = el('table', 'sh-table');
   if (caption) t.append(el('caption', '', caption));
   const thead = el('thead');
@@ -368,12 +423,39 @@ export function table({ caption, columns, rows, empty = 'Nothing here.', srOnly 
         else cell.textContent = typeof v === 'number' ? fmt(v) : (v ?? '');
         tr.append(cell);
       });
+      cardRow(tr, columns.map((c) => c.label));
       tbody.append(tr);
     }
   };
   body(current);
   wrap.redraw = body;
   return wrap;
+}
+
+/**
+ * Ready a table row to be drawn as a card on a phone (sheet.css, inside a
+ * wrapper with `is-phone-cards`): each cell carries its column's name, a long
+ * value or a control takes the card's whole width, and a row whose one control
+ * is a link opens as a whole. Attributes and classes only; on a desk the row is
+ * the row it was. For the pages that draw their own tables beside `table()`.
+ *
+ * @param {HTMLTableRowElement} tr
+ * @param {string[]} labels the column names, in cell order
+ */
+export function cardRow(tr, labels) {
+  [...tr.cells].forEach((cell, i) => {
+    cell.dataset.label = labels[i] ?? '';
+    // Nothing to say (an empty span, a blank): the card leaves the pair out.
+    if (i > 0 && !cell.textContent.trim() && !cell.querySelector('img, svg, select, input, textarea, button')) {
+      cell.classList.add('sh-cell-blank');
+    }
+    if (i > 0 && (cell.textContent.trim().length > 24 || cell.querySelector('select, textarea, input, button'))) {
+      cell.classList.add('sh-cell-wide');
+    }
+  });
+  const reach = tr.querySelectorAll('a[href], button, select, input, textarea');
+  if (reach.length === 1 && reach[0].matches('a[href]')) tr.classList.add('sh-row-link');
+  return tr;
 }
 
 // ── a second press ──────────────────────────────────────────────────

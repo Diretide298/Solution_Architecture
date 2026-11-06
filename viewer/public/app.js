@@ -44,6 +44,53 @@ let graphGalaxy; // the Spine, Schemas and Permissions scopes of the contract gr
 let lineageGalaxy; // services against the tables they touch
 let appsGalaxy;  // the apps against the contracts their screens call
 
+/**
+ * The galaxies on a phone: what the tap picked, and a button that opens it.
+ *
+ * On a desk a single click pins a body and says what it is in the toolbar's
+ * hint line, and a double click opens it. A finger has neither: the hint line
+ * is hidden below 1180px for want of room, and a double tap is not something a
+ * galaxy reads (galaxy.js turns a tap into one `onSelect`). So on a phone the
+ * tap that pins a body also raises this card over the bottom of the view: the
+ * body's name, the sentence the hint line would have said, and the open action
+ * as a button. Tapping the body again, empty space, or the close button puts it
+ * away.
+ *
+ * Drawn at every width and shown only by viewer-phone.css (a phone, or any
+ * screen whose pointer is a finger), so a desk is exactly as it was.
+ */
+function galaxyFocus(viewId, galaxy, hub, says, open) {
+  const view = $(viewId);
+  if (!view) return;
+  let card = view.querySelector(':scope > .galaxy-focus');
+  if (!galaxy.selectedId || !hub) { card?.remove(); return; }
+  if (!card) {
+    card = el('div', 'galaxy-focus');
+    card.setAttribute('role', 'status');
+    view.append(card);
+  }
+  card.replaceChildren();
+  const text = el('div', 'galaxy-focus-text');
+  text.append(el('b', 'galaxy-focus-name', String(hub.full ?? hub.name ?? hub.id)));
+  if (says) text.append(el('span', 'galaxy-focus-says', says));
+  card.append(text);
+  const actions = el('div', 'galaxy-focus-actions');
+  if (open) {
+    const go = el('button', 'galaxy-focus-open', open.label);
+    go.type = 'button';
+    go.onclick = () => { card.remove(); open.run(); };
+    actions.append(go);
+  }
+  const shut = el('button', 'galaxy-focus-close');
+  shut.type = 'button';
+  shut.setAttribute('aria-label', 'Put it away');
+  shut.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  shut.onclick = () => { galaxy.setSelected(null); card.remove(); };
+  actions.append(shut);
+  card.append(actions);
+}
+const galaxyUnfocus = (viewId) => $(viewId)?.querySelector(':scope > .galaxy-focus')?.remove();
+
 async function boot() {
   // The four reads the first drawing needs, asked for before anything else —
   // beside the sign-in check below rather than after it (13 October). See
@@ -79,6 +126,8 @@ async function boot() {
         servicesGalaxy.setSelected(hub.id === servicesGalaxy.selectedId ? null : hub.id);
         selectService(hub.key);
         $('services-graph-hint').textContent = describeServiceHub(hub);
+        galaxyFocus('view-services-graph', servicesGalaxy, hub, describeServiceHub(hub),
+          { label: 'Open the service', run: () => servicesGalaxy.onSelect(hub, { open: true }) });
         return;
       }
       // Fly into it rather than cut: the field and the service page are the
@@ -88,6 +137,7 @@ async function boot() {
     onHover: (hub) => {
       $('services-graph-hint').textContent = hub ? describeServiceHub(hub) : servicesGalaxySummary;
     },
+    onEmpty: () => galaxyUnfocus('view-services-graph'),
   });
 
   // The third box diagram: the same renderer again, with services as the
@@ -120,6 +170,10 @@ async function boot() {
       if (!open) {
         eventGalaxy.setSelected(hub.id === eventGalaxy.selectedId ? null : hub.id);
         $('events-hint').textContent = describeContext(hub);
+        galaxyFocus('view-events', eventGalaxy, hub, describeContext(hub),
+          hub.context?.contract && state.nodesById.has(`file:${hub.context.contract}`)
+            ? { label: 'Read its contract', run: () => eventGalaxy.onSelect(hub, { open: true }) }
+            : null);
         return;
       }
       const node = hub.context?.contract
@@ -131,6 +185,7 @@ async function boot() {
     onHover: (hub) => {
       $('events-hint').textContent = hub ? describeContext(hub) : eventGalaxySummary;
     },
+    onEmpty: () => galaxyUnfocus('view-events'),
   });
 
   // The database as bodies rather than boxes. Clicking drills: a schema opens
@@ -140,6 +195,10 @@ async function boot() {
       if (!open) {
         dataGalaxy.setSelected(hub.id === dataGalaxy.selectedId ? null : hub.id);
         $('data-hint').textContent = describeDataHub(hub);
+        galaxyFocus('view-data', dataGalaxy, hub, describeDataHub(hub),
+          hub.module || hub.table
+            ? { label: hub.module ? 'Open the schema' : 'Open the table', run: () => dataGalaxy.onSelect(hub, { open: true }) }
+            : null);
         return;
       }
       // Fly into it. The two pictures are the same claim at different
@@ -152,6 +211,7 @@ async function boot() {
     onHover: (hub) => {
       $('data-hint').textContent = hub ? describeDataHub(hub) : dataGalaxySummary;
     },
+    onEmpty: () => galaxyUnfocus('view-data'),
   });
 
   // Two of the five graph scopes are the ones a force simulation cannot hold:
@@ -162,6 +222,10 @@ async function boot() {
       if (!open) {
         graphGalaxy.setSelected(hub.id === graphGalaxy.selectedId ? null : hub.id);
         $('graph-hint').textContent = describeGraphHub(hub);
+        galaxyFocus('view-graph', graphGalaxy, hub, describeGraphHub(hub),
+          state.nodesById.has(hub.id)
+            ? { label: 'Read it', run: () => graphGalaxy.onSelect(hub, { open: true }) }
+            : null);
         return;
       }
       if (state.nodesById.has(hub.id)) { select(hub.id); setMode('reader'); }
@@ -170,6 +234,7 @@ async function boot() {
     onHover: (hub) => {
       $('graph-hint').textContent = hub ? describeGraphHub(hub) : graphGalaxySummary;
     },
+    onEmpty: () => galaxyUnfocus('view-graph'),
   });
 
   // The one join the package cannot derive for itself, drawn as a join.
@@ -178,6 +243,10 @@ async function boot() {
       if (!open) {
         appsGalaxy.setSelected(hub.id === appsGalaxy.selectedId ? null : hub.id);
         $('apps-hint').textContent = describeAppsHub(hub);
+        galaxyFocus('view-apps', appsGalaxy, hub, describeAppsHub(hub),
+          hub.contractFile
+            ? { label: 'Show what links to it', run: () => { appsGalaxy.onSelect(hub, { open: true }); setDrawer('right'); } }
+            : null);
         return;
       }
       // A contract is a node the rest of the viewer knows about; an app is not,
@@ -188,6 +257,7 @@ async function boot() {
     onHover: (hub) => {
       $('apps-hint').textContent = hub ? describeAppsHub(hub) : appsGalaxySummary;
     },
+    onEmpty: () => galaxyUnfocus('view-apps'),
   });
 
   lineageGalaxy = new Galaxy($('lineage-galaxy'), {
@@ -195,6 +265,8 @@ async function boot() {
       if (!open) {
         lineageGalaxy.setSelected(hub.id === lineageGalaxy.selectedId ? null : hub.id);
         $('lineage-hint').textContent = describeLineageHub(hub);
+        galaxyFocus('view-lineage', lineageGalaxy, hub, describeLineageHub(hub),
+          hub.table ? { label: 'Open the table', run: () => lineageGalaxy.onSelect(hub, { open: true }) } : null);
         return;
       }
       if (hub.table) selectTable(hub.table);
@@ -203,6 +275,7 @@ async function boot() {
     onHover: (hub) => {
       $('lineage-hint').textContent = hub ? describeLineageHub(hub) : lineageGalaxySummary;
     },
+    onEmpty: () => galaxyUnfocus('view-lineage'),
   });
 
   tree = new StructureTree($('struct-canvas'), {
@@ -1438,6 +1511,8 @@ export function setMode(mode) {
   // whatever asked for this view — a mode button, a tree row, a search hit —
   // the point was to look at it, so nothing may be left covering it
   setDrawer(null);
+  // and a galaxy's focus card (phone only) belongs to the picture it was raised on
+  for (const card of document.querySelectorAll('.galaxy-focus')) card.remove();
   for (const view of VIEWS) $(`view-${view}`).hidden = view !== mode;
   for (const button of $('modes').querySelectorAll('.mode')) {
     button.classList.toggle('active', button.dataset.mode === mode);

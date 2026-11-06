@@ -168,6 +168,22 @@ const ZOOM_STEP = 0.0014;       // per wheel pixel
 const ZOOM_MIN = 0.35;
 const ZOOM_MAX = 8;
 
+// A finger. It is wider than a cursor and it wobbles, so a tap is anything that
+// moved less than TAP_SLOP and lifted inside TAP_MS, and the smallest thing it
+// can hit is 44px across (TOUCH_HIT is a radius). A drag that is let go while
+// still moving carries on and slows to a stop over about FLING_TAU seconds,
+// which is what a thumb expects of anything it has thrown.
+const TAP_SLOP = 10;
+const TAP_MS = 500;
+const TOUCH_HIT = 22;
+const VIEW_HIT_TOUCH = 24;
+const FLING_TAU = 0.32;
+const FLING_STOP = 0.02;        // px per ms: below this it has stopped
+const FLING_FRESH = 80;         // ms: a finger that rested this long before lifting threw nothing
+// The browser follows a tap that is handled here with a click of its own, and
+// that click must not be read a second time as a mouse click.
+const TOUCH_CLICK_MS = 700;
+
 // Where a cluster stops being a quantity and starts being a list. Below this a
 // mote is anonymous, which is the point of it; above it, the ones that have
 // names get them — nearest first, and never more than will fit being read.
@@ -950,7 +966,8 @@ export class Galaxy {
     if (this._yaw == null) this._yaw = STILL_T * rate;
     // Not while the reader is holding it. A scene that keeps turning under a
     // pointer trying to aim at it is fighting them.
-    if (!still && !this._drag?.active) this._yaw += dt * rate;
+    // A finger on it counts as holding it, the same as a mouse button.
+    if (!still && !this._drag?.active && !this._touching) this._yaw += dt * rate;
 
     const yaw = this._yaw + this.spin.yaw;
     const nod = this.camera
@@ -1365,10 +1382,10 @@ export class Galaxy {
     return out;
   }
 
-  /** The view node under a point, or null. */
-  viewAt(sx, sy) {
+  /** The view node under a point, or null. `hit` is wider for a finger. */
+  viewAt(sx, sy, hit = VIEW_HIT) {
     for (const entry of this._views ?? []) {
-      if (Math.hypot(entry.sx - sx, entry.sy - sy) < VIEW_HIT) return entry;
+      if (Math.hypot(entry.sx - sx, entry.sy - sy) < hit) return entry;
     }
     return null;
   }
@@ -1795,12 +1812,12 @@ export class Galaxy {
    * pixels across at the back of the sphere, and a hit radius of "the dot" makes
    * them unclickable exactly when a reader has finally spotted one.
    */
-  hubAt(sx, sy) {
+  hubAt(sx, sy, floor = this.camera ? 46 : 14) {
     let best = null;
     let bestD = Infinity;
     for (const entry of this._screen) {
       const d = Math.hypot(entry.sx - sx, entry.sy - sy);
-      const hit = Math.max(this.camera ? 46 : 14, entry.r * 1.25);
+      const hit = Math.max(floor, entry.r * 1.25);
       if (d < hit && d < bestD) { best = entry.hub; bestD = d; }
     }
     return best;
@@ -1814,8 +1831,12 @@ export class Galaxy {
     };
 
     // ---- turning it ---------------------------------------------------
+    // The mouse handlers ignore the mouse events a browser makes up from a
+    // touch: the touch handlers below have already answered it, and a made-up
+    // mousemove would leave a hover (on a view mark, say) that a finger never
+    // asked for, so the next tap would open it.
     canvas.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
+      if (e.button !== 0 || this.recentTouch()) return;
       this._drag = { x: e.clientX, y: e.clientY, active: true, moved: 0 };
       canvas.style.cursor = 'grabbing';
     });
@@ -1865,7 +1886,7 @@ export class Galaxy {
     }, { passive: false });
 
     canvas.addEventListener('mousemove', (e) => {
-      if (this._drag?.active) return;
+      if (this._drag?.active || this.recentTouch()) return;
       const over = this.viewAt(...at(e));
       const wasView = this.hoverView;
       this.hoverView = over?.view.id ?? null;
@@ -1887,7 +1908,7 @@ export class Galaxy {
     });
 
     canvas.addEventListener('mouseleave', () => {
-      if (!this.hover) return;
+      if (!this.hover || this.recentTouch()) return;
       this.hover = null;
       this.onHover(null);
       if (this._still()) this.draw();
@@ -1895,6 +1916,8 @@ export class Galaxy {
 
     canvas.addEventListener('click', (e) => {
       if (this._swallowClick) { this._swallowClick = false; return; }
+      // A tap, already answered by the touch handlers below.
+      if (this.recentTouch()) return;
       // Before the hubs: a view node sits on top of whatever it overlaps, and
       // the ring is drawn over the body it belongs to.
       const view = this.viewAt(...at(e));
@@ -1905,13 +1928,177 @@ export class Galaxy {
     });
 
     canvas.addEventListener('dblclick', (e) => {
+      if (this.recentTouch()) return;
       const hub = this.hubAt(...at(e));
       if (hub) this.onSelect(hub, { open: true });
     });
 
-    // A tap is a click on every browser here, so touch needs nothing of its
-    // own — there is no pan or pinch to conflict with, because the scene has no
-    // camera the reader controls.
+    this._bindTouch(at);
+  }
+
+  // ── touch ───────────────────────────────────────────────────────
+  /**
+   * Fingers, through pointer events of type `touch`. The mouse keeps the
+   * handlers above, untouched: nothing here reads a mouse or a pen.
+   *
+   *   one finger drags to turn, at the mouse's rates, and a drag let go while
+   *   moving keeps turning and slows to a stop;
+   *   two fingers pinch to zoom, held to the wheel's stops;
+   *   a tap is a click: a body is selected (`onSelect`), nothing is `onEmpty`.
+   *   A view mark round a focused body is named by the first tap (a finger
+   *   has no hover to name it) and opened by the second.
+   *
+   * Which gestures reach this at all is the page's choice, through CSS
+   * `touch-action` on the canvas: `none` hands it every gesture, `pan-y` keeps
+   * a vertical swipe for scrolling the page (the browser then cancels the
+   * pointer, which is not read as a tap).
+   */
+  _bindTouch(at) {
+    const canvas = this.canvas;
+    const fingers = new Map();   // pointerId -> { x, y }
+    let gesture = null;
+    const apart = () => {
+      const [a, b] = [...fingers.values()];
+      return Math.max(1, Math.hypot(a.x - b.x, a.y - b.y));
+    };
+    const pinchFrom = () => (fingers.size >= 2 ? { d0: apart(), z0: this.zoom } : null);
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch') return;
+      // Stops the mousedown and mouseup the browser would send after it, which
+      // would run the mouse drag above a second time. The click still comes,
+      // and `recentTouch` turns it away.
+      e.preventDefault();
+      fingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      this._fling = null;
+      this._touching = true;
+      const now = performance.now();
+      if (fingers.size === 1) {
+        gesture = {
+          tap: true, t0: now, x0: e.clientX, y0: e.clientY, pinch: null, vx: 0, vy: 0, at: now,
+          // Which way the drag is going, once it has gone far enough to say.
+          // Where the page keeps vertical swipes for itself (`pan-y`), one
+          // that starts vertical is a scroll, and turning the scene by the few
+          // pixels before the browser takes it would tilt it on every scroll.
+          axis: null,
+          panY: getComputedStyle(canvas).touchAction.includes('pan-y'),
+        };
+      } else if (gesture) {
+        gesture.tap = false;
+        gesture.pinch = pinchFrom();
+      }
+      this.start();
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'touch' || !gesture || !fingers.has(e.pointerId)) return;
+      const travel = Math.hypot(e.clientX - gesture.x0, e.clientY - gesture.y0);
+      if (travel > TAP_SLOP) gesture.tap = false;
+      // A single finger inside the slop has not chosen a direction yet: it is
+      // held where it went down, so the first move that counts carries the
+      // whole way from there and nothing is lost to the wait.
+      if (!gesture.axis && !gesture.pinch && fingers.size === 1) {
+        if (travel <= TAP_SLOP) return;
+        gesture.axis = Math.abs(e.clientX - gesture.x0) >= Math.abs(e.clientY - gesture.y0) ? 'x' : 'y';
+      }
+      const was = fingers.get(e.pointerId);
+      const dx = e.clientX - was.x;
+      const dy = e.clientY - was.y;
+      fingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (gesture.panY && gesture.axis === 'y' && !gesture.pinch) return;
+
+      if (gesture.pinch && fingers.size >= 2) {
+        // Exponential like the wheel, so the same spread back undoes it.
+        const next = gesture.pinch.z0 * (apart() / gesture.pinch.d0);
+        this.zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, next));
+        this.onZoom(this.zoom);
+      } else if (fingers.size === 1) {
+        // Same signs and rates as the mouse drag; see the note there.
+        this.spin.yaw -= dx * DRAG_YAW;
+        this.spin.pitch += dy * DRAG_PITCH;
+        const now = performance.now();
+        const span = Math.max(1, now - gesture.at);
+        // Smoothed, so one jittery sample at the end does not decide the throw.
+        gesture.vx = 0.7 * (dx / span) + 0.3 * gesture.vx;
+        gesture.vy = 0.7 * (dy / span) + 0.3 * gesture.vy;
+        gesture.at = now;
+      }
+      this.start();
+      if (this._still()) this.draw();
+    });
+
+    const end = (e) => {
+      if (e.pointerType !== 'touch' || !fingers.has(e.pointerId)) return;
+      fingers.delete(e.pointerId);
+      // A pinch that loses a finger carries on as a drag from where the other
+      // finger is, and one that gains a finger back starts a fresh pinch.
+      if (gesture) gesture.pinch = pinchFrom();
+      if (fingers.size) return;
+      const done = gesture;
+      gesture = null;
+      this._touching = false;
+      this._touchEnd = performance.now();
+      // Cancelled is the browser taking the gesture (a scroll): not a tap and
+      // not a throw.
+      if (!done || e.type === 'pointercancel') { this.start(); return; }
+      if (done.tap && this._touchEnd - done.t0 < TAP_MS) {
+        this._tap(...at(e));
+        return;
+      }
+      const fresh = this._touchEnd - done.at < FLING_FRESH;
+      if (fresh && !this._still() && Math.hypot(done.vx, done.vy) > FLING_STOP * 4) {
+        this._throw(done.vx, done.vy);
+      }
+      this.start();
+    };
+    canvas.addEventListener('pointerup', end);
+    canvas.addEventListener('pointercancel', end);
+  }
+
+  /** A tap at a point on the canvas: what a click does, with a finger's reach. */
+  _tap(x, y) {
+    const view = this.viewAt(x, y, VIEW_HIT_TOUCH);
+    if (view) {
+      if (this.hoverView === view.view.id) { this.onView(view.hub, view.view); return; }
+      this.hoverView = view.view.id;
+      this.start();
+      this.draw();
+      return;
+    }
+    if (this.hoverView) this.hoverView = null;
+    const hub = this.hubAt(x, y, Math.max(this.camera ? 46 : 14, TOUCH_HIT));
+    if (hub) this.onSelect(hub, { open: false });
+    else this.onEmpty();
+  }
+
+  /** Keep turning after a drag is let go, slowing to a stop. */
+  _throw(vx, vy) {
+    const fling = { vx, vy, at: performance.now() };
+    this._fling = fling;
+    const step = (now) => {
+      if (this._fling !== fling) return;   // a new touch, or another throw
+      const dt = Math.min(48, now - fling.at);
+      fling.at = now;
+      this.spin.yaw -= fling.vx * dt * DRAG_YAW;
+      this.spin.pitch += fling.vy * dt * DRAG_PITCH;
+      const decay = Math.exp(-dt / (FLING_TAU * 1000));
+      fling.vx *= decay;
+      fling.vy *= decay;
+      if (Math.hypot(fling.vx, fling.vy) < FLING_STOP) { this._fling = null; return; }
+      this.start();
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  /** Whether a finger is on the scene or a throw is still turning it. */
+  gesturing() {
+    return Boolean(this._touching || this._fling);
+  }
+
+  /** Whether a touch ended a moment ago, so the click that follows it is not a mouse's. */
+  recentTouch() {
+    return performance.now() - (this._touchEnd ?? -Infinity) < TOUCH_CLICK_MS;
   }
 }
 

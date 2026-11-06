@@ -108,3 +108,103 @@
   }
   .ip-when { white-space: normal; }
 }
+
+/* Why Switch on is greyed out, in words. The desktop has the tooltip; only a
+   phone, with no hover, shows this (below). */
+.ip-arm-why { display: none; }
+
+/* ── a phone ───────────────────────────────────────────────────────────
+   Below 720px (DESIGN-SYSTEM.md: a phone), with the design system's tokens.
+   Every control is a thumb's width (44px, 48px for fields), the fields run the
+   width of the card, text that is read is 14px or more, and each table row
+   becomes a small stack: who or what on the first line with its verdict on
+   the right, then the rest underneath, so nothing is squeezed into a column a
+   few characters wide. Desktop is untouched above this. */
+@media (max-width: 719px) {
+  #ips .admin-heading { font-size: var(--ds-text-lg); line-height: var(--ds-leading-tight); text-wrap: balance; }
+  #ips .admin-count { font-size: var(--ds-text-sm); font-variant-numeric: tabular-nums; }
+  #ips .set-lede { font-size: var(--ds-text-md); line-height: var(--ds-leading-body); text-wrap: pretty; }
+  #ips .auth-fine { font-size: var(--ds-text-sm); line-height: var(--ds-leading-body); color: var(--ds-ink-2); }
+
+  /* Status: the facts as label and value side by side, not a browser's
+     default indented list. */
+  .ip-state { padding: var(--ds-space-4); border-radius: var(--ds-radius-sm); }
+  .ip-headline-text { font-size: var(--ds-text-md); }
+  .ip-state .set-facts {
+    display: grid; grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--ds-space-2) var(--ds-space-4); margin: var(--ds-space-4) 0 0;
+    font-size: var(--ds-text-sm);
+  }
+  .ip-state .set-facts dt { color: var(--ds-ink-2); }
+  .ip-state .set-facts dd {
+    margin: 0; color: var(--ds-ink); font-weight: var(--ds-weight-semibold);
+    text-align: right; overflow-wrap: anywhere; font-variant-numeric: tabular-nums;
+  }
+  .ip-override { font-size: var(--ds-text-sm); }
+
+  /* Fields: full width, 48px, 16px text (no zoom on focus), a visible edge. */
+  #ips input[type="text"], #ips input[type="search"] {
+    box-sizing: border-box; width: 100%; min-height: var(--ds-touch-comfy); margin: 0;
+    padding: 0 var(--ds-space-3); font-size: var(--ds-text-md);
+    border: 1px solid var(--ds-line-control); border-radius: var(--ds-radius-sm);
+    background: var(--ds-surface); color: var(--ds-ink);
+  }
+  #ips input:focus-visible { outline: 3px solid var(--ds-focus); outline-offset: 0; border-color: var(--ds-focus); }
+  #ip-cidr { font-family: var(--ds-font-mono); }
+
+  /* Buttons in this page's own forms and rows. */
+  #ips .set-actions .chip, #ips .ip-add .chip, #ips .ip-row .chip {
+    min-height: var(--ds-touch-min); padding: 0 var(--ds-space-4);
+    border-radius: var(--ds-radius-sm); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold);
+    color: var(--ds-ink); border-color: var(--ds-line-control); background: var(--ds-surface-2);
+    touch-action: manipulation;
+    transition-property: transform, background-color; transition-duration: var(--ds-dur-fast);
+  }
+  #ips .chip:active:not(:disabled) { transform: scale(var(--ds-press-scale)); background: var(--ds-surface-press); }
+  #ips .chip:disabled { opacity: 0.45; }
+  #ips .set-actions { gap: var(--ds-touch-gap); }
+
+  /* Switching on: the typed word, then the button, each the full width. */
+  .ip-confirm { display: grid; gap: var(--ds-space-2); width: 100%; font-size: var(--ds-text-sm); color: var(--ds-ink); }
+  .ip-confirm[hidden] { display: none; }
+  .ip-confirm input { width: 100%; }
+  #ip-arm, #ip-disarm { flex: 1 1 100%; min-height: var(--ds-touch-comfy); }
+  #ips #ip-arm:not(:disabled) { background: var(--ds-accent-fill); color: var(--ds-accent-on); border-color: transparent; }
+  .ip-arm-why { display: block; flex: 1 1 100%; margin: 0; font-size: var(--ds-text-sm); color: var(--ds-ink-2); }
+  .ip-arm-why[hidden] { display: none; }
+
+  /* Adding a network: address, label, then the two ways to allow. */
+  .ip-add { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ds-touch-gap); margin-bottom: var(--ds-space-3); }
+  .ip-add input { grid-column: 1 / -1; }
+  .ip-add .chip { min-height: var(--ds-touch-comfy); }
+  #ips .ip-add .chip[type="submit"] { background: var(--ds-accent-fill); color: var(--ds-accent-on); border-color: transparent; }
+
+  /* The log's filter, and the one checkbox as a full-height row. */
+  .ip-filter { flex: 1 1 100%; }
+  .ip-only {
+    display: flex; gap: var(--ds-space-3); align-items: center;
+    min-height: var(--ds-touch-min); width: 100%; font-size: var(--ds-text-sm); color: var(--ds-ink);
+  }
+  .ip-only input { width: 22px; height: 22px; margin: 0; flex: none; accent-color: var(--ds-accent-fill); }
+
+  /* Rows: a stack, the verdict or the action pinned to the first line. */
+  .ip-row.admin-row,
+  #ip-rules .ip-row.admin-row,
+  #ip-seen .ip-row.admin-row,
+  #ip-refused .ip-row.admin-row,
+  #ip-dry .ip-row.admin-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-auto-flow: row dense;
+    gap: var(--ds-space-1) var(--ds-space-3); align-items: start;
+    padding: var(--ds-space-3) 0; font-size: var(--ds-text-sm); line-height: var(--ds-leading-snug);
+  }
+  .ip-row.admin-row > * { grid-column: 1 / -1; min-width: 0; }
+  .ip-row.admin-row > :first-child { grid-column: 1; grid-row: 1; font-size: var(--ds-text-md); font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
+  .ip-row.admin-row > .ip-verdict,
+  .ip-row.admin-row > button { grid-column: 2; grid-row: 1; align-self: start; }
+  .ip-row-uncovered, .ip-row-bad, .ip-row-unknown { padding-left: var(--ds-space-3) !important; }
+  .ip-cidr { font-size: var(--ds-text-sm); }
+  .ip-when, .ip-where, .ip-label { white-space: normal; color: var(--ds-ink-2); }
+  .ip-verdict { font-size: var(--ds-text-xs); font-weight: var(--ds-weight-semibold); padding: 2px var(--ds-space-2); }
+  .ip-here { font-size: var(--ds-text-xs); }
+}

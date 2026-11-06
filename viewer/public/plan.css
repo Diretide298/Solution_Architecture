@@ -186,3 +186,225 @@ a.pl-name-text:hover { color: var(--accent); text-decoration: underline; }
   .pl-name-count { display: none; }
   .pl-dialog-list .admin-row { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ── a bar's dates (phone) ────────────────────────────────────────────
+   Built on design-tokens.css. Only a phone opens it: below 720px tapping a
+   bar shows its dates here rather than picking it up. */
+.pl-phone-lede, .pl-phone-note, .pl-refresh-phone { display: none; }
+.pl-toolbar[hidden], .pl-chart-panel[hidden], .pl-zoom[hidden], .pl-switch[hidden] { display: none; }
+
+/* ── loading, nothing to draw, could not read ─────────────────────── */
+.pl-state {
+  display: grid; justify-items: start; gap: var(--ds-space-2);
+  padding: var(--ds-space-6);
+}
+.pl-state[hidden] { display: none; }
+.pl-state-mark {
+  width: 56px; height: 56px; margin-bottom: var(--ds-space-2); border-radius: var(--ds-radius-md);
+  background: var(--ds-accent-soft) center / 28px no-repeat;
+  /* A calendar, drawn as a mask so it takes the state's colour. */
+  position: relative;
+}
+.pl-state-mark::before {
+  content: ''; position: absolute; inset: 0; background: var(--ds-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15' rx='2'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4M8 14h4'/%3E%3C/svg%3E") center / 28px no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15' rx='2'/%3E%3Cpath d='M3.5 10h17M8 3v4M16 3v4M8 14h4'/%3E%3C/svg%3E") center / 28px no-repeat;
+}
+.pl-state[data-kind='error'] .pl-state-mark { background-color: var(--ds-danger-soft); }
+.pl-state[data-kind='error'] .pl-state-mark::before {
+  background: var(--ds-danger);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5v5.5M12 16.5v.01'/%3E%3C/svg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5v5.5M12 16.5v.01'/%3E%3C/svg%3E");
+}
+.pl-state[data-kind='loading'] .pl-state-mark::before { animation: pl-breathe 1.4s ease-in-out infinite; }
+@keyframes pl-breathe { 50% { opacity: 0.35; } }
+.pl-state-title {
+  margin: 0; font-size: var(--ds-text-lg); font-weight: var(--ds-weight-bold);
+  line-height: var(--ds-leading-snug); color: var(--text);
+}
+.pl-state-text {
+  margin: 0; max-width: 64ch; font-size: var(--ds-text-md); line-height: var(--ds-leading-body);
+  color: var(--text-dim); text-wrap: pretty;
+}
+.pl-btn.pl-btn-line {
+  min-height: var(--ds-touch-min); padding: 0 var(--ds-space-5);
+  margin-top: var(--ds-space-2); background: transparent; color: var(--text);
+  border: 1px solid var(--ds-line-control);
+}
+
+.pl-scrim {
+  position: fixed; inset: 0; z-index: var(--ds-z-sheet); background: var(--ds-scrim);
+  opacity: 0; transition: opacity var(--ds-dur-normal) var(--ds-ease-out);
+}
+.pl-scrim.is-open { opacity: 1; }
+.pl-scrim[hidden], .pl-sheet[hidden] { display: none; }
+.pl-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: calc(var(--ds-z-sheet) + 1);
+  max-height: min(88dvh, 640px); display: flex; flex-direction: column;
+  background: var(--ds-surface); color: var(--ds-ink); font-family: var(--ds-font-sans);
+  border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0; box-shadow: var(--ds-shadow-3);
+  transform: translateY(100%); transition: transform var(--ds-dur-normal) var(--ds-ease-sheet);
+  padding-bottom: var(--ds-safe-bottom);
+}
+.pl-sheet.is-open { transform: none; }
+.pl-sheet.is-pulling { transition: none; }
+.pl-sheet-grip {
+  flex: none; width: 40px; height: 5px; margin: var(--ds-space-2) auto 0;
+  border-radius: var(--ds-radius-pill); background: var(--ds-line-strong);
+  touch-action: none;
+}
+.pl-sheet-inner { overflow-y: auto; overscroll-behavior: contain; padding: var(--ds-space-3) var(--ds-gutter) 0; }
+.pl-sheet-key {
+  margin: 0; font-family: var(--ds-font-mono); font-size: var(--ds-text-xs); color: var(--ds-ink-3);
+  touch-action: none;
+}
+.pl-sheet-title {
+  margin: var(--ds-space-1) 0 var(--ds-space-4); font-size: var(--ds-text-lg); font-weight: var(--ds-weight-bold);
+  line-height: var(--ds-leading-snug); letter-spacing: var(--ds-tracking-tight); text-wrap: balance;
+  outline: none; touch-action: none;
+}
+/* The bar against the whole chart, with today. */
+.pl-sheet-span {
+  position: relative; height: 12px; margin-bottom: var(--ds-space-4);
+  border-radius: var(--ds-radius-pill); background: var(--ds-surface-2);
+}
+.pl-sheet-span::after {
+  content: ''; position: absolute; top: -4px; bottom: -4px; left: var(--now, -10%);
+  width: 2px; margin-left: -1px; background: var(--warning); border-radius: 1px;
+}
+.pl-sheet-span > span {
+  position: absolute; top: 0; bottom: 0; border-radius: var(--ds-radius-pill);
+  background: var(--accent);
+}
+.pl-sheet-span > span.is-done { background: var(--ok); }
+.pl-sheet-span > span.is-moved { background: var(--warning); }
+.pl-sheet-facts {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0; margin: 0;
+  border-top: 1px solid var(--ds-line);
+}
+.pl-sheet-facts dt, .pl-sheet-facts dd {
+  margin: 0; padding: var(--ds-space-3) 0; border-bottom: 1px solid var(--ds-line);
+  font-size: var(--ds-text-md); line-height: var(--ds-leading-snug);
+}
+.pl-sheet-facts dt { color: var(--ds-ink-2); }
+.pl-sheet-facts dd { padding-left: var(--ds-space-4); text-align: right; font-weight: var(--ds-weight-semibold); font-variant-numeric: tabular-nums; }
+.pl-sheet-note {
+  margin: var(--ds-space-4) 0 0; padding: var(--ds-space-3) var(--ds-space-4);
+  border-radius: var(--ds-radius-md); background: var(--ds-warn-soft); color: var(--ds-ink);
+  font-size: var(--ds-text-sm); line-height: var(--ds-leading-body);
+}
+.pl-sheet-note[hidden] { display: none; }
+.pl-sheet-actions {
+  position: sticky; bottom: 0; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+  gap: var(--ds-space-2); margin: var(--ds-space-5) calc(-1 * var(--ds-gutter)) 0;
+  padding: var(--ds-space-3) var(--ds-gutter) var(--ds-space-4);
+  background: var(--ds-surface); border-top: 1px solid var(--ds-line);
+}
+.pl-sheet-actions .pl-btn:only-child, .pl-sheet-actions .pl-btn:has(+ .pl-btn[hidden]) { grid-column: 1 / -1; }
+.pl-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-2);
+  min-height: var(--ds-touch-comfy); padding: 0 var(--ds-space-4); border: 0;
+  border-radius: var(--ds-radius-sm); font: inherit; font-size: var(--ds-text-md);
+  font-weight: var(--ds-weight-semibold); text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: transform var(--ds-dur-fast) var(--ds-ease-out), background-color var(--ds-dur-fast) var(--ds-ease-out);
+}
+.pl-btn[hidden] { display: none; }
+.pl-btn:active { transform: scale(var(--ds-press-scale)); }
+.pl-btn:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 2px; }
+.pl-btn-quiet { background: var(--ds-surface-2); color: var(--ds-ink); }
+.pl-btn-primary { background: var(--ds-accent-fill); color: var(--ds-accent-on); }
+
+/* ── the phone: view and zoom ─────────────────────────────────────── */
+@media (max-width: 719px) {
+  .pl-main { gap: var(--ds-space-3); }
+  .pl-intro { padding: var(--ds-space-4); }
+  .pl-intro .admin-heading { font-size: var(--ds-text-lg); line-height: var(--ds-leading-snug); }
+  .pl-intro .set-lede { display: none; }
+  .pl-state { padding: var(--ds-space-5) var(--ds-space-4); }
+  /* The empty state above already says how dates are set; the desktop's offer
+     to place a module here is not one a phone can take. */
+  #pl-undated-panel .set-lede { display: none; }
+  .pl-phone-lede {
+    display: block; margin: var(--ds-space-2) 0 0; color: var(--text-dim);
+    font-size: var(--ds-text-md); line-height: var(--ds-leading-body); text-wrap: pretty;
+  }
+  /* Said, not offered: plain text, since there is nothing here to tap. */
+  .pl-phone-note {
+    display: flex; align-items: center; gap: var(--ds-space-2);
+    margin: var(--ds-space-3) 0 0;
+    color: var(--text-dim);
+    font-size: var(--ds-text-sm);
+  }
+  .pl-phone-note svg {
+    width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* The toolbar: zoom as one segmented control, the switch as a full row. */
+  .pl-toolbar { gap: var(--ds-space-2) var(--ds-space-3); padding: 0; }
+  .pl-zoom {
+    flex: 1 1 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px;
+    padding: 3px; border: 1px solid var(--border-strong); border-radius: var(--ds-radius-sm);
+    background: var(--bg-panel);
+  }
+  .pl-zoom .chip {
+    min-height: 40px; border: 0; border-radius: 8px; background: transparent;
+    font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--text-dim);
+  }
+  .pl-zoom .chip.is-on { background: var(--accent); color: var(--ink-on-accent, #fff); }
+  .pl-switch { min-height: var(--ds-touch-min); font-size: var(--ds-text-sm); flex: 1 1 auto; }
+  .pl-refresh-phone {
+    display: inline-flex; align-items: center; min-height: var(--ds-touch-min); padding: 0 var(--ds-space-5);
+    font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold);
+    border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft);
+  }
+  .pl-switch input { width: 20px; height: 20px; }
+  .pl-spacer { display: none; }
+  /* Editing stays on a larger screen. The sketch's count is still said, so a
+     move made on the laptop is not forgotten, but nothing here sends it. */
+  #pl-discard, #pl-ship, .pl-undated-row .chip { display: none !important; }
+  .pl-dirty { flex: 1 1 100%; font-size: var(--ds-text-sm); white-space: normal; }
+
+  /* The chart: a narrow names column, and the time axis slid with a thumb. */
+  .pl-chart-panel { position: relative; border-radius: var(--ds-radius-md); }
+  .pl-chart-panel::after {
+    /* A soft edge on the right: there is more chart that way. */
+    content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 20px; z-index: 3;
+    pointer-events: none; border-radius: 0 var(--ds-radius-md) var(--ds-radius-md) 0;
+    background: linear-gradient(to right, transparent, color-mix(in srgb, var(--bg-panel) 85%, transparent));
+  }
+  .pl-names { flex-basis: clamp(108px, 31vw, 132px); width: clamp(108px, 31vw, 132px); }
+  .pl-names-head {
+    padding: 0 10px; text-transform: none; letter-spacing: 0;
+    font-size: var(--ds-text-xs); font-weight: var(--ds-weight-semibold);
+  }
+  .pl-name { padding: 0 10px; }
+  .pl-name-text {
+    white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    font-size: 12.5px; line-height: 1.25; font-weight: 500;
+  }
+  .pl-scroll {
+    touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none;
+  }
+  .pl-scroll::-webkit-scrollbar { display: none; }
+  .pl-tick { font-size: var(--ds-text-xs); }
+  .pl-bar { cursor: pointer; height: 28px; overflow: visible; }
+  .pl-bar-label { overflow: hidden; }
+  /* The bar's hit area reaches most of its lane: 28px is a small target. */
+  .pl-bar::before { content: ''; position: absolute; inset: -5px 0; }
+  .pl-bar:hover { filter: none; }
+  .pl-bar:active { filter: brightness(1.12); }
+  .pl-grip { display: none; }
+  .pl-bar-label { font-size: 12px; }
+
+  .pl-undated-row.admin-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .pl-undated-row .pl-name-text { white-space: normal; }
+  .pl-asof { font-size: var(--ds-text-xs); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-state[data-kind='loading'] .pl-state-mark::before { animation: none; }
+  .pl-sheet, .pl-sheet.is-open { transform: none; transition: opacity var(--ds-dur-normal) linear; opacity: 0; }
+  .pl-sheet.is-open { opacity: 1; }
+  .pl-btn:active { transform: none; }
+}

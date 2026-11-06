@@ -371,22 +371,27 @@ fi
 # all rather than a feature raising later. It was present on the workstation as
 # somebody else's transitive dependency, which is not the same as being depended
 # on — a resolver that stops pulling it in takes the whole service down.
+#
+# pyyaml is the change-request watcher (ticvai/tools/cr-watch.py and the
+# audit_guard beside it import yaml at load). The watcher's job runs on this venv,
+# and the accounts service loads cr-watch.py to read and mark its REVIEW.md
+# (api/watcher.py), so without it the watcher's routes answer 503.
 "$APP_DIR/.venv/bin/pip" install -q fastapi "uvicorn[standard]" argon2-cffi \
-  openpyxl python-multipart cryptography
+  openpyxl python-multipart cryptography pyyaml
 chown -R "$APP_USER:$APP_USER" "$APP_DIR/.venv"
 
 # Asserted rather than assumed, for the same reason the gate and the cookie
 # domain are asserted further down: a missing import here is invisible until an
 # admin uploads a file, and by then the deploy has been declared done.
-"$APP_DIR/.venv/bin/python" - <<'PYCHECK' || die "the venv is missing openpyxl, python-multipart or cryptography — the first two fail at request time, the third stops the service starting at all"
+"$APP_DIR/.venv/bin/python" - <<'PYCHECK' || die "the venv is missing openpyxl, python-multipart, cryptography or pyyaml — the first two fail at request time, the third stops the service starting at all, the fourth stops the change-request watcher"
 import importlib.util, sys
 # "multipart" and not "python-multipart": the distribution is named one thing
 # and the module it installs another, and find_spec asks about the module.
-missing = [m for m in ("openpyxl", "multipart", "cryptography")
+missing = [m for m in ("openpyxl", "multipart", "cryptography", "yaml")
            if not importlib.util.find_spec(m)]
 sys.exit(1 if missing else 0)
 PYCHECK
-note "openpyxl, python-multipart and cryptography are in the venv"
+note "openpyxl, python-multipart, cryptography and pyyaml are in the venv"
 
 # ── the store ───────────────────────────────────────────────────────────────
 say "Database"
@@ -456,6 +461,158 @@ if [[ -r "$DROP_FILE" ]]; then
 fi
 [[ -n "$SECRET_KEY" ]] || die "$SECRET_FILE is empty. Remove it and re-run to generate one."
 
+# ── the change-request watcher ──────────────────────────────────────────────
+#
+# ADAM on the phone (viewer/PHONE-SPEC.md section 1). The watcher used to run
+# every 30 minutes on the lead's laptop; here it is a PM2 job beside the two
+# services, run hourly as $APP_USER, that drafts an answer to every new change
+# request and lists them for the lead. It never settles: the job runs `run`
+# without --auto, and the lead decides and settles from the decide page.
+#
+#   $WATCH_MIRROR           a bare mirror of the checkout this deploy runs from,
+#                           refreshed here (as root) on every deploy, so a new
+#                           release tag reaches the watcher with the deploy and
+#                           the watcher needs no git credential of its own.
+#                           Root's, readable by everybody, and outside $APP_DIR
+#                           (which is handed to $APP_USER above): root runs git
+#                           in it, so $APP_USER must not be able to write in it,
+#                           or a hook or a config line it planted would run as
+#                           root at the next deploy (security review, H1).
+#   $WATCH_DIR/repo         the watcher's clone of the mirror, at what was
+#                           deployed; its own worktree at the latest release tag
+#                           is $WATCH_DIR/release, made by the watcher
+#   $WATCH_DIR/out          state.json, drafts/, REVIEW.md, runs.log, spend.jsonl
+#
+# Its credentials are in $WATCH_ENV, written by hand once (deploy/README.md,
+# "The change-request watcher") and never in git or in the generated config:
+# the job and the API are given the file's *path*. This section checks the file
+# names the four values it needs and never prints one. Until the file, Claude
+# Code and a seeded out folder are all there, the job is not started and the
+# decide page answers "not set up"; the rest of the deploy goes on.
+WATCH_DIR="${WATCH_DIR:-$APP_DIR/cr-watch}"
+WATCH_MIRROR="${WATCH_MIRROR:-/var/lib/ticvai/cr-watch-mirror.git}"
+WATCH_ENV="${WATCH_ENV:-/etc/ticvai/cr-watch.env}"
+WATCH_ON=0
+WATCH_APP=""
+WATCH_API=""
+say "Change-request watcher"
+as_app() { sudo -u "$APP_USER" HOME="/home/$APP_USER" "$@"; }
+# Every git command root runs here runs no hook, no file-system monitor and no
+# automatic gc, whatever a repository's own config says (security review, H1).
+root_git() { git -c core.hooksPath=/dev/null -c core.fsmonitor=false -c gc.auto=0 "$@"; }
+# The checkout this deploy runs from belongs to whoever pulled it, not to root,
+# so git refuses to read it as root ("dubious ownership") unless it is named
+# safe. Its top is found by walking up to the .git, named safe for these
+# commands only (never a global setting), and a git that still refuses stops
+# the deploy with git's own words: it is never taken for "not a checkout",
+# which would leave the watcher on an old release without a word.
+SOURCE_GIT=""
+SOURCE_TOP="$REPO"
+while [[ ! -e "$SOURCE_TOP/.git" && "$(dirname "$SOURCE_TOP")" != "$SOURCE_TOP" ]]; do SOURCE_TOP="$(dirname "$SOURCE_TOP")"; done
+if [[ -e "$SOURCE_TOP/.git" ]]; then
+  SOURCE_GIT="$(root_git -c safe.directory="$SOURCE_TOP" -C "$SOURCE_TOP" rev-parse --show-toplevel 2>&1)" \
+    || die "git cannot read the checkout at $SOURCE_TOP as root: $SOURCE_GIT. The services have not been restarted."
+fi
+if [[ -z "$SOURCE_GIT" ]]; then
+  note "$REPO is not in a git checkout — the watcher is left as it is"
+else
+  install -d -m 755 -o "$APP_USER" -g "$APP_USER" "$WATCH_DIR"
+  install -d -m 755 -o root -g root "$(dirname "$WATCH_MIRROR")"
+  MIRROR="$WATCH_MIRROR"
+  # A mirror with anything in it that is not root's (an earlier deploy kept it
+  # under $APP_DIR, owned by $APP_USER) is made again rather than trusted: it is
+  # a copy of the checkout, so nothing is lost.
+  if [[ -e "$MIRROR" ]] && { [[ -L "$MIRROR" ]] || [[ -n "$(find "$MIRROR" ! -user root -print -quit)" ]]; }; then
+    note "the watcher's mirror at $MIRROR is not all root's; making it again"
+    rm -rf "$MIRROR"
+  fi
+  [[ -e "$WATCH_DIR/mirror.git" ]] && rm -rf "$WATCH_DIR/mirror.git"   # where an earlier deploy kept it
+  ( umask 022
+    [[ -d "$MIRROR" ]] || root_git init -q --bare "$MIRROR"
+    # Root writes its own mirror and reads the checkout, which is named safe for
+    # this one command. The mirror is root's, so it needs no such naming.
+    root_git -c safe.directory="$SOURCE_GIT" --git-dir="$MIRROR" \
+      fetch -q --prune --force "$SOURCE_GIT" "+HEAD:refs/heads/main" "+refs/tags/*:refs/tags/*" \
+      && root_git --git-dir="$MIRROR" symbolic-ref HEAD refs/heads/main ) \
+    || die "the watcher's mirror could not be refreshed from $SOURCE_GIT. The services have not been restarted."
+  chmod -R a+rX "$MIRROR"
+  # $APP_USER only reads the mirror (clone, fetch). It is root's, so its own git
+  # needs it named safe; that is $APP_USER trusting root, in $APP_USER's config.
+  as_app git config --global --get-all safe.directory 2>/dev/null | grep -qxF "$MIRROR" \
+    || as_app git config --global --add safe.directory "$MIRROR"
+  CLONE="$WATCH_DIR/repo"
+  [[ -d "$CLONE/.git" ]] || as_app git clone -q "$MIRROR" "$CLONE"
+  as_app git -C "$CLONE" remote set-url origin "$MIRROR"
+  # The watcher runs released code only. A clone somebody edited by hand stops
+  # the deploy here, before anything restarts, rather than being overwritten.
+  [[ -z "$(as_app git -C "$CLONE" status --porcelain)" ]] \
+    || die "$CLONE has local changes. Look at them (git -C $CLONE status), put them back, and deploy again."
+  as_app git -C "$CLONE" fetch -q --prune --tags --force origin
+  as_app git -C "$CLONE" checkout -q --detach origin/main
+  install -d -m 750 -o "$APP_USER" -g "$APP_USER" "$WATCH_DIR/out"
+  note "watcher clone at $(as_app git -C "$CLONE" rev-parse --short HEAD), newest release tag $(as_app git -C "$CLONE" tag --list 'r*' --sort=-v:refname | grep -E '^r[0-9]+$' | head -1)"
+
+  CLAUDE_BIN="$(command -v claude || true)"
+  if [[ -L "$WATCH_ENV" ]]; then
+    # chown and chmod follow a link, so root would hand whatever it points at
+    # to $APP_USER. A link there is refused, never followed (security review, L7).
+    note "$WATCH_ENV is a symbolic link, not a file — refused; the watcher job is not started. Put the file itself there."
+  elif [[ ! -f "$WATCH_ENV" ]]; then
+    note "no $WATCH_ENV — the watcher job is not started (deploy/README.md, The change-request watcher)"
+  elif [[ "$(stat -c %h "$WATCH_ENV")" != 1 ]]; then
+    note "$WATCH_ENV has more than one name (a hard link) — refused; the watcher job is not started. Write it afresh."
+  else
+    # 0600 and the service account's, whatever it was written as: it holds an
+    # API key and two logins. --no-dereference, and the checks above, so no
+    # link swapped in can redirect either.
+    chown --no-dereference "$APP_USER:$APP_USER" "$WATCH_ENV"
+    chmod 600 "$WATCH_ENV"
+    MISSING_KEYS=""
+    for k in ANTHROPIC_API_KEY ADAM_EMAIL ADAM_PASSWORD TICVAI_OP_TOKEN; do
+      grep -qE "^[[:space:]]*(export[[:space:]]+)?$k=[^[:space:]]" "$WATCH_ENV" || MISSING_KEYS="$MISSING_KEYS $k"
+    done
+    if [[ -n "$MISSING_KEYS" ]]; then
+      note "$WATCH_ENV does not set$MISSING_KEYS — the watcher job is not started"
+    elif [[ -z "$CLAUDE_BIN" ]] || ! as_app test -x "$CLAUDE_BIN"; then
+      note "Claude Code is not installed for $APP_USER (npm install -g @anthropic-ai/claude-code) — the watcher job is not started"
+    elif [[ ! -f "$WATCH_DIR/out/state.json" ]]; then
+      note "$WATCH_DIR/out has no state.json yet — seed it once (deploy/README.md); the watcher job is not started"
+    else
+      WATCH_ON=1
+      note "the watcher job runs hourly; credentials from $WATCH_ENV (not printed)"
+    fi
+  fi
+fi
+if [[ "$WATCH_ON" == 1 ]]; then
+  WATCH_API="        // The change-request watcher's folder and script (api/watcher.py). Paths
+        // only: the credentials stay in $WATCH_ENV.
+        CR_WATCH_OUT: '$WATCH_DIR/out',
+        CR_WATCH_RELEASE_DIR: '$WATCH_DIR/release',
+        CR_WATCH_SCRIPT: '$WATCH_DIR/repo/ticvai/tools/cr-watch.py',
+        CR_WATCH_ENV_FILE: '$WATCH_ENV',"
+  WATCH_APP="    {
+      // The change-request watcher: hourly, at seven past. Never with the flag
+      // that closes requests on its own: it drafts and tells; the lead decides
+      // and settles (PHONE-SPEC.md).
+      name: 'ticvai-cr-watch',
+      cwd: '$WATCH_DIR/repo',
+      script: '$APP_DIR/.venv/bin/python',
+      args: 'ticvai/tools/cr-watch.py run --env-file $WATCH_ENV --out $WATCH_DIR/out --release-dir $WATCH_DIR/release',
+      interpreter: 'none',
+      cron_restart: '7 * * * *',
+      autorestart: false,
+      // A stop or a restart sends SIGINT first: the watcher kills its Claude
+      // turns and releases its run lock, given this long before SIGKILL.
+      kill_timeout: 15000,
+      env: {
+        CR_WATCH_OUT: '$WATCH_DIR/out',
+        CR_WATCH_RELEASE_DIR: '$WATCH_DIR/release',
+        HOME: '/home/$APP_USER',
+        PYTHONUNBUFFERED: '1',
+      },
+    },"
+fi
+
 # ── pm2 ─────────────────────────────────────────────────────────────────────
 say "Processes"
 
@@ -492,6 +649,7 @@ module.exports = {
         // That is the intended failure: there is no default key, because a
         // default key is the one that ships.
         TICVAI_SECRET_KEY: '$SECRET_KEY',
+$WATCH_API
       },
       autorestart: true,
       max_restarts: 20,
@@ -515,9 +673,14 @@ $DROP_LINE
       autorestart: true,
       max_restarts: 20,
     },
+$WATCH_APP
   ],
 };
 CONFIG
+# The watcher never settles on its own: a config that would run it with --auto
+# is refused before anything starts.
+! grep -qE -- "cr-watch\.py run[^']*--auto" "$APP_DIR/ecosystem.config.cjs" \
+  || die "the generated ecosystem.config.cjs runs the watcher with --auto; it must only draft. Nothing was restarted."
 chown "$APP_USER:$APP_USER" "$APP_DIR/ecosystem.config.cjs"
 # **0600, because this file now carries TICVAI_SECRET_KEY in the clear.**
 #
@@ -541,6 +704,11 @@ chmod 600 "$APP_DIR/ecosystem.config.cjs"
 # environment a process was first started with.
 sudo -u "$APP_USER" HOME="/home/$APP_USER" \
   pm2 startOrRestart "$APP_DIR/ecosystem.config.cjs" --update-env >/dev/null
+# A watcher job from an earlier deploy whose env file, Claude Code or state has
+# gone since is stopped, not left drafting on what is no longer there.
+if [[ "$WATCH_ON" != 1 ]]; then
+  sudo -u "$APP_USER" HOME="/home/$APP_USER" pm2 delete ticvai-cr-watch >/dev/null 2>&1 || true
+fi
 sudo -u "$APP_USER" HOME="/home/$APP_USER" pm2 save >/dev/null
 
 # Survive a reboot. pm2 startup prints a command to run as root rather than
@@ -716,6 +884,7 @@ cat <<DONE
     pm2 status                     what is running
     pm2 logs ticvai-viewer         follow one of them
     pm2 restart ticvai-viewer      after a package drop
+    pm2 logs ticvai-cr-watch       the change-request watcher's last runs (when it is set up)
     ticvai-backup                  take a snapshot now
 
     This address has no certificate, deliberately for now. The password and the

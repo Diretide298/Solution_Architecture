@@ -271,7 +271,7 @@ function setScope(change) {
   }
   params.set('count', state.unit);
   const query = params.toString();
-  history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
+  history.replaceState(history.state, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
   draw();
 }
 
@@ -1475,14 +1475,25 @@ async function loadChanges() {
   if (state.scope.person) drawPersonChanges(state.scope.person, mineOf(state.scope.person));
 }
 
+// A person is a page of their own: opening one from the team is a new history
+// entry (the hash first, so the person is written into that entry and not the
+// team's), and Back is a true return to the team as it was. Another person,
+// picked while one is open, replaces the entry rather than stacking one.
 function openPerson(name) {
+  if (location.hash !== '#person') {
+    location.hash = '#person';
+    history.replaceState({ tkPerson: true }, '');
+  }
   setScope({ person: name });
-  if (location.hash !== '#person') location.hash = '#person';
 }
 
 function backToTeam() {
+  // Opened from the team: go back to its entry (popstate puts its scope back).
+  if (history.state?.tkPerson) { history.back(); return; }
+  // Arrived on the person by a link: there is no team entry behind, so this
+  // one becomes it.
   setScope({ person: '' });
-  location.hash = '#overview';
+  location.replace('#overview');
 }
 
 /** Every ticket a person holds, under the type filter but not the sprint one:
@@ -1972,6 +1983,7 @@ function drawDaily() {
     const thead = el('thead');
     thead.append(head);
     table.replaceChildren(caption, thead, body, foot);
+    cardify(table, { total: true });
   }
 
   // Sprints with nothing in them, said once as runs: "Sprints 7 to 13".
@@ -2161,6 +2173,7 @@ function drawFinishedDaily() {
   const thead = el('thead');
   thead.append(head);
   table.replaceChildren(el('caption', null, `${WsCap()} finished each day, ${range.label}`), thead, body, foot);
+  cardify(table, { total: true });
 
   const fromAdam = [...cells.values()].flat().filter(([t]) => state.data.closes?.[t.key]).length;
   $('tk-fd-note').textContent = `A ${W1()} counts on the day ADAM closed it where the close went through ADAM`
@@ -2409,6 +2422,7 @@ function drawPeopleTable(focus) {
   const thead = el('thead');
   thead.append(head);
   table.replaceChildren(caption, thead, body);
+  cardify(table);
   $('tk-people-count').textContent = plural(rows.filter((r) => r.name !== 'Unassigned').length, 'person', 'people');
 }
 
@@ -2691,6 +2705,7 @@ function drawTimeline(items) {
     box.append(wrap);
   });
   if (!shown) box.append(el('p', 'tk-empty', 'Everything placed is finished.'));
+  ganttToToday();
   $('tk-timeline-count').textContent = `${plural(shown, 'row', 'rows')}, counted in ${Ws()}`;
 }
 
@@ -2790,6 +2805,145 @@ function exportCsv() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+// ── the phone ───────────────────────────────────────────────────────
+//
+// Below 720px the page is laid out by tasks.css for a thumb; what follows is
+// the little the stylesheet cannot do on its own. Nothing here changes what is
+// counted or read: the tables carry their column names for their cards, one
+// person opens as a full screen, the rail keeps its current chip in sight, and
+// the Gantt slides sideways at a zoom chosen here.
+
+const PHONE = matchMedia('(max-width: 719px)');
+const COARSE = matchMedia('(hover: none)');
+
+/** A table that becomes a card per row on a phone. Each cell carries its
+ *  column's name for the card to show, and explicit roles keep it a table to a
+ *  screen reader once the stylesheet stops drawing it as one. `total` marks the
+ *  last column, the row's sum, which the card puts beside the name. */
+function cardify(table, { total = false } = {}) {
+  table.setAttribute('role', 'table');
+  const heads = [...table.querySelectorAll('thead th')];
+  const label = (th) => (th.querySelector('.tk-daily-sprint')?.textContent ?? th.textContent).trim();
+  const sub = (th) => th.querySelector('.tk-daily-dates')?.textContent.trim() ?? '';
+  for (const group of table.querySelectorAll('thead, tbody, tfoot')) group.setAttribute('role', 'rowgroup');
+  for (const th of heads) th.setAttribute('role', 'columnheader');
+  for (const tr of table.querySelectorAll('tr')) {
+    tr.setAttribute('role', 'row');
+    if (tr.parentElement?.tagName === 'THEAD') continue;
+    [...tr.children].forEach((cell, i) => {
+      cell.setAttribute('role', cell.tagName === 'TH' ? 'rowheader' : 'cell');
+      const th = heads[i];
+      if (!th || cell.tagName === 'TH') return;
+      cell.dataset.label = label(th);
+      const when = sub(th);
+      if (when) cell.dataset.sub = when;
+      if (th.classList.contains('is-weekend')) cell.classList.add('is-weekend');
+      if (total && i === tr.children.length - 1) cell.classList.add('tk-col-total');
+    });
+  }
+}
+
+/** One person, on a phone, is a screen of its own over the page. */
+function personSheet(open) {
+  const on = open && PHONE.matches;
+  const was = document.body.classList.contains('tk-person-sheet');
+  document.body.classList.toggle('tk-person-sheet', on);
+  const section = $('person');
+  const behind = [document.querySelector('.admin-bar'), document.querySelector('#tasks .set-nav'),
+    document.querySelector('.tk-top'), document.querySelector('.phone-tabbar')];
+  if (on) {
+    section.setAttribute('role', 'dialog');
+    section.setAttribute('aria-modal', 'true');
+    section.setAttribute('aria-labelledby', state.scope.person ? 'tk-p-name' : 'tk-p-pick-title');
+    for (const n of behind) n?.setAttribute('inert', '');
+    section.scrollTop = 0;
+    if (!was) requestAnimationFrame(() => $('tk-p-back').focus({ preventScroll: true }));
+  } else {
+    section.removeAttribute('role');
+    section.removeAttribute('aria-modal');
+    section.removeAttribute('aria-labelledby');
+    for (const n of behind) n?.removeAttribute('inert');
+  }
+}
+
+/** Long explanations, clamped to three lines on a phone with a button to read
+ *  the rest. The words are all still there for a screen reader. */
+const clamped = [];
+function mountClamps() {
+  for (const p of document.querySelectorAll('#tasks .set-lede, #tasks .tk-note')) {
+    const more = el('button', 'tk-more-text', 'Read more');
+    more.type = 'button';
+    more.hidden = true;
+    more.setAttribute('aria-expanded', 'false');
+    more.onclick = () => {
+      const open = p.classList.toggle('is-open');
+      more.textContent = open ? 'Show less' : 'Read more';
+      more.setAttribute('aria-expanded', String(open));
+    };
+    p.classList.add('tk-clampable');
+    p.after(more);
+    clamped.push([p, more]);
+  }
+  addEventListener('resize', () => requestAnimationFrame(measureClamps));
+}
+function measureClamps() {
+  requestAnimationFrame(() => {
+    for (const [p, more] of clamped) {
+      more.hidden = !PHONE.matches || !p.textContent.trim()
+        || (!p.classList.contains('is-open') && p.scrollHeight <= p.clientHeight + 2);
+    }
+  });
+}
+
+/** The rail's current chip, slid into the middle of the row. */
+function railToCurrent() {
+  if (!PHONE.matches) return;
+  const list = document.querySelector('#tasks .set-nav-list');
+  const current = list?.querySelector('[aria-current="true"]');
+  if (!current) return;
+  const left = current.offsetLeft - (list.clientWidth - current.offsetWidth) / 2;
+  list.scrollTo({ left: Math.max(0, left), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+
+/** How wide the Gantt is drawn on a phone, as a multiple of the screen. */
+const GANTT_ZOOMS = [['Fit', 1], ['Wider', 2.5], ['Widest', 5]];
+function mountGanttZoom() {
+  const actions = document.querySelector('#timeline .set-actions');
+  if (!actions) return;
+  let saved = 2.5;
+  try { saved = Number(localStorage.getItem('adam-tasks-gantt-zoom')) || 2.5; } catch { /* storage denied */ }
+  const group = el('div', 'tk-zoom');
+  group.setAttribute('role', 'group');
+  group.setAttribute('aria-label', 'How wide the chart is drawn');
+  const set = (z) => {
+    $('tk-gantt').style.setProperty('--gantt-zoom', String(z));
+    for (const b of group.children) b.setAttribute('aria-pressed', String(Number(b.dataset.zoom) === z));
+    try { localStorage.setItem('adam-tasks-gantt-zoom', String(z)); } catch { /* storage denied */ }
+    ganttToToday();
+  };
+  for (const [words, z] of GANTT_ZOOMS) {
+    const b = el('button', null, words);
+    b.type = 'button';
+    b.dataset.zoom = String(z);
+    b.onclick = () => set(z);
+    group.append(b);
+  }
+  actions.prepend(group);
+  set(GANTT_ZOOMS.some(([, z]) => z === saved) ? saved : 2.5);
+}
+
+/** The Gantt slid so today sits a third of the way in, on a phone. */
+function ganttToToday() {
+  if (!PHONE.matches) return;
+  const box = $('tk-gantt');
+  const now = box.querySelector('.tk-gantt-now');
+  if (!now || !box.clientWidth) return;
+  requestAnimationFrame(() => {
+    const at = now.getBoundingClientRect().left - box.getBoundingClientRect().left + box.scrollLeft;
+    box.scrollLeft = Math.max(0, at - box.clientWidth / 2);
+  });
+}
+
 // ── the tooltip ─────────────────────────────────────────────────────
 //
 // One for the page. Anything with `data-tip` shows it on hover and on keyboard
@@ -2816,8 +2970,36 @@ function mountTip() {
     tip.hidden = false;
     place(x, y);
   };
-  const hide = () => { owner = null; tip.hidden = true; };
+  const hide = () => {
+    owner?.classList.remove('is-tipped');
+    owner = null;
+    tip.hidden = true;
+    tip.classList.remove('is-tapped');
+    tip.setAttribute('role', 'tooltip');
+  };
+  // A phone has no hover, so a tap shows the tip instead, as a card along the
+  // bottom of the screen rather than under the finger that would hide it. A
+  // second tap on the same thing, a tap anywhere else, or a scroll puts it
+  // away. Inside a button or a link the tap keeps its own meaning (a person's
+  // bar opens the person), and the words beside it carry the same numbers.
+  document.addEventListener('click', (e) => {
+    if (!PHONE.matches && !COARSE.matches) return;
+    const target = e.target.closest?.('[data-tip]');
+    if (!target || target.closest('button, a')) { if (tip.classList.contains('is-tapped')) hide(); return; }
+    if (target === owner) { hide(); return; }
+    hide();
+    owner = target;
+    target.classList.add('is-tipped');
+    tip.textContent = target.dataset.tip;
+    tip.setAttribute('role', 'status');
+    tip.classList.add('is-tapped');
+    tip.style.left = '';
+    tip.style.top = '';
+    tip.hidden = false;
+  });
   document.addEventListener('pointermove', (e) => {
+    // A finger sliding the page is not hovering over what it passes.
+    if (e.pointerType === 'touch') return;
     const target = e.target.closest?.('[data-tip]');
     if (!target) { if (owner && e.pointerType !== 'touch') hide(); return; }
     if (target !== owner) show(target, e.clientX, e.clientY);
@@ -2825,12 +3007,14 @@ function mountTip() {
   });
   document.addEventListener('focusin', (e) => {
     const target = e.target.closest?.('[data-tip]') ?? e.target.querySelector?.(':scope [data-tip]');
-    if (!target || !e.target.matches(':focus-visible')) return;
+    if (!target || !e.target.matches(':focus-visible') || tip.classList.contains('is-tapped')) return;
     const box = target.getBoundingClientRect();
     show(target, box.left + box.width / 2, box.top);
   });
-  document.addEventListener('focusout', hide);
-  document.addEventListener('scroll', hide, { passive: true });
+  document.addEventListener('focusout', () => { if (!tip.classList.contains('is-tapped')) hide(); });
+  // Captured, because on a phone the page scrolls inside the body and the
+  // Gantt inside its own box, and neither scroll reaches the document.
+  document.addEventListener('scroll', hide, { passive: true, capture: true });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
 }
 
@@ -2918,8 +3102,19 @@ function redrawBurn() {
   $('tk-scope-type').onchange = (e) => setScope({ type: e.target.value });
   $('tk-scope-clear').onclick = () => {
     setScope({ person: '', sprint: '', type: '' });
-    if (location.hash === '#person') location.hash = '#overview';
+    if (location.hash === '#person') location.replace('#overview');
   };
+  // Back and Forward bring their entry's scope with them: Back from a person
+  // is the team unfiltered again, not the team still filtered to them.
+  addEventListener('popstate', () => {
+    const params = new URLSearchParams(location.search);
+    const scope = { person: params.get('person') ?? '', sprint: params.get('sprint') ?? '', type: params.get('type') ?? '' };
+    if (!Object.keys(scope).some((k) => scope[k] !== state.scope[k])) return;
+    setScope(scope);
+    // The entries differ in their query as well as their hash, and Chrome
+    // says hashchange only when the hash alone differs: panels.js is told here.
+    dispatchEvent(new HashChangeEvent('hashchange'));
+  });
   $('tk-team-sort').onchange = (e) => {
     state.teamSort = e.target.value;
     try { localStorage.setItem('adam-tasks-team-sort', state.teamSort); } catch { /* storage denied */ }
@@ -2941,6 +3136,12 @@ function redrawBurn() {
   $('tk-open-only').onchange = (e) => { state.filter.openOnly = e.target.checked; listLimit = LIST_PAGE; drawList(); };
   $('tk-export').onclick = exportCsv;
   mountTip();
+  mountGanttZoom();
+  mountClamps();
+  PHONE.addEventListener('change', () => personSheet(location.hash === '#person'));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('tk-person-sheet')) backToTeam();
+  });
   let resizing = 0;
   addEventListener('resize', () => { clearTimeout(resizing); resizing = setTimeout(redrawBurn, 150); });
 
@@ -2950,6 +3151,12 @@ function redrawBurn() {
   // page; see panels.js.
   mountPanels({ nav: document.querySelector('#tasks .set-nav'), fallback: 'overview',
     onShow: (name) => {
+      // panels.js scrolls the window, and on a phone this page scrolls in its body.
+      document.body.scrollTop = 0;
+      personSheet(name === 'person');
+      railToCurrent();
+      measureClamps();
+      if (name === 'timeline') ganttToToday();
       if (name === 'overview' || name === 'person') redrawBurn();
       // Drawn to its box's width, which is nothing while the section is hidden.
       if (name === 'finished' && state.data) drawFinishedDaily();

@@ -17,6 +17,8 @@
  */
 
 import * as auth from '/validation.js';
+// The shared frame: on a phone, the app bar and the bottom bar every page has.
+import '/page-chrome.js';
 
 // Asked for at the top, beside the sign-in check rather than after it (13
 // October). Anybody but the System Architect is refused it, and is shown the
@@ -35,6 +37,12 @@ function el(tag, cls, text) {
 
 const ZOOMS = { week: 28, month: 8, quarter: 3 };
 const ROW_H = 38;
+
+// A phone reads the plan and does not change it (decided with the lead, 4
+// November): below 720px a bar opens a sheet with its dates instead of being
+// dragged, and the editing controls are hidden by plan.css. A tablet or a
+// laptop with a touch screen keeps the drag.
+const phone = matchMedia('(max-width: 719px)');
 
 const state = {
   data: null,
@@ -202,7 +210,8 @@ function drawRows(win) {
     block.setAttribute('role', 'button');
     block.setAttribute('aria-label',
       `${module.subject}, ${readable(isoOf(from))} to ${readable(isoOf(to))}. `
-      + 'Arrow keys move it, shift and arrow keys change its length.');
+      + (phone.matches ? 'Shows its dates.'
+        : 'Arrow keys move it, shift and arrow keys change its length.'));
     block.title = [
       `#${module.key} — ${module.subject}`,
       `${readable(isoOf(from))} → ${readable(isoOf(to))} (${to - from + 1} days)`,
@@ -225,10 +234,11 @@ function drawRows(win) {
   });
 
   drawNames(on);
+  // Only the filter can empty a chart that has dated modules (draw() says the
+  // rest in the page's own empty state), so this line names the filter.
   $('pl-empty').hidden = on.length > 0;
   if (!on.length) {
-    $('pl-empty').textContent = state.data?.note
-      ?? 'Nothing here has dates yet, so there is nothing to arrange.';
+    $('pl-empty').textContent = 'Every module with dates is finished. Untick Hide finished modules to see them.';
   }
 }
 
@@ -265,6 +275,8 @@ function grab(block, module, win) {
 
   const begin = (event) => {
     if (event.button != null && event.button !== 0) return;
+    // On a phone the finger scrolls the chart; nothing is dragged.
+    if (phone.matches) return;
     const edge = event.target.classList.contains('pl-grip-start') ? 'start'
       : event.target.classList.contains('pl-grip-end') ? 'end' : 'move';
     const bar = barOf(module);
@@ -311,8 +323,13 @@ function grab(block, module, win) {
   };
 
   block.addEventListener('pointerdown', begin);
+  block.addEventListener('click', () => { if (phone.matches) openBar(module, block); });
 
   block.addEventListener('keydown', (event) => {
+    if (phone.matches) {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openBar(module, block); }
+      return;
+    }
     const step = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
     if (!step) return;
     event.preventDefault();
@@ -397,11 +414,176 @@ function drawUndated() {
 // ── drawing the lot ──────────────────────────────────────────────────
 
 function draw() {
+  // Nothing has dates at all: no axis to draw, so the page says why instead.
+  const all = state.data?.modules ?? [];
+  const datedAny = all.some(dated);
+  $('pl-chart-panel').hidden = !datedAny;
+  for (const n of $('pl-toolbar').querySelectorAll('.pl-zoom, .pl-switch')) n.hidden = !datedAny;
+  // With no chart the toolbar has nothing to offer a desk (Refresh is in the
+  // header there); a phone keeps it for its own Refresh.
+  if (state.data) $('pl-toolbar').hidden = !datedAny && !phone.matches;
+  if (!datedAny) {
+    const n = all.length;
+    showState('empty', n ? 'No module has dates yet' : 'There are no modules yet',
+      n
+        ? `A bar is a top-level ticket in OpenProject, drawn from its own start and finish, or else from the `
+          + `earliest start and latest finish of the tickets under it. None of the ${n} module${n === 1 ? '' : 's'} `
+          + `here has either yet, so there is nothing to draw. `
+          + (phone.matches
+            ? 'Give them dates in OpenProject, or place them on a larger screen.'
+            : 'Put one on the chart from the list below to give it a fortnight from today, or give it dates in OpenProject.')
+        : (state.data?.note || 'The OpenProject project has no top-level tickets, so there is nothing to draw.'));
+  } else {
+    showState(null);
+  }
   const win = window_();
   drawAxis(win);
   drawRows(win);
   drawUndated();
   drawToolbar();
+  showToday(win);
+}
+
+// On a phone the chart opens on today rather than on its first day, a third of
+// the way in, so what is just behind is still in sight. Once per zoom, so a
+// redraw does not pull the chart back from where somebody slid it.
+let todayShownAt = '';
+function showToday(win) {
+  if (!phone.matches || todayShownAt === state.zoom) return;
+  const scroller = $('pl-scroll');
+  if (!scroller.clientWidth) return;
+  todayShownAt = state.zoom;
+  scroller.scrollLeft = Math.max(0, (TODAY - win.from) * pxPerDay() - scroller.clientWidth / 3);
+}
+
+// ── a bar's dates, on a phone ────────────────────────────────────────
+
+let sheetFrom = null;
+let sheetTimer = 0;
+
+function showLoadFailure(title, text, retry) {
+  $('plan').hidden = false;
+  $('pl-chart-panel').hidden = true;
+  $('pl-toolbar').hidden = true;
+  $('pl-undated-panel').hidden = true;
+  showState('error', title, text, retry);
+}
+
+function openBar(module, block) {
+  const bar = barOf(module);
+  let from = dayOf(bar.start);
+  let to = dayOf(bar.due);
+  if (from == null) from = to - 13;
+  if (to == null) to = from + 13;
+  const days = to - from + 1;
+  $('pl-sheet-key').textContent = `#${module.key}${module.type ? ` · ${module.type}` : ''}`;
+  $('pl-sheet-title').textContent = module.subject;
+
+  // Where the bar sits against the whole chart, drawn small, so the sheet still
+  // reads as the bar that was tapped.
+  const win = window_();
+  const range = win.to - win.from;
+  const span = $('pl-sheet-span').firstElementChild;
+  span.style.left = `${((from - win.from) / range) * 100}%`;
+  span.style.width = `${Math.max(2, (days / range) * 100)}%`;
+  span.className = ['is-moved', 'is-done', 'is-derived'].filter((c) => block.classList.contains(c)).join(' ');
+  $('pl-sheet-span').style.setProperty('--now', `${((TODAY - win.from) / range) * 100}%`);
+
+  const facts = [
+    ['Starts', readable(isoOf(from))],
+    ['Finishes', readable(isoOf(to))],
+    ['Length', `${days} day${days === 1 ? '' : 's'}${days >= 14 ? `, about ${Math.round(days / 7)} weeks` : ''}`],
+    ['Tickets', module.children ? `${module.openChildren} open of ${module.children}` : 'None underneath'],
+  ];
+  if (module.percent != null) facts.push(['Finished', `${module.percent}%`]);
+  facts.push(['Dates set by', module.scheduleManually ? 'Hand, in OpenProject' : 'OpenProject, from its children']);
+  $('pl-sheet-facts').replaceChildren(...facts.flatMap(([term, value]) => [el('dt', null, term), el('dd', null, value)]));
+
+  const moved = state.moved.has(module.key);
+  $('pl-sheet-note').hidden = !moved;
+  $('pl-sheet-note').textContent = moved
+    ? `Moved in your sketch and not yet sent. OpenProject still has ${readable(module.barStart)} to ${readable(module.barDue)}.`
+    : '';
+  $('pl-sheet-open').href = module.url || '#';
+  $('pl-sheet-open').hidden = !module.url;
+
+  clearTimeout(sheetTimer);
+  sheetFrom = block.dataset.key;
+  const sheet = $('pl-sheet');
+  sheet.style.transform = '';
+  $('pl-scrim').hidden = false;
+  sheet.hidden = false;
+  for (const id of ['plan', 'denied', 'unconnected']) $(id).inert = true;
+  for (const n of document.querySelectorAll('.admin-bar, .phone-tabbar')) n.setAttribute('inert', '');
+  // Two frames: one to lay the sheet out below the screen, one to slide it up.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $('pl-scrim').classList.add('is-open');
+    sheet.classList.add('is-open');
+  }));
+  $('pl-sheet-title').focus({ preventScroll: true });
+}
+
+function closeBar() {
+  const sheet = $('pl-sheet');
+  if (sheet.hidden) return;
+  $('pl-scrim').classList.remove('is-open');
+  sheet.classList.remove('is-open');
+  sheet.style.transform = '';
+  for (const id of ['plan', 'denied', 'unconnected']) $(id).inert = false;
+  for (const n of document.querySelectorAll('.admin-bar, .phone-tabbar')) n.removeAttribute('inert');
+  const done = () => { $('pl-scrim').hidden = true; sheet.hidden = true; };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
+  else sheetTimer = setTimeout(done, 280);
+  const back = sheetFrom && document.querySelector(`.pl-bar[data-key="${CSS.escape(sheetFrom)}"]`);
+  back?.focus({ preventScroll: true });
+  sheetFrom = null;
+}
+
+/** The sheet's ways out: Done, the scrim, Escape, and pulling it down by its top. */
+function mountSheet() {
+  const sheet = $('pl-sheet');
+  $('pl-scrim').onclick = closeBar;
+  $('pl-sheet-close').onclick = closeBar;
+  document.addEventListener('keydown', (event) => {
+    if (sheet.hidden) return;
+    if (event.key === 'Escape') closeBar();
+    // Focus stays inside the sheet while it is open.
+    if (event.key === 'Tab') {
+      const stops = [...sheet.querySelectorAll('button, a[href]')].filter((n) => !n.hidden);
+      const first = stops[0];
+      const last = stops.at(-1);
+      const at = document.activeElement;
+      if (event.shiftKey && (at === first || at === $('pl-sheet-title'))) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && at === last) { event.preventDefault(); first.focus(); }
+    }
+  });
+  let startY = null;
+  let pulled = 0;
+  sheet.addEventListener('pointerdown', (event) => {
+    // Only by the grip and the heading, so the facts below can still scroll.
+    if (!event.target.closest('.pl-sheet-grip, .pl-sheet-key, .pl-sheet-title')) return;
+    startY = event.clientY;
+    pulled = 0;
+    sheet.setPointerCapture(event.pointerId);
+    sheet.classList.add('is-pulling');
+  });
+  sheet.addEventListener('pointermove', (event) => {
+    if (startY == null) return;
+    pulled = Math.max(0, event.clientY - startY);
+    sheet.style.transform = `translateY(${pulled}px)`;
+  });
+  const release = () => {
+    if (startY == null) return;
+    startY = null;
+    sheet.classList.remove('is-pulling');
+    if (pulled > 80) closeBar();
+    else sheet.style.transform = '';
+  };
+  sheet.addEventListener('pointerup', release);
+  sheet.addEventListener('pointercancel', release);
+  // Turning the phone, or a window resized past the breakpoint: the drag comes
+  // back on the wider side, and the bars' labels say which it is.
+  phone.addEventListener('change', () => { closeBar(); todayShownAt = ''; if (state.data) draw(); });
 }
 
 // ── shipping ─────────────────────────────────────────────────────────
@@ -483,6 +665,28 @@ function askAgain(asOf) {
   }, ASK_MS);
 }
 
+/** The page's one message when there is no chart: loading, empty or failed.
+ *  `kind` null puts it away. */
+function showState(kind, title = '', text = '', retry = false) {
+  const box = $('pl-state');
+  box.hidden = !kind;
+  if (!kind) return;
+  box.dataset.kind = kind;
+  box.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+  $('pl-state-title').textContent = title;
+  $('pl-state-text').textContent = text;
+  $('pl-state-retry').hidden = !retry;
+}
+
+/** "2 days ago", not "197741s ago". */
+function ago(seconds) {
+  const n = (count, unit) => `${count} ${unit}${count === 1 ? '' : 's'} ago`;
+  if (seconds < 60) return 'under a minute ago';
+  if (seconds < 3600) return n(Math.round(seconds / 60), 'minute');
+  if (seconds < 86400) return n(Math.round(seconds / 3600), 'hour');
+  return n(Math.round(seconds / 86400), 'day');
+}
+
 async function load(refresh = false, answer = null) {
   clearTimeout(asking);
   try {
@@ -497,11 +701,23 @@ async function load(refresh = false, answer = null) {
     if (error.status === 503) {
       // The first read of a big project, still running on the server. It goes
       // on without this page; asking again is the whole of the fix.
-      say('pl-error', `${error.message} Checking again in a few seconds…`);
+      if (state.data) say('pl-error', `${error.message} Checking again in a few seconds…`);
+      else showLoadFailure('OpenProject is still being read', `${error.message} This page checks again every ten seconds.`, false);
       asking = setTimeout(() => load(), ASK_MS);
       return;
     }
-    say('pl-error', error.message);
+    // With a chart already drawn, the line above it says what went wrong and
+    // the chart stays. With nothing drawn yet, the error was going into a page
+    // that was still hidden, and the page was blank (the lead's phone, 5 Nov).
+    if (state.data) say('pl-error', error.message);
+    else {
+      const said = String(error.message ?? '').trim();
+      const why = !said || /^\d+$/.test(said)
+        ? `ADAM answered ${error.status ?? said ?? 'nothing'} when asked for the plan`
+        : said.replace(/\.$/, '');
+      showLoadFailure('The plan could not be read',
+        `${why}. Nothing was changed. Try again; if it keeps failing, the ADAM server needs a look.`, true);
+    }
     return;
   }
   state.bars.clear();
@@ -514,7 +730,7 @@ async function load(refresh = false, answer = null) {
   $('plan').hidden = false;
   $('pl-asof').textContent = state.data.asOf
     ? `OpenProject read ${new Date(state.data.asOf).toLocaleString()}`
-      + (state.data.ageSeconds ? ` · ${state.data.ageSeconds}s ago` : '')
+      + (state.data.ageSeconds ? ` · ${ago(state.data.ageSeconds)}` : '')
       + (state.data.truncated ? ' · more modules than this chart shows' : '')
       + (state.data.refreshing ? ' · refreshing…' : '')
     : '';
@@ -530,15 +746,31 @@ async function load(refresh = false, answer = null) {
   // because one of them is presentation and the other is the rule.
   if (!auth.isOwner(me)) { $('denied').hidden = false; return; }
 
+  // The page is shown at once, saying it is reading, rather than blank until
+  // the plan arrives.
+  $('plan').hidden = false;
+  $('pl-chart-panel').hidden = true;
+  $('pl-toolbar').hidden = true;
+  showState('loading', 'Reading the plan', 'Every module and its dates, from OpenProject.');
+  $('pl-state-retry').onclick = () => {
+    showState('loading', 'Reading the plan', 'Every module and its dates, from OpenProject.');
+    load();
+  };
+
   for (const button of $('pl-toolbar').querySelectorAll('[data-zoom]')) {
     button.onclick = () => { state.zoom = button.dataset.zoom; draw(); };
   }
   $('pl-hide-done').onchange = () => { state.hideDone = $('pl-hide-done').checked; draw(); };
   $('pl-refresh').onclick = async () => {
     $('pl-refresh').disabled = true;
+    $('pl-refresh-phone').disabled = true;
     await load(true);
     $('pl-refresh').disabled = false;
+    $('pl-refresh-phone').disabled = false;
   };
+  // The header's buttons give way to the phone's app bar, so a phone has its
+  // own Refresh in the toolbar. Same action.
+  $('pl-refresh-phone').onclick = () => $('pl-refresh').click();
   $('pl-discard').onclick = async () => {
     try { await auth.clearPlanDraft(auth.project()); await load(); }
     catch (error) { say('pl-error', error.message); }
@@ -546,6 +778,7 @@ async function load(refresh = false, answer = null) {
   $('pl-ship').onclick = openShip;
   $('pl-cancel').onclick = () => { $('pl-veil').hidden = true; state.proposal = null; };
   $('pl-confirm').onclick = confirmShip;
+  mountSheet();
   $('pl-veil').onclick = (event) => {
     if (event.target === $('pl-veil')) { $('pl-veil').hidden = true; state.proposal = null; }
   };

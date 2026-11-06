@@ -65,3 +65,39 @@
   .invite-page { padding: 24px 14px; align-items: flex-start; }
   .invite-card { padding: 26px 22px 22px; gap: 18px; }
 }
+
+/* The fields and the button sit in a <form> (so a password manager can find
+   them); the form keeps the state's own 14px rhythm. */
+.invite-fields { display: flex; flex-direction: column; gap: 14px; margin: 0; }
+
+/* ── a phone ───────────────────────────────────────────────────────────
+   Below 720px (DESIGN-SYSTEM.md: a phone), on the design system's tokens.
+   The page scrolls (styles.css holds html and body still for the viewer), so
+   with the keyboard up the field being typed in and the button under it can
+   always be reached; the lattice and its wash stay pinned behind. Fields are
+   52px with 16px text, the button 52px, labels readable. The card's look is
+   kept. */
+@media (max-width: 719px) {
+  .invite-page {
+    height: 100%; overflow-y: auto; overflow-x: hidden;
+    padding: calc(var(--ds-space-4) + var(--ds-safe-top)) var(--ds-space-3) calc(var(--ds-space-6) + var(--ds-safe-bottom));
+  }
+  .invite-page .auth-field, .invite-page .auth-scrim { position: fixed; }
+  .invite-card { padding: var(--ds-space-6) var(--ds-space-5) var(--ds-space-5); gap: var(--ds-space-5); border-radius: var(--ds-radius-lg); }
+  .invite-page .auth-lockup { height: 40px; }
+  .invite-page .auth-title { font-size: var(--ds-text-xl); text-wrap: balance; }
+  .invite-page .auth-note { font-size: var(--ds-text-md); overflow-wrap: anywhere; }
+  .invite-page .auth-fine { font-size: var(--ds-text-sm); }
+  .invite-page .auth-label { font-size: var(--ds-text-xs); letter-spacing: 0.08em; }
+  .invite-page .auth-input {
+    min-height: 52px; font-size: var(--ds-text-md); padding: 0 var(--ds-space-4);
+    border-radius: var(--ds-radius-sm);
+  }
+  .invite-page .auth-button {
+    min-height: 52px; display: flex; align-items: center; justify-content: center;
+    font-size: var(--ds-text-md); border-radius: var(--ds-radius-sm); touch-action: manipulation;
+  }
+  .invite-page .auth-button:active:not(:disabled) { transform: scale(var(--ds-press-scale)); }
+  .invite-page .auth-error { font-size: var(--ds-text-sm); }
+  .invite-page .auth-by-label { font-size: 10px; }
+}

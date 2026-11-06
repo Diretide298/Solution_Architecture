@@ -64,6 +64,122 @@
   .doc-sections { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* ── a phone ───────────────────────────────────────────────────────────
+   Below 720px (DESIGN-SYSTEM.md: a phone), on the design system's tokens.
+   The sections are a list of full-width rows, each a 48px tap anywhere on
+   it with a 22px box; Generate stays under the thumb while the list is
+   scrolled (until there is a preview, when every way out sits at the end of
+   the form); and the preview reads at 16px in a box most of the screen tall.
+   Desktop and print are untouched. */
+@media screen and (max-width: 719px) {
+  /* minmax(0, 1fr): a plain grid column is as wide as the widest table in
+     the preview, which pushed the whole page sideways. */
+  .doc-main { grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-4); padding-left: var(--ds-space-3); padding-right: var(--ds-space-3); }
+  .doc-main > *, .doc-form, .doc-fieldset { min-width: 0; }
+  .doc-main .admin-panel { padding: var(--ds-space-5) var(--ds-space-4); border-radius: var(--ds-radius-md); }
+  .doc-title {
+    font-size: var(--ds-text-xl); line-height: var(--ds-leading-tight);
+    letter-spacing: var(--ds-tracking-tight); text-wrap: balance;
+  }
+  .doc-lede { margin-bottom: var(--ds-space-6); font-size: var(--ds-text-md); line-height: var(--ds-leading-body); text-wrap: pretty; }
+  .doc-legend { font-size: var(--ds-text-lg); margin-bottom: var(--ds-space-3); }
+
+  /* Select all / none, and how many are ticked. */
+  .doc-pick-bar { gap: var(--ds-touch-gap); }
+  .doc-pick-bar .chip {
+    min-height: var(--ds-touch-min); padding: 0 var(--ds-space-4);
+    font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold);
+    color: var(--ds-ink); border-color: var(--ds-line-control); touch-action: manipulation;
+  }
+  #dc-count { flex-basis: 100%; font-size: var(--ds-text-sm); color: var(--ds-ink-2); font-variant-numeric: tabular-nums; }
+
+  /* The sections: one surface, a line between rows. */
+  .doc-sections {
+    grid-template-columns: minmax(0, 1fr); gap: 0;
+    border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md);
+    background: var(--ds-surface); overflow: hidden;
+  }
+  .doc-section {
+    display: flex; align-items: center; gap: var(--ds-space-1) var(--ds-space-3); flex-wrap: wrap;
+    min-height: var(--ds-touch-comfy); padding: var(--ds-space-2) var(--ds-space-4);
+    font-size: var(--ds-text-md); line-height: var(--ds-leading-snug); color: var(--ds-ink);
+    border-bottom: 1px solid var(--ds-line);
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    transition: background-color var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  .doc-section:last-child { border-bottom: 0; }
+  .doc-section:active { background: var(--ds-surface-press); }
+  .doc-section:has(input:checked) { background: color-mix(in srgb, var(--ds-accent-soft) 55%, transparent); }
+  .doc-section input { width: 22px; height: 22px; flex: none; transform: none; accent-color: var(--ds-accent-fill); }
+  .doc-section > span:not(.sh-quiet) { flex: 1 1 0; min-width: 0; }
+  .doc-section .sh-quiet { flex-basis: 100%; padding-left: calc(22px + var(--ds-space-3)); font-size: var(--ds-text-xs); color: var(--ds-ink-2); }
+
+  /* The ways out. Generate and the workbook first, side by side; the rest
+     appear after a preview, in pairs. */
+  .doc-actions.set-actions {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ds-touch-gap);
+  }
+  .doc-actions .auth-button, .doc-actions .chip {
+    min-height: var(--ds-touch-comfy); width: 100%; padding: 0 var(--ds-space-3);
+    border-radius: var(--ds-radius-sm); font-size: var(--ds-text-md); font-weight: var(--ds-weight-semibold);
+    touch-action: manipulation;
+    transition-property: transform, opacity; transition-duration: var(--ds-dur-fast); transition-timing-function: var(--ds-ease-out);
+  }
+  .doc-actions .chip { color: var(--ds-ink); border-color: var(--ds-line-control); background: var(--ds-surface-2); }
+  .doc-actions .auth-button { background: var(--ds-accent-fill); color: var(--ds-accent-on); }
+  .doc-actions .auth-button:active:not(:disabled), .doc-actions .chip:active:not(:disabled) { transform: scale(var(--ds-press-scale)); }
+  .doc-actions .auth-button:disabled, .doc-actions .chip:disabled { opacity: 0.45; }
+  .doc-actions .set-state { grid-column: 1 / -1; font-size: var(--ds-text-sm); }
+  .doc-actions .set-state:empty { display: none; }
+
+  /* Docked to the bottom of the screen while there is only something to
+     generate; once a preview exists the bar would be five buttons tall, so it
+     goes back into the form. */
+  .doc-actions:not(:has(#dc-download:not([hidden]))) {
+    position: sticky; bottom: 0; z-index: var(--ds-z-bar);
+    margin: 0 calc(-1 * var(--ds-space-4));
+    padding: var(--ds-space-3) var(--ds-space-4) calc(var(--ds-space-3) + var(--ds-safe-bottom));
+    background: var(--ds-surface); border-top: 1px solid var(--ds-line-strong);
+  }
+  /* The phone frame pads the body (the scroller) for its bottom bar, and a
+     sticky box is measured inside that padding: bottom 0 sits on the bar. */
+  body.has-phone-frame .doc-actions:not(:has(#dc-download:not([hidden]))) { padding-bottom: var(--ds-space-3); }
+  .doc-form .auth-error { font-size: var(--ds-text-sm); }
+  #dc-skipped { font-size: var(--ds-text-sm); }
+
+  /* The preview. */
+  .doc-preview-head { gap: var(--ds-space-3); }
+  .doc-preview-head .sh-part-title { font-size: var(--ds-text-lg); }
+  .doc-preview-head .sh-field-inline { width: 100%; font-size: var(--ds-text-sm); }
+  .doc-preview-head .sh-switch { flex: 1 1 auto; border-radius: var(--ds-radius-sm); }
+  .doc-preview-head .sh-switch button { flex: 1 1 0; min-height: var(--ds-touch-min); font-size: var(--ds-text-sm); }
+  .doc-stale { font-size: var(--ds-text-sm); line-height: var(--ds-leading-body); }
+
+  /* A reader of its own: the whole package can run to hundreds of thousands
+     of words, so it scrolls in a box most of the screen tall, and a swipe
+     that reaches its end stops there rather than carrying the page off. */
+  .doc-rendered {
+    max-height: 75dvh; overflow: auto; overscroll-behavior: contain;
+    margin: 0 calc(-1 * var(--ds-space-2));
+    padding: var(--ds-space-1) var(--ds-space-4) var(--ds-space-6);
+    border-color: var(--ds-line-strong); border-radius: var(--ds-radius-md);
+    font-size: var(--ds-text-md); line-height: var(--ds-leading-body);
+  }
+  .doc-rendered .md-p, .doc-rendered .md-list li { font-size: var(--ds-text-md); line-height: var(--ds-leading-body); }
+  .doc-rendered .md-head { text-wrap: balance; }
+  .doc-rendered .md-h1 { font-size: var(--ds-text-xl); }
+  .doc-rendered .md-h2 { font-size: var(--ds-text-lg); }
+  .doc-rendered .md-h3 { font-size: var(--ds-text-md); }
+  .doc-rendered code { overflow-wrap: anywhere; }
+
+  .doc-rendered .md-table { font-size: var(--ds-text-sm); width: max-content; min-width: 100%; }
+  .doc-rendered .md-table th, .doc-rendered .md-table td { max-width: 70vw; }
+  .doc-preview {
+    max-height: 75dvh; overscroll-behavior: contain; margin: 0 calc(-1 * var(--ds-space-2));
+    padding: var(--ds-space-3); font-size: var(--ds-text-sm); border-radius: var(--ds-radius-md);
+  }
+}
+
 /* Printing is the third way out, after download and copy, and it prints the
    document as it reads, never the Markdown source: on paper `| --- |` and
    `**` are noise. Everything else on the page is furniture. */

@@ -854,3 +854,301 @@ a.tk-gantt-label:hover { text-decoration: underline; color: var(--text); }
   .tk-fd-row .tk-when { display: block; grid-column: 2 / -1; text-align: left; }
 }
 .tk-fd-detail-head .chip { white-space: nowrap; }
+
+.tk-more-text { display: none; }
+
+/* ── the phone (below 720px) ─────────────────────────────────────────
+   Built on design-tokens.css, which tasks.html loads before this file. The
+   desktop above 720px is untouched by everything below except `.tk-zoom`,
+   which only exists for the phone's Gantt and stays hidden on a wide screen.
+
+   What changes on a phone: the rail is a row of chips that keeps the current
+   one in sight; every target is 44px or more and every field 16px text (so
+   the phone does not zoom into it); the three tables become a block per
+   person; one person opens as a full screen; a tap shows what a hover shows;
+   and the Gantt slides sideways under a fixed column of names. */
+.tk-zoom { display: none; }
+
+@media (max-width: 719px) {
+  /* ── the rail: a row of chips ── */
+  #tasks .set-nav-list {
+    gap: var(--ds-space-2); scroll-padding-inline: var(--ds-space-4);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    padding-right: 28px;
+  }
+  #tasks .set-nav a {
+    display: inline-flex; align-items: center; min-height: var(--ds-touch-min);
+    padding: 0 var(--ds-space-4); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold);
+    white-space: nowrap; transition: background-color var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  #tasks .set-nav a[aria-current='true'] {
+    background: var(--ds-accent-fill); border-color: var(--ds-accent-fill); color: var(--ds-accent-on);
+  }
+
+  /* ── what is read, and the filter ── */
+  .tk-top { gap: var(--ds-space-3); }
+  .tk-top-line { gap: var(--ds-space-2) var(--ds-space-3); }
+  .tk-lede { font-size: var(--ds-text-sm); }
+  .tk-top-actions { gap: var(--ds-space-3); }
+  .tk-asof { font-size: var(--ds-text-sm); line-height: var(--ds-leading-snug); }
+  .chip.tk-refresh { min-height: var(--ds-touch-min); padding: 0 var(--ds-space-5); font-size: var(--ds-text-sm); flex: none; }
+  .tk-scope { gap: var(--ds-space-3); padding: var(--ds-space-4); border-radius: var(--ds-radius-md); }
+  .tk-field { font-size: var(--ds-text-xs); font-weight: var(--ds-weight-semibold); }
+  .tk-field .scope-select, .tk-top .scope-select, .tk-field-inline .scope-select, #tk-status {
+    min-height: var(--ds-touch-min); font-size: var(--ds-text-md); padding: 0 var(--ds-space-3);
+    border-radius: var(--ds-radius-sm);
+  }
+  .tk-unit { flex: 1 1 100%; }
+  .tk-switch { display: grid; grid-template-columns: 1fr 1fr; width: 100%; border-radius: var(--ds-radius-sm); padding: 3px; }
+  .tk-switch button { min-height: 40px; font-size: var(--ds-text-sm); }
+  .tk-clear { min-height: var(--ds-touch-min); padding: 0 var(--ds-space-4); font-size: var(--ds-text-sm); margin: 0; }
+  .tk-scope-says { font-size: var(--ds-text-sm); }
+  .tk-unit-says { font-size: var(--ds-text-xs); line-height: var(--ds-leading-body); }
+
+  /* ── this sprint ── */
+  .tk-sheet { padding: var(--ds-space-5) var(--ds-space-4) var(--ds-space-6); }
+  .tk-part { margin-top: var(--ds-space-8); }
+  .tk-part-title { font-size: var(--ds-text-lg); line-height: var(--ds-leading-snug); }
+  .tk-part-head { gap: var(--ds-space-2); }
+  .tk-part-head .tk-field-inline { flex: 1 1 100%; font-size: var(--ds-text-sm); }
+  .tk-part-head .tk-field-inline .scope-select { flex: 1; }
+  /* Long explanations are three lines until asked for (tasks.js mountClamps). */
+  .tk-clampable:not(.is-open) {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+  }
+  .tk-more-text {
+    display: inline-flex; align-items: center; min-height: var(--ds-touch-min); margin: -6px 0 var(--ds-space-2);
+    padding: 0; border: 0; background: none; cursor: pointer;
+    font: inherit; font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--accent-text);
+  }
+  .tk-more-text:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .tk-note { font-size: var(--ds-text-sm); }
+  .tk-headline { font-size: 28px; gap: var(--ds-space-3); }
+  .tk-pace { font-size: var(--ds-text-md); }
+  .tk-ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-space-4); }
+  .tk-ledger dd { font-size: var(--ds-text-lg); }
+  .tk-saying, .tk-next { font-size: var(--ds-text-sm); line-height: var(--ds-leading-body); }
+  .tk-burn-caption { font-size: var(--ds-text-xs); }
+
+  /* Who is doing what: the name on its own line with the verdict beside it,
+     the bar across the width, then finished, last moved and open. */
+  .tk-person {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: 'who who pace' 'bar bar bar' 'done moved open';
+    gap: var(--ds-space-2) var(--ds-space-3); padding: var(--ds-space-4) var(--ds-space-1);
+    min-height: var(--ds-touch-min);
+  }
+  .tk-person:active { background: var(--bg-hover); }
+  .tk-person-name { font-size: var(--ds-text-md); }
+  .tk-avatar { width: 32px; height: 32px; font-size: 11.5px; }
+  .tk-person-pace { font-size: var(--ds-text-xs); }
+  .tk-person-done, .tk-person-open, .tk-person-moved { font-size: var(--ds-text-xs); }
+  .tk-person-done { text-align: left; }
+  .tk-person-moved { justify-content: center; }
+  .tk-person-bar .tk-stack-fill { height: 14px; }
+  .tk-roster-key { gap: var(--ds-space-2) var(--ds-space-4); }
+
+  /* Rows of tickets: the subject gets two lines, and the number is a target. */
+  .tk-qa-row, .tk-att-item { padding: var(--ds-space-3) 0; }
+  .tk-qa-row .tk-subject, .tk-att-subject, .tk-row .tk-subject {
+    white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    font-size: var(--ds-text-sm); line-height: var(--ds-leading-snug);
+  }
+  .tk-att-head { align-items: flex-start; }
+  /* 44px to the finger, the line unmoved: padding out, the same margin back. */
+  .tk-key, .tk-lede a { display: inline-block; padding: 13px 2px; margin: -13px -2px; }
+  .tk-att-meta, .tk-parent { font-size: var(--ds-text-xs); }
+  .tk-att-more { display: inline-flex; align-items: center; min-height: var(--ds-touch-min); margin-top: 0; font-size: var(--ds-text-sm); }
+
+  /* ── the three tables, one block per row ──
+     The header row is read by a screen reader and hidden from sight; each
+     cell says its column name itself (tasks.js `cardify`). */
+  .tk-table-wrap { overflow: visible; margin-top: var(--ds-space-3); }
+  .tk-table, .tk-table tbody, .tk-table tfoot { display: block; width: 100%; }
+  .tk-table caption { display: block; padding-bottom: var(--ds-space-2); font-size: var(--ds-text-xs); }
+  .tk-table thead {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .tk-table tr {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: var(--ds-space-2);
+    padding: var(--ds-space-4) 0; border-bottom: 1px solid var(--border);
+  }
+  .tk-table tbody tr:hover { background: none; }
+  .tk-table tr.is-chosen {
+    margin: 0 calc(-1 * var(--ds-space-3)); padding-inline: var(--ds-space-3); border-radius: var(--ds-radius-md);
+  }
+  .tk-table th, .tk-table td {
+    padding: 0; border: 0; white-space: normal; text-align: left; min-width: 0;
+  }
+  .tk-table tbody th, .tk-table tfoot th {
+    grid-column: 1 / -2; order: -2; align-self: center;
+    font-size: var(--ds-text-md); font-weight: var(--ds-weight-bold); color: var(--text);
+  }
+  .tk-table .tk-link { display: inline-flex; align-items: center; min-height: var(--ds-touch-min); }
+  .tk-table td[data-label] {
+    display: grid; align-content: start; gap: 2px;
+    padding: var(--ds-space-2) var(--ds-space-3); border-radius: var(--ds-radius-sm);
+    background: color-mix(in srgb, var(--text-faint) 9%, transparent);
+    font-size: var(--ds-text-md); font-weight: var(--ds-weight-bold); color: var(--text);
+    font-variant-numeric: tabular-nums; text-align: left; justify-items: start;
+  }
+  .tk-table td[data-label]::before {
+    content: attr(data-label); font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium);
+    color: var(--text-dim); line-height: var(--ds-leading-snug);
+  }
+  /* The row's sum sits beside the name, in the name's type. */
+  .tk-table td.tk-col-total {
+    grid-column: -2 / -1; order: -1; background: none !important; padding: 0;
+    text-align: right; justify-items: end; align-self: center; box-shadow: none !important;
+  }
+  .tk-table td.tk-col-total::before { font-size: 11.5px; white-space: nowrap; }
+  .tk-table tfoot tr { border-bottom: 0; border-top: 2px solid var(--border-strong); margin-top: -1px; }
+  .tk-daily tfoot th, .tk-daily tfoot td { border-top: 0; }
+
+  /* Expected per day: tiles in the heat colour tasks.js gives them. */
+  .tk-daily .is-now { box-shadow: inset 0 0 0 2px var(--accent); }
+  .tk-daily td.is-now::before { color: var(--accent-text); font-weight: var(--ds-weight-bold); }
+
+  /* Finished each day: a tile a day; days still to come are left out, and the
+     number is a target the size of its tile. */
+  /* Five to a row: a working week. */
+  .tk-fd tr { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .tk-fd td[data-label] { position: relative; padding: var(--ds-space-2); }
+  .tk-fd td[data-label]::before { content: attr(data-label) '\A' attr(data-sub); white-space: pre; font-size: 11.5px; }
+  .tk-fd td.tk-col-total::before { content: attr(data-label); }
+  .tk-fd tbody th, .tk-fd tfoot th { grid-column: 1 / 4; }
+  .tk-fd td.tk-col-total { grid-column: 4 / -1; }
+  .tk-fd td.is-future { display: none; }
+  .tk-fd td.is-weekend::before { font-style: italic; }
+  .tk-fd-n { padding: 0; font-size: var(--ds-text-md); text-align: left; }
+  .tk-fd-n::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .tk-fd td:has(.tk-fd-n) { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .tk-fd td:has(.tk-fd-n):active { background: color-mix(in srgb, var(--accent) 24%, transparent); }
+  .tk-fd .tk-col-total .tk-fd-n::after { inset: -8px; }
+  .tk-fd-zero { font-weight: var(--ds-weight-medium); }
+  .tk-fd-detail-head { flex-wrap: wrap; }
+  .tk-fd-detail-head .chip { min-height: var(--ds-touch-min); }
+
+  /* People, in numbers: label and figure in two columns, with the longer
+     facts across the full width. */
+  #tk-people tr { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #tk-people tbody th { grid-column: 1 / -1; }
+  #tk-people tr { gap: var(--ds-space-3) var(--ds-space-4); }
+  #tk-people td[data-label] { background: none; padding: 0 0 var(--ds-space-2); border-bottom: 1px solid var(--border); border-radius: 0; font-weight: var(--ds-weight-bold); }
+  #tk-people .tk-moved-cell, #tk-people .tk-gate-cell { grid-column: 1 / -1; font-weight: var(--ds-weight-medium); font-size: var(--ds-text-sm); }
+  #tk-people .tk-moved-cell[data-label], #tk-people .tk-gate-cell[data-label] { grid-template-columns: minmax(0, 1fr); }
+  #tk-people td.is-late[data-label]::before, #tk-people .tk-moved-cell.is-still[data-label]::before {
+    content: attr(data-label); color: var(--text-dim);
+  }
+  #tk-people td.is-late[data-label] { box-shadow: inset 2px 0 0 var(--tk-late); padding-left: var(--ds-space-2); }
+  #tk-people .tk-moved-cell.is-still[data-label] { color: var(--text); font-weight: var(--ds-weight-bold); box-shadow: inset 2px 0 0 var(--tk-late); padding-left: var(--ds-space-2); }
+
+  /* ── the tooltip, tapped: a card along the bottom of the screen ── */
+  .tk-tip.is-tapped {
+    left: var(--ds-space-3) !important; right: var(--ds-space-3); top: auto !important;
+    bottom: calc(var(--ds-space-4) + var(--ds-safe-bottom));
+    max-width: 560px; margin-inline: auto; padding: var(--ds-space-3) var(--ds-space-4); border-radius: var(--ds-radius-md);
+    background: var(--ds-frame); border-color: var(--ds-frame-line); color: var(--ds-frame-ink);
+    box-shadow: var(--ds-shadow-2); font-size: var(--ds-text-sm); line-height: var(--ds-leading-body);
+    z-index: var(--ds-z-toast);
+    animation: tk-tip-in var(--ds-dur-fast) var(--ds-ease-out);
+  }
+  /* Above the shared bottom bar, where the page has one. */
+  body.has-phone-frame .tk-tip.is-tapped { bottom: calc(var(--ds-bar-bottom) + var(--ds-safe-bottom) + var(--ds-space-3)); }
+  [data-tip].is-tipped { outline: 2px solid var(--accent); outline-offset: 1px; }
+  rect[data-tip].is-tipped { outline: 0; fill: color-mix(in srgb, var(--accent) 16%, transparent); }
+
+  /* ── one person: a screen of its own ── */
+  body.tk-person-sheet { overflow: hidden; }
+  body.tk-person-sheet #person {
+    position: fixed; inset: 0; z-index: var(--ds-z-sheet); margin: 0;
+    border: 0; border-radius: 0; box-shadow: none;
+    overflow-y: auto; overscroll-behavior: contain;
+    padding: 0 var(--ds-gutter) calc(var(--ds-space-10) + var(--ds-safe-bottom));
+    background: var(--bg-panel);
+    animation: tk-push var(--ds-dur-normal) var(--ds-ease-sheet);
+  }
+  body.tk-person-sheet .tk-back {
+    position: sticky; top: 0; z-index: 6; display: flex; align-items: center; gap: var(--ds-space-2);
+    margin: 0 calc(-1 * var(--ds-gutter)) var(--ds-space-5);
+    padding: var(--ds-safe-top) var(--ds-space-4) 0 var(--ds-space-2);
+    min-height: calc(var(--ds-bar-top) + var(--ds-safe-top));
+    background: var(--ds-frame); color: var(--ds-frame-ink); border-bottom: 1px solid var(--ds-frame-line);
+    font-size: var(--ds-text-md); font-weight: var(--ds-weight-semibold); text-decoration: none;
+  }
+  body.tk-person-sheet .tk-back::before {
+    content: ''; width: 44px; height: 44px; margin: 0; flex: none;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 5l-7 7 7 7'/%3E%3C/svg%3E") center / 24px no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 5l-7 7 7 7'/%3E%3C/svg%3E") center / 24px no-repeat;
+  }
+  body.tk-person-sheet .tk-back:focus-visible { outline: 2px solid var(--ds-frame-accent); outline-offset: -4px; }
+  .tk-p-head { gap: var(--ds-space-4); }
+  .tk-p-name { font-size: 26px; }
+  .tk-p-role { font-size: var(--ds-text-sm); }
+  .tk-p-verdict { font-size: var(--ds-text-md); }
+  .tk-p-pick-item { min-height: 56px; padding: var(--ds-space-2) var(--ds-space-2); }
+  .tk-p-pick-item .tk-person-name { font-size: var(--ds-text-md); }
+  .tk-p-feature > summary { min-height: var(--ds-touch-min); align-items: center; padding: var(--ds-space-2) var(--ds-space-1); font-size: var(--ds-text-sm); }
+  .tk-p-feature > summary::before { font-size: 18px; }
+  .tk-p-ticket { font-size: var(--ds-text-sm); padding: var(--ds-space-2) 0; }
+  .tk-p-all { min-height: var(--ds-touch-min); font-size: var(--ds-text-sm); }
+
+  /* ── features by sprint: slid sideways under a fixed column of names ── */
+  #timeline .set-actions { display: grid; gap: var(--ds-space-3); }
+  .tk-zoom {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 3px;
+    border: 1px solid var(--border-strong); border-radius: var(--ds-radius-sm); background: var(--bg-raised);
+  }
+  .tk-zoom button {
+    min-height: 40px; border: 0; border-radius: 8px; background: transparent; cursor: pointer;
+    font: inherit; font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--text-dim);
+  }
+  .tk-zoom button[aria-pressed='true'] { background: var(--accent); color: var(--ink-on-accent); }
+  .tk-zoom button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tk-only { min-height: var(--ds-touch-min); font-size: var(--ds-text-sm); }
+  .tk-only input { width: 20px; height: 20px; }
+
+  .tk-gantt {
+    --gantt-label: clamp(118px, 34vw, 150px);
+    overflow-x: auto; overscroll-behavior-x: contain; touch-action: pan-x pan-y;
+    gap: var(--ds-space-4); padding-bottom: var(--ds-space-2);
+    scrollbar-width: thin;
+  }
+  .tk-gantt > * { width: calc(100% * var(--gantt-zoom, 2.5)); min-width: 100%; }
+  .tk-gantt > .tk-empty { width: auto; }
+  .tk-gantt-scale { margin-left: calc(var(--gantt-label) + 10px); margin-right: 52px; }
+  .tk-gantt-month { font-size: 11.5px; }
+  .tk-gantt-row { grid-template-columns: var(--gantt-label) minmax(0, 1fr) 42px; min-height: 44px; }
+  .tk-gantt-group { gap: 6px; }
+  .tk-gantt-label {
+    grid-column: auto; position: sticky; left: 0; z-index: 2; align-self: stretch;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; white-space: normal;
+    padding: 3px 8px 3px 0; background: var(--bg-panel); overflow: hidden; align-self: stretch; max-height: calc(3.9em + 6px);
+    /* Stretched to the row, so a bar starting under the names never shows below a short name. */
+    overflow-wrap: anywhere;
+    box-shadow: 8px 0 10px -8px rgb(0 0 0 / 35%);
+    font-size: var(--ds-text-xs); line-height: 1.3; color: var(--text);
+  }
+  .tk-gantt-track { grid-column: auto; height: 18px; }
+  .tk-gantt-bar { height: 18px; }
+  .tk-gantt-count { font-size: 11.5px; }
+  details.tk-gantt-group > summary {
+    position: sticky; left: 0; width: fit-content; max-width: calc(100vw - 80px);
+    min-height: var(--ds-touch-min); display: list-item; padding-top: var(--ds-space-2);
+    font-size: var(--ds-text-sm); line-height: var(--ds-leading-snug); color: var(--text);
+  }
+
+  /* ── the rest ── */
+  .signoff-controls { gap: var(--ds-space-3); }
+  #tk-search { min-height: var(--ds-touch-min); font-size: var(--ds-text-md); flex: 1 1 100%; }
+  #tk-export, .tk-more { min-height: var(--ds-touch-min); padding: 0 var(--ds-space-4); font-size: var(--ds-text-sm); }
+  .tk-row { padding: var(--ds-space-1) 0; }
+}
+
+@keyframes tk-push { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes tk-tip-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  body.tk-person-sheet #person, .tk-tip.is-tapped { animation: none; }
+}

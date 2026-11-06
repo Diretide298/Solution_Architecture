@@ -317,10 +317,13 @@ function renderControls(col) {
     ui.showAll = !ui.showAll;
     applyStep();
   }, 'bld-btn is-quiet');
-  btn('Present', 'Full screen', () => {
+  const present = btn('Present', 'Full screen', () => {
     if (document.fullscreenElement) document.exitFullscreen();
     else ui.host.requestFullscreen?.().catch(() => {});
   }, 'bld-btn is-quiet');
+  // Not in the Android app: its web view leaves full screen the moment it is
+  // entered, so the button would do nothing.
+  present.hidden = Boolean(window.Capacitor);
   col.append(bar);
 }
 

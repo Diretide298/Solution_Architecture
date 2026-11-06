@@ -35,7 +35,7 @@ import '/page-chrome.js';
 import * as auth from '/validation.js';
 import { mountPanels } from '/panels.js';
 import {
-  el, fmt, plural, verdict, next, mountScope, legend, table, personLink, param,
+  el, fmt, plural, verdict, next, mountScope, legend, table, personLink, param, cardRow,
 } from '/sheet.js';
 
 const $ = (id) => document.getElementById(id);
@@ -388,7 +388,7 @@ function drawSessions() {
   host.replaceChildren();
   if (!shown) return;
 
-  const wrap = el('div', 'sh-table-wrap');
+  const wrap = el('div', 'sh-table-wrap is-phone-cards');
   const t = el('table', 'sh-table ag-sessions');
   const head = el('tr');
   const cols = ['Started', ...(d.whole ? ['Person'] : []), 'Ticket', 'Repository', 'Active', 'Ended', 'Agent', 'Machine'];
@@ -428,6 +428,7 @@ function drawSessions() {
     tr.append(el('td', 'is-nowrap', sameDay ? clock(s.endedAt) : when(s.endedAt)));
     tr.append(el('td', '', s.agent || '—'));
     tr.append(el('td', '', s.host || '—'));
+    cardRow(tr, cols);
     tbody.append(tr);
 
     let detail = null;

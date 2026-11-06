@@ -152,6 +152,10 @@ function drawMatrix(role) {
   const table = $('me-matrix');
   if (!table) return;
   const cols = [...table.querySelectorAll('thead th[data-col]')].map((th) => th.dataset.col);
+  // Each cell carries its role's name, so a phone can draw a capability as a
+  // card with the roles as a row of labelled dots (layers.css).
+  const names = Object.fromEntries([...table.querySelectorAll('thead th[data-col]')]
+    .map((th) => [th.dataset.col, th.firstChild?.textContent.trim() ?? th.dataset.col]));
   // The System Architect and an admin hold the same things here; a column each
   // would be two identical columns.
   const mine = role === 'owner' || role === 'pm' || role === 'lead' ? 'admin' : role;
@@ -165,6 +169,7 @@ function drawMatrix(role) {
     const holds = new Set((tr.dataset.caps ?? '').split(' ').filter(Boolean));
     for (const col of cols) {
       const td = el('td');
+      td.dataset.label = names[col];
       if (col === mine) td.setAttribute('data-you', '');
       const dot = el('span', 'set-dot');
       dot.dataset.on = holds.has(col) ? '1' : '0';
