@@ -13,7 +13,8 @@
  * sends the file in one request.
  *
  * **It is deliberately narrow about what it writes down.** Which tool ran,
- * whether it worked, how long it took, and which ticket was open. Never the
+ * whether it worked, how long it took, how long its answer was (a byte count,
+ * never the answer), and which ticket was open. Never the
  * prompt, never tool arguments, never file contents, never a command line.
  * Those are what would make this uncomfortable to keep, and a log that is
  * uncomfortable to keep gets turned off. The service drops anything else it is
@@ -151,6 +152,20 @@ function classify(response) {
   return 'error';
 }
 
+/** How long a tool's answer was, in bytes: roughly what the model had to read,
+ *  which is what makes a tool expensive (6 November 2026: the change-request
+ *  tools were costing developers' sessions most). The length is all that leaves
+ *  this function; the answer itself is never written down. */
+function answerBytes(response) {
+  if (response === undefined || response === null) return 0;
+  try {
+    const text = typeof response === 'string' ? response : JSON.stringify(response);
+    return Buffer.byteLength(text ?? '', 'utf8');
+  } catch {
+    return 0;
+  }
+}
+
 /** Whether a tool result says it failed. Claude Code reports this differently
  *  per tool, so this asks the two questions that hold across all of them and
  *  treats anything else as success — over-reporting failure would make the
@@ -215,6 +230,7 @@ async function record(hook) {
       ok: !bad,
       error_kind: bad ? classify(hook.tool_response) : '',
       ms: Math.max(0, now - began),
+      bytes: answerBytes(hook.tool_response),
     });
   } else if (event === 'UserPromptSubmit') {
     // That there was one, and when. Not a word of it — see the header.

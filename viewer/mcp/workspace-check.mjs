@@ -272,6 +272,30 @@ try {
       && withLook.replace(LOOK_RE, '').split('<!-- ADAM:end working-a-ticket -->\n\n')[1] === noLookMd.split('<!-- ADAM:end working-a-ticket -->\n')[1]
       && /"Building a screen to its wireframe"/.test(lk.text), lk.text);
 
+  // ── 5d. the adam-cr agent reaches a workspace made before it (6 November 2026) ──
+  const AGENT = ['.claude', 'agents', 'adam-cr.md'];
+  const noAgent = oldWorkspace('be-no-agent', 'backend', { markers: true });
+  check('a workspace made before the agent has none', !existsSync(path.join(noAgent, ...AGENT)));
+  const ag = updater(noAgent, ['--refresh-workspace', noAgent, '--from', STARTERS]);
+  check("**the refresh adds .claude/agents/adam-cr.md, the starter's own**",
+    ag.code === 0 && lf(read(noAgent, ...AGENT)) === lf(starter('backend', ...AGENT)), ag.text);
+  check('and says so', /added \.claude\/agents\/adam-cr\.md/.test(ag.text), ag.text);
+  check('the agent cannot edit files or file the change request itself',
+    /^disallowedTools: .*\bEdit\b.*\bBash\b.*mcp__adam__adam_raise_change.*mcp__plugin_adam_adam__adam_raise_change/m.test(read(noAgent, ...AGENT)));
+  const OWN_AGENT = ['---', 'name: adam-cr', '---', "The team's own agent.", ''].join('\n');
+  const ownAgent = oldWorkspace('be-own-agent', 'backend', { markers: true });
+  mkdirSync(path.join(ownAgent, '.claude', 'agents'), { recursive: true });
+  writeFileSync(path.join(ownAgent, ...AGENT), OWN_AGENT);
+  updater(ownAgent, ['--refresh-workspace', ownAgent, '--from', STARTERS]);
+  check("**a team's own adam-cr.md is left alone**", read(ownAgent, ...AGENT) === OWN_AGENT);
+  for (const role of ['backend', 'frontend', 'ai']) {
+    check(`the ${role} /cr hands the research to adam-cr and drops the adam_changes search`,
+      /adam-cr/.test(starter(role, '.claude', 'commands', 'cr.md'))
+        && !/^2\. `adam_changes` for those artefacts/m.test(starter(role, '.claude', 'commands', 'cr.md')));
+    check(`the ${role} working-a-ticket section says one ticket per session`,
+      /One ticket per session/.test(lf(starter(role, 'CLAUDE.md')).match(/<!-- ADAM:start working-a-ticket -->[\s\S]*?<!-- ADAM:end working-a-ticket -->/)[0]));
+  }
+
   // ── 6. a folder that is not an ADAM workspace is not written to ────
   const empty = path.join(T, 'empty');
   mkdirSync(empty, { recursive: true });
@@ -295,6 +319,9 @@ try {
   check('for the backend it also sends ADAM\'s script, .claude/scripts/db-ticket.mjs',
     JSON.stringify(backendRoute.scripts?.map((x) => x.name)) === '["db-ticket.mjs"]'
       && lf(backendRoute.scripts[0].text) === lf(starter('backend', '.claude', 'scripts', 'db-ticket.mjs')), JSON.stringify(backendRoute.scripts?.map((x) => x.name)));
+  check("and every role gets ADAM's agent, .claude/agents/adam-cr.md",
+    JSON.stringify(route.agents?.map((x) => x.name)) === '["adam-cr.md"]'
+      && lf(route.agents[0].text) === lf(starter('frontend', '.claude', 'agents', 'adam-cr.md')), JSON.stringify(route.agents?.map((x) => x.name)));
   check('a role that is neither is refused',
     (await fetch(`http://127.0.0.1:${PORTS.viewer}/connector/workspace?role=..%2Fx`)).status === 400);
 

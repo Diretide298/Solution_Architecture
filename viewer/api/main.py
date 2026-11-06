@@ -26,7 +26,7 @@ import urllib.error
 import urllib.request
 import zlib
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date, timedelta
+from datetime import date, timedelta, timezone
 from typing import List, Optional
 
 from fastapi import (
@@ -5240,6 +5240,8 @@ class AgentEventIn(BaseModel):
     # whatever arrives becomes one of six or becomes 'error'.
     error_kind: str = Field(default="", max_length=200)
     ms: int = Field(default=0, ge=0, le=86_400_000)
+    # The length of the tool's answer, never the answer: what the model had to read.
+    bytes: int = Field(default=0, ge=0, le=1_000_000_000)
 
 
 class AgentFlushIn(BaseModel):
@@ -5281,6 +5283,12 @@ def _active_ms(events: list) -> int:
         if 0 < gap < IDLE_GAP_MS:
             total += min(gap, IDLE_GAP_MS)
     return total
+
+
+# A draft this many calls into its session is written on top of a long context.
+DEEP_DRAFT_CALLS = 300
+# A session this long has outlived one ticket; its share of the calls is the multiplier.
+LONG_SESSION_CALLS = 500
 
 
 @app.post("/api/agent/flush")
@@ -5326,10 +5334,10 @@ def flush_agent_session(body: AgentFlushIn, account: dict = Depends(require_acco
         # service does not know what kind of wrong.
         word = event.error_kind if event.error_kind in ERROR_KINDS else ("error" if not event.ok else "")
         db.write(
-            "INSERT INTO agent_event (session_id, at, kind, tool, ok, error_kind, ms) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO agent_event (session_id, at, kind, tool, ok, error_kind, ms, bytes) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (session_id, _stamp_in(event.at), kind, event.tool[:60],
-             1 if event.ok else 0, word, event.ms))
+             1 if event.ok else 0, word, event.ms, event.bytes))
         kept += 1
     return {"ok": True, "session": session_id, "events": kept, "activeMs": active}
 
@@ -5416,16 +5424,21 @@ def agent_usage(project_id: str = Query(default=""), days: int = Query(default=1
 
     tools: dict = {}
     for row in db.all_rows(
-            f"SELECT e.tool, e.ok, e.error_kind, COUNT(*) AS n, SUM(e.ms) AS total, MAX(e.ms) AS worst "
+            f"SELECT e.tool, e.ok, e.error_kind, COUNT(*) AS n, SUM(e.ms) AS total, MAX(e.ms) AS worst, "
+            f"SUM(e.bytes) AS bytes, SUM(CASE WHEN e.bytes > 0 THEN 1 ELSE 0 END) AS measured "
             f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
             f"WHERE {where} AND e.kind = 'tool' AND e.tool != '' "
             f"GROUP BY e.tool, e.ok, e.error_kind", args):
         entry = tools.setdefault(row["tool"], {
             "tool": row["tool"], "calls": 0, "failed": 0, "totalMs": 0, "worstMs": 0,
-            "why": {}})
+            "bytes": 0, "measured": 0, "why": {}})
         entry["calls"] += row["n"]
         entry["totalMs"] += row["total"] or 0
         entry["worstMs"] = max(entry["worstMs"], row["worst"] or 0)
+        # What the answers cost to read, over the calls the hook measured: a hook
+        # older than the measurement sends none, and those calls are not zero bytes.
+        entry["bytes"] += row["bytes"] or 0
+        entry["measured"] += row["measured"] or 0
         if not row["ok"]:
             entry["failed"] += row["n"]
             # Added, not assigned: a failure stored with no word and one stored
@@ -5458,6 +5471,22 @@ def agent_usage(project_id: str = Query(default=""), days: int = Query(default=1
         expected = len({r["id"] for r in crew} | set(by_person))
         quiet = [r["name"] or r["email"] for r in crew if r["id"] not in by_person]
 
+    # How deep into a session change requests get written. Every call in a
+    # session re-reads the session so far, so a draft made 800 calls in costs
+    # what 800 calls of context cost; drafting in a fresh context (the adam-cr
+    # agent) or a fresh session per ticket is what brings this down.
+    depth_rows = db.all_rows(
+        f"SELECT e.session_id, e.tool, ROW_NUMBER() OVER "
+        f"(PARTITION BY e.session_id ORDER BY e.at, e.id) AS depth "
+        f"FROM agent_event e JOIN agent_session s ON s.id = e.session_id "
+        f"WHERE {where} AND e.kind = 'tool' AND e.tool != ''", args)
+    drafts = sorted(r["depth"] for r in depth_rows if r["tool"].endswith("adam_draft_change"))
+    per_session: dict = {}
+    for r in depth_rows:
+        per_session[r["session_id"]] = max(per_session.get(r["session_id"], 0), r["depth"])
+    long_calls = sum(n for n in per_session.values() if n >= LONG_SESSION_CALLS)
+    all_calls = sum(per_session.values())
+
     calls = sum(t["calls"] for t in tools.values())
     failed = sum(t["failed"] for t in tools.values())
     return {
@@ -5473,6 +5502,14 @@ def agent_usage(project_id: str = Query(default=""), days: int = Query(default=1
         },
         "expected": expected,
         "quiet": quiet,
+        "drafting": {
+            "drafts": len(drafts),
+            "medianDepth": drafts[len(drafts) // 2] if drafts else 0,
+            "deepShare": round(100 * sum(d > DEEP_DRAFT_CALLS for d in drafts) / len(drafts)) if drafts else 0,
+            "deepAfter": DEEP_DRAFT_CALLS,
+            "longSessionShare": round(100 * long_calls / all_calls) if all_calls else 0,
+            "longAfter": LONG_SESSION_CALLS,
+        },
         # Sorted by what is going wrong rather than by what is used most: the
         # page exists to find the thing that keeps failing.
         "tools": sorted(tools.values(), key=lambda t: (-t["failed"], -t["calls"])),
@@ -5502,7 +5539,7 @@ def agent_session(session_id: int, account: dict = Depends(require_account)):
         "activeMs": row["active_ms"],
         "events": [{
             "at": e["at"], "kind": e["kind"], "tool": e["tool"], "ok": bool(e["ok"]),
-            "why": e["error_kind"], "ms": e["ms"],
+            "why": e["error_kind"], "ms": e["ms"], "bytes": e["bytes"],
         } for e in db.all_rows(
             "SELECT * FROM agent_event WHERE session_id = ? ORDER BY at, id", (session_id,))],
     }
@@ -6108,13 +6145,35 @@ def _json_list(value) -> list:
     return found if isinstance(found, list) else []
 
 
-def _open_on_target(project: str, kind: str, target: str) -> list:
+# How far back a settled request on the same artefact is still news to a draft.
+RELATED_SETTLED_DAYS = 30
+RELATED_SETTLED_MAX = 5
+
+
+def _related_to_draft(project: str, target: str, artefacts: list) -> dict:
+    """The requests a new draft may repeat: open or accepted ones, and ones settled
+    in the last RELATED_SETTLED_DAYS, on its target **or any artefact it names**,
+    matched against theirs. This is the duplicate check, done here once, so the
+    agent does not page through adam_changes before every draft. Short rows: the
+    open ones by id and title, the settled ones with their decision, which is
+    usually the answer the draft was about to ask for."""
+    wanted = {a.strip() for a in [target, *artefacts] if str(a or "").strip()}
+    if not wanted:
+        return {"open": [], "settled": []}
+    since = security.stamp(security.now() - timedelta(days=RELATED_SETTLED_DAYS))
     rows = db.all_rows(
-        _CHANGE_SELECT + " WHERE c.project_id = ? AND c.target_kind = ? AND c.target_id = ? "
-        "AND c.status IN ('open', 'accepted') ORDER BY c.number",
-        (project, kind, target),
-    )
-    return [_change_row(r) for r in rows]
+        _CHANGE_SELECT + " WHERE c.project_id = ? AND (c.status IN ('open', 'accepted') "
+        "OR (c.status = 'done' AND c.resolved_at >= ?)) ORDER BY c.number DESC",
+        (project, since))
+    hit = [r for r in rows if wanted & {r["target_id"], *map(str, _json_list(r["artefact_ids"]))}]
+    short = lambda r: {"id": f"CR-{r['number']:03d}", "status": r["status"], "title": r["title"],
+                       "target": {"kind": r["target_kind"], "id": r["target_id"]},
+                       "ticket": r["external_key"], "blocking": bool(r["blocking"])}
+    return {
+        "open": [short(r) for r in reversed(hit) if r["status"] in ("open", "accepted")],
+        "settled": [{**short(r), "settledAt": r["resolved_at"], "decision": r["resolution"]}
+                    for r in hit if r["status"] == "done"][:RELATED_SETTLED_MAX],
+    }
 
 
 def _file_change(project: str, fields: dict, account: dict, via: str) -> dict:
@@ -6478,8 +6537,16 @@ def _days_since(stamp: str) -> int:
 @app.get("/api/changes")
 def list_changes(project_id: str = Query(default=""), status: str = Query(default=""),
                  target_kind: str = Query(default=""), target_id: str = Query(default=""),
-                 ticket: str = Query(default=""), account: dict = Depends(require_account)):
-    """The project's change requests, newest first, narrowed by what is given."""
+                 ticket: str = Query(default=""), settled_since: str = Query(default=""),
+                 limit: int = Query(default=0, ge=0, le=1000), offset: int = Query(default=0, ge=0),
+                 account: dict = Depends(require_account)):
+    """The project's change requests, newest first, narrowed by what is given.
+
+    `settled_since` keeps those settled at or after that time: what a developer's
+    agent asks to learn which decisions reached its tickets, rather than paging
+    through every request. `limit` and `offset` are a page of the newest; `total`
+    still counts every match, so the connector can say how many more there are.
+    """
     scope = _change_project(account, project_id)
     where, args = ["c.project_id = ?"], [scope["project"]]
     if status:
@@ -6494,8 +6561,24 @@ def list_changes(project_id: str = Query(default=""), status: str = Query(defaul
         where.append("c.target_id = ?"); args.append(target_id.strip())
     if ticket:
         where.append("c.external_key = ?"); args.append(ticket.strip().lstrip("#"))
+    if settled_since:
+        # Parsed here, not by _stamp_in: that one turns a bad value into "now",
+        # which here would quietly answer nothing instead of saying what is wrong.
+        text = settled_since.strip()
+        text = f"{text[:-1]}+00:00" if text.endswith("Z") else text
+        try:
+            moment = security.parse(text)
+        except (ValueError, TypeError):
+            raise HTTPException(400, "settled_since is a date or time, e.g. 2026-11-06 or 2026-11-06T09:00:00Z.")
+        since = security.stamp(moment if moment.tzinfo else moment.replace(tzinfo=timezone.utc))
+        where.append("c.resolved_at IS NOT NULL AND c.resolved_at >= ?"); args.append(since)
     rows = db.all_rows(_CHANGE_SELECT + " WHERE " + " AND ".join(where) + " ORDER BY c.number DESC",
                        tuple(args))
+    matched = len(rows)
+    if limit:
+        rows = rows[offset:offset + limit]
+    elif offset:
+        rows = rows[offset:]
 
     # Every request, for everybody who may read them — a lead sees the whole
     # project, which is the point of the role. What the slice decides is marked
@@ -6536,7 +6619,7 @@ def list_changes(project_id: str = Query(default=""), status: str = Query(defaul
         "AND status = 'open' AND tag = ''", (scope["project"],))["n"]
 
     return {"project": scope["project"], "mayResolve": scope["may_resolve"],
-            "total": len(items), "counts": counts,
+            "total": matched, "shown": len(items), "counts": counts,
             "unpicked": waiting, "overdue": overdue, "unrouted": unrouted,
             "afterDays": PICK_SLA_DAYS, "items": items}
 
@@ -6584,13 +6667,16 @@ def draft_change(body: ChangeIn, account: dict = Depends(require_account)):
         (security.token_hash(code), account["id"], scope["project"], json.dumps(fields),
          security.stamp(now), security.stamp(now + timedelta(minutes=DRAFT_MINUTES))),
     )
+    related = _related_to_draft(scope["project"], fields["target_id"], fields.get("artefact_ids") or [])
     return {
         "draft": code,
         "preview": fields,
-        "alreadyOpen": _open_on_target(scope["project"], fields["target_kind"], fields["target_id"]),
+        "alreadyOpen": related["open"],
+        "recentlySettled": related["settled"],
         "expiresInMinutes": DRAFT_MINUTES,
         "note": "Nothing has been filed. Show this to the person; file it only after they say yes. "
-                "If one of alreadyOpen says the same thing, point to it instead.",
+                "If one of alreadyOpen says the same thing, point to it instead. If one of "
+                "recentlySettled already decides it, follow that decision and do not file this.",
     }
 
 

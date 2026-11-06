@@ -4314,20 +4314,27 @@ export const TOOLS = [
     description:
       'The change requests raised against this ADAM project: places where the package (a contract, '
       + 'table, screen, journey or decision) was found wrong, contradictory or missing something. '
-      + 'With `id` (CR-007), one in full. Otherwise a list, narrowed by `status`, `kind` + `target`, '
-      + 'or `ticket`. With `from` and/or `to` (release tags), the release notes: what was settled between '
-      + 'two releases, with a markdown note. **Check this before drafting a new one** - somebody may have raised it already - '
-      + 'and before building against an artefact that has an open or accepted request.',
+      + 'With `id` (CR-007), one in full. With `ticket` and `since`, the decisions settled on that ticket '
+      + 'since then. Otherwise a short list (open ones, 10 at a time unless `status` or `limit` says '
+      + 'otherwise), narrowed by `kind` + `target` or `ticket`. With `from` and/or `to` (release tags), the '
+      + 'release notes. **Not needed before drafting:** adam_draft_change already answers the open and '
+      + 'recently settled requests on the same artefacts. **Not needed before building:** the pulled '
+      + "README.md lists the ticket's change requests.",
     inputSchema: {
       type: 'object',
       properties: {
         id: { type: 'string', description: 'A change request, e.g. CR-007' },
-        status: { type: 'string', description: 'open, accepted, rejected or done; comma-separated for several' },
+        status: { type: 'string', description: 'open, accepted, rejected or done; comma-separated for several. Default open, unless id, ticket or since is given' },
         kind: { type: 'string', description: 'Artefact kind, e.g. operation, schema, table, screen, flow' },
         target: { type: 'string', description: 'Artefact id, e.g. identity#requestGuestCode' },
         ticket: { type: 'string', description: 'OpenProject work package number' },
-        limit: { type: 'integer', description: 'How many to list, newest first; default 40' },
+        limit: { type: 'integer', description: 'How many to list, newest first; default 10' },
         offset: { type: 'integer', description: 'How many of the newest to skip, to read the next page' },
+        since: {
+          type: 'string',
+          description: 'Only those settled at or after this date or time (2026-11-06 or 2026-11-06T09:00:00Z): '
+            + 'with `ticket`, which decisions reached it since you last looked',
+        },
         from: {
           type: 'string',
           description: 'Release notes: the change requests settled (accepted or done) after this release tag, e.g. r1',
@@ -4338,7 +4345,7 @@ export const TOOLS = [
         },
       },
     },
-    async run(client, { id, status, kind, target, ticket, limit, offset, from, to } = {}) {
+    async run(client, { id, status, kind, target, ticket, limit, offset, since, from, to } = {}) {
       const project = (await client.projectId()) ?? '';
       if (from || to) {
         const query = new URLSearchParams({ project_id: project });
@@ -4365,24 +4372,32 @@ export const TOOLS = [
         return answer.data;
       }
       const query = new URLSearchParams({ project_id: project });
-      if (status) query.set('status', status);
+      // Open ones by default: a bare call is an agent looking for what is still undecided, and every answer
+      // is read by the model, so 10 short rows (about 3 KB) rather than 40 of every status (about 17 KB; the
+      // agents made 958 such calls in the fortnight to 6 November).
+      const wanted = status || (ticket || since || target ? '' : 'open');
+      if (wanted) query.set('status', wanted);
       if (kind) query.set('target_kind', kind);
       if (target) query.set('target_id', target);
       if (ticket) query.set('ticket', String(ticket).replace(/^#/, ''));
+      if (since) query.set('settled_since', String(since));
+      const skip = Math.max(0, Number(offset) || 0);
+      const take = Math.max(1, Math.min(200, Number(limit) || 10));
+      // The page is cut by the service, newest first: the whole list was 3.4 MB by 6 November.
+      query.set('limit', String(take));
+      if (skip) query.set('offset', String(skip));
       const answer = await client.service(`/api/changes?${query}`);
       if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
-      // A list, newest first and a page at a time: by 22 October the project's whole list was 121 KB, past the
-      // answer ceiling, so a bare call (the first thing an agent and mcp-check make) failed outright.
-      const { items: all, ...rest } = answer.data;
-      const skip = Math.max(0, Number(offset) || 0);
-      const take = Math.max(1, Math.min(200, Number(limit) || 40));
-      const items = [...all].sort((a, b) => String(b.raisedAt ?? '').localeCompare(String(a.raisedAt ?? '')))
-        .slice(skip, skip + take);
-      const more = Math.max(0, all.length - skip - items.length);
+      const { items: page, total, counts } = answer.data;
+      // A service older than the paging sends every match: cut it here the same way.
+      const items = page.length > take ? page.slice(skip, skip + take) : page;
+      const all = total ?? page.length;
+      const more = Math.max(0, all - skip - items.length);
       return {
         found: items.length > 0,
-        ...rest,
-        total: rest.total ?? all.length,
+        ...(wanted ? { status: wanted } : {}),
+        total: all,
+        counts,
         shown: items.length,
         ...(more ? { more: `${more} more follow: call again with offset ${skip + items.length}, or narrow by status, kind + target, or ticket` } : {}),
         items: items.map((c) => ({
@@ -4391,8 +4406,12 @@ export const TOOLS = [
           ...(c.source ? { source: c.source } : {}),
           ...(c.triage ? { triage: c.triage } : {}),
           ...(c.contractImpact ? { contractImpact: c.contractImpact } : {}),
+          // A settled one's decision is what the asker came for (ticket + since): say it, no need for a second call.
+          ...(since && c.resolution ? { settledAt: c.resolvedAt, decision: c.resolution } : {}),
         })),
-        ...(items.length ? {} : { note: 'No change requests match. Nothing has been raised for this yet.' }),
+        ...(items.length ? {} : { note: since
+          ? 'Nothing settled on this since then.'
+          : `No ${wanted ? `${wanted} ` : ''}change requests match.` }),
       };
     },
   },
@@ -4402,8 +4421,10 @@ export const TOOLS = [
     description:
       'Draft a change request for the package - when the contract, table, screen or decision you are '
       + 'building from contradicts itself, is wrong, or lacks something the ticket needs. **Do not '
-      + 'resolve such a thing in code; draft this instead.** Files nothing: returns the draft, a '
-      + '`draft` code, and any open requests already on the same artefact. Show the person the '
+      + 'resolve such a thing in code; draft this instead.** Best done by the adam-cr agent, in its own context. '
+      + 'Files nothing: returns the draft, a `draft` code, the open requests already on the same artefacts '
+      + '(`alreadyOpen`) and those settled on them in the last 30 days with their decisions (`recentlySettled`), '
+      + 'so there is no need to search adam_changes first. Name every artefact it touches in `artefacts`. Show the person the '
       + 'draft; call adam_raise_change only if they clearly say yes. Quote the conflicting passages '
       + 'in `evidence` and give the ways it could be settled in `options`. ' + BLOCKER_RULE,
     inputSchema: {
@@ -4474,15 +4495,22 @@ export const TOOLS = [
         const detail = answer.data?.detail;
         return { ok: false, filed: false, error: typeof detail === 'string' ? detail : JSON.stringify(detail ?? `HTTP ${answer.status}`) };
       }
+      const open = answer.data.alreadyOpen ?? [];
+      const settled = answer.data.recentlySettled ?? [];
       return {
         ok: true,
         filed: false,
         ...answer.data,
-        next: answer.data.alreadyOpen?.length
-          ? `Tell the person ${answer.data.alreadyOpen.map((c) => c.id).join(', ')} is already open on this; `
-            + 'ask whether theirs is different before filing.'
-          : 'Show the person this draft and ask whether to file it. Only after a clear yes, call '
-            + 'adam_raise_change with the draft code.',
+        next: settled.length
+          ? `Read the decision of ${settled.map((c) => c.id).join(', ')} first (recentlySettled): if it already `
+            + 'settles this, follow it and do not file the draft. '
+            + (open.length ? `${open.map((c) => c.id).join(', ')} is also still open on this. ` : '')
+            + 'Otherwise show the person this draft and file it only after a clear yes.'
+          : open.length
+            ? `Tell the person ${open.map((c) => c.id).join(', ')} is already open on this; `
+              + 'ask whether theirs is different before filing.'
+            : 'Show the person this draft and ask whether to file it. Only after a clear yes, call '
+              + 'adam_raise_change with the draft code.',
       };
     },
   },

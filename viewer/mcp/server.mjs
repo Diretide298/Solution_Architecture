@@ -150,8 +150,12 @@ async function handle(message) {
           + 'and nothing to re-pin. When it is done, adam_propose '
           + 'the status change and a comment, show the person, and adam_apply only after they say yes. '
           + 'If the package contradicts itself or lacks what the ticket needs, do not settle it in code: '
-          + 'check adam_changes, then adam_draft_change, show the draft, and adam_raise_change only '
+          + 'hand it to the adam-cr agent where the workspace has one (it researches and drafts in its own '
+          + 'context and returns the draft), else adam_draft_change yourself (it reports any request already '
+          + 'open or recently settled on the same artefacts); show the draft, and adam_raise_change only '
           + 'after they say yes. ' + BLOCKER_RULE + ' '
+          + 'One ticket per session: when a ticket is done, tell the person to start a new session (/clear) '
+          + 'for the next one. '
           + 'To see what a teammate or the whole team is working on, adam_team (read-only).',
       });
     }

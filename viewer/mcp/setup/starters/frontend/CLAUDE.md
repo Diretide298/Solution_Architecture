@@ -164,6 +164,16 @@ A ticket's commit holds the ticket's change, made in the repository folder. Wher
 inside a repository (the setup-on-a-clone case above), setup has listed them in
 `.git/info/exclude`; they are still not part of any ticket, so never force-add them.
 
+**One ticket per session.** When a ticket is proposed for QA (or put On hold), tell the person to start a
+new session (`/clear`) before the next one: every step re-reads the whole session, so a session that carries
+on for days makes each later step cost what all the earlier ones did. `/ticket` gives a new session all it needs.
+
+**When the package is wrong, `/cr` hands the research to the `adam-cr` agent** (`.claude/agents/adam-cr.md`),
+which drafts the change request in its own context and hands back the draft. There is no `adam_changes`
+check before drafting (the draft reports any request open or recently settled on the same artefacts) and
+none before building (README.md lists the ticket's change requests). This replaces any older line in this
+file that says to check `adam_changes` first.
+
 <!-- ADAM:end working-a-ticket -->
 
 <!-- ADAM:start screen-look -->
@@ -243,12 +253,18 @@ through ADAM; a placeholder layout only when no frame was written; never a wiref
 If the contract, table, screen or journey you are building from contradicts itself, is wrong, or
 lacks something the ticket needs, **do not settle it in code** - not even with a sensible guess.
 
-1. `adam_changes` for the artefact: somebody may have raised it already. If so, name that CR.
-2. Otherwise `adam_draft_change`: quote the conflicting passages in `evidence`, list the `options`,
+1. **Hand it to the `adam-cr` agent** (`.claude/agents/adam-cr.md`), with the ticket number and what you
+   found, in a few lines: it looks up the artefacts, quotes the evidence and drafts the change request in
+   its own context, so the research does not fill this session, and it hands back the draft and its code.
+   No `adam_changes` search first: the draft already reports any request open on the same artefacts
+   (`alreadyOpen`) and any settled on them in the last 30 days with its decision (`recentlySettled`). If
+   a settled one decides it, follow that decision and file nothing. (No agent? `adam_draft_change`
+   yourself, with what is listed in step 2.)
+2. What the draft carries: quote the conflicting passages in `evidence`, list the `options`,
    say which you would pick in `recommendation`, set `blocking` and the `ticket`. The intake goes
    with it: `source` is `developer` (the reference defaults to the ticket) unless the person says
    it came from minutes, a client answer, a design or an audit - then `sourceRef`, and for minutes
-   `clientSignoff`; `triage` and `when` if known; other `artefacts` it touches; `contractImpact`
+   `clientSignoff`; `triage` and `when` if known; every other artefact it touches in `artefacts`; `contractImpact`
    (none, additive, breaking - breaking needs an `approver`); `effortPoints` if the estimate moves.
 3. Show the draft and **wait for a yes** before `adam_raise_change`.
 4. **A blocker is always a change request** (CHG-ADM-004): set `blocking: true`, and once it is filed,
@@ -258,8 +274,9 @@ lacks something the ticket needs, **do not settle it in code** - not even with a
    `blocked` column and the "Blocked by" section of its README.md name the CRs). Propose the first one,
    and say which CR holds back each ticket you skipped.
 
-Before building against an artefact, check `adam_changes` for an accepted request on it: the
-package may be about to change.
+No `adam_changes` check before building: the ticket's README.md already lists its change requests
+with their decisions ("Change requests on this ticket"). To learn which decisions reached the ticket
+since you last looked, `adam_changes` with `ticket` and `since`.
 
 ## Ticket statuses (OpenProject)
 
