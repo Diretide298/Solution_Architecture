@@ -161,8 +161,9 @@ const stored = await as('harness.dev', 'GET', `/api/agent/sessions/${nosy.data.s
 const only = stored.data?.events?.[0] ?? {};
 check('it becomes the one word the service knows',
   only.why === 'error', String(only.why));
+// bytes is the answer's length (6 November 2026), a number: never the answer.
 check('and nothing else survives the trip',
-  JSON.stringify(Object.keys(only).sort()) === JSON.stringify(['at', 'kind', 'ms', 'ok', 'tool', 'why']),
+  JSON.stringify(Object.keys(only).sort()) === JSON.stringify(['at', 'bytes', 'kind', 'ms', 'ok', 'tool', 'why']),
   Object.keys(only).sort().join(' '));
 check('no prompt, no command, no diff anywhere in the answer',
   !/production database password|psql|secrets\.env/.test(JSON.stringify(stored.data)),

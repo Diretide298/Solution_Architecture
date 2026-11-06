@@ -13,3 +13,5 @@ Ticket $ARGUMENTS is finished.
 4. Show me the proposal and stop. Run `adam_apply` only after I say yes.
 5. If something in the package stopped the ticket from being finished, it is not done: it is a change
    request (`/cr`, blocking) and the ticket is proposed **On hold** naming it, not Ready for QA.
+6. Once it is applied, tell me to start a new session (`/clear`) before the next ticket: one ticket per
+   session, because every step re-reads the whole session and a long one makes each step cost more.

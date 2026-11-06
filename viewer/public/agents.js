@@ -363,11 +363,33 @@ function drawTools() {
         render: (t) => spell(t.calls ? t.totalMs / t.calls : 0), sort: (t) => (t.calls ? t.totalMs / t.calls : 0),
       },
       { key: 'worstMs', label: 'Slowest', num: true, render: (t) => spell(t.worstMs), sort: (t) => t.worstMs },
+      // What a call's answer costs the model to read. Over the calls the hook measured only: a hook from before
+      // 6 November sends no length, and those calls are not zero bytes.
+      {
+        key: 'answer', label: 'Typical answer', num: true,
+        render: (t) => (t.measured ? kb(t.bytes / t.measured) : '—'),
+        sort: (t) => (t.measured ? t.bytes / t.measured : -1),
+      },
+      {
+        key: 'read', label: 'Read in all', num: true,
+        render: (t) => (t.measured ? kb(t.bytes) : '—'), sort: (t) => t.bytes ?? 0,
+      },
     ],
     rows: tools,
     empty: 'No tool calls in this window.',
   }));
+  const d = state.data.drafting;
+  $('ag-drafting').textContent = d?.drafts
+    ? `Change requests drafted in this window: ${fmt(d.drafts)}, typically ${fmt(d.medianDepth)} calls into their session `
+      + `(${d.deepShare}% more than ${d.deepAfter} in). Sessions of ${d.longAfter} calls or more made ${d.longSessionShare}% `
+      + 'of all calls. Each call re-reads its session so far, so both fall when change requests are drafted by the '
+      + 'adam-cr agent and each ticket gets a new session.'
+    : '';
 }
+
+/** A byte count as people read it. */
+const kb = (bytes) => (bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB`
+  : bytes >= 1024 ? `${Math.round(bytes / 1024)} KB` : `${Math.round(bytes)} B`);
 
 // ── sessions ────────────────────────────────────────────────────────
 

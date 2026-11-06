@@ -13,11 +13,15 @@ none, `blocking` false, `when` now, the ticket, and the one option "Update the w
 its page info to match". Show me the draft, run `adam_raise_change` after my yes, and then carry on with the
 ticket: no hold and no waiting. Otherwise:
 
-1. Find the artefact(s) involved with ADAM (`adam_contract`, `adam_table`, `adam_screen`,
-   `adam_journey`, `adam_search`) and quote the passages that show the problem, with where each is.
-2. `adam_changes` for those artefacts. If an open or accepted request already covers it, show me
-   that one and stop.
-3. `adam_draft_change` with the kind, the artefact, a one-line title, the problem, the quoted
+1. **Hand it to the `adam-cr` agent** with the ticket number and what you found, in a few lines. It finds
+   the artefacts, quotes the evidence and drafts the change request in its own context, so none of that
+   research fills this session, and it hands back the draft, its code, and any request already open or
+   recently settled on the same artefacts. If a settled one already decides this, tell me, follow its
+   decision and file nothing; if an open one covers it, show me that one and stop. Go to step 4.
+2. No `adam_changes` search first: `adam_draft_change` reports both of those itself.
+3. Only if this workspace has no `adam-cr` agent: find the artefact(s) with ADAM (`adam_contract`,
+   `adam_table`, `adam_screen`, `adam_journey`, `adam_search`), quote the passages that show the problem,
+   and `adam_draft_change` yourself with the kind, the artefact, a one-line title, the problem, the quoted
    evidence, the options, your recommendation, whether it blocks the current ticket, and the ticket
    number if there is one. Then the intake:
    - `source`: `developer` (the default: a gap found while building) unless I say it came from

@@ -419,6 +419,13 @@ const SECTIONS = {
     title: 'Building a screen to its wireframe', seen: '## Building a screen to its wireframe', add: true,
   },
 };
+/** Agents ADAM owns under .claude/agents (6 November 2026: adam-cr drafts change requests in its own context, so
+ *  their research does not fill the developer's session). Added when missing, replaced when they differ and are
+ *  ADAM's; any other name in an answer is refused. */
+const AGENT_NAMES = ['adam-cr.md'];
+/** Whether an agent file is ADAM's (its own name line and what it drafts), so one of the team's under the same name stays. */
+const isAdamsAgent = (name, text) => lf(text).includes(`\nname: ${name.replace(/\.md$/, '')}\n`)
+  && text.includes('ADAM change request');
 /** Scripts ADAM owns under .claude/scripts, per role; any other name in an answer is refused. */
 const SCRIPT_NAMES = { backend: ['db-ticket.mjs'], frontend: [], ai: [] };
 /** Whether a script's text is ADAM's (its own header names it), so one of the team's under the same name stays. */
@@ -496,16 +503,24 @@ async function workspaceSource(role, startersDir) {
       const text = await readOrNull(path.join(startersDir, role, '.claude', 'scripts', name));
       if (text !== null) scripts.push({ name, text });
     }
-    got = { role, commands, scripts, claudeMd: await readOrNull(path.join(startersDir, role, 'CLAUDE.md')) ?? '' };
+    const agents = [];
+    for (const name of AGENT_NAMES) {
+      const text = await readOrNull(path.join(startersDir, role, '.claude', 'agents', name));
+      if (text !== null) agents.push({ name, text });
+    }
+    got = { role, commands, scripts, agents, claudeMd: await readOrNull(path.join(startersDir, role, 'CLAUDE.md')) ?? '' };
   } else {
     got = await ask(`/connector/workspace?role=${role}`);
   }
   const commands = Array.isArray(got?.commands) ? got.commands : [];
   // An ADAM from before scripts sends none: then there is simply nothing to refresh.
   const scripts = Array.isArray(got?.scripts) ? got.scripts : [];
+  // And an ADAM from before agents sends none.
+  const agents = Array.isArray(got?.agents) ? got.agents : [];
   const odd = [
     ...commands.filter((c) => !COMMAND_NAMES.includes(c?.name) || typeof c.text !== 'string'),
     ...scripts.filter((c) => !(SCRIPT_NAMES[role] ?? []).includes(c?.name) || typeof c.text !== 'string'),
+    ...agents.filter((c) => !AGENT_NAMES.includes(c?.name) || typeof c.text !== 'string'),
   ];
   if (odd.length || typeof got?.claudeMd !== 'string') {
     const error = new Error('refused: the workspace files name something that is not one of ADAM\'s: '
@@ -513,7 +528,7 @@ async function workspaceSource(role, startersDir) {
     error.refused = true;
     throw error;
   }
-  return { commands, scripts, claudeMd: got.claudeMd };
+  return { commands, scripts, agents, claudeMd: got.claudeMd };
 }
 
 const markedRe = (name) => new RegExp(`(<!-- ADAM:start ${name} -->\\r?\\n)([\\s\\S]*?)(<!-- ADAM:end ${name} -->)`);
@@ -570,6 +585,23 @@ async function refreshWorkspace(folder, source, quiet) {
     changed.push(name);
   }
   if (scriptsDone.length) say(`workspace: ${scriptsDone.join(', ')} in ${folder}.`);
+
+  // ADAM's agents, the same way: added when missing (the new /cr hands its research to adam-cr), replaced when
+  // they differ, and one of the team's under the same name left alone.
+  const agentsDone = [];
+  for (const { name, text } of source.agents ?? []) {
+    const target = path.join(folder, '.claude', 'agents', name);
+    const have = await readOrNull(target);
+    if (have !== null && (lf(have) === lf(text) || !isAdamsAgent(name, have))) continue;
+    if (have !== null) await keep(name, have);
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, text, 'utf8');
+    if (have === null) await excludeInGit(folder, `/.claude/agents/${name}`);
+    agentsDone.push(have === null ? `added .claude/agents/${name}`
+      : `refreshed .claude/agents/${name} (the old one is in ${kept})`);
+    changed.push(name);
+  }
+  if (agentsDone.length) say(`workspace: ${agentsDone.join(', ')} in ${folder}.`);
 
   const mdPath = path.join(folder, 'CLAUDE.md');
   const local = await readOrNull(mdPath);

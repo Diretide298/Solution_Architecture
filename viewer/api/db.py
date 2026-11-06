@@ -848,7 +848,10 @@ CREATE TABLE IF NOT EXISTS agent_event (
   -- 'conflict', 'error'. A message would carry paths and snippets, which is
   -- exactly what this table is for not carrying.
   error_kind TEXT    NOT NULL DEFAULT '',
-  ms         INTEGER NOT NULL DEFAULT 0
+  ms         INTEGER NOT NULL DEFAULT 0,
+  -- How long the tool's answer was, in bytes: what it cost the model to read.
+  -- A length and never the answer itself. 0 where the hook did not say.
+  bytes      INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS agent_event_session ON agent_event(session_id, at);
 CREATE INDEX IF NOT EXISTS agent_event_tool ON agent_event(tool, ok);
@@ -1385,6 +1388,12 @@ def init() -> None:
             cur.execute("ALTER TABLE wp_proposal ADD COLUMN type_id INTEGER")
             cur.execute("ALTER TABLE wp_proposal ADD COLUMN type_name TEXT NOT NULL DEFAULT ''")
             cur.execute("ALTER TABLE wp_proposal ADD COLUMN result_key TEXT NOT NULL DEFAULT ''")
+
+        have = {row[1] for row in cur.execute("PRAGMA table_info(agent_event)")}
+        if "bytes" not in have:
+            # 0 for every event already kept: the hook did not measure answers
+            # before this, and 0 is what the page reads as "not measured".
+            cur.execute("ALTER TABLE agent_event ADD COLUMN bytes INTEGER NOT NULL DEFAULT 0")
 
         # ---- the allowlist, off -------------------------------------------
         #
