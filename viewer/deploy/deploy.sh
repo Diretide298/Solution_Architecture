@@ -496,7 +496,11 @@ WATCH_ON=0
 WATCH_APP=""
 WATCH_API=""
 say "Change-request watcher"
-as_app() { sudo -u "$APP_USER" HOME="/home/$APP_USER" "$@"; }
+# From `/`: the deploy runs from root's own checkout (/root/adam/viewer), which
+# the service account cannot read, and git stats the working directory before
+# anything else ("fatal: failed to stat '/root/adam/viewer': Permission denied",
+# the first server deploy, 6 November 2026). Every caller passes full paths.
+as_app() { (cd / && sudo -u "$APP_USER" HOME="/home/$APP_USER" "$@"); }
 # Every git command root runs here runs no hook, no file-system monitor and no
 # automatic gc, whatever a repository's own config says (security review, H1).
 root_git() { git -c core.hooksPath=/dev/null -c core.fsmonitor=false -c gc.auto=0 "$@"; }
