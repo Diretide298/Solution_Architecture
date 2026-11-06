@@ -533,6 +533,8 @@ function buildChrome() {
   right.querySelector('.chip[href="/"]')?.remove();
 
   right.insertAdjacentHTML('beforeend', `
+    <a id="decide-chip" class="chip" href="/decide" hidden
+       title="Decide the change requests the watcher has drafted">Decide</a>
     <button id="bell-toggle" class="icon-btn bell-toggle" type="button"
             title="Where you were named" aria-haspopup="dialog"
             aria-expanded="false" aria-controls="bell-panel" hidden>
@@ -563,6 +565,15 @@ function buildChrome() {
   // button beside it answers a different question: the badge is who you are,
   // the line is what this page decided to say about you.
   mountAccountDrawer();
+
+  // Decide, beside Tasks and Reviews, for the two roles that decide: on a desk
+  // it was only in the account menu, one click deeper than the lead looked.
+  // The server answers 403 to anyone else; this only keeps the chip from
+  // offering a page that would refuse them.
+  const decideChip = document.getElementById('decide-chip');
+  const showDecide = () => { decideChip.hidden = !isDecider(auth.account()); };
+  auth.onAuthChange(showDecide);
+  showDecide();
 
   coverSafeAreas();
   buildPhoneFrame(bar);
