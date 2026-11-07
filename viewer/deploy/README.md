@@ -342,11 +342,24 @@ on this server."
    sudo -u ticvai -H pm2 logs ticvai-cr-watch --lines 30
    ```
 
-   Then open the decide page signed in as the lead. Only the lead and the System
-   Architect can read or decide there.
+   Then open the decide page signed in as the System Architect. Only the System
+   Architect can read or decide there; a Team Lead, like everybody else, is
+   refused (403) and is not shown the page.
+
+   A request whose drafting failed twice waits for Draft again on the page, or,
+   from a shell, as the watcher's account:
+
+   ```
+   sudo -u ticvai -H /srv/ticvai/.venv/bin/python /srv/ticvai/cr-watch/repo/ticvai/tools/cr-watch.py \
+     redraft --all-failed --out /srv/ticvai/cr-watch/out
+   ```
+
+   Neither starts a Claude turn: the next hourly run drafts them.
 
 To stop the watcher, move the env file away and deploy. The job is removed, and
-the list in `out/` stays as it was.
+the list in `out/` stays as it was. The decide page then says "The watcher is not
+running on this server", with no error and no stale pause; Draft again and Ask
+are off, and History still lists what was settled from it.
 
 ## Inviting a client
 

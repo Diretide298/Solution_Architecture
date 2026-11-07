@@ -121,12 +121,14 @@ const icon24 = (body) =>
  * target. `bar(who)` says whether the tab is in the bar for this account; when
  * it is not and `orMore` is set, it heads More's list instead, with its icon.
  *
- *   Owner and lead:  Home, Tasks, My work, Decide, More (Changes heads More).
- *   Everyone else:   Home, Tasks, My work, Changes, More.
+ *   The owner:       Home, Tasks, My work, Decide, More (Changes heads More).
+ *   Everyone else:   Home, Tasks, My work, Changes, More (a Team Lead too).
  *   A client:        Home, My work, Changes, More (Tasks refuses a client).
  *
- * The lead, 6 November 2026: Changes moves into More for the two roles that
- * have Decide, so the bar stays at five.
+ * The lead, 6 November 2026: Changes moves into More for the role that has
+ * Decide, so the bar stays at five; and Decide is the System Architect's alone
+ * ("the decide page only I can see it, no one else"), so a Team Lead's bar is
+ * the non-decider one.
  */
 export const PHONE_TABS = [
   { key: 'home', href: '/home.html', label: 'Home', bar: () => true,
@@ -566,8 +568,9 @@ function buildChrome() {
   // the line is what this page decided to say about you.
   mountAccountDrawer();
 
-  // Decide, beside Tasks and Reviews, for the two roles that decide: on a desk
-  // it was only in the account menu, one click deeper than the lead looked.
+  // Decide, beside Tasks and Reviews, for the System Architect, who alone
+  // decides: on a desk it was only in the account menu, one click deeper than
+  // he looked.
   // The server answers 403 to anyone else; this only keeps the chip from
   // offering a page that would refuse them.
   const decideChip = document.getElementById('decide-chip');

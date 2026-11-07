@@ -138,10 +138,12 @@ SETTLERS = ("owner", "admin", "lead", "reviewer")
 READERS = ("owner", "admin", "pm")
 
 # Who decides what the change-request watcher drafted (viewer/api/watcher.py, ADAM on the phone, 4 November 2026):
-# the lead, and the owner above them. Narrower than SETTLERS on purpose: the watcher's marks are the lead's own
-# REVIEW.md, written "the exact way we do here", and an admin or a reviewer deciding there would be deciding as the
-# lead. The device token a phone keeps for its background check is not a role and reads the summary only.
-DECIDERS = ("owner", "lead")
+# the System Architect alone. Narrower than SETTLERS on purpose: the watcher's marks are the System Architect's own
+# REVIEW.md, written "the exact way we do here", and anybody else deciding there would be deciding as him. A Team
+# Lead was in this set until 6 November 2026 (the System Architect: "the decide page only I can see it, no one
+# else"). The device token a phone keeps for its background check is not a role and reads the summary only; one a
+# Team Lead made before then reads nothing.
+DECIDERS = ("owner",)
 
 # Who a platform can be handed to. A scope row for anybody else is meaningless
 # rather than harmful, and refusing it early is how it stays that way.

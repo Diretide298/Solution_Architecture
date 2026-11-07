@@ -63,6 +63,23 @@
             </h2>
             <p class="dc-lede-line" id="dc-lede-line"></p>
           </div>
+          <!-- Search, filters and the developer: drawn once, so typing never loses its place. -->
+          <div class="dc-tools" id="dc-tools" role="search" hidden>
+            <div class="dc-tools-row">
+              <label class="dc-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.8-4.8" /></svg>
+                <span class="dc-sr">Search the waiting requests</span>
+                <input class="dc-search-input" id="dc-search" type="search" placeholder="Number, title or ticket"
+                       autocomplete="off" spellcheck="false" enterkeyhint="search" />
+              </label>
+              <label class="dc-dev">
+                <span class="dc-sr">Developer</span>
+                <select class="dc-select dc-dev-select" id="dc-dev"></select>
+              </label>
+            </div>
+            <div class="dc-filters" id="dc-filters" role="group" aria-label="Show"></div>
+            <p class="dc-tools-line" id="dc-tools-line" aria-live="polite" hidden></p>
+          </div>
           <div id="dc-groups" class="dc-groups" aria-busy="true">
             <ul class="dc-list" aria-hidden="true">
               <li class="dc-row dc-row-skel"><span></span><span></span><span></span></li>
@@ -80,6 +97,15 @@
             <p class="dc-lede-line" id="dc-tray-line"></p>
           </div>
           <div id="dc-tray"></div>
+        </section>
+
+        <!-- History: the requests settled from here, newest first -->
+        <section class="dc-view" id="view-history" data-view="history" aria-labelledby="dc-history-title" hidden>
+          <div class="dc-lede">
+            <h2 class="dc-headline" id="dc-history-title">History</h2>
+            <p class="dc-lede-line" id="dc-history-line"></p>
+          </div>
+          <div id="dc-history"></div>
         </section>
 
         <!-- Health: is the watcher running, failing, or out of money -->
@@ -114,7 +140,7 @@
       </section>
       <div class="dc-pane-empty" id="dc-pane-empty" aria-hidden="true">
         <p>Open a request to read its draft here.</p>
-        <p class="dc-pane-keys">On a keyboard: <kbd>j</kbd> and <kbd>k</kbd> move, <kbd>a</kbd> approves, <kbd>Enter</kbd> opens.</p>
+        <p class="dc-pane-keys">On a keyboard: <kbd>j</kbd> and <kbd>k</kbd> move, <kbd>a</kbd> approves, <kbd>Enter</kbd> opens, <kbd>/</kbd> searches.</p>
       </div>
     </div>
 
@@ -129,6 +155,10 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7" /></svg>
         <span class="dc-tab-label">Decided</span>
         <span class="dc-tab-count dc-tab-count-accent" id="dc-count-tray" hidden></span>
+      </button>
+      <button class="dc-tab" type="button" data-go="history">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.34-5.66M4 4v4.5h4.5M12 8v4.5l3 1.75" /></svg>
+        <span class="dc-tab-label">History</span>
       </button>
       <button class="dc-tab" type="button" data-go="health">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2.5-6 5 12 2.5-6h4" /></svg>

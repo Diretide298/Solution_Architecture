@@ -17,17 +17,20 @@ The safety rules carried over (PHONE-SPEC.md, "Safety rules"):
   showed (the fingerprint; 409 otherwise); OpenProject mail stays off (settle_changes.py without --notify); one
   settle at a time;
 - the ask-back turn is cr-watch.py's: read-only tools inside the release worktree, no credential in its environment;
-- only the lead and the owner decide (security.DECIDERS); a phone's device token reads the summary's counts and
-  nothing else, only its hash is stored, and it ends after DEVICE_DAYS, after DEVICE_IDLE_DAYS unused, and whenever
+- only the System Architect decides (security.DECIDERS, the owner alone since 6 November 2026: "the decide page
+  only I can see it, no one else"); a phone's device token reads the summary's counts and nothing else, only its hash is stored, and it ends after DEVICE_DAYS, after DEVICE_IDLE_DAYS unused, and whenever
   its account's sessions are ended (sign out everywhere, a password change or reset, deactivation).
 
 What ADAM adds is the audit trail (`watcher_event`), the ask-back thread (`watcher_thread`) and the device tokens
-(`watcher_device`), in its own database.
+(`watcher_device`), in its own database. Asking for a failed draft to be drafted again (`redraft`) starts no Claude
+turn: it resets the request in state.json under the review lock with the watcher's own `redraft`, and the next
+hourly run drafts it.
 
 Environment: CR_WATCH_OUT (the watcher's folder; unset, every route answers 503), CR_WATCH_SCRIPT (cr-watch.py,
 default the one in this repository), CR_WATCH_ENV_FILE (the watcher's credentials for settling and asking, default
 /etc/ticvai/cr-watch.env when it exists), CR_WATCH_CLAUDE (the claude command, default found on PATH),
-CR_WATCH_PREVIEW_EVERY (seconds between one account's settle previews, default 10; the checks shorten it).
+CR_WATCH_PREVIEW_EVERY (seconds between one account's settle previews, default 10; the checks shorten it),
+CR_WATCH_RUN_MINUTE (the minute past each hour the watcher's job starts, default 7: deploy.sh's cron_restart).
 """
 from __future__ import annotations
 
@@ -68,6 +71,10 @@ PREVIEW_EVERY = 10                   # seconds between one account's settle prev
 DEVICE_DAYS = 90                     # a device token's life (M3)
 DEVICE_IDLE_DAYS = 30                # and how long it may go unused
 DEVICE_MAX = 5                       # live tokens per account; a new one past it revokes the longest unused
+REDRAFTS_PER_MINUTE = 20             # one account's Draft again presses (each a write to the watcher's state)
+RUN_MINUTE = 7                       # the PM2 job's cron_restart, "7 * * * *" in the server's local time
+HISTORY_MAX = 200                    # settled requests History lists at most
+RUNS_SHOWN = 12                      # lines of runs.log Health shows
 BODY_MAX = 64 * 1024                 # bytes a request body to these routes may carry (M6)
 DRAIN_MAX = 1024 * 1024              # what of a refused body is read and dropped before the 413
 
@@ -77,6 +84,8 @@ BUSY = "The watcher is writing its list right now; try again in a moment."
 _SETTLING = threading.Lock()         # one settle preview or apply at a time (M1)
 _previews: dict = {}                 # account id -> when it last previewed
 _previews_lock = threading.Lock()
+_redrafts: dict = {}                 # account id -> when its recent Draft again presses were
+_redrafts_lock = threading.Lock()
 
 
 # ── the watcher's own code ───────────────────────────────────────────
@@ -225,12 +234,13 @@ def _account(request: Request) -> Optional[dict]:
 
 
 def require_decider(request: Request) -> dict:
-    """The lead or the owner, signed in. Mirrors main.py's require_* guards; a device token is not a session."""
+    """The System Architect, signed in (security.DECIDERS). Mirrors main.py's require_* guards; a device token is
+    not a session. Every route here takes it, the device-token routes too: a Team Lead is refused 403."""
     account = _account(request)
     if not account:
         raise HTTPException(401, "Sign in to do that.")
     if account["role"] not in security.DECIDERS:
-        raise HTTPException(403, "Only the lead or the System Architect can decide change requests.")
+        raise HTTPException(403, "Only the System Architect can decide change requests.")
     return account
 
 
@@ -271,7 +281,7 @@ def _event(account: dict, kind: str, cr: str, decision: str = "", draft_hash: st
     db.write(
         "INSERT INTO watcher_event (account_id, who, at, kind, cr, decision, draft_hash, detail) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        (account["id"], account["email"], _now(), kind, cr, decision, draft_hash, detail[:2000]))
+        (account["id"], account["email"], _now(), kind, cr, decision, draft_hash, detail[:12000]))
 
 
 # ── what the pages read ──────────────────────────────────────────────
@@ -315,7 +325,13 @@ def _row(p: dict, mark: dict, rel: tuple, hidden: Optional[List[str]] = None) ->
             "settle_status": settle_status, "settle_ref": settle_ref,
             "drafted_at": p.get("drafted_at") or "", "draft_hash": m.draft_hash(d) if d else "",
             "mark_digest": m.mark_digest(mark),
-            "draft_error": _redact(p.get("draft_error") or "", hidden)}
+            "draft_error": _redact(p.get("draft_error") or "", hidden),
+            # Why it has no draft, without the watcher's "failed twice" wrapping, and whether the watcher has given up
+            # on it until Draft again (MAX_TRIES).
+            "draft_reason": _redact(p.get("draft_reason") or p.get("draft_error") or "", hidden),
+            "draft_tries": int(p.get("draft_tries") or 0),
+            "gave_up": not d and int(p.get("draft_tries") or 0) >= m.MAX_TRIES,
+            "redraft_asked_at": p.get("redraft_asked_at") or ""}
 
 
 def _mark(mark: dict) -> dict:
@@ -346,15 +362,51 @@ def _summary(out: Path, since: Optional[str], titles: bool = True) -> dict:
                     "blocking": p.get("blocking") == "yes",
                     "needs": (p.get("draft") or {}).get("needs") or "", "raised_at": p.get("raised") or ""})
     cap = state.get("daily_cap_usd") or m.DAILY_USD
+    watching = _watching()
+    running = _running(out, state) if watching else ""
     return {"waiting": len(pending),
             "blocking": sum(1 for p in pending.values() if p.get("blocking") == "yes"),
             "needs_lead": sum(1 for d in drafts if d.get("needs") == "lead"),
             "needs_client": sum(1 for d in drafts if d.get("needs") == "client"),
             "new": new,
-            "last_run_at": state.get("last_run_at") or "", "last_error": _redact(state.get("last_error") or ""),
-            "paused": state.get("paused") or "",
+            # With no watcher running here, what its last run said no longer stands: no error, no pause.
+            "watching": watching,
+            "last_run_at": state.get("last_run_at") or "",
+            "last_error": _redact(state.get("last_error") or "") if watching else "",
+            # While a run drafts, what the last run said no longer stands (6 November 2026: a stale "stopped at the
+            # daily cap" stood all through a run); `running_since` says since when it drafts.
+            "paused": "" if running or not watching else _redact(state.get("paused") or ""),
+            "running_since": running,
             "spend_today_usd": round(m.spend_today(out), 2), "daily_cap_usd": float(cap),
-            "decided": sum(1 for r, mk in marks.items() if r in pending and mk["decision"] in ("approve", "change"))}
+            "decided": sum(1 for r, mk in marks.items() if r in pending and mk["decision"] in ("approve", "change")),
+            # requests with no draft: none yet, or failed; they are never decided, only drafted again
+            "not_drafted": sum(1 for p in pending.values() if not p.get("draft")),
+            "draft_failed": sum(1 for p in pending.values() if not p.get("draft") and p.get("draft_error"))}
+
+
+NOT_RUNNING = "The watcher is not running on this server"
+
+
+def _watching() -> bool:
+    """Whether the watcher's job runs on this server: deploy.sh starts it only with its env file, and the lead stops
+    it by taking the env file away (6 November 2026: the PM2 job deleted, the env file shredded, change requests
+    drafted on the lead's own machine). Its folder may still be here, read for History's sake; nothing drafts it."""
+    return _env_file() is not None
+
+
+def _running(out: Path, state: dict) -> str:
+    """When the watcher's run now drafting started, or "": the run marks its start in state.json, and it counts
+    only while the run lock is held by a live process (a run PM2 killed leaves the mark behind)."""
+    since = state.get("running_since") or ""
+    if not since:
+        return ""
+    try:
+        held = (out / "cr-watch.lock").read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    m = cw()
+    pid = m._lock_pid(held)
+    return since if pid and m.pid_alive(pid) else ""
 
 
 @router.get("/summary")
@@ -462,7 +514,7 @@ class TakeBackIn(BaseModel):
 
 
 class _Conflict(Exception):
-    """A 409 with a reason the page can tell apart: draft-moved, mark-moved or not-listed."""
+    """A 409 with a reason the page can tell apart: draft-moved, mark-moved, not-listed or not-drafted."""
 
     def __init__(self, detail: str, reason: str):
         super().__init__(detail)
@@ -518,6 +570,11 @@ def decide(cr: str, body: DecisionIn, account: dict = Depends(require_decider)):
             if not p:
                 raise HTTPException(404, f"{ref} is not waiting in the watcher's list.")
             current = m.draft_hash(p.get("draft"))
+            if not current:
+                # Nothing drafted (none yet, or the drafting failed): there is nothing to approve, change or reject
+                # here. Draft it again (redraft); an answer in the lead's own words goes in REVIEW.md by hand.
+                raise _Conflict(f"{ref} has no draft yet, so there is nothing to decide; draft it again.",
+                                "not-drafted")
             text, marks, _ = _review(out)
             shown = marks.get(ref)
             if decision == "approve":
@@ -592,6 +649,159 @@ def take_back(cr: str, body: TakeBackIn, account: dict = Depends(require_decider
             "taken_back": True}
 
 
+# ── drafting again ───────────────────────────────────────────────────
+
+class RedraftIn(BaseModel):
+    # POST /redraft: every request whose draft failed ("Draft all again"), or the ones named
+    all_failed: bool = False
+    crs: List[str] = Field(default_factory=list, max_length=200)
+
+
+def _redraft_allowed(account: dict, presses: int = 1) -> None:
+    """At most REDRAFTS_PER_MINUTE Draft again presses a minute per account (429): each writes the watcher's state
+    under its lock, though none starts a Claude turn."""
+    now = time.monotonic()
+    with _redrafts_lock:
+        recent = [t for t in _redrafts.get(account["id"], []) if now - t < 60]
+        if len(recent) + presses > REDRAFTS_PER_MINUTE:
+            _redrafts[account["id"]] = recent
+            raise HTTPException(429, f"You asked for {len(recent)} drafts again in the last minute, the most there "
+                                     f"can be; ask again in a minute.")
+        _redrafts[account["id"]] = recent + [now] * presses
+
+
+def _not_running(why: str) -> JSONResponse:
+    """409 not-running: the watcher's folder is here but its job is not (no env file), so a Draft again or a question
+    would wait for a turn that never comes."""
+    return JSONResponse(status_code=409, content={"detail": f"{NOT_RUNNING}, {why}.", "reason": "not-running"})
+
+
+def _redraft(account: dict, refs: List[str], all_failed: bool) -> dict:
+    """The watcher's own redraft (cr-watch.py): under its review lock, each request's tries and failure are reset so
+    the next hourly run drafts it. No Claude turn is started here. Each request reset is in the audit trail."""
+    out = _out()
+    m = cw()
+    try:
+        got = m.redraft(out, refs, all_failed=all_failed)
+    except m.Busy:
+        raise HTTPException(423, BUSY) from None
+    except ValueError:
+        raise HTTPException(503, "The watcher's state could not be read; try again in a minute.") from None
+    for ref in got["redraft"]:
+        _event(account, "redraft", ref, detail=json.dumps({"all_failed": all_failed}))
+    return {"redraft": got["redraft"], "skipped": got["skipped"],
+            "detail": (f"{len(got['redraft'])} request{'' if len(got['redraft']) == 1 else 's'} will be drafted "
+                       f"again at the next hourly run." if got["redraft"] else "Nothing was asked to be drafted "
+                                                                                 "again.")}
+
+
+@router.post("/requests/{cr}/redraft")
+def redraft_one(cr: str, account: dict = Depends(require_decider)):
+    """Draft again: a request with no draft (none yet, or failed MAX_TRIES times) is drafted at the next hourly run.
+    A request that has a draft, or is marked, is refused 409 with why."""
+    ref = _ref(cr)
+    _out()
+    if not _watching():
+        return _not_running("so nothing would draft it again")
+    _redraft_allowed(account)
+    got = _redraft(account, [ref], False)
+    if not got["redraft"]:
+        why = got["skipped"].get(ref) or "it cannot be drafted again"
+        return JSONResponse(status_code=404 if "not waiting" in why else 409,
+                            content={"detail": f"{ref} was not asked to be drafted again: {why}.",
+                                     "reason": "not-redraftable"})
+    return got
+
+
+@router.post("/redraft")
+def redraft_many(body: RedraftIn, account: dict = Depends(require_decider)):
+    """Draft all again: every request whose draft failed (all_failed), or the ones named in crs."""
+    refs = [_ref(c) for c in body.crs]
+    if not body.all_failed and not refs:
+        raise HTTPException(400, "Name the requests to draft again, or ask for every failed one.")
+    _out()
+    if not _watching():
+        return _not_running("so nothing would draft them again")
+    _redraft_allowed(account)
+    return _redraft(account, refs, body.all_failed)
+
+
+# ── what was settled, and how the watcher is ─────────────────────────
+
+@router.get("/history")
+def history(limit: int = 100, account: dict = Depends(require_decider)):
+    """The requests settled from Decide, newest first, from the audit trail: what was decided, when, by whom, the
+    ticket it told and what it posted there. A settle that failed part way is listed too, marked failed."""
+    limit = max(1, min(int(limit), HISTORY_MAX))
+    rows = db.all_rows("SELECT id, who, at, kind, cr, decision, draft_hash, detail FROM watcher_event "
+                       "WHERE kind IN ('settle', 'settle-failed') ORDER BY id DESC LIMIT ?", (limit,))
+    hidden = _hidden_values()
+    items = []
+    for r in rows:
+        try:
+            d = json.loads(r["detail"] or "{}")
+        except ValueError:
+            d = {}
+        d = d if isinstance(d, dict) else {}
+        items.append({"id": r["id"], "cr": r["cr"], "at": r["at"], "who": r["who"], "failed": r["kind"] != "settle",
+                      "status": r["decision"] or "", "decision": str(d.get("decision") or ""),
+                      "ref": str(d.get("ref") or ""), "ticket": str(d.get("ticket") or ""),
+                      "title": _redact(str(d.get("title") or ""), hidden, shaped=False),
+                      "resolution": _redact(str(d.get("resolution") or ""), hidden, shaped=False),
+                      "draft_hash": r["draft_hash"] or ""})
+    return {"items": items}
+
+
+def _next_run(now: Optional[_dt.datetime] = None) -> str:
+    """When the PM2 job next starts the watcher: RUN_MINUTE past the hour, in the server's local time (PM2's cron
+    is local; a zone half an hour off UTC moves the minute), as a UTC time."""
+    minute = RUN_MINUTE
+    try:
+        minute = int(os.environ.get("CR_WATCH_RUN_MINUTE") or RUN_MINUTE) % 60
+    except ValueError:
+        pass
+    local = (now or _dt.datetime.now(_dt.timezone.utc)).astimezone()
+    nxt = local.replace(minute=minute, second=0, microsecond=0)
+    if nxt <= local:
+        nxt += _dt.timedelta(hours=1)
+    return security.stamp(nxt.astimezone(_dt.timezone.utc))
+
+
+def _runs(out: Path, hidden: List[str]) -> List[dict]:
+    """The last RUNS_SHOWN lines of runs.log, newest first: the time and the counts line the run wrote."""
+    path = out / "runs.log"
+    try:
+        with path.open("rb") as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - 64 * 1024))
+            tail = f.read().decode("utf-8", "replace")
+    except OSError:
+        return []
+    lines = [x for x in tail.splitlines() if x.strip()][-RUNS_SHOWN:]
+    got = []
+    for x in reversed(lines):
+        at, _, rest = x.partition(" ")
+        if _parse_time(at) is None:
+            at, rest = "", x
+        got.append({"at": at, "line": _redact(rest, hidden)[:400]})
+    return got
+
+
+@router.get("/health")
+def health(account: dict = Depends(require_decider)):
+    """How the watcher is: its last runs, today's spend against the cap, why drafting stopped, the last error, and
+    when the next hourly run is due."""
+    out = _out()
+    s = _summary(out, None)
+    m = cw()
+    hidden = _hidden_values()
+    return {k: s[k] for k in ("watching", "last_run_at", "last_error", "paused", "running_since", "spend_today_usd",
+                              "daily_cap_usd", "waiting", "not_drafted", "draft_failed")} | {
+        "spend_held_usd": round(m.spend_held(out), 2), "next_run_at": _next_run() if s["watching"] else "", "runs": _runs(out, hidden),
+        "batch_usd": float(m.MAX_BUDGET_USD)}
+
+
 # ── asking back ──────────────────────────────────────────────────────
 
 class AskIn(BaseModel):
@@ -657,6 +867,8 @@ def ask(cr: str, body: AskIn, account: dict = Depends(require_decider)):
         raise HTTPException(404, f"{ref} is not waiting in the watcher's list.")
     if not (out / "drafts" / f"{ref}.md").is_file():
         raise HTTPException(409, f"{ref} has no draft to ask about yet.")
+    if not _watching():
+        return _not_running("so there is no Claude turn to ask")
     question = body.question.strip()
     if not question:
         raise HTTPException(400, "There is no question to ask.")
@@ -785,7 +997,9 @@ def settle_apply(body: ApplyIn, account: dict = Depends(require_decider)):
     for it in applied:
         _event(account, "settle", it["cr"], it.get("status") or "", it.get("draft_hash") or "",
                json.dumps({"fingerprint": fingerprint, "decision": it.get("decision") or "", "ref": it.get("ref") or "",
-                           "mark": it.get("mark") or ""}, ensure_ascii=False))
+                           "mark": it.get("mark") or "", "ticket": str(it.get("ticket") or "")[:20],
+                           "title": str(it.get("title") or "")[:500],
+                           "resolution": str(it.get("resolution") or "")[:8000]}, ensure_ascii=False))
     done = [it["cr"] for it in applied]
     if not done:
         return {"applied": False, "settled": [], "lines": lines, "exit": rc,

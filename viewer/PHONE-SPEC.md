@@ -42,31 +42,53 @@ pages work in Safari as a home-screen web app).
   (`total_cost_usd`); a turn that times out, is killed or answers no cost keeps its budget as the estimate. Today's
   spend therefore counts the turns still running. Per batch stays $10; an ask-back turn is capped at $2
   (`CR_WATCH_ASK_USD`).
+- **Room under the cap, and saying why** (6 November 2026: a $20 cap fitted two $10 reservations, nine requests waited
+  an hour for a run that cost $1.78, and the page said "stopped at the daily cap: $0.00 spent; until tomorrow"). A
+  batch refused only because the turns beside it hold the room waits for one to settle and starts in the same run,
+  within `CAP_WAIT_SECONDS` (15 minutes) of the run's start; it is skipped only when today's real spend (the ledger
+  less what running turns hold) leaves no room. A request not tried this run drops an earlier run's failure. state.json
+  `paused` says what happened (`drafting_note`): "Drafting failed: <reason>; N requests wait for a draft", "Drafting is
+  held: N failed twice (<reason>)", "Daily cap reached: $X of $Y spent today; N wait until tomorrow (UTC)", or that N
+  wait for the next hourly run because only K batches fit under the cap at once. The first failure is also
+  `last_error`. While a run drafts, state.json says since when (`running_since`) and the summary shows that rather
+  than the last run's note.
+- **Draft again.** A request whose drafting failed `MAX_TRIES` (2) times waits for the lead: Draft again on the page,
+  or `cr-watch.py redraft CR-nnn [CR-nnn ...] | --all-failed` from a shell (run as the watcher's account), resets it
+  for the next run. Neither starts a Claude turn.
 - **Never settles on its own.** The server job runs `run` without `--auto` (no automatic closes): the lead decides
   everything ("the watcher never replied on its own, it gives me a notification and I make the decision").
 
 ## 2. The decision API (viewer/api/watcher.py, an APIRouter included by main.py)
 
-Only the lead role and the owner (security.py: a new `DECIDERS = ("owner", "lead")`). Every route reads the watcher's
-output folder `CR_WATCH_OUT`; with none configured they answer 503 "The watcher is not set up on this server".
+Only the owner, the System Architect (security.py `DECIDERS = ("owner",)`; the lead, 6 November 2026: "the decide
+page only I can see it, no one else"). Every route, the device-token routes too, answers 403 to anybody else, a Team
+Lead included, and a device token a Team Lead made earlier reads nothing. Every route but `history` reads the
+watcher's output folder `CR_WATCH_OUT`; with none configured they answer 503, and the page says "The watcher is not
+running on this server". With the folder there but no env file (the job stopped: 6 November 2026, the PM2 job deleted
+and the env file shredded; change requests are drafted on the lead's machine), the summary says `watching: false`,
+with no error and no pause, and Draft again and Ask are refused 409 `not-running`.
 
 | Route | Does |
 |---|---|
-| `GET /api/watcher/summary` | waiting, blocking, needs-lead, needs-client counts; new since a time; last run and its error; today's spend and the cap |
-| `GET /api/watcher/requests` | the waiting requests as REVIEW.md lists them: number, title, verdict, class, blocking, needs, decision mark, ticket, developer, raised at, draft hash, `mark_digest` |
-| `GET /api/watcher/requests/{cr}` | one request: the draft (recommendation, resolution, misread, facts, the agent's full answer), its draft hash, the current mark and its `mark_digest`, the ask-back thread |
-| `POST /api/watcher/requests/{cr}/decision` | `{decision: approve, change or reject, draft_hash, expected_mark, resolution?, status?, ref?, note?}`; written into REVIEW.md under the watcher's lock exactly as the lead types it today. Refused 409 `{detail, reason}` when the draft hash moved (`draft-moved`) or the mark is no longer `expected_mark` (`mark-moved`: decided again elsewhere, or an offline replay after a newer mark). The same decision sent again over the mark it made answers `unchanged: true`. An approve puts the draft's status, ref and resolution back. Answers the new `mark_digest` |
+| `GET /api/watcher/summary` | waiting, blocking, needs-lead, needs-client counts; new since a time; last run and its error; today's spend and the cap; `watching`; `running_since` while a run drafts (its lock held by a live process; the last run's `paused` is then empty); `not_drafted` and `draft_failed` |
+| `GET /api/watcher/requests` | the waiting requests as REVIEW.md lists them: number, title, verdict, class, blocking, needs, decision mark, ticket, developer, raised at, draft hash, `mark_digest`; for one with no draft, why (`draft_reason`), its tries and whether the watcher gave up on it (`gave_up`) |
+| `GET /api/watcher/requests/{cr}` | one request: the draft (recommendation, resolution, misread, facts, the agent's full answer), its draft hash, the current mark and its `mark_digest`, the ask-back thread, and the developer's own request (`request`: problem, evidence, options, recommendation, as ADAM's export has it; the watcher keeps it in state.json, while drafts/CR-n.md holds the facts, the draft and the agent's answer) |
+| `POST /api/watcher/requests/{cr}/decision` | `{decision: approve, change or reject, draft_hash, expected_mark, resolution?, status?, ref?, note?}`; written into REVIEW.md under the watcher's lock exactly as the lead types it today. Refused 409 `{detail, reason}` when the request has no draft (`not-drafted`: nothing to decide; draft it again), the draft hash moved (`draft-moved`) or the mark is no longer `expected_mark` (`mark-moved`: decided again elsewhere, or an offline replay after a newer mark). The same decision sent again over the mark it made answers `unchanged: true`. An approve puts the draft's status, ref and resolution back. Answers the new `mark_digest` |
 | `DELETE /api/watcher/requests/{cr}/decision` | `{draft_hash, expected_mark}`; takes the mark back (the drafted lines return); bound and refused like a decision |
 | `POST /api/watcher/requests/{cr}/ask` | `{question}`; starts one read-only Claude turn in the release worktree (same tools and denials as drafting, $2, 30 turns) with the draft, the thread so far and the question; answers 202 with the thread entry; the page polls. Ten an hour per account (429) |
 | `POST /api/watcher/settle/preview` | runs `cr-watch.py settle` (dry run); answers the lines it printed and a fingerprint of the decisions file. One per account every 10 seconds (429); one settle preview or apply at a time (423) |
 | `POST /api/watcher/settle/apply` | `{fingerprint}`; refuses 409 if REVIEW.md's marks changed since the preview; else runs `settle --apply` (mail off) and answers `{applied, settled, lines}`; `applied` is false when nothing was settled. A settle that fails part way answers 502 and each request it was attempting goes in the audit trail |
-| `POST /api/watcher/device-token` | the lead makes a token the phone app keeps for background checks; it reads `summary` only (counts, no titles); one per device, five per account, 90 days, 30 days unused; revocable, and revoked whenever the account's sessions end |
+| `POST /api/watcher/device-token` | the owner makes a token the phone app keeps for background checks; it reads `summary` only (counts, no titles); one per device, five per account, 90 days, 30 days unused; revocable, and revoked whenever the account's sessions end |
+| `POST /api/watcher/requests/{cr}/redraft` | Draft again: a request with no draft (none yet, or failed `MAX_TRIES` times) has its tries and failure reset under the watcher's review lock (cr-watch.py `redraft`), and is queued in out/redraft.json so a run drafting at that moment takes it in when it publishes. Starts no Claude turn: the next hourly run drafts it. Refused 409 for a request with a draft or a mark, 404 for one not waiting, 409 `not-running` with no watcher. Twenty a minute per account (429); each in the audit trail (`redraft`) |
+| `POST /api/watcher/redraft` | `{all_failed: true}` or `{crs: [...]}`: the same for every failed request ("Draft all again") or the ones named |
+| `GET /api/watcher/history` | the requests settled from Decide, newest first, from `watcher_event`: when, who, the decision, the new status, the release, the ticket it told and what it posted; a settle that failed part way is marked failed. Reads ADAM's database only, so it answers with no watcher too |
+| `GET /api/watcher/health` | the summary's run fields, the last twelve lines of runs.log (time and counts line), today's spend and what of it running turns hold, a batch's budget, and when the next hourly run is due (`CR_WATCH_RUN_MINUTE`, default 7, past the hour in the server's time; none with no watcher) |
 
 An ask-back answer may end with a proposed resolution in a fenced `json` block; the page offers "Use this answer",
 which fills the Change box. Asking never changes a decision on its own.
 
-Records: every decision, take-back, settle (from the fingerprinted marks), failed settle, and device token made or
-revoked (with why) is stored in ADAM's database (`watcher_event`: who, when, cr, decision, draft hash) as the audit
+Records: every decision, take-back, Draft again, settle (from the fingerprinted marks, with the ticket it told and
+what it posted), failed settle, and device token made or revoked (with why) is stored in ADAM's database (`watcher_event`: who, when, cr, decision, draft hash) as the audit
 trail; the thread in `watcher_thread`. What a route answers is cleaned of the env file's values (plain, base64 and
 URL-encoded) and of anything shaped like a token. Request bodies to these routes are capped at 64 KB (413), in the
 viewer's proxy and in the API.
@@ -92,13 +114,28 @@ not committed anywhere; they are kept in D:/Chinmay/adam/adam-app/ (gitignored).
 
 - **Inbox:** blocking first, then needs-lead, then the rest; each row shows the number, title, ticket and developer,
   how long it has waited, and chips for blocking / needs you / needs the client. Swipe right to approve (with an
-  undo), left to open. "Approve all that need nobody" lists them before it marks anything.
-- **Request:** the recommendation first, then the exact text that would be posted, then the facts and the agent's
-  full answer (folded). Buttons: Approve, Change (edit the text), Reject (with a note), Ask.
+  undo), left to open. "Approve all that need nobody" lists them before it marks anything. A search over number,
+  title and ticket; filters with counts (blocking, needs you, needs the client, not drafted) and a developer.
+- **Not drafted yet:** a request with no draft (none yet, or its drafting failed) is never decided here: no swipe, no
+  Approve, not in "Approve all that need nobody", not counted in the headline ("16 new, none drafted yet" and why,
+  until drafts exist). It sits in its own section with the reason in plain words and Draft again, and "Draft all
+  again" for the failed ones; opened, it says why and shows the developer's request, with Draft again only.
+- **Request:** the ticket (a link to OpenProject, https://pms.softlabsgroup.in/work_packages/<id>), the developer,
+  when it was raised and its class; the recommendation; the exact text that would be posted with its length against
+  the 4,000 characters ADAM takes (a warning above it); the developer's own request; the facts; the agent's full
+  answer (folded). Buttons: Approve, Change (edit the text, the count live), Reject (with a note), Ask.
 - **Ask:** a thread under the request; each answer cites file:line like the drafts.
 - **Decided tray and Settle:** decisions collect in a tray; Settle shows the dry run (each request, its new status,
   the ticket it tells) and applies after a fingerprint check.
-- **Health:** last run, errors, today's spend against the cap.
+- **History:** the requests settled from Decide, newest first, grouped by day: the decision, when, the ticket it
+  told, and what was posted (folded).
+- **Health:** the last run (or "Drafting now" while one runs), when the next is due, why drafting is held in the
+  watcher's own honest words (cr-watch.py `drafting_note`: a failure and its reason, the real cap, or only a wait for
+  room), the last error, today's spend against the cap and what running turns hold, and the last runs from runs.log.
+- **No watcher on this server:** the inbox and Health say plainly "The watcher is not running on this server", with
+  no error banner and no stale pause; Draft again and Ask are off with that reason; History still reads.
+- A phone (420 by 933, in the app) has the bottom bar (Inbox, Decided, History, Health); a desktop has a rail and two
+  panes, the list on the left and the request on the right.
 - Works offline for reading (the last list is cached); a decision made offline is sent when back online and refused
   if its draft changed meanwhile, or if the request was decided again elsewhere (the page says which).
 
@@ -131,13 +168,14 @@ does does not change.
 
 ## Contracts between the pieces (built in parallel; each side keeps to these)
 
-**Summary** (`GET /api/watcher/summary?since=<ISO time>`; the lead's session, or `Authorization: Bearer <device
+**Summary** (`GET /api/watcher/summary?since=<ISO time>`; the owner's session, or `Authorization: Bearer <device
 token>`, which may read this route and nothing else):
 
     {"waiting": 19, "blocking": 9, "needs_lead": 5, "needs_client": 2,
      "new": [{"cr": "CR-650", "title": "...", "blocking": true, "needs": "none", "raised_at": "2026-11-04T12:22:42Z"}],
      "last_run_at": "2026-11-04T13:23:10Z", "last_error": "", "paused": "",
-     "spend_today_usd": 12.40, "daily_cap_usd": 50.0, "decided": 3}
+     "spend_today_usd": 12.40, "daily_cap_usd": 50.0, "decided": 3,
+     "watching": true, "running_since": "", "not_drafted": 0, "draft_failed": 0}
 
 `new` holds requests drafted after `since` (all waiting ones when `since` is absent). `paused` is empty or the reason
 drafting stopped (the cap). `decided` counts marks waiting in the tray for Settle. **With a device token, `title` is

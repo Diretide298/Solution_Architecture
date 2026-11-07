@@ -20,18 +20,32 @@
  * the phone is back online, still bound to the hash and the mark it was made
  * on, so a replay after a newer mark is refused and says so.
  *
+ * A request with no draft (none yet, or its drafting failed) is never
+ * decided here: it has no swipe, no Approve, no place in "Approve all that
+ * need nobody", and it is not counted as waiting for a decision. It sits under
+ * "Not drafted yet" with why, in plain words, and Draft again (the API's
+ * redraft), which starts no Claude turn: the next hourly run drafts it.
+ *
+ * Only the System Architect decides (security.py DECIDERS, 6 November 2026).
+ *
  * `?demo=1` runs against an in-page fake (realistic titles, invented drafts)
  * so the page can be seen before the API exists. `&app=1` adds a fake
- * window.AdamApp so the app-only parts can be seen too.
+ * window.AdamApp so the app-only parts can be seen too. `&scenario=failed` is
+ * the server on 6 November: every request waiting, none drafted, the key
+ * refused. `&scenario=stopped` is the watcher's folder kept with its job gone
+ * (four undrafted requests left); `&scenario=unset` is no watcher at all (503).
  */
 import { currentTheme, setTheme } from '/theme.js';
 import * as auth from '/validation.js';
 
 const params = new URLSearchParams(location.search);
 const DEMO = params.get('demo') === '1';
-const DECIDERS = ['owner', 'lead'];
+const SCENARIO = params.get('scenario') ?? '';
+const DECIDERS = ['owner'];
+const POST_LIMIT = 4000;            // what ADAM takes in one resolution (CR-455)
+const TICKET_URL = 'https://pms.softlabsgroup.in/work_packages/';
 const UNDO_MS = 5000;
-const CACHE_KEY = 'adam-decide-cache-v1';
+const CACHE_KEY = 'adam-decide-cache-v2';
 const OUTBOX_KEY = 'adam-decide-outbox-v1';
 const HINT_KEY = 'adam-decide-swiped';
 const STATUSES = ['accepted', 'done', 'rejected', 'open'];
@@ -71,6 +85,9 @@ const PATHS = {
   send: 'M5 12h13M13 6l6 6-6 6',
   clock: 'M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z',
   info: 'M12 11v5M12 8v.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z',
+  redo: 'M4 12a8 8 0 1 0 2.34-5.66M4 4v4.5h4.5',
+  external: 'M14 5h5v5M19 5l-8 8M18 14v5H5V6h5',
+  search: 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM20 20l-4.8-4.8',
 };
 function icon(name) {
   const ns = 'http://www.w3.org/2000/svg';
@@ -157,7 +174,43 @@ function normRow(r) {
     // after the request was marked again elsewhere is refused, not written over.
     markDigest: r.mark_digest ?? '',
     draftError: r.draft_error ?? '',
+    // Why it has no draft, as the watcher said it (redacted by the API), and whether the watcher gave up on it.
+    draftReason: r.draft_reason ?? r.draft_error ?? '',
+    draftTries: Number(r.draft_tries ?? 0),
+    gaveUp: Boolean(r.gave_up),
+    redraftAskedAt: r.redraft_asked_at ?? '',
+    draftedAt: r.drafted_at ?? '',
   };
+}
+/** A request with no draft to decide: no draft hash, or a drafting that failed. Never approved from here. */
+const isUndrafted = (r) => Boolean(r) && (!r.hash || Boolean(r.draftError));
+/** "Invalid API key" from "claude reported an error (exit 1): Invalid API key · Please run /login". */
+function shortReason(why) {
+  let s = String(why ?? '').replace(/^draft failed twice:[^(]*\((.*)\)$/i, '$1');
+  s = s.replace(/^claude (?:reported an error|exited)[^:]*:\s*/i, '').split(' · ')[0].trim();
+  return s.length > 90 ? `${s.slice(0, 88).trimEnd()}…` : s;
+}
+/** Why a request has no draft, in plain words, for the row and the request. */
+function plainReason(r) {
+  const why = String(r.draftReason || r.draftError || '');
+  const w = why.toLowerCase();
+  if (!why) {
+    return r.redraftAskedAt ? 'You asked for it to be drafted again. The next hourly run drafts it.'
+      : 'Not drafted yet. The next hourly run drafts it.';
+  }
+  if (/credit balance|billing/.test(w)) return 'The Anthropic account has run out of credit, so nothing could be drafted.';
+  if (/api key|authentication|unauthori[sz]ed|\b401\b|\/login/.test(w)) return 'Claude refused the watcher\'s API key, so nothing could be drafted.';
+  if (/not on path/.test(w)) return 'Claude Code is not installed for the watcher on the server.';
+  if (/no worktree/.test(w)) return 'The watcher could not open the release it checks drafts against.';
+  if (/took too long|timed? ?out|timeoutexpired/.test(w)) return 'The drafting turn took too long and was stopped.';
+  if (/budget/.test(w)) return 'The drafting turn ran out of its budget before it answered.';
+  if (/json block|no entry for it|not json|one object for/.test(w)) return 'The drafting turn answered without a draft the watcher could read.';
+  return 'Drafting failed.';
+}
+function triesLine(r) {
+  if (r.gaveUp) return 'Tried twice. It waits for Draft again.';
+  if (r.draftError) return 'Tried once. The next hourly run tries again.';
+  return '';
 }
 function proposedFrom(text) {
   const m = /```json\s*([\s\S]*?)```/.exec(text ?? '');
@@ -198,6 +251,11 @@ function normDetail(d) {
     ref: draft.ref ?? d.ref ?? '',
     question: draft.question ?? '',
     noDraft: !d.draft,
+    // The developer's own request, as ADAM's export has it (the watcher keeps it in state.json).
+    asked: {
+      problem: d.request?.problem ?? '', evidence: d.request?.evidence ?? '', options: d.request?.options ?? '',
+      recommendation: d.request?.recommendation ?? '', artefact: d.request?.artefact ?? '', kind: d.request?.kind ?? '',
+    },
     misread: draft.misread ?? '',
     facts,
     answer: draft.answer ?? draft.full_answer ?? '',
@@ -236,6 +294,10 @@ const realApi = {
   apply: (fingerprint) => http('/api/watcher/settle/apply', { method: 'POST', body: { fingerprint } }),
   deviceToken: (device) => http('/api/watcher/device-token', { method: 'POST', body: { device } }),
   dropDeviceToken: (id) => http(`/api/watcher/device-token/${enc(id)}`, { method: 'DELETE' }),
+  redraft: (cr) => http(`/api/watcher/requests/${enc(cr)}/redraft`, { method: 'POST', body: {} }),
+  redraftFailed: () => http('/api/watcher/redraft', { method: 'POST', body: { all_failed: true } }),
+  history: () => http('/api/watcher/history'),
+  health: () => http('/api/watcher/health'),
 };
 const api = DEMO ? makeFake() : realApi;
 
@@ -257,6 +319,13 @@ const S = {
   refused: new Map(),   // cr -> why the API refused the decision
   asking: new Set(),
   watch: null,
+  // the inbox's filter (all, blocking, lead, client, undrafted), developer and search
+  filter: 'all',
+  dev: '',
+  query: '',
+  history: null,        // {items, at} once read
+  health: null,         // the health route's answer once read
+  redrafting: new Set(),
 };
 
 function loadJson(key, fallback) {
@@ -268,13 +337,14 @@ function saveJson(key, value) {
 const saveOutbox = () => saveJson(OUTBOX_KEY, S.outbox);
 function saveCache() {
   if (DEMO) return;
-  saveJson(CACHE_KEY, { at: S.readAt, summary: S.summary, rows: S.rows, details: [...S.details] });
+  saveJson(CACHE_KEY, { at: S.readAt, summary: S.summary, rows: S.rows, details: [...S.details], history: S.history, health: S.health });
 }
 function loadCache() {
   if (DEMO) return false;
   const c = loadJson(CACHE_KEY, null);
   if (!c?.rows) return false;
   S.rows = c.rows; S.summary = c.summary; S.readAt = c.at; S.details = new Map(c.details ?? []);
+  S.history = c.history ?? null; S.health = c.health ?? null;
   return true;
 }
 
@@ -284,10 +354,36 @@ const isDecided = (r) => Boolean(r.decision) || S.pending.has(r.cr) || inOutbox(
 const kindOf = (r) => (r.blocking ? 'blocking' : r.needs === 'lead' ? 'lead' : r.needs === 'client' ? 'client' : 'none');
 const groupOf = (r) => (r.blocking ? 'blocking' : r.needs === 'lead' ? 'lead' : 'rest');
 const byWait = (a, b) => Date.parse(a.raisedAt ?? 0) - Date.parse(b.raisedAt ?? 0);
+/** The drafted requests waiting for a decision: what the inbox, its counts and every approve read. */
 function inboxRows() {
   const order = { blocking: 0, lead: 1, rest: 2 };
-  return S.rows.filter((r) => !isDecided(r)).sort((a, b) => order[groupOf(a)] - order[groupOf(b)] || byWait(a, b));
+  return S.rows.filter((r) => !isDecided(r) && !isUndrafted(r)).sort((a, b) => order[groupOf(a)] - order[groupOf(b)] || byWait(a, b));
 }
+/** The requests with no draft: failed ones first, blocking first, then by how long they have waited. */
+function undraftedRows() {
+  return S.rows.filter((r) => !isDecided(r) && isUndrafted(r))
+    .sort((a, b) => Number(Boolean(b.draftError)) - Number(Boolean(a.draftError)) || Number(b.blocking) - Number(a.blocking) || byWait(a, b));
+}
+// The inbox's filters. Each count is taken with the search and the developer applied, so a count says what a tap shows.
+const FILTERS = [
+  { key: 'all', label: 'All', test: () => true },
+  { key: 'blocking', label: 'Blocking', test: (r) => r.blocking },
+  { key: 'lead', label: 'Needs you', test: (r) => !isUndrafted(r) && r.needs === 'lead' },
+  { key: 'client', label: 'Needs the client', test: (r) => !isUndrafted(r) && r.needs === 'client' },
+  { key: 'undrafted', label: 'Not drafted', test: (r) => isUndrafted(r) },
+];
+function searched(r) {
+  if (S.dev && r.developer !== S.dev) return false;
+  const q = S.query.trim().toLowerCase().replace(/^#/, '');
+  if (!q) return true;
+  return r.cr.toLowerCase().includes(q) || r.cr.replace(/^CR-/i, '') === q || r.title.toLowerCase().includes(q)
+    || String(r.ticket).replace(/^#/, '').includes(q);
+}
+const filterOf = () => FILTERS.find((f) => f.key === S.filter) ?? FILTERS[0];
+const shown = (r) => searched(r) && filterOf().test(r);
+const narrowed = () => S.filter !== 'all' || Boolean(S.dev) || Boolean(S.query.trim());
+/** The rows in the order the inbox lists them, as filtered: what j/k and the request's arrows step through. */
+const navRows = () => [...inboxRows().filter(shown), ...undraftedRows().filter(shown)];
 const trayRows = () => S.rows.filter(isDecided).sort(byWait);
 const markOf = (r) => S.pending.get(r.cr)?.body ?? S.outbox.find((o) => o.cr === r.cr)?.body ?? r.decision;
 
@@ -361,10 +457,16 @@ async function refresh({ quiet = false } = {}) {
     S.fatal = null;
     saveCache();
     prefetch();
+    // Health and History are read beside the list, never in its way: a failure there leaves the list as it is.
+    loadHealth();
+    if (S.view === 'history' || S.history) loadHistory();
   } catch (e) {
     if (e.status === 401) { location.replace(`/login.html?next=${enc(location.pathname + location.search)}`); return; }
     if (e.status === 403) S.fatal = { kind: 'permission' };
-    else if (e.status === 503) S.fatal = { kind: 'setup', message: e.message };
+    else if (e.status === 503) {
+      S.fatal = { kind: 'setup', message: e.message };
+      if (S.view === 'history') loadHistory();
+    }
     else if (e.offline) {
       S.offline = true;
       if (!S.rows.length) S.fatal = { kind: 'reach' };
@@ -383,7 +485,7 @@ let prefetching = false;
 async function prefetch() {
   if (prefetching) return;
   prefetching = true;
-  const todo = inboxRows().filter((r) => !S.details.has(r.cr)).map((r) => r.cr);
+  const todo = [...inboxRows(), ...undraftedRows()].filter((r) => !S.details.has(r.cr)).map((r) => r.cr);
   const worker = async () => {
     while (todo.length) {
       const cr = todo.shift();
@@ -393,6 +495,56 @@ async function prefetch() {
   await Promise.all([worker(), worker(), worker()]);
   prefetching = false;
   saveCache();
+}
+
+async function loadHealth() {
+  try {
+    S.health = await api.health();
+    saveCache();
+    if (S.view === 'health') renderHealth();
+    if (S.view === 'inbox') { renderBanner(); renderInbox(); }
+  } catch { /* the summary still says the essentials */ }
+}
+async function loadHistory() {
+  try {
+    const got = await api.history();
+    S.history = { items: got?.items ?? [], at: new Date().toISOString() };
+    saveCache();
+  } catch (e) {
+    if (!S.history) S.history = { items: [], at: null, error: e.offline ? 'Offline, and no History is kept yet.' : e.message };
+  }
+  if (S.view === 'history') renderHistory();
+}
+
+/** Draft again: the request (or every failed one) is reset on the server so the next hourly run drafts it. No
+ *  Claude turn starts now, and nothing is decided. */
+async function redraft(crs, { all = false } = {}) {
+  const list = all ? undraftedRows().filter((r) => r.draftError).map((r) => r.cr) : crs;
+  if (!list.length) return;
+  if (S.offline) { toast({ text: 'Drafting again needs a connection.', error: true }); return; }
+  if (notRunning()) { toast({ text: 'Draft again is off.', sub: `${NOT_RUNNING}.`, error: true }); return; }
+  for (const cr of list) S.redrafting.add(cr);
+  renderAll();
+  try {
+    const got = all ? await api.redraftFailed() : await api.redraft(list[0]);
+    const done = got?.redraft ?? [];
+    const now = new Date().toISOString();
+    for (const cr of done) {
+      const r = rowOf(cr);
+      if (r) Object.assign(r, { draftError: '', draftReason: '', gaveUp: false, draftTries: 0, redraftAskedAt: now });
+    }
+    saveCache();
+    const next = S.health?.next_run_at ? ` at ${clock(S.health.next_run_at)}` : '';
+    toast(done.length
+      ? { text: done.length === 1 ? `${done[0]} will be drafted again` : `${plural(done.length, 'request')} will be drafted again`,
+        sub: `At the next hourly run${next}. Nothing is decided until you read the draft.` }
+      : { text: 'Nothing was asked to be drafted again.', sub: Object.values(got?.skipped ?? {})[0] ?? '', error: true });
+  } catch (e) {
+    toast({ text: 'Draft again did not go through.', sub: e.offline ? 'You are offline.' : e.message, error: true });
+  } finally {
+    for (const cr of list) S.redrafting.delete(cr);
+    renderAll();
+  }
 }
 
 async function detailOf(cr, { fresh = false } = {}) {
@@ -410,6 +562,11 @@ const VERB = { approve: 'Approved', change: 'Changed', reject: 'Rejected' };
 
 /** Marks a request, holds it for the undo window, then sends it. */
 async function decide(cr, body, { quietToast = false, render = true } = {}) {
+  if (isUndrafted(rowOf(cr))) {
+    // A request with no draft has nothing to approve, change or reject (the API refuses it too: not-drafted).
+    toast({ text: `${cr} has no draft to decide.`, sub: 'Draft it again; decide when the draft is in.', error: true });
+    return false;
+  }
   let hash = body.draft_hash || rowOf(cr)?.hash;
   // The mark read with the same reading as the hash: the open request's when it is open, else the row's.
   let mark = body.expected_mark ?? (S.details.get(cr)?.hash === hash ? S.details.get(cr)?.markDigest : rowOf(cr)?.markDigest);
@@ -486,7 +643,11 @@ function newMark(cr, got) {
 }
 
 function refusedWith(cr, e) {
-  if (e.status === 409 && e.reason === 'mark-moved') {
+  if (e.status === 409 && e.reason === 'not-drafted') {
+    S.refused.set(cr, 'It has no draft any more, so there was nothing to decide. Draft it again and decide when the draft is in.');
+    S.details.delete(cr);
+    toast({ text: `${cr} was not kept: it has no draft.`, sub: 'Draft it again, then decide.', error: true, action: 'Open', onAction: () => openRequest(cr) });
+  } else if (e.status === 409 && e.reason === 'mark-moved') {
     S.refused.set(cr, 'It was decided again somewhere else after you decided here, so this decision was not kept. Read it again and decide again.');
     S.details.delete(cr);
     toast({ text: `${cr} was not kept: it was decided again elsewhere.`, sub: 'A newer decision is there now. Read it again and decide again.', error: true, action: 'Open', onAction: () => openRequest(cr) });
@@ -537,9 +698,33 @@ function renderAll() {
   renderCounts();
   if (S.view === 'inbox') renderInbox();
   if (S.view === 'tray') renderTray();
+  if (S.view === 'history') renderHistory();
   if (S.view === 'health') renderHealth();
   if (S.open) renderRequest();
 }
+/** The watcher's drafting note, cut to what fits one banner line: what happened and the short reason. */
+function bannerText(paused) {
+  let m = /^Drafting failed: (.*?); (\d+) requests? waits? for a draft/.exec(paused);
+  if (m) return `Drafting failed: ${shortReason(m[1])}. ${m[2]} waiting for a draft.`;
+  m = /^Drafting is held: (\d+) requests? failed \d+ times \((.*)\) and waits?/.exec(paused);
+  if (m) return `Drafting is held: ${m[1]} failed twice (${shortReason(m[2])}).`;
+  const first = paused.split(/(?<=\.)\s/)[0];
+  return first.length > 140 ? `${first.slice(0, 138).trimEnd()}…` : first;
+}
+/** The watcher does not run on this server: the API answers 503 (no watcher folder configured), or its folder is
+ *  here and its job is not (the summary's `watching` is false). 6 November 2026: the lead stopped it; change
+ *  requests are drafted on his machine. The page says so plainly, with no error and no stale pause. */
+const NOT_RUNNING = 'The watcher is not running on this server';
+const notRunning = () => S.fatal?.kind === 'setup' || S.summary?.watching === false;
+function notRunningBlock() {
+  return stateBlock({
+    iconName: 'info', title: NOT_RUNNING,
+    text: 'Change requests are drafted on the System Architect\'s machine, not here, so nothing new arrives on this page and nothing is drafted again. History still lists what was settled from Decide.',
+    action: h('button', { class: 'dc-btn dc-btn-line', type: 'button', onclick: () => go('history') }, 'See History'),
+  });
+}
+/** When the watcher's run now drafting started, or '' (the summary says it only while the run lock is held). */
+const runningSince = () => (notRunning() ? '' : S.summary?.running_since || S.health?.running_since || '');
 
 function renderFresh() {
   const sub = $('dc-fresh');
@@ -547,6 +732,7 @@ function renderFresh() {
   if (S.loading && !S.readAt) sub.textContent = 'Reading the watcher…';
   else if (S.offline) sub.textContent = S.readAt ? `Offline. List from ${clock(S.readAt)}` : 'Offline';
   else if (DEMO) sub.textContent = `Demo data. Updated ${ago(S.readAt)}`;
+  else if (S.fatal?.kind === 'setup') sub.textContent = 'No watcher on this server';
   else sub.textContent = `Updated ${ago(S.readAt)}`;
 }
 
@@ -558,8 +744,14 @@ function renderBanner() {
     b.append(icon('cloud'), h('span', { text: S.outbox.length
       ? `Offline. ${plural(S.outbox.length, 'decision')} will send when you are back.`
       : 'Offline. You can read and decide; decisions send when you are back.' }));
-  } else if (S.summary?.paused) {
-    b.append(icon('alert'), h('span', { text: `Drafting is paused: ${S.summary.paused}` }));
+  } else if (runningSince()) {
+    // A run drafting now: what the last run said no longer stands.
+    b.classList.add('is-info');
+    b.append(icon('clock'), h('span', { text: `Drafting now (started ${clock(runningSince())}). New drafts arrive when the run ends.` }));
+  } else if (S.summary?.paused && S.view !== 'health' && !notRunning()) {
+    // One line here; the whole of it is on Health, a tap away.
+    b.append(icon('alert'), h('span', { text: bannerText(S.summary.paused) }),
+      h('button', { class: 'dc-banner-btn', type: 'button', onclick: () => go('health') }, 'Details'));
   } else if (DEMO && !S.fatal) {
     b.classList.add('is-info');
     b.append(icon('info'), h('span', { text: 'Demo: invented drafts on real titles. Nothing you do here is sent.' }));
@@ -580,15 +772,16 @@ function renderCounts() {
   ct.hidden = !t || S.fatal;
   ct.textContent = t;
   if (t > before) { ct.classList.remove('is-bump'); void ct.offsetWidth; ct.classList.add('is-bump'); }
-  const tabs = document.querySelectorAll('.dc-tab');
-  tabs[0].setAttribute('aria-label', `Inbox, ${plural(n, 'request')} waiting`);
-  tabs[1].setAttribute('aria-label', `Decided, ${plural(t, 'request')} to settle`);
+  const tab = (go) => document.querySelector(`.dc-tab[data-go="${go}"]`);
+  const u = undraftedRows().length;
+  tab('inbox').setAttribute('aria-label', `Inbox, ${plural(n, 'request')} waiting for a decision${u ? `, ${u} not drafted yet` : ''}`);
+  tab('tray').setAttribute('aria-label', `Decided, ${plural(t, 'request')} to settle`);
   const dot = $('dc-health-dot');
   const s = S.summary;
-  const hot = s && (s.last_error || s.paused || (s.daily_cap_usd && s.spend_today_usd / s.daily_cap_usd >= 0.8));
+  const hot = s && !notRunning() && !runningSince() && (s.last_error || s.paused || (s.daily_cap_usd && s.spend_today_usd / s.daily_cap_usd >= 0.8));
   dot.hidden = !hot;
   dot.classList.toggle('is-warn', Boolean(s && !s.last_error));
-  tabs[2].setAttribute('aria-label', hot ? `Health, ${s.last_error ? 'the last run failed' : 'needs a look'}` : 'Health');
+  tab('health').setAttribute('aria-label', hot ? `Health, ${s.last_error ? 'the last run failed' : 'needs a look'}` : 'Health');
 }
 
 function go(view, { focus = true } = {}) {
@@ -600,6 +793,8 @@ function go(view, { focus = true } = {}) {
   }
   $('dc-shell').classList.toggle('is-single', view !== 'inbox');
   if (view !== 'inbox' && S.open && wide.matches) closeRequest({ pop: false, focusBack: false });
+  if (view === 'history') loadHistory();
+  if (view === 'health') loadHealth();
   renderAll();
   window.scrollTo({ top: 0 });
   if (focus) $('dc-main').focus({ preventScroll: true });
@@ -617,18 +812,12 @@ function fatalBlock() {
   const f = S.fatal;
   if (f.kind === 'permission') {
     return stateBlock({
-      iconName: 'lock', title: 'This page is for the lead',
-      text: `Deciding change requests is for the lead and the System Architect.${S.me ? ` You are signed in as ${S.me.name ?? S.me.email}.` : ''}`,
+      iconName: 'lock', title: 'This page is for the System Architect',
+      text: `Only the System Architect decides change requests here.${S.me ? ` You are signed in as ${S.me.name ?? S.me.email}.` : ''} Change requests are open to you on their own page.`,
       action: h('a', { class: 'dc-btn dc-btn-line', href: '/changes.html' }, 'Go to Change requests'),
     });
   }
-  if (f.kind === 'setup') {
-    return stateBlock({
-      error: true, iconName: 'alert', title: 'The watcher is not set up on this server',
-      text: 'Its drafts appear here once the ticvai-cr-watch job runs on the ADAM server and the API knows its output folder.',
-      action: h('button', { class: 'dc-btn dc-btn-line', type: 'button', onclick: () => refresh() }, 'Check again'),
-    });
-  }
+  if (f.kind === 'setup') return notRunningBlock();
   return stateBlock({
     error: true, iconName: 'cloud', title: 'ADAM cannot be reached',
     text: 'Nothing is kept on this phone yet, so there is nothing to read offline. Check the connection and try again.',
@@ -644,20 +833,22 @@ function renderInbox() {
   if (S.loading && !S.rows.length) return;
   groups.setAttribute('aria-busy', 'false');
   if (S.fatal) {
-    head.textContent = S.fatal.kind === 'permission' ? 'Decide' : 'No requests to show';
+    $('dc-tools').hidden = true;
+    head.textContent = S.fatal.kind === 'permission' ? 'Decide' : S.fatal.kind === 'setup' ? 'Nothing waiting here' : 'No requests to show';
     line.textContent = '';
     groups.replaceChildren(fatalBlock());
     return;
   }
   const rows = inboxRows();
-  const blocking = rows.filter((r) => r.blocking).length;
-  const lead = rows.filter((r) => r.needs === 'lead').length;
-  const client = rows.filter((r) => r.needs === 'client').length;
+  const undrafted = undraftedRows();
+  const failed = undrafted.filter((r) => r.draftError);
+  renderTools(rows, undrafted);
 
-  if (!rows.length) {
+  if (!rows.length && !undrafted.length) {
     head.textContent = 'Nothing waiting';
     line.textContent = '';
     const t = trayRows().length;
+    if (notRunning() && !t) { groups.replaceChildren(notRunningBlock()); return; }
     groups.replaceChildren(stateBlock({
       iconName: 'check', title: t ? `${plural(t, 'decision')} ready to settle` : 'You are up to date',
       text: t
@@ -668,20 +859,33 @@ function renderInbox() {
     return;
   }
 
-  head.replaceChildren(
-    blocking ? h('span', { text: `${blocking} blocking` }) : h('span', { text: `${rows.length} waiting` }),
-    blocking ? h('span', { class: 'is-quiet', text: ` of ${rows.length}` }) : null,
-  );
-  const bits = [];
-  if (lead) bits.push(`${lead} ${lead === 1 ? 'needs' : 'need'} you`);
-  if (client) bits.push(`${client} ${client === 1 ? 'needs' : 'need'} the client`);
-  const oldest = rows.reduce((a, r) => Math.max(a, since(r.raisedAt)), 0);
-  line.textContent = [bits.join(' and '), oldest ? `The oldest has waited ${span(oldest).long}.` : '']
-    .filter(Boolean).map((s, i) => (i === 0 && !s.endsWith('.') ? `${s}.` : s)).join(' ');
+  if (!rows.length) {
+    // Nothing to decide yet: the headline never counts a request with no draft as waiting for a decision.
+    head.replaceChildren(h('span', { text: `${undrafted.length} new` }), h('span', { class: 'is-quiet', text: ', none drafted yet' }));
+    line.textContent = undraftedLine(undrafted, failed);
+  } else {
+    const blocking = rows.filter((r) => r.blocking).length;
+    const lead = rows.filter((r) => r.needs === 'lead').length;
+    const client = rows.filter((r) => r.needs === 'client').length;
+    head.replaceChildren(
+      blocking ? h('span', { text: `${blocking} blocking` }) : h('span', { text: `${rows.length} to decide` }),
+      blocking ? h('span', { class: 'is-quiet', text: ` of ${rows.length}` }) : null,
+    );
+    const bits = [];
+    if (lead) bits.push(`${lead} ${lead === 1 ? 'needs' : 'need'} you`);
+    if (client) bits.push(`${client} ${client === 1 ? 'needs' : 'need'} the client`);
+    const oldest = rows.reduce((a, r) => Math.max(a, since(r.raisedAt)), 0);
+    line.textContent = [bits.join(' and '), oldest ? `The oldest has waited ${span(oldest).long}.` : '',
+      undrafted.length ? `${undrafted.length} more ${undrafted.length === 1 ? 'is' : 'are'} not drafted yet.` : '',
+      notRunning() ? `${NOT_RUNNING}: nothing new arrives here.` : '']
+      .filter(Boolean).map((s, i) => (i === 0 && !s.endsWith('.') ? `${s}.` : s)).join(' ');
+  }
 
-  const nobody = rows.filter((r) => r.needs === 'none');
+  const vis = rows.filter(shown);
+  const visU = undrafted.filter(shown);
   const parts = [];
-  if (nobody.length > 1) {
+  const nobody = rows.filter((r) => r.needs === 'none');
+  if (nobody.length > 1 && S.filter !== 'undrafted') {
     parts.push(h('div', { class: 'dc-inline-action' },
       h('button', { class: 'dc-btn dc-btn-ghost', type: 'button', onclick: () => approveAllSheet() },
         icon('check'), `Approve the ${nobody.length} that need nobody`)));
@@ -694,7 +898,7 @@ function renderInbox() {
   };
   let hinted = false;
   for (const g of ['blocking', 'lead', 'rest']) {
-    const list = rows.filter((r) => groupOf(r) === g);
+    const list = vis.filter((r) => groupOf(r) === g);
     if (!list.length) continue;
     const id = `dc-g-${g}`;
     const showHint = !hinted && coarse.matches && !localStorage.getItem(HINT_KEY);
@@ -708,8 +912,90 @@ function renderInbox() {
         : notes[g] && h('p', { class: 'dc-group-note', text: notes[g] }),
       h('ul', { class: 'dc-list', role: 'list' }, list.map(rowEl))));
   }
+  if (visU.length) {
+    const visFailed = visU.filter((r) => r.draftError).length;
+    const busyAll = failed.some((r) => S.redrafting.has(r.cr));
+    parts.push(h('section', { class: 'dc-group dc-group-undrafted', 'aria-labelledby': 'dc-g-undrafted' },
+      h('div', { class: 'dc-group-head' },
+        h('h3', { class: 'dc-group-title', id: 'dc-g-undrafted', text: 'Not drafted yet' }),
+        h('span', { class: 'dc-group-count', text: plural(visU.length, 'request') })),
+      h('p', { class: 'dc-group-note', text: notRunning()
+        ? `Nothing to decide until a draft is in. ${NOT_RUNNING}, so Draft again is off.`
+        : visFailed
+          ? 'Nothing to decide until a draft is in. Draft again asks the next hourly run to try; it starts nothing now.'
+          : 'Nothing to decide until a draft is in. The next hourly run drafts these.' }),
+      failed.length > 1 && h('div', { class: 'dc-inline-action' },
+        h('button', { class: 'dc-btn dc-btn-ghost', type: 'button', 'data-redraft-all': '', disabled: busyAll || S.offline || notRunning() },
+          icon('redo'), `Draft all ${failed.length} failed again`)),
+      h('ul', { class: 'dc-list', role: 'list' }, visU.map(undraftedEl))));
+  }
+  if (!vis.length && !visU.length) {
+    parts.push(stateBlock({
+      iconName: 'inbox', title: 'Nothing matches',
+      text: 'No waiting request fits this filter and search.',
+      action: h('button', { class: 'dc-btn dc-btn-line', type: 'button', onclick: clearFilters }, 'Clear the filters'),
+    }));
+  }
   groups.replaceChildren(...parts);
   S.arrived = new Set();
+}
+
+function undraftedLine(undrafted, failed) {
+  if (notRunning()) return `${NOT_RUNNING}, so nothing drafts them here.`;
+  if (runningSince()) return `The watcher is drafting now (started ${clock(runningSince())}).`;
+  const next = S.health?.next_run_at;
+  if (failed.length) {
+    const why = shortReason(failed[0].draftReason || failed[0].draftError);
+    const held = failed.every((r) => r.gaveUp);
+    return `Drafting failed: ${why}. ${held ? 'Fix the cause on the server, then Draft all again.' : `The next hourly run tries again${next ? ` at ${clock(next)}` : ''}.`}`;
+  }
+  return `The next hourly run drafts them${next ? `, at ${clock(next)}` : ''}.`;
+}
+
+function clearFilters() {
+  S.filter = 'all';
+  S.dev = '';
+  S.query = '';
+  $('dc-search').value = '';
+  renderInbox();
+}
+
+/** The inbox's search, filters and developer: built once, so typing never loses its place; counts kept fresh. */
+function renderTools(rows, undrafted) {
+  const box = $('dc-tools');
+  const all = [...rows, ...undrafted];
+  box.hidden = all.length < 3 && !narrowed();
+  const bar = $('dc-filters');
+  if (!bar.childNodes.length) {
+    bar.append(...FILTERS.map((f) => h('button', {
+      class: 'dc-filter', type: 'button', 'data-filter': f.key, 'aria-pressed': 'false',
+      onclick: () => { S.filter = S.filter === f.key && f.key !== 'all' ? 'all' : f.key; renderInbox(); },
+    }, h('span', { text: f.label }), h('span', { class: 'dc-filter-n' }))));
+  }
+  for (const f of FILTERS) {
+    const btn = bar.querySelector(`[data-filter="${f.key}"]`);
+    const n = all.filter((r) => searched(r) && f.test(r)).length;
+    btn.querySelector('.dc-filter-n').textContent = n;
+    btn.setAttribute('aria-pressed', String(S.filter === f.key));
+    btn.setAttribute('aria-label', `${f.label}, ${plural(n, 'request')}`);
+    btn.hidden = f.key !== 'all' && !n && S.filter !== f.key;
+    btn.classList.toggle('is-undrafted', f.key === 'undrafted');
+  }
+  const sel = $('dc-dev');
+  const devs = [...new Set(all.map((r) => r.developer).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  if (sel.dataset.devs !== devs.join('|')) {
+    sel.replaceChildren(h('option', { value: '' }, 'Any developer'), ...devs.map((d) => h('option', { value: d }, d)));
+    sel.dataset.devs = devs.join('|');
+  }
+  if (S.dev && !devs.includes(S.dev)) S.dev = '';
+  sel.value = S.dev;
+  const n = all.filter(shown).length;
+  const said = $('dc-tools-line');
+  said.replaceChildren(...(narrowed()
+    ? [h('span', { text: `Showing ${n} of ${plural(all.length, 'request')}.` }),
+      h('button', { class: 'dc-link-btn', type: 'button', onclick: clearFilters }, 'Clear')]
+    : []));
+  said.hidden = !narrowed();
 }
 
 function chipsFor(r) {
@@ -745,10 +1031,40 @@ function rowEl(r) {
   return li;
 }
 
+/** A request with no draft: why, in plain words, and Draft again. No swipe and nothing that approves. */
+function undraftedEl(r) {
+  const w = since(r.raisedAt);
+  const busy = S.redrafting.has(r.cr);
+  const sub = triesLine(r);
+  return h('li', {
+    class: `dc-row is-undrafted${S.open === r.cr ? ' is-open' : ''}`, 'data-cr': r.cr,
+    'data-kind': r.draftError ? 'failed' : 'waiting', 'data-noswipe': '',
+  },
+    h('div', { class: 'dc-row-face' },
+      h('button', { class: 'dc-row-open', type: 'button', 'data-open': r.cr },
+        h('span', { class: 'dc-row-top' },
+          h('span', { class: 'dc-row-cr', text: r.cr }),
+          r.raisedAt && h('span', { class: 'dc-row-wait' }, h('span', { class: 'dc-sr', text: 'waiting ' }), span(w).short)),
+        h('span', { class: 'dc-row-title', text: r.title }),
+        h('span', { class: `dc-row-why${r.draftError ? ' is-failed' : ''}` }, icon(r.draftError ? 'alert' : 'clock'),
+          h('span', null, plainReason(r), sub && h('span', { class: 'dc-row-why-sub', text: ` ${sub}` }))),
+        h('span', { class: 'dc-row-meta' },
+          r.ticket && h('span', { class: 'is-ticket' }, h('span', { class: 'dc-sr', text: 'ticket ' }), `#${String(r.ticket).replace(/^#/, '')}`),
+          r.developer && h('span', { text: r.developer }),
+          r.blocking && h('span', { class: 'dc-chip dc-chip-blocking', text: 'Blocking' }))),
+      r.draftError && h('div', { class: 'dc-row-redraft-wrap' },
+        h('button', {
+          class: 'dc-btn dc-btn-line dc-row-redraft', type: 'button', 'data-redraft': r.cr, disabled: busy || S.offline || notRunning(),
+          'aria-label': `Draft ${r.cr} again`, 'aria-describedby': notRunning() ? `dc-off-${r.cr}` : null,
+        }, icon('redo'), busy ? 'Asking…' : 'Draft again'),
+        notRunning() && h('span', { class: 'dc-row-off', id: `dc-off-${r.cr}`, text: `${NOT_RUNNING}.` }))));
+}
+
 // ── the swipe ────────────────────────────────────────────────────────
 // Right approves (with an undo), left opens. Horizontal intent is decided
 // after 10 px so a vertical scroll never becomes a swipe, and touches that
-// start at the screen's edges are left to the system's back gesture.
+// start at the screen's edges are left to the system's back gesture. A row
+// with no draft has no swipe at all: there is nothing to approve.
 function bindSwipe(container) {
   let g = null;
   container.addEventListener('pointerdown', (e) => {
@@ -756,6 +1072,7 @@ function bindSwipe(container) {
     if (!face || e.button !== 0 || S.fatal) return;
     if (e.pointerType !== 'mouse' && (e.clientX < 24 || e.clientX > innerWidth - 24)) return;
     const li = face.closest('.dc-row');
+    if (li.hasAttribute('data-noswipe')) return;
     g = { li, face, id: e.pointerId, x0: e.clientX, y0: e.clientY, dx: 0, on: false, armed: false, w: li.offsetWidth };
   });
   container.addEventListener('pointermove', (e) => {
@@ -927,20 +1244,27 @@ window.addEventListener('popstate', (e) => {
 });
 
 function step(dir) {
-  const list = inboxRows();
+  const list = navRows();
   const i = list.findIndex((r) => r.cr === S.open);
   const next = list[i + dir] ?? (i < 0 ? list[0] : null);
   if (next) openRequest(next.cr);
 }
 
 /** After a decision in the request: a phone goes back to the list to watch
- *  the row leave; a wide screen moves straight to the next one. */
+ *  the row leave; a wide screen moves straight to the next one to decide. */
 function afterDecision(cr) {
-  const list = inboxRows();
+  const list = inboxRows().filter(shown);
   if (wide.matches && list.length) { openRequest(list[0].cr); return; }
   if (wide.matches) { closeRequest(); return; }
   closeRequest();
   announce(`${cr} moved to Decided.`);
+}
+
+const ticketHref = (t) => `${TICKET_URL}${encodeURIComponent(String(t).replace(/^#/, ''))}`;
+const longDate = (iso) => (iso ? new Date(iso).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) : '');
+function ticketLink(t) {
+  return h('a', { class: 'dc-ticket', href: ticketHref(t), target: '_blank', rel: 'noopener noreferrer' },
+    `#${String(t).replace(/^#/, '')}`, icon('external'), h('span', { class: 'dc-sr', text: ' (opens OpenProject)' }));
 }
 
 function renderRequest(error) {
@@ -951,11 +1275,12 @@ function renderRequest(error) {
   const body = $('dc-req-body');
   const actions = $('dc-actions');
   $('dc-req-code').textContent = cr;
-  const list = inboxRows();
+  const list = navRows();
   const idx = list.findIndex((x) => x.cr === cr);
   $('dc-req-prev').disabled = idx <= 0;
   $('dc-req-next').disabled = idx < 0 ? !list.length : idx >= list.length - 1;
 
+  const undrafted = isUndrafted(r);
   const mark = markOf(r);
   const parts = [];
   if (S.refused.has(cr)) parts.push(said('danger', 'alert', S.refused.get(cr)));
@@ -965,17 +1290,19 @@ function renderRequest(error) {
 
   const w = since(r.raisedAt);
   parts.push(h('div', { class: 'dc-req-head' },
-    h('div', { class: 'dc-req-chips' }, chipsFor(r), r.raisedAt && h('span', { class: 'dc-req-waited', text: `Waiting ${span(w).long}` })),
+    h('div', { class: 'dc-req-chips' }, chipsFor(r), undrafted && h('span', { class: 'dc-chip dc-chip-undrafted', text: 'Not drafted' }),
+      r.raisedAt && h('span', { class: 'dc-req-waited', text: `Waiting ${span(w).long}` })),
     h('h2', { class: 'dc-req-title', id: 'dc-req-title', text: r.title }),
-    h('div', { class: 'dc-req-meta' },
-      r.ticket && h('span', null, 'Ticket ', h('b', { text: `#${String(r.ticket).replace(/^#/, '')}` })),
-      r.developer && h('span', null, 'Developer ', h('b', { text: r.developer })),
-      r.verdict && h('span', null, 'Verdict ', h('b', { text: sentence(r.verdict) })),
-      r.klass && r.klass !== 'none' && h('span', null, 'Class ', h('b', { text: r.klass })))));
+    h('dl', { class: 'dc-req-meta' },
+      r.ticket && h('div', null, h('dt', { text: 'Ticket' }), h('dd', null, ticketLink(r.ticket))),
+      r.developer && h('div', null, h('dt', { text: 'Developer' }), h('dd', { text: r.developer })),
+      r.raisedAt && h('div', null, h('dt', { text: 'Raised' }), h('dd', null, h('time', { datetime: r.raisedAt, text: longDate(r.raisedAt) }))),
+      r.klass && r.klass !== 'none' && h('div', null, h('dt', { text: 'Class' }), h('dd', { text: r.klass })),
+      r.verdict && h('div', null, h('dt', { text: 'Verdict' }), h('dd', { text: sentence(r.verdict) })))));
 
   if (!d) {
     parts.push(error
-      ? stateBlock({ error: true, iconName: 'alert', title: 'The draft did not load', text: error.message,
+      ? stateBlock({ error: true, iconName: 'alert', title: 'The request did not load', text: error.message,
         action: h('button', { class: 'dc-btn dc-btn-line', type: 'button', onclick: () => openRequest(cr, { push: false }) }, 'Try again') })
       : h('div', { 'aria-busy': 'true' },
         h('span', { class: 'dc-skel', style: 'height:28px;width:90%;margin-bottom:10px' }),
@@ -983,40 +1310,54 @@ function renderRequest(error) {
         h('span', { class: 'dc-skel', style: 'height:140px;width:100%' }),
         h('span', { class: 'dc-sr', text: 'Reading the draft' })));
     body.replaceChildren(...parts);
-    actions.replaceChildren();
-    actions.hidden = true;
+    if (undrafted) renderActions(cr, null, mark);
+    else { actions.replaceChildren(); actions.hidden = true; }
     return;
   }
 
-  if (d.noDraft) parts.push(said('warn', 'alert', `The watcher has no draft for this request yet.${r.draftError ? ` ${r.draftError}` : ''} It tries again on the next run.`));
+  if (undrafted || d.noDraft) {
+    // No draft: why, what happens next, and the developer's own words. Nothing here decides.
+    const why = r.draftReason || r.draftError;
+    parts.push(h('section', { class: `dc-nodraft${r.draftError ? ' is-failed' : ''}`, 'aria-labelledby': 'dc-b-nodraft' },
+      h('div', { class: 'dc-nodraft-icon' }, icon(r.draftError ? 'alert' : 'clock')),
+      h('div', null,
+        h('h3', { class: 'dc-nodraft-title', id: 'dc-b-nodraft', text: r.draftError ? 'Drafting failed' : 'Not drafted yet' }),
+        h('p', { text: plainReason(r) }),
+        triesLine(r) && h('p', { class: 'dc-nodraft-sub', text: triesLine(r) }),
+        why && h('p', { class: 'dc-nodraft-raw' }, h('span', { class: 'dc-sr', text: 'What the watcher said: ' }), h('code', { text: why })),
+        h('p', { class: 'dc-nodraft-sub', id: 'dc-nodraft-next', text: notRunning()
+          ? `There is nothing to approve until a draft is in. ${NOT_RUNNING}, so Draft again is off.`
+          : r.draftError
+          ? 'There is nothing to approve until a draft is in. Draft again asks the next hourly run to draft it; it starts nothing now.'
+          : `There is nothing to approve until a draft is in.${S.health?.next_run_at ? ` The run is due at ${clock(S.health.next_run_at)}.` : ''}` }))));
+    parts.push(askedBlock(d));
+    if (d.facts.length) parts.push(factsBlock(d));
+    body.replaceChildren(...parts);
+    renderActions(cr, d, mark);
+    return;
+  }
+
   parts.push(h('section', { class: 'dc-block', 'aria-labelledby': 'dc-b-rec' },
     h('h3', { class: 'dc-block-title', id: 'dc-b-rec', text: 'The watcher recommends' }),
     h('p', { class: 'dc-rec', text: d.rec || 'No recommendation in this draft.' }),
     d.question && h('p', { class: 'dc-rec-why', text: d.question })));
 
-  const shown = mark?.decision === 'change' && mark.resolution ? mark : d;
+  const shownMark = mark?.decision === 'change' && mark.resolution ? mark : d;
   if (S.changing) parts.push(changeForm(d, mark));
   else {
+    const text = shownMark.resolution || d.resolution || '';
     parts.push(h('section', { class: 'dc-block', 'aria-labelledby': 'dc-b-post' },
-      h('h3', { class: 'dc-block-title', id: 'dc-b-post', text: shown === d ? 'What will be posted' : 'What will be posted, as you changed it' }),
+      h('h3', { class: 'dc-block-title', id: 'dc-b-post', text: shownMark === d ? 'What will be posted' : 'What will be posted, as you changed it' }),
       h('div', { class: 'dc-post-meta' },
-        h('span', { class: 'dc-chip is-plain', text: `Status: ${shown.status || d.status || 'not set'}` }),
-        (shown.ref || d.ref) && h('span', { class: 'dc-chip is-plain', text: `Release: ${shown.ref || d.ref}` })),
-      h('p', { class: `dc-post${shown === d ? '' : ' is-changed'}`, text: shown.resolution || d.resolution || 'Nothing is posted for this draft.' })));
+        h('span', { class: 'dc-chip is-plain', text: `Status: ${shownMark.status || d.status || 'not set'}` }),
+        (shownMark.ref || d.ref) && h('span', { class: 'dc-chip is-plain', text: `Release: ${shownMark.ref || d.ref}` })),
+      h('p', { class: `dc-post${shownMark === d ? '' : ' is-changed'}`, text: text || 'Nothing is posted for this draft.' }),
+      text && countLine(text)));
   }
 
+  parts.push(askedBlock(d));
+  if (d.facts.length) parts.push(factsBlock(d));
   const folds = [];
-  if (d.facts.length) {
-    parts.push(h('section', { class: 'dc-block', 'aria-labelledby': 'dc-b-facts' },
-      h('h3', { class: 'dc-block-title', id: 'dc-b-facts', text: 'Facts' }),
-      h('dl', { class: 'dc-facts' }, d.facts.map((f) => {
-        const text = typeof f === 'string' ? f : `${f.label}: ${f.value}`;
-        const [k, ...v] = text.split(': ');
-        return v.length && k.length <= 28
-          ? h('div', { class: 'dc-fact' }, h('dt', { text: k }), h('dd', null, rich(v.join(': '))[0] ?? ''))
-          : h('div', { class: 'dc-fact' }, h('dd', null, rich(text)[0] ?? ''));
-      }))));
-  }
   if (d.misread) folds.push(fold('What the request misread', d.misread));
   if (d.answer) folds.push(fold('The agent\'s full answer', d.answer));
   if (folds.length) parts.push(h('section', { class: 'dc-block' }, folds));
@@ -1024,6 +1365,42 @@ function renderRequest(error) {
   parts.push(askBlock(cr, d));
   body.replaceChildren(...parts);
   renderActions(cr, d, mark);
+}
+
+/** "1,284 of 4,000 characters", and a warning above ADAM's limit. */
+function countLine(text, id) {
+  const n = [...String(text)].length;
+  const over = n > POST_LIMIT;
+  const fix = id ? 'Shorten it before you save.' : 'Change it to shorten it before you settle.';
+  return h('p', { class: `dc-count${over ? ' is-over' : ''}`, id, 'aria-live': id ? 'polite' : null },
+    over ? icon('alert') : null,
+    over ? `${n.toLocaleString()} characters: ${(n - POST_LIMIT).toLocaleString()} over the ${POST_LIMIT.toLocaleString()} ADAM takes. ${fix}`
+      : `${n.toLocaleString()} of ${POST_LIMIT.toLocaleString()} characters`);
+}
+
+/** The developer's request in their own words: the problem open, the rest folded. */
+function askedBlock(d) {
+  const a = d.asked ?? {};
+  const more = [['Evidence', a.evidence], ['Options', a.options], ['What they recommend', a.recommendation]].filter(([, v]) => v);
+  if (!a.problem && !more.length) return null;
+  return h('section', { class: 'dc-block', 'aria-labelledby': 'dc-b-asked' },
+    h('h3', { class: 'dc-block-title', id: 'dc-b-asked', text: `What ${d.developer ? d.developer.split(' ')[0] : 'the developer'} asked` }),
+    a.problem && h('blockquote', { class: 'dc-asked' }, rich(a.problem)),
+    more.length > 0 && h('details', { class: 'dc-fold', style: 'margin-top:var(--ds-space-3)' },
+      h('summary', null, h('span', { text: sentence(more.map(([k]) => k).join(', ').replace(/, ([^,]*)$/, ' and $1')) }), icon('chevron')),
+      h('div', { class: 'dc-fold-body' }, more.map(([k, v]) => h('div', { class: 'dc-asked-part' }, h('h4', { text: k }), rich(v))))));
+}
+
+function factsBlock(d) {
+  return h('section', { class: 'dc-block', 'aria-labelledby': 'dc-b-facts' },
+    h('h3', { class: 'dc-block-title', id: 'dc-b-facts', text: 'Facts' }),
+    h('dl', { class: 'dc-facts' }, d.facts.map((f) => {
+      const text = typeof f === 'string' ? f : `${f.label}: ${f.value}`;
+      const [k, ...v] = text.split(': ');
+      return v.length && k.length <= 28
+        ? h('div', { class: 'dc-fact' }, h('dt', { text: k }), h('dd', null, rich(v.join(': '))[0] ?? ''))
+        : h('div', { class: 'dc-fact' }, h('dd', null, rich(text)[0] ?? ''));
+    })));
 }
 
 const sentence = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1).toLowerCase();
@@ -1041,6 +1418,20 @@ function renderActions(cr, d, mark) {
   const actions = $('dc-actions');
   actions.hidden = false;
   actions.classList.toggle('is-two', S.changing);
+  actions.classList.remove('is-one');
+  const r = rowOf(cr);
+  if (isUndrafted(r)) {
+    // Nothing to decide: one action, and only when the watcher has given up or failed on it.
+    actions.classList.add('is-one');
+    const busy = S.redrafting.has(cr);
+    actions.replaceChildren(r.draftError
+      ? h('button', {
+        class: 'dc-act dc-act-primary', type: 'button', disabled: busy || S.offline || notRunning(), onclick: () => redraft([cr]),
+        'aria-describedby': notRunning() ? 'dc-nodraft-next' : null,
+      }, icon('redo'), busy ? 'Asking…' : S.offline ? 'Draft again needs a connection' : notRunning() ? 'Draft again is off here' : 'Draft again')
+      : h('p', { class: 'dc-act-note', text: r.redraftAskedAt ? 'Asked. The next hourly run drafts it.' : 'The next hourly run drafts it.' }));
+    return;
+  }
   if (S.changing) {
     actions.replaceChildren(
       h('button', { class: 'dc-act', type: 'button', onclick: () => { S.changing = false; renderRequest(); } }, icon('x'), 'Cancel'),
@@ -1061,11 +1452,15 @@ function renderActions(cr, d, mark) {
 
 function changeForm(d, mark) {
   const draft = mark?.decision === 'change' ? mark : d;
+  const area = h('textarea', { class: 'dc-textarea', id: 'dc-change-text', rows: 8, 'aria-describedby': 'dc-change-help dc-change-count' }, draft.resolution || d.resolution || '');
+  let count = countLine(area.value, 'dc-change-count');
+  area.addEventListener('input', () => { const next = countLine(area.value, 'dc-change-count'); count.replaceWith(next); count = next; });
   return h('section', { class: 'dc-block', 'aria-labelledby': 'dc-b-change' },
     h('h3', { class: 'dc-block-title', id: 'dc-b-change', text: 'Change what will be posted' }),
     h('div', { class: 'dc-field' },
       h('label', { class: 'dc-field-label', for: 'dc-change-text', text: 'Text to post' }),
-      h('textarea', { class: 'dc-textarea', id: 'dc-change-text', rows: 8, 'aria-describedby': 'dc-change-help' }, draft.resolution || d.resolution || ''),
+      area,
+      count,
       h('p', { class: 'dc-field-help', id: 'dc-change-help', text: 'Posted to the ticket word for word when you settle.' }),
       h('p', { class: 'dc-field-error', id: 'dc-change-error', hidden: true })),
     h('div', { class: 'dc-field-row' },
@@ -1082,8 +1477,12 @@ async function saveChange(cr, d) {
   const text = $('dc-change-text');
   const err = $('dc-change-error');
   const resolution = text.value.trim();
-  if (!resolution) {
-    err.textContent = 'Write the text to post, or press Cancel to keep the draft.';
+  const tooLong = [...resolution].length > POST_LIMIT - 100;
+  if (!resolution || tooLong) {
+    // The watcher keeps a resolution to 3,900 characters, under the 4,000 ADAM takes (cr-watch.py RESOLUTION_LIMIT).
+    err.textContent = tooLong
+      ? `Shorten it to ${(POST_LIMIT - 100).toLocaleString()} characters or fewer: the watcher keeps it under ADAM's ${POST_LIMIT.toLocaleString()}.`
+      : 'Write the text to post, or press Cancel to keep the draft.';
     err.hidden = false;
     text.setAttribute('aria-invalid', 'true');
     text.setAttribute('aria-describedby', 'dc-change-help dc-change-error');
@@ -1150,8 +1549,8 @@ function askBlock(cr, d) {
     entries.length
       ? h('ol', { class: 'dc-thread', 'aria-live': 'polite' }, entries)
       : h('p', { class: 'dc-field-help', style: 'margin-bottom:12px', text: 'Claude reads the release, read-only, and answers with the files it used. Asking never changes your decision.' }),
-    S.offline
-      ? h('p', { class: 'dc-field-help', text: 'Asking needs a connection.' })
+    S.offline || notRunning()
+      ? h('p', { class: 'dc-field-help', text: S.offline ? 'Asking needs a connection.' : `Asking needs the watcher. ${NOT_RUNNING}.` })
       : h('div', { class: 'dc-compose' }, box, sendBtn));
 }
 
@@ -1336,39 +1735,133 @@ async function applySettle(p, n, btn) {
   }
 }
 
+// ── history ──────────────────────────────────────────────────────────
+const DECIDED_AS = { approve: 'Approved', change: 'Changed', reject: 'Rejected' };
+function renderHistory() {
+  const box = $('dc-history');
+  const line = $('dc-history-line');
+  // History is ADAM's own record, so it reads whether or not the watcher runs here.
+  if (S.fatal && S.fatal.kind === 'permission') { line.textContent = ''; box.replaceChildren(fatalBlock()); return; }
+  if (!S.history) {
+    line.textContent = 'Reading what was settled…';
+    box.replaceChildren(h('ul', { class: 'dc-list', 'aria-hidden': 'true' },
+      [0, 1, 2].map(() => h('li', { class: 'dc-row dc-row-skel' }, h('span'), h('span'), h('span')))));
+    return;
+  }
+  const items = S.history.items ?? [];
+  if (!items.length) {
+    line.textContent = '';
+    box.replaceChildren(stateBlock({
+      iconName: 'inbox', title: S.history.error ? 'History did not load' : 'Nothing settled from here yet',
+      text: S.history.error ?? 'Requests you settle from Decide are listed here, newest first, with what was posted and the ticket it told.',
+    }));
+    return;
+  }
+  const ok = items.filter((i) => !i.failed).length;
+  line.textContent = `${plural(ok, 'request')} settled from Decide, newest first${items.length > ok ? `; ${items.length - ok} settle${items.length - ok === 1 ? '' : 's'} failed part way` : ''}.`;
+  // Grouped by day, because "when" is the question History answers.
+  const days = new Map();
+  for (const it of items) {
+    const key = it.at ? new Date(it.at).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' }) : 'Undated';
+    if (!days.has(key)) days.set(key, []);
+    days.get(key).push(it);
+  }
+  const parts = [];
+  for (const [day, list] of days) {
+    parts.push(h('section', { class: 'dc-group' },
+      h('div', { class: 'dc-group-head' }, h('h3', { class: 'dc-group-title', text: day }),
+        h('span', { class: 'dc-group-count', text: plural(list.length, 'request') })),
+      h('ul', { class: 'dc-list dc-history', role: 'list' }, list.map(historyEl))));
+  }
+  box.replaceChildren(...parts);
+}
+function historyEl(it) {
+  const verb = it.failed ? 'Settle failed' : DECIDED_AS[it.decision] ?? 'Settled';
+  const status = it.status ? sentence(it.status) : '';
+  return h('li', { class: `dc-hist${it.failed ? ' is-failed' : ''}` },
+    h('div', { class: 'dc-hist-top' },
+      h('span', { class: 'dc-row-cr', text: it.cr }),
+      h('span', { class: `dc-mark-label is-${it.failed ? 'reject' : it.decision || 'approve'}`, text: verb }),
+      h('time', { class: 'dc-hist-at', datetime: it.at, text: clock(it.at) })),
+    it.title && h('p', { class: 'dc-hist-title', text: it.title }),
+    h('p', { class: 'dc-hist-meta' },
+      status && h('span', null, it.failed ? 'Was settling as ' : 'Now ', h('b', { text: status.toLowerCase() })),
+      it.ref && h('span', null, 'Release ', h('b', { text: it.ref })),
+      it.ticket ? h('span', null, it.failed ? 'Ticket ' : 'Told ', ticketLink(it.ticket)) : h('span', { text: 'No ticket to tell' })),
+    it.resolution && h('details', { class: 'dc-fold dc-hist-post' },
+      h('summary', null, h('span', { text: 'What was posted' }), icon('chevron')),
+      h('div', { class: 'dc-fold-body' }, h('p', { class: 'dc-post', text: it.resolution }))));
+}
+
 // ── health ───────────────────────────────────────────────────────────
 function renderHealth() {
   const box = $('dc-health');
   const line = $('dc-health-line');
-  const s = S.summary;
-  if (S.fatal && S.fatal.kind !== 'reach') { line.textContent = ''; box.replaceChildren(fatalBlock()); return; }
+  const s = { ...(S.summary ?? {}), ...(S.health ?? {}) };
+  const have = Boolean(S.summary || S.health);
+  if (S.fatal && S.fatal.kind === 'permission') { line.textContent = ''; box.replaceChildren(fatalBlock()); return; }
   const cards = [];
-  if (s) {
+  if (notRunning()) {
+    line.textContent = `${NOT_RUNNING}.`;
+    cards.push(h('div', { class: 'dc-card' },
+      h('h3', { class: 'dc-card-title', text: 'The watcher' }),
+      h('p', { class: 'dc-card-value', text: 'Not running here' }),
+      h('p', { class: 'dc-card-note', text: 'Change requests are drafted on the System Architect\'s machine. Nothing drafts, spends or runs on this server, so there is no next run, no error and no pause to show.' }),
+      have && s.last_run_at && h('p', { class: 'dc-card-note', text: `It last ran here ${ago(s.last_run_at)}, at ${longDate(s.last_run_at)}.` })));
+  } else if (have) {
+    const running = runningSince();
     const failed = Boolean(s.last_error);
-    line.textContent = failed ? 'The last run failed. The list may be out of date.'
-      : s.paused ? 'The watcher is running, but drafting has stopped for today.'
-        : 'The watcher is running and drafting.';
+    line.textContent = running ? `The watcher is drafting now. It started at ${clock(running)}.`
+      : failed ? (/^Drafting failed/i.test(s.last_error) ? 'The watcher runs, but its drafting failed. Nothing new was drafted.' : 'The last run failed. The list may be out of date.')
+        : s.paused ? 'The watcher runs, but drafting is held. The reason is below.'
+          : 'The watcher is running and drafting.';
+    const next = s.next_run_at;
     const pair = [];
     pair.push(h('div', { class: 'dc-card' },
-      h('h3', { class: 'dc-card-title', text: 'Last run' }),
-      h('p', { class: 'dc-card-value', text: ago(s.last_run_at) }),
-      s.last_run_at && h('p', { class: 'dc-card-note', text: `At ${clock(s.last_run_at)}. Runs hourly.` })));
-    pair.push(h('div', { class: `dc-card${failed ? ' is-danger' : ''}` },
-      h('h3', { class: 'dc-card-title', text: 'Errors' }),
-      h('p', { class: 'dc-card-value', text: failed ? 'Last run failed' : 'None' }),
-      h('p', { class: 'dc-card-note', text: failed ? 'Details below.' : 'In the last run.' })));
+      h('h3', { class: 'dc-card-title', text: running ? 'Drafting now' : 'Last run' }),
+      h('p', { class: 'dc-card-value', text: running ? `Since ${clock(running)}` : ago(s.last_run_at) }),
+      !running && s.last_run_at && h('p', { class: 'dc-card-note', text: `At ${clock(s.last_run_at)}.` })));
+    pair.push(h('div', { class: 'dc-card' },
+      h('h3', { class: 'dc-card-title', text: 'Next run' }),
+      h('p', { class: 'dc-card-value', text: next ? (since(next) > -MIN ? 'Due now' : `In ${span(-since(next)).long}`) : 'Hourly' }),
+      next && h('p', { class: 'dc-card-note', text: `At ${clock(next)}. Runs every hour.` })));
     cards.push(h('div', { class: 'dc-cards-pair' }, pair));
-    if (failed) cards.push(h('div', { class: 'dc-card is-danger' }, h('h3', { class: 'dc-card-title', text: 'What the last run said' }), h('div', { class: 'dc-card-note' }, rich(s.last_error))));
+    if (s.paused && !running) {
+      cards.push(h('div', { class: 'dc-card is-warn' },
+        h('h3', { class: 'dc-card-title', text: 'Why drafting is held' }),
+        h('p', { class: 'dc-card-text', text: s.paused })));
+    }
+    if (failed) {
+      cards.push(h('div', { class: 'dc-card is-danger' },
+        h('h3', { class: 'dc-card-title', text: 'The last error' }),
+        h('p', { class: 'dc-card-text' }, h('code', { text: s.last_error })),
+        s.draft_failed > 0 && h('div', { class: 'dc-card-actions' },
+          h('button', { class: 'dc-btn dc-btn-line', type: 'button', disabled: S.offline, onclick: () => redraft([], { all: true }) },
+            icon('redo'), `Draft the ${plural(s.draft_failed, 'failed request')} again`))));
+    }
     const cap = Number(s.daily_cap_usd || 0);
     const spent = Number(s.spend_today_usd || 0);
+    const held = Number(s.spend_held_usd || 0);
     const share = cap ? Math.min(1, spent / cap) : 0;
     const meter = h('div', { class: `dc-meter${share >= 1 ? ' is-danger' : share >= 0.8 ? ' is-warn' : ''}`, role: 'meter', 'aria-valuemin': 0, 'aria-valuemax': cap, 'aria-valuenow': spent, 'aria-label': 'Spend today against the daily cap' },
       h('span', { style: `transform:scaleX(${share})` }));
+    const batch = Number(s.batch_usd || 10);
     cards.push(h('div', { class: 'dc-card' },
       h('h3', { class: 'dc-card-title', text: 'Spend today' }),
       h('p', { class: 'dc-card-value', text: cap ? `${usd(spent)} of ${usd(cap)}` : usd(spent) }),
       cap && meter,
-      h('p', { class: 'dc-card-note', text: s.paused ? `Drafting is paused: ${s.paused}` : cap ? `Drafting stops at the cap and starts again tomorrow. ${usd(Math.max(0, cap - spent))} left today.` : '' })));
+      h('p', { class: 'dc-card-note', text: [
+        held ? `${usd(held)} of it is held by turns still running and comes back when they end.` : '',
+        cap ? `${usd(Math.max(0, cap - spent))} left today. A drafting batch needs ${usd(batch)} of room.` : '',
+      ].filter(Boolean).join(' ') })));
+    const runs = s.runs ?? [];
+    if (runs.length) {
+      cards.push(h('div', { class: 'dc-card' },
+        h('h3', { class: 'dc-card-title', text: 'The last runs' }),
+        h('ol', { class: 'dc-runs' }, runs.map((r) => h('li', { class: /failed|could not/.test(r.line) ? 'is-failed' : '' },
+          h('time', { datetime: r.at, text: r.at ? `${new Date(r.at).toLocaleDateString([], { day: 'numeric', month: 'short' })}, ${clock(r.at)}` : '' }),
+          h('span', { text: r.line }))))));
+    }
   } else {
     line.textContent = S.offline ? 'Offline, and no reading of the watcher is kept yet.' : 'Reading the watcher…';
   }
@@ -1519,10 +2012,15 @@ function bindChrome() {
   groups.addEventListener('click', (e) => {
     const open = e.target.closest('[data-open]');
     if (open) { openRequest(open.dataset.open); return; }
+    const again = e.target.closest('[data-redraft]');
+    if (again) { redraft([again.dataset.redraft]); return; }
+    if (e.target.closest('[data-redraft-all]')) { redraft([], { all: true }); return; }
     const ap = e.target.closest('[data-approve]');
     if (ap) decide(ap.dataset.approve, { decision: 'approve', draft_hash: S.details.get(ap.dataset.approve)?.hash }).then((ok) => ok && renderAll());
   });
   bindSwipe(groups);
+  $('dc-search').addEventListener('input', (e) => { S.query = e.target.value; renderInbox(); });
+  $('dc-dev').addEventListener('change', (e) => { S.dev = e.target.value; renderInbox(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (!$('dc-sheet').hidden) { closeSheet(); return; }
@@ -1540,6 +2038,7 @@ function bindChrome() {
       next?.focus();
       return;
     }
+    if (e.key === '/') { e.preventDefault(); $('dc-search').focus(); return; }
     if (e.key === 'a') {
       const cr = S.open ?? (at >= 0 ? rows[at].dataset.open : null);
       if (!cr) return;
@@ -1623,6 +2122,37 @@ function makeFake() {
   }));
   // one already decided, so the tray has something in it
   rows.push({ cr: 'CR-605', title: 'No storage for the landing-page templates TICVAI provides', verdict: 'PARTLY FIXED', class: 'Contract against storage', blocking: true, needs: 'none', decision: 'approve', ticket: '31045', developer: 'Sanket Keluskar', raised_at: at(4 * 60) });
+  // Requests the watcher could not draft (6 November 2026: the server's API key was refused). Invented for the demo.
+  const KEY = 'claude reported an error (exit 1): Invalid API key · Please run /login';
+  const FAILED = [
+    ['CR-651', 'getSeatMap answers 500 when a venue map has a section with no rows: the contract says an empty section is allowed', true, '31588', 'Narayan Gaonkar', 50, 2, KEY],
+    ['CR-652', 'Refund approvals: the approval matrix has no level for refunds over the venue limit, so createRefund cannot route them', true, '30851', 'Pranay Shinde', 75, 2, KEY],
+    ['CR-653', 'listOrders pages by offset but the contract promises a cursor; the mobile client already sends one', false, '31420', 'Sanket Keluskar', 95, 1, 'the drafting turn took too long and was stopped'],
+    ['CR-654', 'Loyalty tiers: tier_rule has no column for the qualifying period the screen shows', false, '37290', 'Hrushikant Patkar', 8, 0, ''],
+  ];
+  for (const [cr, title, blocking, ticket, developer, mins, tries, why] of FAILED) {
+    rows.push({ cr, title, verdict: '', class: '', blocking, needs: '', decision: '', ticket, developer, raised_at: at(mins),
+      undrafted: true, draft_tries: tries, draft_reason: why,
+      draft_error: tries >= 2 ? `draft failed twice: draft it again from Decide or with cr-watch.py redraft, or answer by hand (${why})` : why });
+  }
+  if (SCENARIO === 'failed') {
+    // The server on 6 November: every request waiting, none drafted, the key refused at every turn.
+    for (const r of rows) {
+      if (r.decision || r.undrafted) continue;
+      Object.assign(r, { undrafted: true, verdict: '', class: '', needs: '', draft_tries: 2, draft_reason: KEY,
+        draft_error: `draft failed twice: draft it again from Decide or with cr-watch.py redraft, or answer by hand (${KEY})` });
+    }
+    rows.splice(rows.findIndex((r) => r.cr === 'CR-605'), 1);
+  }
+  if (SCENARIO === 'stopped') {
+    // The job deleted and its env file gone: only the requests it never drafted are left in its folder.
+    for (let i = rows.length - 1; i >= 0; i--) if (!rows[i].undrafted) rows.splice(i, 1);
+  }
+  const unset = () => {
+    if (SCENARIO === 'unset') throw new ApiError('The watcher is not set up on this server.', 503);
+  };
+  const listed = (r) => ({ ...r, draft_hash: r.undrafted ? '' : hashOf(r.cr), mark_digest: 'demo',
+    gave_up: Boolean(r.undrafted && r.draft_tries >= 2) });
   const info = Object.fromEntries(D.map((d) => [d[0], d]));
   const threads = {};
   const hashes = {};
@@ -1635,10 +2165,18 @@ function makeFake() {
     const d = info[cr];
     const rec = d?.[9] ?? 'Approve as drafted.';
     const post = d?.[10] ?? 'Accepted. Build now as the draft describes.';
+    const request = {
+      problem: `${r.title}. I hit this while building ticket #${r.ticket}: the contract and the storage disagree, and I cannot finish the operation without one of them changing.`,
+      evidence: `The integration test fails on the first call; the log shows the read refused. Ticket #${r.ticket} has the trace.`,
+      options: 'A: change the storage to match the contract. B: change the contract to match the storage.',
+      recommendation: 'A, because the screens already assume the contract.',
+    };
+    if (r.undrafted) {
+      return { ...listed(r), draft: null, request, facts: [`Ticket: #${r.ticket}, ${r.developer}`, 'Class: none matched yet'], thread: [] };
+    }
     return {
-      ...r,
-      draft_hash: hashOf(cr),
-      mark_digest: 'demo',
+      ...listed(r),
+      request,
       draft: {
         recommendation: rec,
         resolution: post,
@@ -1659,18 +2197,80 @@ function makeFake() {
   return {
     async summary() {
       await wait();
+      unset();
       const open = rows.filter((r) => !r.decision);
+      if (SCENARIO === 'stopped') {
+        return { waiting: open.length, blocking: open.filter((r) => r.blocking).length, needs_lead: 0, needs_client: 0, new: [],
+          watching: false, last_run_at: at(5 * 60), last_error: '', paused: '', running_since: '', spend_today_usd: 0,
+          daily_cap_usd: 20, decided: 0, not_drafted: open.length, draft_failed: open.filter((r) => r.draft_error).length };
+      }
+      const failedNow = open.filter((r) => r.undrafted && r.draft_error);
+      const failedAll = SCENARIO === 'failed';
       return {
         waiting: open.length, blocking: open.filter((r) => r.blocking).length,
         needs_lead: open.filter((r) => r.needs === 'lead').length, needs_client: open.filter((r) => r.needs === 'client').length,
-        new: [], last_run_at: at(12), last_error: '', paused: '',
-        spend_today_usd: 12.4, daily_cap_usd: 50, decided: rows.filter((r) => r.decision).length,
+        new: [], last_run_at: at(12), running_since: '',
+        last_error: failedAll ? `Drafting failed: ${KEY}` : '',
+        paused: failedNow.length ? (failedAll
+          ? `Drafting failed: ${KEY}; ${open.length} requests wait for a draft (${failedNow.length} failed 2 times and wait for Draft again on Decide (or cr-watch.py redraft --all-failed) once the cause is fixed).`
+          : `Drafting is held: ${failedNow.filter((r) => r.draft_tries >= 2).length} requests failed 2 times (${KEY}) and wait for Draft again on Decide (or cr-watch.py redraft --all-failed) once the cause is fixed.`) : '',
+        spend_today_usd: failedAll ? 0 : 12.4, daily_cap_usd: failedAll ? 20 : 50, decided: rows.filter((r) => r.decision).length,
+        not_drafted: open.filter((r) => r.undrafted).length, draft_failed: failedNow.length,
       };
     },
-    async requests() { await wait(); return { items: rows.map((r) => ({ ...r, draft_hash: hashOf(r.cr), mark_digest: 'demo' })), last_run_at: at(12) }; },
-    async request(cr) { await wait(); if (!find(cr)) throw new ApiError('No such request.', 404); return detail(cr); },
+    async requests() { await wait(); unset(); return { items: rows.map(listed), last_run_at: at(12) }; },
+    async redraft(cr) {
+      await wait(300);
+      demoCalls.push(['redraft', cr]);
+      const r = find(cr);
+      if (!r?.undrafted) throw new ApiError(`${cr} was not asked to be drafted again: it has a draft already.`, 409);
+      Object.assign(r, { draft_error: '', draft_reason: '', draft_tries: 0, redraft_asked_at: new Date().toISOString() });
+      return { redraft: [cr], skipped: {} };
+    },
+    async redraftFailed() {
+      await wait(300);
+      const crs = rows.filter((r) => r.undrafted && r.draft_error).map((r) => r.cr);
+      demoCalls.push(['redraft-all', crs.length]);
+      for (const cr of crs) Object.assign(find(cr), { draft_error: '', draft_reason: '', draft_tries: 0, redraft_asked_at: new Date().toISOString() });
+      return { redraft: crs, skipped: {} };
+    },
+    async history() {
+      await wait();
+      const H = [
+        [26, 'CR-597', 'approve', 'done', 'r15', '31533', 'createTicketTier: the price band has no currency, so a tier priced in AED and one in USD compare as equal', 'Accepted. Build now: a price band carries its currency; two tiers compare only within one currency, and a mixed list answers 422.'],
+        [70, 'CR-595', 'change', 'done', '', '30711', 'Guest profile merge: which record keeps the consent history when two guests are merged', 'Decided (Chinmay, 6 November 2026): the surviving record keeps both histories, newest first. Build now: merge appends the consent rows of the record merged away.'],
+        [75, 'CR-594', 'approve', 'rejected', '', '31102', 'Event capacity: the request asks for a second capacity per gate, which the venue map already holds', 'Done, not a problem. Each gate\'s capacity is on the venue map\'s gate rows; read it from there.'],
+        [26 * 60, 'CR-590', 'approve', 'done', 'r14', '30598', 'Wallet top-up: the receipt has no tax line though the screen shows one', 'Accepted. Build now: the receipt carries the tax line the screen shows, from the same calculation.'],
+        [27 * 60, 'CR-588', 'approve', 'done', 'r14', '', 'Design change: the seat picker opens on the cheapest available section', 'Accepted. Recorded as a design change; the wireframe follows.'],
+      ];
+      return { items: H.map(([mins, cr, decision, status, ref, ticket, title, resolution], i) => ({
+        id: 100 - i, cr, at: at(mins), who: 'chinmay.parab@softlabsgroup.com', failed: false, status, decision, ref, ticket, title, resolution,
+      })).concat(SCENARIO === 'failed' ? [] : [{ id: 90, cr: 'CR-587', at: at(28 * 60), who: 'chinmay.parab@softlabsgroup.com', failed: true, status: 'done', decision: 'approve', ref: '', ticket: '30444', title: 'Coupon stacking: two percentage coupons apply in the wrong order', resolution: '' }]) };
+    },
+    async health() {
+      await wait();
+      unset();
+      if (SCENARIO === 'stopped') {
+        return { watching: false, last_run_at: at(5 * 60), last_error: '', paused: '', running_since: '', next_run_at: '',
+          runs: [{ at: at(5 * 60), line: '0 new, 0 closed on their own, 4 waiting, 0 to draft' }], spend_held_usd: 0, batch_usd: 10 };
+      }
+      const next = new Date(now);
+      next.setMinutes(7, 0, 0);
+      if (next <= new Date(now)) next.setHours(next.getHours() + 1);
+      const failedAll = SCENARIO === 'failed';
+      const runs = failedAll
+        ? [[12, '0 new, 0 closed on their own, 16 waiting, 0 to draft'], [72, '0 new, 0 closed on their own, 16 waiting, 8 to draft, 0 drafted, 8 failed; first failure: claude reported an error (exit 1): Invalid API key'],
+          [132, '16 new, 0 closed on their own, 16 waiting, 16 to draft, 0 drafted, 16 failed; first failure: claude reported an error (exit 1): Invalid API key']]
+        : [[12, '3 new, 0 closed on their own, 21 waiting, 4 to draft, 1 drafted, 3 failed; first failure: claude reported an error (exit 1): Invalid API key'],
+          [72, '2 new, 0 closed on their own, 18 waiting, 2 to draft, 2 drafted'], [132, '0 new, 0 closed on their own, 16 waiting, 0 to draft'],
+          [192, '5 new, 0 closed on their own, 16 waiting, 5 to draft, 5 drafted']];
+      return { runs: runs.map(([mins, line]) => ({ at: at(mins), line })), next_run_at: next.toISOString(), spend_held_usd: failedAll ? 0 : 2,
+        batch_usd: 10, running_since: '' };
+    },
+    async request(cr) { await wait(); unset(); if (!find(cr)) throw new ApiError('No such request.', 404); return detail(cr); },
     async decide(cr, body) {
       await wait(200);
+      if (find(cr)?.undrafted) throw new ApiError(`${cr} has no draft yet, so there is nothing to decide; draft it again.`, 409, false, 'not-drafted');
       if (body.draft_hash !== hashOf(cr)) throw new ApiError('The draft changed.', 409);
       const r = find(cr);
       r.decision = body.decision === 'reject' ? `reject: ${body.note}` : { decision: body.decision, resolution: body.resolution, note: body.note ?? '' };

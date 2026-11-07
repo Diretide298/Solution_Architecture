@@ -157,9 +157,9 @@ const DRAWER_HTML = `
           <a class="drawer-link" href="/board.html">My work</a>
           <a class="drawer-link" href="/tasks.html">Tasks</a>
           <a class="drawer-link" id="changes-link" href="/changes.html">Change requests</a>
-          <!-- The watcher's drafts, for the two people who decide them
-               (security.py DECIDERS). Hidden for everybody else, and refused
-               by the service for everybody else. -->
+          <!-- The watcher's drafts, for the one person who decides them: the
+               System Architect (security.py DECIDERS). Hidden for everybody
+               else, and refused by the service for everybody else. -->
           <a class="drawer-link" id="decide-link" data-link="decide" href="/decide" hidden>Decide change requests</a>
           <a class="drawer-link" id="mentions-link" href="/reviews.html">Reviews</a>
           <a class="drawer-link" href="/agents.html">Agent activity</a>
@@ -344,8 +344,9 @@ function renderAccountPanel() {
   }
 }
 
-/** Who may decide the watcher's drafts: the owner and the lead (security.py DECIDERS). */
-export const isDecider = (who) => who?.role === 'owner' || who?.role === 'lead';
+/** Who may decide the watcher's drafts: the System Architect alone (security.py DECIDERS). A Team Lead could
+ *  until 6 November 2026; the lead: "the decide page only I can see it, no one else". */
+export const isDecider = (who) => who?.role === 'owner';
 
 /**
  * Shows the links this account may use and hides the rest, inside `root`.

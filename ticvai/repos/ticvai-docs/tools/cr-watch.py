@@ -26,6 +26,8 @@ gives it a first answer the same hour, on a schedule (every 30 minutes on the le
   python3 tools/cr-watch.py run [--no-draft] [--csv FILE] # 1-4: what the schedule runs
   python3 tools/cr-watch.py settle [--apply]              # 5: after the lead marks REVIEW.md
   python3 tools/cr-watch.py ask --cr CR-650 < ask.json    # one read-only question about a draft (the phone's Ask)
+  python3 tools/cr-watch.py redraft CR-650 [CR-651 ...]   # draft these again at the next run (a failed draft)
+  python3 tools/cr-watch.py redraft --all-failed          # every request whose draft failed
   python3 tools/cr-watch.py --self-test
 
 **On the server** (ADAM on the phone, viewer/PHONE-SPEC.md, 4 November 2026) a PM2 job runs `run` hourly, never with
@@ -111,7 +113,9 @@ NEEDS = ("lead", "client", "none")
 STATUSES = ("open", "accepted", "rejected", "done")   # settle_changes.py
 LOCK_HOURS = 2
 DRAFT_MINUTES = 40                   # one batch agent (2 November: 13 to 19 minutes for 5 or 6 requests)
-MAX_TRIES = 2                        # a draft that fails this often is answered by hand (fix round 1, I-4)
+CAP_WAIT_SECONDS = 15 * 60           # how long into a run a batch waits for room under the cap (a turn beside it to end)
+CAP_RETRY_SECONDS = 5                # and how often it looks
+MAX_TRIES = 2                        # a draft that fails this often waits for `redraft` (fix round 1, I-4)
 MAX_TURNS = "150"                    # a batch agent's limits (fix round 1, I-4; 2 November: 60 to 120 tool calls
 MAX_BUDGET_USD = "10.00"             # per batch of six; 12 turns per single request stopped 11 of 27 mid-check)
 ASK_TURNS = "30"                     # one ask-back turn from the phone (PHONE-SPEC.md section 1)
@@ -866,6 +870,33 @@ def spend_today(out, day: str = "") -> float:
     return round(total, 4)
 
 
+def spend_held(out, day: str = "") -> float:
+    """Of spend_today, the budgets reserved by turns still running: a reservation with no line yet that reconciles it.
+    What is really spent today is spend_today less this; it comes back as room under the cap when those turns end."""
+    day, held = day or _today(), {}
+    for d in _ledger_lines(out):
+        rid = d.get("reserve")
+        if not rid or d.get("day") != day:
+            continue
+        if d.get("state") == "reserved":
+            try:
+                held[rid] = float(d.get("usd") or 0)
+            except (ValueError, TypeError):
+                continue
+        else:
+            held.pop(rid, None)
+    return round(sum(held.values()), 4)
+
+
+def day_label() -> str:
+    """Which day the cap counts in (the ledger's day is the server's local date): "UTC", or the server's offset."""
+    off = datetime.datetime.now().astimezone().utcoffset() or datetime.timedelta(0)
+    if not off:
+        return "UTC"
+    mins = int(off.total_seconds() // 60)
+    return f"server time, UTC{'+' if mins >= 0 else '-'}{abs(mins) // 60:02d}:{abs(mins) % 60:02d}"
+
+
 SPEND_LOCK_WAIT = 30                 # seconds a turn waits to reserve its budget
 SPEND_LOCK_STALE = 60
 
@@ -933,6 +964,21 @@ without a JSON block.
 def _clean(text) -> str:
     """One line with no control characters: what REVIEW.md and a prompt may be given from outside."""
     return _fold(re.sub(r"[\x00-\x1f\x7f]", " ", str(text or "")))
+
+
+KEY_SHAPED = re.compile(r"sk-ant-[A-Za-z0-9_\-]{8,}")
+SECRET_KEYS = ("ANTHROPIC_API_KEY", "ADAM_PASSWORD", "TICVAI_OP_TOKEN")
+
+
+def _scrub(text) -> str:
+    """A failure's words as state.json, REVIEW.md and runs.log keep them: the credentials this process holds and
+    anything shaped like an Anthropic key taken out. (ADAM's API redacts again, in every form, before it answers.)"""
+    text = str(text or "")
+    for k in SECRET_KEYS:
+        v = os.environ.get(k, "")
+        if len(v) >= 6:
+            text = text.replace(v, "[hidden]")
+    return KEY_SHAPED.sub("[hidden]", text)
 
 
 def ask_proposal(text: str):
@@ -1015,7 +1061,7 @@ def _item(r: dict) -> dict:
     return {"id": r["id"], "ref": r["ref"], "raised": r["raised"], "title": r["title"], "ticket": r["ticket"],
             "blocking": r["blocking"], "cr": dict(r), "facts": {}, "facts_lines": [], "draft": None,
             "draft_error": "", "drafted_at": "", "decision": "", "note": "", "status": "", "ref_to": "",
-            "resolution": "", "redraft_note": "", "draft_tries": 0}
+            "resolution": "", "redraft_note": "", "draft_tries": 0, "draft_reason": ""}
 
 
 def _default_ruled(p: dict) -> bool:
@@ -1390,17 +1436,20 @@ def _read_marks(review: Path) -> dict:
     return parse_review(review.read_text(encoding="utf-8")) if review.exists() else {}
 
 
-def _publish(out: Path, state: dict, seen: dict, line: str, apply=None) -> dict:
+def _publish(out: Path, state: dict, seen: dict, line, apply=None) -> dict:
     """REVIEW.md and state.json written from the state, under the review lock. A mark that is not what the run (or
     settle) read at its start was made meanwhile (on the phone): `apply(fresh)` runs first, so the caller can leave
-    those requests alone, then the fresh marks are taken in. Returns the marks as written."""
+    those requests alone, then the fresh marks are taken in, then any Draft again asked meanwhile. `line`, the
+    status line, may be a function, called after all that. Returns the marks as written."""
     review = out / "REVIEW.md"
     with review_lock(out):
         fresh = {r: m for r, m in _read_marks(review).items() if seen.get(r) != m}
         if apply:
             apply(fresh)
         absorb_marks(state["pending"], fresh)
-        text = render_review(state["pending"], line)
+        _take_redraft(out, state["pending"])       # a Draft again asked while this ran (redraft)
+        state["running_since"] = ""                # what the run says now stands (run marks its start)
+        text = render_review(state["pending"], line() if callable(line) else line)
         _write(review, text)
         save_state(out, state)
     return parse_review(text)
@@ -1436,11 +1485,132 @@ def absorb_marks(pending: dict, marks: dict):
         if not p:
             continue
         if m["decision"] == "reject":
-            p.update(draft=None, draft_error="", draft_tries=0, decision="", note="", status="", ref_to="",
-                     resolution="", redraft_note=m["note"] or "no reason given")
+            p.update(draft=None, draft_error="", draft_reason="", draft_tries=0, decision="", note="", status="",
+                     ref_to="", resolution="", redraft_note=m["note"] or "no reason given")
         else:
             p.update(decision=m["decision"], note=m["note"], status=m["status"], ref_to=m["ref_to"],
                      resolution=m["resolution"])
+
+
+# ------------------------------------------------------------------------------------------------- draft again
+CR_REF = re.compile(r"^CR-[0-9]{1,6}$")
+
+
+def _redraft_asked(out: Path) -> list:
+    """The requests queued in out/redraft.json to be drafted again (redraft), in the order they were asked."""
+    f = Path(out) / "redraft.json"
+    try:
+        got = json.loads(f.read_text(encoding="utf-8")) if f.exists() else []
+    except (OSError, ValueError):
+        return []
+    return [r for r in got if isinstance(r, str) and CR_REF.match(r)] if isinstance(got, list) else []
+
+
+def _take_redraft(out: Path, pending: dict) -> list:
+    """Under the review lock: the queued requests' tries and failure reset in `pending` (a run's or a settle's own
+    copy of the state, read before the request was queued), and the queue emptied. A request drafted or marked
+    meanwhile is left as it is. Returns the refs reset."""
+    asked = _redraft_asked(out)
+    done = []
+    for ref in asked:
+        p = pending.get(ref)
+        if p and not p.get("draft") and not p.get("decision"):
+            p.update(draft_tries=0, draft_error="", draft_reason="")
+            done.append(ref)
+    if asked:
+        with contextlib.suppress(OSError):
+            (Path(out) / "redraft.json").unlink()
+    return done
+
+
+def why_not_redraft(p, mark=None) -> str:
+    """Why a request cannot be drafted again by `redraft`, or "" when it can."""
+    if not p:
+        return "it is not waiting in the watcher's list"
+    if p.get("draft"):
+        return "it has a draft already; reject that draft to have it drafted again"
+    if p.get("decision") or (mark or {}).get("decision"):
+        return "it is marked in REVIEW.md; take the mark back first"
+    return ""
+
+
+def redraft(out, refs=(), all_failed: bool = False) -> dict:
+    """Ask for requests with no draft to be drafted again at the next run (viewer/PHONE-SPEC.md section 4: Draft
+    again). Starts no Claude turn: the next hourly run drafts them, inside the daily cap like any other.
+
+    Under the review lock: each request's draft_tries and draft_error are reset in state.json at once, and the
+    request is queued in out/redraft.json, because a run drafting at this moment writes state.json from the copy it
+    read at its start; it takes the queue in when it publishes (_publish), so the reset is never lost. `all_failed`
+    takes every request whose draft failed. Returns {"redraft": [refs reset], "skipped": {ref: why}}. Raises Busy
+    when the lock is held, ValueError when the watcher has no state yet."""
+    out = Path(out)
+    with review_lock(out):
+        state = load_state(out)
+        if state is None:
+            raise ValueError("the watcher has no state.json yet; it has never run here")
+        pending = state.get("pending") or {}
+        marks = _read_marks(out / "REVIEW.md")
+        if all_failed:
+            refs = [r for r, p in sorted(pending.items(), key=lambda kv: kv[1].get("id") or 0)
+                    if not p.get("draft") and p.get("draft_error")]
+        done, skipped = [], {}
+        for ref in dict.fromkeys(str(r).strip().upper() for r in refs):
+            why = ("that is not a change request number" if not CR_REF.match(ref)
+                   else why_not_redraft(pending.get(ref), marks.get(ref)))
+            if why:
+                skipped[ref] = why
+                continue
+            pending[ref].update(draft_tries=0, draft_error="", draft_reason="", redraft_asked_at=_now())
+            done.append(ref)
+        if done:
+            save_state(out, state)
+            _write(out / "redraft.json", json.dumps(list(dict.fromkeys(_redraft_asked(out) + done))) + "\n")
+    return {"redraft": done, "skipped": skipped}
+
+
+def _plural(n: int, one: str, many: str = "") -> str:
+    return f"{n} {one if n == 1 else (many or one + 's')}"
+
+
+def drafting_note(first_error: str, waiting: int, gave_up: int, refused: int, spent: float, cap: float,
+                  budget: float, held_error: str = "", day: str = "UTC") -> str:
+    """What state.json's `paused` says after a run, in the words the decide page shows. Empty when drafting went as
+    it should. `spent` is what today's turns really cost: the ledger less the budgets of turns still running (an
+    ask-back from the phone), which come back as room when they end. (6 November 2026: every turn failed on an
+    invalid API key, and the page said "Drafting stopped at the daily cap: $0.00 spent today of $20.00; 11
+    request(s) wait for a draft until tomorrow". Nothing was spent: the batches had been refused only because the
+    ones beside them held the cap while they ran, and the next hourly run would draft them.)
+
+    - Turns failed: "Drafting failed: <the first reason>; N requests wait for a draft", and how many wait for Draft
+      again. With nothing tried because every one has failed MAX_TRIES times: "Drafting is held: ...".
+    - The cap: "Daily cap reached" only when today's real spend leaves no room for one batch; those requests wait
+      until tomorrow. A batch that waited for room and found none before CAP_WAIT_SECONDS waits for the next hourly
+      run, with how many batches fit under the cap at once; never "stopped", never "tomorrow"."""
+    def again(n):
+        return (f"{'waits' if n == 1 else 'wait'} for Draft again on Decide (or cr-watch.py redraft --all-failed) "
+                f"once the cause is fixed")
+    parts = []
+    if first_error:
+        tail = f" ({gave_up} failed {MAX_TRIES} times and {again(gave_up)})" if gave_up else ""
+        parts.append(f"Drafting failed: {first_error}; {_plural(waiting, 'request')} "
+                     f"{'waits' if waiting == 1 else 'wait'} for a draft{tail}.")
+    elif held_error and gave_up:
+        # Nothing was tried this run: every request with no draft has failed MAX_TRIES times already.
+        parts.append(f"Drafting is held: {_plural(gave_up, 'request')} failed {MAX_TRIES} times ({held_error}) and "
+                     f"{again(gave_up)}.")
+    no_room = spent + budget > cap + 1e-9
+    if refused and no_room:
+        room = "" if spent >= cap - 1e-9 else f", and a batch needs ${budget:.2f} of room"
+        parts.append(f"Daily cap reached: ${spent:.2f} of ${cap:.2f} spent today{room}; {_plural(refused, 'request')} "
+                     f"{'waits' if refused == 1 else 'wait'} until tomorrow ({day}).")
+    elif refused:
+        fit = max(1, int(cap // budget + 1e-9))
+        parts.append(f"{_plural(refused, 'request')} {'waits' if refused == 1 else 'wait'} for the next run "
+                     f"(hourly): only {_plural(fit, 'batch', 'batches')} fit under the ${cap:.2f} cap at once.")
+    elif spent >= cap - 1e-9:
+        parts.append(f"Daily cap reached: ${spent:.2f} of ${cap:.2f} spent today; a new request waits until tomorrow "
+                     f"({day}).")
+    return " ".join(parts)
 
 
 def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
@@ -1462,6 +1632,14 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
     # The marks as this run found them. A mark that differs at the end was made meanwhile (on the phone) and is kept.
     with review_lock(out):
         seen = _read_marks(review)
+        _take_redraft(out, pending)               # asked between load_state and here; state.json has it already
+        if load_state(out) is not None:
+            # Drafting now: the summary says so while the run lock is held, rather than the last run's `paused`
+            # (6 November 2026: a stale "stopped at the daily cap" stood while a run was drafting). Written into
+            # the file as it is, so nothing the run has not finished is published.
+            now_state = load_state(out)
+            now_state["running_since"] = stamp
+            save_state(out, now_state)
     absorb_marks(pending, seen)
     try:
         text = Path(a.csv).read_text(encoding="utf-8-sig") if a.csv else (fetch or _fetch_live)(a)
@@ -1512,54 +1690,87 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
     # MAX_TRIES times waits for them (I-4).
     todo = [p for p in pending.values()
             if not p.get("draft") and not p.get("decision") and p.get("draft_tries", 0) < MAX_TRIES]
-    results, skipped = [], []
+    results, skipped, setup_error = [], [], ""
     if todo and not a.no_draft:
         claude = a.claude or shutil.which("claude") or ""
         if drafter is None and not claude:
+            setup_error = "Claude Code (claude) is not on PATH: pass --claude"
             for p in todo:
-                p["draft_error"] = "Claude Code (claude) is not on PATH: pass --claude"
+                p.update(draft_error=setup_error, draft_reason=setup_error)
         else:
             draft = drafter or (lambda prompt, cwd: run_claude(prompt, cwd, claude, ledger=out, cap=cap))
             try:
                 cwd = tree or release_tree(Path(a.release_dir), release)
             except RuntimeError as e:
                 cwd = None
+                setup_error = _scrub(f"no worktree at {release}: {e}")[:300]
                 for p in todo:
-                    p["draft_error"] = f"no worktree at {release}: {e}"
+                    p.update(draft_error=setup_error, draft_reason=setup_error)
             today = datetime.date.today()
             today = f"{today.day} {today.strftime('%B %Y')}"
 
+            wait_until = time.monotonic() + CAP_WAIT_SECONDS
+            budget = float(MAX_BUDGET_USD)
+
             def one(batch):
-                # The daily cap, before every batch (PHONE-SPEC.md section 1): at or over it, the batch waits. The
-                # turn itself reserves its budget first (claude_turn) and is not started if that would pass the cap,
-                # so four batches at once cannot each find room under it (security review, M2).
-                if spend_today(out) >= cap:
-                    return batch, "", None
+                # The daily cap, before every batch (PHONE-SPEC.md section 1): with today's real spend at or over it,
+                # the batch waits for tomorrow. The turn itself reserves its budget first (claude_turn) and is not
+                # started if that would pass the cap, so four batches at once cannot each find room under it
+                # (security review, M2). A batch refused only because the batches beside it hold the room waits for
+                # one of them to end and then starts, within CAP_WAIT_SECONDS of the run's start (6 November 2026:
+                # with a $20 cap two batches fit at once, and the other two were left for the next run).
                 refs = [p["ref"] for p in batch]
-                try:
-                    answer = draft(batch_prompt(batch, rows, release, today), cwd)
-                    return batch, answer, parse_batch(answer, refs, release)
-                except CapReached:
-                    return batch, "", None
-                except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as e:
-                    return batch, "", {r: e for r in refs}
+                while True:
+                    if spend_today(out) - spend_held(out) >= cap:
+                        return batch, "", None
+                    try:
+                        answer = draft(batch_prompt(batch, rows, release, today), cwd)
+                        return batch, answer, parse_batch(answer, refs, release)
+                    except CapReached:
+                        # Room under what is really spent (the turns running beside it hold the rest): it comes
+                        # back when one of them settles, so this batch waits and tries again. Skipped only when
+                        # the real spend leaves no room, or at the run's time limit (6 November 2026: two $10
+                        # reservations filled a $20 cap, nine requests waited an hour for a run that cost $1.78).
+                        if spend_today(out) - spend_held(out) + budget <= cap + 1e-9 \
+                                and time.monotonic() < wait_until:
+                            time.sleep(CAP_RETRY_SECONDS)
+                            continue
+                        return batch, "", None
+                    except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as e:
+                        return batch, "", {r: e for r in refs}
 
             batches = make_batches(todo, getattr(a, "batch_size", None) or BATCH_SIZE) if cwd else []
             jobs = max(1, getattr(a, "jobs", None) or BATCH_JOBS)
             with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as pool:
                 results = list(pool.map(one, batches))
-    spent = spend_today(out)
+    spent = spend_today(out) - spend_held(out)        # what is really spent: an ask still running is room to come
     skipped = [p["ref"] for batch, _, got in results if got is None for p in batch]
-    if spent >= cap or skipped:
-        state["paused"] = (f"Drafting stopped at the daily cap: ${spent:.2f} spent today of ${cap:.2f}"
-                           + (f"; {len(skipped)} request(s) wait for a draft until tomorrow" if skipped else "") + ".")
-    else:
-        state["paused"] = ""
+    drafted = {r for _, _, got in results if got for r, d in got.items() if isinstance(d, dict)}
+    failed = {r for _, _, got in results if got for r, d in got.items() if not isinstance(d, dict)}
+    failures = [got[r] for _, _, got in results if got for r in got if r in failed]
+    first = setup_error or (_scrub(_fold(failures[0]))[:300] if failures else "")
+
+    def note():
+        # What drafting came to, from the state as it is written: after this run's drafts and failures are taken in
+        # and after a Draft again asked meanwhile (so its request is not counted as held).
+        waiting = [p for p in pending.values() if not p.get("draft") and not p.get("decision")]
+        gave_up = [p for p in waiting if p.get("draft_tries", 0) >= MAX_TRIES and p.get("draft_error")]
+        held = "" if first or not gave_up else _fold(gave_up[0].get("draft_reason") or gave_up[0]["draft_error"])[:300]
+        state["paused"] = drafting_note(first, len(waiting), len(gave_up), len(skipped), spent, cap,
+                                        float(MAX_BUDGET_USD), held, day_label())
+        if first:
+            state["last_error"] = f"Drafting failed: {first}"
 
     def take_drafts(fresh):
         # A request the lead marked while this run drafted it keeps the lead's mark, not this draft.
         for batch, answer, got in results:
             if got is None:
+                # Not tried this run (no room under the cap): a failure from an earlier run no longer stands (the
+                # lead, 6 November 2026: two requests still said "Invalid API key" after the key was fixed). Its
+                # tries are kept; it waits for the next run.
+                for p in batch:
+                    if p["ref"] not in fresh and not p.get("draft"):
+                        p.update(draft_error="", draft_reason="")
                 continue
             for p in batch:
                 if p["ref"] in fresh:
@@ -1567,13 +1778,14 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
                 d = got[p["ref"]]
                 if isinstance(d, dict):
                     status, ref_to = settle_as(d["verdict"], release, nxt)
-                    p.update(draft=d, draft_error="", drafted_at=_now(), status=status, ref_to=ref_to,
-                             resolution=d["resolution"], redraft_note="")
+                    p.update(draft=d, draft_error="", draft_reason="", drafted_at=_now(), status=status,
+                             ref_to=ref_to, resolution=d["resolution"], redraft_note="")
                 else:
                     p["draft_tries"] = p.get("draft_tries", 0) + 1
-                    p["draft_error"] = _fold(d)[:200]
+                    p["draft_error"] = p["draft_reason"] = _scrub(_fold(d))[:200]
                     if p["draft_tries"] >= MAX_TRIES:
-                        p["draft_error"] = f"draft failed twice: answer by hand ({p['draft_error']})"
+                        p["draft_error"] = (f"draft failed twice: draft it again from Decide or with cr-watch.py "
+                                            f"redraft, or answer by hand ({p['draft_error']})")
                 _draft_file(out, p, answer)
         for p in pending.values():
             if not (out / "drafts" / f"{p['ref']}.md").exists():
@@ -1582,16 +1794,20 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
     state["last_id"] = top
 
     def status_line(closed):
+        note()
         return (f"Last run {stamp}: {len(new)} new request(s); {len(closed)} closed on their own (the package answers "
                 f"them or a ruling covers them); {len(pending)} waiting for you; {len(rows)} rows read from ADAM; "
                 f"answers against {release}." + (f" **{state['paused']}**" if state["paused"] else ""))
 
-    seen = _publish(out, state, seen, status_line([]), apply=take_drafts)
+    seen = _publish(out, state, seen, lambda: status_line([]), apply=take_drafts)
     closed = auto_close(a, out, state, release, stamp) if getattr(a, "auto", False) else []
     if closed:
         _publish(out, state, seen, status_line(closed))
     _log(out, f"{stamp} {len(new)} new, {len(closed)} closed on their own, {len(pending)} waiting, {len(todo)} to draft"
-         + (f", {len(skipped)} held at the daily cap" if skipped else ""))
+         + (f", {len(drafted)} drafted" if results else "")
+         + (f", {len(failed)} failed" if failed else "")
+         + (f", {len(skipped)} held for room under the daily cap" if skipped else "")
+         + (f"; first failure: {first[:160]}" if first else ""))
     print(f"cr-watch: {len(new)} new, {len(closed)} closed on their own ({', '.join(closed) or 'none'}), "
           f"{len(pending)} waiting for the lead; {review}")
     return 0
@@ -1665,7 +1881,11 @@ def settle(a, runner=None, env=None, rel=None) -> int:
     # (viewer/api/watcher.py; security review, L2). One JSON line; nothing in it is a credential.
     made = [{"cr": it["cr"], "status": it["status"], "ref": it.get("ref") or "",
              "decision": marks[it["cr"]]["decision"], "draft_hash": marks[it["cr"]].get("draft_hash") or "",
-             "mark": mark_digest(marks[it["cr"]])} for it in spec["items"]]
+             "mark": mark_digest(marks[it["cr"]]),
+             # for the decide page's History: the ticket this settle tells and what it posts there
+             "ticket": str(state["pending"][it["cr"]].get("ticket") or ""), "resolution": it["resolution"],
+             "title": state["pending"][it["cr"]].get("title") or ""}
+            for it in spec["items"]]
     if a.apply:
         print("cr-watch settle: attempted " + json.dumps(made, ensure_ascii=False))
     rc = (runner or (lambda argv, e: subprocess.run(argv, env=e).returncode))(settle_argv(path, a.adam, a.apply), env)
@@ -2200,7 +2420,7 @@ def _t_budget(fails):
                 run(a, **kw)
         _expect(fails, "a failing draft is tried twice, no more", len(calls), 2)
         text = (d / "out" / "REVIEW.md").read_text(encoding="utf-8")
-        if "draft failed twice: answer by hand" not in text:
+        if "draft failed twice: draft it again from Decide" not in text:
             fails.append("REVIEW.md does not say the draft failed twice")
         marked = text.replace("decision: \n", "decision: reject: try again\n", 1)
         (d / "out" / "REVIEW.md").write_text(marked, encoding="utf-8")
@@ -2392,7 +2612,8 @@ def _t_spend(fails):
             _expect(fails, "cap: the run still succeeds", run(a, **kw), 0)
         state = load_state(d / "out")
         _expect(fails, "cap: nothing is drafted at the cap", len(calls), 0)
-        _expect(fails, "cap: state.json says why", "daily cap" in state.get("paused", ""), True)
+        _expect(fails, "cap: state.json says why", "Daily cap reached: $5.00 of $5.00 spent today; 2 requests wait "
+                "until tomorrow (" in state.get("paused", ""), True)
         _expect(fails, "cap: a skipped request is not counted as a failed try",
                 [p["draft_tries"] for p in state["pending"].values()], [0, 0])
         _expect(fails, "cap: the run's time, cap and release are kept",
@@ -2749,8 +2970,208 @@ def _t_digest(fails):
             (False, True))
 
 
+def _t_redraft(fails):
+    """Draft again, the honest drafting note, waiting for room under the cap: with the waits shortened."""
+    saved = CAP_WAIT_SECONDS, CAP_RETRY_SECONDS
+    globals().update(CAP_WAIT_SECONDS=2, CAP_RETRY_SECONDS=0.05)
+    try:
+        _t_redraft_body(fails)
+    finally:
+        globals().update(CAP_WAIT_SECONDS=saved[0], CAP_RETRY_SECONDS=saved[1])
+
+
+def _t_redraft_body(fails):
+    """6 November 2026: on the server every drafting turn failed ("Invalid API key"), each request was given up on
+    after MAX_TRIES, and the summary blamed the daily cap. A failed request is drafted again when the lead asks
+    (Draft again, `redraft`), a run drafting meanwhile keeps the ask, and the run says why drafting stopped."""
+    key = "sk-ant-api03-" + "q" * 24
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        out = d / "out"
+        (d / "c.yaml").write_text(TEST_CLASSES, encoding="utf-8")
+        (d / "b.json").write_text(json.dumps(TEST_BASELINE), encoding="utf-8")
+        csv_text = _csv([_row(1), _row(2), _row(3)])
+        calls = []
+
+        def failing(prompt, cwd):
+            calls.append(prompt)
+            raise RuntimeError(f"claude reported an error (exit 1): Invalid API key {key} · Please run /login")
+
+        kw = dict(fetch=lambda _a: csv_text, drafter=failing, tree=d, rel=("r6", "r7"), branches=set())
+        a = _pipe_args(d, daily_usd=20.0)
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **kw)
+            run(a, **kw)
+        state = load_state(out)
+        paused = state["paused"]
+        _expect(fails, "redraft: each failing request is tried twice", len(calls), 6)
+        _expect(fails, "redraft: a run whose turns failed says so, with the reason, and not the cap",
+                (paused.startswith("Drafting failed: claude reported an error (exit 1): Invalid API key"),
+                 "3 requests wait for a draft" in paused, "3 failed 2 times" in paused, "cap" in paused), (True,) * 3
+                + (False,))
+        _expect(fails, "redraft: the first failure is the summary's last error",
+                (state["last_error"].startswith("Drafting failed: claude"), "Invalid API key" in state["last_error"]),
+                (True, True))
+        kept = "".join(f.read_text(encoding="utf-8") for f in (out / "state.json", out / "runs.log", out / "REVIEW.md"))
+        _expect(fails, "redraft: a key in a failure is kept nowhere", (key in kept, "[hidden]" in kept), (False, True))
+        _expect(fails, "redraft: the runs log counts the failures",
+                bool(re.search(r"3 to draft, 0 drafted, 3 failed; first failure: claude", kept)), True)
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **kw)
+        state = load_state(out)
+        _expect(fails, "redraft: after two tries a run starts no turn but says why drafting is held",
+                (len(calls), state["paused"].startswith("Drafting is held: 3 requests failed 2 times (claude"),
+                 "cap" in state["paused"]), (6, True, False))
+
+        got = redraft(out, ["cr-001", "CR-009", "nonsense"])
+        state = load_state(out)
+        _expect(fails, "redraft: a failed request is reset at once and queued; others are refused with why",
+                (got["redraft"], sorted(got["skipped"]), state["pending"]["CR-001"]["draft_tries"],
+                 state["pending"]["CR-001"]["draft_error"], _redraft_asked(out)),
+                (["CR-001"], ["CR-009", "NONSENSE"], 0, "", ["CR-001"]))
+
+        def drafting_while_asked(prompt, cwd):
+            # The lead presses Draft again on CR-002 while this run drafts CR-001.
+            calls.append(prompt)
+            redraft(out, ["CR-002"])
+            return ANSWER
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **dict(kw, drafter=drafting_while_asked))
+        state = load_state(out)
+        p1, p2 = state["pending"]["CR-001"], state["pending"]["CR-002"]
+        _expect(fails, "redraft: the next run drafts it, and only the one still failed is held",
+                (len(calls), bool(p1["draft"]), p1["draft_error"],
+                 state["paused"].startswith("Drafting is held: 1 request failed 2 times (claude")), (7, True, "", True))
+        _expect(fails, "redraft: one asked while a run drafted is not lost when the run writes its state",
+                (p2["draft_tries"], p2["draft_error"], (out / "redraft.json").exists()), (0, "", False))
+        got = redraft(out, all_failed=True)
+        _expect(fails, "redraft: --all-failed takes every failed request, no other",
+                (got["redraft"], got["skipped"]), (["CR-003"], {}))
+        _expect(fails, "redraft: a drafted request is not drafted again this way",
+                "has a draft" in redraft(out, ["CR-001"])["skipped"].get("CR-001", ""), True)
+
+        def refused(prompt, cwd):
+            raise CapReached("the batches beside it hold the cap")
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **dict(kw, drafter=refused))
+        paused = load_state(out)["paused"]
+        _expect(fails, "redraft: batches that only waited for room wait for the next run, never 'stopped' or tomorrow",
+                (paused, "stopped" in paused or "tomorrow" in paused,
+                 [load_state(out)["pending"][r]["draft_tries"] for r in ("CR-002", "CR-003")]),
+                ("2 requests wait for the next run (hourly): only 2 batches fit under the $20.00 cap at once.",
+                 False, [0, 0]))
+        rid = reserve_spend(out, "ask", 2.0)          # a question from the phone, still running
+        record_spend(out, "draft", 9.0, [])
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **dict(kw, drafter=refused))
+        paused = load_state(out)["paused"]
+        _expect(fails, "redraft: a turn still running is room to come, not spend: $9 spent and $2 held is not the cap",
+                paused.startswith("2 requests wait for the next run"), True)
+        settle_spend(out, rid, 2.0)
+        record_spend(out, "draft", 4.0, [])
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **dict(kw, drafter=refused))
+        paused = load_state(out)["paused"]
+        _expect(fails, "redraft: no room for a batch under today's real spend is the cap, and tomorrow",
+                (paused.startswith("Daily cap reached: $15.00 of $20.00 spent today, and a batch needs $10.00 of "
+                                   "room; 2 requests wait until tomorrow ("), "stopped" in paused), (True, False))
+        record_spend(out, "draft", 6.0, [])
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, **dict(kw, drafter=refused))
+        _expect(fails, "redraft: real spend over the cap says so plainly",
+                load_state(out)["paused"].startswith("Daily cap reached: $21.00 of $20.00 spent today; 2 requests wait "
+                                                     "until tomorrow ("), True)
+
+    # A $20 cap, $10 reserved per batch, three batches at once and cheap turns: all three are drafted in one run.
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        out = d / "out"
+        (d / "c.yaml").write_text(TEST_CLASSES, encoding="utf-8")
+        (d / "b.json").write_text(json.dumps(TEST_BASELINE), encoding="utf-8")
+        a = _pipe_args(d, daily_usd=20.0, jobs=3)
+        out.mkdir()
+        turns = []
+
+        def cheap(argv_, prompt, cwd, timeout):
+            turns.append(1)
+            time.sleep(0.3)
+            return _Ran(json.dumps({"result": ANSWER, "total_cost_usd": 0.45}))
+
+        def real_reserve(prompt, cwd):
+            return claude_turn(prompt, cwd, ["claude", "--max-budget-usd", MAX_BUDGET_USD], 60, ledger=out,
+                               kind="draft", proc=cheap, cap=20.0)["text"]
+
+        def key_refused(prompt, cwd):
+            raise RuntimeError("claude reported an error (exit 1): Invalid API key")
+
+        rows3 = _csv([_row(1), _row(2), _row(3)])
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, fetch=lambda _a: _csv([]), drafter=real_reserve, tree=d, rel=("r6", "r7"), branches=set())
+            run(a, fetch=lambda _a: rows3, drafter=key_refused, tree=d, rel=("r6", "r7"), branches=set())
+            run(a, fetch=lambda _a: rows3, drafter=real_reserve, tree=d, rel=("r6", "r7"), branches=set())
+        state = load_state(out)
+        _expect(fails, "redraft: $20 cap, $10 reservations, three batches: all drafted in one run, nothing held",
+                (len(turns), sorted(r for r, p in state["pending"].items() if p["draft"]), state["paused"],
+                 round(spend_today(out), 2), [p["draft_error"] for p in state["pending"].values()]),
+                (3, ["CR-001", "CR-002", "CR-003"], "", 1.35, ["", "", ""]))
+
+    # A request not tried this run (no room under the cap) does not keep an earlier run's failure.
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        out = d / "out"
+        (d / "c.yaml").write_text(TEST_CLASSES, encoding="utf-8")
+        (d / "b.json").write_text(json.dumps(TEST_BASELINE), encoding="utf-8")
+        a = _pipe_args(d, daily_usd=20.0)
+        out.mkdir()
+
+        def key_refused_1(prompt, cwd):
+            raise RuntimeError("claude reported an error (exit 1): Invalid API key")
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, fetch=lambda _a: _csv([]), drafter=lambda *_: ANSWER, tree=d, rel=("r6", "r7"), branches=set())
+            run(a, fetch=lambda _a: _csv([_row(1)]), drafter=key_refused_1, tree=d, rel=("r6", "r7"),
+                branches=set())
+            record_spend(out, "draft", 20.0, [])
+            run(a, fetch=lambda _a: _csv([_row(1)]), drafter=lambda *_: ANSWER, tree=d, rel=("r6", "r7"),
+                branches=set())
+        p = load_state(out)["pending"]["CR-001"]
+        _expect(fails, "redraft: a request skipped at the cap drops the earlier run's failure and keeps its tries",
+                (p["draft_error"], p["draft_reason"], p["draft_tries"], bool(p["draft"])), ("", "", 1, False))
+
+    # A batch refused room only while the batch beside it runs starts in the same run when that one ends.
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        out = d / "out"
+        (d / "c.yaml").write_text(TEST_CLASSES, encoding="utf-8")
+        (d / "b.json").write_text(json.dumps(TEST_BASELINE), encoding="utf-8")
+        a = _pipe_args(d, daily_usd=20.0)
+        out.mkdir()
+        tried, seen = [], {}
+        def beside(prompt, cwd):
+            tried.append(1)
+            seen.setdefault("running", (load_state(out) or {}).get("running_since"))
+            if len(tried) == 1:
+                # the other batch holds the room for a moment, then ends
+                rid = reserve_spend(out, "draft", 15.0)
+                threading.Timer(0.3, lambda: settle_spend(out, rid, 1.0)).start()
+                raise CapReached("held by the batch beside it")
+            return ANSWER
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            run(a, fetch=lambda _a: _csv([]), drafter=beside, tree=d, rel=("r6", "r7"), branches=set())
+            run(a, fetch=lambda _a: _csv([_row(1)]), drafter=beside, tree=d, rel=("r6", "r7"), branches=set())
+        state = load_state(out)
+        _expect(fails, "redraft: a batch waits for room in the same run and is drafted",
+                (len(tried), bool(state["pending"]["CR-001"]["draft"]), state["paused"]), (2, True, ""))
+        _expect(fails, "redraft: while a run drafts, state.json says since when (the page shows Drafting now, not "
+                       "the last run's note); when it ends, not",
+                (seen.get("running") == state["last_run_at"], state.get("running_since")), (True, ""))
+
+
 TESTS = [_t_export, _t_sort, _t_draft, _t_review, _t_default, _t_pipeline, _t_marks, _t_budget, _t_proposed, _t_auto,
-         _t_batch, _t_server, _t_spend, _t_ask, _t_mark, _t_lock, _t_reserve, _t_digest]
+         _t_batch, _t_server, _t_spend, _t_ask, _t_mark, _t_lock, _t_reserve, _t_digest, _t_redraft]
 SLOW_TESTS = [_t_group]              # seconds each: run by --self-test, not before every run, settle and question
 
 
@@ -2767,7 +3188,9 @@ def self_test(slow: bool = False) -> list:
 def main(argv=None) -> int:
     g.force_utf8()
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("command", nargs="?", choices=("run", "settle", "ask"))
+    ap.add_argument("command", nargs="?", choices=("run", "settle", "ask", "redraft"))
+    ap.add_argument("refs", nargs="*", metavar="CR-nnn", help="redraft: the requests to draft again")
+    ap.add_argument("--all-failed", action="store_true", help="redraft: every request whose draft failed")
     ap.add_argument("--self-test", action="store_true", help="run the self-tests only")
     ap.add_argument("--csv", help="read a saved export instead of ADAM's")
     ap.add_argument("--env-file", help="KEY=VALUE file with ADAM_EMAIL, ADAM_PASSWORD, TICVAI_OP_TOKEN")
@@ -2811,6 +3234,27 @@ def main(argv=None) -> int:
     a.daily_usd = limits["daily_usd"]
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
+    if a.command == "redraft":
+        # No run lock: a run drafting now takes the request in when it publishes (redraft, _take_redraft).
+        if not a.refs and not a.all_failed:
+            print("cr-watch redraft: name the requests (CR-650 CR-651) or pass --all-failed")
+            return 2
+        try:
+            got = redraft(out, a.refs, all_failed=a.all_failed)
+        except Busy as e:
+            print(f"cr-watch redraft: {e}; nothing changed (try again in a moment)")
+            return 4
+        except ValueError as e:
+            print(f"cr-watch redraft: {e}; nothing changed")
+            return 2
+        for ref, why in got["skipped"].items():
+            print(f"  not drafted again: {ref}: {why}")
+        if got["redraft"]:
+            print(f"cr-watch redraft: {', '.join(got['redraft'])}: the next run drafts "
+                  f"{'it' if len(got['redraft']) == 1 else 'them'} again")
+            return 0
+        print("cr-watch redraft: nothing to draft again")
+        return 0 if a.all_failed and not got["skipped"] else 1
     if a.command == "ask":
         # One JSON line on stdout, for ADAM's API (viewer/api/watcher.py). No run lock: an ask writes no list.
         try:

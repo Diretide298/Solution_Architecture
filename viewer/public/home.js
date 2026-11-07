@@ -829,10 +829,11 @@ function syncLayerList() {
  * The rest of ADAM, for a phone. The desktop door is reached from every
  * page's top bar and leaves through the viewer; a phone that lands here (the
  * app opens on it) needs the way on written down. The pages people open daily,
- * as the account drawer groups them, and Decide for the two roles that decide.
+ * as the account drawer groups them, and Decide for the System Architect, who
+ * alone decides (security.py DECIDERS).
  */
 const PAGES = [
-  { href: '/decide', label: 'Decide', who: (a) => a?.role === 'owner' || a?.role === 'lead',
+  { href: '/decide', label: 'Decide', who: (a) => a?.role === 'owner',
     // A tick in a ring: a decision made.
     icon: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17ZM8.3 12.3l2.6 2.6 4.8-5.2' },
   { href: '/board.html', label: 'My work',
